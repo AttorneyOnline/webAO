@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+    <title>Attorney Online session</title>
+    <link rel="stylesheet" type="text/css" href="client.css">
+    <script src="client.js"></script>
+</head>
+
+<body>
+    <span id="sound"></span>
+    <div id="client_loading">
+	<h1 id="client_loadingtext">Loading</h1>
+    </div>
+	<div id="client_charselect">
+	<table id="client_chartable">
+	</table>
+	</div>
+    <div id="client_wrapper">
+        <div id="client_gamewindow">
+            <img id="client_court" onerror="imgError(this);" src="background/default/defenseempty.png" />
+            <img id="client_char" onerror="imgError(this);" />
+            <img id="client_bench" />
+            <img id="client_fg" onerror="imgError(this);" />
+            <div id="client_name">
+                <p>Dolan</p>
+            </div>
+            <div id="client_chat">
+                <p id="client_inner_chat"></p>
+            </div>
+        </div>
+		<input id="client_inputbox" type="text" onKeyPress="onEnter(event)" />
+        <div id="client_emo">
+		</div>
+		<div id="client_settings">
+			Music <input id="client_mvolume" type="range"  min="0" max="100" value="80" onChange="changeMusicVolume()"/>
+			SFX <input id="client_svolume" type="range"  min="0" max="100" value="70" onChange="changeSFXVolume()"/>
+			Blip <input id="client_bvolume" type="range"  min="0" max="100" value="60" onChange="changeBlipVolume()"/>
+        </div>
+    </div>
+
+    <div id="client_chatlog">
+        <div id="client_log">
+        </div>
+        <div id="client_bars">
+            <img class="client_defense" id="client_defense_bg" src="misc/zdoh.png">
+            <img class="client_defense" id="client_defense_hp" src="misc/advocat.png">
+
+            <img class="client_prosecutor" id="client_prosecutor_bg" src="misc/zdoh.png">
+            <img class="client_prosecutor" id="client_prosecutor_hp" src="misc/procuror.png">
+        </div>
+        <textarea id="client_ooclog"></textarea>
+        <input id="client_oocinputbox" type="text" onKeyPress="onOOCEnter(event)" />
+		<select id="client_musiclist" size="25" onclick="musiclist_click(event)"></select>
+    </div>
+</body>
+
+</html>

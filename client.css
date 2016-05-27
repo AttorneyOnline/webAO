@@ -1,0 +1,254 @@
+body {	
+	font-family: "Ace Attorney","メイリオ",Meiryo,Hiragino Kaku Gothic Pro,"ヒラギノ角ゴ Pro W3",Osaka,"MS Gothic","ＭＳ Ｐゴシック",Tahoma,Sans;
+}
+
+img {
+	image-rendering: pixelated;
+}
+
+@keyframes error_blink {  
+    0% { color: red; }
+    100% { color: white; }
+}
+
+.error {
+	position: absolute;
+	width: 50vw;
+	height: 25vh;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+	justify-content: center;
+	display: flex;
+	align-items: center;
+	background: red;
+	color: white;
+	font-size: 4em;
+	animation: error_blink 0.5s linear infinite;
+}
+
+#client_loading {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	overflow:hidden;
+	margin: 0 auto;
+	justify-content: center;
+	display: flex;
+	align-items: center;
+	background: black;
+	color: lightgreen;
+	font-size: 3em;
+	z-index: 100;
+}
+
+#client_gamewindow {
+	position: relative;
+	top: 0;
+	left: 0;
+  width: 100%;
+  padding-bottom: 75%;
+}
+
+#client_charselect {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	justify-content: center;
+	display: flex;
+	align-items: center;
+	vertical-align: middle;
+	margin: 0 auto;
+	background: rgba(70, 70, 70, 0.5);
+	z-index: 50;
+}
+
+#client_chartable {
+	height: 360px;
+	width: 320px;
+	margin: 0 auto;
+	vertical-align: middle;
+	background: #eeeeee;
+}
+
+.demothing {
+	height: 60px;
+	width: 60px;
+	margin: 3px;
+	border: 1px solid black;
+}
+
+#client_wrapper {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #888888;
+	height: 99%;
+	width: 256px;
+	margin: 0;
+	padding: 0;
+	float: left;
+	resize: horizontal;
+	overflow: auto;
+	overflow-y:hidden;
+	border: 1px solid;
+}
+
+#client_emo {
+	position: relative;
+	top: 10px;
+	width: 95%;
+}
+
+#client_settings {
+	position: relative;
+	top: 10px;
+	width: 95%;
+}
+
+.area_btn {
+	width: 20%;
+}
+
+#client_court {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 0;
+}
+
+#client_char {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	bottom: 0;
+	left: 0;
+}
+
+#client_bench {
+	display: none;
+	position: absolute;
+	height: 20%;
+	width: 100%;
+	top: 80%;
+	left: 0;
+}
+
+#client_fg {
+	display: none;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	bottom: 0;
+	left: 0;
+}
+
+#client_name {
+	display: none;
+	height: 7%;
+	border: 1px solid rgba(255,255,255,0.7);
+	background:rgba(73,0,254,0.5);
+	top: 63%;
+	border-radius: 3px;
+	position: absolute;
+}
+
+#client_name p {
+	opacity: 2;
+	color: white;
+	position: relative;
+	margin: 0;
+}
+
+#client_chat {
+	display: none;
+	width: 98%; /* fallback if needed */
+    width: calc(100% - 4px);
+	margin: auto;
+	height: 30%;
+	border: 2px solid rgba(255,255,255,0.7);
+	background-color: rgba(0,0,0,0.5);
+	top: 70%;
+	border-radius: 4px;
+	position: absolute;
+	word-break: break-word;
+	word-wrap:break-word;
+	overflow-wrap: break-word;
+}
+
+#client_chat p {
+	margin: 3px;
+	color: white;
+}
+input {	
+	width: 97%;
+	background-color: #dddddd;
+	border: 1px solid #555555;
+}
+
+#client_chatlog {
+	display: none;
+	width: 244px;
+	height: 100%;
+	background: #dbdbdb url("misc/chat2.png") no-repeat;
+	padding: 0;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+#client_log {
+	position: relative;
+	top: 3px;
+	left: 10px;
+	height: 310px;
+	width: 225px;
+	color: white;
+	word-break: break-word;
+	word-wrap:break-word;
+	overflow-wrap: break-word;
+	overflow-y: hidden;
+	font-size: 12px;
+	margin-bottom: 40px;
+}
+
+#client_ooclog {
+	width: 220px;
+	margin-top: 30px;
+	height: 50%;
+	position: relative;
+	background-color: #8b8b8b; 
+}
+
+#client_musiclist {
+	width: 244px;
+	margin-top: 30px;
+	height: 50%;
+	position: relative;
+	background-color: #ff0000; 
+}
+
+#client_bars {
+	position: relative;
+	margin-bottom: 30px;
+	text-align: center;
+}
+
+.client_defense {
+	position: absolute;
+	left: 30px;
+}
+
+.client_prosecutor {
+	position: absolute;
+	left: 130px;
+}
+
+
+}
