@@ -51,6 +51,7 @@ location.search.substr(1).split("&").forEach(function(item) {
     //serv = new WebSocket("ws://51.255.160.217:50000");
     //serv = new WebSocket("ws://85.25.196.172:5000");
 serv = new WebSocket("ws://" + queryDict.ip);
+var mode = queryDict.mode;
 serv.onopen = function(evt) {
     onOpen(evt)
 };
@@ -115,7 +116,7 @@ function onEnter(event) {
     if (event.keyCode == 13) {
             mychar = chars[me]
     myemo = emotes[myemotion]
-    serv.send("MS#chat#" + myemo.speaking + "#" + mychar.name + "#" + myemo.silent + "#" + document.getElementById("client_inputbox").value + "#def#0#0#0#0#0#0#0#0#0#0#0#0#0#%" );
+    serv.send("MS#chat#" + myemo.speaking + "#" + mychar.name + "#" + myemo.silent + "#" + document.getElementById("client_inputbox").value + "#"+mychar.side+"#0#0#0#0#0#0#0#0#0#0#0#0#0#%" );
     document.getElementById("client_inputbox").value = '';
     }
 }
@@ -142,6 +143,12 @@ function changeBlipVolume() {
 function imgError(image) {
     image.onerror = "";
     image.src = "/misc/placeholder.gif";
+    return true;
+}
+
+function demoError(image) {
+    image.onerror = "";
+    image.src = "/misc/placeholder.png";
     return true;
 }
 
@@ -230,7 +237,6 @@ function changebg(position) {
 }
 
 function updateText() {
-    console.log("updating");
     if (chatmsg.content == "") {
         document.getElementById("client_name").style.display = "none";
         document.getElementById("client_chat").style.display = "none";
@@ -260,7 +266,6 @@ function updateText() {
                     comboblip.play()
                     break;
             }
-            console.log("magic");
             textnow = chatmsg.content.substring(0, textnow.length + 1);
             document.getElementById("client_inner_chat").innerHTML = escapeHtml(textnow);
         } else {
@@ -272,7 +277,11 @@ function updateText() {
 }
 
 function onOpen(e) {
+	if(mode=="join"){
     serv.send("HI#" + navigator.userAgent + "#%");
+	} else {
+		document.getElementById("client_loading").style.display = "none";
+	}
 };
 
 function onClose(e) {
@@ -356,7 +365,7 @@ function onMessage(e) {
                 textnow = '';
                 addlog(chatmsg.nameplate + ": " + escapeHtml(arguments[5]))
                 console.log("Message received: " + arguments[5]);
-                updater = setInterval(updateText, 60);
+                updater = setInterval(updateText, 80);
             }
             break;
         case "CT":
@@ -461,7 +470,7 @@ function onMessage(e) {
 			} else {
 			var thispick = chars[i].icon;
 			}			
-			td.innerHTML = "<img class='demothing' id='demo_"+i+"' src='"+thispick + "' alt='"+chars[i].desc+"' onclick='pickchar(" + i + ")' >";
+			td.innerHTML = "<img class='demothing' id='demo_"+i+"' src='"+thispick + "' alt='"+chars[i].desc+"' onclick='pickchar(" + i + ")' onerror='demoError(this);'>";
 			tr.appendChild(td);
 			if (i % 5 == 0){
 				document.getElementById("client_chartable").appendChild(tr);
@@ -478,8 +487,7 @@ function onMessage(e) {
                 if (this.status == 200) {
                     linifile = this.responseText;
                     pinifile = parseINI(linifile);
-                    console.log(pinifile.Options.gender);
-                    console.log(pinifile.Emotions.number);
+                    chars[me].side = pinifile.Options.side;
                     for (var i = 1; i < pinifile.Emotions.number; i++) {
 						var emoteinfo = pinifile.Emotions[i].split('#');
                         emotes[i] = { 
@@ -503,7 +511,15 @@ function addlog(toadd) {
 }
 
 function pickchar(ccharacter) {
-    serv.send("CC#" +pid + "#" + ccharacter + "#web#%")
+	console.log(ccharacter);
+	if (ccharacter<1000){
+    serv.send("CC#" +pid + "#" + ccharacter + "#web#%");
+} else {
+	//spectator
+	document.getElementById("client_charselect").style.display = "none";
+	document.getElementById("client_inputbox").style.display = "none";
+	document.getElementById("client_emo").style.display = "none";
+}
 }
 
 function pickemotion(emo) {

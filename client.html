@@ -13,6 +13,7 @@
 	<h1 id="client_loadingtext">Loading</h1>
     </div>
 	<div id="client_charselect">
+	<button onclick="pickchar(1001)">SPECTATE</button>
 	<table id="client_chartable">
 	</table>
 	</div>
@@ -31,13 +32,13 @@
         </div>
 		<input id="client_inputbox" type="text" onKeyPress="onEnter(event)" />
         <div id="client_emo">
-		</div>
-		<div id="client_settings">
+		</div>		
+    </div>
+	<div id="client_settings">
 			Music <input id="client_mvolume" type="range"  min="0" max="100" value="80" onChange="changeMusicVolume()"/>
 			SFX <input id="client_svolume" type="range"  min="0" max="100" value="70" onChange="changeSFXVolume()"/>
 			Blip <input id="client_bvolume" type="range"  min="0" max="100" value="60" onChange="changeBlipVolume()"/>
         </div>
-    </div>
 
     <div id="client_chatlog">
         <div id="client_log">
