@@ -1,4 +1,4 @@
-MASTERSERVER_IP = "51.255.160.217:27016"
+MASTERSERVER_IP = "master.aceattorneyonline.com:27016"
 
 masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 masterserver.onopen = function(evt) { onOpen(evt) };
