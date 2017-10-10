@@ -3,8 +3,8 @@ glorious webao
 made by sD
 credits to aleks for original idea and source
 */
-var AO_HOST = "http://weedlan.de/";
-//var AO_HOST = "../client/base/";
+//var AO_HOST = "http://weedlan.de/";
+var AO_HOST = "../client/base/";
 var MUSIC_HOST = AO_HOST + "sounds/music/";
 var BAR_WIDTH = 90;
 var BAR_HEIGHT = 20;
@@ -105,9 +105,16 @@ function parseINI(data) {
     return value;
 }
 
+function escapeChat(string) {
+string.replace("#","<pound>");
+string.replace("&","<and>");
+string.replace("%","<percent>");
+string.replace("$","<dollar>");
+}
+
 function onOOCEnter(event) {
     if (event.keyCode == 13) {
-        serv.send("CT#web" + pid + "#" + document.getElementById("client_oocinputbox").value + "#%");
+        serv.send("CT#web" + pid + "#" + escapeChat(document.getElementById("client_oocinputbox").value) + "#%");
         document.getElementById("client_oocinputbox").value = "";
     }
 }
@@ -116,7 +123,7 @@ function onEnter(event) {
     if (event.keyCode == 13) {
             mychar = chars[me]
     myemo = emotes[myemotion]
-    serv.send("MS#chat#" + myemo.speaking + "#" + mychar.name + "#" + myemo.silent + "#" + document.getElementById("client_inputbox").value + "#"+mychar.side+"#0#0#0#0#0#0#0#0#0#0#0#0#0#%" );
+    serv.send("MS#chat#" + myemo.speaking + "#" + mychar.name + "#" + myemo.silent + "#" + escapeChat(document.getElementById("client_inputbox").value) + "#"+mychar.side+"#0#0#0#0#0#0#0#0#0#0#0#0#0#%" );
     document.getElementById("client_inputbox").value = '';
     }
 }
