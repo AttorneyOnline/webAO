@@ -4,7 +4,7 @@ made by sD
 credits to aleks for original idea and source
 */
 //var AO_HOST = "http://weedlan.de/";
-var AO_HOST = "../client/base/";
+var AO_HOST = "http://assets.aceattorneyonline.com/base/";
 var MUSIC_HOST = AO_HOST + "sounds/music/";
 var BAR_WIDTH = 90;
 var BAR_HEIGHT = 20;
