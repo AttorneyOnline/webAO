@@ -147,6 +147,11 @@ function changeBlipVolume() {
     comboblip.volume = document.getElementById("client_bvolume").value / 100;
 }
 
+function changeCharacter(event) {
+	serv.send("FC#%");
+	document.getElementById("client_charselect").style.display = "block"; 
+}
+
 function imgError(image) {
     image.onerror = "";
     image.src = "/misc/placeholder.gif";
@@ -218,18 +223,18 @@ function changebg(position) {
     switch (position) {
         case "def":
             document.getElementById("client_bench").style.display = "block";
-            if (ImageExist(bgfolder + "bancodefensa.gif")) {
-                document.getElementById("client_bench").src = bgfolder + "bancodefensa.gif"
-            } else if (ImageExist(bgfolder + "bancodefensa.png")) {
-                document.getElementById("client_bench").src = bgfolder + "bancodefensa.png"
+            if (ImageExist(bgfolder + "defensedesk.gif")) {
+                document.getElementById("client_bench").src = bgfolder + "defensedesk.gif"
+            } else if (ImageExist(bgfolder + "defensedesk.png")) {
+                document.getElementById("client_bench").src = bgfolder + "defensedesk.png"
             }
             break;
         case "pro":
             document.getElementById("client_bench").style.display = "block"
-            if (ImageExist(bgfolder + "bancoacusacion.gif")) {
-                document.getElementById("client_bench").src = bgfolder + "bancoacusacion.gif"
-            } else if (ImageExist(bgfolder + "bancoacusacion.png")) {
-                document.getElementById("client_bench").src = bgfolder + "bancoacusacion.png"
+            if (ImageExist(bgfolder + "prosecutiondesk.gif")) {
+                document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.gif"
+            } else if (ImageExist(bgfolder + "prosecutiondesk.png")) {
+                document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png"
             }
             break;
         case "wit":
@@ -409,8 +414,7 @@ function onMessage(e) {
                         "name": charguments[0],
                         "desc": charguments[1],
                         "evidence": charguments[3],
-                        "icon": AO_HOST + "misc/DemoThings/" + charguments[0] + "_char_icon.png",
-                        "icon_chosen": AO_HOST + "misc/DemoThings/" + charguments[0] + "_char_icon_chosen.png"
+                        "icon": AO_HOST + "characters/" + charguments[0] + "/char_icon.png"
                     };
                 }
             }
@@ -472,12 +476,14 @@ function onMessage(e) {
 				var tr = document.createElement('TR');
 			}
 			var td = document.createElement('TD');
+			var icon_chosen;
 			if (arguments[1+i]=="-1"){
-			var thispick = chars[i].icon_chosen;
+			icon_chosen = " chosen";
 			} else {
 			var thispick = chars[i].icon;
+			icon_chosen = "";
 			}			
-			td.innerHTML = "<img class='demothing' id='demo_"+i+"' src='"+thispick + "' alt='"+chars[i].desc+"' onclick='pickchar(" + i + ")' onerror='demoError(this);'>";
+			td.innerHTML = "<img class='demothing"+icon_chosen+"+' id='demo_"+i+"' src='"+thispick + "' alt='"+chars[i].desc+"' onclick='pickchar(" + i + ")' onerror='demoError(this);'>";
 			tr.appendChild(td);
 			if (i % 5 == 0){
 				document.getElementById("client_chartable").appendChild(tr);

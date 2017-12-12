@@ -47,7 +47,13 @@ function onMessage(e) {
 	header = msg.split('#', 2)[0];
 	arguments = msg.split('#').slice(1)
 	if (header == 'SN') {
-		document.getElementById('masterlist').innerHTML += '<li onmouseover="setServ(' + arguments[0] + ')"><p>' + arguments[4] + '</p> <a class=\"button\" href=\"client.html?mode=watch&ip=' + arguments[1] + ':' + arguments[3] + '\">Watch</a><a class=\"button\" href=\"client.html?mode=join&ip=' + arguments[1] + ':' + arguments[3] + '\">Join</a></li><br/>'
+		console.log(arguments[2].substring(0, 7));
+		if (arguments[2].substring(0, 7) == 'serverD') {
+			unavv = 'class="available" '
+		}else{
+			unavv = ''
+		}
+		document.getElementById('masterlist').innerHTML += '<li ' + unavv + 'onmouseover="setServ(' + arguments[0] + ')"><p>' + arguments[4] + '</p> <a class=\"button\" href=\"client.html?mode=watch&ip=' + arguments[1] + ':' + arguments[3] + '\">Watch</a><a class=\"button\" href=\"client.html?mode=join&ip=' + arguments[1] + ':' + arguments[3] + '\">Join</a></li><br/>'
 		serverpics[arguments[0]] = arguments[2];
 		descs[arguments[0]] = arguments[5];
 	}

@@ -4,6 +4,7 @@ body {
 	background-size: cover;
 	background-attachment: fixed;
 	font-family: "Ace Attorney","Tahoma",Sans;
+	transition: ease-in-out;
 }
 
 #content {
@@ -189,7 +190,7 @@ body {
 .servs {
 	display: block;
 	margin: auto;
-	width: 300px;
+	width: 500px;
 }
 
 .servs li {
@@ -201,7 +202,7 @@ body {
 	padding: 0px;
 	padding-left: 10px;
 	display: block;
-	width: 400px;
+	width: 500px;
 	height: 50px;
 	margin: 10px;
 	margin-left: auto;
@@ -233,6 +234,11 @@ body {
 	border-radius: 0px 5px 5px 0px;
 	width: 50px;
 	box-shadow: 0 0 0 2px #BBB; 
+}
+
+.servs .available {
+	background-color: #6BFF6B;
+	border-color: #21AD21;
 }
 
 .servs .button:hover {

@@ -83,6 +83,10 @@ img {
 	border: 1px solid black;
 }
 
+.demothing .chosen {
+	border: 1px broken red;
+}
+
 #client_wrapper {
 	position: absolute;
 	top: 0;
