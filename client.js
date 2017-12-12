@@ -105,11 +105,12 @@ function parseINI(data) {
     return value;
 }
 
-function escapeChat(string) {
-string.replace("#","<pound>");
-string.replace("&","<and>");
-string.replace("%","<percent>");
-string.replace("$","<dollar>");
+function escapeChat(estring) {
+estring.replace("#","<pound>");
+estring.replace("&","<and>");
+estring.replace("%","<percent>");
+estring.replace("$","<dollar>");
+return estring;
 }
 
 function onOOCEnter(event) {
