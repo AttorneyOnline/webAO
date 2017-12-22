@@ -87,6 +87,8 @@ function parseINI(data) {
     lines.forEach(function(line) {
         if (regex.comment.test(line)) {
             return;
+        } else if (line.length == 0) {
+            return;
         } else if (regex.param.test(line)) {
             var match = line.match(regex.param);
             if (section) {
@@ -98,8 +100,6 @@ function parseINI(data) {
             var match = line.match(regex.section);
             value[match[1]] = {};
             section = match[1];
-        } else if (line.length == 0 && section) {
-            section = null;
         };
     });
     return value;
@@ -264,7 +264,7 @@ function updateText() {
         document.getElementById("client_name").innerHTML = "<p>" + escapeHtml(chatmsg.nameplate) + "</p>";
         chatmsg.isnew = false;
         changebg(chatmsg.side);
-        document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/(b)" + chatmsg.speaking + ".gif";
+        document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.speaking + ".gif";
     } else {
         if (textnow != chatmsg.content) {
             combo = (combo + 1) % 3;
@@ -282,7 +282,7 @@ function updateText() {
             textnow = chatmsg.content.substring(0, textnow.length + 1);
             document.getElementById("client_inner_chat").innerHTML = escapeHtml(textnow);
         } else {
-            document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/(a)" + chatmsg.silent + ".gif";
+            document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.silent + ".gif";
             chatstate = 3;
             clearInterval(updater);
         }
@@ -359,8 +359,9 @@ function onMessage(e) {
                         break;
                     }
                 }
-                chatmsg.speaking = arguments[2];
-                chatmsg.silent = arguments[4];
+                chatmsg.preanim = arguments[2];
+                chatmsg.speaking = "(b)"+arguments[4];
+                chatmsg.silent = "(a)"+arguments[4];
                 chatmsg.content = arguments[5];
                 chatmsg.side = arguments[6];
                 chatmsg.sound = arguments[7];
@@ -420,6 +421,20 @@ function onMessage(e) {
                 }
             }
             break;
+        case "SC":
+            document.getElementById("client_loadingtext").innerHTML = "Loading Characters";
+            for (var i = 1; i < arguments.length - 1; i++) {
+                    charguments = arguments[i].split("&");
+                    console.log(charguments);
+                    chars[i-1] = {
+                        "name": charguments[0],
+                        "desc": charguments[1],
+                        "evidence": charguments[3],
+                        "icon": AO_HOST + "characters/" + charguments[0] + "/char_icon.png"
+                }
+            }
+            serv.send("RM#%");
+            break;
         case "EI":
             document.getElementById("client_loadingtext").innerHTML = "Loading Evidence " + arguments[1];
             serv.send("AE#" + (arguments[1] + 1) + "#%");
@@ -437,6 +452,18 @@ function onMessage(e) {
                     hmusiclist.options.add(newentry);
                 }
             }
+            break;
+        case "SM":
+            document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
+            var hmusiclist = document.getElementById("client_musiclist");
+            for (var i = 1; i < arguments.length - 1; i++) {
+                    var newentry = document.createElement("OPTION");
+                    console.log(i);
+                    console.log(arguments[i]);
+                    newentry.text = arguments[i];
+                    hmusiclist.options.add(newentry);
+            }
+            serv.send("RD#%");
             break;
         case "music":
             for (var i = 0; i < arguments.length / 2; i++) {
