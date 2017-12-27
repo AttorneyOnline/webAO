@@ -241,6 +241,11 @@ body {
 	border-color: #21AD21;
 }
 
+.servs .unavailable {
+	background-color: #ff6b6B;
+	border-color: #ad2121;
+}
+
 .servs .button:hover {
 	box-shadow: 0 0 0 1px #EFAD21; 
 }

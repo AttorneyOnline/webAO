@@ -437,7 +437,8 @@ function onMessage(e) {
             break;
         case "EI":
             document.getElementById("client_loadingtext").innerHTML = "Loading Evidence " + arguments[1];
-            serv.send("AE#" + (arguments[1] + 1) + "#%");
+            //serv.send("AE#" + (arguments[1] + 1) + "#%");
+            serv.send("RM#%");
             break;
         case "EM":
             document.getElementById("client_loadingtext").innerHTML = "Loading Music " + arguments[1];
