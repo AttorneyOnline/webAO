@@ -124,7 +124,9 @@ function onEnter(event) {
     if (event.keyCode == 13) {
             mychar = chars[me]
     myemo = emotes[myemotion]
-    serv.send("MS#chat#" + myemo.speaking + "#" + mychar.name + "#" + myemo.silent + "#" + escapeChat(document.getElementById("client_inputbox").value) + "#"+mychar.side+"#0#0#0#0#0#0#0#0#0#0#0#0#0#%" );
+    ICmessage="MS#chat#" + myemo.speaking + "#" + mychar.name + "#" + myemo.silent + "#" + escapeChat(document.getElementById("client_inputbox").value) + "#"+mychar.side+"#0#0#" + me + "#0#0#0#0#0#0#%";
+    console.log(ICmessage)
+    serv.send(ICmessage);
     document.getElementById("client_inputbox").value = '';
     }
 }
