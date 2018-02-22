@@ -541,6 +541,7 @@ function onMessage(e) {
                         button_on: AO_HOST + 'characters/' + chars[me].name + '/emotions/button' + i + '_on.png'};
                         document.getElementById("client_emo").innerHTML += "<img src='" + emotes[i].button_off + "' id='emo_" + i + "' alt='"+emotes[i].desc+"' class='client_button' onclick='pickemotion(" + i + ")'>";
                     }
+                    pickemotion(1);
                 }
             };
             xhr.send();
