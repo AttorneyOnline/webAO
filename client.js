@@ -152,7 +152,8 @@ function changeBlipVolume() {
 
 function changeCharacter(event) {
 	serv.send("FC#%");
-	document.getElementById("client_charselect").style.display = "block"; 
+    document.getElementById("client_charselect").style.display = "block";
+    document.getElementById("client_emo").innerHTML = "";
 }
 
 function imgError(image) {
@@ -296,7 +297,8 @@ function onOpen(e) {
     serv.send("HI#" + navigator.userAgent + "#%");
 	} else {
 		document.getElementById("client_loading").style.display = "none";
-	}
+    }
+    updater = setInterval(sendCheck, 5000);
 };
 
 function onClose(e) {
@@ -578,6 +580,10 @@ function pickemotion(emo) {
 function sendMusic(song) {
     serv.send("MC#" + song);
     console.log("Music sent!");
+}
+
+function sendCheck() {
+    serv.send("CHECK#"+me+"#%");
 }
 
 function escapeHtml(unsafe) {
