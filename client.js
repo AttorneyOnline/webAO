@@ -15,12 +15,14 @@ var chatmsg = {
 var blip = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
 var womboblip = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
 var comboblip = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
-blip.volume = 0.5
-womboblip.volume = 0.5
-comboblip.volume = 0.5
+var sfxaudio = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
+var sfxplayed = 0;
 var music = new Audio();
 music.play();
-var combo = false;
+blip.volume = 0.5;
+womboblip.volume = 0.5;
+comboblip.volume = 0.5;
+combo = false;
 var musiclist = Object();
 var ex = false;
 var tempchars = [];
@@ -28,7 +30,6 @@ var chars = [];
 var emotes = [];
 var charcheck;
 var pid = 1;
-var charsound = new Audio();
 var bgname = 'gs4';
 var bgfolder = AO_HOST + "background/" + bgname + "/";
 // 0 = objection shout, 1 = pre-anim, 2 = speaking, 3 = silent
@@ -37,7 +38,10 @@ var position;
 var me = -1;
 var myemotion = -1;
 var myschar = -1;
+var objection_state = 0;
+var updateInterval = 80;
 var updater;
+var CHECKupdater;
 var serv;
 var carea = 0;
 var linifile;
@@ -124,7 +128,7 @@ function onEnter(event) {
     if (event.keyCode == 13) {
             mychar = chars[me]
     myemo = emotes[myemotion]
-    ICmessage="MS#chat#" + myemo.speaking + "#" + mychar.name + "#" + myemo.silent + "#" + escapeChat(document.getElementById("client_inputbox").value) + "#"+mychar.side+"#0#0#" + me + "#0#0#0#0#0#0#%";
+    ICmessage="MS#chat#" + myemo.speaking + "#" + mychar.name + "#" + myemo.silent + "#" + escapeChat(document.getElementById("client_inputbox").value) + "#"+mychar.side+"#0#0#"+me+"#0#"+objection_state+"#0#0#0#0#%";
     console.log(ICmessage)
     serv.send(ICmessage);
     document.getElementById("client_inputbox").value = '';
@@ -141,7 +145,7 @@ function changeMusicVolume() {
 }
 
 function changeSFXVolume() {
-    charsound.volume = document.getElementById("client_svolume").value / 100;
+    sfxaudio.volume = document.getElementById("client_svolume").value / 100;
 }
 
 function changeBlipVolume() {
@@ -285,9 +289,17 @@ function updateText() {
             textnow = chatmsg.content.substring(0, textnow.length + 1);
             document.getElementById("client_inner_chat").innerHTML = escapeHtml(textnow);
         } else {
-            document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.silent + ".gif";
             chatstate = 3;
             clearInterval(updater);
+            document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.silent + ".gif";
+        }
+    }
+    if(!sfxplayed && chatmsg.snddelay>=(updateInterval*textnow.length)) {
+        sfxaudio.pause();
+        sfxplayed=1
+        if(chatmsg.sound!="0"){
+        sfxaudio.src = AO_HOST + "sounds/general/"+chatmsg.sound+".wav";
+        sfxaudio.play();
         }
     }
 }
@@ -298,7 +310,7 @@ function onOpen(e) {
 	} else {
 		document.getElementById("client_loading").style.display = "none";
     }
-    updater = setInterval(sendCheck, 5000);
+    CHECKupdater = setInterval(sendCheck, 5000);
 };
 
 function onClose(e) {
@@ -323,35 +335,6 @@ function onMessage(e) {
     arguments = lines[0].split('#');
     header = arguments[0];
     switch (header) {
-        case "NMS":
-            if ( /*arguments[2] != chatmsg.content*/ true) {
-                document.getElementById("client_inner_chat").innerHTML = '';
-                chatmsg.character = arguments[0];
-                msgchar = chars[chatmsg.character]
-                msgemo = msgchar.emotions[arguments[1]]
-                chatmsg.pre = msgemo.pre;
-                chatmsg.speaking = msgemo.speaking
-                chatmsg.silent = msgemo.silent
-                chatmsg.side = msgchar.side;
-                chatmsg.sound = msgemo.soundn;
-                chatmsg.type = msgemo.type;
-                if (msgchar.hasOwnProperty("showname")) {
-                    chatmsg.nameplate = msgchar.showname;
-                } else {
-                    chatmsg.nameplate = msgchar.name;
-                }
-                chatmsg.snddelay = msgemo.soundt;
-                chatmsg.content = arguments[2];
-                chatmsg.objection = arguments[3];
-                chatmsg.evidence = arguments[4];
-                chatmsg.flash = arguments[5];
-                chatmsg.color = arguments[6];
-                chatmsg.isnew = true;
-                textnow = '';
-                addlog(chatmsg.nameplate + ": " + escapeHtml(chatmsg.content))
-                console.log("Message received: " + chatmsg.content);
-            }
-            break;
         case "MS":
             if (arguments[4] != chatmsg.content) {
                 document.getElementById("client_inner_chat").innerHTML = '';
@@ -364,6 +347,8 @@ function onMessage(e) {
                     }
                 }
                 chatmsg.preanim = arguments[2];
+                chatmsg.nameplate = arguments[3];
+                chatmsg.name = arguments[3];
                 chatmsg.speaking = "(b)"+arguments[4];
                 chatmsg.silent = "(a)"+arguments[4];
                 chatmsg.content = arguments[5];
@@ -371,8 +356,6 @@ function onMessage(e) {
                 chatmsg.sound = arguments[7];
                 chatmsg.type = arguments[8];
                 console.log(arguments[8]);
-                chatmsg.nameplate = arguments[3];
-                chatmsg.name = arguments[3];
                 chatmsg.snddelay = arguments[9];
                 chatmsg.objection = arguments[10];
                 chatmsg.evidence = arguments[11];
@@ -383,7 +366,8 @@ function onMessage(e) {
                 textnow = '';
                 addlog(chatmsg.nameplate + ": " + escapeHtml(arguments[5]))
                 console.log("Message received: " + arguments[5]);
-                updater = setInterval(updateText, 80);
+                sfxplayed=0
+                updater = setInterval(updateText, updateInterval);
             }
             break;
         case "CT":
@@ -392,10 +376,14 @@ function onMessage(e) {
         case "MC":
             console.log(music.currentTime)
             music.pause();
-            music = new Audio(MUSIC_HOST + arguments[1]);
+            music.src = MUSIC_HOST + arguments[1];
             music.play();
             console.log("Now playing: " + arguments[1] + "(" + musiclist[arguments[1]] + ")");
-            musicname = chars[arguments[2]].name;
+            if(arguments[2]>=0){
+                musicname = chars[arguments[2]].name;
+            }else{
+                musicname = "$SERVER"
+            }
             addlog(musicname + " changed music to " + arguments[1]);
             break;
         case "RMC":
@@ -575,6 +563,18 @@ function pickemotion(emo) {
     }
     document.getElementById("emo_" + emo).src = emotes[emo].button_on;
     myemotion = emo
+}
+
+function toggleshout(shout) {
+    if (shout != objection_state) {
+        document.getElementById("button_" + shout).className = "client_button dark";
+    }
+    if (shout = objection_state) {
+        document.getElementById("button_" + shout).className = "client_button";
+        objection_state=0;
+    }
+    document.getElementById("button_" + objection_state).className = "client_button";
+    objection_state = shout;
 }
 
 function sendMusic(song) {
