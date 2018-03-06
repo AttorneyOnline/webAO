@@ -21,6 +21,8 @@ img {
     transform: translate(-50%, -50%);
 	justify-content: center;
 	display: flex;
+	align-content: center;
+	margin: 0 auto;
 	align-items: center;
 	background: red;
 	color: white;
@@ -54,11 +56,12 @@ img {
 }
 
 #client_charselect {
-	position: absolute;
+	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
-	overflow: hidden;
+	height: 100%;
+	overflow-y: scroll;
 	justify-content: center;
 	display: none;
 	align-items: center;
@@ -83,17 +86,13 @@ img {
 	border: 1px solid black;
 }
 
-.demothing .chosen {
-	border: 1px broken red;
-}
-
 #client_wrapper {
 	position: absolute;
 	top: 0;
 	left: 0;
 	background-color: #888888;
 	height: 99%;
-	width: 256px;
+	width: 512px;
 	margin: 0;
 	padding: 0;
 	float: left;
@@ -157,6 +156,8 @@ img {
 	display: none;
 	height: 7%;
 	border: 1px solid rgba(255,255,255,0.7);
+	padding-left: 5px;
+	padding-right: 5px;
 	background:rgba(73,0,254,0.5);
 	top: 63%;
 	border-radius: 3px;
@@ -181,8 +182,8 @@ img {
 	top: 70%;
 	border-radius: 4px;
 	position: absolute;
-	word-break: break-word;
-	word-wrap:break-word;
+	word-break: keep-all;
+	word-wrap: break-word;
 	overflow-wrap: break-word;
 }
 
@@ -213,7 +214,7 @@ input {
 	height: 310px;
 	width: 225px;
 	color: white;
-	word-break: break-word;
+	word-break: keep-all;
 	word-wrap:break-word;
 	overflow-wrap: break-word;
 	overflow-y: hidden;
@@ -251,4 +252,12 @@ input {
 .client_prosecutor {
 	position: absolute;
 	left: 130px;
+}
+
+.client_button {
+	padding: 1px;
+}
+
+.dark {
+	filter: brightness(50%);
 }

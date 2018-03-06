@@ -3,14 +3,28 @@ glorious webao
 made by sD
 credits to aleks for original idea and source
 */
+var queryDict = {};
+location.search.substr(1).split("&").forEach(function(item) {
+	queryDict[item.split("=")[0]] = item.split("=")[1]
+})
+//document.getElementById("client_wrapper").style = "width: 800px;";
+/* Server magic */
+//serv = new WebSocket("ws://51.255.160.217:50000");
+//serv = new WebSocket("ws://85.25.196.172:5000");
+serv = new WebSocket("ws://" + queryDict.ip);
+var mode = queryDict.mode;
 //var AO_HOST = "http://weedlan.de/";
-var AO_HOST = "http://assets.aceattorneyonline.com/base/";
+if (queryDict.asset === undefined) {
+	var AO_HOST = "http://assets.aceattorneyonline.com/base/";
+} else {
+	var AO_HOST = queryDict.asset;
+}
 var MUSIC_HOST = AO_HOST + "sounds/music/";
 var BAR_WIDTH = 90;
 var BAR_HEIGHT = 20;
 var textnow = "";
 var chatmsg = {
-    "isnew": false
+	"isnew": false
 };
 var blip = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
 var womboblip = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
@@ -23,6 +37,7 @@ blip.volume = 0.5;
 womboblip.volume = 0.5;
 comboblip.volume = 0.5;
 combo = false;
+var charselectWidth = 8;
 var musiclist = Object();
 var ex = false;
 var tempchars = [];
@@ -40,558 +55,563 @@ var myemotion = -1;
 var myschar = -1;
 var objection_state = 0;
 var updateInterval = 80;
+var shouttimer = 0;
+var texttimer = 0;
 var updater;
 var CHECKupdater;
 var serv;
 var carea = 0;
 var linifile;
 var pinifile;
-var queryDict = {};
-location.search.substr(1).split("&").forEach(function(item) {
-        queryDict[item.split("=")[0]] = item.split("=")[1]
-    })
-    //document.getElementById("client_wrapper").style = "width: 800px;";
-    /* Server magic */
-    //serv = new WebSocket("ws://51.255.160.217:50000");
-    //serv = new WebSocket("ws://85.25.196.172:5000");
-serv = new WebSocket("ws://" + queryDict.ip);
-var mode = queryDict.mode;
 serv.onopen = function(evt) {
-    onOpen(evt)
+	onOpen(evt)
 };
 serv.onclose = function(evt) {
-    onClose(evt)
+	onClose(evt)
 };
 serv.onmessage = function(evt) {
-    onMessage(evt)
+	onMessage(evt)
 };
 serv.onerror = function(evt) {
-    onError(evt)
+	onError(evt)
 };
 /* Making elements undraggable - looks much nicer */
 function undrag() {
-    var a = document.getElementsByTagName("img");
-    for (var i = 0; i < a.length; i++) {
-        a[i].addEventListener("dragstart", function(ev) {
-            ev.preventDefault();
-        }, false);
-    }
+	var a = document.getElementsByTagName("img");
+	for (var i = 0; i < a.length; i++) {
+		a[i].addEventListener("dragstart", function(ev) {
+			ev.preventDefault();
+		}, false);
+	}
 }
 undrag();
 
 function parseINI(data) {
-    var regex = {
-        section: /^\s*\[\s*([^\]]*)\s*\]\s*$/,
-        param: /^\s*([\w\.\-\_]+)\s*=\s*(.*?)\s*$/,
-        comment: /^\s*;.*$/
-    };
-    var value = {};
-    var lines = data.split(/\r\n|\r|\n/);
-    var section = null;
-    lines.forEach(function(line) {
-        if (regex.comment.test(line)) {
-            return;
-        } else if (line.length == 0) {
-            return;
-        } else if (regex.param.test(line)) {
-            var match = line.match(regex.param);
-            if (section) {
-                value[section][match[1]] = match[2];
-            } else {
-                value[match[1]] = match[2];
-            }
-        } else if (regex.section.test(line)) {
-            var match = line.match(regex.section);
-            value[match[1]] = {};
-            section = match[1];
-        };
-    });
-    return value;
+	var regex = {
+		section: /^\s*\[\s*([^\]]*)\s*\]\s*$/,
+		param: /^\s*([\w\.\-\_]+)\s*=\s*(.*?)\s*$/,
+		comment: /^\s*;.*$/
+	};
+	var value = {};
+	var lines = data.split(/\r\n|\r|\n/);
+	var section = null;
+	lines.forEach(function(line) {
+		if (regex.comment.test(line)) {
+			return;
+		} else if (line.length == 0) {
+			return;
+		} else if (regex.param.test(line)) {
+			var match = line.match(regex.param);
+			if (section) {
+				value[section][match[1]] = match[2];
+			} else {
+				value[match[1]] = match[2];
+			}
+		} else if (regex.section.test(line)) {
+			var match = line.match(regex.section);
+			value[match[1]] = {};
+			section = match[1];
+		};
+	});
+	return value;
 }
 
 function escapeChat(estring) {
-estring.replace("#","<pound>");
-estring.replace("&","<and>");
-estring.replace("%","<percent>");
-estring.replace("$","<dollar>");
-return estring;
+	estring.replace("#", "<pound>");
+	estring.replace("&", "<and>");
+	estring.replace("%", "<percent>");
+	estring.replace("$", "<dollar>");
+	return estring;
 }
 
 function onOOCEnter(event) {
-    if (event.keyCode == 13) {
-        serv.send("CT#web" + pid + "#" + escapeChat(document.getElementById("client_oocinputbox").value) + "#%");
-        document.getElementById("client_oocinputbox").value = "";
-    }
+	if (event.keyCode == 13) {
+		serv.send("CT#web" + pid + "#" + escapeChat(document.getElementById("client_oocinputbox").value) + "#%");
+		document.getElementById("client_oocinputbox").value = "";
+	}
 }
 
 function onEnter(event) {
-    if (event.keyCode == 13) {
-            mychar = chars[me]
-    myemo = emotes[myemotion]
-    ICmessage="MS#chat#" + myemo.speaking + "#" + mychar.name + "#" + myemo.silent + "#" + escapeChat(document.getElementById("client_inputbox").value) + "#"+mychar.side+"#0#0#"+me+"#0#"+objection_state+"#0#0#0#0#%";
-    console.log(ICmessage)
-    serv.send(ICmessage);
-    document.getElementById("client_inputbox").value = '';
-    }
+	if (event.keyCode == 13) {
+		mychar = chars[me]
+		myemo = emotes[myemotion]
+		ICmessage = "MS#chat#" + myemo.speaking + "#" + mychar.name + "#" + myemo.silent + "#" + escapeChat(document.getElementById("client_inputbox").value) + "#" + mychar.side + "#0#0#" + me + "#0#" + objection_state + "#0#0#0#0#%";
+		serv.send(ICmessage);
+		document.getElementById("client_inputbox").value = '';
+		if (objection_state) {
+			document.getElementById("button_" + objection_state).className = "client_button";
+			objection_state = 0;
+		}
+	}
 }
 
 function musiclist_click(event) {
 	var playtrack = document.getElementById("client_musiclist").value;
-	serv.send("MC#"+playtrack+"#"+me+"#%");
+	serv.send("MC#" + playtrack + "#" + me + "#%");
 }
 
 function changeMusicVolume() {
-    music.volume = document.getElementById("client_mvolume").value / 100;
+	music.volume = document.getElementById("client_mvolume").value / 100;
 }
 
 function changeSFXVolume() {
-    sfxaudio.volume = document.getElementById("client_svolume").value / 100;
+	sfxaudio.volume = document.getElementById("client_svolume").value / 100;
 }
 
 function changeBlipVolume() {
-    blip.volume = document.getElementById("client_bvolume").value / 100;
-    womboblip.volume = document.getElementById("client_bvolume").value / 100;
-    comboblip.volume = document.getElementById("client_bvolume").value / 100;
+	blip.volume = document.getElementById("client_bvolume").value / 100;
+	womboblip.volume = document.getElementById("client_bvolume").value / 100;
+	comboblip.volume = document.getElementById("client_bvolume").value / 100;
 }
 
 function changeCharacter(event) {
 	serv.send("FC#%");
-    document.getElementById("client_charselect").style.display = "block";
-    document.getElementById("client_emo").innerHTML = "";
+	document.getElementById("client_charselect").style.display = "block";
+	document.getElementById("client_emo").innerHTML = "";
 }
 
 function imgError(image) {
-    image.onerror = "";
-    image.src = "/misc/placeholder.gif";
-    return true;
+	image.onerror = "";
+	image.src = "/misc/placeholder.gif";
+	return true;
 }
 
 function demoError(image) {
-    image.onerror = "";
-    image.src = "/misc/placeholder.png";
-    return true;
+	image.onerror = "";
+	image.src = "/misc/placeholder.png";
+	return true;
 }
 
 function ImageExist(url) {
-    var img = new Image();
-    console.log(url)
-    img.src = url;
-    return img.height != 0;
+	var img = new Image();
+	img.src = url;
+	return img.height != 0;
 }
 
 function changebg(position) {
-    bgfolder = AO_HOST + "background/" + bgname + "/";
-    document.getElementById("client_fg").style.display = "none";
-    document.getElementById("client_bench").style.display = "none";
-    //document.getElementById("client_bench").style.display = "block"
-    switch (position) {
-        case "def":
-            if (ImageExist(bgfolder + "defenseempty.gif")) {
-                document.getElementById("client_court").src = bgfolder + "defenseempty.gif"
-            } else if (ImageExist(bgfolder + "defenseempty.png")) {
-                document.getElementById("client_court").src = bgfolder + "defenseempty.png"
-            }
-            break;
-        case "pro":
-            if (ImageExist(bgfolder + "prosecutorempty.gif")) {
-                document.getElementById("client_court").src = bgfolder + "prosecutorempty.gif"
-            } else if (ImageExist(bgfolder + "prosecutorempty.png")) {
-                document.getElementById("client_court").src = bgfolder + "prosecutorempty.png"
-            }
-            break;
-        case "hld":
-            if (ImageExist(bgfolder + "helperstand.gif")) {
-                document.getElementById("client_court").src = bgfolder + "helperstand.gif"
-            } else if (ImageExist(bgfolder + "helperstand.png")) {
-                document.getElementById("client_court").src = bgfolder + "helperstand.png"
-            }
-            break;
-        case "hlp":
-            if (ImageExist(bgfolder + "prohelperstand.gif")) {
-                document.getElementById("client_court").src = bgfolder + "prohelperstand.gif"
-            } else if (ImageExist(bgfolder + "prohelperstand.png")) {
-                document.getElementById("client_court").src = bgfolder + "prohelperstand.png"
-            }
-            break;
-        case "wit":
-            if (ImageExist(bgfolder + "witnessempty.gif")) {
-                document.getElementById("client_court").src = bgfolder + "witnessempty.gif"
-            } else if (ImageExist(bgfolder + "witnessempty.png")) {
-                document.getElementById("client_court").src = bgfolder + "witnessempty.png"
-            }
-            break;
-        case "jud":
-            if (ImageExist(bgfolder + "judgestand.gif")) {
-                document.getElementById("client_court").src = bgfolder + "judgestand.gif"
-            } else if (ImageExist(bgfolder + "judgestand.png")) {
-                document.getElementById("client_court").src = bgfolder + "judgestand.png"
-            }
-            break;
-    }
-    switch (position) {
-        case "def":
-            document.getElementById("client_bench").style.display = "block";
-            if (ImageExist(bgfolder + "defensedesk.gif")) {
-                document.getElementById("client_bench").src = bgfolder + "defensedesk.gif"
-            } else if (ImageExist(bgfolder + "defensedesk.png")) {
-                document.getElementById("client_bench").src = bgfolder + "defensedesk.png"
-            }
-            break;
-        case "pro":
-            document.getElementById("client_bench").style.display = "block"
-            if (ImageExist(bgfolder + "prosecutiondesk.gif")) {
-                document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.gif"
-            } else if (ImageExist(bgfolder + "prosecutiondesk.png")) {
-                document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png"
-            }
-            break;
-        case "wit":
-            document.getElementById("client_fg").style.display = "block"
-            if (ImageExist(bgfolder + "estrado.gif")) {
-                document.getElementById("client_fg").src = bgfolder + "estrado.gif"
-            } else if (ImageExist(bgfolder + "estrado.png")) {
-                document.getElementById("client_fg").src = bgfolder + "estrado.png"
-            }
-            break;
-    }
+	bgfolder = AO_HOST + "background/" + bgname + "/";
+	document.getElementById("client_fg").style.display = "none";
+	document.getElementById("client_bench").style.display = "none";
+	//document.getElementById("client_bench").style.display = "block"
+	switch (position) {
+		case "def":
+			if (ImageExist(bgfolder + "defenseempty.gif")) {
+				document.getElementById("client_court").src = bgfolder + "defenseempty.gif"
+			} else if (ImageExist(bgfolder + "defenseempty.png")) {
+				document.getElementById("client_court").src = bgfolder + "defenseempty.png"
+			}
+			break;
+		case "pro":
+			if (ImageExist(bgfolder + "prosecutorempty.gif")) {
+				document.getElementById("client_court").src = bgfolder + "prosecutorempty.gif"
+			} else if (ImageExist(bgfolder + "prosecutorempty.png")) {
+				document.getElementById("client_court").src = bgfolder + "prosecutorempty.png"
+			}
+			break;
+		case "hld":
+			if (ImageExist(bgfolder + "helperstand.gif")) {
+				document.getElementById("client_court").src = bgfolder + "helperstand.gif"
+			} else if (ImageExist(bgfolder + "helperstand.png")) {
+				document.getElementById("client_court").src = bgfolder + "helperstand.png"
+			}
+			break;
+		case "hlp":
+			if (ImageExist(bgfolder + "prohelperstand.gif")) {
+				document.getElementById("client_court").src = bgfolder + "prohelperstand.gif"
+			} else if (ImageExist(bgfolder + "prohelperstand.png")) {
+				document.getElementById("client_court").src = bgfolder + "prohelperstand.png"
+			}
+			break;
+		case "wit":
+			if (ImageExist(bgfolder + "witnessempty.gif")) {
+				document.getElementById("client_court").src = bgfolder + "witnessempty.gif"
+			} else if (ImageExist(bgfolder + "witnessempty.png")) {
+				document.getElementById("client_court").src = bgfolder + "witnessempty.png"
+			}
+			break;
+		case "jud":
+			if (ImageExist(bgfolder + "judgestand.gif")) {
+				document.getElementById("client_court").src = bgfolder + "judgestand.gif"
+			} else if (ImageExist(bgfolder + "judgestand.png")) {
+				document.getElementById("client_court").src = bgfolder + "judgestand.png"
+			}
+			break;
+	}
+	switch (position) {
+		case "def":
+			document.getElementById("client_bench").style.display = "block";
+			if (ImageExist(bgfolder + "defensedesk.gif")) {
+				document.getElementById("client_bench").src = bgfolder + "defensedesk.gif"
+			} else if (ImageExist(bgfolder + "defensedesk.png")) {
+				document.getElementById("client_bench").src = bgfolder + "defensedesk.png"
+			}
+			break;
+		case "pro":
+			document.getElementById("client_bench").style.display = "block"
+			if (ImageExist(bgfolder + "prosecutiondesk.gif")) {
+				document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.gif"
+			} else if (ImageExist(bgfolder + "prosecutiondesk.png")) {
+				document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png"
+			}
+			break;
+		case "wit":
+			document.getElementById("client_fg").style.display = "block"
+			if (ImageExist(bgfolder + "estrado.gif")) {
+				document.getElementById("client_fg").src = bgfolder + "estrado.gif"
+			} else if (ImageExist(bgfolder + "estrado.png")) {
+				document.getElementById("client_fg").src = bgfolder + "estrado.png"
+			}
+			break;
+	}
 }
 
 function updateText() {
-    if (chatmsg.content == "") {
-        document.getElementById("client_name").style.display = "none";
-        document.getElementById("client_chat").style.display = "none";
-    } else {
-        document.getElementById("client_name").style.display = "block";
-        document.getElementById("client_chat").style.display = "block";
-    }
-    if (chatmsg.isnew) {
-        console.log("new message")
-        document.getElementById("client_name").style.fontSize = (document.getElementById("client_name").offsetHeight * 0.7) + "px";
-        document.getElementById("client_chat").style.fontSize = (document.getElementById("client_chat").offsetHeight * 0.2) + "px";
-        document.getElementById("client_name").innerHTML = "<p>" + escapeHtml(chatmsg.nameplate) + "</p>";
-        chatmsg.isnew = false;
-        changebg(chatmsg.side);
-        document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.speaking + ".gif";
-    } else {
-        if (textnow != chatmsg.content) {
-            combo = (combo + 1) % 3;
-            switch (combo) {
-                case 0:
-                    blip.play()
-                    break;
-                case 1:
-                    womboblip.play()
-                    break;
-                case 2:
-                    comboblip.play()
-                    break;
-            }
-            textnow = chatmsg.content.substring(0, textnow.length + 1);
-            document.getElementById("client_inner_chat").innerHTML = escapeHtml(textnow);
-        } else {
-            chatstate = 3;
-            clearInterval(updater);
-            document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.silent + ".gif";
-        }
-    }
-    if(!sfxplayed && chatmsg.snddelay>=(updateInterval*textnow.length)) {
-        sfxaudio.pause();
-        sfxplayed=1
-        if(chatmsg.sound!="0"){
-        sfxaudio.src = AO_HOST + "sounds/general/"+chatmsg.sound+".wav";
-        sfxaudio.play();
-        }
-    }
+	if (chatmsg.content == "") {
+		document.getElementById("client_name").style.display = "none";
+		document.getElementById("client_chat").style.display = "none";
+	} else {
+		document.getElementById("client_name").style.display = "block";
+		document.getElementById("client_chat").style.display = "block";
+	}
+	switch (chatmsg.objection) {
+		case 0:
+			shouttimer = 0;
+			break;
+		case 1:
+			document.getElementById("client_char").src = AO_HOST + "/misc/holdit.gif";
+			shouttimer = updateInterval * 2;
+			break;
+		case 2:
+			document.getElementById("client_char").src = AO_HOST + "/misc/takethat.gif";
+			shouttimer = updateInterval * 2;
+			break;
+		case 3:
+			document.getElementById("client_char").src = AO_HOST + "/misc/objection.gif";
+			shouttimer = updateInterval * 2;
+			break;
+	}
+	if (texttimer >= shouttimer) {
+		if (chatmsg.isnew) {
+			document.getElementById("client_name").style.fontSize = (document.getElementById("client_name").offsetHeight * 0.7) + "px";
+			document.getElementById("client_chat").style.fontSize = (document.getElementById("client_chat").offsetHeight * 0.2) + "px";
+			document.getElementById("client_name").innerHTML = "<p>" + escapeHtml(chatmsg.nameplate) + "</p>";
+			changebg(chatmsg.side);
+			chatmsg.isnew = false;
+			document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.speaking + ".gif";
+		} else {
+			if (textnow != chatmsg.content) {
+				combo = (combo + 1) % 3;
+				switch (combo) {
+					case 0:
+						blip.play()
+						break;
+					case 1:
+						womboblip.play()
+						break;
+					case 2:
+						comboblip.play()
+						break;
+				}
+				textnow = chatmsg.content.substring(0, textnow.length + 1);
+				document.getElementById("client_inner_chat").innerHTML = escapeHtml(textnow);
+				if (textnow == chatmsg.content) {
+					chatstate = 3;
+					clearInterval(updater);
+					document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.silent + ".gif";
+				}
+			}
+		}
+	}
+	if (!sfxplayed && chatmsg.snddelay + shouttimer >= texttimer) {
+		sfxaudio.pause();
+		sfxplayed = 1
+		if (chatmsg.sound != "0") {
+			sfxaudio.src = AO_HOST + "sounds/general/" + chatmsg.sound + ".wav";
+			sfxaudio.play();
+		}
+	}
+	texttimer = +updateInterval;
 }
 
 function onOpen(e) {
-	if(mode=="join"){
-    serv.send("HI#" + navigator.userAgent + "#%");
+	if (mode == "join") {
+		serv.send("HI#" + navigator.userAgent + "#%");
 	} else {
 		document.getElementById("client_loading").style.display = "none";
-    }
-    CHECKupdater = setInterval(sendCheck, 5000);
+	}
+	CHECKupdater = setInterval(sendCheck, 5000);
 };
 
 function onClose(e) {
-    var errorm = document.createElement("div");
-    errorm.setAttribute('class', 'error');
-    errorm.innerHTML = "CONNECTION LOST";
-    document.body.appendChild(errorm);
+	document.getElementById("client_error").style.display = "block";
 };
 
+function ReconnectButton() {
+	serv = new WebSocket("ws://" + queryDict.ip);
+	if (serv) {
+		document.getElementById("client_error").style.display = "none";
+	}
+}
+
 function onError(e) {
-    var errorm = document.createElement("div");
-    errorm.setAttribute('class', 'error');
-    errorm.innerHTML = "ERROR";
-    document.body.appendChild(errorm);
+	document.getElementById("client_error").style.display = "block";
 };
 
 function onMessage(e) {
-    var musicname = "undefined";
-    msg = e.data;
-    console.log(msg)
-    lines = msg.split('%');
-    arguments = lines[0].split('#');
-    header = arguments[0];
-    switch (header) {
-        case "MS":
-            if (arguments[4] != chatmsg.content) {
-                document.getElementById("client_inner_chat").innerHTML = '';
-                chatmsg.pre = arguments[2];
-                chatmsg.character = -1;
-                for (var i = 0; i < chars.length; i++) {
-                    if (chars[i].name == arguments[3]) {
-                        chatmsg.character = i;
-                        break;
-                    }
-                }
-                chatmsg.preanim = arguments[2];
-                chatmsg.nameplate = arguments[3];
-                chatmsg.name = arguments[3];
-                chatmsg.speaking = "(b)"+arguments[4];
-                chatmsg.silent = "(a)"+arguments[4];
-                chatmsg.content = arguments[5];
-                chatmsg.side = arguments[6];
-                chatmsg.sound = arguments[7];
-                chatmsg.type = arguments[8];
-                console.log(arguments[8]);
-                chatmsg.snddelay = arguments[9];
-                chatmsg.objection = arguments[10];
-                chatmsg.evidence = arguments[11];
-                chatmsg.flash = arguments[12];
-                chatmsg.color = arguments[13];
-                chatmsg.isnew = true;
-                changebg(chatmsg.side);
-                textnow = '';
-                addlog(chatmsg.nameplate + ": " + escapeHtml(arguments[5]))
-                console.log("Message received: " + arguments[5]);
-                sfxplayed=0
-                updater = setInterval(updateText, updateInterval);
-            }
-            break;
-        case "CT":
-            document.getElementById("client_ooclog").innerHTML = document.getElementById("client_ooclog").innerHTML + arguments[1] + ": " + arguments[2] + "\r\n"
-            break;
-        case "MC":
-            console.log(music.currentTime)
-            music.pause();
-            music.src = MUSIC_HOST + arguments[1];
-            music.play();
-            console.log("Now playing: " + arguments[1] + "(" + musiclist[arguments[1]] + ")");
-            if(arguments[2]>=0){
-                musicname = chars[arguments[2]].name;
-            }else{
-                musicname = "$SERVER"
-            }
-            addlog(musicname + " changed music to " + arguments[1]);
-            break;
-        case "RMC":
-            music.pause();
-            music = new Audio(musiclist[arguments[0]]);
-            music.totime = arguments[1]
-            music.offset = new Date().getTime() / 1000
-            music.addEventListener('loadedmetadata', function() {
-                music.currentTime += parseFloat(music.totime + (new Date().getTime() / 1000 - music.offset)).toFixed(3);
-                music.play();
-            }, false)
-            console.log("Now playing: " + arguments[0] + "(" + musiclist[arguments[0]] + ") from " + arguments[1]);
-            break;
-        case "CI":
-            document.getElementById("client_loadingtext").innerHTML = "Loading Character " + arguments[1];
-            serv.send("AN#" + ((arguments[1] / 10) + 1) + "#%");
-            for (var i = 2; i < arguments.length - 1; i++) {
-                if (i % 2 == 0) {
-                    charguments = arguments[i].split("&");
-                    console.log(charguments);
-                    chars[arguments[i - 1]] = {
-                        "name": charguments[0],
-                        "desc": charguments[1],
-                        "evidence": charguments[3],
-                        "icon": AO_HOST + "characters/" + charguments[0] + "/char_icon.png"
-                    };
-                }
-            }
-            break;
-        case "SC":
-            document.getElementById("client_loadingtext").innerHTML = "Loading Characters";
-            for (var i = 1; i < arguments.length - 1; i++) {
-                    charguments = arguments[i].split("&");
-                    console.log(charguments);
-                    chars[i-1] = {
-                        "name": charguments[0],
-                        "desc": charguments[1],
-                        "evidence": charguments[3],
-                        "icon": AO_HOST + "characters/" + charguments[0] + "/char_icon.png"
-                }
-            }
-            serv.send("RM#%");
-            break;
-        case "EI":
-            document.getElementById("client_loadingtext").innerHTML = "Loading Evidence " + arguments[1];
-            //serv.send("AE#" + (arguments[1] + 1) + "#%");
-            serv.send("RM#%");
-            break;
-        case "EM":
-            document.getElementById("client_loadingtext").innerHTML = "Loading Music " + arguments[1];
-            serv.send("AM#" + ((arguments[1] / 10) + 1) + "#%");
-            var hmusiclist = document.getElementById("client_musiclist");
-            for (var i = 2; i < arguments.length - 1; i++) {
-                if (i % 2 == 0) {
-                    var newentry = document.createElement("OPTION");
-                    console.log(i);
-                    console.log(arguments[i]);
-                    newentry.text = arguments[i];
-                    hmusiclist.options.add(newentry);
-                }
-            }
-            break;
-        case "SM":
-            document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
-            var hmusiclist = document.getElementById("client_musiclist");
-            for (var i = 1; i < arguments.length - 1; i++) {
-                    var newentry = document.createElement("OPTION");
-                    console.log(i);
-                    console.log(arguments[i]);
-                    newentry.text = arguments[i];
-                    hmusiclist.options.add(newentry);
-            }
-            serv.send("RD#%");
-            break;
-        case "music":
-            for (var i = 0; i < arguments.length / 2; i++) {
-                musiclist[arguments[2 * i]] = arguments[2 * i + 1];
-            }
-            break;
-        case "DONE":
-		document.getElementById("client_loading").style.display = "none";
-            document.getElementById("client_chatlog").style.display = "block";
-            document.getElementById("client_wrapper").style.display = "block";
-			document.getElementById("client_charselect").style.display = "block";            
-            break;
-        case "BN":
-            bgname = arguments[1];
-            break;
-        case "NBG":
-            /* TODO */
-            break;
-        case "HP":
-            /* TODO */
-            if (arguments[1] == 1) {
-                document.getElementById("client_defense_hp").style.clip = "rect(0px," + BAR_WIDTH * arguments[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
-            } else {
-                document.getElementById("client_prosecutor_hp").style.clip = "rect(0px," + BAR_WIDTH * arguments[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
-            }
-            break;
-        case "ID":
-            pid = arguments[1];
-        case "PN":
-            serv.send("askchaa#%");
-            break;
+	msg = e.data;
+	console.log(msg)
+	lines = msg.split('%');
+	arguments = lines[0].split('#');
+	header = arguments[0];
+	switch (header) {
+		case "MS":
+			if (arguments[4] != chatmsg.content) {
+				document.getElementById("client_inner_chat").innerHTML = '';
+				chatmsg.pre = arguments[2];
+				chatmsg.character = -1;
+				for (var i = 0; i < chars.length; i++) {
+					if (chars[i].name == arguments[3]) {
+						chatmsg.character = i;
+						break;
+					}
+				}
+				chatmsg.preanim = arguments[2];
+				chatmsg.nameplate = arguments[3];
+				chatmsg.name = arguments[3];
+				chatmsg.speaking = "(b)" + arguments[4];
+				chatmsg.silent = "(a)" + arguments[4];
+				chatmsg.content = arguments[5];
+				chatmsg.side = arguments[6];
+				chatmsg.sound = arguments[7];
+				chatmsg.type = arguments[8];
+				chatmsg.snddelay = arguments[9];
+				chatmsg.objection = arguments[10];
+				chatmsg.evidence = arguments[11];
+				chatmsg.flash = arguments[12];
+				chatmsg.color = arguments[13];
+				chatmsg.isnew = true;
+				changebg(chatmsg.side);
+				textnow = '';
+				addlog(chatmsg.nameplate + ": " + escapeHtml(arguments[5]))
+				sfxplayed = 0
+				texttimer = 0
+				updater = setInterval(updateText, updateInterval);
+			}
+			break;
+		case "CT":
+			document.getElementById("client_ooclog").innerHTML = document.getElementById("client_ooclog").innerHTML + arguments[1] + ": " + arguments[2] + "\r\n"
+			break;
+		case "MC":
+			music.pause();
+			music.src = MUSIC_HOST + arguments[1];
+			music.play();
+			if (arguments[2] >= 0) {
+				musicname = chars[arguments[2]].name;
+			} else {
+				musicname = "$SERVER"
+			}
+			addlog(musicname + " changed music to " + arguments[1]);
+			break;
+		case "RMC":
+			music.pause();
+			music = new Audio(musiclist[arguments[0]]);
+			music.totime = arguments[1]
+			music.offset = new Date().getTime() / 1000
+			music.addEventListener('loadedmetadata', function() {
+				music.currentTime += parseFloat(music.totime + (new Date().getTime() / 1000 - music.offset)).toFixed(3);
+				music.play();
+			}, false)
+			break;
+		case "CI":
+			document.getElementById("client_loadingtext").innerHTML = "Loading Character " + arguments[1];
+			serv.send("AN#" + ((arguments[1] / 10) + 1) + "#%");
+			for (var i = 2; i < arguments.length - 1; i++) {
+				if (i % 2 == 0) {
+					charguments = arguments[i].split("&");
+					chars[arguments[i - 1]] = {
+						"name": charguments[0],
+						"desc": charguments[1],
+						"evidence": charguments[3],
+						"icon": AO_HOST + "characters/" + charguments[0] + "/char_icon.png"
+					};
+				}
+			}
+			break;
+		case "SC":
+			document.getElementById("client_loadingtext").innerHTML = "Loading Characters";
+			for (var i = 1; i < arguments.length - 1; i++) {
+				charguments = arguments[i].split("&");
+				chars[i - 1] = {
+					"name": charguments[0],
+					"desc": charguments[1],
+					"evidence": charguments[3],
+					"icon": AO_HOST + "characters/" + charguments[0] + "/char_icon.png"
+				}
+			}
+			serv.send("RM#%");
+			break;
+		case "EI":
+			document.getElementById("client_loadingtext").innerHTML = "Loading Evidence " + arguments[1];
+			//serv.send("AE#" + (arguments[1] + 1) + "#%");
+			serv.send("RM#%");
+			break;
+		case "EM":
+			document.getElementById("client_loadingtext").innerHTML = "Loading Music " + arguments[1];
+			serv.send("AM#" + ((arguments[1] / 10) + 1) + "#%");
+			var hmusiclist = document.getElementById("client_musiclist");
+			for (var i = 2; i < arguments.length - 1; i++) {
+				if (i % 2 == 0) {
+					var newentry = document.createElement("OPTION");
+					newentry.text = arguments[i];
+					hmusiclist.options.add(newentry);
+				}
+			}
+			break;
+		case "SM":
+			document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
+			var hmusiclist = document.getElementById("client_musiclist");
+			for (var i = 1; i < arguments.length - 1; i++) {
+				var newentry = document.createElement("OPTION");
+				newentry.text = arguments[i];
+				hmusiclist.options.add(newentry);
+			}
+			serv.send("RD#%");
+			break;
+		case "music":
+			for (var i = 0; i < arguments.length / 2; i++) {
+				musiclist[arguments[2 * i]] = arguments[2 * i + 1];
+			}
+			break;
+		case "DONE":
+			document.getElementById("client_loading").style.display = "none";
+			document.getElementById("client_chatlog").style.display = "block";
+			document.getElementById("client_wrapper").style.display = "block";
+			document.getElementById("client_charselect").style.display = "block";
+			break;
+		case "BN":
+			bgname = arguments[1];
+			break;
+		case "NBG":
+			/* TODO */
+			break;
+		case "HP":
+			/* TODO */
+			if (arguments[1] == 1) {
+				document.getElementById("client_defense_hp").style.clip = "rect(0px," + BAR_WIDTH * arguments[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
+			} else {
+				document.getElementById("client_prosecutor_hp").style.clip = "rect(0px," + BAR_WIDTH * arguments[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
+			}
+			break;
+		case "ID":
+			pid = arguments[1];
+		case "PN":
+			serv.send("askchaa#%");
+			break;
 		case "SI":
 			serv.send("askchar2#%");
-            break;
+			break;
 		case "CharsCheck":
-		for (var i=0; i < chars.length; i++){
-			if (i % 5 == 0){
-				var tr = document.createElement('TR');
+			document.getElementById("client_chartable").innerHTML = "";
+			for (var i = 0; i < chars.length; i++) {
+				if (i % charselectWidth == 0) {
+					var tr = document.createElement('TR');
+				}
+				var td = document.createElement('TD');
+				var icon_chosen;
+				var thispick = chars[i].icon;
+				if (arguments[1 + i] == "-1") {
+					icon_chosen = " chosen";
+				} else {
+					icon_chosen = "";
+				}
+				td.innerHTML = "<img class='demothing" + icon_chosen + "' id='demo_" + i + "' src='" + thispick + "' alt='" + chars[i].desc + "' onclick='pickchar(" + i + ")' onerror='demoError(this);'>";
+				tr.appendChild(td);
+				if (i % charselectWidth == 0) {
+					document.getElementById("client_chartable").appendChild(tr);
+				}
 			}
-			var td = document.createElement('TD');
-			var icon_chosen;
-			if (arguments[1+i]=="-1"){
-			icon_chosen = " chosen";
-			} else {
-			var thispick = chars[i].icon;
-			icon_chosen = "";
-			}			
-			td.innerHTML = "<img class='demothing"+icon_chosen+"+' id='demo_"+i+"' src='"+thispick + "' alt='"+chars[i].desc+"' onclick='pickchar(" + i + ")' onerror='demoError(this);'>";
-			tr.appendChild(td);
-			if (i % 5 == 0){
-				document.getElementById("client_chartable").appendChild(tr);
-			}
-		}
-		break;
-        case "PV":
-            me = arguments[3]
-            document.getElementById("client_charselect").style.display = "none";  
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', AO_HOST + 'characters/' + chars[me].name + '/char.ini', true);
-            xhr.responseType = 'text';
-            xhr.onload = function(e) {
-                if (this.status == 200) {
-                    linifile = this.responseText;
-                    pinifile = parseINI(linifile);
-                    chars[me].side = pinifile.Options.side;
-                    for (var i = 1; i < pinifile.Emotions.number; i++) {
+			break;
+		case "PV":
+			me = arguments[3]
+			document.getElementById("client_charselect").style.display = "none";
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', AO_HOST + 'characters/' + chars[me].name + '/char.ini', true);
+			xhr.responseType = 'text';
+			xhr.onload = function(e) {
+				if (this.status == 200) {
+					linifile = this.responseText;
+					pinifile = parseINI(linifile);
+					chars[me].side = pinifile.Options.side;
+					for (var i = 1; i < pinifile.Emotions.number; i++) {
 						var emoteinfo = pinifile.Emotions[i].split('#');
-                        emotes[i] = { 
-						desc: emoteinfo[0],
-						speaking: emoteinfo[1],
-						silent: emoteinfo[2],
-						zoom: emoteinfo[3],
-						button_off: AO_HOST + 'characters/' + chars[me].name + '/emotions/button' + i + '_off.png',
-                        button_on: AO_HOST + 'characters/' + chars[me].name + '/emotions/button' + i + '_on.png'};
-                        document.getElementById("client_emo").innerHTML += "<img src='" + emotes[i].button_off + "' id='emo_" + i + "' alt='"+emotes[i].desc+"' class='client_button' onclick='pickemotion(" + i + ")'>";
-                    }
-                    pickemotion(1);
-                }
-            };
-            xhr.send();
-            break;
-    }
+						emotes[i] = {
+							desc: emoteinfo[0],
+							speaking: emoteinfo[1],
+							silent: emoteinfo[2],
+							zoom: emoteinfo[3],
+							button_off: AO_HOST + 'characters/' + chars[me].name + '/emotions/button' + i + '_off.png',
+							button_on: AO_HOST + 'characters/' + chars[me].name + '/emotions/button' + i + '_on.png'
+						};
+						document.getElementById("client_emo").innerHTML += "<img src='" + emotes[i].button_off + "' id='emo_" + i + "' alt='" + emotes[i].desc + "' class='client_button' onclick='pickemotion(" + i + ")'>";
+					}
+					pickemotion(1);
+				}
+			};
+			xhr.send();
+			break;
+	}
 };
 
 function addlog(toadd) {
-    document.getElementById("client_log").innerHTML = toadd + "<br/>" + document.getElementById("client_log").innerHTML
+	document.getElementById("client_log").innerHTML = toadd + "<br/>" + document.getElementById("client_log").innerHTML
 }
 
 function pickchar(ccharacter) {
-	console.log(ccharacter);
-	if (ccharacter<1000){
-    serv.send("CC#" +pid + "#" + ccharacter + "#web#%");
-} else {
-	//spectator
-	document.getElementById("client_charselect").style.display = "none";
-	document.getElementById("client_inputbox").style.display = "none";
-	document.getElementById("client_emo").style.display = "none";
-}
+	if (ccharacter < 1000) {
+		serv.send("CC#" + pid + "#" + ccharacter + "#web#%");
+	} else {
+		//spectator
+		document.getElementById("client_charselect").style.display = "none";
+		document.getElementById("client_inputbox").style.display = "none";
+		document.getElementById("client_emo").style.display = "none";
+	}
 }
 
 function pickemotion(emo) {
-    if (myemotion != -1) {
-        document.getElementById("emo_" + myemotion).src = emotes[myemotion].button_off;
-    }
-    document.getElementById("emo_" + emo).src = emotes[emo].button_on;
-    myemotion = emo
+	if (myemotion != -1) {
+		document.getElementById("emo_" + myemotion).src = emotes[myemotion].button_off;
+	}
+	document.getElementById("emo_" + emo).src = emotes[emo].button_on;
+	myemotion = emo
 }
 
 function toggleshout(shout) {
-    if (shout != objection_state) {
-        document.getElementById("button_" + shout).className = "client_button dark";
-    }
-    if (shout = objection_state) {
-        document.getElementById("button_" + shout).className = "client_button";
-        objection_state=0;
-    }
-    document.getElementById("button_" + objection_state).className = "client_button";
-    objection_state = shout;
+	if (shout == objection_state) {
+		document.getElementById("button_" + shout).className = "client_button";
+		objection_state = 0;
+	} else {
+		document.getElementById("button_" + shout).className = "client_button dark";
+		if (objection_state) {
+			document.getElementById("button_" + objection_state).className = "client_button";
+		}
+		objection_state = shout;
+	}
 }
 
 function sendMusic(song) {
-    serv.send("MC#" + song);
-    console.log("Music sent!");
+	serv.send("MC#" + song);
 }
 
 function sendCheck() {
-    serv.send("CHECK#"+me+"#%");
+	serv.send("CHECK#" + me + "#%");
 }
 
 function escapeHtml(unsafe) {
-    var transfer = unsafe;
-    transfer.replace(/&/g, "&amp;");
-    transfer.replace(/</g, "&lt;");
-    transfer.replace(/>/g, "&gt;");
-    transfer.replace(/"/g, "&quot;");
-    transfer.replace(/'/g, "&#039;");
-    return transfer;
+	var transfer = unsafe;
+	transfer.replace(/&/g, "&amp;");
+	transfer.replace(/</g, "&lt;");
+	transfer.replace(/>/g, "&gt;");
+	transfer.replace(/"/g, "&quot;");
+	transfer.replace(/'/g, "&#039;");
+	return transfer;
 }
