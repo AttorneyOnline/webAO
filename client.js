@@ -273,30 +273,37 @@ function updateText() {
 		document.getElementById("client_name").style.display = "block";
 		document.getElementById("client_chat").style.display = "block";
 	}
+	if (chatmsg.isnew){
 	switch (chatmsg.objection) {
-		case 0:
+		case "0":
 			shouttimer = 0;
 			break;
-		case 1:
-			document.getElementById("client_char").src = AO_HOST + "/misc/holdit.gif";
-			shouttimer = updateInterval * 2;
+		case "1":
+			document.getElementById("client_char").src = AO_HOST + "misc/holdit.gif";
+			shouttimer = 800;
+			chatmsg.sound = "sfx-objection"
 			break;
-		case 2:
-			document.getElementById("client_char").src = AO_HOST + "/misc/takethat.gif";
-			shouttimer = updateInterval * 2;
+		case "2":
+			document.getElementById("client_char").src = AO_HOST + "misc/takethat.gif";
+			shouttimer = 800;
+			chatmsg.sound = "sfx-objection"
 			break;
-		case 3:
-			document.getElementById("client_char").src = AO_HOST + "/misc/objection.gif";
-			shouttimer = updateInterval * 2;
+		case "3":
+			document.getElementById("client_char").src = AO_HOST + "misc/objection.gif";
+			shouttimer = 800;
+			chatmsg.sound = "sfx-objection"
 			break;
 	}
+	chatmsg.isnew=false;
+	chatmsg.startspeaking=true;
+}
 	if (texttimer >= shouttimer) {
-		if (chatmsg.isnew) {
+		if (chatmsg.startspeaking) {
 			document.getElementById("client_name").style.fontSize = (document.getElementById("client_name").offsetHeight * 0.7) + "px";
 			document.getElementById("client_chat").style.fontSize = (document.getElementById("client_chat").offsetHeight * 0.2) + "px";
 			document.getElementById("client_name").innerHTML = "<p>" + escapeHtml(chatmsg.nameplate) + "</p>";
 			changebg(chatmsg.side);
-			chatmsg.isnew = false;
+			chatmsg.startspeaking = false;
 			document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.speaking + ".gif";
 		} else {
 			if (textnow != chatmsg.content) {
@@ -316,6 +323,7 @@ function updateText() {
 				document.getElementById("client_inner_chat").innerHTML = escapeHtml(textnow);
 				if (textnow == chatmsg.content) {
 					chatstate = 3;
+					texttimer=0;
 					clearInterval(updater);
 					document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.silent + ".gif";
 				}
@@ -325,12 +333,12 @@ function updateText() {
 	if (!sfxplayed && chatmsg.snddelay + shouttimer >= texttimer) {
 		sfxaudio.pause();
 		sfxplayed = 1
-		if (chatmsg.sound != "0") {
+		if (chatmsg.sound != "0" && chatmsg.sound != "1") {
 			sfxaudio.src = AO_HOST + "sounds/general/" + chatmsg.sound + ".wav";
 			sfxaudio.play();
 		}
 	}
-	texttimer = +updateInterval;
+	texttimer = texttimer + updateInterval;
 }
 
 function onOpen(e) {
@@ -384,11 +392,13 @@ function onMessage(e) {
 				chatmsg.side = arguments[6];
 				chatmsg.sound = arguments[7];
 				chatmsg.type = arguments[8];
-				chatmsg.snddelay = arguments[9];
-				chatmsg.objection = arguments[10];
-				chatmsg.evidence = arguments[11];
-				chatmsg.flash = arguments[12];
-				chatmsg.color = arguments[13];
+				//chatmsg.charid = arguments[9];
+				chatmsg.snddelay = arguments[10];
+				chatmsg.objection = arguments[11];
+				chatmsg.evidence = arguments[12];
+				//chatmsg.flip = arguments[13];
+				chatmsg.flash = arguments[14];
+				chatmsg.color = arguments[15];
 				chatmsg.isnew = true;
 				changebg(chatmsg.side);
 				textnow = '';
@@ -520,7 +530,7 @@ function onMessage(e) {
 				var icon_chosen;
 				var thispick = chars[i].icon;
 				if (arguments[1 + i] == "-1") {
-					icon_chosen = " chosen";
+					icon_chosen = " dark";
 				} else {
 					icon_chosen = "";
 				}
