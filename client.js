@@ -302,6 +302,30 @@ function updateText() {
 			document.getElementById("client_name").style.fontSize = (document.getElementById("client_name").offsetHeight * 0.7) + "px";
 			document.getElementById("client_chat").style.fontSize = (document.getElementById("client_chat").offsetHeight * 0.2) + "px";
 			document.getElementById("client_name").innerHTML = "<p>" + escapeHtml(chatmsg.nameplate) + "</p>";
+			switch(chatmsg.color){
+				case "0":
+				stylecolor="color: #ffffff;";
+				break;
+				case "1":
+				stylecolor="color: #00ff00;";
+				break;
+				case "2":
+				stylecolor="color: #ff0000;";
+				break;
+				case "3":
+				stylecolor="color: #ffaa00;";
+				break;
+				case "4":
+				stylecolor="color: #0000ff;";
+				break;
+				case "5":
+				stylecolor="color: #ffff00;";
+				break;
+				case "6":
+				stylecolor="color: #aa00aa;";
+				break;
+			}
+			document.getElementById("client_inner_chat").style = stylecolor;
 			changebg(chatmsg.side);
 			chatmsg.startspeaking = false;
 			document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.speaking + ".gif";
