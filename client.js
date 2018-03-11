@@ -76,16 +76,6 @@ serv.onmessage = function(evt) {
 serv.onerror = function(evt) {
 	onError(evt)
 };
-/* Making elements undraggable - looks much nicer */
-function undrag() {
-	var a = document.getElementsByTagName("img");
-	for (var i = 0; i < a.length; i++) {
-		a[i].addEventListener("dragstart", function(ev) {
-			ev.preventDefault();
-		}, false);
-	}
-}
-undrag();
 
 function parseINI(data) {
 	var regex = {
@@ -198,7 +188,7 @@ function ImageExist(url) {
 
 function changebg(position) {
 	var standname
-	bgfolder = AO_HOST + "background/" + bgname + "/";
+	bgfolder = AO_HOST + "background/" + escape(bgname) + "/";
 	document.getElementById("client_fg").style.display = "none";
 	document.getElementById("client_bench").style.display = "none";
 	switch (position) {
@@ -274,7 +264,7 @@ function updateText() {
 	if (texttimer >= shouttimer) {
 		if (chatmsg.startspeaking) {
 			changebg(chatmsg.side);
-			document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.speaking + ".gif";
+			document.getElementById("client_char").src = AO_HOST + "characters/" + escape(chatmsg.name) + "/" + chatmsg.speaking + ".gif";
 			document.getElementById("client_name").style.fontSize = (document.getElementById("client_name").offsetHeight * 0.7) + "px";
 			document.getElementById("client_chat").style.fontSize = (document.getElementById("client_chat").offsetHeight * 0.25) + "px";
 			document.getElementById("client_name").innerHTML = "<p>" + escapeHtml(chatmsg.nameplate) + "</p>";
@@ -305,7 +295,8 @@ function updateText() {
 			chatmsg.startspeaking = false;
 		} else {
 			if (textnow != chatmsg.content) {
-				combo = (combo + 1) % 3;
+				if(chatmsg.content.substring(textnow.length, textnow.length + 1)!=" "){
+				combo = (combo + 1) % 2;
 				switch (combo) {
 					case 0:
 						blip.play()
@@ -313,17 +304,15 @@ function updateText() {
 					case 1:
 						//womboblip.play()
 						break;
-					case 2:
-						comboblip.play()
-						break;
 				}
+			}
 				textnow = chatmsg.content.substring(0, textnow.length + 1);
 				document.getElementById("client_inner_chat").innerHTML = escapeHtml(textnow);
 				if (textnow == chatmsg.content) {
 					chatstate = 3;
 					texttimer=0;
 					clearInterval(updater);
-					document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.silent + ".gif";
+					document.getElementById("client_char").src = AO_HOST + "characters/" + escape(chatmsg.name) + "/" + chatmsg.silent + ".gif";
 				}
 			}
 		}
@@ -332,7 +321,7 @@ function updateText() {
 		sfxaudio.pause();
 		sfxplayed = 1
 		if (chatmsg.sound != "0" && chatmsg.sound != "1") {
-			sfxaudio.src = AO_HOST + "sounds/general/" + chatmsg.sound + ".wav";
+			sfxaudio.src = AO_HOST + "sounds/general/" + escape(chatmsg.sound) + ".wav";
 			sfxaudio.play();
 		}
 	}
@@ -373,7 +362,7 @@ function onMessage(e) {
 		case "MS":
 			if (arguments[4] != chatmsg.content) {
 				document.getElementById("client_inner_chat").innerHTML = '';
-				chatmsg.pre = arguments[2];
+				chatmsg.pre = escape(arguments[2]);
 				chatmsg.character = -1;
 				for (var i = 0; i < chars.length; i++) {
 					if (chars[i].name == arguments[3]) {
@@ -381,14 +370,14 @@ function onMessage(e) {
 						break;
 					}
 				}
-				chatmsg.preanim = arguments[2];
+				chatmsg.preanim = escape(arguments[2]);
 				chatmsg.nameplate = arguments[3];
 				chatmsg.name = arguments[3];
-				chatmsg.speaking = "(b)" + arguments[4];
-				chatmsg.silent = "(a)" + arguments[4];
+				chatmsg.speaking = "(b)" + escape(arguments[4]);
+				chatmsg.silent = "(a)" + escape(arguments[4]);
 				chatmsg.content = arguments[5];
 				chatmsg.side = arguments[6];
-				chatmsg.sound = arguments[7];
+				chatmsg.sound = escape(arguments[7]);
 				chatmsg.type = arguments[8];
 				//chatmsg.charid = arguments[9];
 				chatmsg.snddelay = arguments[10];
@@ -400,7 +389,6 @@ function onMessage(e) {
 				chatmsg.isnew = true;
 				changebg(chatmsg.side);
 				textnow = '';
-				addlog(chatmsg.nameplate + ": " + escapeHtml(arguments[5]))
 				sfxplayed = 0
 				texttimer = 0
 				updater = setInterval(updateText, updateInterval);
@@ -440,7 +428,7 @@ function onMessage(e) {
 						"name": charguments[0],
 						"desc": charguments[1],
 						"evidence": charguments[3],
-						"icon": AO_HOST + "characters/" + charguments[0] + "/char_icon.png"
+						"icon": AO_HOST + "characters/" + escape(charguments[0]) + "/char_icon.png"
 					};
 				}
 			}
@@ -450,9 +438,9 @@ function onMessage(e) {
 			for (var i = 1; i < arguments.length - 1; i++) {
 				chars[i - 1] = {
 					"name": arguments[i],
-					"desc": "",
+					"desc": arguments[i],
 					"evidence": "",
-					"icon": AO_HOST + "characters/" + arguments[i] + "/char_icon.png"
+					"icon": AO_HOST + "characters/" + escape(arguments[i]) + "/char_icon.png"
 				}
 			}
 			serv.send("RM#%");
@@ -541,12 +529,13 @@ function onMessage(e) {
 					document.getElementById("client_chartable").appendChild(tr);
 				}
 			}
+			changebg("def");
 			break;
 		case "PV":
 			me = arguments[3]
 			document.getElementById("client_charselect").style.display = "none";
 			var xhr = new XMLHttpRequest();
-			xhr.open('GET', AO_HOST + 'characters/' + chars[me].name + '/char.ini', true);
+			xhr.open('GET', AO_HOST + 'characters/' + escape(chars[me].name) + '/char.ini', true);
 			xhr.responseType = 'text';
 			xhr.onload = function(e) {
 				if (this.status == 200) {
@@ -570,8 +559,8 @@ function onMessage(e) {
 							zoom: emoteinfo[3],
 							sfx: esfx,
 							sfxdelay: esfxd,
-							button_off: AO_HOST + 'characters/' + chars[me].name + '/emotions/button' + i + '_off.png',
-							button_on: AO_HOST + 'characters/' + chars[me].name + '/emotions/button' + i + '_on.png'
+							button_off: AO_HOST + 'characters/' + escape(chars[me].name) + '/emotions/button' + i + '_off.png',
+							button_on: AO_HOST + 'characters/' + escape(chars[me].name) + '/emotions/button' + i + '_on.png'
 						};
 						document.getElementById("client_emo").innerHTML += "<img src='" + emotes[i].button_off + "' id='emo_" + i + "' alt='" + emotes[i].desc + "' class='client_button' onclick='pickemotion(" + i + ")'>";
 					}
