@@ -230,7 +230,7 @@ function changebg(position) {
 }
 
 function updateText() {
-	if (chatmsg.content == "") {
+	if (chatmsg.content.trim() == "") {
 		document.getElementById("client_name").style.display = "none";
 		document.getElementById("client_chat").style.display = "none";
 	} else {
@@ -375,7 +375,7 @@ function onMessage(e) {
 				chatmsg.name = arguments[3];
 				chatmsg.speaking = "(b)" + escape(arguments[4]);
 				chatmsg.silent = "(a)" + escape(arguments[4]);
-				chatmsg.content = arguments[5];
+				chatmsg.content = escapeHtml(arguments[5]);
 				chatmsg.side = arguments[6];
 				chatmsg.sound = escape(arguments[7]);
 				chatmsg.type = arguments[8];
@@ -387,6 +387,7 @@ function onMessage(e) {
 				chatmsg.flash = arguments[14];
 				chatmsg.color = arguments[15];
 				chatmsg.isnew = true;
+				addlog(chatmsg.nameplate + ": " + escapeHtml(arguments[5]))
 				changebg(chatmsg.side);
 				textnow = '';
 				sfxplayed = 0
@@ -624,4 +625,12 @@ function escapeHtml(unsafe) {
 	transfer.replace(/"/g, "&quot;");
 	transfer.replace(/'/g, "&#039;");
 	return transfer;
+}
+
+if(typeof(String.prototype.trim) === "undefined")
+{
+    String.prototype.trim = function() 
+    {
+        return String(this).replace(/^\s+|\s+$/g, '');
+    };
 }
