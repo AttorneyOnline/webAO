@@ -195,72 +195,28 @@ function changebg(position) {
 	//document.getElementById("client_bench").style.display = "block"
 	switch (position) {
 		case "def":
-			if (ImageExist(bgfolder + "defenseempty.gif")) {
-				document.getElementById("client_court").src = bgfolder + "defenseempty.gif"
-			} else if (ImageExist(bgfolder + "defenseempty.png")) {
-				document.getElementById("client_court").src = bgfolder + "defenseempty.png"
-			}
+			document.getElementById("client_court").src = bgfolder + "defenseempty.png"
+			document.getElementById("client_bench").style.display = "block";
+			document.getElementById("client_bench").src = bgfolder + "defensedesk.png"
 			break;
 		case "pro":
-			if (ImageExist(bgfolder + "prosecutorempty.gif")) {
-				document.getElementById("client_court").src = bgfolder + "prosecutorempty.gif"
-			} else if (ImageExist(bgfolder + "prosecutorempty.png")) {
-				document.getElementById("client_court").src = bgfolder + "prosecutorempty.png"
-			}
+			document.getElementById("client_court").src = bgfolder + "prosecutorempty.png"
+			document.getElementById("client_bench").style.display = "block"
+			document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png"
 			break;
 		case "hld":
-			if (ImageExist(bgfolder + "helperstand.gif")) {
-				document.getElementById("client_court").src = bgfolder + "helperstand.gif"
-			} else if (ImageExist(bgfolder + "helperstand.png")) {
-				document.getElementById("client_court").src = bgfolder + "helperstand.png"
-			}
+			document.getElementById("client_court").src = bgfolder + "helperstand.png"
 			break;
 		case "hlp":
-			if (ImageExist(bgfolder + "prohelperstand.gif")) {
-				document.getElementById("client_court").src = bgfolder + "prohelperstand.gif"
-			} else if (ImageExist(bgfolder + "prohelperstand.png")) {
-				document.getElementById("client_court").src = bgfolder + "prohelperstand.png"
-			}
+			document.getElementById("client_court").src = bgfolder + "prohelperstand.png"
 			break;
 		case "wit":
-			if (ImageExist(bgfolder + "witnessempty.gif")) {
-				document.getElementById("client_court").src = bgfolder + "witnessempty.gif"
-			} else if (ImageExist(bgfolder + "witnessempty.png")) {
-				document.getElementById("client_court").src = bgfolder + "witnessempty.png"
-			}
+			document.getElementById("client_court").src = bgfolder + "witnessempty.png"
+			document.getElementById("client_fg").style.display = "block"
+			document.getElementById("client_fg").src = bgfolder + "estrado.png"
 			break;
 		case "jud":
-			if (ImageExist(bgfolder + "judgestand.gif")) {
-				document.getElementById("client_court").src = bgfolder + "judgestand.gif"
-			} else if (ImageExist(bgfolder + "judgestand.png")) {
-				document.getElementById("client_court").src = bgfolder + "judgestand.png"
-			}
-			break;
-	}
-	switch (position) {
-		case "def":
-			document.getElementById("client_bench").style.display = "block";
-			if (ImageExist(bgfolder + "defensedesk.gif")) {
-				document.getElementById("client_bench").src = bgfolder + "defensedesk.gif"
-			} else if (ImageExist(bgfolder + "defensedesk.png")) {
-				document.getElementById("client_bench").src = bgfolder + "defensedesk.png"
-			}
-			break;
-		case "pro":
-			document.getElementById("client_bench").style.display = "block"
-			if (ImageExist(bgfolder + "prosecutiondesk.gif")) {
-				document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.gif"
-			} else if (ImageExist(bgfolder + "prosecutiondesk.png")) {
-				document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png"
-			}
-			break;
-		case "wit":
-			document.getElementById("client_fg").style.display = "block"
-			if (ImageExist(bgfolder + "estrado.gif")) {
-				document.getElementById("client_fg").src = bgfolder + "estrado.gif"
-			} else if (ImageExist(bgfolder + "estrado.png")) {
-				document.getElementById("client_fg").src = bgfolder + "estrado.png"
-			}
+			document.getElementById("client_court").src = bgfolder + "judgestand.png"
 			break;
 	}
 }
@@ -299,6 +255,8 @@ function updateText() {
 }
 	if (texttimer >= shouttimer) {
 		if (chatmsg.startspeaking) {
+			changebg(chatmsg.side);
+			document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.speaking + ".gif";
 			document.getElementById("client_name").style.fontSize = (document.getElementById("client_name").offsetHeight * 0.7) + "px";
 			document.getElementById("client_chat").style.fontSize = (document.getElementById("client_chat").offsetHeight * 0.2) + "px";
 			document.getElementById("client_name").innerHTML = "<p>" + escapeHtml(chatmsg.nameplate) + "</p>";
@@ -326,9 +284,7 @@ function updateText() {
 				break;
 			}
 			document.getElementById("client_inner_chat").style = stylecolor;
-			changebg(chatmsg.side);
 			chatmsg.startspeaking = false;
-			document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.speaking + ".gif";
 		} else {
 			if (textnow != chatmsg.content) {
 				combo = (combo + 1) % 3;
@@ -337,7 +293,7 @@ function updateText() {
 						blip.play()
 						break;
 					case 1:
-						womboblip.play()
+						//womboblip.play()
 						break;
 					case 2:
 						comboblip.play()
