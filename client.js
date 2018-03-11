@@ -60,6 +60,7 @@ var texttimer = 0;
 var updater;
 var CHECKupdater;
 var serv;
+var oldloading=false;
 var carea = 0;
 var linifile;
 var pinifile;
@@ -258,7 +259,7 @@ function updateText() {
 			changebg(chatmsg.side);
 			document.getElementById("client_char").src = AO_HOST + "characters/" + chatmsg.name + "/" + chatmsg.speaking + ".gif";
 			document.getElementById("client_name").style.fontSize = (document.getElementById("client_name").offsetHeight * 0.7) + "px";
-			document.getElementById("client_chat").style.fontSize = (document.getElementById("client_chat").offsetHeight * 0.2) + "px";
+			document.getElementById("client_chat").style.fontSize = (document.getElementById("client_chat").offsetHeight * 0.25) + "px";
 			document.getElementById("client_name").innerHTML = "<p>" + escapeHtml(chatmsg.nameplate) + "</p>";
 			switch(chatmsg.color){
 				case "0":
@@ -430,12 +431,11 @@ function onMessage(e) {
 		case "SC":
 			document.getElementById("client_loadingtext").innerHTML = "Loading Characters";
 			for (var i = 1; i < arguments.length - 1; i++) {
-				charguments = arguments[i].split("&");
 				chars[i - 1] = {
-					"name": charguments[0],
-					"desc": charguments[1],
-					"evidence": charguments[3],
-					"icon": AO_HOST + "characters/" + charguments[0] + "/char_icon.png"
+					"name": arguments[i],
+					"desc": "",
+					"evidence": "",
+					"icon": AO_HOST + "characters/" + arguments[i] + "/char_icon.png"
 				}
 			}
 			serv.send("RM#%");
@@ -498,7 +498,11 @@ function onMessage(e) {
 			serv.send("askchaa#%");
 			break;
 		case "SI":
+		if(oldloading){
 			serv.send("askchar2#%");
+		}else{
+			serv.send("RC#%");
+		}
 			break;
 		case "CharsCheck":
 			document.getElementById("client_chartable").innerHTML = "";
@@ -593,7 +597,7 @@ function sendMusic(song) {
 }
 
 function sendCheck() {
-	serv.send("CHECK#" + me + "#%");
+	serv.send("CH#" + me + "#%");
 }
 
 function escapeHtml(unsafe) {

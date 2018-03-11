@@ -160,8 +160,6 @@ img {
 	display: none;
 	height: 7%;
 	border: 1px solid rgba(255,255,255,0.7);
-	padding-left: 5px;
-	padding-right: 5px;
 	background:rgba(73,0,254,0.5);
 	top: 63%;
 	border-radius: 3px;
@@ -172,7 +170,9 @@ img {
 	opacity: 2;
 	color: white;
 	position: relative;
-	margin: 0;
+	margin-left: 4px;
+	margin-right: 4px;
+	margin-top: auto;
 }
 
 #client_chat {
@@ -192,7 +192,7 @@ img {
 }
 
 #client_chat p {
-	margin: 3px;
+	margin: 4px;
 	color: white;
 }
 input {	
