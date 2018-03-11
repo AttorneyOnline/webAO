@@ -31,7 +31,7 @@
                 <p id="client_inner_chat"></p>
             </div>
         </div>
-		<input id="client_inputbox" type="text" onKeyPress="onEnter(event)" />
+		<input id="client_inputbox" class="long" type="text" onKeyPress="onEnter(event)" />
         <div id="client_emo">
         </div>
         <br>
@@ -39,12 +39,15 @@
             <img src="misc/holdit.png" id="button_1" alt="Hold it!" class="client_button" onclick="toggleshout(1)">
             <img src="misc/objection.png" id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleshout(2)">
             <img src="misc/takethat.png" id="button_3" alt="Take That!" class="client_button" onclick="toggleshout(3)">
+            <br>
+            <input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
+            <label for="sendsfx">SFX</label>
         </div>	
     </div>
 	<div id="client_settings">
-			Music <input id="client_mvolume" type="range"  min="0" max="100" value="80" onChange="changeMusicVolume()"/>
-			SFX <input id="client_svolume" type="range"  min="0" max="100" value="70" onChange="changeSFXVolume()"/>
-			Blip <input id="client_bvolume" type="range"  min="0" max="100" value="60" onChange="changeBlipVolume()"/>
+			Music <input id="client_mvolume" class="long" type="range"  min="0" max="100" value="80" onChange="changeMusicVolume()"/>
+			SFX <input id="client_svolume" class="long" type="range"  min="0" max="100" value="70" onChange="changeSFXVolume()"/>
+			Blip <input id="client_bvolume" class="long" type="range"  min="0" max="100" value="60" onChange="changeBlipVolume()"/>
 			<input id="change_character" type="button" onClick="changeCharacter()" value="Change character"/>
         </div>
 

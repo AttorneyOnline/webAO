@@ -136,7 +136,14 @@ function onEnter(event) {
 	if (event.keyCode == 13) {
 		mychar = chars[me]
 		myemo = emotes[myemotion]
-		ICmessage = "MS#chat#" + myemo.speaking + "#" + mychar.name + "#" + myemo.silent + "#" + escapeChat(document.getElementById("client_inputbox").value) + "#" + mychar.side + "#0#0#" + me + "#0#" + objection_state + "#0#0#0#0#%";
+		if(document.getElementById("sendsfx").checked){
+			ssfxname=myemo.sfx;
+			ssfxdelay=myemo.sfxdelay;
+		}else{
+			ssfxname="0";
+			ssfxdelay="0";
+		}
+		ICmessage = "MS#chat#" + myemo.speaking + "#" + mychar.name + "#" + myemo.silent + "#" + escapeChat(document.getElementById("client_inputbox").value) + "#" + mychar.side + "#" + ssfxname +"#" + myemo.zoom + "#" + me + "#" + ssfxdelay + "#" + objection_state + "#0#0#0#0#%";
 		serv.send(ICmessage);
 		document.getElementById("client_inputbox").value = '';
 		if (objection_state) {
@@ -190,35 +197,45 @@ function ImageExist(url) {
 }
 
 function changebg(position) {
+	var standname
 	bgfolder = AO_HOST + "background/" + bgname + "/";
 	document.getElementById("client_fg").style.display = "none";
 	document.getElementById("client_bench").style.display = "none";
-	//document.getElementById("client_bench").style.display = "block"
 	switch (position) {
 		case "def":
 			document.getElementById("client_court").src = bgfolder + "defenseempty.png"
 			document.getElementById("client_bench").style.display = "block";
 			document.getElementById("client_bench").src = bgfolder + "defensedesk.png"
+			standname="defense";
 			break;
 		case "pro":
 			document.getElementById("client_court").src = bgfolder + "prosecutorempty.png"
 			document.getElementById("client_bench").style.display = "block"
 			document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png"
+			standname="prosecution";
 			break;
 		case "hld":
 			document.getElementById("client_court").src = bgfolder + "helperstand.png"
+			standname="defense";
 			break;
 		case "hlp":
 			document.getElementById("client_court").src = bgfolder + "prohelperstand.png"
+			standname="prosecution";
 			break;
 		case "wit":
 			document.getElementById("client_court").src = bgfolder + "witnessempty.png"
-			document.getElementById("client_fg").style.display = "block"
-			document.getElementById("client_fg").src = bgfolder + "estrado.png"
+			document.getElementById("client_bench").style.display = "block"
+			document.getElementById("client_bench").src = bgfolder + "estrado.png"
+			standname="prosecution";
 			break;
 		case "jud":
 			document.getElementById("client_court").src = bgfolder + "judgestand.png"
+			standname="prosecution";
 			break;
+	}
+	if(chatmsg.type==5){
+		document.getElementById("client_bench").style.display = "none";
+		document.getElementById("client_court").src = AO_HOST + "themes/default/"+standname+"_speedlines.gif";
 	}
 }
 
@@ -538,11 +555,21 @@ function onMessage(e) {
 					chars[me].side = pinifile.Options.side;
 					for (var i = 1; i < pinifile.Emotions.number; i++) {
 						var emoteinfo = pinifile.Emotions[i].split('#');
+						esfx="0";
+						esfxd="0";
+						if (typeof pinifile.SoundN !== 'undefined') {
+							esfx=pinifile.SoundN[i];
+						}
+						if (typeof pinifile.SoundT !== 'undefined') {
+							esfxd=pinifile.SoundT[i];
+						}
 						emotes[i] = {
 							desc: emoteinfo[0],
 							speaking: emoteinfo[1],
 							silent: emoteinfo[2],
 							zoom: emoteinfo[3],
+							sfx: esfx,
+							sfxdelay: esfxd,
 							button_off: AO_HOST + 'characters/' + chars[me].name + '/emotions/button' + i + '_off.png',
 							button_on: AO_HOST + 'characters/' + chars[me].name + '/emotions/button' + i + '_on.png'
 						};
