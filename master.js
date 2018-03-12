@@ -8,6 +8,7 @@ masterserver.onerror = function(evt) { onError(evt) };
 var idnow;
 var descs = [];
 descs[99]="This is your computer on port 27016";
+var onlinec = [];
 var serverpics = [];
 function UrlExists(url)
 {
@@ -20,7 +21,7 @@ function UrlExists(url)
 function setServ(ID) {
 	console.log(descs[ID]);
 	if (descs[ID] != undefined) {
-		document.getElementById("serverdescC").innerHTML = descs[ID];
+		document.getElementById("serverdescC").innerHTML = "<b>Online: "+onlinec[ID]+"</b><br>" +descs[ID];
 	}
 	else {
 		document.getElementById("serverdescC").innerHTML = "";
@@ -40,7 +41,39 @@ function onOpen(e) {
 	masterserver.send("askforservers#%")
 	masterserver.send("VC#%")
 };
-			
+
+function checkOnline(serverID,coIP) {
+	function onCOOpen(e) {
+		console.log("Open");
+		console.log("YES")
+		oserv.send("HI#" + navigator.userAgent + "#%");
+		oserv.send("ID#webAO#2.4.5#%");
+	};
+	function onCOMessage(e) {
+		comsg = e.data;
+		console.log(comsg)
+		console.log("YES")
+		coheader = comsg.split('#', 2)[0];
+		coarguments = comsg.split('#').slice(1)
+		if (coheader == 'PN') {
+			onlinec[serverID]=coarguments[0]+"/"+coarguments[1];
+			document.getElementById('server'+serverID).className = "available";
+			oserv.close();
+		}
+	};
+
+	var oserv = new WebSocket("ws://" + coIP);
+
+	oserv.onopen = function(evt) {
+		onCOOpen(evt)
+	};
+
+	oserv.onmessage = function(evt) {
+		onCOMessage(evt)
+	};
+	
+}
+
 function onMessage(e) {
 	msg = e.data;
 	console.log(msg)
@@ -56,9 +89,10 @@ function onMessage(e) {
 		}else{
 			unavv = '';
 		}
-		document.getElementById('masterlist').innerHTML += '<li ' + unavv + 'onmouseover="setServ(' + arguments[0] + ')"><p>' + arguments[4] + '</p> <a class=\"button\" href=\"client.html?mode=watch&ip=' + arguments[1] + ':' + arguments[3] + '\">Watch</a><a class=\"button\" href=\"client.html?mode=join&ip=' + arguments[1] + ':' + arguments[3] + '\">Join</a></li><br/>'
+		document.getElementById('masterlist').innerHTML += '<li id="server' + arguments[0] + '" onmouseover="setServ(' + arguments[0] + ')"><p>' + arguments[4] + '</p> <a class=\"button\" href=\"client.html?mode=watch&ip=' + arguments[1] + ':' + arguments[3] + '\">Watch</a><a class=\"button\" href=\"client.html?mode=join&ip=' + arguments[1] + ':' + arguments[3] + '\">Join</a></li><br/>'
 		serverpics[arguments[0]] = arguments[2];
 		descs[arguments[0]] = arguments[5];
+		setTimeout(checkOnline(arguments[0],arguments[1] + ':' + arguments[3]), 3);
 	}
 	else if (header == 'servercheok')
 	{

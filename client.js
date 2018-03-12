@@ -11,7 +11,8 @@ location.search.substr(1).split("&").forEach(function(item) {
 /* Server magic */
 //serv = new WebSocket("ws://51.255.160.217:50000");
 //serv = new WebSocket("ws://85.25.196.172:5000");
-serv = new WebSocket("ws://" + queryDict.ip);
+var serverIP = queryDict.ip;
+serv = new WebSocket("ws://" + serverIP);
 var mode = queryDict.mode;
 //var AO_HOST = "http://weedlan.de/";
 if (queryDict.asset === undefined) {
@@ -331,6 +332,7 @@ function updateText() {
 function onOpen(e) {
 	if (mode == "join") {
 		serv.send("HI#" + navigator.userAgent + "#%");
+		serv.send("ID#webAO#2.4.5#%");
 	} else {
 		document.getElementById("client_loading").style.display = "none";
 	}
@@ -342,10 +344,15 @@ function onClose(e) {
 };
 
 function ReconnectButton() {
-	serv = new WebSocket("ws://" + queryDict.ip);
+	serv = new WebSocket("ws://" + serverIP);
 	if (serv) {
+		serv.send("HI#" + navigator.userAgent + "#%");
 		document.getElementById("client_error").style.display = "none";
 	}
+}
+
+function RetryButton() {
+serv.send("HI#" + navigator.userAgent + "#%");
 }
 
 function onError(e) {
