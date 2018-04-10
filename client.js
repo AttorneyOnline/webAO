@@ -7,6 +7,7 @@ var queryDict = {};
 location.search.substr(1).split("&").forEach(function(item) {
 	queryDict[item.split("=")[0]] = item.split("=")[1]
 })
+
 //document.getElementById("client_wrapper").style = "width: 800px;";
 /* Server magic */
 //serv = new WebSocket("ws://51.255.160.217:50000");
@@ -62,6 +63,9 @@ var updater;
 var CHECKupdater;
 var serv;
 var oldloading=false;
+if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
+	oldloading=true;
+}
 var carea = 0;
 var linifile;
 var pinifile;
