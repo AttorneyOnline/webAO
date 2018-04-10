@@ -444,11 +444,12 @@ function onMessage(e) {
 		case "SC":
 			document.getElementById("client_loadingtext").innerHTML = "Loading Characters";
 			for (var i = 1; i < arguments.length - 1; i++) {
+				charguments = arguments[i].split("&");
 				chars[i - 1] = {
-					"name": arguments[i],
-					"desc": arguments[i],
-					"evidence": "",
-					"icon": AO_HOST + "characters/" + escape(arguments[i]) + "/char_icon.png"
+					"name": charguments[0],
+					"desc": charguments[1],
+					"evidence": charguments[3],
+					"icon": AO_HOST + "characters/" + escape(charguments[0]) + "/char_icon.png"
 				}
 			}
 			serv.send("RM#%");
