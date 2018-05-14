@@ -53,9 +53,9 @@ img {
 
 #client_gamewindow {
 	position: relative;
-	top: 0;
-	left: 0;
-  width: 100%;
+	/*! top: 0; */
+	/*! left: 0; */
+  /*! width: 100%; */
   padding-bottom: 75%;
 }
 
@@ -91,19 +91,27 @@ img {
 }
 
 #client_wrapper {
-	position: absolute;
-	top: 0;
-	left: 0;
+	/*! position: absolute; */
+	/*! top: 0; */
+	/*! left: 0; */
 	background-color: #888888;
-	height: 99%;
-	width: 512px;
-	margin: 0;
-	padding: 0;
-	float: left;
-	resize: horizontal;
+	/*! height: 99%; */
+	/*! width: 512px; */
+	/*! margin: 0; */
+	/*! padding: 0; */
+	/*! float: left; */
+	/*! resize: horizontal; */
 	overflow: auto;
 	overflow-y:hidden;
-	border: 1px solid;
+	/*! border: 1px solid; */
+	min-width: 256px;
+	resize: horizontal;
+}
+
+@media (max-width: 360px) {
+	#kek {
+		width: fit-content;
+	}
 }
 
 #client_emo {
@@ -113,9 +121,11 @@ img {
 }
 
 #client_settings {
-	position: absolute;
-	top: 100%;
-	width: 60%;
+	/*! position: absolute; */
+	/*! top: 100%; */
+	width: 100%;
+	/*! grid-column: 1; */
+	/*! grid-row: 2; */
 }
 
 .area_btn {
@@ -195,67 +205,94 @@ img {
 	margin: 4px;
 	color: white;
 }
-.long {	
-	width: 98%;
+.long {
+	width: 100%;
 	background-color: #dddddd;
 	border: 1px solid #555555;
+	border-style: solid;
+	box-sizing: border-box;
 }
 
 #client_chatlog {
-	width: 244px;
-	height: 100%;
-	background: #dbdbdb url("misc/chat2.png") no-repeat;
-	padding: 0;
-	position: absolute;
+	/*! width: 244px; */
+	/*! height: 100%; */
+	/*! background: #dbdbdb url("misc/chat2.png") no-repeat; */
+	/*! padding: 0; */
+	/*! position: absolute; */
 	top: 0;
 	right: 0;
+	/* grid-column: 2; */
+	flex: 1;
 }
 
 #client_log {
 	position: relative;
-	top: 3px;
-	left: 10px;
-	height: 310px;
-	width: 225px;
+	/* top: 3px; */
+	/*! left: 10px; */
+	/* height: 315px; */
+	/*! width: 99%; */
 	color: white;
 	word-break: keep-all;
 	word-wrap:break-word;
 	overflow-wrap: break-word;
-	overflow-y: hidden;
-	font-size: 12px;
-	margin-bottom: 40px;
+	overflow-y: scroll;
+	font-size: medium;
+	/* margin-bottom: 10px; */
+	background-color: #242424;
+	border: black;
+	border-style: solid;
+	/* max-width: 50em; */
+	/* min-height: 30em; */
 }
 
 #client_ooclog {
-	width: 220px;
-	margin-top: 30px;
-	height: 50%;
+	/*! width: 99%; */
+	/* margin-top: 25px; */
+	/* height: 50%; */
 	position: relative;
-	background-color: #8b8b8b; 
+	background-color: #242424;
+	color: white;
+	font-family: "Source Code Pro", "Consolas", monospace;
+	font-size: small;
+	overflow-wrap: break-word;
+	overflow-y: scroll;
+	text-rendering: optimizelegibility;
+	resize: none;
+	flex: 1 1 auto;
 }
 
 #client_musiclist {
-	width: 244px;
-	margin-top: 30px;
-	height: 50%;
+	width: 99%;
+	/* margin-top: 20px; */
+	/*! height: 50%; */
 	position: relative;
-	background-color: #ff0000; 
+	background-color: #ff0000;
+	/* resize: vertical; */
+	width: auto;
 }
 
 #client_bars {
 	position: relative;
-	margin-bottom: 30px;
+	/*! margin-bottom: 30px; */
 	text-align: center;
+	/* display: flex; */
+	/* flex-direction: row; */
+	height: 20px;
+}
+
+.slider {
+	padding-right: 4px;
 }
 
 .client_defense {
-	position: absolute;
-	left: 30px;
+	/* position: absolute; */
+	/* left: 30px; */
+	width: 90px;
+	height: 20px;
 }
 
 .client_prosecutor {
-	position: absolute;
-	left: 130px;
+	/* left: 130px; */
 }
 
 .client_button {

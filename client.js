@@ -492,7 +492,7 @@ function onMessage(e) {
 			break;
 		case "DONE":
 			document.getElementById("client_loading").style.display = "none";
-			document.getElementById("client_chatlog").style.display = "block";
+			document.getElementById("client_chatlog").style.display = "grid";
 			document.getElementById("client_wrapper").style.display = "block";
 			document.getElementById("client_charselect").style.display = "block";
 			break;

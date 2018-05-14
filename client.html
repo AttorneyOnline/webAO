@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <title>Attorney Online session</title>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="client.css">
@@ -10,65 +9,71 @@
 <body>
     <span id="sound"></span>
     <div id="client_loading">
-    <h1 id="client_loadingtext">Loading</h1>
-    <button onclick='RetryButton()'>RETRY</button>
+        <h1 id="client_loadingtext">Loading</h1>
+        <button onclick="RetryButton()">RETRY</button>
     </div>
-	<div id="client_charselect">
-	<button onclick="pickchar(1001)">SPECTATE</button>
-	<table id="client_chartable">
-	</table>
-	</div>
-    <div id="client_wrapper">
-        <div id="client_gamewindow">
-            <img id="client_court" alt="Courtroom background" onerror="imgError(this);">
-            <img id="client_char" alt="Character sprite" onerror="imgError(this);">
-            <img id="client_bench" alt="Bench overlay">
-            <img id="client_fg" alt="Various overlay" onerror="imgError(this);">
-            <div id="client_name">
-                <p>Dolan</p>
+        <div id="client_charselect">
+        <button onclick="pickchar(1001)">SPECTATE</button>
+        <table id="client_chartable"></table>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; flex-shrink: 1;">
+        <div>
+        <div id="client_wrapper">
+            <div id="client_gamewindow">
+                <img id="client_court" alt="Courtroom background" onerror="imgError(this);">
+                <img id="client_char" alt="Character sprite" onerror="imgError(this);">
+                <img id="client_bench" alt="Bench overlay">
+                <img id="client_fg" alt="Various overlay" onerror="imgError(this);">
+                <div id="client_name">
+                    <p>Dolan</p>
+                </div>
+                <div id="client_chat">
+                    <p id="client_inner_chat"></p>
+                </div>
             </div>
-            <div id="client_chat">
-                <p id="client_inner_chat"></p>
+            <input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)" style="padding-left: 1px; padding-right: 1px;">
+            <div id="client_emo">
             </div>
-        </div>
-		<input id="client_inputbox" class="long" type="text" onKeyPress="onEnter(event)">
-        <div id="client_emo">
-        </div>
-        <br>
-        <div id="client_buttons">
-            <img src="misc/holdit.png" id="button_1" alt="Hold it!" class="client_button" onclick="toggleshout(1)">
-            <img src="misc/objection.png" id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleshout(2)">
-            <img src="misc/takethat.png" id="button_3" alt="Take That!" class="client_button" onclick="toggleshout(3)">
             <br>
-            <input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
-            <label for="sendsfx">SFX</label>
+            <div id="client_buttons">
+                <img src="misc/holdit.png" id="button_1" alt="Hold it!" class="client_button" onclick="toggleshout(1)">
+                <img src="misc/objection.png" id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleshout(2)">
+                <img src="misc/takethat.png" id="button_3" alt="Take That!" class="client_button" onclick="toggleshout(3)">
+                <br>
+                <input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
+                <label for="sendsfx">SFX</label>
+            </div>
         </div>	
-    </div>
-	<div id="client_settings">
-			Music <input id="client_mvolume" class="long" type="range"  min="0" max="100" value="80" onChange="changeMusicVolume()">
-			SFX <input id="client_svolume" class="long" type="range"  min="0" max="100" value="70" onChange="changeSFXVolume()">
-			Blip <input id="client_bvolume" class="long" type="range"  min="0" max="100" value="60" onChange="changeBlipVolume()">
-			<input id="change_character" type="button" onClick="changeCharacter()" value="Change character">
+        <div id="client_settings">
+            <div class="slider">Music<input id="client_mvolume" class="long" type="range" min="0" max="100" value="80" onchange="changeMusicVolume()"></div>
+            <div class="slider">SFX <input id="client_svolume" class="long" type="range" min="0" max="100" value="70" onchange="changeSFXVolume()"></div>
+            <div class="slider">Blip <input id="client_bvolume" class="long" type="range" min="0" max="100" value="60" onchange="changeBlipVolume()"></div>
+            <input id="change_character" type="button" onclick="changeCharacter()" value="Change character">
         </div>
-
-    <div id="client_chatlog">
-        <div id="client_log">
         </div>
-        <div id="client_bars">
-            <img class="client_defense" alt="Defense health background" id="client_defense_bg" src="misc/zdoh.png">
-            <img class="client_defense" alt="Defense health" id="client_defense_hp" src="misc/advocat.png">
-
-            <img class="client_prosecutor" alt="Prosecution health background" id="client_prosecutor_bg" src="misc/zdoh.png">
-            <img class="client_prosecutor" alt="Prosecution health" id="client_prosecutor_hp" src="misc/procuror.png">
+        <div id="client_chatlog" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));grid-template-rows: repeat(auto-fit, minmax(10em, 40em));">
+        <div style="display: flex; flex-direction: column;">
+            <div id="client_log" style="flex: 1"></div>
+            <div id="client_bars">
+                <span style="background-image: url(&quot;misc/zdoh.png&quot;); width: 90px; height: 20px;">
+                    <img class="client_defense" alt="Defense health" id="client_defense_hp" src="misc/advocat.png" style="clip-path: polygon(0px 0px, 90px 0px, 90px 20px, 0px 20px, 0px 0px); clip: rect(0px, 90px, 20px, 0px);">
+                </span>
+                <span style="background-image: url(&quot;misc/zdoh.png&quot;); width: 90px; height: 20px;" misc="">
+                    <img class="client_prosecutor" alt="Prosecution health" id="client_prosecutor_hp" src="misc/procuror.png" style="clip-path: polygon(0px 0px, 90px 0px, 90px 20px, 0px 20px, 0px 0px); clip: rect(0px, 90px, 20px, 0px);" misc="">
+                </span>
+            </div>
         </div>
-        <textarea id="client_ooclog"></textarea>
-        <input id="client_oocinputbox" class="long" type="text" onKeyPress="onOOCEnter(event)">
-		<select id="client_musiclist" size="25" onclick="musiclist_click(event)"></select>
+        <div style="display: flex; flex-direction: column; /* grid-column: 2; */ /* grid-row: 1; */">
+            <textarea id="client_ooclog" style="/* margin: 25px 0px 0px; *//* height: 563px; *//* width: 615px; *//* min-width: 100%; */min-height: 20em;">
+            </textarea>
+            <input id="client_oocinputbox" class="long" type="text" onkeypress="onOOCEnter(event)">
+        </div>
+            <select id="client_musiclist" size="5" onclick="musiclist_click(event)" style="/* margin-top: 20px; *//* margin-bottom: 0px; *//* height: 361px; */">
+            </select>
+        </div>
+        <div id="client_error" class="error" style="display: none">
+            <p>CONNECTION ERROR</p><br>
+            <button onclick="ReconnectButton()">RECONNECT</button>
+        </div>
     </div>
-    <div id="client_error" class="error" style="display: none">
-        <p>CONNECTION ERROR</p><br>
-        <button onclick='ReconnectButton()'>RECONNECT</button>
-    </div>
-</body>
-
-</html>
+</body></html>
