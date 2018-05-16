@@ -67,7 +67,6 @@ img {
 	height: 100%;
 	overflow-y: scroll;
 	justify-content: center;
-	display: none;
 	align-items: center;
 	vertical-align: middle;
 	margin: 0 auto;
@@ -199,6 +198,9 @@ img {
 	word-break: keep-all;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
+	text-align: start;
+	overflow: hidden;
+	scroll-behavior: smooth;
 }
 
 #client_chat p {
@@ -229,7 +231,7 @@ img {
 	position: relative;
 	/* top: 3px; */
 	/*! left: 10px; */
-	/* height: 315px; */
+	height: 100%;
 	/*! width: 99%; */
 	color: white;
 	word-break: keep-all;
@@ -243,6 +245,7 @@ img {
 	border-style: solid;
 	/* max-width: 50em; */
 	/* min-height: 30em; */
+	text-align: start;
 }
 
 #client_ooclog {
@@ -259,6 +262,7 @@ img {
 	text-rendering: optimizelegibility;
 	resize: none;
 	flex: 1 1 auto;
+	border: none;
 }
 
 #client_musiclist {

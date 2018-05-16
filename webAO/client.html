@@ -2,16 +2,18 @@
 <html lang="en"><head>
     <title>Attorney Online session</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="client.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <!--<script src="golden/js/goldenlayout.js"></script>-->
     <link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
     <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css" />
-    <script src="src/index.js" type="module"></script>
+    <script src="ui.b.js"></script>
     <script src="client.js"></script>
 </head>
 
 <template id="client_wrapper">
+    <meta name="frame-title" lang="en" content="Game">
     <div id="client_gamewindow">
         <img id="client_court" alt="Courtroom background" onerror="imgError(this);">
         <img id="client_char" alt="Character sprite" onerror="imgError(this);">
@@ -39,15 +41,20 @@
 </template>
 
 <template id="client_settings">
+    <meta name="frame-title" lang="en" content="Settings">
     <div class="slider">Music<input id="client_mvolume" class="long" type="range" min="0" max="100" value="80" onchange="changeMusicVolume()"></div>
     <div class="slider">SFX <input id="client_svolume" class="long" type="range" min="0" max="100" value="70" onchange="changeSFXVolume()"></div>
     <div class="slider">Blip <input id="client_bvolume" class="long" type="range" min="0" max="100" value="60" onchange="changeBlipVolume()"></div>
     <input id="change_character" type="button" onclick="changeCharacter()" value="Change character">
 </template>
 
-<template id="client_log"></template>
+<template id="log">
+    <meta name="frame-title" lang="en" content="Log">
+    <div id="client_log"></div>
+</template>
 
 <template id="misc" style="display: flex; flex-direction: column;">
+    <meta name="frame-title" lang="en" content="Miscellaneous">
     <div id="client_bars">
         <span style="background-image: url(&quot;misc/zdoh.png&quot;); width: 90px; height: 20px;">
             <img class="client_defense" alt="Defense health" id="client_defense_hp" src="misc/advocat.png" style="clip-path: polygon(0px 0px, 90px 0px, 90px 20px, 0px 20px, 0px 0px); clip: rect(0px, 90px, 20px, 0px);">
@@ -59,12 +66,16 @@
 </template>
 
 <template id="ooc">
-    <textarea id="client_ooclog" style="/* margin: 25px 0px 0px; *//* height: 563px; *//* width: 615px; *//* min-width: 100%; */min-height: 20em;"></textarea>
-    <input id="client_oocinputbox" class="long" type="text" onkeypress="onOOCEnter(event)">
+    <meta name="frame-title" lang="en" content="Server">
+    <div style="height: 100%; display: flex; flex-direction: column;">
+        <textarea id="client_ooclog" style="flex: 1 auto"></textarea>
+        <input id="client_oocinputbox" class="long" type="text" onkeypress="onOOCEnter(event)">
+    </div>
 </template>
 
 <template id="music">
-    <select id="client_musiclist" size="5" onclick="musiclist_click(event)" style="/* margin-top: 20px; *//* margin-bottom: 0px; *//* height: 361px; */">
+    <meta name="frame-title" lang="en" content="Music">
+    <select id="client_musiclist" size="5" onclick="musiclist_click(event)" style="width: 100%; height: 100%;">
     </select>
 </template>
 
