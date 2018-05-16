@@ -5,6 +5,9 @@ var config = {
         showPopoutIcon: false,
         showCloseIcon: false
     },
+    dimensions: {
+        minItemHeight: 40
+    },
     content: [
     {
         type: "row",
