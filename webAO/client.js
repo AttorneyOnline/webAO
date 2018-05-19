@@ -686,25 +686,28 @@ window.musiclist_click = musiclist_click;
 /**
  * Triggered by the music volume slider.
  */
-function changeMusicVolume() {
+export function changeMusicVolume() {
 	viewport.music.volume = document.getElementById("client_mvolume").value / 100;
 }
+window.changeMusicVolume = changeMusicVolume;
 
 /**
  * Triggered by the sound effect volume slider.
  */
-function changeSFXVolume() {
+export function changeSFXVolume() {
 	viewport.sfxaudio.volume = document.getElementById("client_svolume").value / 100;
 }
+window.changeSFXVolume = changeSFXVolume;
 
 /**
  * Triggered by the blip volume slider.
  */
-function changeBlipVolume() {
+export function changeBlipVolume() {
 	viewport.blip.volume = document.getElementById("client_bvolume").value / 100;
 	viewport.womboblip.volume = document.getElementById("client_bvolume").value / 100;
 	viewport.comboblip.volume = document.getElementById("client_bvolume").value / 100;
 }
+window.changeBlipVolume = changeBlipVolume;
 
 /**
  * Triggered when a character icon is clicked in the character selection menu.
