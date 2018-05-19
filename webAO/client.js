@@ -21,12 +21,6 @@ const BAR_HEIGHT = 20;
 const CHAR_SELECT_WIDTH = 8;
 const UPDATE_INTERVAL = 80;
 
-let client = new Client(serverIP);
-let viewport = new Viewport();
-
-let music = new Audio();
-music.play();
-
 let oldLoading = false;
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
 	oldLoading = true;
@@ -34,9 +28,9 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phon
 
 let selectedShout = 0;
 
-export default class Client {
+class Client {
 	constructor(address) {
-		this.serv = new WebSocket("ws://" + serverIP);
+		this.serv = new WebSocket("ws://" + address);
 
 		this.serv.onopen    = (evt) => this.onOpen(evt);
 		this.serv.onclose   = (evt) => this.onClose(evt);
@@ -55,6 +49,28 @@ export default class Client {
 
 		// Only used for RMC/`music` packets, not EM/SM/MC packets.
 		this.musicList = Object();
+
+		this.handlers = {
+			"MS":         (args) => this.handleMS(args),
+			"CT":         (args) => this.handleCT(args),
+			"MC":         (args) => this.handleMC(args),
+			"RMC":        (args) => this.handleRMC(args),
+			"CI":         (args) => this.handleCI(args),
+			"SC":         (args) => this.handleSC(args),
+			"EI":         (args) => this.handleEI(args),
+			"EM":         (args) => this.handleEM(args),
+			"SM":         (args) => this.handleSM(args),
+			"music":      (args) => this.handlemusic(args),
+			"DONE":       (args) => this.handleDONE(args),
+			"BN":         (args) => this.handleBN(args),
+			"NBG":        (args) => this.handleNBG(args),
+			"HP":         (args) => this.handleHP(args),
+			"ID":         (args) => this.handleID(args),
+			"PN":         (args) => this.handlePN(args),
+			"SI":         (args) => this.handleSI(args),
+			"CharsCheck": (args) => this.handleCharsCheck(args),
+			"PV":         (args) => this.handlePV(args)
+		}
 	}
 
 	/**
@@ -93,8 +109,8 @@ export default class Client {
 	 */
 	sendIC(speaking, name, silent, message, side, ssfxname, zoom, ssfxdelay, objection) {
 		this.serv.send(
-			`MS#chat#${speaking}#${name}#${silent}`
-			`#${escapeChat(message)}#${side}#${ssfxname}#${zoom}`
+			`MS#chat#${speaking}#${name}#${silent}` +
+			`#${escapeChat(message)}#${side}#${ssfxname}#${zoom}` +
 			`#${this.charID}#${ssfxdelay}#${selectedShout}#0#0#0#0#%`
 		);
 	}
@@ -179,9 +195,14 @@ export default class Client {
 		let msg = e.data;
 		console.debug(msg);
 		let lines = msg.split('%');
-		let arguments = lines[0].split('#');
-		let header = arguments[0];
-		this[`handle${header}`](arguments);
+		let args = lines[0].split('#');
+		let header = args[0];
+		let handler = this.handlers[header];
+		if (typeof handler !== "undefined") {
+			handler(args);
+		} else {
+			console.warn(`Invalid packet header ${header}`);
+		}
 	}
 
 	/**
@@ -197,35 +218,35 @@ export default class Client {
 		clearInterval(this.checkUpdater);
 	}
 
-	handleMS(arguments) {
+	handleMS(args) {
 		// TODO: this if-statement might be a bug.
-		if (arguments[4] != viewport.chatmsg.content) {
+		if (args[4] != viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
 			let chatmsg = {
-				pre: escape(arguments[2]),
+				pre: escape(args[2]),
 				character: -1, // Will do a linear search
-				preanim: escape(arguments[2]), // XXX: why again?
-				nameplate: arguments[3], // TODO: parse INI to get this info
-				name: arguments[3],
-				speaking: "(b)" + escape(arguments[4]),
-				silent: "(a)" + escape(arguments[4]),
-				content: escapeHtml(arguments[5]),
-				side: arguments[6],
-				sound: escape(arguments[7]),
-				type: arguments[8],
-				// charid: arguments[9],
-				snddelay: arguments[10],
-				objection: arguments[11],
-				evidence: arguments[12],
-				// flip: arguments[13],
-				flash: arguments[14],
-				color: arguments[15],
+				preanim: escape(args[2]), // XXX: why again?
+				nameplate: args[3], // TODO: parse INI to get this info
+				name: args[3],
+				speaking: "(b)" + escape(args[4]),
+				silent: "(a)" + escape(args[4]),
+				content: args[5],
+				side: args[6],
+				sound: escape(args[7]),
+				type: args[8],
+				// charid: args[9],
+				snddelay: args[10],
+				objection: args[11],
+				evidence: args[12],
+				// flip: args[13],
+				flash: args[14],
+				color: args[15],
 				isnew: true,
 			};
 
 			// The dreaded linear search...
 			for (let i = 0; i < this.chars.length; i++) {
-				if (this.chars[i].name == arguments[3]) {
+				if (this.chars[i].name == args[3]) {
 					chatmsg.character = i;
 					break;
 				}
@@ -235,27 +256,27 @@ export default class Client {
 		}
 	}
 
-	handleCT(arguments) {
-		document.getElementById("client_ooclog").innerHTML = document.getElementById("client_ooclog").innerHTML + arguments[1] + ": " + arguments[2] + "\r\n";
+	handleCT(args) {
+		document.getElementById("client_ooclog").innerHTML = document.getElementById("client_ooclog").innerHTML + args[1] + ": " + args[2] + "\r\n";
 	}
 
-	handleMC(arguments) {
+	handleMC(args) {
 		music.pause();
-		music.src = MUSIC_HOST + arguments[1];
+		music.src = MUSIC_HOST + args[1];
 		music.play();
-		if (arguments[2] >= 0) {
-			musicname = this.chars[arguments[2]].name;
-			appendICLog(`${musicname} changed music to ${arguments[1]}`);
+		if (args[2] >= 0) {
+			let musicname = this.chars[args[2]].name;
+			appendICLog(`${musicname} changed music to ${args[1]}`);
 		} else {
-			appendICLog(`The music was changed to ${arguments[1]}`);
+			appendICLog(`The music was changed to ${args[1]}`);
 		}
 	}
 
-	handleRMC(arguments) {
+	handleRMC(args) {
 		music.pause();
-		music = new Audio(this.musicList[arguments[1]]);
+		music = new Audio(this.musicList[args[1]]);
 		// Music offset + drift from song loading
-		music.totime = arguments[1];
+		music.totime = args[1];
 		music.offset = new Date().getTime() / 1000;
 		music.addEventListener('loadedmetadata', function() {
 			music.currentTime += parseFloat(music.totime + (new Date().getTime() / 1000 - music.offset)).toFixed(3);
@@ -263,106 +284,104 @@ export default class Client {
 		}, false);
 	}
 
-	handleCI(arguments) {
-		document.getElementById("client_loadingtext").innerHTML = "Loading Character " + arguments[1];
-		this.serv.send("AN#" + ((arguments[1] / 10) + 1) + "#%");
-		for (let i = 2; i < arguments.length - 1; i++) {
+	handleCI(args) {
+		document.getElementById("client_loadingtext").innerHTML = "Loading Character " + args[1];
+		this.serv.send("AN#" + ((args[1] / 10) + 1) + "#%");
+		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 == 0) {
-				charguments = arguments[i].split("&");
-				this.chars[arguments[i - 1]] = {
-					"name": charguments[0],
-					"desc": charguments[1],
-					"evidence": charguments[3],
-					"icon": AO_HOST + "characters/" + escape(charguments[0]) + "/char_icon.png"
+				let chargs = args[i].split("&");
+				this.chars[args[i - 1]] = {
+					"name": chargs[0],
+					"desc": chargs[1],
+					"evidence": chargs[3],
+					"icon": AO_HOST + "characters/" + escape(chargs[0]) + "/char_icon.png"
 				};
 			}
 		}
 	}
 
-	handleSC(arguments) {
+	handleSC(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Characters";
-		for (let i = 1; i < arguments.length - 1; i++) {
-			charguments = arguments[i].split("&");
+		for (let i = 1; i < args.length - 1; i++) {
+			let chargs = args[i].split("&");
 			this.chars[i - 1] = {
-				"name": charguments[0],
-				"desc": charguments[1],
-				"evidence": charguments[3],
-				"icon": AO_HOST + "characters/" + escape(charguments[0]) + "/char_icon.png"
+				"name": chargs[0],
+				"desc": chargs[1],
+				"evidence": chargs[3],
+				"icon": AO_HOST + "characters/" + escape(chargs[0]) + "/char_icon.png"
 			}
 		}
 		this.serv.send("RM#%");
 	}
 
-	handleEI(arguments) {
-		document.getElementById("client_loadingtext").innerHTML = "Loading Evidence " + arguments[1];
-		//serv.send("AE#" + (arguments[1] + 1) + "#%");
+	handleEI(args) {
+		document.getElementById("client_loadingtext").innerHTML = "Loading Evidence " + args[1];
+		//serv.send("AE#" + (args[1] + 1) + "#%");
 		this.serv.send("RM#%");
 	}
 
-	handleEM(arguments) {
-		document.getElementById("client_loadingtext").innerHTML = "Loading Music " + arguments[1];
-		this.serv.send("AM#" + ((arguments[1] / 10) + 1) + "#%");
+	handleEM(args) {
+		document.getElementById("client_loadingtext").innerHTML = "Loading Music " + args[1];
+		this.serv.send("AM#" + ((args[1] / 10) + 1) + "#%");
 		let hmusiclist = document.getElementById("client_musiclist");
-		for (let i = 2; i < arguments.length - 1; i++) {
+		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 == 0) {
 				let newentry = document.createElement("OPTION");
-				newentry.text = arguments[i];
+				newentry.text = args[i];
 				hmusiclist.options.add(newentry);
 			}
 		}
 	}
 
-	handleSM(arguments) {
+	handleSM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
 		let hmusiclist = document.getElementById("client_musiclist");
-		for (let i = 1; i < arguments.length - 1; i++) {
+		for (let i = 1; i < args.length - 1; i++) {
 			let newentry = document.createElement("OPTION");
-			newentry.text = arguments[i];
+			newentry.text = args[i];
 			hmusiclist.options.add(newentry);
 		}
 		this.serv.send("RD#%");
 	}
 
-	handlemusic(arguments) {
-		for (let i = 0; i < arguments.length / 2; i++) {
-			this.musicList[arguments[2 * i]] = arguments[2 * i + 1];
+	handlemusic(args) {
+		for (let i = 0; i < args.length / 2; i++) {
+			this.musicList[args[2 * i]] = args[2 * i + 1];
 		}
 	}
 
-	handleDONE(arguments) {
+	handleDONE(args) {
 		document.getElementById("client_loading").style.display = "none";
-		document.getElementById("client_chatlog").style.display = "grid";
-		document.getElementById("client_wrapper").style.display = "block";
 		document.getElementById("client_charselect").style.display = "block";
 	}
 
-	handleBN(arguments) {
-		viewport.bgname = escape(arguments[1]);
+	handleBN(args) {
+		viewport.bgname = escape(args[1]);
 	}
 
-	handleNBG(arguments) {
+	handleNBG(args) {
 		// TODO (set by sD)
 	}
 
-	handleHP(arguments) {
+	handleHP(args) {
 		// TODO (set by sD)
 		// Also, this is broken.
-		if (arguments[1] == 1) {
-			document.getElementById("client_defense_hp").style.clip = "rect(0px," + BAR_WIDTH * arguments[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
+		if (args[1] == 1) {
+			document.getElementById("client_defense_hp").style.clip = "rect(0px," + BAR_WIDTH * args[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
 		} else {
-			document.getElementById("client_prosecutor_hp").style.clip = "rect(0px," + BAR_WIDTH * arguments[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
+			document.getElementById("client_prosecutor_hp").style.clip = "rect(0px," + BAR_WIDTH * args[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
 		}
 	}
 	
-	handleID(arguments) {
-		this.playerID = arguments[1];
+	handleID(args) {
+		this.playerID = args[1];
 	}
 
-	handlePN(arguments) {
+	handlePN(args) {
 		this.serv.send("askchaa#%");
 	}
 
-	handleSI(arguments) {
+	handleSI(args) {
 		if (oldLoading) {
 			this.serv.send("askchar2#%");
 		} else {
@@ -370,7 +389,7 @@ export default class Client {
 		}
 	}
 
-	handleCharsCheck(arguments) {
+	handleCharsCheck(args) {
 		document.getElementById("client_chartable").innerHTML = "";
 		for (let i = 0; i < this.chars.length; i++) {
 			if (i % CHAR_SELECT_WIDTH == 0) {
@@ -379,12 +398,14 @@ export default class Client {
 			let td = document.createElement('TD');
 			let icon_chosen;
 			let thispick = this.chars[i].icon;
-			if (arguments[1 + i] == "-1") {
+			if (args[i + 1] == "-1") {
 				icon_chosen = " dark";
 			} else {
 				icon_chosen = "";
 			}
-			td.innerHTML = "<img class='demothing" + icon_chosen + "' id='demo_" + i + "' src='" + thispick + "' alt='" + chars[i].desc + "' onclick='pickchar(" + i + ")' onerror='demoError(this);'>";
+			td.innerHTML = `<img class='demothing${icon_chosen}' id='demo_${i}' ` +
+				`src='${thispick}' alt='${this.chars[i].desc}' onclick='pickchar(${i})' ` +
+				`onerror='demoError(this);'>`;
 			tr.appendChild(td);
 			if (i % CHAR_SELECT_WIDTH == 0) {
 				document.getElementById("client_chartable").appendChild(tr);
@@ -393,36 +414,38 @@ export default class Client {
 		changeBackground("def");
 	}
 
-	handlePV(arguments) {
-		this.charID = arguments[3];
+	handlePV(args) {
+		this.charID = args[3];
 		document.getElementById("client_charselect").style.display = "none";
+		let me = this.me();
+		let emotes = this.emotes;
 		let xhr = new XMLHttpRequest();
-		xhr.open('GET', AO_HOST + 'characters/' + escape(me().name) + '/char.ini', true);
+		xhr.open('GET', AO_HOST + 'characters/' + escape(this.me().name) + '/char.ini', true);
 		xhr.responseType = 'text';
-		xhr.onload = function(e) {
+		xhr.onload = function (e) {
 			if (this.status == 200) {
 				let linifile = this.responseText;
 				let pinifile = INI.parse(linifile);
-				me().side = pinifile.Options.side;
+				me.side = pinifile.Options.side;
 				for (let i = 1; i < pinifile.Emotions.number; i++) {
 					let emoteinfo = pinifile.Emotions[i].split('#');
-					esfx = "0";
-					esfxd = "0";
+					let esfx = "0";
+					let esfxd = "0";
 					if (typeof pinifile.SoundN !== 'undefined') {
 						esfx = pinifile.SoundN[i];
 					}
 					if (typeof pinifile.SoundT !== 'undefined') {
 						esfxd = pinifile.SoundT[i];
 					}
-					this.emotes[i] = {
+					emotes[i] = {
 						desc: emoteinfo[0],
 						speaking: emoteinfo[1],
 						silent: emoteinfo[2],
 						zoom: emoteinfo[3],
 						sfx: esfx,
 						sfxdelay: esfxd,
-						button_off: AO_HOST + 'characters/' + escape(me().name) + '/emotions/button' + i + '_off.png',
-						button_on: AO_HOST + 'characters/' + escape(me().name) + '/emotions/button' + i + '_on.png'
+						button_off: AO_HOST + 'characters/' + escape(me.name) + '/emotions/button' + i + '_off.png',
+						button_on: AO_HOST + 'characters/' + escape(me.name) + '/emotions/button' + i + '_on.png'
 					};
 					document.getElementById("client_emo").innerHTML += "<img src='" + emotes[i].button_off + "' id='emo_" + i + "' alt='" + emotes[i].desc + "' class='client_button' onclick='pickemotion(" + i + ")'>";
 				}
@@ -475,7 +498,7 @@ class Viewport {
 	 * Returns the path which the background is located in.
 	 */
 	bgFolder() {
-		return `${AO_HOST}background/${bgname}/`;
+		return `${AO_HOST}background/${this.bgname}/`;
 	}
 
 	/**
@@ -484,7 +507,7 @@ class Viewport {
 	 */
 	say(chatmsg) {
 		this.chatmsg = chatmsg;
-		appendICLog(chatmsg.nameplate + ": " + escapeHtml(arguments[5]));
+		appendICLog(`${chatmsg.nameplate}: ${chatmsg.content}`);
 		changeBackground(chatmsg.side);
 		this.textnow = '';
 		this.sfxplayed = 0;
@@ -543,7 +566,7 @@ class Viewport {
 					"5": "#ffff00",
 					"6": "#aa00aa"
 				}
-				stylecolor = "color: " + (colors[this.chatmsg.color] || "#ffffff");
+				let stylecolor = "color: " + (colors[this.chatmsg.color] || "#ffffff");
 				document.getElementById("client_inner_chat").style = stylecolor;
 				this.chatmsg.startspeaking = false;
 			} else {
@@ -560,7 +583,7 @@ class Viewport {
 						}
 					}
 					this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
-					document.getElementById("client_inner_chat").innerHTML = escapeHtml(this.textnow);
+					document.getElementById("client_inner_chat").innerHTML = this.textnow;
 					if (this.textnow == this.chatmsg.content) {
 						this.textTimer = 0;
 						clearInterval(this.updater);
@@ -617,18 +640,19 @@ class INI {
  * Triggered when the Return key is pressed on the out-of-character chat input box.
  * @param {KeyboardEvent} event
  */
-function onOOCEnter(event) {
+export function onOOCEnter(event) {
 	if (event.keyCode == 13) {
 		client.sendOOC(document.getElementById("client_oocinputbox").value);
 		document.getElementById("client_oocinputbox").value = "";
 	}
 }
+window.onOOCEnter = onOOCEnter;
 
 /**
  * Triggered when the Return key is pressed on the in-character chat input box.
  * @param {KeyboardEvent} event
  */
-function onEnter(event) {
+export function onEnter(event) {
 	if (event.keyCode == 13) {
 		let mychar = client.me();
 		let myemo = client.myEmote();
@@ -647,15 +671,17 @@ function onEnter(event) {
 		}
 	}
 }
+window.onEnter = onEnter;
 
 /**
  * Triggered when an item on the music list is clicked.
  * @param {MouseEvent} event
  */
-function musiclist_click(event) {
+export function musiclist_click(event) {
 	let playtrack = document.getElementById("client_musiclist").value;
 	client.sendMusicChange(playtrack);
 }
+window.musiclist_click = musiclist_click;
 
 /**
  * Triggered by the music volume slider.
@@ -684,31 +710,34 @@ function changeBlipVolume() {
  * Triggered when a character icon is clicked in the character selection menu.
  * @param {MouseEvent} event
  */
-function changeCharacter(event) {
+export function changeCharacter(event) {
 	client.sendLeaveRoom();
 	document.getElementById("client_charselect").style.display = "block";
 	document.getElementById("client_emo").innerHTML = "";
 }
+window.changeCharacter = changeCharacter;
 
 /**
  * Triggered when there was an error loading a character sprite.
  * @param {HTMLImageElement} image the element containing the missing image
  */
-function imgError(image) {
+export function imgError(image) {
 	image.onerror = "";
 	image.src = "/misc/placeholder.gif";
 	return true;
 }
+window.imgError = imgError;
 
 /**
  * Triggered when there was an error loading a character icon.
  * @param {HTMLImageElement} image the element containing the missing image
  */
-function demoError(image) {
+export function demoError(image) {
 	image.onerror = "";
 	image.src = "/misc/placeholder.png";
 	return true;
 }
+window.demoError = demoError;
 
 /**
  * Checks if an image exists at the specified URI.
@@ -772,36 +801,38 @@ function changeBackground(position) {
 /**
  * Triggered when the reconnect button is pushed.
  */
-function ReconnectButton() {
+export function ReconnectButton() {
 	client = new Client(serverIP);
 	if (client) {
 		mode = "join"; // HACK: see client.onOpen
 		document.getElementById("client_error").style.display = "none";
 	}
 }
+window.ReconnectButton = ReconnectButton;
 
 /**
  * Triggered when the retry button is pushed (during the loading process).
  */
-function RetryButton() {
+export function RetryButton() {
 	client.joinServer();
 }
+window.RetryButton = RetryButton;
 
 /**
  * Appends a message to the in-character chat log.
  * @param {string} toadd the string to be added
  */
 function appendICLog(toadd) {
-	document.getElementById("client_log").innerHTML = toadd + "<br>" + document.getElementById("client_log").innerHTML;
+	document.getElementById("client_log").appendChild(document.createTextNode(toadd));
 }
 
 /**
  * Requests to play as a character.
  * @param {number} ccharacter the character ID; if this is a large number, then spectator is chosen instead.
  */
-function pickchar(ccharacter) {
+export function pickchar(ccharacter) {
 	if (ccharacter < 1000) {
-		sendCharacter(ccharacter);
+		client.sendCharacter(ccharacter);
 	} else {
 		// Spectator
 		document.getElementById("client_charselect").style.display = "none";
@@ -809,25 +840,27 @@ function pickchar(ccharacter) {
 		document.getElementById("client_emo").style.display = "none";
 	}
 }
+window.pickchar = pickchar;
 
 /**
  * Highlights and selects an emotion for in-character chat.
  * @param {string} emo the new emotion to be selected
  */
-function pickemotion(emo) {
+export function pickemotion(emo) {
 	if (client.selectedEmote != -1) {
 		document.getElementById("emo_" + client.selectedEmote).src = client.myEmote().button_off;
 	}
 	client.selectedEmote = emo
 	document.getElementById("emo_" + emo).src = client.myEmote().button_on;
 }
+window.pickemotion = pickemotion;
 
 /**
  * Highlights and selects a shout for in-character chat.
  * If the same shout button is selected, then the shout is canceled.
  * @param {string} shout the new shout to be selected
  */
-function toggleshout(shout) {
+export function toggleshout(shout) {
 	if (shout == selectedShout) {
 		document.getElementById("button_" + shout).className = "client_button";
 		selectedShout = 0;
@@ -839,6 +872,7 @@ function toggleshout(shout) {
 		selectedShout = shout;
 	}
 }
+window.toggleshout = toggleshout;
 
 /**
  * Escapes a string to be HTML-safe.
@@ -875,3 +909,14 @@ if (typeof(String.prototype.trim) === "undefined")
         return String(this).replace(/^\s+|\s+$/g, '');
     };
 }
+
+
+//
+// Client code
+//
+
+let client = new Client(serverIP);
+let viewport = new Viewport();
+
+let music = new Audio();
+music.play();

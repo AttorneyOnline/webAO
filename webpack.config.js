@@ -1,7 +1,10 @@
 module.exports = {
-    entry: './webAO/ui.js',
+    entry: {
+        ui: './webAO/ui.js',
+        client: './webAO/client.js'
+    },
     output: {
-        filename: './webAO/ui.b.js'
+        filename: '[name].b.js'
     },
     module: {
         rules: [
@@ -16,5 +19,7 @@ module.exports = {
                 }
             }
         ]
-    }
+    },
+
+    devtool: 'source-map'
 }
