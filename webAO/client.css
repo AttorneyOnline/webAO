@@ -10,9 +10,16 @@ img {
     -ms-interpolation-mode: nearest-neighbor;
 }
 
+#about-logo {
+	padding-top: 5px;
+	height: 30%;
+	image-rendering: auto;
+}
+
 @keyframes error_blink {  
-    0% { color: red; }
-    100% { color: white; }
+	0% { color: white; }
+	50% { color: red; }
+	100% { color: white; }
 }
 
 .error {
@@ -23,15 +30,17 @@ img {
     left: 50%;
     margin-right: -50%;
     transform: translate(-50%, -50%);
-	justify-content: center;
 	display: flex;
-	align-content: center;
 	margin: 0 auto;
+	justify-content: center;
+	align-content: center;
 	align-items: center;
-	background: red;
+	text-align: center;
+	background: #4e0e00;
 	color: white;
-	font-size: 4em;
-	animation: error_blink 0.5s linear infinite;
+	font-size: x-large;
+	animation: error_blink 0.5s ease-in-out infinite;
+	z-index: 3;
 }
 
 #client_loading {
@@ -53,9 +62,9 @@ img {
 
 #client_gamewindow {
 	position: relative;
-	top: 0;
-	left: 0;
-  width: 100%;
+	/*! top: 0; */
+	/*! left: 0; */
+  /*! width: 100%; */
   padding-bottom: 75%;
 }
 
@@ -67,7 +76,6 @@ img {
 	height: 100%;
 	overflow-y: scroll;
 	justify-content: center;
-	display: none;
 	align-items: center;
 	vertical-align: middle;
 	margin: 0 auto;
@@ -91,19 +99,27 @@ img {
 }
 
 #client_wrapper {
-	position: absolute;
-	top: 0;
-	left: 0;
+	/*! position: absolute; */
+	/*! top: 0; */
+	/*! left: 0; */
 	background-color: #888888;
-	height: 99%;
-	width: 512px;
-	margin: 0;
-	padding: 0;
-	float: left;
-	resize: horizontal;
+	/*! height: 99%; */
+	/*! width: 512px; */
+	/*! margin: 0; */
+	/*! padding: 0; */
+	/*! float: left; */
+	/*! resize: horizontal; */
 	overflow: auto;
 	overflow-y:hidden;
-	border: 1px solid;
+	/*! border: 1px solid; */
+	min-width: 256px;
+	resize: horizontal;
+}
+
+@media (max-width: 360px) {
+	#kek {
+		width: fit-content;
+	}
 }
 
 #client_emo {
@@ -113,9 +129,11 @@ img {
 }
 
 #client_settings {
-	position: absolute;
-	top: 100%;
-	width: 60%;
+	/*! position: absolute; */
+	/*! top: 100%; */
+	width: 100%;
+	/*! grid-column: 1; */
+	/*! grid-row: 2; */
 }
 
 .area_btn {
@@ -189,73 +207,124 @@ img {
 	word-break: keep-all;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
+	text-align: start;
+	overflow: hidden;
+	scroll-behavior: smooth;
 }
 
 #client_chat p {
 	margin: 4px;
 	color: white;
 }
-.long {	
-	width: 98%;
+.long {
+	width: 100%;
 	background-color: #dddddd;
 	border: 1px solid #555555;
+	border-style: solid;
+	box-sizing: border-box;
+	margin: auto;
 }
 
 #client_chatlog {
-	width: 244px;
-	height: 100%;
-	background: #dbdbdb url("misc/chat2.png") no-repeat;
-	padding: 0;
-	position: absolute;
+	/*! width: 244px; */
+	/*! height: 100%; */
+	/*! background: #dbdbdb url("misc/chat2.png") no-repeat; */
+	/*! padding: 0; */
+	/*! position: absolute; */
 	top: 0;
 	right: 0;
+	/* grid-column: 2; */
+	flex: 1;
 }
 
 #client_log {
 	position: relative;
-	top: 3px;
-	left: 10px;
-	height: 310px;
-	width: 225px;
+	/* top: 3px; */
+	/*! left: 10px; */
+	height: 100%;
+	/*! width: 99%; */
 	color: white;
 	word-break: keep-all;
 	word-wrap:break-word;
 	overflow-wrap: break-word;
-	overflow-y: hidden;
-	font-size: 12px;
-	margin-bottom: 40px;
+	overflow-y: scroll;
+	font-size: medium;
+	/* margin-bottom: 10px; */
+	background-color: #242424;
+	border: black;
+	border-style: solid;
+	/* max-width: 50em; */
+	/* min-height: 30em; */
+	text-align: start;
+	line-height: .85em;
+}
+
+#client_log > p {
+	line-height: 1.1em;
+}
+
+#iclog_name {
+	font-weight: bold;
+	padding-right: .35em;
+}
+
+#iclog_time {
+	float: right;
+	padding-right: .5em;
+	color: #dbdbdb;
 }
 
 #client_ooclog {
-	width: 220px;
-	margin-top: 30px;
-	height: 50%;
+	/*! width: 99%; */
+	/* margin-top: 25px; */
+	/* height: 50%; */
 	position: relative;
-	background-color: #8b8b8b; 
+	background-color: #242424;
+	color: white;
+	font-family: "Source Code Pro", "Consolas", monospace;
+	font-size: small;
+	overflow-wrap: break-word;
+	overflow-y: scroll;
+	text-rendering: optimizelegibility;
+	resize: none;
+	flex: 1 1 auto;
+	border: none;
 }
 
 #client_musiclist {
-	width: 244px;
-	margin-top: 30px;
-	height: 50%;
-	position: relative;
-	background-color: #ff0000; 
+	width: 99%;
+	/* margin-top: 20px; */
+	/*! height: 50%; */
+	background-color: #222;
+	color: white;
 }
 
 #client_bars {
 	position: relative;
-	margin-bottom: 30px;
+	/*! margin-bottom: 30px; */
 	text-align: center;
+	/* display: flex; */
+	/* flex-direction: row; */
+	height: 20px;
+}
+
+.slider {
+	padding-right: 4px;
+	width: 80%;
+	align-self: center;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .client_defense {
-	position: absolute;
-	left: 30px;
+	/* position: absolute; */
+	/* left: 30px; */
+	width: 90px;
+	height: 20px;
 }
 
 .client_prosecutor {
-	position: absolute;
-	left: 130px;
+	/* left: 130px; */
 }
 
 .client_button {
@@ -264,4 +333,31 @@ img {
 
 .dark {
 	filter: brightness(50%);
+}
+
+.hrtext {
+	overflow: hidden;
+	text-align: center;
+	font-size: small;
+}
+
+.hrtext:before,
+.hrtext:after {
+	background-color: #c6c6c6;
+	content: "";
+	display: inline-block;
+	height: 1px;
+	position: relative;
+	vertical-align: middle;
+	width: 50%;
+}
+
+.hrtext:before {
+	right: 0.5em;
+	margin-left: -50%;
+}
+
+.hrtext:after {
+	left: 0.5em;
+	margin-right: -50%;
 }
