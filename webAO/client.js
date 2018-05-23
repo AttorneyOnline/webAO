@@ -261,6 +261,10 @@ class Client {
 				}
 			}
 
+			if (chatmsg.character == this.charID) {
+				resetICParams();
+			}
+
 			viewport.say(chatmsg);
 		}
 	}
@@ -754,16 +758,23 @@ export function onEnter(event) {
 			ssfxname = myemo.sfx;
 			ssfxdelay = myemo.sfxdelay;
 		}
-		// TODO URGENT: Do NOT send if we know that our message is going to get thrown away!
 		client.sendIC(myemo.speaking, mychar.name, myemo.silent, document.getElementById("client_inputbox").value, mychar.side, ssfxname, myemo.zoom, ssfxdelay, selectedShout);
-		document.getElementById("client_inputbox").value = "";
-		if (selectedShout) {
-			document.getElementById("button_" + selectedShout).className = "client_button";
-			selectedShout = 0;
-		}
 	}
 }
 window.onEnter = onEnter;
+
+/**
+ * Resets the IC parameters for the player to enter a new chat message.
+ * This should only be called when the player's previous chat message
+ * was successfully sent/presented.
+ */
+function resetICParams() {
+	document.getElementById("client_inputbox").value = "";
+	if (selectedShout) {
+		document.getElementById("button_" + selectedShout).className = "client_button";
+		selectedShout = 0;
+	}
+}
 
 /**
  * Triggered when an item on the music list is clicked.
