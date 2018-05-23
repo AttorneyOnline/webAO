@@ -62,10 +62,21 @@ var config = {
                                 componentState: { id: "music" }
                             },
                             {
-                                type: "component",
-                                title: "Settings",
-                                componentName: "template",
-                                componentState: { id: "client_settings" }
+                                type: "stack",
+                                content: [
+                                    {
+                                        type: "component",
+                                        title: "Settings",
+                                        componentName: "template",
+                                        componentState: { id: "client_settings" }
+                                    },
+                                    {
+                                        type: "component",
+                                        title: "About",
+                                        componentName: "template",
+                                        componentState: { id: "about" }
+                                    }
+                                ]
                             }
                         ]
                     }
