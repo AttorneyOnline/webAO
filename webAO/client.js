@@ -27,6 +27,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phon
 }
 
 let selectedShout = 0;
+let lastICMessageTime = new Date(0);
 
 class Client {
 	constructor(address) {
@@ -71,6 +72,8 @@ class Client {
 			"CharsCheck": (args) => this.handleCharsCheck(args),
 			"PV":         (args) => this.handlePV(args)
 		}
+
+		this._lastTimeICReceived = new Date(0);
 	}
 
 	/**
@@ -591,7 +594,7 @@ class Viewport {
 	 */
 	say(chatmsg) {
 		this.chatmsg = chatmsg;
-		appendICLog(`${chatmsg.nameplate}: ${chatmsg.content}`);
+		appendICLog(chatmsg.content, chatmsg.nameplate);
 		changeBackground(chatmsg.side);
 		this.textnow = '';
 		this.sfxplayed = 0;
@@ -908,9 +911,35 @@ window.RetryButton = RetryButton;
 /**
  * Appends a message to the in-character chat log.
  * @param {string} toadd the string to be added
+ * @param {string} name the name of the sender
  */
-function appendICLog(toadd) {
-	document.getElementById("client_log").appendChild(document.createTextNode(toadd));
+function appendICLog(toadd, name = "", time = new Date()) {
+	const entry = document.createElement("p");
+	const nameField = document.createElement("span");
+	nameField.id = "iclog_name";
+	nameField.appendChild(document.createTextNode(name));
+	entry.appendChild(nameField);
+	entry.appendChild(document.createTextNode(toadd));
+
+	// Only put a timestamp if the minute has changed.
+	if (lastICMessageTime.getMinutes() !== time.getMinutes()) {
+		const timeStamp = document.createElement("span");
+		timeStamp.id = "iclog_time";
+		timeStamp.innerText = time.toLocaleTimeString(undefined, {
+			hour: "numeric",
+			minute: "2-digit"
+		});
+		entry.appendChild(timeStamp);
+	}
+
+	const clientLog = document.getElementById("client_log");
+	clientLog.appendChild(entry);
+
+	if (clientLog.scrollTop > clientLog.scrollHeight - 600) {
+		clientLog.scrollTop = clientLog.scrollHeight;
+	}
+
+	lastICMessageTime = new Date();
 }
 
 /**

@@ -247,6 +247,22 @@ img {
 	/* max-width: 50em; */
 	/* min-height: 30em; */
 	text-align: start;
+	line-height: .85em;
+}
+
+#client_log > p {
+	line-height: 1.2em;
+}
+
+#iclog_name {
+	font-weight: bold;
+	padding-right: .35em;
+}
+
+#iclog_time {
+	float: right;
+	padding-right: .5em;
+	color: #dbdbdb;
 }
 
 #client_ooclog {
@@ -308,4 +324,31 @@ img {
 
 .dark {
 	filter: brightness(50%);
+}
+
+.hrtext {
+	overflow: hidden;
+	text-align: center;
+	font-size: small;
+}
+
+.hrtext:before,
+.hrtext:after {
+	background-color: #c6c6c6;
+	content: "";
+	display: inline-block;
+	height: 1px;
+	position: relative;
+	vertical-align: middle;
+	width: 50%;
+}
+
+.hrtext:before {
+	right: 0.5em;
+	margin-left: -50%;
+}
+
+.hrtext:after {
+	left: 0.5em;
+	margin-right: -50%;
 }
