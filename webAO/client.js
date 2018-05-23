@@ -187,8 +187,11 @@ class Client {
 	 */
 	onClose(e) {
 		console.error(`The connection was closed: ${e.reason} (${e.code})`);
-		document.getElementById("client_error").style.display = "block";
-		this.cleanup();
+		if (e.code !== 1001) {
+			document.getElementById("client_error").style.display = "block";
+			document.getElementById("error_id").textContent = e.code;
+			this.cleanup();
+		}
 	}
 
 	/**
@@ -216,10 +219,12 @@ class Client {
 	onError(e) {
 		console.error(`A network error occurred: ${e.reason} (${e.code})`);
 		document.getElementById("client_error").style.display = "block";
+		document.getElementById("error_id").textContent = e.code;
 		this.cleanup();
 	}
 
 	cleanup() {
+		this.serv.close(1001);
 		clearInterval(this.checkUpdater);
 	}
 
@@ -906,6 +911,7 @@ function changeBackground(position) {
  * Triggered when the reconnect button is pushed.
  */
 export function ReconnectButton() {
+	client.cleanup();
 	client = new Client(serverIP);
 	if (client) {
 		mode = "join"; // HACK: see client.onOpen

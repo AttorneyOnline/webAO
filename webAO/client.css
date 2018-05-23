@@ -11,8 +11,9 @@ img {
 }
 
 @keyframes error_blink {  
-    0% { color: red; }
-    100% { color: white; }
+	0% { color: white; }
+	50% { color: red; }
+	100% { color: white; }
 }
 
 .error {
@@ -23,15 +24,17 @@ img {
     left: 50%;
     margin-right: -50%;
     transform: translate(-50%, -50%);
-	justify-content: center;
 	display: flex;
-	align-content: center;
 	margin: 0 auto;
+	justify-content: center;
+	align-content: center;
 	align-items: center;
-	background: red;
+	text-align: center;
+	background: #4e0e00;
 	color: white;
-	font-size: 4em;
-	animation: error_blink 0.5s linear infinite;
+	font-size: x-large;
+	animation: error_blink 0.5s ease-in-out infinite;
+	z-index: 3;
 }
 
 #client_loading {
