@@ -556,16 +556,15 @@ class Viewport {
 		this.blip = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
 		this.blip.volume = 0.5;
 
-		// Wombo + combo: two audio channels allocated to make blips less jittery
+		// Allocate multiple blip audio channels to make blips less jittery
 
 		// TODO: read blip type ("gender") from ini
-		this.womboblip = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
-		this.womboblip.volume = 0.5;
-
-		this.comboblip = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
-		this.comboblip.volume = 0.5;
-
-		this.combo = false;
+		this.blipChannels = new Array(6);
+		for (let i = 0; i < this.blipChannels.length; i++) {
+			this.blipChannels[i] = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
+			this.blipChannels[i].volume = 0.5;
+		}
+		this.currentBlipChannel = 0;
 
 		this.sfxaudio = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
 		this.sfxplayed = 0;
@@ -579,6 +578,16 @@ class Viewport {
 
 		this.shoutTimer = 0;
 		this.textTimer = 0;
+	}
+
+	/**
+	 * Sets the volume of the blip sound.
+	 * @param {number} volume
+	 */
+	setBlipVolume(volume) {
+		for (let i = 0; i < this.blipChannels.length; i++) {
+			this.blipChannels[i].volume = 0.5;
+		}
 	}
 
 	/**
@@ -659,15 +668,9 @@ class Viewport {
 			} else {
 				if (this.textnow != this.chatmsg.content) {
 					if (this.chatmsg.content.charAt(this.textnow.length) != " ") {
-						this.combo = (this.combo + 1) % 2;
-						switch (this.combo) {
-						case 0:
-							this.blip.play()
-							break;
-						case 1:
-							//this.womboblip.play()
-							break;
-						}
+						this.blipChannels[this.currentBlipChannel].play();
+						this.currentBlipChannel++;
+						this.currentBlipChannel %= this.blipChannels.length;
 					}
 					this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
 					document.getElementById("client_inner_chat").innerHTML = this.textnow;
@@ -790,9 +793,7 @@ window.changeSFXVolume = changeSFXVolume;
  * Triggered by the blip volume slider.
  */
 export function changeBlipVolume() {
-	viewport.blip.volume = document.getElementById("client_bvolume").value / 100;
-	viewport.womboblip.volume = document.getElementById("client_bvolume").value / 100;
-	viewport.comboblip.volume = document.getElementById("client_bvolume").value / 100;
+	viewport.setBlipVolume(document.getElementById("client_bvolume").value / 100);
 }
 window.changeBlipVolume = changeBlipVolume;
 
