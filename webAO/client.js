@@ -261,6 +261,7 @@ class Client {
 	}
 
 	handleMC(args) {
+		const music = viewport.music;
 		music.pause();
 		music.src = MUSIC_HOST + args[1];
 		music.play();
@@ -273,8 +274,9 @@ class Client {
 	}
 
 	handleRMC(args) {
-		music.pause();
-		music = new Audio(this.musicList[args[1]]);
+		viewport.music.pause();
+		viewport.music = new Audio(this.musicList[args[1]]);
+		const music = viewport.music;
 		// Music offset + drift from song loading
 		music.totime = args[1];
 		music.offset = new Date().getTime() / 1000;
@@ -485,6 +487,9 @@ class Viewport {
 
 		this.sfxaudio = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
 		this.sfxplayed = 0;
+
+		this.music = new Audio();
+		this.music.play();
 
 		this.updater = null;
 
@@ -920,6 +925,3 @@ if (typeof(String.prototype.trim) === "undefined")
 
 let client = new Client(serverIP);
 let viewport = new Viewport();
-
-let music = new Audio();
-music.play();
