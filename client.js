@@ -69,21 +69,6 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phon
 var carea = 0;
 var linifile;
 var pinifile;
-var hdid;
-
-hashCode = function(str) {
-	var hash = 0, i, chr, len;
-	if (str.length === 0) return hash;
-	for (i = 0, len = str.length; i < len; i++) {
-	  chr   = str.charCodeAt(i);
-	  hash  = ((hash << 5) - hash) + chr;
-	  hash |= 0; // Convert to 32bit integer
-	}
-	return hash;
-  };
-
-hdid = hashCode(navigator.userAgent);
-
 serv.onopen = function(evt) {
 	onOpen(evt)
 };
@@ -350,7 +335,7 @@ function updateText() {
 
 function onOpen(e) {
 	if (mode == "join") {
-		serv.send("HI#" + hdid + "#%");
+		serv.send("HI#" + navigator.userAgent + "#%");
 		serv.send("ID#webAO#2.4.5#%");
 	} else {
 		document.getElementById("client_loading").style.display = "none";
@@ -365,13 +350,13 @@ function onClose(e) {
 function ReconnectButton() {
 	serv = new WebSocket("ws://" + serverIP);
 	if (serv) {
-		serv.send("HI#" + hdid + "#%");
+		serv.send("HI#" + navigator.userAgent + "#%");
 		document.getElementById("client_error").style.display = "none";
 	}
 }
 
 function RetryButton() {
-serv.send("HI#" + hdid + "#%");
+serv.send("HI#" + navigator.userAgent + "#%");
 }
 
 function onError(e) {
