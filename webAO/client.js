@@ -186,6 +186,7 @@ class Client {
 	 * @param {CloseEvent} e
 	 */
 	onClose(e) {
+		console.error(`The connection was closed: ${e.reason} (${e.code})`);
 		document.getElementById("client_error").style.display = "block";
 		this.cleanup();
 	}
@@ -213,6 +214,7 @@ class Client {
 	 * @param {ErrorEvent} e 
 	 */
 	onError(e) {
+		console.error(`A network error occurred: ${e.reason} (${e.code})`);
 		document.getElementById("client_error").style.display = "block";
 		this.cleanup();
 	}
