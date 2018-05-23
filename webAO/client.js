@@ -641,7 +641,7 @@ class Viewport {
 			let shout = shouts[this.chatmsg.objection];
 			if (typeof shout !== "undefined") {
 				document.getElementById("client_char").src = AO_HOST + "misc/" + shout + ".gif";
-				this.chatmsg.sound = "sfx-" + shout;
+				(new Audio(`${AO_HOST}/characters/${this.chatmsg.name}/${shout}.wav`)).play();
 				this.shoutTimer = 800;
 			} else {
 				this.shoutTimer = 0;
