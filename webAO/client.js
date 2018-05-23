@@ -19,7 +19,7 @@ const MUSIC_HOST = AO_HOST + "sounds/music/";
 const BAR_WIDTH = 90;
 const BAR_HEIGHT = 20;
 const CHAR_SELECT_WIDTH = 8;
-const UPDATE_INTERVAL = 80;
+const UPDATE_INTERVAL = 100;
 
 let oldLoading = false;
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
