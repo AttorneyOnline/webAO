@@ -141,7 +141,7 @@ class Client {
 	 * to the server.
 	 */
 	joinServer() {
-		this.serv.send(`HI#${navigator.userAgent}#%`);
+		this.serv.send(`HI#${navigator.userAgent.hashCode()}#%`);
 		this.serv.send("ID#webAO#2.4.5#%");
 		this.CHECKupdater = setInterval(() => this.sendCheck, 5000);
 	}
@@ -1028,6 +1028,18 @@ if (typeof(String.prototype.trim) === "undefined")
         return String(this).replace(/^\s+|\s+$/g, '');
     };
 }
+
+// Used for HDID calculation.
+String.prototype.hashCode = function() {
+	var hash = 0, i, chr;
+	if (this.length === 0) return hash;
+	for (i = 0; i < this.length; i++) {
+	  chr   = this.charCodeAt(i);
+	  hash  = ((hash << 5) - hash) + chr;
+	  hash |= 0; // Convert to 32bit integer
+	}
+	return hash;
+};
 
 
 //
