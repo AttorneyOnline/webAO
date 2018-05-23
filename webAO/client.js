@@ -70,7 +70,8 @@ class Client {
 			"PN":         (args) => this.handlePN(args),
 			"SI":         (args) => this.handleSI(args),
 			"CharsCheck": (args) => this.handleCharsCheck(args),
-			"PV":         (args) => this.handlePV(args)
+			"PV":         (args) => this.handlePV(args),
+			"CHECK":      (args) => {}
 		}
 
 		this._lastTimeICReceived = new Date(0);
@@ -143,7 +144,7 @@ class Client {
 	joinServer() {
 		this.serv.send(`HI#${navigator.userAgent.hashCode()}#%`);
 		this.serv.send("ID#webAO#2.4.5#%");
-		this.CHECKupdater = setInterval(() => this.sendCheck, 5000);
+		this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
 	}
 
 	/**
@@ -174,10 +175,11 @@ class Client {
 	 */
 	onOpen(e) {
 		// XXX: Why does watching mean just SITTING there and doing nothing?
-		if (mode == "join") {
-			client.joinServer();
-		} else {
+		if (mode === "watch") {
 			document.getElementById("client_loading").style.display = "none";
+			document.getElementById("client_charselect").style.display = "none";
+		} else {
+			client.joinServer();
 		}
 	}
 
@@ -503,7 +505,7 @@ class Client {
 				icon_chosen = "";
 			}
 			td.innerHTML = `<img class='demothing${icon_chosen}' id='demo_${i}' ` +
-				`src='${thispick}' alt='${this.chars[i].desc}' onclick='pickchar(${i})' ` +
+				`src='${thispick}' alt='${this.chars[i].name}' onclick='pickchar(${i})' ` +
 				`onerror='demoError(this);'>`;
 			tr.appendChild(td);
 			if (i % CHAR_SELECT_WIDTH == 0) {
@@ -638,7 +640,8 @@ class Viewport {
 		this.sfxplayed = 0;
 		this.textTimer = 0;
 		this._animating = true;
-		this.updater = setInterval(() => this.updateText(), UPDATE_INTERVAL);
+		clearTimeout(this.updater);
+		this.updater = setTimeout(() => this.updateText(), UPDATE_INTERVAL);
 	}
 
 	/**
@@ -653,6 +656,10 @@ class Viewport {
 		} else {
 			document.getElementById("client_name").style.display = "block";
 			document.getElementById("client_chat").style.display = "block";
+		}
+
+		if (this._animating) {
+			this.updater = setTimeout(() => this.updateText(), UPDATE_INTERVAL);
 		}
 
 		if (this.chatmsg.isnew) {
@@ -695,6 +702,12 @@ class Viewport {
 				let stylecolor = "color: " + (colors[this.chatmsg.color] || "#ffffff");
 				document.getElementById("client_inner_chat").style = stylecolor;
 				this.chatmsg.startspeaking = false;
+
+				if (this.textnow == this.chatmsg.content) {
+					document.getElementById("client_char").src = AO_HOST + "characters/" + escape(this.chatmsg.name) + "/" + this.chatmsg.silent + ".gif";
+					this._animating = false;
+					clearTimeout(this.updater);
+				}
 			} else {
 				if (this.textnow != this.chatmsg.content) {
 					if (this.chatmsg.content.charAt(this.textnow.length) != " ") {
@@ -707,8 +720,8 @@ class Viewport {
 					if (this.textnow == this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						clearInterval(this.updater);
 						document.getElementById("client_char").src = AO_HOST + "characters/" + escape(this.chatmsg.name) + "/" + this.chatmsg.silent + ".gif";
+						clearTimeout(this.updater);
 					}
 				}
 			}

@@ -85,7 +85,7 @@
     <meta name="frame-title" lang="en" content="About">
     <img id="about-logo" src="images/logo-new.png" alt="Attorney Online logo">
     <h1 style="line-height: .3em;">webAO</h1>
-    <h3>version 2.1</h3>
+    <h3>version 2.1.1</h3>
     <p>Client created by <a href="https://github.com/stonedDiscord">@stonedDiscord</a> and fixed up by <a href="https://github.com/oldmud0">@oldmud0</a>.</p>
     <p>Special thanks to Aleks for reverse engineering the original Delphi client written by FanatSors.</p>
 </template>
@@ -102,8 +102,8 @@
         <table id="client_chartable"></table>
     </div>
     <div id="client_error" class="error" style="display: none">
-            <p>A network error occurred.</p>
-            <p id="error_id">(unknown error id)</p>
+            <p>You were disconnected from the server.</p>
+            <p>Code: <span id="error_id">(none)</span></p>
             <button onclick="ReconnectButton()">Reconnect</button>
     </div>
 </body>
