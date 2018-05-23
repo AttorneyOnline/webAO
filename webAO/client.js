@@ -218,6 +218,10 @@ class Client {
 		clearInterval(this.checkUpdater);
 	}
 
+	/**
+	 * Handles an in-character chat message.
+	 * @param {*} args packet arguments
+	 */
 	handleMS(args) {
 		// TODO: this if-statement might be a bug.
 		if (args[4] != viewport.chatmsg.content) {
@@ -256,10 +260,18 @@ class Client {
 		}
 	}
 
+	/**
+	 * Handles an out-of-character chat message.
+	 * @param {Array} args packet arguments
+	 */
 	handleCT(args) {
 		document.getElementById("client_ooclog").innerHTML = document.getElementById("client_ooclog").innerHTML + args[1] + ": " + args[2] + "\r\n";
 	}
 
+	/**
+	 * Handles a music change to an arbitrary resource.
+	 * @param {Array} args packet arguments
+	 */
 	handleMC(args) {
 		const music = viewport.music;
 		music.pause();
@@ -273,6 +285,10 @@ class Client {
 		}
 	}
 
+	/**
+	 * Handles a music change to an arbitrary resource, with an offset in seconds.
+	 * @param {Array} args packet arguments
+	 */
 	handleRMC(args) {
 		viewport.music.pause();
 		viewport.music = new Audio(this.musicList[args[1]]);
@@ -286,6 +302,11 @@ class Client {
 		}, false);
 	}
 
+	/**
+	 * Handles incoming character information, bundling multiple characters
+	 * per packet.
+	 * @param {Array} args packet arguments
+	 */
 	handleCI(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Character " + args[1];
 		this.serv.send("AN#" + ((args[1] / 10) + 1) + "#%");
@@ -302,6 +323,11 @@ class Client {
 		}
 	}
 
+	/**
+	 * Handles incoming character information, containing only one character
+	 * per packet.
+	 * @param {Array} args packet arguments
+	 */
 	handleSC(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Characters";
 		for (let i = 1; i < args.length - 1; i++) {
@@ -316,12 +342,24 @@ class Client {
 		this.serv.send("RM#%");
 	}
 
+	/**
+	 * Handles incoming evidence information, containing only one evidence
+	 * item per packet.
+	 * 
+	 * Mostly unimplemented in webAO.
+	 * @param {Array} args packet arguments
+	 */
 	handleEI(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Evidence " + args[1];
 		//serv.send("AE#" + (args[1] + 1) + "#%");
 		this.serv.send("RM#%");
 	}
 
+	/**
+	 * Handles incoming music information, containing multiple entries
+	 * per packet.
+	 * @param {Array} args packet arguments
+	 */
 	handleEM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music " + args[1];
 		this.serv.send("AM#" + ((args[1] / 10) + 1) + "#%");
@@ -335,6 +373,11 @@ class Client {
 		}
 	}
 
+	/**
+	 * Handles incoming music information, containing only one entry
+	 * per packet.
+	 * @param {Array} args packet arguments
+	 */
 	handleSM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
 		let hmusiclist = document.getElementById("client_musiclist");
@@ -346,17 +389,32 @@ class Client {
 		this.serv.send("RD#%");
 	}
 
+	/**
+	 * Handles incoming music information, containing all entries
+	 * in the same packet.
+	 * @param {Array} args packet arguments
+	 */
 	handlemusic(args) {
 		for (let i = 0; i < args.length / 2; i++) {
 			this.musicList[args[2 * i]] = args[2 * i + 1];
 		}
 	}
 
+	/**
+	 * Handles the handshake completion packet, meaning the player
+	 * is ready to select a character.
+	 * 
+	 * @param {Array} args packet arguments
+	 */
 	handleDONE(args) {
 		document.getElementById("client_loading").style.display = "none";
 		document.getElementById("client_charselect").style.display = "block";
 	}
 
+	/**
+	 * Handles a background change.
+	 * @param {Array} args packet arguments
+	 */
 	handleBN(args) {
 		viewport.bgname = escape(args[1]);
 	}
@@ -365,6 +423,10 @@ class Client {
 		// TODO (set by sD)
 	}
 
+	/**
+	 * Handles a change in the health bars' states.
+	 * @param {Array} args packet arguments
+	 */
 	handleHP(args) {
 		// TODO (set by sD)
 		// Also, this is broken.
@@ -375,6 +437,10 @@ class Client {
 		}
 	}
 	
+	/**
+	 * Handles the issuance of a player ID by the server.
+	 * @param {Array} args packet arguments
+	 */
 	handleID(args) {
 		this.playerID = args[1];
 	}
@@ -383,6 +449,11 @@ class Client {
 		this.serv.send("askchaa#%");
 	}
 
+	/**
+	 * Received when the server announces its server info,
+	 * but we use it as a cue to begin retrieving characters.
+	 * @param {Array} args packet arguments
+	 */
 	handleSI(args) {
 		if (oldLoading) {
 			this.serv.send("askchar2#%");
@@ -391,6 +462,10 @@ class Client {
 		}
 	}
 
+	/**
+	 * Handles the list of all used and vacant characters.
+	 * @param {Array} args packet arguments
+	 */
 	handleCharsCheck(args) {
 		document.getElementById("client_chartable").innerHTML = "";
 		for (let i = 0; i < this.chars.length; i++) {
@@ -416,6 +491,10 @@ class Client {
 		changeBackground("def");
 	}
 
+	/**
+	 * Handles the server's assignment of a character for the player to use.
+	 * @param {Array} args packet arguments
+	 */
 	handlePV(args) {
 		this.charID = args[3];
 		document.getElementById("client_charselect").style.display = "none";
