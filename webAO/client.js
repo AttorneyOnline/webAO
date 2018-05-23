@@ -592,7 +592,7 @@ class Viewport {
 	 */
 	setBlipVolume(volume) {
 		for (let i = 0; i < this.blipChannels.length; i++) {
-			this.blipChannels[i].volume = 0.5;
+			this.blipChannels[i].volume = volume;
 		}
 	}
 
