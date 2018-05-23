@@ -19,7 +19,7 @@ const MUSIC_HOST = AO_HOST + "sounds/music/";
 const BAR_WIDTH = 90;
 const BAR_HEIGHT = 20;
 const CHAR_SELECT_WIDTH = 8;
-const UPDATE_INTERVAL = 100;
+const UPDATE_INTERVAL = 65;
 
 let oldLoading = false;
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
@@ -224,7 +224,11 @@ class Client {
 	}
 
 	cleanup() {
-		this.serv.close(1001);
+		try {
+			this.serv.close(1001);
+		} catch (e) {
+			// I don't care if this errors
+		}
 		clearInterval(this.checkUpdater);
 	}
 
@@ -279,7 +283,11 @@ class Client {
 	 * @param {Array} args packet arguments
 	 */
 	handleCT(args) {
-		document.getElementById("client_ooclog").innerHTML = document.getElementById("client_ooclog").innerHTML + args[1] + ": " + args[2] + "\r\n";
+		const oocLog = document.getElementById("client_ooclog");
+		oocLog.innerHTML += `${args[1]}: ${args[2]}\r\n`;
+		if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
+			oocLog.scrollTop = oocLog.scrollHeight;
+		}
 	}
 
 	/**
@@ -589,6 +597,16 @@ class Viewport {
 
 		this.shoutTimer = 0;
 		this.textTimer = 0;
+
+		this._animating = false;
+	}
+
+	/**
+	 * Returns whether or not the viewport is busy
+	 * performing a task (animating).
+	 */
+	isAnimating() {
+		return this._animating;
 	}
 
 	/**
@@ -619,6 +637,7 @@ class Viewport {
 		this.textnow = '';
 		this.sfxplayed = 0;
 		this.textTimer = 0;
+		this._animating = true;
 		this.updater = setInterval(() => this.updateText(), UPDATE_INTERVAL);
 	}
 
@@ -687,6 +706,7 @@ class Viewport {
 					document.getElementById("client_inner_chat").innerHTML = this.textnow;
 					if (this.textnow == this.chatmsg.content) {
 						this.textTimer = 0;
+						this._animating = false;
 						clearInterval(this.updater);
 						document.getElementById("client_char").src = AO_HOST + "characters/" + escape(this.chatmsg.name) + "/" + this.chatmsg.silent + ".gif";
 					}

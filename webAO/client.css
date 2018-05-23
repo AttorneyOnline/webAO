@@ -10,6 +10,12 @@ img {
     -ms-interpolation-mode: nearest-neighbor;
 }
 
+#about-logo {
+	padding-top: 5px;
+	height: 30%;
+	image-rendering: auto;
+}
+
 @keyframes error_blink {  
 	0% { color: white; }
 	50% { color: red; }
