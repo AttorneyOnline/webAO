@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="client.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
     <!--<script src="golden/js/goldenlayout.js"></script>-->
     <link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
     <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css" />
@@ -14,15 +15,17 @@
 
 <template id="client_wrapper">
     <meta name="frame-title" lang="en" content="Game">
-    <div id="client_gamewindow">
+	<div id="client_background"></div>
+    <div id="client_gamewindow">		
         <img id="client_court" alt="Courtroom background" onerror="imgError(this);">
         <img id="client_char" alt="Character sprite" onerror="imgError(this);">
         <img id="client_bench" alt="Bench overlay">
         <img id="client_fg" alt="Various overlay" onerror="imgError(this);">
-        <div id="client_name">
+		<img id="client_shout" alt="Effect overlay" onerror="imgError(this);">
+		<div id="client_name">
             <p>Dolan</p>
-        </div>
-        <div id="client_chat">
+        </div>        
+		<div id="client_chat">
             <p id="client_inner_chat"></p>
         </div>
     </div>
@@ -34,9 +37,25 @@
         <img src="misc/holdit.png" id="button_1" alt="Hold it!" class="client_button" onclick="toggleshout(1)">
         <img src="misc/objection.png" id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleshout(2)">
         <img src="misc/takethat.png" id="button_3" alt="Take That!" class="client_button" onclick="toggleshout(3)">
-        <br>
+        <br><br>
+		<label for="textcolor">Text Color:</label>
+		<select id="textcolor" name="textcolor">
+		  <option value="0">Default</option>
+		  <option value="1">Green</option>
+		  <option value="2">Red</option>
+		  <option value="3">Orange</option>
+		  <option value="4">Blue</option>
+		  <option value="5">Yellow</option>
+		  <option value="6">Margenta</option>
+		</select>
+		<label for="sendsfx">SFX</label>
         <input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
-        <label for="sendsfx">SFX</label>
+        <br><br>
+		<label>Flip: </label>
+		<img src="misc/flip.png"  id="button_flip" alt="Flip" class="client_button" onclick="toggleflip()">
+		<label>Effect: </label>
+		<img src="misc/flash.png" id="button_effect_1" alt="Flash" class="client_button" onclick="toggleaffect(1)">
+        <img src="misc/shake.png" id="button_effect_2" alt="Shake" class="client_button" onclick="toggleaffect(2)">
     </div>
 </template>
 

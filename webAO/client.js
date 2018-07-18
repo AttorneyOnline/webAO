@@ -26,6 +26,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phon
 	oldLoading = true;
 }
 
+let selectedEffect = 0;
 let selectedShout = 0;
 let lastICMessageTime = new Date(0);
 
@@ -37,6 +38,8 @@ class Client {
 		this.serv.onclose   = (evt) => this.onClose(evt);
 		this.serv.onmessage = (evt) => this.onMessage(evt);
 		this.serv.onerror   = (evt) => this.onError(evt);
+		
+		this.flip = false;
 
 		this.playerID = 1;
 		this.charID = -1;
@@ -111,11 +114,11 @@ class Client {
 	 * @param {string} ssfxdelay the delay (in milliseconds) to play the sound effect
 	 * @param {string} objection the number of the shout to play
 	 */
-	sendIC(speaking, name, silent, message, side, ssfxname, zoom, ssfxdelay, objection) {
+	sendIC(speaking, name, silent, message, side, ssfxname, zoom, ssfxdelay, objection, flip, flash, color) {
 		this.serv.send(
 			`MS#chat#${speaking}#${name}#${silent}` +
 			`#${escapeChat(message)}#${side}#${ssfxname}#${zoom}` +
-			`#${this.charID}#${ssfxdelay}#${selectedShout}#0#0#0#0#%`
+			`#${this.charID}#${ssfxdelay}#${selectedShout}#0#${flip}#${flash}#${color}#%`
 		);
 	}
 
@@ -243,7 +246,7 @@ class Client {
 		if (args[4] != viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
 			let chatmsg = {
-				pre: escape(args[2]),
+				// pre: escape(args[2]),
 				character: -1, // Will do a linear search
 				preanim: escape(args[2]), // XXX: why again?
 				nameplate: args[3], // TODO: parse INI to get this info
@@ -258,7 +261,7 @@ class Client {
 				snddelay: args[10],
 				objection: args[11],
 				evidence: args[12],
-				// flip: args[13],
+				flip: args[13],
 				flash: args[14],
 				color: args[15],
 				isnew: true,
@@ -569,10 +572,12 @@ class Viewport {
 			"content": "",
 			"objection": "0",
 			"sound": "",
+			"startpreanim": false,
 			"startspeaking": false,
 			"side": null,
 			"color": "0",
-			"snddelay": 0
+			"snddelay": 0,
+			"preanimdelay": 0
 		};
 		this.blip = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
 		this.blip.volume = 0.5;
@@ -641,7 +646,61 @@ class Viewport {
 		this.textTimer = 0;
 		this._animating = true;
 		clearTimeout(this.updater);
-		this.updater = setTimeout(() => this.updateText(), UPDATE_INTERVAL);
+		//If preanim existed then determine the length
+		if (chatmsg.preanim != "-") {
+			chatmsg.preanimdelay = this.getAnimLength(AO_HOST + 'characters/' + escape(chatmsg.name) + '/' + chatmsg.preanim + '.gif',this.initUpdater);
+		} else {
+			this.initUpdater(0)
+		}	
+	}
+	
+	/**
+	 * Intialize updater
+	 * @param {int} animdelay the length of pre-animation 
+	 */
+	initUpdater(animdelay){
+		console.log(animdelay);
+		viewport.chatmsg.preanimdelay = parseInt(animdelay); 
+		viewport.updater = setTimeout(() => viewport.updateText(), UPDATE_INTERVAL);
+	}
+	
+	/**
+	 * Gets animation length.
+	 * @param {string} filename the animation file name
+	 * @param {function} callback the callback function
+	 */
+	getAnimLength(filename,callback) {
+		//Source (Thanks to Ryman): https://codepen.io/Ryman/pen/wzioA
+		var request = new XMLHttpRequest();
+		request.open('GET', filename, true);
+		request.responseType = 'arraybuffer';
+		request.addEventListener('load', function () {
+			var arr = new Uint8Array(request.response),
+			// Thanks to http://justinsomnia.org/2006/10/gif-animation-duration-calculation/
+			// And http://www.w3.org/Graphics/GIF/spec-gif89a.txt
+			bin = '', 
+			duration = 0;
+			
+			for (var i = 0; i < arr.length; i++) {				
+				bin += String.fromCharCode( arr[i] )
+
+				// Find a Graphic Control Extension hex(21F904__ ____ __00)
+				if (arr[i] == 0x21 
+				 && arr[i + 1] == 0xF9 
+				 && arr[i + 2] == 0x04 
+				 && arr[i + 7] == 0x00) {
+				  // Swap 5th and 6th bytes to get the delay per frame
+				  let delay = (arr[i + 5] << 8) | (arr[i + 4] & 0xFF)
+				  
+				  // Should be aware browsers have a minimum frame delay 
+				  // e.g. 6ms for IE, 2ms modern browsers (50fps)
+				  duration += delay < 2 ? 10 : (delay+2)
+				}
+			}
+			// Return animation length
+			callback(duration * 10);
+		});
+		request.send();
 	}
 
 	/**
@@ -650,41 +709,78 @@ class Viewport {
 	 * XXX: This relies on a global variable `this.chatmsg`!
 	 */
 	updateText() {
-		if (this.chatmsg.content.trim() == "") {
-			document.getElementById("client_name").style.display = "none";
-			document.getElementById("client_chat").style.display = "none";
+		// Flip the character
+		if (this.chatmsg.flip == 1){
+			document.getElementById("client_char").style.transform = "scaleX(-1)"; 
 		} else {
-			document.getElementById("client_name").style.display = "block";
-			document.getElementById("client_chat").style.display = "block";
+			document.getElementById("client_char").style.transform = "scaleX(1)";
 		}
-
+			
 		if (this._animating) {
 			this.updater = setTimeout(() => this.updateText(), UPDATE_INTERVAL);
 		}
 
 		if (this.chatmsg.isnew) {
+			// Reset screen background
+			document.getElementById("client_background").style.backgroundColor = "transparent";
+			//Hide message window
+			document.getElementById("client_name").style.display = "none";
+			document.getElementById("client_chat").style.display = "none";
+			
 			const shouts = {
 				"1": "holdit",
-				"2": "takethat",
-				"3": "objection"
+				"2": "objection",
+				"3": "takethat"
 			};
 
 			let shout = shouts[this.chatmsg.objection];
 			if (typeof shout !== "undefined") {
-				document.getElementById("client_char").src = AO_HOST + "misc/" + shout + ".gif";
+				document.getElementById("client_shout").src = AO_HOST + "misc/" + shout + ".gif";
 				(new Audio(`${AO_HOST}/characters/${this.chatmsg.name}/${shout}.wav`)).play();
-				this.shoutTimer = 800;
+				this.shoutTimer = 850;
 			} else {
 				this.shoutTimer = 0;
 			}
 
 			this.chatmsg.isnew = false;
-			this.chatmsg.startspeaking = true;
+			this.chatmsg.startpreanim = true;
 		}
 
-		if (this.textTimer >= this.shoutTimer) {
-			if (this.chatmsg.startspeaking) {
+		if(this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
+			// Effect stuff
+			if (this.chatmsg.flash == 2){
+				//Shake screen
+				this.sfxaudio.pause();
+				this.sfxplayed = 1;
+				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-stab.wav";
+				this.sfxaudio.play();
+				$('#client_gamewindow').effect( "shake",{"direction":"up"});
+			} else if (this.chatmsg.flash == 1) {
+				//Flash screen
+				document.getElementById("client_background").style.backgroundColor = "white";
+				this.sfxaudio.pause();
+				this.sfxplayed = 1;
+				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-realization.wav";
+				this.sfxaudio.play();
+				$('#client_gamewindow').effect("pulsate");
+			}
+			
+			//Pre-animation stuff
+			if(this.chatmsg.preanimdelay > 0){
+				document.getElementById("client_shout").src = "";
 				changeBackground(this.chatmsg.side);
+				document.getElementById("client_char").src = AO_HOST + "characters/" + escape(this.chatmsg.name) + "/" + this.chatmsg.preanim + ".gif";
+			}
+			this.chatmsg.startpreanim = false;
+			this.chatmsg.startspeaking = true;
+		} else if (this.textTimer >= this.shoutTimer + this.chatmsg.preanimdelay && !this.chatmsg.startpreanim) {
+			if (this.chatmsg.startspeaking) {
+				$("#client_name").toggle( "fade" );
+				$("#client_chat").toggle("drop",{"direction":"down"});
+				if(this.chatmsg.preanimdelay == 0){
+					document.getElementById("client_shout").src = "";
+					changeBackground(this.chatmsg.side);
+				}
 				document.getElementById("client_char").src = AO_HOST + "characters/" + escape(this.chatmsg.name) + "/" + this.chatmsg.speaking + ".gif";
 				document.getElementById("client_name").style.fontSize = (document.getElementById("client_name").offsetHeight * 0.7) + "px";
 				document.getElementById("client_chat").style.fontSize = (document.getElementById("client_chat").offsetHeight * 0.25) + "px";
@@ -726,6 +822,7 @@ class Viewport {
 				}
 			}
 		}
+		
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
 			this.sfxaudio.pause();
 			this.sfxplayed = 1;
@@ -790,13 +887,15 @@ export function onEnter(event) {
 	if (event.keyCode == 13) {
 		let mychar = client.me();
 		let myemo = client.myEmote();
+		let myflip = ((client.flip)? 1:0);
+		let mycolor = document.getElementById("textcolor").value;
 		let ssfxname = "0";
 		let ssfxdelay = "0";
 		if (document.getElementById("sendsfx").checked) {
 			ssfxname = myemo.sfx;
 			ssfxdelay = myemo.sfxdelay;
 		}
-		client.sendIC(myemo.speaking, mychar.name, myemo.silent, document.getElementById("client_inputbox").value, mychar.side, ssfxname, myemo.zoom, ssfxdelay, selectedShout);
+		client.sendIC(myemo.speaking, mychar.name, myemo.silent, document.getElementById("client_inputbox").value, mychar.side, ssfxname, myemo.zoom, ssfxdelay, selectedShout, myflip, selectedEffect, mycolor);
 	}
 }
 window.onEnter = onEnter;
@@ -808,10 +907,14 @@ window.onEnter = onEnter;
  */
 function resetICParams() {
 	document.getElementById("client_inputbox").value = "";
+	if (selectedEffect) {
+		document.getElementById("button_effect_" + selectedEffect).className = "client_button";
+		selectedEffect = 0;
+	}
 	if (selectedShout) {
 		document.getElementById("button_" + selectedShout).className = "client_button";
 		selectedShout = 0;
-	}
+	}		
 }
 
 /**
@@ -1023,6 +1126,38 @@ export function pickemotion(emo) {
 	document.getElementById("emo_" + emo).src = client.myEmote().button_on;
 }
 window.pickemotion = pickemotion;
+
+/**
+ * Highlights and selects an effect for in-character chat.
+ * If the same effect button is selected, then the effect is canceled.
+ * @param {string} effect the new effect to be selected
+ */
+export function toggleaffect(effect) {
+	if (effect == selectedEffect) {
+		document.getElementById("button_effect_" + effect).className = "client_button";
+		selectedEffect = 0;
+	} else {
+		document.getElementById("button_effect_" + effect).className = "client_button dark";
+		if (selectedEffect) {
+			document.getElementById("button_effect_" + selectedEffect).className = "client_button";
+		}
+		selectedEffect = effect;
+	}
+}
+window.toggleaffect = toggleaffect;
+
+/**
+ * Toggle flip for in-character chat.
+ */
+export function toggleflip() {
+	if (client.flip) {
+		document.getElementById("button_flip").className = "client_button";
+	} else {
+		document.getElementById("button_flip").className = "client_button dark";
+	}
+	client.flip = !client.flip;
+}
+window.toggleflip = toggleflip;
 
 /**
  * Highlights and selects a shout for in-character chat.
