@@ -149,6 +149,35 @@ class Client {
 		this.serv.send("ID#webAO#2.4.5#%");
 		this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
 	}
+	
+	/**
+	 * Create observer to detect BBCode elements
+	 * then manipulate them.
+	 */
+	initialObservBBCode() {
+		var target = document.getElementById("client_inner_chat");
+		var observer = new MutationObserver(function(mutations) {
+		  mutations.forEach(function(mutation) {
+			var children = mutation.addedNodes;
+			if (children !== null) {
+				children.forEach( function(node) {
+					if (node.tagName == "C") {
+						node.style.color = node.getAttribute("a");
+					} else if(node.tagName == "M"){
+						if (node.hasAttribute('a')) {
+							node.style.backgroundColor = node.getAttribute("a");
+						} else {
+							node.style.backgroundColor = "yellow";
+							node.style.color = "black";
+						}
+					}
+				});
+			}
+		  });    
+		});
+		var config = {attributes: true,childList: true};
+		observer.observe(target,config);
+	}
 
 	/**
 	 * Requests to play as a specified character.
@@ -253,7 +282,7 @@ class Client {
 				name: args[3],
 				speaking: "(b)" + escape(args[4]),
 				silent: "(a)" + escape(args[4]),
-				content: decodeChat(unescapeChat(args[5])),
+				content: decodeBBCode(escapeHtml(decodeChat(unescapeChat(args[5])))), // Escape HTML tag, Use BBCode Only!
 				side: args[6],
 				sound: escape(args[7]),
 				type: args[8],
@@ -659,7 +688,6 @@ class Viewport {
 	 * @param {int} animdelay the length of pre-animation 
 	 */
 	initUpdater(animdelay){
-		console.log(animdelay);
 		viewport.chatmsg.preanimdelay = parseInt(animdelay); 
 		viewport.updater = setTimeout(() => viewport.updateText(), UPDATE_INTERVAL);
 	}
@@ -1258,6 +1286,25 @@ function decodeChat(estring) {
 	}
 }
 
+/**
+ * Decoding text on client side.
+ * @param {string} estring the string to be decoded
+ */
+function decodeBBCode(estring) {
+	return estring
+		.replace(/\\n/g, "<br>") // Newline \n
+		.replace(/\[(\/?)b\]/g, "<$1b>") // Bold [b][/b]
+		.replace(/\[(\/?)i\]/g, "<$1i>") // Italic [i][/i]
+		.replace(/\[(\/?)del\]/g, "<$1del>") // Deleted [del][/del]
+		.replace(/\[(\/?)u\]/g, "<$1ins>") // Underline [u][/u]
+		.replace(/\[(\/?)sub\]/g, "<$1sub>") // Subscript [sub][/sub]
+		.replace(/\[(\/?)sup\]/g, "<$1sup>") // Superscript [sup][/sup]
+		.replace(/\[m=([#a-zA-Z0-9]+)\]/g, '<m a="$1">') // Markup [m=#0ff]
+		.replace(/\[(\/?)m\]/g, '<$1m>') // [m][/m]
+		.replace(/\[c=?([#a-zA-Z0-9]+)\]/g, '<c a="$1">') // Color [c=red]
+		.replace(/\[\/c\]/g, '</c>'); // [/c]
+}
+
 
 // TODO: Possibly safe to remove, since we are using a transpiler.
 if (typeof(String.prototype.trim) === "undefined")
@@ -1287,3 +1334,7 @@ String.prototype.hashCode = function() {
 
 let client = new Client(serverIP);
 let viewport = new Viewport();
+
+$(document).ready(function(){
+	client.initialObservBBCode();
+});
