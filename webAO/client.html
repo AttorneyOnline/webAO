@@ -61,6 +61,21 @@
 
 <template id="client_settings">
     <meta name="frame-title" lang="en" content="Settings">
+	<br><br>
+	<label for="client_encoding"> Client Side Chat Encoding:</label>	
+	<select id="client_encoding" name="client_encoding">
+		  <option value="none">None</option>
+		  <option value="unicode">Unicode</option>
+		  <option value="utf16">UTF-16</option>
+	</select>
+	<br><br>
+	<label for="client_decoding"> Client Side Chat Decoding:</label>	
+	<select id="client_decoding" name="client_decoding">
+		  <option value="none">None</option>
+		  <option value="unicode">Unicode</option>
+		  <option value="utf16">UTF-16</option>
+	</select>
+	<br><br>
     <div class="slider">Music<input id="client_mvolume" class="long" type="range" min="0" max="100" value="80" onchange="changeMusicVolume()"></div>
     <div class="slider">SFX <input id="client_svolume" class="long" type="range" min="0" max="100" value="70" onchange="changeSFXVolume()"></div>
     <div class="slider">Blip <input id="client_bvolume" class="long" type="range" min="0" max="100" value="60" onchange="changeBlipVolume()"></div>

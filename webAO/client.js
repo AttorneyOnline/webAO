@@ -99,7 +99,7 @@ class Client {
 	 * @param {string} message the message to send
 	 */
 	sendOOC(message) {
-		this.serv.send(`CT#web${this.playerID}#${escapeChat(message)}#%`);
+		this.serv.send(`CT#web${this.playerID}#${escapeChat(encodeChat(message))}#%`);
 	}
 
 	/**
@@ -117,7 +117,7 @@ class Client {
 	sendIC(speaking, name, silent, message, side, ssfxname, zoom, ssfxdelay, objection, flip, flash, color) {
 		this.serv.send(
 			`MS#chat#${speaking}#${name}#${silent}` +
-			`#${escapeChat(message)}#${side}#${ssfxname}#${zoom}` +
+			`#${escapeChat(encodeChat(message))}#${side}#${ssfxname}#${zoom}` +
 			`#${this.charID}#${ssfxdelay}#${selectedShout}#0#${flip}#${flash}#${color}#%`
 		);
 	}
@@ -253,7 +253,7 @@ class Client {
 				name: args[3],
 				speaking: "(b)" + escape(args[4]),
 				silent: "(a)" + escape(args[4]),
-				content: args[5],
+				content: decodeChat(unescapeChat(args[5])),
 				side: args[6],
 				sound: escape(args[7]),
 				type: args[8],
@@ -289,7 +289,7 @@ class Client {
 	 */
 	handleCT(args) {
 		const oocLog = document.getElementById("client_ooclog");
-		oocLog.innerHTML += `${args[1]}: ${args[2]}\r\n`;
+		oocLog.innerHTML += `${decodeChat(unescapeChat(args[1]))}: ${decodeChat(unescapeChat(args[2]))}\r\n`;
 		if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
@@ -1204,6 +1204,60 @@ function escapeChat(estring) {
 		.replace(/%/g, "<percent>")
 		.replace(/\$/g, "<dollar>");
 }
+
+/**
+ * Unescapes a string to AO1 escape codes.
+ * @param {string} estring the string to be unescaped
+ */
+function unescapeChat(estring) {
+	return estring
+		.replace(/<pound>/g, "#")
+		.replace(/<and>/g, "&")
+		.replace(/<percent>/g, "%")
+		.replace(/\<dollar>/g, "$");
+}
+
+/**
+ * Encoding text on client side.
+ * @param {string} estring the string to be encoded
+ */
+function encodeChat(estring) {
+	let selectedEncoding = document.getElementById("client_encoding").value;
+	if (selectedEncoding == "unicode") {
+		//Source: https://gist.github.com/mathiasbynens/1243213
+		return estring.replace(/[^\0-~]/g, function(ch) {
+			return "\\u" + ("000" + ch.charCodeAt().toString(16)).slice(-4); });
+	} else if (selectedEncoding == "utf16"){
+		//Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+		var buffer = new ArrayBuffer(estring.length*2);
+		var result = new Uint16Array(buffer);
+		for (var i=0, strLen=estring.length; i < strLen; i++) {
+			result[i] = estring.charCodeAt(i);
+		}
+		return String(result);
+	} else {
+		return estring;
+	}
+}
+
+/**
+ * Decoding text on client side.
+ * @param {string} estring the string to be decoded
+ */
+function decodeChat(estring) {
+	let selectedDecoding = document.getElementById("client_decoding").value;
+	if (selectedDecoding == "unicode") {
+		//Source: https://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode
+        return estring.replace(/\\u([\d\w]{1,})/gi, function (match, group) {
+			return String.fromCharCode(parseInt(group, 16)); } );
+	} else if (selectedDecoding == "utf16"){	
+		//Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+		return String.fromCharCode.apply(null, new Uint16Array(estring.split(",")));
+	} else {
+		return estring;
+	}
+}
+
 
 // TODO: Possibly safe to remove, since we are using a transpiler.
 if (typeof(String.prototype.trim) === "undefined")
