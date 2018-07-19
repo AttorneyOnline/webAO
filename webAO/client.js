@@ -590,8 +590,8 @@ class Client {
 		let bg_index = getIndexFromSelect("bg_select", escape(args[1]));
 		document.getElementById("bg_select").selectedIndex = bg_index;
 		updateBackgroundPreview();
-		if(bg_index > 0){
-			document.getElementById("bg_filename").value = escape(args[1]);
+		if(bg_index == 0){
+			document.getElementById("bg_filename").value = args[1];
 		}
 		document.getElementById("bg_preview").src = AO_HOST + 'background/' + escape(args[1]) + "/defenseempty.png";
 				
