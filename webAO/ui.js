@@ -35,22 +35,34 @@ var config = {
                 type: "column",
                 content: [
                     {
-                        type: "stack",
-                        height: 60,
-                        content: [
-                            {
-                                type: "component",
-                                title: "Server chat",
-                                componentName: "template",
-                                componentState: { id: "ooc" }
-                            },
-                            {
-                                type: "component",
-                                title: "Log",
-                                componentName: "template",
-                                componentState: { id: "log" }
-                            }
-                        ]
+                        type: "row",
+						height: 65,
+						content: [
+							{
+								type: "stack",
+								content: [
+									{
+										type: "component",
+										title: "Main",
+										componentName: "template",
+										componentState: { id: "mainmenu" }
+									},
+									{
+										type: "component",
+										title: "Log",
+										componentName: "template",
+										componentState: { id: "log" }
+									}
+								]
+							},
+							{
+								type: "component",
+								title: "Server chat",
+								width: 30,
+								componentName: "template",
+								componentState: { id: "ooc" }
+							}
+						]
                     },
                     {
                         type: "row",

@@ -27,6 +27,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phon
 }
 
 let selectedEffect = 0;
+let selectedMenu = 1;
 let selectedShout = 0;
 let lastICMessageTime = new Date(0);
 
@@ -40,14 +41,17 @@ class Client {
 		this.serv.onerror   = (evt) => this.onError(evt);
 		
 		this.flip = false;
+		this.presentable = false;
 
 		this.playerID = 1;
 		this.charID = -1;
 
 		this.chars = [];
-		this.emotes = [];
+		this.emotes = [];		
+		this.evidences = [];
 
 		this.selectedEmote = -1;
+		this.selectedEvidence = 0;
 
 		this.checkUpdater = null;
 
@@ -62,6 +66,7 @@ class Client {
 			"CI":         (args) => this.handleCI(args),
 			"SC":         (args) => this.handleSC(args),
 			"EI":         (args) => this.handleEI(args),
+			"LE":         (args) => this.handleLE(args),
 			"EM":         (args) => this.handleEM(args),
 			"SM":         (args) => this.handleSM(args),
 			"music":      (args) => this.handlemusic(args),
@@ -93,6 +98,13 @@ class Client {
 	myEmote() {
 		return this.emotes[this.selectedEmote];
 	}
+	
+	/**
+	 * Gets the player's currently selected evidence if presentable.
+	 */
+	myEvidence() {
+		return (this.presentable)? this.selectedEvidence : 0;
+	}
 
 	/**
 	 * Sends an out-of-character chat message.
@@ -114,12 +126,41 @@ class Client {
 	 * @param {string} ssfxdelay the delay (in milliseconds) to play the sound effect
 	 * @param {string} objection the number of the shout to play
 	 */
-	sendIC(speaking, name, silent, message, side, ssfxname, zoom, ssfxdelay, objection, flip, flash, color) {
+	sendIC(speaking, name, silent, message, side, ssfxname, zoom, ssfxdelay, objection, evidence, flip, flash, color) {
 		this.serv.send(
 			`MS#chat#${speaking}#${name}#${silent}` +
 			`#${escapeChat(encodeChat(message))}#${side}#${ssfxname}#${zoom}` +
-			`#${this.charID}#${ssfxdelay}#${selectedShout}#0#${flip}#${flash}#${color}#%`
+			`#${this.charID}#${ssfxdelay}#${selectedShout}#${evidence}#${flip}#${flash}#${color}#%`
 		);
+	}
+	
+	/**
+	 * Sends add evidence command.
+	 * @param {string} evidence name
+	 * @param {string} evidence description
+	 * @param {string} evidence image filename
+	 */
+	sendPE(name, desc, img) {
+		this.serv.send(`PE#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
+	}
+	
+	/**
+	 * Sends edit evidence command.
+	 * @param {string} evidence id
+	 * @param {string} evidence name
+	 * @param {string} evidence description
+	 * @param {string} evidence image filename
+	 */
+	sendEE(id, name, desc, img) {
+		this.serv.send(`EE#${id}#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
+	}
+	
+	/**
+	 * Sends delete evidence command.
+	 * @param {string} evidence id
+	 */
+	sendDE(id, name, desc, img) {
+		this.serv.send(`DE#${id}#%`);
 	}
 
 	/**
@@ -148,6 +189,20 @@ class Client {
 		this.serv.send(`HI#${navigator.userAgent.hashCode()}#%`);
 		this.serv.send("ID#webAO#2.4.5#%");
 		this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
+	}
+	
+	/**
+	 * Load game resources.
+	 */
+	loadResources() {
+		// Load evidence array to select
+		var evidence_select = document.getElementById("evi_select");
+		evidence_select.add(new Option("Custom", 0));
+		for(let i = 1; i <= evidence_arr.length; i++) {
+		  evidence_select.add(new Option(evidence_arr[i - 1]));
+		}		
+		// TODO: Cache some resources
+		
 	}
 	
 	/**
@@ -410,6 +465,34 @@ class Client {
 		//serv.send("AE#" + (args[1] + 1) + "#%");
 		this.serv.send("RM#%");
 	}
+	
+	/**
+	 * Handles incoming evidence list, all evidences at once
+	 * item per packet.
+	 * 
+	 * @param {Array} args packet arguments
+	 */
+	handleLE(args) {
+		this.evidences = [];
+		for (let i = 1; i < args.length - 1; i++) {
+			var arg = args[i].split("&");
+			this.evidences[i - 1] = {
+				"name": escapeHtml(decodeChat(unescapeChat(arg[0]))),
+				"desc": escapeHtml(decodeChat(unescapeChat(arg[1]))),
+				"filename": escape(arg[2]),
+				"icon": AO_HOST + "evidence/" + escape(arg[2])
+			}
+		}
+		
+		var evidence_box = document.getElementById("evidences");
+		evidence_box.innerHTML = "";
+		for(let i = 1; i <= this.evidences.length; i++){
+			evidence_box.innerHTML += '<img src="' + this.evidences[i - 1].icon + 
+				'" id="evi_' + i +'" alt="' + this.evidences[i - 1].name +
+				'" class="client_button" ' +
+				'onclick="pickevidence('+ i +')">';								
+		}
+	}
 
 	/**
 	 * Handles incoming music information, containing multiple entries
@@ -590,7 +673,7 @@ class Client {
 			}
 		};
 		xhr.send();
-	}
+	}		
 }
 
 class Viewport {
@@ -751,10 +834,11 @@ class Viewport {
 		if (this.chatmsg.isnew) {
 			// Reset screen background
 			document.getElementById("client_background").style.backgroundColor = "transparent";
-			//Hide message window
+			//Hide message and evidence window
 			document.getElementById("client_name").style.display = "none";
 			document.getElementById("client_chat").style.display = "none";
-			
+			document.getElementById("client_evi").style.opacity = "0";
+			document.getElementById("client_evi").style.height = "0%";
 			const shouts = {
 				"1": "holdit",
 				"2": "objection",
@@ -795,7 +879,7 @@ class Viewport {
 			
 			//Pre-animation stuff
 			if(this.chatmsg.preanimdelay > 0){
-				document.getElementById("client_shout").src = "";
+				document.getElementById("client_shout").src = "misc/placeholder.gif";
 				changeBackground(this.chatmsg.side);
 				document.getElementById("client_char").src = AO_HOST + "characters/" + escape(this.chatmsg.name) + "/" + this.chatmsg.preanim + ".gif";
 			}
@@ -803,10 +887,34 @@ class Viewport {
 			this.chatmsg.startspeaking = true;
 		} else if (this.textTimer >= this.shoutTimer + this.chatmsg.preanimdelay && !this.chatmsg.startpreanim) {
 			if (this.chatmsg.startspeaking) {
+				if(this.chatmsg.evidence > 0){
+					// Prepare evidence
+					document.getElementById("client_evi").style.backgroundImage = "url('"+ client.evidences[this.chatmsg.evidence - 1].icon +"')";
+				
+					if (this.chatmsg.side == 'def'){
+						// Only def show evidence on right
+						document.getElementById("client_evi").style.right = "1.5em";
+						document.getElementById("client_evi").style.left = "initial";
+						$( "#client_evi" ).animate({
+							height: "30%",
+							opacity: 1,
+							marginLeft: "10.6in"
+						}, 250 );
+					} else {
+						document.getElementById("client_evi").style.right = "initial";
+						document.getElementById("client_evi").style.left = "1.5em";
+						$( "#client_evi" ).animate({
+							height: "30%",
+							opacity: 1,
+							marginRight: "10.6in"
+						}, 250 );
+					}
+				}
+				
 				$("#client_name").toggle( "fade" );
 				$("#client_chat").toggle("drop",{"direction":"down"});
 				if(this.chatmsg.preanimdelay == 0){
-					document.getElementById("client_shout").src = "";
+					document.getElementById("client_shout").src = "misc/placeholder.gif";
 					changeBackground(this.chatmsg.side);
 				}
 				document.getElementById("client_char").src = AO_HOST + "characters/" + escape(this.chatmsg.name) + "/" + this.chatmsg.speaking + ".gif";
@@ -915,6 +1023,7 @@ export function onEnter(event) {
 	if (event.keyCode == 13) {
 		let mychar = client.me();
 		let myemo = client.myEmote();
+		let myevi = client.myEvidence();
 		let myflip = ((client.flip)? 1:0);
 		let mycolor = document.getElementById("textcolor").value;
 		let ssfxname = "0";
@@ -923,7 +1032,7 @@ export function onEnter(event) {
 			ssfxname = myemo.sfx;
 			ssfxdelay = myemo.sfxdelay;
 		}
-		client.sendIC(myemo.speaking, mychar.name, myemo.silent, document.getElementById("client_inputbox").value, mychar.side, ssfxname, myemo.zoom, ssfxdelay, selectedShout, myflip, selectedEffect, mycolor);
+		client.sendIC(myemo.speaking, mychar.name, myemo.silent, document.getElementById("client_inputbox").value, mychar.side, ssfxname, myemo.zoom, ssfxdelay, selectedShout, myevi, myflip, selectedEffect, mycolor);
 	}
 }
 window.onEnter = onEnter;
@@ -996,7 +1105,7 @@ window.changeCharacter = changeCharacter;
  */
 export function imgError(image) {
 	image.onerror = "";
-	image.src = "/misc/placeholder.gif";
+	image.src = "misc/placeholder.gif";
 	return true;
 }
 window.imgError = imgError;
@@ -1156,6 +1265,145 @@ export function pickemotion(emo) {
 window.pickemotion = pickemotion;
 
 /**
+ * Highlights and selects an evidence for in-character chat.
+ * @param {string} evidence the evidence to be presented
+ */
+export function pickevidence(evidence) {
+	if (client.selectedEvidence != evidence) {
+		//Update selected evidence		
+		if(client.selectedEvidence > 0){
+			document.getElementById("evi_" + client.selectedEvidence).className = "client_button";
+		}
+		document.getElementById("evi_" + evidence).className = "client_button dark";
+		client.selectedEvidence = evidence;
+		
+		// Show evidence on information window
+		document.getElementById("evi_name").value = client.evidences[evidence - 1].name;
+		document.getElementById("evi_desc").value = client.evidences[evidence - 1].desc;
+
+		//Update Icon
+		let icon_id  = findEvidenceIcon(evidence);
+		document.getElementById("evi_select").selectedIndex = icon_id;
+		if (icon_id == 0){			
+			document.getElementById("evi_filename").value = client.evidences[evidence - 1].filename;
+		}
+		updateEvidenceIcon();
+		
+		// Update button
+		document.getElementById("evi_add").className = "client_button hover_button inactive";
+		document.getElementById("evi_edit").className = "client_button hover_button";
+		document.getElementById("evi_cancel").className = "client_button hover_button";
+		document.getElementById("evi_del").className = "client_button hover_button";
+	} else {
+		cancelevidence();
+	}
+}
+window.pickevidence = pickevidence;
+
+/**
+ * Add evidence.
+ */
+export function addevidence() {
+	let evidence_select = document.getElementById('evi_select');
+	client.sendPE( document.getElementById('evi_name').value,
+		document.getElementById('evi_desc').value,
+		(evidence_select.selectedIndex == 0)? 
+			document.getElementById('evi_filename').value : 
+			evidence_select.options[evidence_select.selectedIndex].text   
+		);
+	cancelevidence();
+}
+window.addevidence = addevidence;
+
+/**
+ * Edit selected evidence.
+ */
+export function editevidence() {
+	let evidence_select = document.getElementById('evi_select');
+	let id = parseInt(client.selectedEvidence) - 1;
+	client.sendEE( id, 
+		document.getElementById('evi_name').value,
+		document.getElementById('evi_desc').value,
+		(evidence_select.selectedIndex == 0)? 
+			document.getElementById('evi_filename').value : 
+			evidence_select.options[evidence_select.selectedIndex].text   
+		);
+	cancelevidence();
+}
+window.editevidence = editevidence;
+
+/**
+ * Delete selected evidence.
+ */
+export function delevidence() {
+	let id = parseInt(client.selectedEvidence) - 1;
+	client.sendDE(id);
+	cancelevidence();
+}
+window.delevidence = delevidence;
+
+/**
+ * Cancel evidence selection.
+ */
+export function cancelevidence() {
+	//Clear evidence data
+	if(client.selectedEvidence > 0){
+		document.getElementById("evi_" + client.selectedEvidence).className = "client_button";
+	}
+	client.selectedEvidence = 0;
+	
+	// Clear evidence on information window
+	document.getElementById("evi_select").selectedIndex = 0;
+	updateEvidenceIcon(); // Update icon widget
+	document.getElementById("evi_filename").value = "";
+	document.getElementById("evi_name").value = "";
+	document.getElementById("evi_desc").value = "";
+	document.getElementById("evi_icon").style.backgroundImage = "url('misc/empty.png')"; //Clear icon
+	
+	// Update button
+	document.getElementById("evi_add").className = "client_button hover_button";
+	document.getElementById("evi_edit").className = "client_button hover_button inactive";
+	document.getElementById("evi_cancel").className = "client_button hover_button inactive";
+	document.getElementById("evi_del").className = "client_button hover_button inactive";
+}
+window.cancelevidence = cancelevidence;
+
+/**
+ * Find evidence icon in select box via id.
+ * @param {integer} id the id of evidence
+ */
+export function findEvidenceIcon(id) {
+		//Find if icon alraedy existed in select box
+		let evidence_select = document.getElementById("evi_select");
+		for (let i = 1; i < evidence_select.length; ++i){
+			if (evidence_select.options[i].value == client.evidences[id - 1].filename){
+			  return i;
+			}
+		}
+		return 0;
+}
+window.findEvidenceIcon = findEvidenceIcon;
+
+/**
+ * Update evidence icon.
+ */
+export function updateEvidenceIcon() {
+	let evidence_select = document.getElementById("evi_select");
+	let evidence_filename = document.getElementById("evi_filename");
+	let evidence_iconbox = document.getElementById("evi_icon");
+	
+	if (evidence_select.selectedIndex == 0) {
+		evidence_filename.style.display = "initial";
+		evidence_iconbox.style.backgroundImage = "url('" + AO_HOST + 'evidence/' + evidence_filename.value + "')";
+	} else {
+		evidence_filename.value = "";
+		evidence_filename.style.display = "none";
+		evidence_iconbox.style.backgroundImage = "url('" + AO_HOST + 'evidence/' + evidence_select.value + "')" ;
+	}
+}
+window.updateEvidenceIcon = updateEvidenceIcon;
+
+/**
  * Highlights and selects an effect for in-character chat.
  * If the same effect button is selected, then the effect is canceled.
  * @param {string} effect the new effect to be selected
@@ -1186,6 +1434,34 @@ export function toggleflip() {
 	client.flip = !client.flip;
 }
 window.toggleflip = toggleflip;
+
+/**
+ * Toggle presentable for presenting evidence in-character chat.
+ */
+export function togglepresent() {
+	if (client.presentable) {
+		document.getElementById("button_present").className = "client_button";
+	} else {
+		document.getElementById("button_present").className = "client_button dark";
+	}
+	client.presentable = !client.presentable;
+}
+window.togglepresent = togglepresent;
+
+/**
+ * Highlights and selects a menu.
+ * @param {string} menu the menu to be selected
+ */
+export function togglemenu(menu) {
+	if (menu != selectedMenu) {
+		document.getElementById("menu_" + menu).className = "menu_icon active";
+		document.getElementById("content_" + menu).className = "menu_content active";
+		document.getElementById("menu_" + selectedMenu).className = "menu_icon";
+		document.getElementById("content_" + selectedMenu).className = "menu_content";
+		selectedMenu = menu;
+	}
+}
+window.togglemenu = togglemenu;
 
 /**
  * Highlights and selects a shout for in-character chat.
@@ -1337,4 +1613,5 @@ let viewport = new Viewport();
 
 $(document).ready(function(){
 	client.initialObservBBCode();
+	client.loadResources(); 
 });

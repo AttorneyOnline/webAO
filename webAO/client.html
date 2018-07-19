@@ -9,7 +9,9 @@
     <!--<script src="golden/js/goldenlayout.js"></script>-->
     <link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
     <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css" />
-    <script src="ui.b.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<script src="evidences.min.js"></script>
+	<script src="ui.b.js"></script>
     <script src="client.b.js"></script>
 </head>
 
@@ -21,7 +23,8 @@
         <img id="client_char" alt="Character sprite" onerror="imgError(this);">
         <img id="client_bench" alt="Bench overlay">
         <img id="client_fg" alt="Various overlay" onerror="imgError(this);">
-		<img id="client_shout" alt="Effect overlay" onerror="imgError(this);">
+		<img id="client_evi" src="misc/evidence_selector.png" alt="Character Evidence" onerror="imgError(this);">
+		<img id="client_shout" alt="Effect overlay" src="misc/placeholder.gif" onerror="imgError(this);">
 		<div id="client_name">
             <p>Dolan</p>
         </div>        
@@ -30,33 +33,33 @@
         </div>
     </div>
     <input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)" style="padding-left: 1px; padding-right: 1px;">
-    <div id="client_emo">
-    </div>
-    <br>
-    <div id="client_buttons">
-        <img src="misc/holdit.png" id="button_1" alt="Hold it!" class="client_button" onclick="toggleshout(1)">
-        <img src="misc/objection.png" id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleshout(2)">
-        <img src="misc/takethat.png" id="button_3" alt="Take That!" class="client_button" onclick="toggleshout(3)">
-        <br><br>
+	<div id="client_emo">
+	</div>
+	<br>
+	<div id="client_buttons">
+		<img src="misc/holdit.png" id="button_1" alt="Hold it!" class="client_button" onclick="toggleshout(1)">
+		<img src="misc/objection.png" id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleshout(2)">
+		<img src="misc/takethat.png" id="button_3" alt="Take That!" class="client_button" onclick="toggleshout(3)">
+		<br><br>		
 		<label for="textcolor">Text Color:</label>
 		<select id="textcolor" name="textcolor">
-		  <option value="0">Default</option>
-		  <option value="1">Green</option>
-		  <option value="2">Red</option>
-		  <option value="3">Orange</option>
-		  <option value="4">Blue</option>
-		  <option value="5">Yellow</option>
-		  <option value="6">Margenta</option>
+			<option value="0">Default</option>
+			<option value="1">Green</option>
+			<option value="2">Red</option>
+			<option value="3">Orange</option>
+			<option value="4">Blue</option>
+			<option value="5">Yellow</option>
+			<option value="6">Margenta</option>
 		</select>
 		<label for="sendsfx">SFX</label>
-        <input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
-        <br><br>
+		<input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
+		<br><br>
 		<label>Flip: </label>
 		<img src="misc/flip.png"  id="button_flip" alt="Flip" class="client_button" onclick="toggleflip()">
 		<label>Effect: </label>
 		<img src="misc/flash.png" id="button_effect_1" alt="Flash" class="client_button" onclick="toggleaffect(1)">
-        <img src="misc/shake.png" id="button_effect_2" alt="Shake" class="client_button" onclick="toggleaffect(2)">
-    </div>
+		<img src="misc/shake.png" id="button_effect_2" alt="Shake" class="client_button" onclick="toggleaffect(2)">
+	</div>
 </template>
 
 <template id="client_settings">
@@ -80,6 +83,52 @@
     <div class="slider">SFX <input id="client_svolume" class="long" type="range" min="0" max="100" value="70" onchange="changeSFXVolume()"></div>
     <div class="slider">Blip <input id="client_bvolume" class="long" type="range" min="0" max="100" value="60" onchange="changeBlipVolume()"></div>
     <input id="change_character" type="button" onclick="changeCharacter()" value="Change character">
+</template>
+
+<template id="mainmenu">
+    <meta name="frame-title" lang="en" content="Log">
+    <div id="client_menu">
+        <div class="hrtext">↓ Main Menu ↓</div>
+		<span id="menu_1" onclick="togglemenu(1)" class="menu_icon active"><i class="material-icons em-3">work</i><div>Evidence</div></span>
+		<span id="menu_2" onclick="togglemenu(2)" class="menu_icon"><i class="material-icons em-3">room</i><div>Location</div></span>
+		<span id="menu_3" onclick="togglemenu(3)" class="menu_icon"><i class="material-icons em-3">gavel</i><div>Action</div></span>
+		<span id="menu_4" onclick="togglemenu(4)" class="menu_icon"><i class="material-icons em-3">description</i><div>Guide</div></span>
+		<div class="hrtext">↓ <span id="content_name">Content</span> ↓</div>
+		<span class="menu_content active" id="content_1">
+			<meta name="frame-title" lang="en" content="Evidence">
+			<fieldset style="text-align: left">
+				<legend>Information</legend>
+				<span>
+					<img id="evi_icon" src="misc/evidence_selector.png" alt="Evidence Icon" onerror="imgError(this);">
+				</span>
+				<span style="display:inline-block">
+					<label for="evi_filename">Icon:</label>
+					<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
+					<input id="evi_filename" name="evi_filename" class="short" type="text">
+					<br><br>
+					<label for="evi_name">Name:</label>
+					<input id="evi_name" name="evi_name" class="short" type="text">
+					<br><br>
+					<label for="evi_desc">Description:</label>
+					<textarea id="evi_desc" name="evi_desc" rows="2" cols="20"></textarea>
+				</span>
+				<br><br>
+				<span style="display:block;text-align:center">
+				<img src="misc/evidence_add.png" id="evi_add" alt="Add Evidence" class="client_button hover_button" onclick="addevidence()">
+				<img src="misc/evidence_edit.png" id="evi_edit" alt="Edit Evidence" class="client_button hover_button inactive" onclick="editevidence()">
+				<img src="misc/evidence_cancel.png" id="evi_cancel" alt="Cancel Evidence" class="client_button hover_button inactive" onclick="cancelevidence()">
+				<img src="misc/evidence_remove.png" id="evi_del" alt="Remove Evidence" class="client_button hover_button inactive" onclick="delevidence()">
+				</span>				
+			</fieldset>			
+			<br>
+			<div id="evidences"></div>
+			<br>
+			<img src="misc/present.png" id="button_present" alt="Present" class="client_button" onclick="togglepresent()"> 
+		</span>
+		<span class="menu_content" id="content_2"></span>
+		<span class="menu_content" id="content_3"></span>
+		<span class="menu_content" id="content_4"></span>
+    </div>
 </template>
 
 <template id="log">
