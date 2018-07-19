@@ -722,7 +722,7 @@ class Viewport {
 				  
 				  // Should be aware browsers have a minimum frame delay 
 				  // e.g. 6ms for IE, 2ms modern browsers (50fps)
-				  duration += delay < 2 ? 10 : (delay+2)
+				  duration += delay < 2 ? 10 : (delay)
 				}
 			}
 			// Return animation length
@@ -1242,7 +1242,7 @@ function unescapeChat(estring) {
 		.replace(/<pound>/g, "#")
 		.replace(/<and>/g, "&")
 		.replace(/<percent>/g, "%")
-		.replace(/\<dollar>/g, "$");
+		.replace(/<dollar>/g, "$");
 }
 
 /**
