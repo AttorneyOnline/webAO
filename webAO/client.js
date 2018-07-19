@@ -201,6 +201,12 @@ class Client {
 		for(let i = 1; i <= evidence_arr.length; i++) {
 		  evidence_select.add(new Option(evidence_arr[i - 1]));
 		}		
+		// Load background array to select
+		var background_select = document.getElementById("bg_select");
+		background_select.add(new Option("Custom", 0));
+		for(let i = 1; i <= background_arr.length; i++) {
+		  background_select.add(new Option(background_arr[i - 1]));
+		}
 		// TODO: Cache some resources
 		
 	}
@@ -519,13 +525,38 @@ class Client {
 	 */
 	handleSM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
-		let hmusiclist = document.getElementById("client_musiclist");
+		let hmusiclist = document.getElementById("client_musiclist"), flagAudio = false;
+		
 		for (let i = 1; i < args.length - 1; i++) {
-			let newentry = document.createElement("OPTION");
-			newentry.text = args[i];
-			hmusiclist.options.add(newentry);
+			// Check when found the song for the first time
+			if(/\.(?:wav|mp3|mp4|ogg|mid)$/i.test(args[i]) && !flagAudio){
+				flagAudio = true;
+			}
+			
+			if(flagAudio) {
+				// After reached the audio put everything in the music list
+				let newentry = document.createElement("OPTION");
+				newentry.text = args[i];
+				hmusiclist.options.add(newentry);
+			
+			} else {
+				// Create area button
+				let newarea = document.createElement("SPAN");
+				newarea.className = "location-box";
+				newarea.textContent = args[i]; 
+				newarea.onclick = function(){ area_click(this) };
+				document.getElementById("areas").appendChild(newarea);
+			}
 		}
-		this.serv.send("RD#%");
+		
+		// Move first audio title from area box to music list
+		let area_box = document.getElementById("areas");
+		let audio_title = document.createElement("OPTION");
+		audio_title.text = area_box.lastChild.textContent;
+		hmusiclist.insertBefore(audio_title, hmusiclist.firstChild);
+		area_box.removeChild(area_box.lastChild); // Remove from arae box
+				
+		this.serv.send("RD#%");		
 	}
 
 	/**
@@ -556,6 +587,14 @@ class Client {
 	 */
 	handleBN(args) {
 		viewport.bgname = escape(args[1]);
+		let bg_index = getIndexFromSelect("bg_select", escape(args[1]));
+		document.getElementById("bg_select").selectedIndex = bg_index;
+		updateBackgroundPreview();
+		if(bg_index > 0){
+			document.getElementById("bg_filename").value = escape(args[1]);
+		}
+		document.getElementById("bg_preview").src = AO_HOST + 'background/' + escape(args[1]) + "/defenseempty.png";
+				
 	}
 
 	handleNBG(args) {
@@ -1065,6 +1104,16 @@ export function musiclist_click(event) {
 window.musiclist_click = musiclist_click;
 
 /**
+ * Triggered when an item on the music list is clicked.
+ * @param {MouseEvent} event
+ */
+export function area_click(el) {
+	let playtrack =  el.textContent;
+	client.sendMusicChange(playtrack);
+}
+window.area_click = area_click;
+
+/**
  * Triggered by the music volume slider.
  */
 export function changeMusicVolume() {
@@ -1146,13 +1195,21 @@ function changeBackground(position) {
 		case "def":
 			document.getElementById("client_court").src = bgfolder + "defenseempty.png"
 			document.getElementById("client_bench").style.display = "block";
-			document.getElementById("client_bench").src = bgfolder + "defensedesk.png"
+			if(ImageExist(bgfolder + "defensedesk.png")){
+				document.getElementById("client_bench").src = bgfolder + "defensedesk.png"
+			}else{
+				document.getElementById("client_bench").src = bgfolder + "bancodefensa.png"
+			}
 			standname = "defense";
 			break;
 		case "pro":
 			document.getElementById("client_court").src = bgfolder + "prosecutorempty.png"
 			document.getElementById("client_bench").style.display = "block"
-			document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png"
+			if(ImageExist(bgfolder + "defensedesk.png")){
+				document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png"
+			} else {
+				document.getElementById("client_bench").src = bgfolder + "bancoacusacion.png"
+			}			
 			standname = "prosecution";
 			break;
 		case "hld":
@@ -1282,7 +1339,7 @@ export function pickevidence(evidence) {
 		document.getElementById("evi_desc").value = client.evidences[evidence - 1].desc;
 
 		//Update Icon
-		let icon_id  = findEvidenceIcon(evidence);
+		let icon_id  = getIndexFromSelect("evi_select", client.evidences[evidence - 1].filename);
 		document.getElementById("evi_select").selectedIndex = icon_id;
 		if (icon_id == 0){			
 			document.getElementById("evi_filename").value = client.evidences[evidence - 1].filename;
@@ -1369,20 +1426,21 @@ export function cancelevidence() {
 window.cancelevidence = cancelevidence;
 
 /**
- * Find evidence icon in select box via id.
- * @param {integer} id the id of evidence
+ * Find index of anything in select box.
+ * @param {string} select_box the select element name
+ * @param {string} value the value that need to be compared
  */
-export function findEvidenceIcon(id) {
+export function getIndexFromSelect(select_box, value) {
 		//Find if icon alraedy existed in select box
-		let evidence_select = document.getElementById("evi_select");
-		for (let i = 1; i < evidence_select.length; ++i){
-			if (evidence_select.options[i].value == client.evidences[id - 1].filename){
-			  return i;
+		let select_element = document.getElementById(select_box);
+		for (let i = 1; i < select_element.length; ++i){
+			if (select_element.options[i].value == value){
+				return i;
 			}
 		}
 		return 0;
 }
-window.findEvidenceIcon = findEvidenceIcon;
+window.getIndexFromSelect = getIndexFromSelect;
 
 /**
  * Update evidence icon.
@@ -1395,13 +1453,45 @@ export function updateEvidenceIcon() {
 	if (evidence_select.selectedIndex == 0) {
 		evidence_filename.style.display = "initial";
 		evidence_iconbox.style.backgroundImage = "url('" + AO_HOST + 'evidence/' + evidence_filename.value + "')";
-	} else {
-		evidence_filename.value = "";
+	} else {		
 		evidence_filename.style.display = "none";
 		evidence_iconbox.style.backgroundImage = "url('" + AO_HOST + 'evidence/' + evidence_select.value + "')" ;
 	}
 }
 window.updateEvidenceIcon = updateEvidenceIcon;
+
+/**
+ * Change background.
+ */
+export function changeBackgroundOOC() {
+	let filename = "", background_select = document.getElementById("bg_select")
+		, bg_command = document.getElementById("bg_command").value;
+	if (background_select.selectedIndex == 0) {
+		filename = document.getElementById("bg_filename").value; 
+	} else{
+		filename = background_select.value;
+	}
+	client.sendOOC("/" + bg_command.replace("$1",filename));
+}
+window.changeBackgroundOOC = changeBackgroundOOC;
+
+/**
+ * Update background preview.
+ */
+export function updateBackgroundPreview() {
+	let background_select = document.getElementById("bg_select");
+	let background_filename = document.getElementById("bg_filename");
+	let background_preview = document.getElementById("bg_preview");
+	
+	if (background_select.selectedIndex == 0) {
+		background_filename.style.display = "initial";
+		background_preview.src = AO_HOST + 'background/' + background_filename.value + "/defenseempty.png";
+	} else {
+		background_filename.style.display = "none";
+		background_preview.src = AO_HOST + 'background/' + background_select.value + "/defenseempty.png";
+	}
+}
+window.updateBackgroundPreview = updateBackgroundPreview;
 
 /**
  * Highlights and selects an effect for in-character chat.
