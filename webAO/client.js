@@ -42,6 +42,8 @@ class Client {
 		
 		this.flip = false;
 		this.presentable = false;
+		
+		this.hp = [0,0];
 
 		this.playerID = 1;
 		this.charID = -1;
@@ -189,6 +191,15 @@ class Client {
 	 */
 	sendDE(id) {
 		this.serv.send(`DE#${id}#%`);
+	}
+	
+	/**
+	 * Sends health point command.
+	 * @param {int} side the position
+	 * @param {int} hp the health point
+	 */
+	sendHP(side,hp) {
+		this.serv.send(`HP#${side}#${hp}#%`);
 	}
 	
 	/**
@@ -707,13 +718,16 @@ class Client {
 	 * @param {Array} args packet arguments
 	 */
 	handleHP(args) {
-		// TODO (set by sD)
-		// Also, this is broken.
+		let percent_hp = args[2] * 10;
 		if (args[1] == 1) {
-			document.getElementById("client_defense_hp").style.clip = "rect(0px," + BAR_WIDTH * args[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
+			// Def hp
+			this.hp[0] = args[2];
+			$("#client_defense_hp > .health-bar").animate({ 'width': percent_hp + "%" }, 500);
 		} else {
-			document.getElementById("client_prosecutor_hp").style.clip = "rect(0px," + BAR_WIDTH * args[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
-		}
+			// Pro hp
+			this.hp[1] = args[2];
+			$("#client_prosecutor_hp > .health-bar").animate({ 'width': percent_hp + "%" }, 500);
+		}		
 	}
 	
 	/**
@@ -740,20 +754,6 @@ class Client {
 		oocLog.innerHTML += `\$Alert: ${decodeChat(unescapeChat(args[1]))}\r\n`;
 		if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
 			oocLog.scrollTop = oocLog.scrollHeight;
-		}
-	}
-	
-	/**
-	 * Handles a change in the health bars' states.
-	 * @param {Array} args packet arguments
-	 */
-	handleHP(args) {
-		// TODO (set by sD)
-		// Also, this is broken.
-		if (args[1] == 1) {
-			document.getElementById("client_defense_hp").style.clip = "rect(0px," + BAR_WIDTH * args[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
-		} else {
-			document.getElementById("client_prosecutor_hp").style.clip = "rect(0px," + BAR_WIDTH * args[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
 		}
 	}
 	
@@ -1672,11 +1672,11 @@ window.updateEvidenceIcon = updateEvidenceIcon;
  */
 export function updateActionCommands(side) {
 	if(side == "jud"){
-		document.getElementById("menu_wt").style.display = "inline-table";
-		document.getElementById("menu_ce").style.display = "inline-table";
+		document.getElementById("judge_action").style.display = "inline-table";
+		document.getElementById("no_action").style.display = "none";
 	} else {
-		document.getElementById("menu_wt").style.display = "none";
-		document.getElementById("menu_ce").style.display = "none";
+		document.getElementById("no_action").style.display = "inline-table";
+		document.getElementById("judge_action").style.display = "none";
 	}
 	//Update role selector
 	for(let i = 0, role_select = document.getElementById("role_select").options; i < role_select.length; i++){
@@ -1726,8 +1726,8 @@ window.randomCharacterOOC = randomCharacterOOC;
 /**
  * Call mod.
  */
-export function callmod() {		
-	client.sendZZ("");
+export function callmod() {	
+	$( "#callmod_dialog" ).dialog( "open" );	
 }
 window.callmod = callmod;
 
@@ -1746,6 +1746,38 @@ export function initce() {
 	client.sendRT("testimony2");
 }
 window.initce = initce;
+
+/**
+ * Add defense health point.
+ */
+export function addHPD() {		
+	client.sendHP(1,String(parseInt(client.hp[0]) + 1));
+}
+window.addHPD = addHPD;
+
+/**
+ * Reduce defense health point.
+ */
+export function redHPD() {		
+	client.sendHP(1,String(parseInt(client.hp[0]) - 1));
+}
+window.redHPD = redHPD;
+
+/**
+ * Add prosecution health point.
+ */
+export function addHPP() {		
+	client.sendHP(2,String(parseInt(client.hp[1]) + 1));
+}
+window.addHPP = addHPP;
+
+/**
+ * Reduce prosecution health point.
+ */
+export function redHPP() {		
+	client.sendHP(2,String(parseInt(client.hp[1]) - 1));
+}
+window.redHPP = redHPP;
 
 /**
  * Update background preview.
@@ -1976,4 +2008,35 @@ let viewport = new Viewport();
 $(document).ready(function(){
 	client.initialObservBBCode();
 	client.loadResources(); 
+	
+});
+
+// Create dialog and link to button	
+$( function() {
+	$( "#callmod_dialog" ).dialog({
+		autoOpen: false,
+		resizable: false,
+		show: {
+			effect: "drop",
+			direction:"down",
+			duration: 500
+		},
+		hide: {
+			effect: "drop",
+			direction:"down",
+			duration: 500
+		},
+		height: "auto",
+		width: 400,
+		modal: true,
+		buttons: {
+			"Sure": function() {
+				client.sendZZ("");
+				$( this ).dialog( "close" );
+			},
+			Cancel: function() {
+				$( this ).dialog( "close" );
+			}
+		}
+	});
 });

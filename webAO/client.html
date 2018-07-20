@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="client.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
     <!--<script src="golden/js/goldenlayout.js"></script>-->
-    <link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
     <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css" />
     <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<script src="lib/jdataview.min.js"></script>
@@ -39,12 +41,12 @@
     <input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)" style="padding-left: 1px; padding-right: 1px;">
 	<meta name="frame-title" lang="en" content="Miscellaneous">
     <div id="client_bars">
-        <span style="background-image: url(&quot;misc/zdoh.png&quot;); width: 90px; height: 20px;">
-            <img class="client_defense" alt="Defense health" id="client_defense_hp" src="misc/advocat.png" style="clip-path: polygon(0px 0px, 90px 0px, 90px 20px, 0px 20px, 0px 0px); clip: rect(0px, 90px, 20px, 0px);">
-        </span>
-        <span style="background-image: url(&quot;misc/zdoh.png&quot;); width: 90px; height: 20px;" misc="">
-            <img class="client_prosecutor" alt="Prosecution health" id="client_prosecutor_hp" src="misc/procuror.png" style="clip-path: polygon(0px 0px, 90px 0px, 90px 20px, 0px 20px, 0px 0px); clip: rect(0px, 90px, 20px, 0px);" misc="">
-        </span>
+		<span id="client_defense_hp" class="health-box">
+			<div class="health-bar"></div>
+		</span>
+		<span id="client_prosecutor_hp" class="health-box">
+			<div class="health-bar"></div>
+		</span>
     </div>
 	<div id="client_emo">
 	</div>
@@ -75,12 +77,29 @@
 	</div>
 	<fieldset style="margin:10px;">
 		<legend>Action Commands</legend>
-		<span>
-			<span id="menu_wt" onclick="initwt()" class="menu_icon" style="display:none"><i class="material-icons em-3">record_voice_over</i><div>Witness<br>Testimony</div></span>
-			<span id="menu_ce" onclick="initce()" class="menu_icon" style="display:none"><i class="material-icons em-3">question_answer</i><div>Cross<br>Examination</div></span>
-			<span id="menu_cm" onclick="callmod()" class="menu_icon"><i class="material-icons em-3">report</i><div>Call Mod</div></span>
+		<!----------- Judge Commands --------------->
+		<span id="judge_action" style="display:none">
+			<span id="menu_wt" onclick="initwt()" class="menu_icon"><i class="material-icons em-3">record_voice_over</i><div>Witness<br>Testimony</div></span>
+			<span id="menu_ce" onclick="initce()" class="menu_icon"><i class="material-icons em-3">question_answer</i><div>Cross<br>Examination</div></span>
+			<br>
+			<span style="display:inline-block; vertical-align: middle;">
+				<span id="menu_ahpd" onclick="addHPD()" class="menu_icon" ><i class="material-icons em1-5">add_circle</i></span>
+				<span style="font-size: 1.25em">Defense</span>
+				<span id="menu_rhpd" onclick="redHPD()" class="menu_icon" ><i class="material-icons em1-5">remove_circle</i></span>
+			</span>
+			<span style="display:inline-block; vertical-align: middle;">
+			<span id="menu_ahpp" onclick="addHPP()" class="menu_icon" ><i class="material-icons em-1-5">add_circle</i></span>
+			 <span style="font-size: 1.25em">Prosecution</span>
+			<span id="menu_rhpp" onclick="redHPP()" class="menu_icon" ><i class="material-icons em-1-5">remove_circle</i></span>
+			</span>
+		</span>
+		<!----------- No Commands --------------->
+		<span id="no_action">
+			No action available for this role.
 		</span>
 	</fieldset>
+	<br>
+	<span id="menu_cm" onclick="callmod()" class="menu_icon"><i class="material-icons em-3">report</i><div>Call Mod</div></span>			
 </template>
 
 <template id="mainmenu">
@@ -227,6 +246,10 @@
     <select id="client_musiclist" size="5" onclick="musiclist_click(event)" style="width: 100%; height: 100%;">
     </select>
 </template>
+
+<div id="callmod_dialog" title="Are you sure to call mod?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>They might be very busy. Are you sure?</p>
+</div>
 
 <body>
     <span id="sound"></span>
