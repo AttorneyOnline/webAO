@@ -334,6 +334,13 @@ img {
 	height: 20px;
 }
 
+#client_testimony {
+	display: block;
+    position: absolute;
+    width: 100%;
+    height: auto;
+}
+
 #evi_icon {
 	background-image: url('misc/empty.png');
 	background-repeat: no-repeat;
@@ -445,6 +452,10 @@ img {
 
 .menu_icon.active{
 	opacity: 0.25;
+}
+
+.menu_icon:hover{
+	color: #FFD081;
 }
 
 .material-icons.em-3 { 

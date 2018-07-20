@@ -10,6 +10,8 @@
     <link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
     <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css" />
     <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<script src="lib/jdataview.min.js"></script>
+	<script src="lib/gify.min.js"></script>
 	<script src="backgrounds.min.js"></script>
 	<script src="evidences.min.js"></script>
 	<script src="ui.b.js"></script>
@@ -32,8 +34,18 @@
 		<div id="client_chat">
             <p id="client_inner_chat"></p>
         </div>
+		<img id="client_testimony" alt="Testimony overlay" onerror="imgError(this);">
     </div>
     <input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)" style="padding-left: 1px; padding-right: 1px;">
+	<meta name="frame-title" lang="en" content="Miscellaneous">
+    <div id="client_bars">
+        <span style="background-image: url(&quot;misc/zdoh.png&quot;); width: 90px; height: 20px;">
+            <img class="client_defense" alt="Defense health" id="client_defense_hp" src="misc/advocat.png" style="clip-path: polygon(0px 0px, 90px 0px, 90px 20px, 0px 20px, 0px 0px); clip: rect(0px, 90px, 20px, 0px);">
+        </span>
+        <span style="background-image: url(&quot;misc/zdoh.png&quot;); width: 90px; height: 20px;" misc="">
+            <img class="client_prosecutor" alt="Prosecution health" id="client_prosecutor_hp" src="misc/procuror.png" style="clip-path: polygon(0px 0px, 90px 0px, 90px 20px, 0px 20px, 0px 0px); clip: rect(0px, 90px, 20px, 0px);" misc="">
+        </span>
+    </div>
 	<div id="client_emo">
 	</div>
 	<br>
@@ -61,32 +73,14 @@
 		<img src="misc/flash.png" id="button_effect_1" alt="Flash" class="client_button" onclick="toggleaffect(1)">
 		<img src="misc/shake.png" id="button_effect_2" alt="Shake" class="client_button" onclick="toggleaffect(2)">
 	</div>
-</template>
-
-<template id="client_settings">
-    <meta name="frame-title" lang="en" content="Settings">
-	<br><br>
-	<label for="client_encoding"> Client Side Chat Encoding:</label>	
-	<select id="client_encoding" name="client_encoding">
-		  <option value="none">None</option>
-		  <option value="unicode">Unicode</option>
-		  <option value="utf16">UTF-16</option>
-	</select>
-	<br><br>
-	<label for="client_decoding"> Client Side Chat Decoding:</label>	
-	<select id="client_decoding" name="client_decoding">
-		  <option value="none">None</option>
-		  <option value="unicode">Unicode</option>
-		  <option value="utf16">UTF-16</option>
-	</select>
-	<br><br>
-	<label for="bg_command"> Change background command:</label>
-	<input id="bg_command" name="bg_command" class="short" type="text" value="bg $1">
-	<br><br>
-    <div class="slider">Music<input id="client_mvolume" class="long" type="range" min="0" max="100" value="80" onchange="changeMusicVolume()"></div>
-    <div class="slider">SFX <input id="client_svolume" class="long" type="range" min="0" max="100" value="70" onchange="changeSFXVolume()"></div>
-    <div class="slider">Blip <input id="client_bvolume" class="long" type="range" min="0" max="100" value="60" onchange="changeBlipVolume()"></div>
-    <input id="change_character" type="button" onclick="changeCharacter()" value="Change character">
+	<fieldset style="margin:10px;">
+		<legend>Action Commands</legend>
+		<span>
+			<span id="menu_wt" onclick="initwt()" class="menu_icon" style="display:none"><i class="material-icons em-3">record_voice_over</i><div>Witness<br>Testimony</div></span>
+			<span id="menu_ce" onclick="initce()" class="menu_icon" style="display:none"><i class="material-icons em-3">question_answer</i><div>Cross<br>Examination</div></span>
+			<span id="menu_cm" onclick="callmod()" class="menu_icon"><i class="material-icons em-3">report</i><div>Call Mod</div></span>
+		</span>
+	</fieldset>
 </template>
 
 <template id="mainmenu">
@@ -95,9 +89,11 @@
         <div class="hrtext">↓ Main Menu ↓</div>
 		<span id="menu_1" onclick="togglemenu(1)" class="menu_icon active"><i class="material-icons em-3">work</i><div>Evidence</div></span>
 		<span id="menu_2" onclick="togglemenu(2)" class="menu_icon"><i class="material-icons em-3">room</i><div>Location</div></span>
-		<span id="menu_3" onclick="togglemenu(3)" class="menu_icon"><i class="material-icons em-3">gavel</i><div>Action</div></span>
+		<span id="menu_3" onclick="togglemenu(3)" class="menu_icon"><i class="material-icons em-3">settings</i><div>Settings</div></span>
 		<span id="menu_4" onclick="togglemenu(4)" class="menu_icon"><i class="material-icons em-3">description</i><div>Guide</div></span>
+		<span id="menu_5" onclick="togglemenu(5)" class="menu_icon"><i class="material-icons em-3">person</i><div>About</div></span>
 		<div class="hrtext">↓ <span id="content_name">Content</span> ↓</div>
+		<!--------  Evidence section  -------->
 		<span class="menu_content active" id="content_1">
 			<meta name="frame-title" lang="en" content="Evidence">
 			<fieldset style="text-align: left">
@@ -129,6 +125,8 @@
 			<br>
 			<img src="misc/present.png" id="button_present" alt="Present" class="client_button" onclick="togglepresent()"> 
 		</span>
+		
+		<!--------  Location section  -------->
 		<span class="menu_content" id="content_2">
 			<div id="areas"></div><br>
 			<fieldset style="text-align: left">
@@ -146,8 +144,66 @@
 				<span>
 			</fieldset>
 		</span>
-		<span class="menu_content" id="content_3"></span>
+		
+		<!--------  Settings section  -------->
+		<span class="menu_content" id="content_3">
+			<meta name="frame-title" lang="en" content="Settings">
+			<label for="role_select" >Role:</label>
+			<select id="role_select" name="role_select" onchange="changeRoleOOC()">
+				<option value="def">Defense</option>
+				<option value="pro">Prosecution</option>
+				<option value="jud">Judge</option>
+				<option value="wit">Witness</option>
+				<option value="hld">Helper Defense</option>
+				<option value="hlp">Helper Prosecution</option>
+			</select>			
+			<br><br>
+			<label for="client_encoding"> Client Side Chat Encoding:</label>	
+			<select id="client_encoding" name="client_encoding">
+				  <option value="none">None</option>
+				  <option value="unicode">Unicode</option>
+				  <option value="utf16">UTF-16</option>
+			</select>
+			<br><br>
+			<label for="client_decoding"> Client Side Chat Decoding:</label>	
+			<select id="client_decoding" name="client_decoding">
+				  <option value="none">None</option>
+				  <option value="unicode">Unicode</option>
+				  <option value="utf16">UTF-16</option>
+			</select>
+			<br><br>
+			<span style="color:red">* If you not sure what does this means, please don't change the settings.</span>
+			<br>
+			<label for="bg_command">Change background command:</label>
+			<input id="bg_command" name="bg_command" class="short" type="text" value="bg $1">
+			<br>
+			<label for="role_command">Change role command:</label>
+			<input id="role_command" name="role_command" class="short" type="text" value="pos $1">
+			<br>
+			<label for="randomchar_command">Random character command:</label>
+			<input id="randomchar_command" name="randomchar_command" class="short" type="text" value="randomchar">
+			<br><br>
+			<div class="slider">Music<input id="client_mvolume" class="long" type="range" min="0" max="100" value="80" onchange="changeMusicVolume()"></div>
+			<div class="slider">SFX <input id="client_svolume" class="long" type="range" min="0" max="100" value="70" onchange="changeSFXVolume()"></div>
+			<div class="slider">Blip <input id="client_bvolume" class="long" type="range" min="0" max="100" value="60" onchange="changeBlipVolume()"></div>
+			<br>
+			<img src="misc/character_change.png" id="char_change" alt="Change" class="client_button hover_button" onclick="changeCharacter()">
+			<img src="misc/character_random.png" id="char_change" alt="Change" class="client_button hover_button" onclick="randomCharacterOOC()">
+		</span>
+		
+		<!--------  Guide section  -------->
 		<span class="menu_content" id="content_4"></span>
+		
+		<!--------  About section  -------->		
+		<span class="menu_content" id="content_5">
+		    <meta name="frame-title" lang="en" content="About">
+		<img id="about-logo" src="images/logo-new.png" alt="Attorney Online logo">
+		<h1 style="line-height: .3em;">webAO</h1>
+		<h3>version 2.1.3</h3>
+		<p>Client created by <a href="https://github.com/stonedDiscord">@stonedDiscord</a> and fixed up by <a href="https://github.com/oldmud0">@oldmud0</a>.</p>
+		<p>Modified by <a href="https://github.com/qubrick">Qubrick</a></p>
+		<p>Special thanks to Aleks for reverse engineering the original Delphi client written by FanatSors.</p>
+		</span>
     </div>
 </template>
 
@@ -155,18 +211,6 @@
     <meta name="frame-title" lang="en" content="Log">
     <div id="client_log">
         <div class="hrtext">↓ log starts here ↓</div>
-    </div>
-</template>
-
-<template id="misc" style="display: flex; flex-direction: column;">
-    <meta name="frame-title" lang="en" content="Miscellaneous">
-    <div id="client_bars">
-        <span style="background-image: url(&quot;misc/zdoh.png&quot;); width: 90px; height: 20px;">
-            <img class="client_defense" alt="Defense health" id="client_defense_hp" src="misc/advocat.png" style="clip-path: polygon(0px 0px, 90px 0px, 90px 20px, 0px 20px, 0px 0px); clip: rect(0px, 90px, 20px, 0px);">
-        </span>
-        <span style="background-image: url(&quot;misc/zdoh.png&quot;); width: 90px; height: 20px;" misc="">
-            <img class="client_prosecutor" alt="Prosecution health" id="client_prosecutor_hp" src="misc/procuror.png" style="clip-path: polygon(0px 0px, 90px 0px, 90px 20px, 0px 20px, 0px 0px); clip: rect(0px, 90px, 20px, 0px);" misc="">
-        </span>
     </div>
 </template>
 
@@ -182,15 +226,6 @@
     <meta name="frame-title" lang="en" content="Music">
     <select id="client_musiclist" size="5" onclick="musiclist_click(event)" style="width: 100%; height: 100%;">
     </select>
-</template>
-
-<template id="about">
-    <meta name="frame-title" lang="en" content="About">
-    <img id="about-logo" src="images/logo-new.png" alt="Attorney Online logo">
-    <h1 style="line-height: .3em;">webAO</h1>
-    <h3>version 2.1.1</h3>
-    <p>Client created by <a href="https://github.com/stonedDiscord">@stonedDiscord</a> and fixed up by <a href="https://github.com/oldmud0">@oldmud0</a>.</p>
-    <p>Special thanks to Aleks for reverse engineering the original Delphi client written by FanatSors.</p>
 </template>
 
 <body>

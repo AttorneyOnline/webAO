@@ -21,14 +21,7 @@ var config = {
                         componentName: "template",
                         title: "Game",
                         componentState: { id: "client_wrapper" }
-                    },
-                    {
-                        type: "component",
-                        title: "Miscellaneous",
-                        height: 5,
-                        componentName: "template",
-                        componentState: { id: "misc" }
-                    },
+                    }
                 ]
             },
             {
@@ -56,40 +49,23 @@ var config = {
 								]
 							},
 							{
-								type: "component",
-								title: "Server chat",
+                                type: "component",
+                                title: "Music",
 								width: 30,
-								componentName: "template",
-								componentState: { id: "ooc" }
-							}
+                                componentName: "template",
+                                componentState: { id: "music" }
+                            }							
 						]
                     },
                     {
                         type: "row",
                         content: [
                             {
-                                type: "component",
-                                title: "Music",
-                                componentName: "template",
-                                componentState: { id: "music" }
-                            },
-                            {
-                                type: "stack",
-                                content: [
-                                    {
-                                        type: "component",
-                                        title: "Settings",
-                                        componentName: "template",
-                                        componentState: { id: "client_settings" }
-                                    },
-                                    {
-                                        type: "component",
-                                        title: "About",
-                                        componentName: "template",
-                                        componentState: { id: "about" }
-                                    }
-                                ]
-                            }
+								type: "component",
+								title: "Server chat",
+								componentName: "template",
+								componentState: { id: "ooc" }
+							}
                         ]
                     }
                 ]

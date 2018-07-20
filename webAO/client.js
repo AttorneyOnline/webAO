@@ -19,7 +19,7 @@ const MUSIC_HOST = AO_HOST + "sounds/music/";
 const BAR_WIDTH = 90;
 const BAR_HEIGHT = 20;
 const CHAR_SELECT_WIDTH = 8;
-const UPDATE_INTERVAL = 65;
+const UPDATE_INTERVAL = 60;
 
 let oldLoading = false;
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
@@ -45,10 +45,36 @@ class Client {
 
 		this.playerID = 1;
 		this.charID = -1;
+		this.testimonyID = 0;
 
 		this.chars = [];
 		this.emotes = [];		
 		this.evidences = [];
+		
+		this.resources = {
+			"holdit":{
+				"src": "misc/holdit.gif",
+				"duration": 720
+			},
+			"objection":{
+				"src": "misc/objection.gif",
+				"duration": 720
+			},
+			"takethat":{
+				"src": "misc/takethat.gif",
+				"duration": 840
+			},
+			"witnesstestimony":{
+				"src": "misc/witnesstestimony.gif",
+				"duration": 1560,
+				"sfx": "sounds/general/sfx-testimony.wav"
+			},
+			"crossexamination":{
+				"src": "misc/crossexamination.gif",
+				"duration": 1600,
+				"sfx": "sounds/general/sfx-testimony2.wav"
+			}
+		};
 
 		this.selectedEmote = -1;
 		this.selectedEvidence = 0;
@@ -71,9 +97,11 @@ class Client {
 			"SM":         (args) => this.handleSM(args),
 			"music":      (args) => this.handlemusic(args),
 			"DONE":       (args) => this.handleDONE(args),
-			"BN":         (args) => this.handleBN(args),
+			"BN":         (args) => this.handleBN(args),			
 			"NBG":        (args) => this.handleNBG(args),
 			"HP":         (args) => this.handleHP(args),
+			"RT":         (args) => this.handleRT(args),
+			"ZZ":         (args) => this.handleZZ(args),
 			"ID":         (args) => this.handleID(args),
 			"PN":         (args) => this.handlePN(args),
 			"SI":         (args) => this.handleSI(args),
@@ -159,8 +187,26 @@ class Client {
 	 * Sends delete evidence command.
 	 * @param {string} evidence id
 	 */
-	sendDE(id, name, desc, img) {
+	sendDE(id) {
 		this.serv.send(`DE#${id}#%`);
+	}
+	
+	/**
+	 * Sends call mod command.
+	 * @param {string} message to mod
+	 */
+	sendZZ(msg) {
+		this.serv.send(`ZZ#${msg}#%`);
+	}
+	
+	/**
+	 * Sends testimony command.
+	 * @param {string} testimony type
+	 */
+	sendRT(testimony) {
+		if(this.chars[this.charID].side == "jud"){
+			this.serv.send(`RT#${testimony}#%`);
+		}
 	}
 
 	/**
@@ -207,9 +253,59 @@ class Client {
 		for(let i = 1; i <= background_arr.length; i++) {
 		  background_select.add(new Option(background_arr[i - 1]));
 		}
+		// Calculate gif duration of shouts
+		let shouts = ["holdit", "objection", "takethat"];
+		for (let i = 0; i < shouts.length; i++) {
+			let shout_src = AO_HOST + this.resources[shouts[i]]["src"];
+			FileExist(shout_src, this.callbackLoadImageResources, shouts[i]);		
+		}
+		
+		// Calculate gif duration of testimony
+		let testimony = ["witnesstestimony", "crossexamination"];
+		for (let i = 0; i < testimony.length; i++) {
+			let testimony_src = AO_HOST + "themes/default/"+ testimony[i] +".gif";
+			// Check iamge existed
+			FileExist(testimony_src, this.callbackLoadImageResources, testimony[i]);
+			// Check sfx existed
+			FileExist(AO_HOST + this.resources[testimony[i]]["sfx"], this.callbackLoadSFXResources, testimony[i]);
+		}	
 		// TODO: Cache some resources
 		
 	}
+	
+	/**
+	 * Callback for image resources.
+	 * @param {boolean} result the image is existed or not
+	 * @param {string} resource the resource name
+	 * @param {string} src the url of resource
+	 */
+	callbackLoadImageResources(result, resource, src) {
+		if(result){
+			client.resources[resource]["src"] = src;
+			viewport.getAnimLength(src,client.callbackGetResourceLength, resource);
+		}	
+	}
+	
+	/**
+	 * Callback for animation duration resource
+	 * @param {integer} length the animation length
+	 * @param {string} resource the resource name
+	 */
+	callbackGetResourceLength(length, resource) {
+		client.resources[resource]["duration"] = length; 
+	}
+	
+	/**
+	 * Callback for sfx resources.
+	 * @param {boolean} result the audio is existed or not
+	 * @param {string} resource the resource name
+	 * @param {string} src the url of resource
+	 */
+	callbackLoadSFXResources(result, resource, src) {
+		if(result){
+			client.resources[resource]["sfx"] = src;
+		}	
+	}	
 	
 	/**
 	 * Create observer to detect BBCode elements
@@ -594,13 +690,59 @@ class Client {
 			document.getElementById("bg_filename").value = args[1];
 		}
 		document.getElementById("bg_preview").src = AO_HOST + 'background/' + escape(args[1]) + "/defenseempty.png";
-				
+		if(this.charID == -1){
+			changeBackground("jud");
+		} else {
+			changeBackground(this.chars[this.charID].side);
+		}
+		
 	}
 
 	handleNBG(args) {
 		// TODO (set by sD)
 	}
 
+	/**
+	 * Handles a change in the health bars' states.
+	 * @param {Array} args packet arguments
+	 */
+	handleHP(args) {
+		// TODO (set by sD)
+		// Also, this is broken.
+		if (args[1] == 1) {
+			document.getElementById("client_defense_hp").style.clip = "rect(0px," + BAR_WIDTH * args[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
+		} else {
+			document.getElementById("client_prosecutor_hp").style.clip = "rect(0px," + BAR_WIDTH * args[2] / 10 + "px," + BAR_HEIGHT + "px,0px)";
+		}
+	}
+	
+	/**
+	 * Handles a testimony states.
+	 * @param {Array} args packet arguments
+	 */
+	handleRT(args) {
+		if (args[1] == "testimony1") {
+			//Witness Testimony
+			this.testimonyID = 1;
+		} else {
+			//Cross Examination
+			this.testimonyID = 2;
+		}
+		viewport.initTestimonyUpdater();
+	}
+	
+	/**
+	 * Handles a call mod message.
+	 * @param {Array} args packet arguments
+	 */
+	handleZZ(args) {
+		const oocLog = document.getElementById("client_ooclog");
+		oocLog.innerHTML += `\$Alert: ${decodeChat(unescapeChat(args[1]))}\r\n`;
+		if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
+			oocLog.scrollTop = oocLog.scrollHeight;
+		}
+	}
+	
 	/**
 	 * Handles a change in the health bars' states.
 	 * @param {Array} args packet arguments
@@ -665,8 +807,8 @@ class Client {
 			if (i % CHAR_SELECT_WIDTH == 0) {
 				document.getElementById("client_chartable").appendChild(tr);
 			}
-		}
-		changeBackground("def");
+		}		
+		//changeBackground("def");
 	}
 
 	/**
@@ -679,6 +821,7 @@ class Client {
 		let me = this.me();
 		let emotes = this.emotes;
 		let xhr = new XMLHttpRequest();
+		document.getElementById("client_emo").innerHTML = ""; // Clear emote box
 		xhr.open('GET', AO_HOST + 'characters/' + escape(this.me().name) + '/char.ini', true);
 		xhr.responseType = 'text';
 		xhr.onload = function (e) {
@@ -686,6 +829,7 @@ class Client {
 				let linifile = this.responseText;
 				let pinifile = INI.parse(linifile);
 				me.side = pinifile.Options.side;
+				updateActionCommands(me.side);
 				for (let i = 1; i < pinifile.Emotions.number; i++) {
 					let emoteinfo = pinifile.Emotions[i].split('#');
 					let esfx = "0";
@@ -750,9 +894,11 @@ class Viewport {
 		this.music.play();
 
 		this.updater = null;
+		this.testimonyUpdater = null;
 
 		this.bgname = "gs4";
-
+		
+		this.testimonyTimer = 0;
 		this.shoutTimer = 0;
 		this.textTimer = 0;
 
@@ -802,7 +948,7 @@ class Viewport {
 			chatmsg.preanimdelay = this.getAnimLength(AO_HOST + 'characters/' + escape(chatmsg.name) + '/' + chatmsg.preanim + '.gif',this.initUpdater);
 		} else {
 			this.initUpdater(0)
-		}	
+		}
 	}
 	
 	/**
@@ -815,44 +961,82 @@ class Viewport {
 	}
 	
 	/**
+	 * Intialize testimony updater 
+	 */
+	initTestimonyUpdater(){		
+		if(client.testimonyID > 0){			
+			let testimony = "";
+			if (client.testimonyID == 1) {
+				testimony = "witnesstestimony";				
+			} else if (client.testimonyID == 2) {
+				testimony = "crossexamination";
+			}
+			(new Audio(client.resources[testimony]["sfx"])).play();
+			this.testimonyTimer = 0;
+			document.getElementById("client_testimony").src = client.resources[testimony]["src"];
+			this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);						
+		}
+	}
+	
+	/**
 	 * Gets animation length.
 	 * @param {string} filename the animation file name
 	 * @param {function} callback the callback function
+	 * @param {object} param 
 	 */
-	getAnimLength(filename,callback) {
-		//Source (Thanks to Ryman): https://codepen.io/Ryman/pen/wzioA
+	getAnimLength(filename, callback, param) {
 		var request = new XMLHttpRequest();
 		request.open('GET', filename, true);
 		request.responseType = 'arraybuffer';
 		request.addEventListener('load', function () {
-			var arr = new Uint8Array(request.response),
-			// Thanks to http://justinsomnia.org/2006/10/gif-animation-duration-calculation/
-			// And http://www.w3.org/Graphics/GIF/spec-gif89a.txt
-			bin = '', 
-			duration = 0;
-			
-			for (var i = 0; i < arr.length; i++) {				
-				bin += String.fromCharCode( arr[i] )
-
-				// Find a Graphic Control Extension hex(21F904__ ____ __00)
-				if (arr[i] == 0x21 
-				 && arr[i + 1] == 0xF9 
-				 && arr[i + 2] == 0x04 
-				 && arr[i + 7] == 0x00) {
-				  // Swap 5th and 6th bytes to get the delay per frame
-				  let delay = (arr[i + 5] << 8) | (arr[i + 4] & 0xFF)
-				  
-				  // Should be aware browsers have a minimum frame delay 
-				  // e.g. 6ms for IE, 2ms modern browsers (50fps)
-				  duration += delay < 2 ? 10 : (delay)
-				}
-			}
+			// Use gify API
+			// https://github.com/rfrench/gify
+			var gifInfo = gify.getInfo(request.response);
+			console.log(gifInfo["duration"]);
 			// Return animation length
-			callback(duration * 10);
+			callback(gifInfo["duration"], param);
 		});
 		request.send();
 	}
-
+	
+	/**
+	 * Updates the testimony overaly
+	 */
+	updateTestimony(){
+		//Update timer
+		this.testimonyTimer = this.testimonyTimer + UPDATE_INTERVAL;
+		
+		if (client.testimonyID == 1) {
+			//Witness Testimony
+			if (this.testimonyTimer >= client.resources["witnesstestimony"]["duration"]){
+				//Finish
+				this.disposeTestimony();
+			} else {
+				this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
+			}			
+		} else if (client.testimonyID == 2) {
+			//Cross Examination
+			if (this.testimonyTimer >= client.resources["crossexamination"]["duration"]){
+				//Finish
+				this.disposeTestimony();
+			} else {
+				this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
+			}
+		} else {
+			this.disposeTestimony();
+		}
+	}
+	
+	/**
+	 * Dispose the testimony overlay
+	 */
+	 disposeTestimony(){
+		client.testimonyID = 0;
+		this.testimonyTimer = 0;
+		document.getElementById("client_testimony").src = "misc/placeholder.gif";
+		clearTimeout(this.testimonyUpdater);
+	 }
+	 
 	/**
 	 * Updates the chatbox based on the given text.
 	 * 
@@ -886,7 +1070,7 @@ class Viewport {
 
 			let shout = shouts[this.chatmsg.objection];
 			if (typeof shout !== "undefined") {
-				document.getElementById("client_shout").src = AO_HOST + "misc/" + shout + ".gif";
+				document.getElementById("client_shout").src = client.resources[shout]["src"];
 				(new Audio(`${AO_HOST}/characters/${this.chatmsg.name}/${shout}.wav`)).play();
 				this.shoutTimer = 850;
 			} else {
@@ -1169,13 +1353,22 @@ export function demoError(image) {
 window.demoError = demoError;
 
 /**
- * Checks if an image exists at the specified URI.
+ * Checks if an file exists at the specified URI.
  * @param {string} url the URI to be checked
+ * @param {function} callback the function to be called when finished
+ * @param {object} param 
  */
-function ImageExist(url) {
-	var img = new Image();
-	img.src = url;
-	return img.height != 0;
+function FileExist(url,callback,param) {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			callback(true, param, url);
+		} else {
+			callback(false, param, url);
+		}
+	};
+	xhttp.open("GET", url, true);
+	xhttp.send();
 }
 
 /**
@@ -1193,21 +1386,13 @@ function changeBackground(position) {
 		case "def":
 			document.getElementById("client_court").src = bgfolder + "defenseempty.png"
 			document.getElementById("client_bench").style.display = "block";
-			if(ImageExist(bgfolder + "defensedesk.png")){
-				document.getElementById("client_bench").src = bgfolder + "defensedesk.png"
-			}else{
-				document.getElementById("client_bench").src = bgfolder + "bancodefensa.png"
-			}
+			FileExist(bgfolder + "defensedesk.png", callbackChangeBackground, position);
 			standname = "defense";
 			break;
 		case "pro":
 			document.getElementById("client_court").src = bgfolder + "prosecutorempty.png"
 			document.getElementById("client_bench").style.display = "block"
-			if(ImageExist(bgfolder + "defensedesk.png")){
-				document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png"
-			} else {
-				document.getElementById("client_bench").src = bgfolder + "bancoacusacion.png"
-			}			
+			FileExist(bgfolder + "defensedesk.png", callbackChangeBackground, position);
 			standname = "prosecution";
 			break;
 		case "hld":
@@ -1232,6 +1417,30 @@ function changeBackground(position) {
 	if (viewport.chatmsg.type == 5) {
 		document.getElementById("client_bench").style.display = "none";
 		document.getElementById("client_court").src = AO_HOST + "themes/default/" + standname + "_speedlines.gif";
+	}
+}
+
+/**
+ * Callback for desk resource
+ * 
+ * Valid positions: `def, pro, hld, hlp, wit, jud`
+ * @param {boolean} result the image is existed or not
+ * @param {string} position the position to change into
+ */
+function callbackChangeBackground(result,position) {
+	let bgfolder = viewport.bgFolder();
+	if (position == "def"){
+		if(result){
+			document.getElementById("client_bench").src = bgfolder + "defensedesk.png"
+		}else{
+			document.getElementById("client_bench").src = bgfolder + "bancodefensa.png"
+		}
+	} else {
+		if(result){
+			document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png"
+		} else {
+			document.getElementById("client_bench").src = bgfolder + "bancoacusacion.png"
+		}			
 	}
 }
 
@@ -1459,7 +1668,28 @@ export function updateEvidenceIcon() {
 window.updateEvidenceIcon = updateEvidenceIcon;
 
 /**
- * Change background.
+ * Update evidence icon.
+ */
+export function updateActionCommands(side) {
+	if(side == "jud"){
+		document.getElementById("menu_wt").style.display = "inline-table";
+		document.getElementById("menu_ce").style.display = "inline-table";
+	} else {
+		document.getElementById("menu_wt").style.display = "none";
+		document.getElementById("menu_ce").style.display = "none";
+	}
+	//Update role selector
+	for(let i = 0, role_select = document.getElementById("role_select").options; i < role_select.length; i++){
+			if(side == role_select[i].value){
+				role_select.selectedIndex = i;
+				return;
+			}
+	}
+}
+window.updateActionCommands = updateActionCommands;
+
+/**
+ * Change background via OOC.
  */
 export function changeBackgroundOOC() {
 	let filename = "", background_select = document.getElementById("bg_select")
@@ -1472,6 +1702,50 @@ export function changeBackgroundOOC() {
 	client.sendOOC("/" + bg_command.replace("$1",filename));
 }
 window.changeBackgroundOOC = changeBackgroundOOC;
+
+/**
+ * Change role via OOC.
+ */
+export function changeRoleOOC() {
+	let role_select = document.getElementById("role_select")
+		, role_command = document.getElementById("role_command").value;
+		
+	client.sendOOC("/" + role_command.replace("$1",role_select.value));
+	updateActionCommands(role_select.value);
+}
+window.changeRoleOOC = changeRoleOOC;
+
+/**
+ * Random character via OOC.
+ */
+export function randomCharacterOOC() {		
+	client.sendOOC("/" + document.getElementById("randomchar_command").value);
+}
+window.randomCharacterOOC = randomCharacterOOC;
+
+/**
+ * Call mod.
+ */
+export function callmod() {		
+	client.sendZZ("");
+}
+window.callmod = callmod;
+
+/**
+ * Decalre witness testimony.
+ */
+export function initwt() {		
+	client.sendRT("testimony1");
+}
+window.initwt = initwt;
+
+/**
+ * Decalre cross examination.
+ */
+export function initce() {		
+	client.sendRT("testimony2");
+}
+window.initce = initce;
 
 /**
  * Update background preview.
