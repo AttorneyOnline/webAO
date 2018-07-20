@@ -936,16 +936,14 @@ class Viewport {
 						document.getElementById("client_evi").style.left = "initial";
 						$( "#client_evi" ).animate({
 							height: "30%",
-							opacity: 1,
-							marginLeft: "10.6in"
+							opacity: 1
 						}, 250 );
 					} else {
 						document.getElementById("client_evi").style.right = "initial";
 						document.getElementById("client_evi").style.left = "1.5em";
 						$( "#client_evi" ).animate({
 							height: "30%",
-							opacity: 1,
-							marginRight: "10.6in"
+							opacity: 1
 						}, 250 );
 					}
 				}
