@@ -823,6 +823,8 @@ class Client {
 		let me = this.me();
 		let emotes = this.emotes;
 		let xhr = new XMLHttpRequest();
+		let isOfficialAssets = (AO_HOST == "http://assets.aceattorneyonline.com/base/");
+		xhr.withCredentials = false;
 		document.getElementById("client_emo").innerHTML = ""; // Clear emote box
 		xhr.open('GET', AO_HOST + 'characters/' + escape(this.me().name) + '/char.ini', true);
 		xhr.responseType = 'text';
@@ -843,14 +845,14 @@ class Client {
 						esfxd = pinifile.SoundT[i];
 					}
 					emotes[i] = {
-						desc: emoteinfo[0],
-						speaking: emoteinfo[1],
-						silent: emoteinfo[2],
+						desc: (isOfficialAssets)? emoteinfo[0].toLowerCase() : emoteinfo[0],
+						speaking: (isOfficialAssets)? emoteinfo[1].toLowerCase() : emoteinfo[1],
+						silent: (isOfficialAssets)? emoteinfo[2].toLowerCase() : emoteinfo[2],
 						zoom: emoteinfo[3],
-						sfx: esfx,
+						sfx: (isOfficialAssets)? esfx.toLowerCase() : esfx,
 						sfxdelay: esfxd,
-						button_off: AO_HOST + 'characters/' + escape(me.name) + '/emotions/button' + i + '_off.png',
-						button_on: AO_HOST + 'characters/' + escape(me.name) + '/emotions/button' + i + '_on.png'
+						button_off: AO_HOST + 'characters/' + ((isOfficialAssets)? escape(me.name).toLowerCase() : escape(me.name)) + '/emotions/button' + i + '_off.png',
+						button_on: AO_HOST + 'characters/' + ((isOfficialAssets)? escape(me.name).toLowerCase() : escape(me.name)) + '/emotions/button' + i + '_on.png'
 					};
 					document.getElementById("client_emo").innerHTML += "<img src='" + emotes[i].button_off + "' id='emo_" + i + "' alt='" + emotes[i].desc + "' class='client_button' onclick='pickemotion(" + i + ")'>";
 				}
