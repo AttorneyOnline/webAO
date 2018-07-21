@@ -168,6 +168,8 @@
 		<!--------  Settings section  -------->
 		<span class="menu_content" id="content_3">
 			<meta name="frame-title" lang="en" content="Settings">
+			<label for="OOC_name">Server chat name:</label>
+			<input id="OOC_name" name="OOC_name" class="short" type="text">
 			<label for="role_select" >Role:</label>
 			<select id="role_select" name="role_select" onchange="changeRoleOOC()">
 				<option value="def">Defense</option>
@@ -178,37 +180,37 @@
 				<option value="hlp">Helper Prosecution</option>
 			</select>			
 			<br><br>
-			<label for="client_encoding"> Client Side Chat Encoding:</label>	
-			<select id="client_encoding" name="client_encoding">
-				  <option value="none">None</option>
-				  <option value="unicode">Unicode</option>
-				  <option value="utf16">UTF-16</option>
-			</select>
-			<br><br>
-			<label for="client_decoding"> Client Side Chat Decoding:</label>	
-			<select id="client_decoding" name="client_decoding">
-				  <option value="none">None</option>
-				  <option value="unicode">Unicode</option>
-				  <option value="utf16">UTF-16</option>
-			</select>
-			<br><br>
-			<span style="color:red">* If you not sure what does this means, please don't change the settings.</span>
-			<br>
-			<label for="bg_command">Change background command:</label>
-			<input id="bg_command" name="bg_command" class="short" type="text" value="bg $1">
-			<br>
-			<label for="role_command">Change role command:</label>
-			<input id="role_command" name="role_command" class="short" type="text" value="pos $1">
-			<br>
-			<label for="randomchar_command">Random character command:</label>
-			<input id="randomchar_command" name="randomchar_command" class="short" type="text" value="randomchar">
-			<br><br>
 			<div class="slider">Music<input id="client_mvolume" class="long" type="range" min="0" max="100" value="80" onchange="changeMusicVolume()"></div>
 			<div class="slider">SFX <input id="client_svolume" class="long" type="range" min="0" max="100" value="70" onchange="changeSFXVolume()"></div>
 			<div class="slider">Blip <input id="client_bvolume" class="long" type="range" min="0" max="100" value="60" onchange="changeBlipVolume()"></div>
 			<br>
 			<img src="misc/character_change.png" id="char_change" alt="Change" class="client_button hover_button" onclick="changeCharacter()">
 			<img src="misc/character_random.png" id="char_change" alt="Change" class="client_button hover_button" onclick="randomCharacterOOC()">
+			<br><br>
+			<label for="client_encoding"> Client side chat encoding:</label>	
+			<select id="client_encoding" name="client_encoding">
+				  <option value="none">None</option>
+				  <option value="unicode">Unicode</option>
+				  <option value="utf16">UTF-16</option>
+			</select>
+			<br><br>
+			<label for="client_decoding"> Client side chat decoding:</label>	
+			<select id="client_decoding" name="client_decoding">
+				  <option value="none">None</option>
+				  <option value="unicode">Unicode</option>
+				  <option value="utf16">UTF-16</option>
+			</select>
+			<br><br>
+			<span style="color:red">* If you not sure what does this means, please don't change these following settings.</span>
+			<br><br>
+			<label for="bg_command">Change background command:</label>
+			<input id="bg_command" name="bg_command" class="short" type="text" value="bg $1">
+			<br><br>
+			<label for="role_command">Change role command:</label>
+			<input id="role_command" name="role_command" class="short" type="text" value="pos $1">
+			<br><br>
+			<label for="randomchar_command">Random character command:</label>
+			<input id="randomchar_command" name="randomchar_command" class="short" type="text" value="randomchar">
 		</span>
 		
 		<!--------  Guide section  -------->
@@ -252,7 +254,7 @@
 <template id="ooc">
     <meta name="frame-title" lang="en" content="Server">
     <div style="height: 100%; display: flex; flex-direction: column;">
-        <textarea id="client_ooclog" style="flex: 1 auto"></textarea>
+        <textarea id="client_ooclog" style="flex: 1 auto" readonly></textarea>
         <input id="client_oocinputbox" class="long" type="text" onkeypress="onOOCEnter(event)">
     </div>
 </template>

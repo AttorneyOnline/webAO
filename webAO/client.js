@@ -141,7 +141,7 @@ class Client {
 	 * @param {string} message the message to send
 	 */
 	sendOOC(message) {
-		this.serv.send(`CT#web${this.playerID}#${escapeChat(encodeChat(message))}#%`);
+		this.serv.send(`CT#${escapeChat(encodeChat(document.getElementById("OOC_name").value))}#${escapeChat(encodeChat(message))}#%`);
 	}
 
 	/**
@@ -252,6 +252,8 @@ class Client {
 	 * Load game resources.
 	 */
 	loadResources() {
+		// Set to playerID to server chat name
+		document.getElementById("OOC_name").value = "web" + this.playerID;
 		// Load evidence array to select
 		var evidence_select = document.getElementById("evi_select");
 		evidence_select.add(new Option("Custom", 0));
