@@ -1965,8 +1965,8 @@ function decodeBBCode(estring) {
 		.replace(/\\n/g, "<br>") // Newline \n
 		.replace(/\[(\/?)b\]/g, "<$1b>") // Bold [b][/b]
 		.replace(/\[(\/?)i\]/g, "<$1i>") // Italic [i][/i]
-		.replace(/\[(\/?)del\]/g, "<$1del>") // Deleted [del][/del]
-		.replace(/\[(\/?)u\]/g, "<$1ins>") // Underline [u][/u]
+		.replace(/\[(\/?)s\]/g, "<$1del>") // Strikethrough  [s][/s]
+		.replace(/\[(\/?)u\]/g, "<$1u>") // Underline [u][/u]
 		.replace(/\[(\/?)sub\]/g, "<$1sub>") // Subscript [sub][/sub]
 		.replace(/\[(\/?)sup\]/g, "<$1sup>") // Superscript [sup][/sup]
 		.replace(/\[m=([#a-zA-Z0-9]+)\]/g, '<m a="$1">') // Markup [m=#0ff]
