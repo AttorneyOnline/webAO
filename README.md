@@ -1,15 +1,15 @@
 # Attorney Online Web Client
 
-webAO client only feature:
+webAO client only features:
  - BBcode
  - Client side encoding-decoding (Unicode escape/UTF-16 array)
  - Location (spilt from music list)
  - Change background UI via menu
  
-Planned feature:
+Planned features:
  - Record testimony on client side (Judge role)
  - Play testimony during cross-examination
- - Defense, prosecution and judge can skip message.(forward/backward)
+ - Defense, prosecution and judge can skip testimony message.(forward/backward)
  - Show Guilty/Not Guilty message (Judge role)
  
 Link to the client in this repo: http://attorneyonline.000webhostapp.com
