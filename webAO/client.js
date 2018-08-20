@@ -1,11 +1,11 @@
 /*
  * Glorious webAO
- * made by sD, refactored by oldmud0
+ * made by sD, refactored by oldmud0 and Qubrick
  * credits to aleks for original idea and source
-*/
+ */
 
 let queryDict = {};
-location.search.substr(1).split("&").forEach(function(item) {
+location.search.substr(1).split("&").forEach(function (item) {
 	queryDict[item.split("=")[0]] = item.split("=")[1]
 });
 
@@ -35,43 +35,43 @@ class Client {
 	constructor(address) {
 		this.serv = new WebSocket("ws://" + address);
 
-		this.serv.onopen    = (evt) => this.onOpen(evt);
-		this.serv.onclose   = (evt) => this.onClose(evt);
+		this.serv.onopen = (evt) => this.onOpen(evt);
+		this.serv.onclose = (evt) => this.onClose(evt);
 		this.serv.onmessage = (evt) => this.onMessage(evt);
-		this.serv.onerror   = (evt) => this.onError(evt);
-		
+		this.serv.onerror = (evt) => this.onError(evt);
+
 		this.flip = false;
 		this.presentable = false;
-		
-		this.hp = [0,0];
+
+		this.hp = [0, 0];
 
 		this.playerID = 1;
 		this.charID = -1;
 		this.testimonyID = 0;
 
 		this.chars = [];
-		this.emotes = [];		
+		this.emotes = [];
 		this.evidences = [];
-		
+
 		this.resources = {
-			"holdit":{
+			"holdit": {
 				"src": "misc/holdit.gif",
 				"duration": 720
 			},
-			"objection":{
+			"objection": {
 				"src": "misc/objection.gif",
 				"duration": 720
 			},
-			"takethat":{
+			"takethat": {
 				"src": "misc/takethat.gif",
 				"duration": 840
 			},
-			"witnesstestimony":{
+			"witnesstestimony": {
 				"src": "misc/witnesstestimony.gif",
 				"duration": 1560,
 				"sfx": "sounds/general/sfx-testimony.wav"
 			},
-			"crossexamination":{
+			"crossexamination": {
 				"src": "misc/crossexamination.gif",
 				"duration": 1600,
 				"sfx": "sounds/general/sfx-testimony2.wav"
@@ -87,29 +87,29 @@ class Client {
 		this.musicList = Object();
 
 		this.handlers = {
-			"MS":         (args) => this.handleMS(args),
-			"CT":         (args) => this.handleCT(args),
-			"MC":         (args) => this.handleMC(args),
-			"RMC":        (args) => this.handleRMC(args),
-			"CI":         (args) => this.handleCI(args),
-			"SC":         (args) => this.handleSC(args),
-			"EI":         (args) => this.handleEI(args),
-			"LE":         (args) => this.handleLE(args),
-			"EM":         (args) => this.handleEM(args),
-			"SM":         (args) => this.handleSM(args),
-			"music":      (args) => this.handlemusic(args),
-			"DONE":       (args) => this.handleDONE(args),
-			"BN":         (args) => this.handleBN(args),			
-			"NBG":        (args) => this.handleNBG(args),
-			"HP":         (args) => this.handleHP(args),
-			"RT":         (args) => this.handleRT(args),
-			"ZZ":         (args) => this.handleZZ(args),
-			"ID":         (args) => this.handleID(args),
-			"PN":         (args) => this.handlePN(args),
-			"SI":         (args) => this.handleSI(args),
+			"MS": (args) => this.handleMS(args),
+			"CT": (args) => this.handleCT(args),
+			"MC": (args) => this.handleMC(args),
+			"RMC": (args) => this.handleRMC(args),
+			"CI": (args) => this.handleCI(args),
+			"SC": (args) => this.handleSC(args),
+			"EI": (args) => this.handleEI(args),
+			"LE": (args) => this.handleLE(args),
+			"EM": (args) => this.handleEM(args),
+			"SM": (args) => this.handleSM(args),
+			"music": (args) => this.handlemusic(args),
+			"DONE": (args) => this.handleDONE(args),
+			"BN": (args) => this.handleBN(args),
+			"NBG": (args) => this.handleNBG(args),
+			"HP": (args) => this.handleHP(args),
+			"RT": (args) => this.handleRT(args),
+			"ZZ": (args) => this.handleZZ(args),
+			"ID": (args) => this.handleID(args),
+			"PN": (args) => this.handlePN(args),
+			"SI": (args) => this.handleSI(args),
 			"CharsCheck": (args) => this.handleCharsCheck(args),
-			"PV":         (args) => this.handlePV(args),
-			"CHECK":      (args) => {}
+			"PV": (args) => this.handlePV(args),
+			"CHECK": (args) => {}
 		}
 
 		this._lastTimeICReceived = new Date(0);
@@ -128,12 +128,12 @@ class Client {
 	myEmote() {
 		return this.emotes[this.selectedEmote];
 	}
-	
+
 	/**
 	 * Gets the player's currently selected evidence if presentable.
 	 */
 	myEvidence() {
-		return (this.presentable)? this.selectedEvidence : 0;
+		return this.presentable ? this.selectedEvidence : 0;
 	}
 
 	/**
@@ -153,8 +153,12 @@ class Client {
 	 * @param {string} side the name of the side in the background
 	 * @param {string} ssfxname the name of the sound effect
 	 * @param {string} zoom whether or not to zoom
-	 * @param {string} ssfxdelay the delay (in milliseconds) to play the sound effect
+	 * @param {number} ssfxdelay the delay (in milliseconds) to play the sound effect
 	 * @param {string} objection the number of the shout to play
+	 * @param {string} evidence the filename of evidence to show
+	 * @param {number} flip change to 1 to reverse sprite for position changes
+	 * @param {string} flash screen flash effect
+	 * @param {string} color text color
 	 */
 	sendIC(speaking, name, silent, message, side, ssfxname, zoom, ssfxdelay, objection, evidence, flip, flash, color) {
 		this.serv.send(
@@ -163,7 +167,7 @@ class Client {
 			`#${this.charID}#${ssfxdelay}#${selectedShout}#${evidence}#${flip}#${flash}#${color}#%`
 		);
 	}
-	
+
 	/**
 	 * Sends add evidence command.
 	 * @param {string} evidence name
@@ -173,10 +177,10 @@ class Client {
 	sendPE(name, desc, img) {
 		this.serv.send(`PE#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
 	}
-	
+
 	/**
 	 * Sends edit evidence command.
-	 * @param {string} evidence id
+	 * @param {number} evidence id
 	 * @param {string} evidence name
 	 * @param {string} evidence description
 	 * @param {string} evidence image filename
@@ -184,24 +188,24 @@ class Client {
 	sendEE(id, name, desc, img) {
 		this.serv.send(`EE#${id}#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
 	}
-	
+
 	/**
 	 * Sends delete evidence command.
-	 * @param {string} evidence id
+	 * @param {number} evidence id
 	 */
 	sendDE(id) {
 		this.serv.send(`DE#${id}#%`);
 	}
-	
+
 	/**
 	 * Sends health point command.
-	 * @param {int} side the position
-	 * @param {int} hp the health point
+	 * @param {number} side the position
+	 * @param {number} hp the health point
 	 */
-	sendHP(side,hp) {
+	sendHP(side, hp) {
 		this.serv.send(`HP#${side}#${hp}#%`);
 	}
-	
+
 	/**
 	 * Sends call mod command.
 	 * @param {string} message to mod
@@ -209,13 +213,13 @@ class Client {
 	sendZZ(msg) {
 		this.serv.send(`ZZ#${msg}#%`);
 	}
-	
+
 	/**
 	 * Sends testimony command.
 	 * @param {string} testimony type
 	 */
 	sendRT(testimony) {
-		if(this.chars[this.charID].side == "jud"){
+		if (this.chars[this.charID].side == "jud") {
 			this.serv.send(`RT#${testimony}#%`);
 		}
 	}
@@ -247,7 +251,7 @@ class Client {
 		this.serv.send("ID#webAO#2.4.5#%");
 		this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
 	}
-	
+
 	/**
 	 * Load game resources.
 	 */
@@ -255,37 +259,37 @@ class Client {
 		// Set to playerID to server chat name
 		document.getElementById("OOC_name").value = "web" + this.playerID;
 		// Load evidence array to select
-		var evidence_select = document.getElementById("evi_select");
+		const evidence_select = document.getElementById("evi_select");
 		evidence_select.add(new Option("Custom", 0));
-		for(let i = 1; i <= evidence_arr.length; i++) {
-		  evidence_select.add(new Option(evidence_arr[i - 1]));
-		}		
+		evidence_arr.forEach(evidence => {
+			evidence_select.add(new Option(evidence));
+		});
 		// Load background array to select
-		var background_select = document.getElementById("bg_select");
+		const background_select = document.getElementById("bg_select");
 		background_select.add(new Option("Custom", 0));
-		for(let i = 1; i <= background_arr.length; i++) {
-		  background_select.add(new Option(background_arr[i - 1]));
-		}
+		background_arr.forEach(background => {
+			background_select.add(new Option(background));
+		});
 		// Calculate gif duration of shouts
-		let shouts = ["holdit", "objection", "takethat"];
+		const shouts = ["holdit", "objection", "takethat"];
 		for (let i = 0; i < shouts.length; i++) {
 			let shout_src = AO_HOST + this.resources[shouts[i]]["src"];
-			FileExist(shout_src, this.callbackLoadImageResources, shouts[i]);		
+			FileExist(shout_src, this.callbackLoadImageResources, shouts[i]);
 		}
-		
+
 		// Calculate gif duration of testimony
-		let testimony = ["witnesstestimony", "crossexamination"];
+		const testimony = ["witnesstestimony", "crossexamination"];
 		for (let i = 0; i < testimony.length; i++) {
-			let testimony_src = AO_HOST + "themes/default/"+ testimony[i] +".gif";
-			// Check iamge existed
+			const testimony_src = `${AO_HOST}themes/default/${testimony[i]}.gif`;
+			// Check image existed
 			FileExist(testimony_src, this.callbackLoadImageResources, testimony[i]);
 			// Check sfx existed
 			FileExist(AO_HOST + this.resources[testimony[i]]["sfx"], this.callbackLoadSFXResources, testimony[i]);
-		}	
+		}
 		// TODO: Cache some resources
-		
+
 	}
-	
+
 	/**
 	 * Callback for image resources.
 	 * @param {boolean} result the image is existed or not
@@ -293,21 +297,21 @@ class Client {
 	 * @param {string} src the url of resource
 	 */
 	callbackLoadImageResources(result, resource, src) {
-		if(result){
+		if (result) {
 			client.resources[resource]["src"] = src;
-			viewport.getAnimLength(src,client.callbackGetResourceLength, resource);
-		}	
+			viewport.getAnimLength(src, client.callbackGetResourceLength, resource);
+		}
 	}
-	
+
 	/**
 	 * Callback for animation duration resource
 	 * @param {integer} length the animation length
 	 * @param {string} resource the resource name
 	 */
 	callbackGetResourceLength(length, resource) {
-		client.resources[resource]["duration"] = length; 
+		client.resources[resource]["duration"] = length;
 	}
-	
+
 	/**
 	 * Callback for sfx resources.
 	 * @param {boolean} result the audio is existed or not
@@ -315,38 +319,41 @@ class Client {
 	 * @param {string} src the url of resource
 	 */
 	callbackLoadSFXResources(result, resource, src) {
-		if(result){
+		if (result) {
 			client.resources[resource]["sfx"] = src;
-		}	
-	}	
-	
+		}
+	}
+
 	/**
 	 * Create observer to detect BBCode elements
 	 * then manipulate them.
 	 */
 	initialObservBBCode() {
-		var target = document.getElementById("client_inner_chat");
-		var observer = new MutationObserver(function(mutations) {
-		  mutations.forEach(function(mutation) {
-			var children = mutation.addedNodes;
-			if (children !== null) {
-				children.forEach( function(node) {
-					if (node.tagName == "C") {
-						node.style.color = node.getAttribute("a");
-					} else if(node.tagName == "M"){
-						if (node.hasAttribute('a')) {
-							node.style.backgroundColor = node.getAttribute("a");
-						} else {
-							node.style.backgroundColor = "yellow";
-							node.style.color = "black";
+		const target = document.getElementById("client_inner_chat");
+		const observer = new MutationObserver(function (mutations) {
+			mutations.forEach(function (mutation) {
+				var children = mutation.addedNodes;
+				if (children !== null) {
+					children.forEach(function (node) {
+						if (node.tagName == "C") {
+							node.style.color = node.getAttribute("a");
+						} else if (node.tagName == "M") {
+							if (node.hasAttribute('a')) {
+								node.style.backgroundColor = node.getAttribute("a");
+							} else {
+								node.style.backgroundColor = "yellow";
+								node.style.color = "black";
+							}
 						}
-					}
-				});
-			}
-		  });    
+					});
+				}
+			});
 		});
-		var config = {attributes: true,childList: true};
-		observer.observe(target,config);
+		const config = {
+			attributes: true,
+			childList: true
+		};
+		observer.observe(target, config);
 	}
 
 	/**
@@ -437,6 +444,15 @@ class Client {
 	}
 
 	/**
+	 * 
+	 * @param {string} msg chat message to prepare for display 
+	 */
+	prepChat(msg){
+		// TODO: make this less awful
+		return decodeBBCode(escapeHtml(decodeChat(unescapeChat(msg))));
+	}
+
+	/**
 	 * Handles an in-character chat message.
 	 * @param {*} args packet arguments
 	 */
@@ -452,7 +468,7 @@ class Client {
 				name: args[3],
 				speaking: "(b)" + escape(args[4]),
 				silent: "(a)" + escape(args[4]),
-				content: decodeBBCode(escapeHtml(decodeChat(unescapeChat(args[5])))), // Escape HTML tag, Use BBCode Only!
+				content: prepChat(args[5]), // Escape HTML tag, Use BBCode Only!
 				side: args[6],
 				sound: escape(args[7]),
 				type: args[8],
@@ -522,7 +538,7 @@ class Client {
 		// Music offset + drift from song loading
 		music.totime = args[1];
 		music.offset = new Date().getTime() / 1000;
-		music.addEventListener('loadedmetadata', function() {
+		music.addEventListener('loadedmetadata', function () {
 			music.currentTime += parseFloat(music.totime + (new Date().getTime() / 1000 - music.offset)).toFixed(3);
 			music.play();
 		}, false);
@@ -580,7 +596,7 @@ class Client {
 		//serv.send("AE#" + (args[1] + 1) + "#%");
 		this.serv.send("RM#%");
 	}
-	
+
 	/**
 	 * Handles incoming evidence list, all evidences at once
 	 * item per packet.
@@ -590,7 +606,7 @@ class Client {
 	handleLE(args) {
 		this.evidences = [];
 		for (let i = 1; i < args.length - 1; i++) {
-			var arg = args[i].split("&");
+			const arg = args[i].split("&");
 			this.evidences[i - 1] = {
 				"name": escapeHtml(decodeChat(unescapeChat(arg[0]))),
 				"desc": escapeHtml(decodeChat(unescapeChat(arg[1]))),
@@ -598,14 +614,15 @@ class Client {
 				"icon": AO_HOST + "evidence/" + escape(arg[2])
 			}
 		}
-		
-		var evidence_box = document.getElementById("evidences");
+
+		const evidence_box = document.getElementById("evidences");
 		evidence_box.innerHTML = "";
-		for(let i = 1; i <= this.evidences.length; i++){
-			evidence_box.innerHTML += '<img src="' + this.evidences[i - 1].icon + 
-				'" id="evi_' + i +'" alt="' + this.evidences[i - 1].name +
-				'" class="client_button" ' +
-				'onclick="pickevidence('+ i +')">';								
+		for (let i = 1; i <= this.evidences.length; i++) {
+			evidence_box.innerHTML += `<img src="${this.evidences[i - 1].icon}" 
+				id="evi_${i}" 
+				alt="${this.evidences[i - 1].name}"
+				class="client_button"
+				onclick="pickevidence(${i})">`;
 		}
 	}
 
@@ -634,38 +651,41 @@ class Client {
 	 */
 	handleSM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
-		let hmusiclist = document.getElementById("client_musiclist"), flagAudio = false;
-		
+		const hmusiclist = document.getElementById("client_musiclist");
+		let flagAudio = false;
+
 		for (let i = 1; i < args.length - 1; i++) {
 			// Check when found the song for the first time
-			if(/\.(?:wav|mp3|mp4|ogg|mid)$/i.test(args[i]) && !flagAudio){
+			if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(args[i]) && !flagAudio) {
 				flagAudio = true;
 			}
-			
-			if(flagAudio) {
+
+			if (flagAudio) {
 				// After reached the audio put everything in the music list
 				let newentry = document.createElement("OPTION");
 				newentry.text = args[i];
 				hmusiclist.options.add(newentry);
-			
+
 			} else {
 				// Create area button
 				let newarea = document.createElement("SPAN");
 				newarea.className = "location-box";
-				newarea.textContent = args[i]; 
-				newarea.onclick = function(){ area_click(this) };
+				newarea.textContent = args[i];
+				newarea.onclick = function () {
+					area_click(this)
+				};
 				document.getElementById("areas").appendChild(newarea);
 			}
 		}
-		
+
 		// Move first audio title from area box to music list
 		let area_box = document.getElementById("areas");
 		let audio_title = document.createElement("OPTION");
 		audio_title.text = area_box.lastChild.textContent;
 		hmusiclist.insertBefore(audio_title, hmusiclist.firstChild);
 		area_box.removeChild(area_box.lastChild); // Remove from arae box
-				
-		this.serv.send("RD#%");		
+
+		this.serv.send("RD#%");
 	}
 
 	/**
@@ -696,19 +716,19 @@ class Client {
 	 */
 	handleBN(args) {
 		viewport.bgname = escape(args[1]);
-		let bg_index = getIndexFromSelect("bg_select", escape(args[1]));
+		const bg_index = getIndexFromSelect("bg_select", escape(args[1]));
 		document.getElementById("bg_select").selectedIndex = bg_index;
 		updateBackgroundPreview();
-		if(bg_index == 0){
+		if (bg_index == 0) {
 			document.getElementById("bg_filename").value = args[1];
 		}
 		document.getElementById("bg_preview").src = AO_HOST + 'background/' + escape(args[1]) + "/defenseempty.png";
-		if(this.charID == -1){
+		if (this.charID == -1) {
 			changeBackground("jud");
 		} else {
 			changeBackground(this.chars[this.charID].side);
 		}
-		
+
 	}
 
 	handleNBG(args) {
@@ -720,18 +740,22 @@ class Client {
 	 * @param {Array} args packet arguments
 	 */
 	handleHP(args) {
-		let percent_hp = args[2] * 10;
+		const percent_hp = args[2] * 10;
 		if (args[1] == 1) {
 			// Def hp
 			this.hp[0] = args[2];
-			$("#client_defense_hp > .health-bar").animate({ 'width': percent_hp + "%" }, 500);
+			$("#client_defense_hp > .health-bar").animate({
+				'width': percent_hp + "%"
+			}, 500);
 		} else {
 			// Pro hp
 			this.hp[1] = args[2];
-			$("#client_prosecutor_hp > .health-bar").animate({ 'width': percent_hp + "%" }, 500);
-		}		
+			$("#client_prosecutor_hp > .health-bar").animate({
+				'width': percent_hp + "%"
+			}, 500);
+		}
 	}
-	
+
 	/**
 	 * Handles a testimony states.
 	 * @param {Array} args packet arguments
@@ -746,7 +770,7 @@ class Client {
 		}
 		viewport.initTestimonyUpdater();
 	}
-	
+
 	/**
 	 * Handles a call mod message.
 	 * @param {Array} args packet arguments
@@ -758,7 +782,7 @@ class Client {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
 	}
-	
+
 	/**
 	 * Handles the issuance of a player ID by the server.
 	 * @param {Array} args packet arguments
@@ -809,7 +833,7 @@ class Client {
 			if (i % CHAR_SELECT_WIDTH == 0) {
 				document.getElementById("client_chartable").appendChild(tr);
 			}
-		}		
+		}
 		//changeBackground("def");
 	}
 
@@ -823,7 +847,6 @@ class Client {
 		let me = this.me();
 		let emotes = this.emotes;
 		let xhr = new XMLHttpRequest();
-		let isOfficialAssets = (AO_HOST == "http://assets.aceattorneyonline.com/base/");
 		xhr.withCredentials = false;
 		document.getElementById("client_emo").innerHTML = ""; // Clear emote box
 		xhr.open('GET', AO_HOST + 'characters/' + escape(this.me().name) + '/char.ini', true);
@@ -844,23 +867,29 @@ class Client {
 					if (typeof pinifile.SoundT !== 'undefined') {
 						esfxd = pinifile.SoundT[i];
 					}
+					// Make sure the asset server is case insensitive, or that everything on it is lowercase
 					emotes[i] = {
-						desc: (isOfficialAssets)? emoteinfo[0].toLowerCase() : emoteinfo[0],
-						speaking: (isOfficialAssets)? emoteinfo[1].toLowerCase() : emoteinfo[1],
-						silent: (isOfficialAssets)? emoteinfo[2].toLowerCase() : emoteinfo[2],
+						desc: emoteinfo[0].toLowerCase(),
+						speaking: emoteinfo[1].toLowerCase(),
+						silent: emoteinfo[2].toLowerCase(),
 						zoom: emoteinfo[3],
-						sfx: (isOfficialAssets)? esfx.toLowerCase() : esfx,
+						sfx: esfx.toLowerCase(),
 						sfxdelay: esfxd,
-						button_off: AO_HOST + 'characters/' + ((isOfficialAssets)? escape(me.name).toLowerCase() : escape(me.name)) + '/emotions/button' + i + '_off.png',
-						button_on: AO_HOST + 'characters/' + ((isOfficialAssets)? escape(me.name).toLowerCase() : escape(me.name)) + '/emotions/button' + i + '_on.png'
+						button_off: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_off.png`,
+						button_on: AO_HOST + `'characters/${escape(me.name).toLowerCase()}/emotions/button${i}_on.png`
 					};
-					document.getElementById("client_emo").innerHTML += "<img src='" + emotes[i].button_off + "' id='emo_" + i + "' alt='" + emotes[i].desc + "' class='client_button' onclick='pickemotion(" + i + ")'>";
+					document.getElementById("client_emo").innerHTML += 
+						`<img src=${emotes[i].button_off}
+						 id="emo_${i}"
+						 alt="${emotes[i].desc}"
+						 class="client_button"
+						 onclick="pickemotion(${i})">`;
 				}
 				pickemotion(1);
 			}
 		};
 		xhr.send();
-	}		
+	}
 }
 
 class Viewport {
@@ -901,7 +930,7 @@ class Viewport {
 		this.testimonyUpdater = null;
 
 		this.bgname = "gs4";
-		
+
 		this.testimonyTimer = 0;
 		this.shoutTimer = 0;
 		this.textTimer = 0;
@@ -949,39 +978,39 @@ class Viewport {
 		clearTimeout(this.updater);
 		//If preanim existed then determine the length
 		if (chatmsg.preanim != "-") {
-			chatmsg.preanimdelay = this.getAnimLength(AO_HOST + 'characters/' + escape(chatmsg.name) + '/' + chatmsg.preanim + '.gif',this.initUpdater);
+			chatmsg.preanimdelay = this.getAnimLength(`${AO_HOST}characters/${escape(chatmsg.name)}/${chatmsg.preanim}.gif`, this.initUpdater);
 		} else {
-			this.initUpdater(0)
+			this.initUpdater(0);
 		}
 	}
-	
+
 	/**
 	 * Intialize updater
-	 * @param {int} animdelay the length of pre-animation 
+	 * @param {number} animdelay the length of pre-animation 
 	 */
-	initUpdater(animdelay){
-		viewport.chatmsg.preanimdelay = parseInt(animdelay); 
+	initUpdater(animdelay) {
+		viewport.chatmsg.preanimdelay = parseInt(animdelay);
 		viewport.updater = setTimeout(() => viewport.updateText(), UPDATE_INTERVAL);
 	}
-	
+
 	/**
 	 * Intialize testimony updater 
 	 */
-	initTestimonyUpdater(){		
-		if(client.testimonyID > 0){			
+	initTestimonyUpdater() {
+		if (client.testimonyID > 0) {
 			let testimony = "";
 			if (client.testimonyID == 1) {
-				testimony = "witnesstestimony";				
+				testimony = "witnesstestimony";
 			} else if (client.testimonyID == 2) {
 				testimony = "crossexamination";
 			}
 			(new Audio(client.resources[testimony]["sfx"])).play();
 			this.testimonyTimer = 0;
 			document.getElementById("client_testimony").src = client.resources[testimony]["src"];
-			this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);						
+			this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
 		}
 	}
-	
+
 	/**
 	 * Gets animation length.
 	 * @param {string} filename the animation file name
@@ -1002,25 +1031,25 @@ class Viewport {
 		});
 		request.send();
 	}
-	
+
 	/**
 	 * Updates the testimony overaly
 	 */
-	updateTestimony(){
+	updateTestimony() {
 		//Update timer
 		this.testimonyTimer = this.testimonyTimer + UPDATE_INTERVAL;
-		
+
 		if (client.testimonyID == 1) {
 			//Witness Testimony
-			if (this.testimonyTimer >= client.resources["witnesstestimony"]["duration"]){
+			if (this.testimonyTimer >= client.resources["witnesstestimony"]["duration"]) {
 				//Finish
 				this.disposeTestimony();
 			} else {
 				this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
-			}			
+			}
 		} else if (client.testimonyID == 2) {
 			//Cross Examination
-			if (this.testimonyTimer >= client.resources["crossexamination"]["duration"]){
+			if (this.testimonyTimer >= client.resources["crossexamination"]["duration"]) {
 				//Finish
 				this.disposeTestimony();
 			} else {
@@ -1030,17 +1059,17 @@ class Viewport {
 			this.disposeTestimony();
 		}
 	}
-	
+
 	/**
 	 * Dispose the testimony overlay
 	 */
-	 disposeTestimony(){
+	disposeTestimony() {
 		client.testimonyID = 0;
 		this.testimonyTimer = 0;
 		document.getElementById("client_testimony").src = "misc/placeholder.gif";
 		clearTimeout(this.testimonyUpdater);
-	 }
-	 
+	}
+
 	/**
 	 * Updates the chatbox based on the given text.
 	 * 
@@ -1048,12 +1077,12 @@ class Viewport {
 	 */
 	updateText() {
 		// Flip the character
-		if (this.chatmsg.flip == 1){
-			document.getElementById("client_char").style.transform = "scaleX(-1)"; 
+		if (this.chatmsg.flip == 1) {
+			document.getElementById("client_char").style.transform = "scaleX(-1)";
 		} else {
 			document.getElementById("client_char").style.transform = "scaleX(1)";
 		}
-			
+
 		if (this._animating) {
 			this.updater = setTimeout(() => this.updateText(), UPDATE_INTERVAL);
 		}
@@ -1085,15 +1114,17 @@ class Viewport {
 			this.chatmsg.startpreanim = true;
 		}
 
-		if(this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
+		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
 			// Effect stuff
-			if (this.chatmsg.flash == 2){
+			if (this.chatmsg.flash == 2) {
 				//Shake screen
 				this.sfxaudio.pause();
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-stab.wav";
 				this.sfxaudio.play();
-				$('#client_gamewindow').effect( "shake",{"direction":"up"});
+				$('#client_gamewindow').effect("shake", {
+					"direction": "up"
+				});
 			} else if (this.chatmsg.flash == 1) {
 				//Flash screen
 				document.getElementById("client_background").style.backgroundColor = "white";
@@ -1103,9 +1134,9 @@ class Viewport {
 				this.sfxaudio.play();
 				$('#client_gamewindow').effect("pulsate");
 			}
-			
+
 			//Pre-animation stuff
-			if(this.chatmsg.preanimdelay > 0){
+			if (this.chatmsg.preanimdelay > 0) {
 				document.getElementById("client_shout").src = "misc/placeholder.gif";
 				changeBackground(this.chatmsg.side);
 				document.getElementById("client_char").src = AO_HOST + "characters/" + escape(this.chatmsg.name) + "/" + this.chatmsg.preanim + ".gif";
@@ -1114,31 +1145,33 @@ class Viewport {
 			this.chatmsg.startspeaking = true;
 		} else if (this.textTimer >= this.shoutTimer + this.chatmsg.preanimdelay && !this.chatmsg.startpreanim) {
 			if (this.chatmsg.startspeaking) {
-				if(this.chatmsg.evidence > 0){
+				if (this.chatmsg.evidence > 0) {
 					// Prepare evidence
-					document.getElementById("client_evi").style.backgroundImage = "url('"+ client.evidences[this.chatmsg.evidence - 1].icon +"')";
-				
-					if (this.chatmsg.side == 'def'){
+					document.getElementById("client_evi").style.backgroundImage = "url('" + client.evidences[this.chatmsg.evidence - 1].icon + "')";
+
+					if (this.chatmsg.side == 'def') {
 						// Only def show evidence on right
 						document.getElementById("client_evi").style.right = "1.5em";
 						document.getElementById("client_evi").style.left = "initial";
-						$( "#client_evi" ).animate({
+						$("#client_evi").animate({
 							height: "30%",
 							opacity: 1
-						}, 250 );
+						}, 250);
 					} else {
 						document.getElementById("client_evi").style.right = "initial";
 						document.getElementById("client_evi").style.left = "1.5em";
-						$( "#client_evi" ).animate({
+						$("#client_evi").animate({
 							height: "30%",
 							opacity: 1
-						}, 250 );
+						}, 250);
 					}
 				}
-				
-				$("#client_name").toggle( "fade" );
-				$("#client_chat").toggle("drop",{"direction":"down"});
-				if(this.chatmsg.preanimdelay == 0){
+
+				$("#client_name").toggle("fade");
+				$("#client_chat").toggle("drop", {
+					"direction": "down"
+				});
+				if (this.chatmsg.preanimdelay == 0) {
 					document.getElementById("client_shout").src = "misc/placeholder.gif";
 					changeBackground(this.chatmsg.side);
 				}
@@ -1183,7 +1216,7 @@ class Viewport {
 				}
 			}
 		}
-		
+
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
 			this.sfxaudio.pause();
 			this.sfxplayed = 1;
@@ -1206,7 +1239,7 @@ class INI {
 		let value = {};
 		let lines = data.split(/\r\n|\r|\n/);
 		let section = null;
-		lines.forEach(function(line) {
+		lines.forEach(function (line) {
 			if (regex.comment.test(line)) {
 				return;
 			} else if (line.length == 0) {
@@ -1249,7 +1282,7 @@ export function onEnter(event) {
 		let mychar = client.me();
 		let myemo = client.myEmote();
 		let myevi = client.myEvidence();
-		let myflip = ((client.flip)? 1:0);
+		let myflip = ((client.flip) ? 1 : 0);
 		let mycolor = document.getElementById("textcolor").value;
 		let ssfxname = "0";
 		let ssfxdelay = "0";
@@ -1276,7 +1309,7 @@ function resetICParams() {
 	if (selectedShout) {
 		document.getElementById("button_" + selectedShout).className = "client_button";
 		selectedShout = 0;
-	}		
+	}
 }
 
 /**
@@ -1294,7 +1327,7 @@ window.musiclist_click = musiclist_click;
  * @param {MouseEvent} event
  */
 export function area_click(el) {
-	let playtrack =  el.textContent;
+	let playtrack = el.textContent;
 	client.sendMusicChange(playtrack);
 }
 window.area_click = area_click;
@@ -1357,14 +1390,14 @@ export function demoError(image) {
 window.demoError = demoError;
 
 /**
- * Checks if an file exists at the specified URI.
+ * Checks if a file exists at the specified URI.
  * @param {string} url the URI to be checked
  * @param {function} callback the function to be called when finished
  * @param {object} param 
  */
-function FileExist(url,callback,param) {
+function fileExists(url, callback, param) {
 	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function() {
+	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			callback(true, param, url);
 		} else {
@@ -1431,20 +1464,20 @@ function changeBackground(position) {
  * @param {boolean} result the image is existed or not
  * @param {string} position the position to change into
  */
-function callbackChangeBackground(result,position) {
+function callbackChangeBackground(result, position) {
 	let bgfolder = viewport.bgFolder();
-	if (position == "def"){
-		if(result){
+	if (position == "def") {
+		if (result) {
 			document.getElementById("client_bench").src = bgfolder + "defensedesk.png"
-		}else{
+		} else {
 			document.getElementById("client_bench").src = bgfolder + "bancodefensa.png"
 		}
 	} else {
-		if(result){
+		if (result) {
 			document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png"
 		} else {
 			document.getElementById("client_bench").src = bgfolder + "bancoacusacion.png"
-		}			
+		}
 	}
 }
 
@@ -1507,7 +1540,7 @@ function appendICLog(toadd, name = "", time = new Date()) {
  * Requests to play as a character.
  * @param {number} ccharacter the character ID; if this is a large number, then spectator is chosen instead.
  */
-export function pickchar(ccharacter) {
+export function pickChar(ccharacter) {
 	if (ccharacter < 1000) {
 		client.sendCharacter(ccharacter);
 	} else {
@@ -1517,46 +1550,46 @@ export function pickchar(ccharacter) {
 		document.getElementById("client_emo").style.display = "none";
 	}
 }
-window.pickchar = pickchar;
+window.pickChar = pickChar;
 
 /**
  * Highlights and selects an emotion for in-character chat.
  * @param {string} emo the new emotion to be selected
  */
-export function pickemotion(emo) {
+export function pickEmotion(emo) {
 	if (client.selectedEmote != -1) {
 		document.getElementById("emo_" + client.selectedEmote).src = client.myEmote().button_off;
 	}
 	client.selectedEmote = emo
 	document.getElementById("emo_" + emo).src = client.myEmote().button_on;
 }
-window.pickemotion = pickemotion;
+window.pickEmotion = pickEmotion;
 
 /**
  * Highlights and selects an evidence for in-character chat.
  * @param {string} evidence the evidence to be presented
  */
-export function pickevidence(evidence) {
-	if (client.selectedEvidence != evidence) {
+export function pickEvidence(evidence) {
+	if (client.selectedEvidence !== evidence) {
 		//Update selected evidence		
-		if(client.selectedEvidence > 0){
+		if (client.selectedEvidence > 0) {
 			document.getElementById("evi_" + client.selectedEvidence).className = "client_button";
 		}
 		document.getElementById("evi_" + evidence).className = "client_button dark";
 		client.selectedEvidence = evidence;
-		
+
 		// Show evidence on information window
 		document.getElementById("evi_name").value = client.evidences[evidence - 1].name;
 		document.getElementById("evi_desc").value = client.evidences[evidence - 1].desc;
 
 		//Update Icon
-		let icon_id  = getIndexFromSelect("evi_select", client.evidences[evidence - 1].filename);
+		let icon_id = getIndexFromSelect("evi_select", client.evidences[evidence - 1].filename);
 		document.getElementById("evi_select").selectedIndex = icon_id;
-		if (icon_id == 0){			
+		if (icon_id == 0) {
 			document.getElementById("evi_filename").value = client.evidences[evidence - 1].filename;
 		}
 		updateEvidenceIcon();
-		
+
 		// Update button
 		document.getElementById("evi_add").className = "client_button hover_button inactive";
 		document.getElementById("evi_edit").className = "client_button hover_button";
@@ -1566,60 +1599,60 @@ export function pickevidence(evidence) {
 		cancelevidence();
 	}
 }
-window.pickevidence = pickevidence;
+window.pickEvidence = pickEvidence;
 
 /**
  * Add evidence.
  */
-export function addevidence() {
+export function addEvidence() {
 	let evidence_select = document.getElementById('evi_select');
-	client.sendPE( document.getElementById('evi_name').value,
+	client.sendPE(document.getElementById('evi_name').value,
 		document.getElementById('evi_desc').value,
-		(evidence_select.selectedIndex == 0)? 
-			document.getElementById('evi_filename').value : 
-			evidence_select.options[evidence_select.selectedIndex].text   
-		);
+		(evidence_select.selectedIndex == 0) ?
+		document.getElementById('evi_filename').value :
+		evidence_select.options[evidence_select.selectedIndex].text
+	);
 	cancelevidence();
 }
-window.addevidence = addevidence;
+window.addEvidence = addEvidence;
 
 /**
  * Edit selected evidence.
  */
-export function editevidence() {
+export function editEvidence() {
 	let evidence_select = document.getElementById('evi_select');
 	let id = parseInt(client.selectedEvidence) - 1;
-	client.sendEE( id, 
+	client.sendEE(id,
 		document.getElementById('evi_name').value,
 		document.getElementById('evi_desc').value,
-		(evidence_select.selectedIndex == 0)? 
-			document.getElementById('evi_filename').value : 
-			evidence_select.options[evidence_select.selectedIndex].text   
-		);
+		(evidence_select.selectedIndex == 0) ?
+		document.getElementById('evi_filename').value :
+		evidence_select.options[evidence_select.selectedIndex].text
+	);
 	cancelevidence();
 }
-window.editevidence = editevidence;
+window.editEvidence = editEvidence;
 
 /**
  * Delete selected evidence.
  */
-export function delevidence() {
+export function deleteEvidence() {
 	let id = parseInt(client.selectedEvidence) - 1;
 	client.sendDE(id);
 	cancelevidence();
 }
-window.delevidence = delevidence;
+window.deleteEvidence = deleteEvidence;
 
 /**
  * Cancel evidence selection.
  */
-export function cancelevidence() {
+export function cancelEvidence() {
 	//Clear evidence data
-	if(client.selectedEvidence > 0){
+	if (client.selectedEvidence > 0) {
 		document.getElementById("evi_" + client.selectedEvidence).className = "client_button";
 	}
 	client.selectedEvidence = 0;
-	
+
 	// Clear evidence on information window
 	document.getElementById("evi_select").selectedIndex = 0;
 	updateEvidenceIcon(); // Update icon widget
@@ -1627,14 +1660,14 @@ export function cancelevidence() {
 	document.getElementById("evi_name").value = "";
 	document.getElementById("evi_desc").value = "";
 	document.getElementById("evi_icon").style.backgroundImage = "url('misc/empty.png')"; //Clear icon
-	
+
 	// Update button
 	document.getElementById("evi_add").className = "client_button hover_button";
 	document.getElementById("evi_edit").className = "client_button hover_button inactive";
 	document.getElementById("evi_cancel").className = "client_button hover_button inactive";
 	document.getElementById("evi_del").className = "client_button hover_button inactive";
 }
-window.cancelevidence = cancelevidence;
+window.cancelEvidence = cancelEvidence;
 
 /**
  * Find index of anything in select box.
@@ -1642,14 +1675,14 @@ window.cancelevidence = cancelevidence;
  * @param {string} value the value that need to be compared
  */
 export function getIndexFromSelect(select_box, value) {
-		//Find if icon alraedy existed in select box
-		let select_element = document.getElementById(select_box);
-		for (let i = 1; i < select_element.length; ++i){
-			if (select_element.options[i].value == value){
-				return i;
-			}
+	//Find if icon alraedy existed in select box
+	let select_element = document.getElementById(select_box);
+	for (let i = 1; i < select_element.length; ++i) {
+		if (select_element.options[i].value == value) {
+			return i;
 		}
-		return 0;
+	}
+	return 0;
 }
 window.getIndexFromSelect = getIndexFromSelect;
 
@@ -1660,13 +1693,13 @@ export function updateEvidenceIcon() {
 	let evidence_select = document.getElementById("evi_select");
 	let evidence_filename = document.getElementById("evi_filename");
 	let evidence_iconbox = document.getElementById("evi_icon");
-	
-	if (evidence_select.selectedIndex == 0) {
+
+	if (evidence_select.selectedIndex === 0) {
 		evidence_filename.style.display = "initial";
-		evidence_iconbox.style.backgroundImage = "url('" + AO_HOST + 'evidence/' + evidence_filename.value + "')";
-	} else {		
+		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${evidence_filename.value})`;
+	} else {
 		evidence_filename.style.display = "none";
-		evidence_iconbox.style.backgroundImage = "url('" + AO_HOST + 'evidence/' + evidence_select.value + "')" ;
+		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${evidence_select.value})`;
 	}
 }
 window.updateEvidenceIcon = updateEvidenceIcon;
@@ -1675,7 +1708,7 @@ window.updateEvidenceIcon = updateEvidenceIcon;
  * Update evidence icon.
  */
 export function updateActionCommands(side) {
-	if(side == "jud"){
+	if (side == "jud") {
 		document.getElementById("judge_action").style.display = "inline-table";
 		document.getElementById("no_action").style.display = "none";
 	} else {
@@ -1683,11 +1716,11 @@ export function updateActionCommands(side) {
 		document.getElementById("judge_action").style.display = "none";
 	}
 	//Update role selector
-	for(let i = 0, role_select = document.getElementById("role_select").options; i < role_select.length; i++){
-			if(side == role_select[i].value){
-				role_select.selectedIndex = i;
-				return;
-			}
+	for (let i = 0, role_select = document.getElementById("role_select").options; i < role_select.length; i++) {
+		if (side == role_select[i].value) {
+			role_select.selectedIndex = i;
+			return;
+		}
 	}
 }
 window.updateActionCommands = updateActionCommands;
@@ -1696,14 +1729,15 @@ window.updateActionCommands = updateActionCommands;
  * Change background via OOC.
  */
 export function changeBackgroundOOC() {
-	let filename = "", background_select = document.getElementById("bg_select")
-		, bg_command = document.getElementById("bg_command").value;
+	let filename = "",
+		background_select = document.getElementById("bg_select"),
+		bg_command = document.getElementById("bg_command").value;
 	if (background_select.selectedIndex == 0) {
-		filename = document.getElementById("bg_filename").value; 
-	} else{
+		filename = document.getElementById("bg_filename").value;
+	} else {
 		filename = background_select.value;
 	}
-	client.sendOOC("/" + bg_command.replace("$1",filename));
+	client.sendOOC("/" + bg_command.replace("$1", filename));
 }
 window.changeBackgroundOOC = changeBackgroundOOC;
 
@@ -1711,10 +1745,10 @@ window.changeBackgroundOOC = changeBackgroundOOC;
  * Change role via OOC.
  */
 export function changeRoleOOC() {
-	let role_select = document.getElementById("role_select")
-		, role_command = document.getElementById("role_command").value;
-		
-	client.sendOOC("/" + role_command.replace("$1",role_select.value));
+	let role_select = document.getElementById("role_select"),
+		role_command = document.getElementById("role_command").value;
+
+	client.sendOOC("/" + role_command.replace("$1", role_select.value));
 	updateActionCommands(role_select.value);
 }
 window.changeRoleOOC = changeRoleOOC;
@@ -1722,7 +1756,7 @@ window.changeRoleOOC = changeRoleOOC;
 /**
  * Random character via OOC.
  */
-export function randomCharacterOOC() {		
+export function randomCharacterOOC() {
 	client.sendOOC("/" + document.getElementById("randomchar_command").value);
 }
 window.randomCharacterOOC = randomCharacterOOC;
@@ -1730,56 +1764,56 @@ window.randomCharacterOOC = randomCharacterOOC;
 /**
  * Call mod.
  */
-export function callmod() {	
-	$( "#callmod_dialog" ).dialog( "open" );	
+export function callMod() {
+	$("#callmod_dialog").dialog("open");
 }
-window.callmod = callmod;
+window.callMod = callMod;
 
 /**
- * Decalre witness testimony.
+ * Declare witness testimony.
  */
-export function initwt() {		
+export function initWT() {
 	client.sendRT("testimony1");
 }
-window.initwt = initwt;
+window.initWT = initWT;
 
 /**
- * Decalre cross examination.
+ * Declare cross examination.
  */
-export function initce() {		
+export function initCE() {
 	client.sendRT("testimony2");
 }
-window.initce = initce;
+window.initCE = initCE;
 
 /**
- * Add defense health point.
+ * Increment defense health point.
  */
-export function addHPD() {		
-	client.sendHP(1,String(parseInt(client.hp[0]) + 1));
+export function addHPD() {
+	client.sendHP(1, String(parseInt(client.hp[0]) + 1));
 }
 window.addHPD = addHPD;
 
 /**
- * Reduce defense health point.
+ * Decrement defense health point.
  */
-export function redHPD() {		
-	client.sendHP(1,String(parseInt(client.hp[0]) - 1));
+export function redHPD() {
+	client.sendHP(1, String(parseInt(client.hp[0]) - 1));
 }
 window.redHPD = redHPD;
 
 /**
- * Add prosecution health point.
+ * Increment prosecution health point.
  */
-export function addHPP() {		
-	client.sendHP(2,String(parseInt(client.hp[1]) + 1));
+export function addHPP() {
+	client.sendHP(2, String(parseInt(client.hp[1]) + 1));
 }
 window.addHPP = addHPP;
 
 /**
- * Reduce prosecution health point.
+ * Decrement prosecution health point.
  */
-export function redHPP() {		
-	client.sendHP(2,String(parseInt(client.hp[1]) - 1));
+export function redHPP() {
+	client.sendHP(2, String(parseInt(client.hp[1]) - 1));
 }
 window.redHPP = redHPP;
 
@@ -1790,7 +1824,7 @@ export function updateBackgroundPreview() {
 	let background_select = document.getElementById("bg_select");
 	let background_filename = document.getElementById("bg_filename");
 	let background_preview = document.getElementById("bg_preview");
-	
+
 	if (background_select.selectedIndex == 0) {
 		background_filename.style.display = "initial";
 		background_preview.src = AO_HOST + 'background/' + background_filename.value + "/defenseempty.png";
@@ -1806,7 +1840,7 @@ window.updateBackgroundPreview = updateBackgroundPreview;
  * If the same effect button is selected, then the effect is canceled.
  * @param {string} effect the new effect to be selected
  */
-export function toggleaffect(effect) {
+export function toggleEffect(effect) {
 	if (effect == selectedEffect) {
 		document.getElementById("button_effect_" + effect).className = "client_button";
 		selectedEffect = 0;
@@ -1818,12 +1852,12 @@ export function toggleaffect(effect) {
 		selectedEffect = effect;
 	}
 }
-window.toggleaffect = toggleaffect;
+window.toggleEffect = toggleEffect;
 
 /**
  * Toggle flip for in-character chat.
  */
-export function toggleflip() {
+export function toggleFlip() {
 	if (client.flip) {
 		document.getElementById("button_flip").className = "client_button";
 	} else {
@@ -1831,12 +1865,12 @@ export function toggleflip() {
 	}
 	client.flip = !client.flip;
 }
-window.toggleflip = toggleflip;
+window.toggleFlip = toggleFlip;
 
 /**
  * Toggle presentable for presenting evidence in-character chat.
  */
-export function togglepresent() {
+export function togglePresent() {
 	if (client.presentable) {
 		document.getElementById("button_present").className = "client_button";
 	} else {
@@ -1844,13 +1878,13 @@ export function togglepresent() {
 	}
 	client.presentable = !client.presentable;
 }
-window.togglepresent = togglepresent;
+window.togglePresent = togglePresent;
 
 /**
  * Highlights and selects a menu.
  * @param {string} menu the menu to be selected
  */
-export function togglemenu(menu) {
+export function toggleMenu(menu) {
 	if (menu != selectedMenu) {
 		document.getElementById("menu_" + menu).className = "menu_icon active";
 		document.getElementById("content_" + menu).className = "menu_content active";
@@ -1859,14 +1893,14 @@ export function togglemenu(menu) {
 		selectedMenu = menu;
 	}
 }
-window.togglemenu = togglemenu;
+window.toggleMenu = toggleMenu;
 
 /**
  * Highlights and selects a shout for in-character chat.
  * If the same shout button is selected, then the shout is canceled.
  * @param {string} shout the new shout to be selected
  */
-export function toggleshout(shout) {
+export function toggleShout(shout) {
 	if (shout == selectedShout) {
 		document.getElementById("button_" + shout).className = "client_button";
 		selectedShout = 0;
@@ -1878,7 +1912,7 @@ export function toggleshout(shout) {
 		selectedShout = shout;
 	}
 }
-window.toggleshout = toggleshout;
+window.toggleShout = toggleShout;
 
 /**
  * Escapes a string to be HTML-safe.
@@ -1927,13 +1961,14 @@ function encodeChat(estring) {
 	let selectedEncoding = document.getElementById("client_encoding").value;
 	if (selectedEncoding == "unicode") {
 		//Source: https://gist.github.com/mathiasbynens/1243213
-		return estring.replace(/[^\0-~]/g, function(ch) {
-			return "\\u" + ("000" + ch.charCodeAt().toString(16)).slice(-4); });
-	} else if (selectedEncoding == "utf16"){
+		return estring.replace(/[^\0-~]/g, function (ch) {
+			return "\\u" + ("000" + ch.charCodeAt().toString(16)).slice(-4);
+		});
+	} else if (selectedEncoding == "utf16") {
 		//Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
-		var buffer = new ArrayBuffer(estring.length*2);
+		var buffer = new ArrayBuffer(estring.length * 2);
 		var result = new Uint16Array(buffer);
-		for (var i=0, strLen=estring.length; i < strLen; i++) {
+		for (var i = 0, strLen = estring.length; i < strLen; i++) {
 			result[i] = estring.charCodeAt(i);
 		}
 		return String(result);
@@ -1950,9 +1985,10 @@ function decodeChat(estring) {
 	let selectedDecoding = document.getElementById("client_decoding").value;
 	if (selectedDecoding == "unicode") {
 		//Source: https://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode
-        return estring.replace(/\\u([\d\w]{1,})/gi, function (match, group) {
-			return String.fromCharCode(parseInt(group, 16)); } );
-	} else if (selectedDecoding == "utf16"){	
+		return estring.replace(/\\u([\d\w]{1,})/gi, function (match, group) {
+			return String.fromCharCode(parseInt(group, 16));
+		});
+	} else if (selectedDecoding == "utf16") {
 		//Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
 		return String.fromCharCode.apply(null, new Uint16Array(estring.split(",")));
 	} else {
@@ -1981,22 +2017,21 @@ function decodeBBCode(estring) {
 
 
 // TODO: Possibly safe to remove, since we are using a transpiler.
-if (typeof(String.prototype.trim) === "undefined")
-{
-    String.prototype.trim = function() 
-    {
-        return String(this).replace(/^\s+|\s+$/g, '');
-    };
+if (typeof (String.prototype.trim) === "undefined") {
+	String.prototype.trim = function () {
+		return String(this).replace(/^\s+|\s+$/g, '');
+	};
 }
 
 // Used for HDID calculation.
-String.prototype.hashCode = function() {
-	var hash = 0, i, chr;
+String.prototype.hashCode = function () {
+	var hash = 0,
+		i, chr;
 	if (this.length === 0) return hash;
 	for (i = 0; i < this.length; i++) {
-	  chr   = this.charCodeAt(i);
-	  hash  = ((hash << 5) - hash) + chr;
-	  hash |= 0; // Convert to 32bit integer
+		chr = this.charCodeAt(i);
+		hash = ((hash << 5) - hash) + chr;
+		hash |= 0; // Convert to 32bit integer
 	}
 	return hash;
 };
@@ -2009,37 +2044,37 @@ String.prototype.hashCode = function() {
 let client = new Client(serverIP);
 let viewport = new Viewport();
 
-$(document).ready(function(){
+$(document).ready(function () {
 	client.initialObservBBCode();
-	client.loadResources(); 
-	
+	client.loadResources();
+
 });
 
 // Create dialog and link to button	
-$( function() {
-	$( "#callmod_dialog" ).dialog({
+$(function () {
+	$("#callmod_dialog").dialog({
 		autoOpen: false,
 		resizable: false,
 		show: {
 			effect: "drop",
-			direction:"down",
+			direction: "down",
 			duration: 500
 		},
 		hide: {
 			effect: "drop",
-			direction:"down",
+			direction: "down",
 			duration: 500
 		},
 		height: "auto",
 		width: 400,
 		modal: true,
 		buttons: {
-			"Sure": function() {
+			Sure: function () {
 				client.sendZZ("");
-				$( this ).dialog( "close" );
+				$(this).dialog("close");
 			},
-			Cancel: function() {
-				$( this ).dialog( "close" );
+			Cancel: function () {
+				$(this).dialog("close");
 			}
 		}
 	});

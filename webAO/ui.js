@@ -8,65 +8,66 @@ var config = {
     dimensions: {
         minItemHeight: 40
     },
-    content: [
-    {
+    content: [{
         type: "row",
-        content: [
-            {
+        content: [{
                 type: "column",
                 width: 40,
-                content: [
-                    {
-                        type: "component",
-                        componentName: "template",
-                        title: "Game",
-                        componentState: { id: "client_wrapper" }
+                content: [{
+                    type: "component",
+                    componentName: "template",
+                    title: "Game",
+                    componentState: {
+                        id: "client_wrapper"
                     }
-                ]
+                }]
             },
             {
                 type: "column",
-                content: [
-                    {
+                content: [{
                         type: "row",
-						height: 65,
-						content: [
-							{
-								type: "stack",
-								content: [
-									{
-										type: "component",
-										title: "Main",
-										componentName: "template",
-										componentState: { id: "mainmenu" }
-									},
-									{
-										type: "component",
-										title: "Log",
-										componentName: "template",
-										componentState: { id: "log" }
-									}
-								]
-							},
-							{
+                        height: 65,
+                        content: [{
+                                type: "stack",
+                                content: [{
+                                        type: "component",
+                                        title: "Main",
+                                        componentName: "template",
+                                        componentState: {
+                                            id: "mainmenu"
+                                        }
+                                    },
+                                    {
+                                        type: "component",
+                                        title: "Log",
+                                        componentName: "template",
+                                        componentState: {
+                                            id: "log"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 type: "component",
                                 title: "Music",
-								width: 30,
+                                width: 30,
                                 componentName: "template",
-                                componentState: { id: "music" }
-                            }							
-						]
+                                componentState: {
+                                    id: "music"
+                                }
+                            }
+                        ]
                     },
                     {
                         type: "row",
-                        content: [
-                            {
-								type: "component",
-								title: "Server chat",
-								componentName: "template",
-								componentState: { id: "ooc" }
-							}
-                        ]
+                        content: [{
+                            type: "component",
+                            title: "Server chat",
+                            componentName: "template",
+                            componentState: {
+                                id: "ooc"
+                            }
+                        }]
                     }
                 ]
             }
@@ -75,7 +76,7 @@ var config = {
 };
 
 var golden = new GoldenLayout(config);
-golden.registerComponent("template", function(container, componentState) {
+golden.registerComponent("template", function (container, componentState) {
     let template = document.querySelector(`#${componentState.id}`);
     container.getElement().html(template.content);
     // TODO: support multiple locales
