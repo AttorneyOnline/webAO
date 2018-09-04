@@ -55,9 +55,9 @@
 	</div>
 	<br>
 	<div id="client_buttons">
-		<img src="misc/holdit.png" id="button_1" alt="Hold it!" class="client_button" onclick="toggleshout(1)">
-		<img src="misc/objection.png" id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleshout(2)">
-		<img src="misc/takethat.png" id="button_3" alt="Take That!" class="client_button" onclick="toggleshout(3)">
+		<img src="misc/holdit.png" id="button_1" alt="Hold it!" class="client_button" onclick="toggleShout(1)">
+		<img src="misc/objection.png" id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleShout(2)">
+		<img src="misc/takethat.png" id="button_3" alt="Take That!" class="client_button" onclick="toggleShout(3)">
 		<br>
 		<br>
 		<label for="textcolor">Text Color:</label>
@@ -75,21 +75,21 @@
 		<br>
 		<br>
 		<label>Flip: </label>
-		<img src="misc/flip.png" id="button_flip" alt="Flip" class="client_button" onclick="toggleflip()">
+		<img src="misc/flip.png" id="button_flip" alt="Flip" class="client_button" onclick="toggleFlip()">
 		<label>Effect: </label>
-		<img src="misc/flash.png" id="button_effect_1" alt="Flash" class="client_button" onclick="toggleaffect(1)">
-		<img src="misc/shake.png" id="button_effect_2" alt="Shake" class="client_button" onclick="toggleaffect(2)">
+		<img src="misc/flash.png" id="button_effect_1" alt="Flash" class="client_button" onclick="toggleEffect(1)">
+		<img src="misc/shake.png" id="button_effect_2" alt="Shake" class="client_button" onclick="toggleEffect(2)">
 	</div>
 	<fieldset style="margin:10px;">
 		<legend>Action Commands</legend>
 		<!-- Judge Commands -->
 		<span id="judge_action" style="display:none">
-			<span id="menu_wt" onclick="initwt()" class="menu_icon">
+			<span id="menu_wt" onclick="initWT()" class="menu_icon">
 				<i class="material-icons em-3">record_voice_over</i>
 				<div>Witness
 					<br>Testimony</div>
 			</span>
-			<span id="menu_ce" onclick="initce()" class="menu_icon">
+			<span id="menu_ce" onclick="initCE()" class="menu_icon">
 				<i class="material-icons em-3">question_answer</i>
 				<div>Cross
 					<br>Examination</div>
@@ -120,7 +120,7 @@
 		</span>
 	</fieldset>
 	<br>
-	<span id="menu_cm" onclick="callmod()" class="menu_icon">
+	<span id="menu_cm" onclick="callMod()" class="menu_icon">
 		<i class="material-icons em-3">report</i>
 		<div>Call Mod</div>
 	</span>
@@ -130,23 +130,23 @@
 	<meta name="frame-title" lang="en" content="Log">
 	<div id="client_menu">
 		<div class="hrtext">↓ Main Menu ↓</div>
-		<span id="menu_1" onclick="togglemenu(1)" class="menu_icon active">
+		<span id="menu_1" onclick="toggleMenu(1)" class="menu_icon active">
 			<i class="material-icons em-3">work</i>
 			<div>Evidence</div>
 		</span>
-		<span id="menu_2" onclick="togglemenu(2)" class="menu_icon">
+		<span id="menu_2" onclick="toggleMenu(2)" class="menu_icon">
 			<i class="material-icons em-3">room</i>
 			<div>Location</div>
 		</span>
-		<span id="menu_3" onclick="togglemenu(3)" class="menu_icon">
+		<span id="menu_3" onclick="toggleMenu(3)" class="menu_icon">
 			<i class="material-icons em-3">settings</i>
 			<div>Settings</div>
 		</span>
-		<span id="menu_4" onclick="togglemenu(4)" class="menu_icon">
+		<span id="menu_4" onclick="toggleMenu(4)" class="menu_icon">
 			<i class="material-icons em-3">description</i>
 			<div>Guide</div>
 		</span>
-		<span id="menu_5" onclick="togglemenu(5)" class="menu_icon">
+		<span id="menu_5" onclick="toggleMenu(5)" class="menu_icon">
 			<i class="material-icons em-3">person</i>
 			<div>About</div>
 		</span>
@@ -176,16 +176,16 @@
 				<br>
 				<br>
 				<span style="display:block;text-align:center">
-					<img src="misc/evidence_add.png" id="evi_add" alt="Add Evidence" class="client_button hover_button" onclick="addevidence()">
-					<img src="misc/evidence_edit.png" id="evi_edit" alt="Edit Evidence" class="client_button hover_button inactive" onclick="editevidence()">
-					<img src="misc/evidence_cancel.png" id="evi_cancel" alt="Cancel Evidence" class="client_button hover_button inactive" onclick="cancelevidence()">
-					<img src="misc/evidence_remove.png" id="evi_del" alt="Remove Evidence" class="client_button hover_button inactive" onclick="delevidence()">
+					<img src="misc/evidence_add.png" id="evi_add" alt="Add Evidence" class="client_button hover_button" onclick="addEvidence()">
+					<img src="misc/evidence_edit.png" id="evi_edit" alt="Edit Evidence" class="client_button hover_button inactive" onclick="editEvidence()">
+					<img src="misc/evidence_cancel.png" id="evi_cancel" alt="Cancel Evidence" class="client_button hover_button inactive" onclick="cancelEvidence()">
+					<img src="misc/evidence_remove.png" id="evi_del" alt="Remove Evidence" class="client_button hover_button inactive" onclick="deleteEvidence()">
 				</span>
 			</fieldset>
 			<br>
 			<div id="evidences"></div>
 			<br>
-			<img src="misc/present.png" id="button_present" alt="Present" class="client_button" onclick="togglepresent()">
+			<img src="misc/present.png" id="button_present" alt="Present" class="client_button" onclick="togglePresent()">
 		</span>
 
 		<!-- Location section -->
@@ -341,9 +341,11 @@
 	</select>
 </template>
 
-<div id="callmod_dialog" title="Are you sure to call mod?">
+<div id="callmod_dialog" title="Call Mod">
 	<p>
-		<span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>They might be very busy. Are you sure?</p>
+		<span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>
+		Are you sure you want to call a moderator?
+	</p>
 </div>
 
 <body>
@@ -354,7 +356,7 @@
 		<button onclick="RetryButton()">RETRY</button>
 	</div>
 	<div id="client_charselect">
-		<button onclick="pickchar(1001)">SPECTATE</button>
+		<button onclick="pickChar(1001)">SPECTATE</button>
 		<table id="client_chartable"></table>
 	</div>
 	<div id="client_error" class="error" style="display: none">

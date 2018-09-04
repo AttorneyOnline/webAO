@@ -14,7 +14,7 @@ location.search.substr(1).split("&").forEach(function (item) {
 const serverIP = queryDict.ip;
 let mode = queryDict.mode;
 
-const AO_HOST = queryDict.asset || "http://assets.aceattorneyonline.com/base/";
+const AO_HOST = queryDict.asset || "http://s3.wasabisys.com/webao/base/";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
 const BAR_WIDTH = 90;
 const BAR_HEIGHT = 20;
@@ -248,7 +248,7 @@ class Client {
 	 */
 	joinServer() {
 		this.serv.send(`HI#${navigator.userAgent.hashCode()}#%`);
-		this.serv.send("ID#webAO#2.4.5#%");
+		this.serv.send("ID#webAO#2.3#%");
 		this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
 	}
 
@@ -257,13 +257,16 @@ class Client {
 	 */
 	loadResources() {
 		// Set to playerID to server chat name
+		// TODO: Make a text box for this!
 		document.getElementById("OOC_name").value = "web" + this.playerID;
+
 		// Load evidence array to select
 		const evidence_select = document.getElementById("evi_select");
 		evidence_select.add(new Option("Custom", 0));
 		evidence_arr.forEach(evidence => {
 			evidence_select.add(new Option(evidence));
 		});
+
 		// Load background array to select
 		const background_select = document.getElementById("bg_select");
 		background_select.add(new Option("Custom", 0));
@@ -274,7 +277,7 @@ class Client {
 		const shouts = ["holdit", "objection", "takethat"];
 		for (let i = 0; i < shouts.length; i++) {
 			let shout_src = AO_HOST + this.resources[shouts[i]]["src"];
-			FileExist(shout_src, this.callbackLoadImageResources, shouts[i]);
+			fileExists(shout_src, this.callbackLoadImageResources, shouts[i]);
 		}
 
 		// Calculate gif duration of testimony
@@ -282,9 +285,9 @@ class Client {
 		for (let i = 0; i < testimony.length; i++) {
 			const testimony_src = `${AO_HOST}themes/default/${testimony[i]}.gif`;
 			// Check image existed
-			FileExist(testimony_src, this.callbackLoadImageResources, testimony[i]);
+			fileExists(testimony_src, this.callbackLoadImageResources, testimony[i]);
 			// Check sfx existed
-			FileExist(AO_HOST + this.resources[testimony[i]]["sfx"], this.callbackLoadSFXResources, testimony[i]);
+			fileExists(AO_HOST + this.resources[testimony[i]]["sfx"], this.callbackLoadSFXResources, testimony[i]);
 		}
 		// TODO: Cache some resources
 
@@ -332,7 +335,7 @@ class Client {
 		const target = document.getElementById("client_inner_chat");
 		const observer = new MutationObserver(function (mutations) {
 			mutations.forEach(function (mutation) {
-				var children = mutation.addedNodes;
+				const children = mutation.addedNodes;
 				if (children !== null) {
 					children.forEach(function (node) {
 						if (node.tagName == "C") {
@@ -460,7 +463,7 @@ class Client {
 		// TODO: this if-statement might be a bug.
 		if (args[4] != viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
-			let chatmsg = {
+			const chatmsg = {
 				// pre: escape(args[2]),
 				character: -1, // Will do a linear search
 				preanim: escape(args[2]), // XXX: why again?
@@ -579,7 +582,7 @@ class Client {
 				"desc": chargs[1],
 				"evidence": chargs[3],
 				"icon": AO_HOST + "characters/" + escape(chargs[0]) + "/char_icon.png"
-			}
+			};
 		}
 		this.serv.send("RM#%");
 	}
@@ -612,7 +615,7 @@ class Client {
 				"desc": escapeHtml(decodeChat(unescapeChat(arg[1]))),
 				"filename": escape(arg[2]),
 				"icon": AO_HOST + "evidence/" + escape(arg[2])
-			}
+			};
 		}
 
 		const evidence_box = document.getElementById("evidences");
@@ -622,7 +625,7 @@ class Client {
 				id="evi_${i}" 
 				alt="${this.evidences[i - 1].name}"
 				class="client_button"
-				onclick="pickevidence(${i})">`;
+				onclick="pickEvidence(${i})">`;
 		}
 	}
 
@@ -672,7 +675,7 @@ class Client {
 				newarea.className = "location-box";
 				newarea.textContent = args[i];
 				newarea.onclick = function () {
-					area_click(this)
+					area_click(this);
 				};
 				document.getElementById("areas").appendChild(newarea);
 			}
@@ -777,7 +780,7 @@ class Client {
 	 */
 	handleZZ(args) {
 		const oocLog = document.getElementById("client_ooclog");
-		oocLog.innerHTML += `\$Alert: ${decodeChat(unescapeChat(args[1]))}\r\n`;
+		oocLog.innerHTML += `$Alert: ${decodeChat(unescapeChat(args[1]))}\r\n`;
 		if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
@@ -814,20 +817,19 @@ class Client {
 	 */
 	handleCharsCheck(args) {
 		document.getElementById("client_chartable").innerHTML = "";
+		let tr;
 		for (let i = 0; i < this.chars.length; i++) {
 			if (i % CHAR_SELECT_WIDTH == 0) {
-				var tr = document.createElement('TR');
+				tr = document.createElement('TR');
 			}
-			let td = document.createElement('TD');
-			let icon_chosen;
-			let thispick = this.chars[i].icon;
+			const td = document.createElement('TD');
+			let icon_chosen = "";
+			const thispick = this.chars[i].icon;
 			if (args[i + 1] == "-1") {
 				icon_chosen = " dark";
-			} else {
-				icon_chosen = "";
 			}
 			td.innerHTML = `<img class='demothing${icon_chosen}' id='demo_${i}' ` +
-				`src='${thispick}' alt='${this.chars[i].name}' onclick='pickchar(${i})' ` +
+				`src='${thispick}' alt='${this.chars[i].name}' onclick='pickChar(${i})' ` +
 				`onerror='demoError(this);'>`;
 			tr.appendChild(td);
 			if (i % CHAR_SELECT_WIDTH == 0) {
@@ -844,21 +846,21 @@ class Client {
 	handlePV(args) {
 		this.charID = args[3];
 		document.getElementById("client_charselect").style.display = "none";
-		let me = this.me();
-		let emotes = this.emotes;
-		let xhr = new XMLHttpRequest();
+		const me = this.me();
+		const emotes = this.emotes;
+		const xhr = new XMLHttpRequest();
 		xhr.withCredentials = false;
 		document.getElementById("client_emo").innerHTML = ""; // Clear emote box
 		xhr.open('GET', AO_HOST + 'characters/' + escape(this.me().name) + '/char.ini', true);
 		xhr.responseType = 'text';
 		xhr.onload = function (e) {
 			if (this.status == 200) {
-				let linifile = this.responseText;
-				let pinifile = INI.parse(linifile);
+				const linifile = this.responseText;
+				const pinifile = INI.parse(linifile);
 				me.side = pinifile.Options.side;
 				updateActionCommands(me.side);
 				for (let i = 1; i < pinifile.Emotions.number; i++) {
-					let emoteinfo = pinifile.Emotions[i].split('#');
+					const emoteinfo = pinifile.Emotions[i].split('#');
 					let esfx = "0";
 					let esfxd = "0";
 					if (typeof pinifile.SoundN !== 'undefined') {
@@ -883,9 +885,9 @@ class Client {
 						 id="emo_${i}"
 						 alt="${emotes[i].desc}"
 						 class="client_button"
-						 onclick="pickemotion(${i})">`;
+						 onclick="pickEmotion(${i})">`;
 				}
-				pickemotion(1);
+				pickEmotion(1);
 			}
 		};
 		xhr.send();
@@ -1018,13 +1020,13 @@ class Viewport {
 	 * @param {object} param 
 	 */
 	getAnimLength(filename, callback, param) {
-		var request = new XMLHttpRequest();
+		const request = new XMLHttpRequest();
 		request.open('GET', filename, true);
 		request.responseType = 'arraybuffer';
 		request.addEventListener('load', function () {
 			// Use gify API
 			// https://github.com/rfrench/gify
-			var gifInfo = gify.getInfo(request.response);
+			const gifInfo = gify.getInfo(request.response);
 			console.log(gifInfo["duration"]);
 			// Return animation length
 			callback(gifInfo["duration"], param);
@@ -1188,7 +1190,7 @@ class Viewport {
 					"4": "#0000ff",
 					"5": "#ffff00",
 					"6": "#aa00aa"
-				}
+				};
 				let stylecolor = "color: " + (colors[this.chatmsg.color] || "#ffffff");
 				document.getElementById("client_inner_chat").style = stylecolor;
 				this.chatmsg.startspeaking = false;
@@ -1255,7 +1257,7 @@ class INI {
 				let match = line.match(regex.section);
 				value[match[1]] = {};
 				section = match[1];
-			};
+			}
 		});
 		return value;
 	}
@@ -1396,7 +1398,7 @@ window.demoError = demoError;
  * @param {object} param 
  */
 function fileExists(url, callback, param) {
-	var xhttp = new XMLHttpRequest();
+	const xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			callback(true, param, url);
@@ -1415,41 +1417,41 @@ function fileExists(url, callback, param) {
  * @param {string} position the position to change into
  */
 function changeBackground(position) {
-	var standname;
-	let bgfolder = viewport.bgFolder();
+	let standname;
+	const bgfolder = viewport.bgFolder();
 	document.getElementById("client_fg").style.display = "none";
 	document.getElementById("client_bench").style.display = "none";
 	switch (position) {
-		case "def":
-			document.getElementById("client_court").src = bgfolder + "defenseempty.png"
-			document.getElementById("client_bench").style.display = "block";
-			FileExist(bgfolder + "defensedesk.png", callbackChangeBackground, position);
-			standname = "defense";
-			break;
-		case "pro":
-			document.getElementById("client_court").src = bgfolder + "prosecutorempty.png"
-			document.getElementById("client_bench").style.display = "block"
-			FileExist(bgfolder + "defensedesk.png", callbackChangeBackground, position);
-			standname = "prosecution";
-			break;
-		case "hld":
-			document.getElementById("client_court").src = bgfolder + "helperstand.png"
-			standname = "defense";
-			break;
-		case "hlp":
-			document.getElementById("client_court").src = bgfolder + "prohelperstand.png"
-			standname = "prosecution";
-			break;
-		case "wit":
-			document.getElementById("client_court").src = bgfolder + "witnessempty.png"
-			document.getElementById("client_bench").style.display = "block"
-			document.getElementById("client_bench").src = bgfolder + "estrado.png"
-			standname = "prosecution";
-			break;
-		case "jud":
-			document.getElementById("client_court").src = bgfolder + "judgestand.png"
-			standname = "prosecution";
-			break;
+	case "def":
+		document.getElementById("client_court").src = bgfolder + "defenseempty.png";
+		document.getElementById("client_bench").style.display = "block";
+		fileExists(bgfolder + "defensedesk.png", callbackChangeBackground, position);
+		standname = "defense";
+		break;
+	case "pro":
+		document.getElementById("client_court").src = bgfolder + "prosecutorempty.png";
+		document.getElementById("client_bench").style.display = "block";
+		fileExists(bgfolder + "defensedesk.png", callbackChangeBackground, position);
+		standname = "prosecution";
+		break;
+	case "hld":
+		document.getElementById("client_court").src = bgfolder + "helperstand.png";
+		standname = "defense";
+		break;
+	case "hlp":
+		document.getElementById("client_court").src = bgfolder + "prohelperstand.png";
+		standname = "prosecution";
+		break;
+	case "wit":
+		document.getElementById("client_court").src = bgfolder + "witnessempty.png";
+		document.getElementById("client_bench").style.display = "block";
+		document.getElementById("client_bench").src = bgfolder + "estrado.png";
+		standname = "prosecution";
+		break;
+	case "jud":
+		document.getElementById("client_court").src = bgfolder + "judgestand.png";
+		standname = "prosecution";
+		break;
 	}
 	if (viewport.chatmsg.type == 5) {
 		document.getElementById("client_bench").style.display = "none";
@@ -1468,15 +1470,15 @@ function callbackChangeBackground(result, position) {
 	let bgfolder = viewport.bgFolder();
 	if (position == "def") {
 		if (result) {
-			document.getElementById("client_bench").src = bgfolder + "defensedesk.png"
+			document.getElementById("client_bench").src = bgfolder + "defensedesk.png";
 		} else {
-			document.getElementById("client_bench").src = bgfolder + "bancodefensa.png"
+			document.getElementById("client_bench").src = bgfolder + "bancodefensa.png";
 		}
 	} else {
 		if (result) {
-			document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png"
+			document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png";
 		} else {
-			document.getElementById("client_bench").src = bgfolder + "bancoacusacion.png"
+			document.getElementById("client_bench").src = bgfolder + "bancoacusacion.png";
 		}
 	}
 }
@@ -1560,7 +1562,7 @@ export function pickEmotion(emo) {
 	if (client.selectedEmote != -1) {
 		document.getElementById("emo_" + client.selectedEmote).src = client.myEmote().button_off;
 	}
-	client.selectedEmote = emo
+	client.selectedEmote = emo;
 	document.getElementById("emo_" + emo).src = client.myEmote().button_on;
 }
 window.pickEmotion = pickEmotion;
@@ -1596,7 +1598,7 @@ export function pickEvidence(evidence) {
 		document.getElementById("evi_cancel").className = "client_button hover_button";
 		document.getElementById("evi_del").className = "client_button hover_button";
 	} else {
-		cancelevidence();
+		cancelEvidence();
 	}
 }
 window.pickEvidence = pickEvidence;
@@ -1608,11 +1610,11 @@ export function addEvidence() {
 	let evidence_select = document.getElementById('evi_select');
 	client.sendPE(document.getElementById('evi_name').value,
 		document.getElementById('evi_desc').value,
-		(evidence_select.selectedIndex == 0) ?
-		document.getElementById('evi_filename').value :
-		evidence_select.options[evidence_select.selectedIndex].text
+		evidence_select.selectedIndex == 0 ?
+			document.getElementById('evi_filename').value :
+			evidence_select.options[evidence_select.selectedIndex].text
 	);
-	cancelevidence();
+	cancelEvidence();
 }
 window.addEvidence = addEvidence;
 
@@ -1625,11 +1627,11 @@ export function editEvidence() {
 	client.sendEE(id,
 		document.getElementById('evi_name').value,
 		document.getElementById('evi_desc').value,
-		(evidence_select.selectedIndex == 0) ?
-		document.getElementById('evi_filename').value :
-		evidence_select.options[evidence_select.selectedIndex].text
+		evidence_select.selectedIndex == 0 ?
+			document.getElementById('evi_filename').value :
+			evidence_select.options[evidence_select.selectedIndex].text
 	);
-	cancelevidence();
+	cancelEvidence();
 }
 window.editEvidence = editEvidence;
 
@@ -1639,7 +1641,7 @@ window.editEvidence = editEvidence;
 export function deleteEvidence() {
 	let id = parseInt(client.selectedEvidence) - 1;
 	client.sendDE(id);
-	cancelevidence();
+	cancelEvidence();
 }
 window.deleteEvidence = deleteEvidence;
 
@@ -1676,7 +1678,7 @@ window.cancelEvidence = cancelEvidence;
  */
 export function getIndexFromSelect(select_box, value) {
 	//Find if icon alraedy existed in select box
-	let select_element = document.getElementById(select_box);
+	const select_element = document.getElementById(select_box);
 	for (let i = 1; i < select_element.length; ++i) {
 		if (select_element.options[i].value == value) {
 			return i;
@@ -1966,9 +1968,9 @@ function encodeChat(estring) {
 		});
 	} else if (selectedEncoding == "utf16") {
 		//Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
-		var buffer = new ArrayBuffer(estring.length * 2);
-		var result = new Uint16Array(buffer);
-		for (var i = 0, strLen = estring.length; i < strLen; i++) {
+		const buffer = new ArrayBuffer(estring.length * 2);
+		const result = new Uint16Array(buffer);
+		for (let i = 0, strLen = estring.length; i < strLen; i++) {
 			result[i] = estring.charCodeAt(i);
 		}
 		return String(result);
@@ -2025,11 +2027,10 @@ if (typeof (String.prototype.trim) === "undefined") {
 
 // Used for HDID calculation.
 String.prototype.hashCode = function () {
-	var hash = 0,
-		i, chr;
+	let hash = 0;
 	if (this.length === 0) return hash;
-	for (i = 0; i < this.length; i++) {
-		chr = this.charCodeAt(i);
+	for (let i = 0; i < this.length; i++) {
+		const chr = this.charCodeAt(i);
 		hash = ((hash << 5) - hash) + chr;
 		hash |= 0; // Convert to 32bit integer
 	}
@@ -2047,7 +2048,6 @@ let viewport = new Viewport();
 $(document).ready(function () {
 	client.initialObservBBCode();
 	client.loadResources();
-
 });
 
 // Create dialog and link to button	
