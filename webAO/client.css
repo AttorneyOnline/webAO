@@ -16,6 +16,14 @@ img {
 	image-rendering: auto;
 }
 
+.lm_content :link {
+	color: #4288f2;
+}
+
+.lm_content :visited {
+	color: #a65bd4;
+}
+
 @keyframes error_blink {
 	0% {
 		color: white;
@@ -87,11 +95,13 @@ img {
 }
 
 #client_chartable {
-	height: 360px;
-	width: 320px;
-	margin: 0 auto;
-	vertical-align: middle;
 	background: #eeeeee;
+}
+
+#client_chartable_container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
 .demothing {
@@ -258,8 +268,6 @@ img {
 	overflow-y: scroll;
 	font-size: medium;
 	background-color: #242424;
-	border: black;
-	border-style: solid;
 	text-align: start;
 	line-height: .85em;
 }
@@ -319,6 +327,15 @@ img {
 	background-size: contain;
 }
 
+.evi_options {
+	display: inline-block;
+}
+
+.evi_options label {
+	display: inline-block;
+	width: 6em;
+}
+
 #bg_preview {
 	max-width: 150px;
 	max-height: 112px;
@@ -376,6 +393,7 @@ img {
 
 .client_button {
 	padding: 1px;
+	cursor: pointer;
 }
 
 .client_button.hover_button.inactive {
@@ -464,15 +482,16 @@ img {
 }
 
 .location-box {
-	border-style: double;
+	border-style: solid;
 	background-color: #7B2900;
 	min-width: 120px;
 	margin: 5px;
 	display: inline-block;
-	padding: 10px;
-	border-radius: 7px;
+	padding: 6px;
+	border-radius: 5px;
 	border-color: white;
-	border-width: 3px;
+	border-width: 1px;
+	cursor: pointer;
 }
 
 .location-box:hover {

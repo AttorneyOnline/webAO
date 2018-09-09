@@ -2,11 +2,19 @@
  * Glorious webAO
  * made by sD, refactored by oldmud0 and Qubrick
  * credits to aleks for original idea and source
- */
+*/
+
+// Uses the Gify library:
+// https://github.com/rfrench/gify
+// The following comment is needed for ESLint:
+/* global gify */
+
+import background_arr from "./backgrounds.js";
+import evidence_arr from "./evidence.js";
 
 let queryDict = {};
 location.search.substr(1).split("&").forEach(function (item) {
-	queryDict[item.split("=")[0]] = item.split("=")[1]
+	queryDict[item.split("=")[0]] = item.split("=")[1];
 });
 
 /* Server magic */
@@ -16,8 +24,6 @@ let mode = queryDict.mode;
 
 const AO_HOST = queryDict.asset || "http://s3.wasabisys.com/webao/base/";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
-const BAR_WIDTH = 90;
-const BAR_HEIGHT = 20;
 const CHAR_SELECT_WIDTH = 8;
 const UPDATE_INTERVAL = 60;
 
@@ -110,7 +116,7 @@ class Client {
 			"CharsCheck": (args) => this.handleCharsCheck(args),
 			"PV": (args) => this.handlePV(args),
 			"CHECK": (args) => {}
-		}
+		};
 
 		this._lastTimeICReceived = new Date(0);
 	}
@@ -276,7 +282,7 @@ class Client {
 		// Calculate gif duration of shouts
 		const shouts = ["holdit", "objection", "takethat"];
 		for (let i = 0; i < shouts.length; i++) {
-			let shout_src = AO_HOST + this.resources[shouts[i]]["src"];
+			let shout_src = AO_HOST + this.resources[shouts[i]]["src"].toLowerCase();
 			fileExists(shout_src, this.callbackLoadImageResources, shouts[i]);
 		}
 
@@ -287,7 +293,7 @@ class Client {
 			// Check image existed
 			fileExists(testimony_src, this.callbackLoadImageResources, testimony[i]);
 			// Check sfx existed
-			fileExists(AO_HOST + this.resources[testimony[i]]["sfx"], this.callbackLoadSFXResources, testimony[i]);
+			fileExists(AO_HOST + this.resources[testimony[i]]["sfx"].toLowerCase(), this.callbackLoadSFXResources, testimony[i]);
 		}
 		// TODO: Cache some resources
 
@@ -341,7 +347,7 @@ class Client {
 						if (node.tagName == "C") {
 							node.style.color = node.getAttribute("a");
 						} else if (node.tagName == "M") {
-							if (node.hasAttribute('a')) {
+							if (node.hasAttribute("a")) {
 								node.style.backgroundColor = node.getAttribute("a");
 							} else {
 								node.style.backgroundColor = "yellow";
@@ -415,8 +421,8 @@ class Client {
 	onMessage(e) {
 		let msg = e.data;
 		console.debug(msg);
-		let lines = msg.split('%');
-		let args = lines[0].split('#');
+		let lines = msg.split("%");
+		let args = lines[0].split("#");
 		let header = args[0];
 		let handler = this.handlers[header];
 		if (typeof handler !== "undefined") {
@@ -447,7 +453,7 @@ class Client {
 	}
 
 	/**
-	 * 
+	 * XXX: a nasty hack made by gameboyprinter.
 	 * @param {string} msg chat message to prepare for display 
 	 */
 	prepChat(msg){
@@ -471,7 +477,7 @@ class Client {
 				name: args[3],
 				speaking: "(b)" + escape(args[4]),
 				silent: "(a)" + escape(args[4]),
-				content: prepChat(args[5]), // Escape HTML tag, Use BBCode Only!
+				content: this.prepChat(args[5]), // Escape HTML tag, Use BBCode Only!
 				side: args[6],
 				sound: escape(args[7]),
 				type: args[8],
@@ -508,7 +514,7 @@ class Client {
 	handleCT(args) {
 		const oocLog = document.getElementById("client_ooclog");
 		oocLog.innerHTML += `${decodeChat(unescapeChat(args[1]))}: ${decodeChat(unescapeChat(args[2]))}\r\n`;
-		if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
+		if (oocLog.scrollTop > oocLog.scrollHeight - 600) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
 	}
@@ -520,7 +526,7 @@ class Client {
 	handleMC(args) {
 		const music = viewport.music;
 		music.pause();
-		music.src = MUSIC_HOST + args[1];
+		music.src = MUSIC_HOST + args[1].toLowerCase();
 		music.play();
 		if (args[2] >= 0) {
 			let musicname = this.chars[args[2]].name;
@@ -541,7 +547,7 @@ class Client {
 		// Music offset + drift from song loading
 		music.totime = args[1];
 		music.offset = new Date().getTime() / 1000;
-		music.addEventListener('loadedmetadata', function () {
+		music.addEventListener("loadedmetadata", function () {
 			music.currentTime += parseFloat(music.totime + (new Date().getTime() / 1000 - music.offset)).toFixed(3);
 			music.play();
 		}, false);
@@ -562,7 +568,7 @@ class Client {
 					"name": chargs[0],
 					"desc": chargs[1],
 					"evidence": chargs[3],
-					"icon": AO_HOST + "characters/" + escape(chargs[0]) + "/char_icon.png"
+					"icon": AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png"
 				};
 			}
 		}
@@ -581,7 +587,7 @@ class Client {
 				"name": chargs[0],
 				"desc": chargs[1],
 				"evidence": chargs[3],
-				"icon": AO_HOST + "characters/" + escape(chargs[0]) + "/char_icon.png"
+				"icon": AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png"
 			};
 		}
 		this.serv.send("RM#%");
@@ -614,7 +620,7 @@ class Client {
 				"name": escapeHtml(decodeChat(unescapeChat(arg[0]))),
 				"desc": escapeHtml(decodeChat(unescapeChat(arg[1]))),
 				"filename": escape(arg[2]),
-				"icon": AO_HOST + "evidence/" + escape(arg[2])
+				"icon": AO_HOST + "evidence/" + escape(arg[2].toLowerCase())
 			};
 		}
 
@@ -665,13 +671,12 @@ class Client {
 
 			if (flagAudio) {
 				// After reached the audio put everything in the music list
-				let newentry = document.createElement("OPTION");
+				const newentry = document.createElement("OPTION");
 				newentry.text = args[i];
 				hmusiclist.options.add(newentry);
-
 			} else {
 				// Create area button
-				let newarea = document.createElement("SPAN");
+				const newarea = document.createElement("SPAN");
 				newarea.className = "location-box";
 				newarea.textContent = args[i];
 				newarea.onclick = function () {
@@ -681,12 +686,15 @@ class Client {
 			}
 		}
 
-		// Move first audio title from area box to music list
-		let area_box = document.getElementById("areas");
-		let audio_title = document.createElement("OPTION");
-		audio_title.text = area_box.lastChild.textContent;
-		hmusiclist.insertBefore(audio_title, hmusiclist.firstChild);
-		area_box.removeChild(area_box.lastChild); // Remove from arae box
+		// We need to check if the last area that we got was actually a category
+		// header for music. If it was, then move it over to the music list.
+		const area_box = document.getElementById("areas");
+		if (area_box.lastChild.textContent.startsWith("=")) {
+			const audio_title = document.createElement("OPTION");
+			audio_title.text = area_box.lastChild.textContent;
+			hmusiclist.insertBefore(audio_title, hmusiclist.firstChild);
+			area_box.removeChild(area_box.lastChild);
+		}
 
 		this.serv.send("RD#%");
 	}
@@ -725,7 +733,7 @@ class Client {
 		if (bg_index == 0) {
 			document.getElementById("bg_filename").value = args[1];
 		}
-		document.getElementById("bg_preview").src = AO_HOST + 'background/' + escape(args[1]) + "/defenseempty.png";
+		document.getElementById("bg_preview").src = AO_HOST + "background/" + escape(args[1].toLowerCase()) + "/defenseempty.png";
 		if (this.charID == -1) {
 			changeBackground("jud");
 		} else {
@@ -748,13 +756,13 @@ class Client {
 			// Def hp
 			this.hp[0] = args[2];
 			$("#client_defense_hp > .health-bar").animate({
-				'width': percent_hp + "%"
+				"width": percent_hp + "%"
 			}, 500);
 		} else {
 			// Pro hp
 			this.hp[1] = args[2];
 			$("#client_prosecutor_hp > .health-bar").animate({
-				'width': percent_hp + "%"
+				"width": percent_hp + "%"
 			}, 500);
 		}
 	}
@@ -820,9 +828,9 @@ class Client {
 		let tr;
 		for (let i = 0; i < this.chars.length; i++) {
 			if (i % CHAR_SELECT_WIDTH == 0) {
-				tr = document.createElement('TR');
+				tr = document.createElement("TR");
 			}
-			const td = document.createElement('TD');
+			const td = document.createElement("TD");
 			let icon_chosen = "";
 			const thispick = this.chars[i].icon;
 			if (args[i + 1] == "-1") {
@@ -830,7 +838,7 @@ class Client {
 			}
 			td.innerHTML = `<img class='demothing${icon_chosen}' id='demo_${i}' ` +
 				`src='${thispick}' alt='${this.chars[i].name}' onclick='pickChar(${i})' ` +
-				`onerror='demoError(this);'>`;
+				"onerror='demoError(this);'>";
 			tr.appendChild(td);
 			if (i % CHAR_SELECT_WIDTH == 0) {
 				document.getElementById("client_chartable").appendChild(tr);
@@ -851,8 +859,8 @@ class Client {
 		const xhr = new XMLHttpRequest();
 		xhr.withCredentials = false;
 		document.getElementById("client_emo").innerHTML = ""; // Clear emote box
-		xhr.open('GET', AO_HOST + 'characters/' + escape(this.me().name) + '/char.ini', true);
-		xhr.responseType = 'text';
+		xhr.open("GET", AO_HOST + "characters/" + escape(this.me().name.toLowerCase()) + "/char.ini", true);
+		xhr.responseType = "text";
 		xhr.onload = function (e) {
 			if (this.status == 200) {
 				const linifile = this.responseText;
@@ -860,13 +868,13 @@ class Client {
 				me.side = pinifile.Options.side;
 				updateActionCommands(me.side);
 				for (let i = 1; i < pinifile.Emotions.number; i++) {
-					const emoteinfo = pinifile.Emotions[i].split('#');
+					const emoteinfo = pinifile.Emotions[i].split("#");
 					let esfx = "0";
 					let esfxd = "0";
-					if (typeof pinifile.SoundN !== 'undefined') {
+					if (typeof pinifile.SoundN !== "undefined") {
 						esfx = pinifile.SoundN[i];
 					}
-					if (typeof pinifile.SoundT !== 'undefined') {
+					if (typeof pinifile.SoundT !== "undefined") {
 						esfxd = pinifile.SoundT[i];
 					}
 					// Make sure the asset server is case insensitive, or that everything on it is lowercase
@@ -878,7 +886,7 @@ class Client {
 						sfx: esfx.toLowerCase(),
 						sfxdelay: esfxd,
 						button_off: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_off.png`,
-						button_on: AO_HOST + `'characters/${escape(me.name).toLowerCase()}/emotions/button${i}_on.png`
+						button_on: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_on.png`
 					};
 					document.getElementById("client_emo").innerHTML += 
 						`<img src=${emotes[i].button_off}
@@ -909,7 +917,7 @@ class Viewport {
 			"snddelay": 0,
 			"preanimdelay": 0
 		};
-		this.blip = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
+		this.blip = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
 		this.blip.volume = 0.5;
 
 		// Allocate multiple blip audio channels to make blips less jittery
@@ -917,12 +925,12 @@ class Viewport {
 		// TODO: read blip type ("gender") from ini
 		this.blipChannels = new Array(6);
 		for (let i = 0; i < this.blipChannels.length; i++) {
-			this.blipChannels[i] = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
+			this.blipChannels[i] = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
 			this.blipChannels[i].volume = 0.5;
 		}
 		this.currentBlipChannel = 0;
 
-		this.sfxaudio = new Audio(AO_HOST + 'sounds/general/sfx-blipmale.wav');
+		this.sfxaudio = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
 		this.sfxplayed = 0;
 
 		this.music = new Audio();
@@ -962,7 +970,7 @@ class Viewport {
 	 * Returns the path which the background is located in.
 	 */
 	bgFolder() {
-		return `${AO_HOST}background/${this.bgname}/`;
+		return `${AO_HOST}background/${this.bgname.toLowerCase()}/`;
 	}
 
 	/**
@@ -973,14 +981,14 @@ class Viewport {
 		this.chatmsg = chatmsg;
 		appendICLog(chatmsg.content, chatmsg.nameplate);
 		changeBackground(chatmsg.side);
-		this.textnow = '';
+		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
 		this._animating = true;
 		clearTimeout(this.updater);
 		//If preanim existed then determine the length
 		if (chatmsg.preanim != "-") {
-			chatmsg.preanimdelay = this.getAnimLength(`${AO_HOST}characters/${escape(chatmsg.name)}/${chatmsg.preanim}.gif`, this.initUpdater);
+			chatmsg.preanimdelay = this.getAnimLength(`${AO_HOST}characters/${escape(chatmsg.name.toLowerCase())}/${chatmsg.preanim.toLowerCase()}.gif`, this.initUpdater);
 		} else {
 			this.initUpdater(0);
 		}
@@ -1008,7 +1016,9 @@ class Viewport {
 			}
 			(new Audio(client.resources[testimony]["sfx"])).play();
 			this.testimonyTimer = 0;
-			document.getElementById("client_testimony").src = client.resources[testimony]["src"];
+			const testimonyOverlay = document.getElementById("client_testimony");
+			testimonyOverlay.src = client.resources[testimony]["src"];
+			testimonyOverlay.style.display = "";
 			this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
 		}
 	}
@@ -1021,11 +1031,9 @@ class Viewport {
 	 */
 	getAnimLength(filename, callback, param) {
 		const request = new XMLHttpRequest();
-		request.open('GET', filename, true);
-		request.responseType = 'arraybuffer';
-		request.addEventListener('load', function () {
-			// Use gify API
-			// https://github.com/rfrench/gify
+		request.open("GET", filename, true);
+		request.responseType = "arraybuffer";
+		request.addEventListener("load", function () {
 			const gifInfo = gify.getInfo(request.response);
 			console.log(gifInfo["duration"]);
 			// Return animation length
@@ -1068,7 +1076,7 @@ class Viewport {
 	disposeTestimony() {
 		client.testimonyID = 0;
 		this.testimonyTimer = 0;
-		document.getElementById("client_testimony").src = "misc/placeholder.gif";
+		document.getElementById("client_testimony").style.display = "none";
 		clearTimeout(this.testimonyUpdater);
 	}
 
@@ -1078,11 +1086,19 @@ class Viewport {
 	 * XXX: This relies on a global variable `this.chatmsg`!
 	 */
 	updateText() {
+		const nameBox = document.getElementById("client_name");
+		const chatBox = document.getElementById("client_chat");
+		const charSprite = document.getElementById("client_char");
+		const eviBox = document.getElementById("client_evi");
+		const background = document.getElementById("client_background");
+		const shoutSprite = document.getElementById("client_shout");
+		const chatBoxInner = document.getElementById("client_inner_chat");
+
 		// Flip the character
 		if (this.chatmsg.flip == 1) {
-			document.getElementById("client_char").style.transform = "scaleX(-1)";
+			charSprite.style.transform = "scaleX(-1)";
 		} else {
-			document.getElementById("client_char").style.transform = "scaleX(1)";
+			charSprite.style.transform = "scaleX(1)";
 		}
 
 		if (this._animating) {
@@ -1091,12 +1107,12 @@ class Viewport {
 
 		if (this.chatmsg.isnew) {
 			// Reset screen background
-			document.getElementById("client_background").style.backgroundColor = "transparent";
-			//Hide message and evidence window
-			document.getElementById("client_name").style.display = "none";
-			document.getElementById("client_chat").style.display = "none";
-			document.getElementById("client_evi").style.opacity = "0";
-			document.getElementById("client_evi").style.height = "0%";
+			background.style.backgroundColor = "transparent";
+			// Hide message and evidence window
+			nameBox.style.display = "none";
+			chatBox.style.display = "none";
+			eviBox.style.opacity = "0";
+			eviBox.style.height = "0%";
 			const shouts = {
 				"1": "holdit",
 				"2": "objection",
@@ -1105,8 +1121,8 @@ class Viewport {
 
 			let shout = shouts[this.chatmsg.objection];
 			if (typeof shout !== "undefined") {
-				document.getElementById("client_shout").src = client.resources[shout]["src"];
-				(new Audio(`${AO_HOST}/characters/${this.chatmsg.name}/${shout}.wav`)).play();
+				shoutSprite.src = client.resources[shout]["src"];
+				(new Audio(`${AO_HOST}characters/${this.chatmsg.name.toLowerCase()}/${shout}.wav`)).play();
 				this.shoutTimer = 850;
 			} else {
 				this.shoutTimer = 0;
@@ -1124,24 +1140,24 @@ class Viewport {
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-stab.wav";
 				this.sfxaudio.play();
-				$('#client_gamewindow').effect("shake", {
+				$("#client_gamewindow").effect("shake", {
 					"direction": "up"
 				});
 			} else if (this.chatmsg.flash == 1) {
 				//Flash screen
-				document.getElementById("client_background").style.backgroundColor = "white";
+				background.style.backgroundColor = "white";
 				this.sfxaudio.pause();
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-realization.wav";
 				this.sfxaudio.play();
-				$('#client_gamewindow').effect("pulsate");
+				$("#client_gamewindow").effect("pulsate");
 			}
 
 			//Pre-animation stuff
 			if (this.chatmsg.preanimdelay > 0) {
-				document.getElementById("client_shout").src = "misc/placeholder.gif";
+				shoutSprite.src = "misc/placeholder.gif";
 				changeBackground(this.chatmsg.side);
-				document.getElementById("client_char").src = AO_HOST + "characters/" + escape(this.chatmsg.name) + "/" + this.chatmsg.preanim + ".gif";
+				charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.preanim.toLowerCase() + ".gif";
 			}
 			this.chatmsg.startpreanim = false;
 			this.chatmsg.startspeaking = true;
@@ -1149,19 +1165,19 @@ class Viewport {
 			if (this.chatmsg.startspeaking) {
 				if (this.chatmsg.evidence > 0) {
 					// Prepare evidence
-					document.getElementById("client_evi").style.backgroundImage = "url('" + client.evidences[this.chatmsg.evidence - 1].icon + "')";
+					eviBox.style.backgroundImage = "url('" + client.evidences[this.chatmsg.evidence - 1].icon + "')";
 
-					if (this.chatmsg.side == 'def') {
+					if (this.chatmsg.side == "def") {
 						// Only def show evidence on right
-						document.getElementById("client_evi").style.right = "1.5em";
-						document.getElementById("client_evi").style.left = "initial";
+						eviBox.style.right = "1.5em";
+						eviBox.style.left = "initial";
 						$("#client_evi").animate({
 							height: "30%",
 							opacity: 1
 						}, 250);
 					} else {
-						document.getElementById("client_evi").style.right = "initial";
-						document.getElementById("client_evi").style.left = "1.5em";
+						eviBox.style.right = "initial";
+						eviBox.style.left = "1.5em";
 						$("#client_evi").animate({
 							height: "30%",
 							opacity: 1
@@ -1169,18 +1185,12 @@ class Viewport {
 					}
 				}
 
-				$("#client_name").toggle("fade");
-				$("#client_chat").toggle("drop", {
-					"direction": "down"
-				});
-				if (this.chatmsg.preanimdelay == 0) {
-					document.getElementById("client_shout").src = "misc/placeholder.gif";
-					changeBackground(this.chatmsg.side);
-				}
-				document.getElementById("client_char").src = AO_HOST + "characters/" + escape(this.chatmsg.name) + "/" + this.chatmsg.speaking + ".gif";
-				document.getElementById("client_name").style.fontSize = (document.getElementById("client_name").offsetHeight * 0.7) + "px";
-				document.getElementById("client_chat").style.fontSize = (document.getElementById("client_chat").offsetHeight * 0.25) + "px";
-				document.getElementById("client_name").innerHTML = "<p>" + escapeHtml(this.chatmsg.nameplate) + "</p>";
+				nameBox.style.display = "block";
+				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
+				nameBox.innerHTML = "<p>" + escapeHtml(this.chatmsg.nameplate) + "</p>";
+
+				chatBox.style.display = "block";
+				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
 
 				const colors = {
 					"0": "#ffffff",
@@ -1191,12 +1201,18 @@ class Viewport {
 					"5": "#ffff00",
 					"6": "#aa00aa"
 				};
-				let stylecolor = "color: " + (colors[this.chatmsg.color] || "#ffffff");
-				document.getElementById("client_inner_chat").style = stylecolor;
+				chatBoxInner.style.color = colors[this.chatmsg.color] || "#ffffff";
 				this.chatmsg.startspeaking = false;
 
+				if (this.chatmsg.preanimdelay == 0) {
+					shoutSprite.src = "misc/placeholder.gif";
+					changeBackground(this.chatmsg.side);
+				}
+
+				charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.speaking.toLowerCase() + ".gif";
+
 				if (this.textnow == this.chatmsg.content) {
-					document.getElementById("client_char").src = AO_HOST + "characters/" + escape(this.chatmsg.name) + "/" + this.chatmsg.silent + ".gif";
+					charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
 					this._animating = false;
 					clearTimeout(this.updater);
 				}
@@ -1208,11 +1224,11 @@ class Viewport {
 						this.currentBlipChannel %= this.blipChannels.length;
 					}
 					this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
-					document.getElementById("client_inner_chat").innerHTML = this.textnow;
+					chatBoxInner.innerHTML = this.textnow;
 					if (this.textnow == this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						document.getElementById("client_char").src = AO_HOST + "characters/" + escape(this.chatmsg.name) + "/" + this.chatmsg.silent + ".gif";
+						charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
 						clearTimeout(this.updater);
 					}
 				}
@@ -1223,7 +1239,7 @@ class Viewport {
 			this.sfxaudio.pause();
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound != "0" && this.chatmsg.sound != "1") {
-				this.sfxaudio.src = AO_HOST + "sounds/general/" + escape(this.chatmsg.sound) + ".wav";
+				this.sfxaudio.src = AO_HOST + "sounds/general/" + escape(this.chatmsg.sound.toLowerCase()) + ".wav";
 				this.sfxaudio.play();
 			}
 		}
@@ -1235,7 +1251,7 @@ class INI {
 	static parse(data) {
 		let regex = {
 			section: /^\s*\[\s*([^\]]*)\s*\]\s*$/,
-			param: /^\s*([\w\.\-\_]+)\s*=\s*(.*?)\s*$/,
+			param: /^\s*([\w.\-_]+)\s*=\s*(.*?)\s*$/,
 			comment: /^\s*;.*$/
 		};
 		let value = {};
@@ -1531,7 +1547,7 @@ function appendICLog(toadd, name = "", time = new Date()) {
 	const clientLog = document.getElementById("client_log");
 	clientLog.appendChild(entry);
 
-	if (clientLog.scrollTop > clientLog.scrollHeight - 600) {
+	if (clientLog.scrollTop > clientLog.scrollHeight - 800) {
 		clientLog.scrollTop = clientLog.scrollHeight;
 	}
 
@@ -1607,11 +1623,11 @@ window.pickEvidence = pickEvidence;
  * Add evidence.
  */
 export function addEvidence() {
-	let evidence_select = document.getElementById('evi_select');
-	client.sendPE(document.getElementById('evi_name').value,
-		document.getElementById('evi_desc').value,
+	let evidence_select = document.getElementById("evi_select");
+	client.sendPE(document.getElementById("evi_name").value,
+		document.getElementById("evi_desc").value,
 		evidence_select.selectedIndex == 0 ?
-			document.getElementById('evi_filename').value :
+			document.getElementById("evi_filename").value :
 			evidence_select.options[evidence_select.selectedIndex].text
 	);
 	cancelEvidence();
@@ -1622,13 +1638,13 @@ window.addEvidence = addEvidence;
  * Edit selected evidence.
  */
 export function editEvidence() {
-	let evidence_select = document.getElementById('evi_select');
+	let evidence_select = document.getElementById("evi_select");
 	let id = parseInt(client.selectedEvidence) - 1;
 	client.sendEE(id,
-		document.getElementById('evi_name').value,
-		document.getElementById('evi_desc').value,
+		document.getElementById("evi_name").value,
+		document.getElementById("evi_desc").value,
 		evidence_select.selectedIndex == 0 ?
-			document.getElementById('evi_filename').value :
+			document.getElementById("evi_filename").value :
 			evidence_select.options[evidence_select.selectedIndex].text
 	);
 	cancelEvidence();
@@ -1698,10 +1714,10 @@ export function updateEvidenceIcon() {
 
 	if (evidence_select.selectedIndex === 0) {
 		evidence_filename.style.display = "initial";
-		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${evidence_filename.value})`;
+		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${evidence_filename.value.toLowerCase()})`;
 	} else {
 		evidence_filename.style.display = "none";
-		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${evidence_select.value})`;
+		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${evidence_select.value.toLowerCase()})`;
 	}
 }
 window.updateEvidenceIcon = updateEvidenceIcon;
@@ -1829,10 +1845,10 @@ export function updateBackgroundPreview() {
 
 	if (background_select.selectedIndex == 0) {
 		background_filename.style.display = "initial";
-		background_preview.src = AO_HOST + 'background/' + background_filename.value + "/defenseempty.png";
+		background_preview.src = AO_HOST + "background/" + background_filename.value.toLowerCase() + "/defenseempty.png";
 	} else {
 		background_filename.style.display = "none";
-		background_preview.src = AO_HOST + 'background/' + background_select.value + "/defenseempty.png";
+		background_preview.src = AO_HOST + "background/" + background_select.value.toLowerCase() + "/defenseempty.png";
 	}
 }
 window.updateBackgroundPreview = updateBackgroundPreview;
@@ -1956,18 +1972,19 @@ function unescapeChat(estring) {
 }
 
 /**
- * Encoding text on client side.
+ * Encode text on client side.
  * @param {string} estring the string to be encoded
  */
 function encodeChat(estring) {
 	let selectedEncoding = document.getElementById("client_encoding").value;
 	if (selectedEncoding == "unicode") {
-		//Source: https://gist.github.com/mathiasbynens/1243213
+		// This approach works by escaping all special characters to Unicode escape sequences.
+		// Source: https://gist.github.com/mathiasbynens/1243213
 		return estring.replace(/[^\0-~]/g, function (ch) {
 			return "\\u" + ("000" + ch.charCodeAt().toString(16)).slice(-4);
 		});
 	} else if (selectedEncoding == "utf16") {
-		//Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+		// Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
 		const buffer = new ArrayBuffer(estring.length * 2);
 		const result = new Uint16Array(buffer);
 		for (let i = 0, strLen = estring.length; i < strLen; i++) {
@@ -1980,18 +1997,18 @@ function encodeChat(estring) {
 }
 
 /**
- * Decoding text on client side.
+ * Decodes text on client side.
  * @param {string} estring the string to be decoded
  */
 function decodeChat(estring) {
 	let selectedDecoding = document.getElementById("client_decoding").value;
 	if (selectedDecoding == "unicode") {
-		//Source: https://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode
+		// Source: https://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode
 		return estring.replace(/\\u([\d\w]{1,})/gi, function (match, group) {
 			return String.fromCharCode(parseInt(group, 16));
 		});
 	} else if (selectedDecoding == "utf16") {
-		//Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+		// Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
 		return String.fromCharCode.apply(null, new Uint16Array(estring.split(",")));
 	} else {
 		return estring;
@@ -2011,17 +2028,17 @@ function decodeBBCode(estring) {
 		.replace(/\[(\/?)u\]/g, "<$1u>") // Underline [u][/u]
 		.replace(/\[(\/?)sub\]/g, "<$1sub>") // Subscript [sub][/sub]
 		.replace(/\[(\/?)sup\]/g, "<$1sup>") // Superscript [sup][/sup]
-		.replace(/\[m=([#a-zA-Z0-9]+)\]/g, '<m a="$1">') // Markup [m=#0ff]
-		.replace(/\[(\/?)m\]/g, '<$1m>') // [m][/m]
-		.replace(/\[c=?([#a-zA-Z0-9]+)\]/g, '<c a="$1">') // Color [c=red]
-		.replace(/\[\/c\]/g, '</c>'); // [/c]
+		.replace(/\[m=([#a-zA-Z0-9]+)\]/g, "<m a=\"$1\">") // Markup [m=#0ff]
+		.replace(/\[(\/?)m\]/g, "<$1m>") // [m][/m]
+		.replace(/\[c=?([#a-zA-Z0-9]+)\]/g, "<c a=\"$1\">") // Color [c=red]
+		.replace(/\[\/c\]/g, "</c>"); // [/c]
 }
 
 
 // TODO: Possibly safe to remove, since we are using a transpiler.
 if (typeof (String.prototype.trim) === "undefined") {
 	String.prototype.trim = function () {
-		return String(this).replace(/^\s+|\s+$/g, '');
+		return String(this).replace(/^\s+|\s+$/g, "");
 	};
 }
 

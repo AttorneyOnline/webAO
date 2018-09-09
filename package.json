@@ -4,7 +4,6 @@
   "description": "Web-based Attorney Online client",
   "main": "client.js",
   "scripts": {
-    "babel": "babel ui.js -o ui.b.js",
     "webpack": "webpack",
     "deploy": "cross-env NODE_ENV=production webpack -p",
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -9,7 +9,6 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
-	<!--<script src="golden/js/goldenlayout.js"></script>-->
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
 	<link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css" />
@@ -17,8 +16,6 @@
 	<script src="lib/jquery.ui.touch-punch.min.js"></script>
 	<script src="lib/jdataview.min.js"></script>
 	<script src="lib/gify.min.js"></script>
-	<script src="backgrounds.min.js"></script>
-	<script src="evidences.min.js"></script>
 	<script src="ui.b.js"></script>
 	<script src="client.b.js"></script>
 </head>
@@ -39,9 +36,9 @@
 		<div id="client_chat">
 			<p id="client_inner_chat"></p>
 		</div>
-		<img id="client_testimony" alt="Testimony overlay" onerror="imgError(this);">
+		<img id="client_testimony" alt="Testimony overlay" style="display: none;" onerror="imgError(this);">
 	</div>
-	<input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)" style="padding-left: 1px; padding-right: 1px;">
+	<input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)" style="padding-left: 1px; padding-right: 1px;" placeholder="Say something&hellip;">
 	<meta name="frame-title" lang="en" content="Miscellaneous">
 	<div id="client_bars">
 		<span id="client_defense_hp" class="health-box">
@@ -74,14 +71,12 @@
 		<input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
 		<br>
 		<br>
-		<label>Flip: </label>
 		<img src="misc/flip.png" id="button_flip" alt="Flip" class="client_button" onclick="toggleFlip()">
-		<label>Effect: </label>
 		<img src="misc/flash.png" id="button_effect_1" alt="Flash" class="client_button" onclick="toggleEffect(1)">
 		<img src="misc/shake.png" id="button_effect_2" alt="Shake" class="client_button" onclick="toggleEffect(2)">
 	</div>
 	<fieldset style="margin:10px;">
-		<legend>Action Commands</legend>
+		<legend>Actions</legend>
 		<!-- Judge Commands -->
 		<span id="judge_action" style="display:none">
 			<span id="menu_wt" onclick="initWT()" class="menu_icon">
@@ -131,12 +126,12 @@
 	<div id="client_menu">
 		<div class="hrtext">↓ Main Menu ↓</div>
 		<span id="menu_1" onclick="toggleMenu(1)" class="menu_icon active">
-			<i class="material-icons em-3">work</i>
-			<div>Evidence</div>
+			<i class="material-icons em-3">room</i>
+			<div>Areas</div>
 		</span>
 		<span id="menu_2" onclick="toggleMenu(2)" class="menu_icon">
-			<i class="material-icons em-3">room</i>
-			<div>Location</div>
+			<i class="material-icons em-3">work</i>
+			<div>Evidence</div>
 		</span>
 		<span id="menu_3" onclick="toggleMenu(3)" class="menu_icon">
 			<i class="material-icons em-3">settings</i>
@@ -152,62 +147,61 @@
 		</span>
 		<div class="hrtext">↓
 			<span id="content_name">Content</span> ↓</div>
-		<!--  Evidence section  -->
-		<span class="menu_content active" id="content_1">
-			<meta name="frame-title" lang="en" content="Evidence">
-			<fieldset style="text-align: left">
-				<legend>Information</legend>
-				<span>
-					<img id="evi_icon" src="misc/evidence_selector.png" alt="Evidence Icon" onerror="imgError(this);">
-				</span>
-				<span style="display:inline-block">
-					<label for="evi_filename">Icon:</label>
-					<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
-					<input id="evi_filename" name="evi_filename" class="short" type="text">
-					<br>
-					<br>
-					<label for="evi_name">Name:</label>
-					<input id="evi_name" name="evi_name" class="short" type="text">
-					<br>
-					<br>
-					<label for="evi_desc">Description:</label>
-					<textarea id="evi_desc" name="evi_desc" rows="2" cols="20"></textarea>
-				</span>
+			<!-- Areas section -->
+			<span class="menu_content active" id="content_1">
+				<meta name="frame-title" lang="en" content="Areas">
+				<div id="areas"></div>
 				<br>
-				<br>
-				<span style="display:block;text-align:center">
-					<img src="misc/evidence_add.png" id="evi_add" alt="Add Evidence" class="client_button hover_button" onclick="addEvidence()">
-					<img src="misc/evidence_edit.png" id="evi_edit" alt="Edit Evidence" class="client_button hover_button inactive" onclick="editEvidence()">
-					<img src="misc/evidence_cancel.png" id="evi_cancel" alt="Cancel Evidence" class="client_button hover_button inactive" onclick="cancelEvidence()">
-					<img src="misc/evidence_remove.png" id="evi_del" alt="Remove Evidence" class="client_button hover_button inactive" onclick="deleteEvidence()">
-				</span>
-			</fieldset>
-			<br>
-			<div id="evidences"></div>
-			<br>
-			<img src="misc/present.png" id="button_present" alt="Present" class="client_button" onclick="togglePresent()">
-		</span>
-
-		<!-- Location section -->
-		<span class="menu_content" id="content_2">
-			<div id="areas"></div>
-			<br>
-			<fieldset style="text-align: left">
-				<legend>Current Area Background</legend>
-				<span>
-					<img id="bg_preview" src="misc/placeholder.gif" alt="Background Preview" onerror="imgError(this);">
-				</span>
-				<span style="display:inline-block">
-					<label for="bg_filename">Background:</label>
-					<br>
-					<select id="bg_select" name="bg_select" onchange="updateBackgroundPreview()" style="margin-top:10px"></select>
-					<br>
-					<input id="bg_filename" name="bg_filename" class="short" type="text" style="margin-top:10px">
-					<br>
-					<br>
-					<img src="misc/location_change.png" id="bg_change" alt="Change" class="client_button hover_button" onclick="changeBackgroundOOC()">
+				<fieldset style="text-align: left">
+					<legend>Current Area Background</legend>
 					<span>
-			</fieldset>
+						<img id="bg_preview" src="misc/placeholder.gif" alt="Background Preview" onerror="imgError(this);">
+					</span>
+					<span style="display:inline-block">
+						<label for="bg_filename">Background:</label>
+						<br>
+						<select id="bg_select" name="bg_select" onchange="updateBackgroundPreview()" style="margin-top:10px"></select>
+						<br>
+						<input id="bg_filename" name="bg_filename" class="short" type="text" style="margin-top:10px">
+						<br>
+						<br>
+						<img src="misc/location_change.png" id="bg_change" alt="Change" class="client_button hover_button" onclick="changeBackgroundOOC()">
+					</span>
+				</fieldset>
+			</span>
+
+			<!--  Evidence section  -->
+			<span class="menu_content" id="content_2">
+				<meta name="frame-title" lang="en" content="Evidence">
+				<fieldset style="text-align: left; display: flex;">
+					<legend>Information</legend>
+					<span>
+						<img id="evi_icon" src="misc/evidence_selector.png" alt="Evidence Icon" onerror="imgError(this);">
+					</span>
+					<span class="evi_options">
+						<label for="evi_filename">Icon:</label>
+						<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
+						<input id="evi_filename" name="evi_filename" class="short" type="text" placeholder="Custom filename">
+						<br>
+						<label for="evi_name">Name:</label>
+						<input id="evi_name" name="evi_name" class="short" type="text" placeholder="Evidence name">
+						<br>
+						<label for="evi_desc">Description:</label>
+						<textarea id="evi_desc" name="evi_desc" rows="2" cols="20" placeholder="Evidence description"></textarea>
+					</span>
+					<br>
+					<br>
+					<span style="display:block; text-align:center">
+						<img src="misc/evidence_add.png" id="evi_add" alt="Add Evidence" class="client_button hover_button" onclick="addEvidence()">
+						<img src="misc/evidence_edit.png" id="evi_edit" alt="Edit Evidence" class="client_button hover_button inactive" onclick="editEvidence()">
+						<img src="misc/evidence_cancel.png" id="evi_cancel" alt="Cancel Evidence" class="client_button hover_button inactive" onclick="cancelEvidence()">
+						<img src="misc/evidence_remove.png" id="evi_del" alt="Remove Evidence" class="client_button hover_button inactive" onclick="deleteEvidence()">
+					</span>
+				</fieldset>
+				<br>
+				<div id="evidences"></div>
+				<br>
+				<img src="misc/present.png" id="button_present" alt="Present" class="client_button" onclick="togglePresent()">
 			</span>
 
 			<!-- Settings section -->
@@ -237,12 +231,12 @@
 				</div>
 				<br>
 				<img src="misc/character_change.png" id="char_change" alt="Change" class="client_button hover_button" onclick="changeCharacter()">
-				<img src="misc/character_random.png" id="char_change" alt="Change" class="client_button hover_button" onclick="randomCharacterOOC()">
+				<img src="misc/character_random.png" id="char_random" alt="Random" class="client_button hover_button" onclick="randomCharacterOOC()">
 				<br>
 				<br>
 				<label for="client_encoding"> Client side chat encoding:</label>
 				<select id="client_encoding" name="client_encoding">
-					<option value="none">None</option>
+					<option value="none" selected>None</option>
 					<option value="unicode">Unicode</option>
 					<option value="utf16">UTF-16</option>
 				</select>
@@ -251,7 +245,7 @@
 				<label for="client_decoding"> Client side chat decoding:</label>
 				<select id="client_decoding" name="client_decoding">
 					<option value="none">None</option>
-					<option value="unicode">Unicode</option>
+					<option value="unicode" selected>Unicode</option>
 					<option value="utf16">UTF-16</option>
 				</select>
 				<br>
@@ -274,9 +268,10 @@
 			<!--  Guide section  -->
 			<span class="menu_content" id="content_4">
 				<span style="text-align:left;margin-left:15px;display:block">
-					<b>BBcode</b>Only works on webAO
-					<ol style="line-height:1.5em;">
-						<li>\n : new line</li>
+					<h3>BBcode</h3>
+					<p>This feature only works on webAO.</p>
+					<ul style="line-height:1.5em;">
+						<li>&bsol;n : new line</li>
 						<li>[b][/b] :
 							<b>bolded text</b>
 						</li>
@@ -301,7 +296,7 @@
 						<li>[c=cyan][/c] :
 							<span style="color:cyan">colorized text</span>
 						</li>
-					</ol>
+					</ul>
 				</span>
 			</span>
 
@@ -356,8 +351,10 @@
 		<button onclick="RetryButton()">RETRY</button>
 	</div>
 	<div id="client_charselect">
-		<button onclick="pickChar(1001)">SPECTATE</button>
-		<table id="client_chartable"></table>
+		<div id="client_chartable_container">
+			<table id="client_chartable"></table>
+			<button onclick="pickChar(1001)">Spectate</button>
+		</div>
 	</div>
 	<div id="client_error" class="error" style="display: none">
 		<p>You were disconnected from the server.</p>
