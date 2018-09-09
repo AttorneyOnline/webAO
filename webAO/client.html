@@ -25,8 +25,8 @@
 	<div id="client_background"></div>
 	<div id="client_gamewindow">
 		<img id="client_court" alt="Courtroom background" onerror="imgError(this);">
-		<img id="client_char" alt="Character sprite" onerror="imgError(this);">
-		<img id="client_bench" alt="Bench overlay">
+		<img id="client_char" onerror="imgError(this);">
+		<img id="client_bench">
 		<img id="client_fg" alt="Various overlay" onerror="imgError(this);">
 		<img id="client_evi" src="misc/evidence_selector.png" alt="Character Evidence" onerror="imgError(this);">
 		<img id="client_shout" alt="Effect overlay" src="misc/placeholder.gif" onerror="imgError(this);">
@@ -114,17 +114,12 @@
 			No actions available for this role.
 		</span>
 	</fieldset>
-	<br>
-	<span id="menu_cm" onclick="callMod()" class="menu_icon">
-		<i class="material-icons em-3">report</i>
-		<div>Call Mod</div>
-	</span>
 </template>
 
 <template id="mainmenu">
 	<meta name="frame-title" lang="en" content="Log">
 	<div id="client_menu">
-		<div class="hrtext">↓ Main Menu ↓</div>
+		<div class="hrtext">Main Menu</div>
 		<span id="menu_1" onclick="toggleMenu(1)" class="menu_icon active">
 			<i class="material-icons em-3">room</i>
 			<div>Areas</div>
@@ -138,15 +133,16 @@
 			<div>Settings</div>
 		</span>
 		<span id="menu_4" onclick="toggleMenu(4)" class="menu_icon">
-			<i class="material-icons em-3">description</i>
-			<div>Guide</div>
-		</span>
-		<span id="menu_5" onclick="toggleMenu(5)" class="menu_icon">
 			<i class="material-icons em-3">person</i>
 			<div>About</div>
 		</span>
-		<div class="hrtext">↓
-			<span id="content_name">Content</span> ↓</div>
+		<span id="menu_cm" onclick="callMod()" class="menu_icon">
+			<i class="material-icons em-3" style="color: #ce2727;">report</i>
+			<div>Call Mod</div>
+		</span>
+		<div class="hrtext">
+			<span id="content_name">Content</span>
+		</div>
 			<!-- Areas section -->
 			<span class="menu_content active" id="content_1">
 				<meta name="frame-title" lang="en" content="Areas">
@@ -173,30 +169,28 @@
 			<!--  Evidence section  -->
 			<span class="menu_content" id="content_2">
 				<meta name="frame-title" lang="en" content="Evidence">
-				<fieldset style="text-align: left; display: flex;">
+				<fieldset style="text-align: left; display: flex; flex-direction: column;">
 					<legend>Information</legend>
-					<span>
+					<div style="display: flex;">
 						<img id="evi_icon" src="misc/evidence_selector.png" alt="Evidence Icon" onerror="imgError(this);">
-					</span>
-					<span class="evi_options">
-						<label for="evi_filename">Icon:</label>
-						<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
-						<input id="evi_filename" name="evi_filename" class="short" type="text" placeholder="Custom filename">
-						<br>
-						<label for="evi_name">Name:</label>
-						<input id="evi_name" name="evi_name" class="short" type="text" placeholder="Evidence name">
-						<br>
-						<label for="evi_desc">Description:</label>
+						<div id="evi_options">
+							<label for="evi_filename">Icon:</label>
+							<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
+							<input id="evi_filename" name="evi_filename" class="short" type="text" placeholder="Custom filename">
+							<br>
+							<label for="evi_name">Name:</label>
+							<input id="evi_name" name="evi_name" class="short" type="text" placeholder="Evidence name">
+						</div>
+					</div>
+					<div style="display: flex; padding-top: 5px;">
 						<textarea id="evi_desc" name="evi_desc" rows="2" cols="20" placeholder="Evidence description"></textarea>
-					</span>
-					<br>
-					<br>
-					<span style="display:block; text-align:center">
+					</div>
+					<div style="display: block; text-align: center; padding-top: 20px;">
 						<img src="misc/evidence_add.png" id="evi_add" alt="Add Evidence" class="client_button hover_button" onclick="addEvidence()">
 						<img src="misc/evidence_edit.png" id="evi_edit" alt="Edit Evidence" class="client_button hover_button inactive" onclick="editEvidence()">
 						<img src="misc/evidence_cancel.png" id="evi_cancel" alt="Cancel Evidence" class="client_button hover_button inactive" onclick="cancelEvidence()">
 						<img src="misc/evidence_remove.png" id="evi_del" alt="Remove Evidence" class="client_button hover_button inactive" onclick="deleteEvidence()">
-					</span>
+					</div>
 				</fieldset>
 				<br>
 				<div id="evidences"></div>
@@ -265,43 +259,8 @@
 				<input id="randomchar_command" name="randomchar_command" class="short" type="text" value="randomchar">
 			</span>
 
-			<!--  Guide section  -->
-			<span class="menu_content" id="content_4">
-				<span style="text-align:left;margin-left:15px;display:block">
-					<h3>BBcode</h3>
-					<p>This feature only works on webAO.</p>
-					<ul style="line-height:1.5em;">
-						<li>&bsol;n : new line</li>
-						<li>[b][/b] :
-							<b>bolded text</b>
-						</li>
-						<li>[i][/i] :
-							<i>italicized text</i>
-						</li>
-						<li>[u][/u] :
-							<u>underlined text</u>
-						</li>
-						<li>[s][/s] :
-							<del>strikethrough text</del>
-						</li>
-						<li>[sub][/sub] :
-							<sub>subscript text</sub>
-						</li>
-						<li>[sup][/sup] :
-							<sup>superscript text</sup>
-						</li>
-						<li>[m=#0f0][/m] :
-							<mark style="background-color:#0f0">highlighted text</mark>
-						</li>
-						<li>[c=cyan][/c] :
-							<span style="color:cyan">colorized text</span>
-						</li>
-					</ul>
-				</span>
-			</span>
-
 			<!-- About section -->
-			<span class="menu_content" id="content_5">
+			<span class="menu_content" id="content_4">
 				<meta name="frame-title" lang="en" content="About">
 				<img id="about-logo" src="images/logo-new.png" alt="Attorney Online logo">
 				<h1 style="line-height: .3em;">webAO</h1>

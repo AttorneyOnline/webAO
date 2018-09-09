@@ -458,7 +458,7 @@ class Client {
 	 */
 	prepChat(msg){
 		// TODO: make this less awful
-		return decodeBBCode(escapeHtml(decodeChat(unescapeChat(msg))));
+		return decodeBBCode(unescapeChat(decodeChat(msg)));
 	}
 
 	/**
@@ -617,8 +617,8 @@ class Client {
 		for (let i = 1; i < args.length - 1; i++) {
 			const arg = args[i].split("&");
 			this.evidences[i - 1] = {
-				"name": escapeHtml(decodeChat(unescapeChat(arg[0]))),
-				"desc": escapeHtml(decodeChat(unescapeChat(arg[1]))),
+				"name": decodeChat(unescapeChat(arg[0])),
+				"desc": decodeChat(unescapeChat(arg[1])),
 				"filename": escape(arg[2]),
 				"icon": AO_HOST + "evidence/" + escape(arg[2].toLowerCase())
 			};
@@ -854,11 +854,14 @@ class Client {
 	handlePV(args) {
 		this.charID = args[3];
 		document.getElementById("client_charselect").style.display = "none";
+		document.getElementById("client_inputbox").style.display = "";
 		const me = this.me();
 		const emotes = this.emotes;
+		const emotesList = document.getElementById("client_emo");
+		emotesList.innerHTML = ""; // Clear emote box
+		emotesList.style.display = "";
 		const xhr = new XMLHttpRequest();
 		xhr.withCredentials = false;
-		document.getElementById("client_emo").innerHTML = ""; // Clear emote box
 		xhr.open("GET", AO_HOST + "characters/" + escape(this.me().name.toLowerCase()) + "/char.ini", true);
 		xhr.responseType = "text";
 		xhr.onload = function (e) {
@@ -867,7 +870,7 @@ class Client {
 				const pinifile = INI.parse(linifile);
 				me.side = pinifile.Options.side;
 				updateActionCommands(me.side);
-				for (let i = 1; i < pinifile.Emotions.number; i++) {
+				for (let i = 1; i <= pinifile.Emotions.number; i++) {
 					const emoteinfo = pinifile.Emotions[i].split("#");
 					let esfx = "0";
 					let esfxd = "0";
@@ -888,7 +891,7 @@ class Client {
 						button_off: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_off.png`,
 						button_on: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_on.png`
 					};
-					document.getElementById("client_emo").innerHTML += 
+					emotesList.innerHTML += 
 						`<img src=${emotes[i].button_off}
 						 id="emo_${i}"
 						 alt="${emotes[i].desc}"
@@ -986,7 +989,7 @@ class Viewport {
 		this.textTimer = 0;
 		this._animating = true;
 		clearTimeout(this.updater);
-		//If preanim existed then determine the length
+		// If preanim existed then determine the length
 		if (chatmsg.preanim != "-") {
 			chatmsg.preanimdelay = this.getAnimLength(`${AO_HOST}characters/${escape(chatmsg.name.toLowerCase())}/${chatmsg.preanim.toLowerCase()}.gif`, this.initUpdater);
 		} else {
@@ -1187,7 +1190,11 @@ class Viewport {
 
 				nameBox.style.display = "block";
 				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
-				nameBox.innerHTML = "<p>" + escapeHtml(this.chatmsg.nameplate) + "</p>";
+
+				while (nameBox.hasChildNodes()) {
+					nameBox.removeChild(nameBox.firstChild);
+				}
+				nameBox.appendChild(document.createTextNode(this.chatmsg.nameplate));
 
 				chatBox.style.display = "block";
 				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
@@ -1224,7 +1231,12 @@ class Viewport {
 						this.currentBlipChannel %= this.blipChannels.length;
 					}
 					this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
-					chatBoxInner.innerHTML = this.textnow;
+
+					while (chatBoxInner.hasChildNodes()) {
+						chatBoxInner.removeChild(chatBoxInner.firstChild);
+					}
+					chatBoxInner.appendChild(document.createTextNode(this.textnow));
+
 					if (this.textnow == this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
@@ -1335,18 +1347,23 @@ function resetICParams() {
  * @param {MouseEvent} event
  */
 export function musiclist_click(event) {
-	let playtrack = document.getElementById("client_musiclist").value;
+	const playtrack = document.getElementById("client_musiclist").value;
 	client.sendMusicChange(playtrack);
 }
 window.musiclist_click = musiclist_click;
 
 /**
- * Triggered when an item on the music list is clicked.
+ * Triggered when an item on the area list is clicked.
  * @param {MouseEvent} event
  */
 export function area_click(el) {
-	let playtrack = el.textContent;
-	client.sendMusicChange(playtrack);
+	const area = el.textContent;
+	client.sendMusicChange(area);
+
+	const areaHr = document.createElement("div");
+	areaHr.className = "hrtext";
+	areaHr.textContent = `switched to ${el.textContent}`;
+	document.getElementById("client_log").appendChild(areaHr);
 }
 window.area_click = area_click;
 
