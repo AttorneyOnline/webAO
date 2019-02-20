@@ -8,7 +8,6 @@
 // https://github.com/rfrench/gify
 // The following comment is needed for ESLint:
 /* global gify */
-/* global evercookie */
 
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
