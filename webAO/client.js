@@ -36,7 +36,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phon
 let selectedEffect = 0;
 let selectedMenu = 1;
 let selectedShout = 0;
-var fp = new Fingerprint({
+let fp = new Fingerprint({
 	canvas: true,
 	ie_activex: true,
 	screen_resolution: true
