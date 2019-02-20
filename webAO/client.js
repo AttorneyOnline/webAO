@@ -11,6 +11,7 @@
 
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
+import Fingerprint from "./fingerprint.js";
 
 let queryDict = {};
 location.search.substr(1).split("&").forEach(function (item) {
@@ -35,6 +36,13 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phon
 let selectedEffect = 0;
 let selectedMenu = 1;
 let selectedShout = 0;
+let fp = new Fingerprint({
+	canvas: true,
+	ie_activex: true,
+	screen_resolution: true
+});
+let uid = fp.get();
+console.log(uid);
 let lastICMessageTime = new Date(0);
 
 class Client {
@@ -253,7 +261,7 @@ class Client {
 	 * to the server.
 	 */
 	joinServer() {
-		this.serv.send(`HI#${navigator.userAgent.hashCode()}#%`);
+		this.serv.send(`HI#${hash6ode()}#%`);
 		this.serv.send("ID#webAO#2.3#%");
 		this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
 	}
@@ -2012,6 +2020,9 @@ function encodeChat(estring) {
 		return estring;
 	}
 }
+function hash6ode() {
+	return uid;
+}
 
 /**
  * Decodes text on client side.
@@ -2060,11 +2071,12 @@ if (typeof (String.prototype.trim) === "undefined") {
 }
 
 // Used for HDID calculation.
-String.prototype.hashCode = function () {
+function hashCode() {
 	let hash = 0;
-	if (this.length === 0) return hash;
-	for (let i = 0; i < this.length; i++) {
-		const chr = this.charCodeAt(i);
+	let hashString = navigator.userAgent;
+	if (hashString.length === 0) return hash;
+	for (let i = 0; i < hashString.length; i++) {
+		const chr = hashString.charCodeAt(i);
 		hash = ((hash << 5) - hash) + chr;
 		hash |= 0; // Convert to 32bit integer
 	}

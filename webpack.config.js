@@ -1,6 +1,7 @@
 module.exports = {
     entry: {
         ui: './webAO/ui.js',
+        fingerprint: './webAO/fingerprint.js',
         client: './webAO/client.js'
     },
     output: {
