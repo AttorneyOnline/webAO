@@ -111,6 +111,7 @@ class Client {
 			"LE": (args) => this.handleLE(args),
 			"EM": (args) => this.handleEM(args),
 			"SM": (args) => this.handleSM(args),
+			"BD": (args) => this.handleBD(args),
 			"music": (args) => this.handlemusic(args),
 			"DONE": (args) => this.handleDONE(args),
 			"BN": (args) => this.handleBN(args),
@@ -705,6 +706,14 @@ class Client {
 		}
 
 		this.serv.send("RD#%");
+	}
+
+	/**
+	 * Handles the banned packet
+	 * @param {Array} args packet arguments
+	 */
+	handleBD(args) {
+		document.getElementById("client_loadingtext").innerHTML = "Banned: " + args[1];
 	}
 
 	/**
