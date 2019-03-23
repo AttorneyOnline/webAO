@@ -1,7 +1,6 @@
 module.exports = {
     entry: {
         ui: './webAO/ui.js',
-        fingerprint: './webAO/fingerprint.js',
         client: './webAO/client.js'
     },
     output: {
@@ -9,18 +8,18 @@ module.exports = {
     },
     module: {
         rules: [
-            {
-                test: /\.js?$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['es2015']
-                    }
-                }
+          {
+            test: /\.m?js$/,
+            exclude: /(node_modules|bower_components)/,
+            use: {
+              loader: 'babel-loader',
+              options: {
+                presets: ['@babel/preset-env']
+              }
             }
+          }
         ]
-    },
+      },
 
     devtool: 'source-map'
 }
