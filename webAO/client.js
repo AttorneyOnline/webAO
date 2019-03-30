@@ -2125,7 +2125,8 @@ $(function () {
 		modal: true,
 		buttons: {
 			Sure: function () {
-				client.sendZZ("");
+				var reason = prompt("Please enter the reason", "");
+				client.sendZZ(reason);
 				$(this).dialog("close");
 			},
 			Cancel: function () {
