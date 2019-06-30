@@ -1481,7 +1481,7 @@ function changeBackground(position) {
 	case "pro":
 		document.getElementById("client_court").src = bgfolder + "prosecutorempty.png";
 		document.getElementById("client_bench").style.display = "block";
-		fileExists(bgfolder + "defensedesk.png", callbackChangeBackground, position);
+		fileExists(bgfolder + "prosecutiondesk.png", callbackChangeBackground, position);
 		standname = "prosecution";
 		break;
 	case "hld":
@@ -1495,7 +1495,7 @@ function changeBackground(position) {
 	case "wit":
 		document.getElementById("client_court").src = bgfolder + "witnessempty.png";
 		document.getElementById("client_bench").style.display = "block";
-		document.getElementById("client_bench").src = bgfolder + "estrado.png";
+		fileExists(bgfolder + "stand.png", callbackChangeBackground, position);
 		standname = "prosecution";
 		break;
 	case "jud":
@@ -1524,11 +1524,17 @@ function callbackChangeBackground(result, position) {
 		} else {
 			document.getElementById("client_bench").src = bgfolder + "bancodefensa.png";
 		}
-	} else {
+	} else if (position == "pro") {
 		if (result) {
 			document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png";
 		} else {
 			document.getElementById("client_bench").src = bgfolder + "bancoacusacion.png";
+		}
+	} else if (position == "wit") {
+		if (result) {
+			document.getElementById("client_bench").src = bgfolder + "stand.png";
+		} else {
+			document.getElementById("client_bench").src = bgfolder + "estrado.png";
 		}
 	}
 }
