@@ -1,20 +1,22 @@
-# Attorney Online Web Client
+# webAO
 
-webAO client only features:
+This is a client for the Attorney Online roleplaying chatroom written in HTML and JavaScript.
+It works with the tsuserver3/serverD software when the server has WebSockets enabled.
+
+webAO-only features:
  - BBcode
- - Client side encoding-decoding (Unicode escape/UTF-16 array)
- - Location (spilt from music list)
- - Change background UI via menu
+ - Screen shake
+ - Asset URLs
+ - Automated testimony control
+
+Desktop-only features:
+ - Pairing
+ - 2.6+ markup
+ - Non-interrupting preanimations
+ - Guilty/not guilty
+
+In short, webAO is in disrepair. Again.
  
-Planned features:
- - Record testimony on client side (Judge role)
- - Play testimony during cross-examination
- - Defense, prosecution and judge can skip testimony message.(forward/backward)
- - Show Guilty/Not Guilty message (Judge role)
- 
-Link to the client in this repo: http://attorneyonline.000webhostapp.com
+Link to the client in this repo: http://web.aceattorneyonline.com/
 
 Guide to installing it locally: https://docs.google.com/document/d/1X4OjG0tfoTZayqY9MM6fqzL_aGMKFAECg7NSQRYafAU/edit
-
-This is a client for the Attorney Online roleplaying chatroom written in HTML and Javascript.
-It works with the tsuserver3/serverD software when the server has WebSockets enabled.
