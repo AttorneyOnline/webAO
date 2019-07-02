@@ -491,7 +491,7 @@ class Client extends EventEmitter {
 				resetICParams();
 			}
 
-			viewport.say(chatmsg);
+			viewport.say(chatmsg); // no await
 		}
 	}
 
@@ -961,7 +961,7 @@ class Viewport {
 	 * Sets a new emote.
 	 * @param {object} chatmsg the new chat message
 	 */
-	say(chatmsg) {
+	async say(chatmsg) {
 		this.chatmsg = chatmsg;
 		appendICLog(chatmsg.content, chatmsg.nameplate);
 		changeBackground(chatmsg.side);
@@ -972,7 +972,9 @@ class Viewport {
 		clearTimeout(this.updater);
 		// If preanim existed then determine the length
 		if (chatmsg.preanim !== "-") {
-			chatmsg.preanimdelay = this.getAnimLength(`${AO_HOST}characters/${escape(chatmsg.name.toLowerCase())}/${chatmsg.preanim.toLowerCase()}.gif`, this.initUpdater);
+			const delay = await this.getAnimLength(`${AO_HOST}characters/${escape(chatmsg.name.toLowerCase())}/${chatmsg.preanim.toLowerCase()}.gif`);
+			chatmsg.preanimdelay = delay;
+			this.initUpdater(delay);
 		} else {
 			this.initUpdater(0);
 		}
@@ -1013,12 +1015,17 @@ class Viewport {
 	}
 
 	/**
-	 * Gets animation length.
+	 * Gets animation length. If the animation cannot be found, it will
+	 * silently fail and return 0 instead.
 	 * @param {string} filename the animation file name
 	 */
 	async getAnimLength(filename) {
-		const file = await request(filename).response;
-		return gify.getInfo(file).duration;
+		try {
+			const file = await request(filename);
+			return gify.getInfo(file).duration;
+		} catch (err) {
+			return 0;
+		}
 	}
 
 	/**
