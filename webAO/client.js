@@ -13,7 +13,9 @@ import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 import Fingerprint from "./fingerprint.js";
 
-let queryDict = {};
+import { EventEmitter } from "events";
+
+const queryDict = {};
 location.search.substr(1).split("&").forEach(function (item) {
 	queryDict[item.split("=")[0]] = item.split("=")[1];
 });
@@ -28,6 +30,10 @@ const MUSIC_HOST = AO_HOST + "sounds/music/";
 const CHAR_SELECT_WIDTH = 8;
 const UPDATE_INTERVAL = 60;
 
+/**
+ * Toggles AO1-style loading using paginated music packets.
+ * (It is unclear why AO2 loading does not work on mobile platforms.)
+ */
 let oldLoading = false;
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
 	oldLoading = true;
@@ -36,23 +42,33 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phon
 let selectedEffect = 0;
 let selectedMenu = 1;
 let selectedShout = 0;
-let fp = new Fingerprint({
+
+const fp = new Fingerprint({
 	canvas: true,
 	ie_activex: true,
 	screen_resolution: true
 });
-let uid = fp.get();
-console.log(uid);
+
+/** An emulated, semi-unique HDID that is generally safe for HDID bans. */
+const hdid = fp.get();
+console.log(`Your emulated HDID is ${hdid}`);
+
 let lastICMessageTime = new Date(0);
 
-class Client {
+class Client extends EventEmitter {
 	constructor(address) {
+		super();
 		this.serv = new WebSocket("ws://" + address);
 
-		this.serv.onopen = (evt) => this.onOpen(evt);
-		this.serv.onclose = (evt) => this.onClose(evt);
-		this.serv.onmessage = (evt) => this.onMessage(evt);
-		this.serv.onerror = (evt) => this.onError(evt);
+		this.serv.addEventListener("open", this.emit.bind(this, "open"));
+		this.serv.addEventListener("close", this.emit.bind(this, "close"));
+		this.serv.addEventListener("message", this.emit.bind(this, "message"));
+		this.serv.addEventListener("error", this.emit.bind(this, "error"));
+
+		this.on("open", this.onOpen.bind(this));
+		this.on("close", this.onClose.bind(this));
+		this.on("message", this.onMessage.bind(this));
+		this.on("error", this.onError.bind(this));
 
 		this.flip = false;
 		this.presentable = false;
@@ -100,32 +116,30 @@ class Client {
 		// Only used for RMC/`music` packets, not EM/SM/MC packets.
 		this.musicList = Object();
 
-		this.handlers = {
-			"MS": (args) => this.handleMS(args),
-			"CT": (args) => this.handleCT(args),
-			"MC": (args) => this.handleMC(args),
-			"RMC": (args) => this.handleRMC(args),
-			"CI": (args) => this.handleCI(args),
-			"SC": (args) => this.handleSC(args),
-			"EI": (args) => this.handleEI(args),
-			"LE": (args) => this.handleLE(args),
-			"EM": (args) => this.handleEM(args),
-			"SM": (args) => this.handleSM(args),
-			"BD": (args) => this.handleBD(args),
-			"music": (args) => this.handlemusic(args),
-			"DONE": (args) => this.handleDONE(args),
-			"BN": (args) => this.handleBN(args),
-			"NBG": (args) => this.handleNBG(args),
-			"HP": (args) => this.handleHP(args),
-			"RT": (args) => this.handleRT(args),
-			"ZZ": (args) => this.handleZZ(args),
-			"ID": (args) => this.handleID(args),
-			"PN": (args) => this.handlePN(args),
-			"SI": (args) => this.handleSI(args),
-			"CharsCheck": (args) => this.handleCharsCheck(args),
-			"PV": (args) => this.handlePV(args),
-			"CHECK": (args) => {}
-		};
+		this.on("MS", this.handleMS.bind(this));
+		this.on("CT", this.handleCT.bind(this));
+		this.on("MC", this.handleMC.bind(this));
+		this.on("RMC", this.handleRMC.bind(this));
+		this.on("CI", this.handleCI.bind(this));
+		this.on("SC", this.handleSC.bind(this));
+		this.on("EI", this.handleEI.bind(this));
+		this.on("LE", this.handleLE.bind(this));
+		this.on("EM", this.handleEM.bind(this));
+		this.on("SM", this.handleSM.bind(this));
+		this.on("BD", this.handleBD.bind(this));
+		this.on("music", this.handlemusic.bind(this));
+		this.on("DONE", this.handleDONE.bind(this));
+		this.on("BN", this.handleBN.bind(this));
+		this.on("NBG", this.handleNBG.bind(this));
+		this.on("HP", this.handleHP.bind(this));
+		this.on("RT", this.handleRT.bind(this));
+		this.on("ZZ", this.handleZZ.bind(this));
+		this.on("ID", this.handleID.bind(this));
+		this.on("PN", this.handlePN.bind(this));
+		this.on("SI", this.handleSI.bind(this));
+		this.on("CharsCheck", this.handleCharsCheck.bind(this));
+		this.on("PV", this.handlePV.bind(this));
+		this.on("CHECK", () => {});
 
 		this._lastTimeICReceived = new Date(0);
 	}
@@ -133,21 +147,21 @@ class Client {
 	/**
 	 * Gets the current player's character.
 	 */
-	me() {
+	get character() {
 		return this.chars[this.charID];
 	}
 
 	/**
 	 * Gets the player's currently selected emote.
 	 */
-	myEmote() {
+	get emote() {
 		return this.emotes[this.selectedEmote];
 	}
 
 	/**
 	 * Gets the player's currently selected evidence if presentable.
 	 */
-	myEvidence() {
+	get evidence() {
 		return this.presentable ? this.selectedEvidence : 0;
 	}
 
@@ -234,7 +248,7 @@ class Client {
 	 * @param {string} testimony type
 	 */
 	sendRT(testimony) {
-		if (this.chars[this.charID].side == "jud") {
+		if (this.chars[this.charID].side === "jud") {
 			this.serv.send(`RT#${testimony}#%`);
 		}
 	}
@@ -262,7 +276,7 @@ class Client {
 	 * to the server.
 	 */
 	joinServer() {
-		this.serv.send(`HI#${hash6ode()}#%`);
+		this.serv.send(`HI#${hdid}#%`);
 		this.serv.send("ID#webAO#2.3#%");
 		this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
 	}
@@ -288,58 +302,25 @@ class Client {
 		background_arr.forEach(background => {
 			background_select.add(new Option(background));
 		});
-		// Calculate gif duration of shouts
-		const shouts = ["holdit", "objection", "takethat"];
-		for (let i = 0; i < shouts.length; i++) {
-			let shout_src = AO_HOST + this.resources[shouts[i]]["src"].toLowerCase();
-			fileExists(shout_src, this.callbackLoadImageResources, shouts[i]);
-		}
 
-		// Calculate gif duration of testimony
-		const testimony = ["witnesstestimony", "crossexamination"];
-		for (let i = 0; i < testimony.length; i++) {
-			const testimony_src = `${AO_HOST}themes/default/${testimony[i]}.gif`;
-			// Check image existed
-			fileExists(testimony_src, this.callbackLoadImageResources, testimony[i]);
-			// Check sfx existed
-			fileExists(AO_HOST + this.resources[testimony[i]]["sfx"].toLowerCase(), this.callbackLoadSFXResources, testimony[i]);
-		}
-		// TODO: Cache some resources
+		this.resources.map(async (resource) => {
+			// Check if image exists and replace `src` with an absolute URL
+			const spriteSrc = `${AO_HOST}themes/default/${resource.src}.gif`;
+			if (await fileExists(spriteSrc)) {
+				Object.assign(resource, {
+					src: spriteSrc,
+					duration: await viewport.getAnimLength(spriteSrc)
+				});
+			}
 
-	}
-
-	/**
-	 * Callback for image resources.
-	 * @param {boolean} result the image is existed or not
-	 * @param {string} resource the resource name
-	 * @param {string} src the url of resource
-	 */
-	callbackLoadImageResources(result, resource, src) {
-		if (result) {
-			client.resources[resource]["src"] = src;
-			viewport.getAnimLength(src, client.callbackGetResourceLength, resource);
-		}
-	}
-
-	/**
-	 * Callback for animation duration resource
-	 * @param {integer} length the animation length
-	 * @param {string} resource the resource name
-	 */
-	callbackGetResourceLength(length, resource) {
-		client.resources[resource]["duration"] = length;
-	}
-
-	/**
-	 * Callback for sfx resources.
-	 * @param {boolean} result the audio is existed or not
-	 * @param {string} resource the resource name
-	 * @param {string} src the url of resource
-	 */
-	callbackLoadSFXResources(result, resource, src) {
-		if (result) {
-			client.resources[resource]["sfx"] = src;
-		}
+			// Check if sfx exists and replace `sfx` with an absolute URL
+			if (resource.sfx) {
+				const sfxSrc = AO_HOST + resource.sfx.toLowerCase();
+				if (await fileExists(sfxSrc)) {
+					resource.sfx = sfxSrc;
+				}
+			}
+		});
 	}
 
 	/**
@@ -348,14 +329,14 @@ class Client {
 	 */
 	initialObservBBCode() {
 		const target = document.getElementById("client_inner_chat");
-		const observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+		const observer = new MutationObserver(mutations => {
+			mutations.forEach(mutation => {
 				const children = mutation.addedNodes;
 				if (children !== null) {
 					children.forEach(function (node) {
-						if (node.tagName == "C") {
+						if (node.tagName === "C") {
 							node.style.color = node.getAttribute("a");
-						} else if (node.tagName == "M") {
+						} else if (node.tagName === "M") {
 							if (node.hasAttribute("a")) {
 								node.style.backgroundColor = node.getAttribute("a");
 							} else {
@@ -400,7 +381,7 @@ class Client {
 	/**
 	 * Triggered when a connection is established to the server.
 	 */
-	onOpen(e) {
+	onOpen(_e) {
 		// XXX: Why does watching mean just SITTING there and doing nothing?
 		if (mode === "watch") {
 			document.getElementById("client_loading").style.display = "none";
@@ -428,15 +409,14 @@ class Client {
 	 * @param {MessageEvent} e
 	 */
 	onMessage(e) {
-		let msg = e.data;
+		const msg = e.data;
 		console.debug(msg);
-		let lines = msg.split("%");
-		let args = lines[0].split("#");
-		let header = args[0];
-		let handler = this.handlers[header];
-		if (typeof handler !== "undefined") {
-			handler(args);
-		} else {
+
+		const lines = msg.split("%");
+		const args = lines[0].split("#");
+		const header = args[0];
+
+		if (!this.emit(header, args)) {
 			console.warn(`Invalid packet header ${header}`);
 		}
 	}
@@ -455,10 +435,9 @@ class Client {
 	cleanup() {
 		try {
 			this.serv.close(1001);
-		} catch (e) {
-			// I don't care if this errors
+		} finally {
+			clearInterval(this.checkUpdater);
 		}
-		clearInterval(this.checkUpdater);
 	}
 
 	/**
@@ -476,7 +455,7 @@ class Client {
 	 */
 	handleMS(args) {
 		// TODO: this if-statement might be a bug.
-		if (args[4] != viewport.chatmsg.content) {
+		if (args[4] !== viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
 			const chatmsg = {
 				// pre: escape(args[2]),
@@ -502,13 +481,13 @@ class Client {
 
 			// The dreaded linear search...
 			for (let i = 0; i < this.chars.length; i++) {
-				if (this.chars[i].name == args[3]) {
+				if (this.chars[i].name === args[3]) {
 					chatmsg.character = i;
 					break;
 				}
 			}
 
-			if (chatmsg.character == this.charID) {
+			if (chatmsg.character === this.charID) {
 				resetICParams();
 			}
 
@@ -533,15 +512,16 @@ class Client {
 	 * @param {Array} args packet arguments
 	 */
 	handleMC(args) {
+		const [ _packet, track, charID ] = args;
 		const music = viewport.music;
 		music.pause();
-		music.src = MUSIC_HOST + args[1].toLowerCase();
+		music.src = MUSIC_HOST + track.toLowerCase();
 		music.play();
 		if (args[2] >= 0) {
-			let musicname = this.chars[args[2]].name;
-			appendICLog(`${musicname} changed music to ${args[1]}`);
+			const musicname = this.chars[charID].name;
+			appendICLog(`${musicname} changed music to ${track}`);
 		} else {
-			appendICLog(`The music was changed to ${args[1]}`);
+			appendICLog(`The music was changed to ${track}`);
 		}
 	}
 
@@ -571,13 +551,13 @@ class Client {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Character " + args[1];
 		this.serv.send("AN#" + ((args[1] / 10) + 1) + "#%");
 		for (let i = 2; i < args.length - 1; i++) {
-			if (i % 2 == 0) {
-				let chargs = args[i].split("&");
+			if (i % 2 === 0) {
+				const chargs = args[i].split("&");
 				this.chars[args[i - 1]] = {
-					"name": chargs[0],
-					"desc": chargs[1],
-					"evidence": chargs[3],
-					"icon": AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png"
+					name: chargs[0],
+					desc: chargs[1],
+					evidence: chargs[3],
+					icon: AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png"
 				};
 			}
 		}
@@ -591,12 +571,12 @@ class Client {
 	handleSC(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Characters";
 		for (let i = 1; i < args.length - 1; i++) {
-			let chargs = args[i].split("&");
+			const chargs = args[i].split("&");
 			this.chars[i - 1] = {
-				"name": chargs[0],
-				"desc": chargs[1],
-				"evidence": chargs[3],
-				"icon": AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png"
+				name: chargs[0],
+				desc: chargs[1],
+				evidence: chargs[3],
+				icon: AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png"
 			};
 		}
 		this.serv.send("RM#%");
@@ -626,10 +606,10 @@ class Client {
 		for (let i = 1; i < args.length - 1; i++) {
 			const arg = args[i].split("&");
 			this.evidences[i - 1] = {
-				"name": decodeChat(unescapeChat(arg[0])),
-				"desc": decodeChat(unescapeChat(arg[1])),
-				"filename": escape(arg[2]),
-				"icon": AO_HOST + "evidence/" + escape(arg[2].toLowerCase())
+				name: decodeChat(unescapeChat(arg[0])),
+				desc: decodeChat(unescapeChat(arg[1])),
+				filename: escape(arg[2]),
+				icon: AO_HOST + "evidence/" + escape(arg[2].toLowerCase())
 			};
 		}
 
@@ -652,10 +632,10 @@ class Client {
 	handleEM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music " + args[1];
 		this.serv.send("AM#" + ((args[1] / 10) + 1) + "#%");
-		let hmusiclist = document.getElementById("client_musiclist");
+		const hmusiclist = document.getElementById("client_musiclist");
 		for (let i = 2; i < args.length - 1; i++) {
-			if (i % 2 == 0) {
-				let newentry = document.createElement("OPTION");
+			if (i % 2 === 0) {
+				const newentry = document.createElement("OPTION");
 				newentry.text = args[i];
 				hmusiclist.options.add(newentry);
 			}
@@ -733,7 +713,7 @@ class Client {
 	 * 
 	 * @param {Array} args packet arguments
 	 */
-	handleDONE(args) {
+	handleDONE(_args) {
 		document.getElementById("client_loading").style.display = "none";
 		document.getElementById("client_charselect").style.display = "block";
 	}
@@ -747,11 +727,11 @@ class Client {
 		const bg_index = getIndexFromSelect("bg_select", escape(args[1]));
 		document.getElementById("bg_select").selectedIndex = bg_index;
 		updateBackgroundPreview();
-		if (bg_index == 0) {
+		if (bg_index === 0) {
 			document.getElementById("bg_filename").value = args[1];
 		}
 		document.getElementById("bg_preview").src = AO_HOST + "background/" + escape(args[1].toLowerCase()) + "/defenseempty.png";
-		if (this.charID == -1) {
+		if (this.charID === -1) {
 			changeBackground("jud");
 		} else {
 			changeBackground(this.chars[this.charID].side);
@@ -759,7 +739,7 @@ class Client {
 
 	}
 
-	handleNBG(args) {
+	handleNBG(_args) {
 		// TODO (set by sD)
 	}
 
@@ -769,7 +749,7 @@ class Client {
 	 */
 	handleHP(args) {
 		const percent_hp = args[2] * 10;
-		if (args[1] == 1) {
+		if (args[1] === 1) {
 			// Def hp
 			this.hp[0] = args[2];
 			$("#client_defense_hp > .health-bar").animate({
@@ -789,7 +769,7 @@ class Client {
 	 * @param {Array} args packet arguments
 	 */
 	handleRT(args) {
-		if (args[1] == "testimony1") {
+		if (args[1] === "testimony1") {
 			//Witness Testimony
 			this.testimonyID = 1;
 		} else {
@@ -819,7 +799,7 @@ class Client {
 		this.playerID = args[1];
 	}
 
-	handlePN(args) {
+	handlePN(_args) {
 		this.serv.send("askchaa#%");
 	}
 
@@ -828,7 +808,7 @@ class Client {
 	 * but we use it as a cue to begin retrieving characters.
 	 * @param {Array} args packet arguments
 	 */
-	handleSI(args) {
+	handleSI(_args) {
 		if (oldLoading) {
 			this.serv.send("askchar2#%");
 		} else {
@@ -844,20 +824,20 @@ class Client {
 		document.getElementById("client_chartable").innerHTML = "";
 		let tr;
 		for (let i = 0; i < this.chars.length; i++) {
-			if (i % CHAR_SELECT_WIDTH == 0) {
+			if (i % CHAR_SELECT_WIDTH === 0) {
 				tr = document.createElement("TR");
 			}
 			const td = document.createElement("TD");
 			let icon_chosen = "";
 			const thispick = this.chars[i].icon;
-			if (args[i + 1] == "-1") {
+			if (args[i + 1] === "-1") {
 				icon_chosen = " dark";
 			}
 			td.innerHTML = `<img class='demothing${icon_chosen}' id='demo_${i}' ` +
 				`src='${thispick}' alt='${this.chars[i].name}' onclick='pickChar(${i})' ` +
 				"onerror='demoError(this);'>";
 			tr.appendChild(td);
-			if (i % CHAR_SELECT_WIDTH == 0) {
+			if (i % CHAR_SELECT_WIDTH === 0) {
 				document.getElementById("client_chartable").appendChild(tr);
 			}
 		}
@@ -868,57 +848,45 @@ class Client {
 	 * Handles the server's assignment of a character for the player to use.
 	 * @param {Array} args packet arguments
 	 */
-	handlePV(args) {
+	async handlePV(args) {
 		this.charID = args[3];
+
 		document.getElementById("client_charselect").style.display = "none";
 		document.getElementById("client_inputbox").style.display = "";
-		const me = this.me();
+
+		const me = this.character;
 		const emotes = this.emotes;
 		const emotesList = document.getElementById("client_emo");
 		emotesList.innerHTML = ""; // Clear emote box
 		emotesList.style.display = "";
-		const xhr = new XMLHttpRequest();
-		xhr.withCredentials = false;
-		xhr.open("GET", AO_HOST + "characters/" + escape(this.me().name.toLowerCase()) + "/char.ini", true);
-		xhr.responseType = "text";
-		xhr.onload = function (e) {
-			if (this.status == 200) {
-				const linifile = this.responseText;
-				const pinifile = INI.parse(linifile);
-				me.side = pinifile.Options.side;
-				updateActionCommands(me.side);
-				for (let i = 1; i <= pinifile.Emotions.number; i++) {
-					const emoteinfo = pinifile.Emotions[i].split("#");
-					let esfx = "0";
-					let esfxd = "0";
-					if (typeof pinifile.SoundN !== "undefined") {
-						esfx = pinifile.SoundN[i];
-					}
-					if (typeof pinifile.SoundT !== "undefined") {
-						esfxd = pinifile.SoundT[i];
-					}
-					// Make sure the asset server is case insensitive, or that everything on it is lowercase
-					emotes[i] = {
-						desc: emoteinfo[0].toLowerCase(),
-						speaking: emoteinfo[1].toLowerCase(),
-						silent: emoteinfo[2].toLowerCase(),
-						zoom: emoteinfo[3],
-						sfx: esfx.toLowerCase(),
-						sfxdelay: esfxd,
-						button_off: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_off.png`,
-						button_on: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_on.png`
-					};
-					emotesList.innerHTML += 
-						`<img src=${emotes[i].button_off}
-						 id="emo_${i}"
-						 alt="${emotes[i].desc}"
-						 class="client_button"
-						 onclick="pickEmotion(${i})">`;
-				}
-				pickEmotion(1);
-			}
-		};
-		xhr.send();
+
+		const data = await request(AO_HOST + "characters/" + escape(this.character.name.toLowerCase()) + "/char.ini");
+		const ini = INI.parse(data);
+		me.side = ini.Options.side;
+		updateActionCommands(me.side);
+		for (let i = 1; i <= ini.Emotions.number; i++) {
+			const emoteinfo = ini.Emotions[i].split("#");
+			const esfx = ini.SoundN ? ini.SoundN[i] : "0";
+			const esfxd = ini.SoundT ? ini.SoundT[i] : "0";
+			// Make sure the asset server is case insensitive, or that everything on it is lowercase
+			emotes[i] = {
+				desc: emoteinfo[0].toLowerCase(),
+				speaking: emoteinfo[1].toLowerCase(),
+				silent: emoteinfo[2].toLowerCase(),
+				zoom: emoteinfo[3],
+				sfx: esfx.toLowerCase(),
+				sfxdelay: esfxd,
+				button_off: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_off.png`,
+				button_on: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_on.png`
+			};
+			emotesList.innerHTML += 
+				`<img src=${emotes[i].button_off}
+					id="emo_${i}"
+					alt="${emotes[i].desc}"
+					class="client_button"
+					onclick="pickEmotion(${i})">`;
+		}
+		pickEmotion(1);
 	}
 }
 
@@ -944,10 +912,8 @@ class Viewport {
 
 		// TODO: read blip type ("gender") from ini
 		this.blipChannels = new Array(6);
-		for (let i = 0; i < this.blipChannels.length; i++) {
-			this.blipChannels[i] = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
-			this.blipChannels[i].volume = 0.5;
-		}
+		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav"))
+			.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
 
 		this.sfxaudio = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
@@ -972,7 +938,7 @@ class Viewport {
 	 * Returns whether or not the viewport is busy
 	 * performing a task (animating).
 	 */
-	isAnimating() {
+	get isAnimating() {
 		return this._animating;
 	}
 
@@ -980,16 +946,14 @@ class Viewport {
 	 * Sets the volume of the blip sound.
 	 * @param {number} volume
 	 */
-	setBlipVolume(volume) {
-		for (let i = 0; i < this.blipChannels.length; i++) {
-			this.blipChannels[i].volume = volume;
-		}
+	set blipVolume(volume) {
+		this.blipChannels.forEach(channel => channel.volume = volume);
 	}
 
 	/**
 	 * Returns the path which the background is located in.
 	 */
-	bgFolder() {
+	get bgFolder() {
 		return `${AO_HOST}background/${this.bgname.toLowerCase()}/`;
 	}
 
@@ -1007,7 +971,7 @@ class Viewport {
 		this._animating = true;
 		clearTimeout(this.updater);
 		// If preanim existed then determine the length
-		if (chatmsg.preanim != "-") {
+		if (chatmsg.preanim !== "-") {
 			chatmsg.preanimdelay = this.getAnimLength(`${AO_HOST}characters/${escape(chatmsg.name.toLowerCase())}/${chatmsg.preanim.toLowerCase()}.gif`, this.initUpdater);
 		} else {
 			this.initUpdater(0);
@@ -1020,73 +984,66 @@ class Viewport {
 	 */
 	initUpdater(animdelay) {
 		viewport.chatmsg.preanimdelay = parseInt(animdelay);
-		viewport.updater = setTimeout(() => viewport.updateText(), UPDATE_INTERVAL);
+		viewport.updater = setTimeout(() => viewport.tick(), UPDATE_INTERVAL);
 	}
 
 	/**
 	 * Intialize testimony updater 
 	 */
 	initTestimonyUpdater() {
-		if (client.testimonyID > 0) {
-			let testimony = "";
-			if (client.testimonyID == 1) {
-				testimony = "witnesstestimony";
-			} else if (client.testimonyID == 2) {
-				testimony = "crossexamination";
-			}
-			(new Audio(client.resources[testimony]["sfx"])).play();
-			this.testimonyTimer = 0;
-			const testimonyOverlay = document.getElementById("client_testimony");
-			testimonyOverlay.src = client.resources[testimony]["src"];
-			testimonyOverlay.style.display = "";
-			this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
+		const testimonyFilenames = {
+			1: "witnesstestimony",
+			2: "crossexamination"
+		};
+
+		const testimony = testimonyFilenames[client.testimonyID];
+		if (!testimony) {
+			console.warn(`Invalid testimony ID ${client.testimonyID}`);
+			return;
 		}
+
+		(new Audio(client.resources[testimony].sfx)).play();
+
+		const testimonyOverlay = document.getElementById("client_testimony");
+		testimonyOverlay.src = client.resources[testimony].src;
+		testimonyOverlay.style.display = "";
+
+		this.testimonyTimer = 0;
+		this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
 	}
 
 	/**
 	 * Gets animation length.
 	 * @param {string} filename the animation file name
-	 * @param {function} callback the callback function
-	 * @param {object} param 
 	 */
-	getAnimLength(filename, callback, param) {
-		const request = new XMLHttpRequest();
-		request.open("GET", filename, true);
-		request.responseType = "arraybuffer";
-		request.addEventListener("load", function () {
-			const gifInfo = gify.getInfo(request.response);
-			console.log(gifInfo["duration"]);
-			// Return animation length
-			callback(gifInfo["duration"], param);
-		});
-		request.send();
+	async getAnimLength(filename) {
+		const file = await request(filename).response;
+		return gify.getInfo(file).duration;
 	}
 
 	/**
 	 * Updates the testimony overaly
 	 */
 	updateTestimony() {
-		//Update timer
+		const testimonyFilenames = {
+			1: "witnesstestimony",
+			2: "crossexamination"
+		};
+
+		// Update timer
 		this.testimonyTimer = this.testimonyTimer + UPDATE_INTERVAL;
 
-		if (client.testimonyID == 1) {
-			//Witness Testimony
-			if (this.testimonyTimer >= client.resources["witnesstestimony"]["duration"]) {
-				//Finish
-				this.disposeTestimony();
-			} else {
-				this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
-			}
-		} else if (client.testimonyID == 2) {
-			//Cross Examination
-			if (this.testimonyTimer >= client.resources["crossexamination"]["duration"]) {
-				//Finish
-				this.disposeTestimony();
-			} else {
-				this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
-			}
-		} else {
+		const testimony = testimonyFilenames[client.testimonyID];
+		const resource = client.resources[testimony];
+		if (!resource) {
 			this.disposeTestimony();
+			return;
+		}
+
+		if (this.testimonyTimer >= resource.duration) {
+			this.disposeTestimony();
+		} else {
+			this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
 		}
 	}
 
@@ -1105,7 +1062,7 @@ class Viewport {
 	 * 
 	 * XXX: This relies on a global variable `this.chatmsg`!
 	 */
-	updateText() {
+	tick() {
 		const nameBox = document.getElementById("client_name");
 		const chatBox = document.getElementById("client_chat");
 		const charSprite = document.getElementById("client_char");
@@ -1115,14 +1072,14 @@ class Viewport {
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
 		// Flip the character
-		if (this.chatmsg.flip == 1) {
+		if (this.chatmsg.flip === 1) {
 			charSprite.style.transform = "scaleX(-1)";
 		} else {
 			charSprite.style.transform = "scaleX(1)";
 		}
 
 		if (this._animating) {
-			this.updater = setTimeout(() => this.updateText(), UPDATE_INTERVAL);
+			this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
 		}
 
 		if (this.chatmsg.isnew) {
@@ -1139,8 +1096,8 @@ class Viewport {
 				"3": "takethat"
 			};
 
-			let shout = shouts[this.chatmsg.objection];
-			if (typeof shout !== "undefined") {
+			const shout = shouts[this.chatmsg.objection];
+			if (shout) {
 				shoutSprite.src = client.resources[shout]["src"];
 				(new Audio(`${AO_HOST}characters/${this.chatmsg.name.toLowerCase()}/${shout}.wav`)).play();
 				this.shoutTimer = 850;
@@ -1154,8 +1111,8 @@ class Viewport {
 
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
 			// Effect stuff
-			if (this.chatmsg.flash == 2) {
-				//Shake screen
+			if (this.chatmsg.flash === 2) {
+				// Shake screen
 				this.sfxaudio.pause();
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-stab.wav";
@@ -1163,8 +1120,8 @@ class Viewport {
 				$("#client_gamewindow").effect("shake", {
 					"direction": "up"
 				});
-			} else if (this.chatmsg.flash == 1) {
-				//Flash screen
+			} else if (this.chatmsg.flash === 1) {
+				// Flash screen
 				background.style.backgroundColor = "white";
 				this.sfxaudio.pause();
 				this.sfxplayed = 1;
@@ -1173,12 +1130,15 @@ class Viewport {
 				$("#client_gamewindow").effect("pulsate");
 			}
 
-			//Pre-animation stuff
+			// Pre-animation stuff
 			if (this.chatmsg.preanimdelay > 0) {
 				shoutSprite.src = "misc/placeholder.gif";
 				changeBackground(this.chatmsg.side);
-				charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.preanim.toLowerCase() + ".gif";
+				const charName = escape(this.chatmsg.name.toLowerCase());
+				const preanim = this.chatmsg.preanim.toLowerCase();
+				charSprite.src = `${AO_HOST}characters/${charName}/${preanim}.gif`;
 			}
+
 			this.chatmsg.startpreanim = false;
 			this.chatmsg.startspeaking = true;
 		} else if (this.textTimer >= this.shoutTimer + this.chatmsg.preanimdelay && !this.chatmsg.startpreanim) {
@@ -1187,7 +1147,7 @@ class Viewport {
 					// Prepare evidence
 					eviBox.style.backgroundImage = "url('" + client.evidences[this.chatmsg.evidence - 1].icon + "')";
 
-					if (this.chatmsg.side == "def") {
+					if (this.chatmsg.side === "def") {
 						// Only def show evidence on right
 						eviBox.style.right = "1.5em";
 						eviBox.style.left = "initial";
@@ -1228,21 +1188,21 @@ class Viewport {
 				chatBoxInner.style.color = colors[this.chatmsg.color] || "#ffffff";
 				this.chatmsg.startspeaking = false;
 
-				if (this.chatmsg.preanimdelay == 0) {
+				if (this.chatmsg.preanimdelay === 0) {
 					shoutSprite.src = "misc/placeholder.gif";
 					changeBackground(this.chatmsg.side);
 				}
 
 				charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.speaking.toLowerCase() + ".gif";
 
-				if (this.textnow == this.chatmsg.content) {
+				if (this.textnow === this.chatmsg.content) {
 					charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
 					this._animating = false;
 					clearTimeout(this.updater);
 				}
 			} else {
-				if (this.textnow != this.chatmsg.content) {
-					if (this.chatmsg.content.charAt(this.textnow.length) != " ") {
+				if (this.textnow !== this.chatmsg.content) {
+					if (this.chatmsg.content.charAt(this.textnow.length) !== " ") {
 						this.blipChannels[this.currentBlipChannel].play();
 						this.currentBlipChannel++;
 						this.currentBlipChannel %= this.blipChannels.length;
@@ -1254,7 +1214,7 @@ class Viewport {
 					}
 					chatBoxInner.appendChild(document.createTextNode(this.textnow));
 
-					if (this.textnow == this.chatmsg.content) {
+					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
 						charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
@@ -1267,7 +1227,7 @@ class Viewport {
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
 			this.sfxaudio.pause();
 			this.sfxplayed = 1;
-			if (this.chatmsg.sound != "0" && this.chatmsg.sound != "1") {
+			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1") {
 				this.sfxaudio.src = AO_HOST + "sounds/general/" + escape(this.chatmsg.sound.toLowerCase()) + ".wav";
 				this.sfxaudio.play();
 			}
@@ -1278,28 +1238,28 @@ class Viewport {
 
 class INI {
 	static parse(data) {
-		let regex = {
+		const regex = {
 			section: /^\s*\[\s*([^\]]*)\s*\]\s*$/,
 			param: /^\s*([\w.\-_]+)\s*=\s*(.*?)\s*$/,
 			comment: /^\s*;.*$/
 		};
-		let value = {};
-		let lines = data.split(/\r\n|\r|\n/);
-		let section = null;
+		const value = {};
+		const lines = data.split(/\r\n|\r|\n/);
+		let section;
 		lines.forEach(function (line) {
 			if (regex.comment.test(line)) {
 				return;
-			} else if (line.length == 0) {
+			} else if (line.length === 0) {
 				return;
 			} else if (regex.param.test(line)) {
-				let match = line.match(regex.param);
+				const match = line.match(regex.param);
 				if (section) {
 					value[section][match[1]] = match[2];
 				} else {
 					value[match[1]] = match[2];
 				}
 			} else if (regex.section.test(line)) {
-				let match = line.match(regex.section);
+				const match = line.match(regex.section);
 				value[match[1]] = {};
 				section = match[1];
 			}
@@ -1313,7 +1273,7 @@ class INI {
  * @param {KeyboardEvent} event
  */
 export function onOOCEnter(event) {
-	if (event.keyCode == 13) {
+	if (event.keyCode === 13) {
 		client.sendOOC(document.getElementById("client_oocinputbox").value);
 		document.getElementById("client_oocinputbox").value = "";
 	}
@@ -1325,19 +1285,23 @@ window.onOOCEnter = onOOCEnter;
  * @param {KeyboardEvent} event
  */
 export function onEnter(event) {
-	if (event.keyCode == 13) {
-		let mychar = client.me();
-		let myemo = client.myEmote();
-		let myevi = client.myEvidence();
-		let myflip = ((client.flip) ? 1 : 0);
-		let mycolor = document.getElementById("textcolor").value;
+	if (event.keyCode === 13) {
+		const mychar = client.character;
+		const myemo = client.emote;
+		const myevi = client.evidence;
+		const myflip = ((client.flip) ? 1 : 0);
+		const mycolor = document.getElementById("textcolor").value;
 		let ssfxname = "0";
 		let ssfxdelay = "0";
 		if (document.getElementById("sendsfx").checked) {
 			ssfxname = myemo.sfx;
 			ssfxdelay = myemo.sfxdelay;
 		}
-		client.sendIC(myemo.speaking, mychar.name, myemo.silent, document.getElementById("client_inputbox").value, mychar.side, ssfxname, myemo.zoom, ssfxdelay, selectedShout, myevi, myflip, selectedEffect, mycolor);
+
+		client.sendIC(myemo.speaking, mychar.name, myemo.silent,
+			document.getElementById("client_inputbox").value, mychar.side,
+			ssfxname, myemo.zoom, ssfxdelay, selectedShout, myevi, myflip,
+			selectedEffect, mycolor);
 	}
 }
 window.onEnter = onEnter;
@@ -1363,7 +1327,7 @@ function resetICParams() {
  * Triggered when an item on the music list is clicked.
  * @param {MouseEvent} event
  */
-export function musiclist_click(event) {
+export function musiclist_click(_event) {
 	const playtrack = document.getElementById("client_musiclist").value;
 	client.sendMusicChange(playtrack);
 }
@@ -1404,7 +1368,7 @@ window.changeSFXVolume = changeSFXVolume;
  * Triggered by the blip volume slider.
  */
 export function changeBlipVolume() {
-	viewport.setBlipVolume(document.getElementById("client_bvolume").value / 100);
+	viewport.blipVolume = document.getElementById("client_bvolume").value / 100;
 }
 window.changeBlipVolume = changeBlipVolume;
 
@@ -1412,7 +1376,7 @@ window.changeBlipVolume = changeBlipVolume;
  * Triggered when a character icon is clicked in the character selection menu.
  * @param {MouseEvent} event
  */
-export function changeCharacter(event) {
+export function changeCharacter(_event) {
 	client.sendLeaveRoom();
 	document.getElementById("client_charselect").style.display = "block";
 	document.getElementById("client_emo").innerHTML = "";
@@ -1442,22 +1406,50 @@ export function demoError(image) {
 window.demoError = demoError;
 
 /**
+ * Make a GET request for a specific URI.
+ * @param {string} url the URI to be requested
+ * @returns response data
+ * @throws {Error} if status code is not 2xx, or a network error occurs
+ */
+async function request(url) {
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		xhr.addEventListener("error", () => {
+			const err = new Error(`Request for ${url} failed: ${xhr.statusText}`);
+			err.code = xhr.status;
+			reject(err);
+		});
+		xhr.addEventListener("abort", () => {
+			const err = new Error(`Request for ${url} was aborted!`);
+			err.code = xhr.status;
+			reject(err);
+		});
+		xhr.addEventListener("load", () => {
+			if (xhr.status < 200 || xhr.status >= 300) {
+				const err = new Error(`Request for ${url} failed with status code ${xhr.status}`);
+				err.code = xhr.status;
+				reject(err);
+			} else {
+				resolve(xhr.response);
+			}
+		});
+		xhr.open("GET", url, true);
+		xhr.send();
+	});
+}
+
+/**
  * Checks if a file exists at the specified URI.
  * @param {string} url the URI to be checked
- * @param {function} callback the function to be called when finished
- * @param {object} param 
  */
-function fileExists(url, callback, param) {
-	const xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
-			callback(true, param, url);
-		} else {
-			callback(false, param, url);
-		}
-	};
-	xhttp.open("GET", url, true);
-	xhttp.send();
+async function fileExists(url) {
+	try {
+		await request(url);
+		return true;
+	} catch (err) {
+		if (err.code >= 400) return false;
+		else throw err;
+	}
 }
 
 /**
@@ -1466,75 +1458,55 @@ function fileExists(url, callback, param) {
  * Valid positions: `def, pro, hld, hlp, wit, jud`
  * @param {string} position the position to change into
  */
-function changeBackground(position) {
-	let standname;
-	const bgfolder = viewport.bgFolder();
-	document.getElementById("client_fg").style.display = "none";
-	document.getElementById("client_bench").style.display = "none";
-	switch (position) {
-	case "def":
-		document.getElementById("client_court").src = bgfolder + "defenseempty.png";
-		document.getElementById("client_bench").style.display = "block";
-		fileExists(bgfolder + "defensedesk.png", callbackChangeBackground, position);
-		standname = "defense";
-		break;
-	case "pro":
-		document.getElementById("client_court").src = bgfolder + "prosecutorempty.png";
-		document.getElementById("client_bench").style.display = "block";
-		fileExists(bgfolder + "prosecutiondesk.png", callbackChangeBackground, position);
-		standname = "prosecution";
-		break;
-	case "hld":
-		document.getElementById("client_court").src = bgfolder + "helperstand.png";
-		standname = "defense";
-		break;
-	case "hlp":
-		document.getElementById("client_court").src = bgfolder + "prohelperstand.png";
-		standname = "prosecution";
-		break;
-	case "wit":
-		document.getElementById("client_court").src = bgfolder + "witnessempty.png";
-		document.getElementById("client_bench").style.display = "block";
-		fileExists(bgfolder + "stand.png", callbackChangeBackground, position);
-		standname = "prosecution";
-		break;
-	case "jud":
-		document.getElementById("client_court").src = bgfolder + "judgestand.png";
-		standname = "prosecution";
-		break;
-	}
-	if (viewport.chatmsg.type == 5) {
-		document.getElementById("client_bench").style.display = "none";
-		document.getElementById("client_court").src = AO_HOST + "themes/default/" + standname + "_speedlines.gif";
-	}
-}
+async function changeBackground(position) {
+	const bgfolder = viewport.bgFolder;
 
-/**
- * Callback for desk resource
- * 
- * Valid positions: `def, pro, hld, hlp, wit, jud`
- * @param {boolean} result the image is existed or not
- * @param {string} position the position to change into
- */
-function callbackChangeBackground(result, position) {
-	let bgfolder = viewport.bgFolder();
-	if (position == "def") {
-		if (result) {
-			document.getElementById("client_bench").src = bgfolder + "defensedesk.png";
-		} else {
-			document.getElementById("client_bench").src = bgfolder + "bancodefensa.png";
+	const positions = {
+		def: {
+			bg: "defenseempty.png",
+			desk: { ao2: "defensedesk.png", ao1: "bancodefensa.png" },
+			speedLines: "defense_speedlines.gif" 
+		},
+		pro: {
+			bg: "prosecutorempty.png",
+			desk: { ao2: "prosecutiondesk.png", ao1: "bancoacusacion.png" },
+			speedLines: "prosecution_speedlines.gif"
+		},
+		hld: {
+			bg: "helperstand.png",
+			desk: null,
+			speedLines: "defense_speedlines.gif"
+		},
+		hlp: {
+			bg: "prohelperstand.png",
+			desk: null,
+			speedLines: "prosecution_speedlines.gif"
+		},
+		wit: {
+			bg: "witnessempty.png",
+			desk: { ao2: "stand.png", ao1: "estrado.png" },
+			speedLines: "prosecution_speedlines.gif"
+		},
+		jud: {
+			bg: "judgestand.png",
+			desk: null,
+			speedLines: "prosecution_speedlines.gif"
 		}
-	} else if (position == "pro") {
-		if (result) {
-			document.getElementById("client_bench").src = bgfolder + "prosecutiondesk.png";
+	};
+
+	const { bg, desk, speedLines } = positions[position];
+	document.getElementById("client_fg").style.display = "none";
+	
+	if (viewport.chatmsg.type === 5) {
+		document.getElementById("client_court").src = `${AO_HOST}themes/default/${speedLines}`;
+	} else {
+		document.getElementById("client_court").src = bgfolder + bg;
+		if (desk) {
+			const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
+			document.getElementById("client_bench").src = bgfolder + deskFilename;
+			document.getElementById("client_bench").style.display = "block";
 		} else {
-			document.getElementById("client_bench").src = bgfolder + "bancoacusacion.png";
-		}
-	} else if (position == "wit") {
-		if (result) {
-			document.getElementById("client_bench").src = bgfolder + "stand.png";
-		} else {
-			document.getElementById("client_bench").src = bgfolder + "estrado.png";
+			document.getElementById("client_bench").style.display = "none";
 		}
 	}
 }
@@ -1562,16 +1534,16 @@ window.RetryButton = RetryButton;
 
 /**
  * Appends a message to the in-character chat log.
- * @param {string} toadd the string to be added
+ * @param {string} msg the string to be added
  * @param {string} name the name of the sender
  */
-function appendICLog(toadd, name = "", time = new Date()) {
+function appendICLog(msg, name = "", time = new Date()) {
 	const entry = document.createElement("p");
 	const nameField = document.createElement("span");
 	nameField.id = "iclog_name";
 	nameField.appendChild(document.createTextNode(name));
 	entry.appendChild(nameField);
-	entry.appendChild(document.createTextNode(toadd));
+	entry.appendChild(document.createTextNode(msg));
 
 	// Only put a timestamp if the minute has changed.
 	if (lastICMessageTime.getMinutes() !== time.getMinutes()) {
@@ -1587,6 +1559,7 @@ function appendICLog(toadd, name = "", time = new Date()) {
 	const clientLog = document.getElementById("client_log");
 	clientLog.appendChild(entry);
 
+	/* This is a little buggy - some troubleshooting might be desirable */
 	if (clientLog.scrollTop > clientLog.scrollHeight - 800) {
 		clientLog.scrollTop = clientLog.scrollHeight;
 	}
@@ -1596,7 +1569,8 @@ function appendICLog(toadd, name = "", time = new Date()) {
 
 /**
  * Requests to play as a character.
- * @param {number} ccharacter the character ID; if this is a large number, then spectator is chosen instead.
+ * @param {number} ccharacter the character ID; if this is a large number,
+ * then spectator is chosen instead.
  */
 export function pickChar(ccharacter) {
 	if (ccharacter < 1000) {
@@ -1615,11 +1589,11 @@ window.pickChar = pickChar;
  * @param {string} emo the new emotion to be selected
  */
 export function pickEmotion(emo) {
-	if (client.selectedEmote != -1) {
-		document.getElementById("emo_" + client.selectedEmote).src = client.myEmote().button_off;
+	if (client.selectedEmote !== -1) {
+		document.getElementById("emo_" + client.selectedEmote).src = client.emote.button_off;
 	}
 	client.selectedEmote = emo;
-	document.getElementById("emo_" + emo).src = client.myEmote().button_on;
+	document.getElementById("emo_" + emo).src = client.emote.button_on;
 }
 window.pickEmotion = pickEmotion;
 
@@ -1640,10 +1614,10 @@ export function pickEvidence(evidence) {
 		document.getElementById("evi_name").value = client.evidences[evidence - 1].name;
 		document.getElementById("evi_desc").value = client.evidences[evidence - 1].desc;
 
-		//Update Icon
-		let icon_id = getIndexFromSelect("evi_select", client.evidences[evidence - 1].filename);
+		// Update icon
+		const icon_id = getIndexFromSelect("evi_select", client.evidences[evidence - 1].filename);
 		document.getElementById("evi_select").selectedIndex = icon_id;
-		if (icon_id == 0) {
+		if (icon_id === 0) {
 			document.getElementById("evi_filename").value = client.evidences[evidence - 1].filename;
 		}
 		updateEvidenceIcon();
@@ -1663,10 +1637,10 @@ window.pickEvidence = pickEvidence;
  * Add evidence.
  */
 export function addEvidence() {
-	let evidence_select = document.getElementById("evi_select");
+	const evidence_select = document.getElementById("evi_select");
 	client.sendPE(document.getElementById("evi_name").value,
 		document.getElementById("evi_desc").value,
-		evidence_select.selectedIndex == 0 ?
+		evidence_select.selectedIndex === 0 ?
 			document.getElementById("evi_filename").value :
 			evidence_select.options[evidence_select.selectedIndex].text
 	);
@@ -1678,12 +1652,12 @@ window.addEvidence = addEvidence;
  * Edit selected evidence.
  */
 export function editEvidence() {
-	let evidence_select = document.getElementById("evi_select");
-	let id = parseInt(client.selectedEvidence) - 1;
+	const evidence_select = document.getElementById("evi_select");
+	const id = parseInt(client.selectedEvidence) - 1;
 	client.sendEE(id,
 		document.getElementById("evi_name").value,
 		document.getElementById("evi_desc").value,
-		evidence_select.selectedIndex == 0 ?
+		evidence_select.selectedIndex === 0 ?
 			document.getElementById("evi_filename").value :
 			evidence_select.options[evidence_select.selectedIndex].text
 	);
@@ -1695,7 +1669,7 @@ window.editEvidence = editEvidence;
  * Delete selected evidence.
  */
 export function deleteEvidence() {
-	let id = parseInt(client.selectedEvidence) - 1;
+	const id = parseInt(client.selectedEvidence) - 1;
 	client.sendDE(id);
 	cancelEvidence();
 }
@@ -1736,7 +1710,7 @@ export function getIndexFromSelect(select_box, value) {
 	//Find if icon alraedy existed in select box
 	const select_element = document.getElementById(select_box);
 	for (let i = 1; i < select_element.length; ++i) {
-		if (select_element.options[i].value == value) {
+		if (select_element.options[i].value === value) {
 			return i;
 		}
 	}
@@ -1748,9 +1722,9 @@ window.getIndexFromSelect = getIndexFromSelect;
  * Update evidence icon.
  */
 export function updateEvidenceIcon() {
-	let evidence_select = document.getElementById("evi_select");
-	let evidence_filename = document.getElementById("evi_filename");
-	let evidence_iconbox = document.getElementById("evi_icon");
+	const evidence_select = document.getElementById("evi_select");
+	const evidence_filename = document.getElementById("evi_filename");
+	const evidence_iconbox = document.getElementById("evi_icon");
 
 	if (evidence_select.selectedIndex === 0) {
 		evidence_filename.style.display = "initial";
@@ -1766,16 +1740,17 @@ window.updateEvidenceIcon = updateEvidenceIcon;
  * Update evidence icon.
  */
 export function updateActionCommands(side) {
-	if (side == "jud") {
+	if (side === "jud") {
 		document.getElementById("judge_action").style.display = "inline-table";
 		document.getElementById("no_action").style.display = "none";
 	} else {
-		document.getElementById("no_action").style.display = "inline-table";
 		document.getElementById("judge_action").style.display = "none";
+		document.getElementById("no_action").style.display = "inline-table";
 	}
-	//Update role selector
+
+	// Update role selector
 	for (let i = 0, role_select = document.getElementById("role_select").options; i < role_select.length; i++) {
-		if (side == role_select[i].value) {
+		if (side === role_select[i].value) {
 			role_select.selectedIndex = i;
 			return;
 		}
@@ -1787,15 +1762,17 @@ window.updateActionCommands = updateActionCommands;
  * Change background via OOC.
  */
 export function changeBackgroundOOC() {
-	let filename = "",
-		background_select = document.getElementById("bg_select"),
-		bg_command = document.getElementById("bg_command").value;
-	if (background_select.selectedIndex == 0) {
-		filename = document.getElementById("bg_filename").value;
+	const selectedBG = document.getElementById("bg_select");
+	const changeBGCommand = document.getElementById("bg_command").value;
+	const bgFilename = document.getElementById("bg_filename");
+
+	let filename = "";
+	if (selectedBG.selectedIndex === 0) {
+		filename = bgFilename.value;
 	} else {
-		filename = background_select.value;
+		filename = selectedBG.value;
 	}
-	client.sendOOC("/" + bg_command.replace("$1", filename));
+	client.sendOOC("/" + changeBGCommand.replace("$1", filename));
 }
 window.changeBackgroundOOC = changeBackgroundOOC;
 
@@ -1803,8 +1780,8 @@ window.changeBackgroundOOC = changeBackgroundOOC;
  * Change role via OOC.
  */
 export function changeRoleOOC() {
-	let role_select = document.getElementById("role_select"),
-		role_command = document.getElementById("role_command").value;
+	const role_select = document.getElementById("role_select");
+	const role_command = document.getElementById("role_command").value;
 
 	client.sendOOC("/" + role_command.replace("$1", role_select.value));
 	updateActionCommands(role_select.value);
@@ -1879,11 +1856,11 @@ window.redHPP = redHPP;
  * Update background preview.
  */
 export function updateBackgroundPreview() {
-	let background_select = document.getElementById("bg_select");
-	let background_filename = document.getElementById("bg_filename");
-	let background_preview = document.getElementById("bg_preview");
+	const background_select = document.getElementById("bg_select");
+	const background_filename = document.getElementById("bg_filename");
+	const background_preview = document.getElementById("bg_preview");
 
-	if (background_select.selectedIndex == 0) {
+	if (background_select.selectedIndex === 0) {
 		background_filename.style.display = "initial";
 		background_preview.src = AO_HOST + "background/" + background_filename.value.toLowerCase() + "/defenseempty.png";
 	} else {
@@ -1899,7 +1876,7 @@ window.updateBackgroundPreview = updateBackgroundPreview;
  * @param {string} effect the new effect to be selected
  */
 export function toggleEffect(effect) {
-	if (effect == selectedEffect) {
+	if (effect === selectedEffect) {
 		document.getElementById("button_effect_" + effect).className = "client_button";
 		selectedEffect = 0;
 	} else {
@@ -1943,7 +1920,7 @@ window.togglePresent = togglePresent;
  * @param {string} menu the menu to be selected
  */
 export function toggleMenu(menu) {
-	if (menu != selectedMenu) {
+	if (menu !== selectedMenu) {
 		document.getElementById("menu_" + menu).className = "menu_icon active";
 		document.getElementById("content_" + menu).className = "menu_content active";
 		document.getElementById("menu_" + selectedMenu).className = "menu_icon";
@@ -1959,7 +1936,7 @@ window.toggleMenu = toggleMenu;
  * @param {string} shout the new shout to be selected
  */
 export function toggleShout(shout) {
-	if (shout == selectedShout) {
+	if (shout === selectedShout) {
 		document.getElementById("button_" + shout).className = "client_button";
 		selectedShout = 0;
 	} else {
@@ -2016,14 +1993,14 @@ function unescapeChat(estring) {
  * @param {string} estring the string to be encoded
  */
 function encodeChat(estring) {
-	let selectedEncoding = document.getElementById("client_encoding").value;
-	if (selectedEncoding == "unicode") {
+	const selectedEncoding = document.getElementById("client_encoding").value;
+	if (selectedEncoding === "unicode") {
 		// This approach works by escaping all special characters to Unicode escape sequences.
 		// Source: https://gist.github.com/mathiasbynens/1243213
 		return estring.replace(/[^\0-~]/g, function (ch) {
 			return "\\u" + ("000" + ch.charCodeAt().toString(16)).slice(-4);
 		});
-	} else if (selectedEncoding == "utf16") {
+	} else if (selectedEncoding === "utf16") {
 		// Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
 		const buffer = new ArrayBuffer(estring.length * 2);
 		const result = new Uint16Array(buffer);
@@ -2035,22 +2012,19 @@ function encodeChat(estring) {
 		return estring;
 	}
 }
-function hash6ode() {
-	return uid;
-}
 
 /**
  * Decodes text on client side.
  * @param {string} estring the string to be decoded
  */
 function decodeChat(estring) {
-	let selectedDecoding = document.getElementById("client_decoding").value;
-	if (selectedDecoding == "unicode") {
+	const selectedDecoding = document.getElementById("client_decoding").value;
+	if (selectedDecoding === "unicode") {
 		// Source: https://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode
 		return estring.replace(/\\u([\d\w]{1,})/gi, function (match, group) {
 			return String.fromCharCode(parseInt(group, 16));
 		});
-	} else if (selectedDecoding == "utf16") {
+	} else if (selectedDecoding === "utf16") {
 		// Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
 		return String.fromCharCode.apply(null, new Uint16Array(estring.split(",")));
 	} else {
@@ -2076,28 +2050,6 @@ function decodeBBCode(estring) {
 		.replace(/\[c=?([#a-zA-Z0-9]+)\]/g, "<c a=\"$1\">") // Color [c=red]
 		.replace(/\[\/c\]/g, "</c>"); // [/c]
 }
-
-
-// TODO: Possibly safe to remove, since we are using a transpiler.
-if (typeof (String.prototype.trim) === "undefined") {
-	String.prototype.trim = function () {
-		return String(this).replace(/^\s+|\s+$/g, "");
-	};
-}
-
-// Used for HDID calculation.
-function hashCode() {
-	let hash = 0;
-	let hashString = navigator.userAgent;
-	if (hashString.length === 0) return hash;
-	for (let i = 0; i < hashString.length; i++) {
-		const chr = hashString.charCodeAt(i);
-		hash = ((hash << 5) - hash) + chr;
-		hash |= 0; // Convert to 32bit integer
-	}
-	return hash;
-};
-
 
 //
 // Client code
@@ -2131,7 +2083,7 @@ $(function () {
 		modal: true,
 		buttons: {
 			Sure: function () {
-				let reason = prompt("Please enter the reason", "");
+				const reason = prompt("Please enter the reason", "");
 				client.sendZZ(reason);
 				$(this).dialog("close");
 			},

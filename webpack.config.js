@@ -1,9 +1,15 @@
+/* eslint-env node */
+
+const path = require('path');
+
 module.exports = {
     entry: {
         ui: './webAO/ui.js',
-        client: './webAO/client.js'
+        client: './webAO/client.js',
+        master: './webAO/master.js'
     },
     output: {
+        path: path.resolve(__dirname, 'webAO'),
         filename: '[name].b.js'
     },
     module: {
@@ -14,7 +20,15 @@ module.exports = {
             use: {
               loader: 'babel-loader',
               options: {
-                presets: ['@babel/preset-env']
+                presets: [
+                  [
+                    '@babel/preset-env', {
+                      useBuiltIns: 'usage',
+                      targets: 'defaults',
+                      corejs: 3
+                    }
+                  ]
+                ]
               }
             }
           }
@@ -22,4 +36,4 @@ module.exports = {
       },
 
     devtool: 'source-map'
-}
+};
