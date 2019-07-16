@@ -243,6 +243,10 @@ img {
 	color: white;
 }
 
+#client_inputbox {
+	padding: 4px;
+}
+
 .long {
 	width: 100%;
 	background-color: #dddddd;
