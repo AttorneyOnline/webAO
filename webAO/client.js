@@ -1155,7 +1155,7 @@ class Viewport {
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-realization.wav";
 				this.sfxaudio.play();
-				$("#client_gamewindow").effect("pulsate",{times:1});
+				$("#client_gamewindow").effect("pulsate",{times:1},200);
 			}
 
 			// Pre-animation stuff
