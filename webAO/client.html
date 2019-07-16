@@ -1,110 +1,327 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-    <title>Attorney Online session</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="client.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <!--<script src="golden/js/goldenlayout.js"></script>-->
-    <link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
-    <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css" />
-    <script src="ui.b.js"></script>
-    <script src="client.b.js"></script>
+<html lang="en">
+
+<head>
+	<title>Attorney Online session</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="client.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
+	<link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css" />
+	<link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<script src="lib/jquery.ui.touch-punch.min.js"></script>
+	<script src="lib/jdataview.min.js"></script>
+	<script src="lib/gify.min.js"></script>
+	<script src="ui.b.js"></script>
+	<script src="client.b.js"></script>
 </head>
 
 <template id="client_wrapper">
-    <meta name="frame-title" lang="en" content="Game">
-    <div id="client_gamewindow">
-        <img id="client_court" alt="Courtroom background" onerror="imgError(this);">
-        <img id="client_char" alt="Character sprite" onerror="imgError(this);">
-        <img id="client_bench" alt="Bench overlay">
-        <img id="client_fg" alt="Various overlay" onerror="imgError(this);">
-        <div id="client_name">
-            <p>Dolan</p>
-        </div>
-        <div id="client_chat">
-            <p id="client_inner_chat"></p>
-        </div>
-    </div>
-    <input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)" style="padding-left: 1px; padding-right: 1px;">
-    <div id="client_emo">
-    </div>
-    <br>
-    <div id="client_buttons">
-        <img src="misc/holdit.png" id="button_1" alt="Hold it!" class="client_button" onclick="toggleshout(1)">
-        <img src="misc/objection.png" id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleshout(2)">
-        <img src="misc/takethat.png" id="button_3" alt="Take That!" class="client_button" onclick="toggleshout(3)">
-        <br>
-        <input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
-        <label for="sendsfx">SFX</label>
-    </div>
+	<meta name="frame-title" lang="en" content="Game">
+	<div id="client_background"></div>
+	<div id="client_gamewindow">
+		<img id="client_court" alt="Courtroom background" onerror="imgError(this);">
+		<img id="client_char" onerror="imgError(this);">
+		<img id="client_bench">
+		<img id="client_fg" alt="Various overlay" onerror="imgError(this);">
+		<img id="client_evi" src="misc/evidence_selector.png" alt="Character Evidence" onerror="imgError(this);">
+		<img id="client_shout" alt="Effect overlay" src="misc/placeholder.gif" onerror="imgError(this);">
+		<div id="client_name">
+			<p>Dolan</p>
+		</div>
+		<div id="client_chat">
+			<p id="client_inner_chat"></p>
+		</div>
+		<img id="client_testimony" alt="Testimony overlay" style="display: none;" onerror="imgError(this);">
+	</div>
+	<input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)" style="padding-left: 1px; padding-right: 1px;" placeholder="Say something&hellip;">
+	<meta name="frame-title" lang="en" content="Miscellaneous">
+	<div id="client_bars">
+		<span id="client_defense_hp" class="health-box">
+			<div class="health-bar"></div>
+		</span>
+		<span id="client_prosecutor_hp" class="health-box">
+			<div class="health-bar"></div>
+		</span>
+	</div>
+	<div id="client_emo">
+	</div>
+	<br>
+	<div id="client_buttons">
+		<img src="misc/holdit.png" id="button_1" alt="Hold it!" class="client_button" onclick="toggleShout(1)">
+		<img src="misc/objection.png" id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleShout(2)">
+		<img src="misc/takethat.png" id="button_3" alt="Take That!" class="client_button" onclick="toggleShout(3)">
+		<br>
+		<br>
+		<label for="textcolor">Text Color:</label>
+		<select id="textcolor" name="textcolor">
+			<option value="0">Default</option>
+			<option value="1">Green</option>
+			<option value="2">Red</option>
+			<option value="3">Orange</option>
+			<option value="4">Blue</option>
+			<option value="5">Yellow</option>
+			<option value="6">Margenta</option>
+		</select>
+		<label for="sendsfx">SFX</label>
+		<input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
+		<br>
+		<br>
+		<img src="misc/flip.png" id="button_flip" alt="Flip" class="client_button" onclick="toggleFlip()">
+		<img src="misc/flash.png" id="button_effect_1" alt="Flash" class="client_button" onclick="toggleEffect(1)">
+		<img src="misc/shake.png" id="button_effect_2" alt="Shake" class="client_button" onclick="toggleEffect(2)">
+	</div>
+	<fieldset style="margin:10px;">
+		<legend>Actions</legend>
+		<!-- Judge Commands -->
+		<span id="judge_action" style="display:none">
+			<span id="menu_wt" onclick="initWT()" class="menu_icon">
+				<i class="material-icons em-3">record_voice_over</i>
+				<div>Witness
+					<br>Testimony</div>
+			</span>
+			<span id="menu_ce" onclick="initCE()" class="menu_icon">
+				<i class="material-icons em-3">question_answer</i>
+				<div>Cross
+					<br>Examination</div>
+			</span>
+			<br>
+			<span style="display:inline-block; vertical-align: middle;">
+				<span id="menu_ahpd" onclick="addHPD()" class="menu_icon">
+					<i class="material-icons em1-5">add_circle</i>
+				</span>
+				<span style="font-size: 1.25em">Defense</span>
+				<span id="menu_rhpd" onclick="redHPD()" class="menu_icon">
+					<i class="material-icons em1-5">remove_circle</i>
+				</span>
+			</span>
+			<span style="display:inline-block; vertical-align: middle;">
+				<span id="menu_ahpp" onclick="addHPP()" class="menu_icon">
+					<i class="material-icons em-1-5">add_circle</i>
+				</span>
+				<span style="font-size: 1.25em">Prosecution</span>
+				<span id="menu_rhpp" onclick="redHPP()" class="menu_icon">
+					<i class="material-icons em-1-5">remove_circle</i>
+				</span>
+			</span>
+		</span>
+		<!-- No Commands -->
+		<span id="no_action">
+			No actions available for this role.
+		</span>
+	</fieldset>
 </template>
 
-<template id="client_settings">
-    <meta name="frame-title" lang="en" content="Settings">
-    <div class="slider">Music<input id="client_mvolume" class="long" type="range" min="0" max="100" value="80" onchange="changeMusicVolume()"></div>
-    <div class="slider">SFX <input id="client_svolume" class="long" type="range" min="0" max="100" value="70" onchange="changeSFXVolume()"></div>
-    <div class="slider">Blip <input id="client_bvolume" class="long" type="range" min="0" max="100" value="60" onchange="changeBlipVolume()"></div>
-    <input id="change_character" type="button" onclick="changeCharacter()" value="Change character">
+<template id="mainmenu">
+	<meta name="frame-title" lang="en" content="Log">
+	<div id="client_menu">
+		<div class="hrtext">Main Menu</div>
+		<span id="menu_1" onclick="toggleMenu(1)" class="menu_icon active">
+			<i class="material-icons em-3">room</i>
+			<div>Areas</div>
+		</span>
+		<span id="menu_2" onclick="toggleMenu(2)" class="menu_icon">
+			<i class="material-icons em-3">work</i>
+			<div>Evidence</div>
+		</span>
+		<span id="menu_3" onclick="toggleMenu(3)" class="menu_icon">
+			<i class="material-icons em-3">settings</i>
+			<div>Settings</div>
+		</span>
+		<span id="menu_4" onclick="toggleMenu(4)" class="menu_icon">
+			<i class="material-icons em-3">person</i>
+			<div>About</div>
+		</span>
+		<span id="menu_cm" onclick="callMod()" class="menu_icon">
+			<i class="material-icons em-3" style="color: #ce2727;">report</i>
+			<div>Call Mod</div>
+		</span>
+		<div class="hrtext">
+			<span id="content_name">Content</span>
+		</div>
+			<!-- Areas section -->
+			<span class="menu_content active" id="content_1">
+				<meta name="frame-title" lang="en" content="Areas">
+				<div id="areas"></div>
+				<br>
+				<fieldset style="text-align: left">
+					<legend>Current Area Background</legend>
+					<span>
+						<img id="bg_preview" src="misc/placeholder.gif" alt="Background Preview" onerror="imgError(this);">
+					</span>
+					<span style="display:inline-block">
+						<label for="bg_filename">Background:</label>
+						<br>
+						<select id="bg_select" name="bg_select" onchange="updateBackgroundPreview()" style="margin-top:10px"></select>
+						<br>
+						<input id="bg_filename" name="bg_filename" class="short" type="text" style="margin-top:10px">
+						<br>
+						<br>
+						<img src="misc/location_change.png" id="bg_change" alt="Change" class="client_button hover_button" onclick="changeBackgroundOOC()">
+					</span>
+				</fieldset>
+			</span>
+
+			<!--  Evidence section  -->
+			<span class="menu_content" id="content_2">
+				<meta name="frame-title" lang="en" content="Evidence">
+				<fieldset style="text-align: left; display: flex; flex-direction: column;">
+					<legend>Information</legend>
+					<div style="display: flex;">
+						<img id="evi_icon" src="misc/evidence_selector.png" alt="Evidence Icon" onerror="imgError(this);">
+						<div id="evi_options">
+							<label for="evi_filename">Icon:</label>
+							<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
+							<input id="evi_filename" name="evi_filename" class="short" type="text" placeholder="Custom filename">
+							<br>
+							<label for="evi_name">Name:</label>
+							<input id="evi_name" name="evi_name" class="short" type="text" placeholder="Evidence name">
+						</div>
+					</div>
+					<div style="display: flex; padding-top: 5px;">
+						<textarea id="evi_desc" name="evi_desc" rows="2" cols="20" placeholder="Evidence description"></textarea>
+					</div>
+					<div style="display: block; text-align: center; padding-top: 20px;">
+						<img src="misc/evidence_add.png" id="evi_add" alt="Add Evidence" class="client_button hover_button" onclick="addEvidence()">
+						<img src="misc/evidence_edit.png" id="evi_edit" alt="Edit Evidence" class="client_button hover_button inactive" onclick="editEvidence()">
+						<img src="misc/evidence_cancel.png" id="evi_cancel" alt="Cancel Evidence" class="client_button hover_button inactive" onclick="cancelEvidence()">
+						<img src="misc/evidence_remove.png" id="evi_del" alt="Remove Evidence" class="client_button hover_button inactive" onclick="deleteEvidence()">
+					</div>
+				</fieldset>
+				<br>
+				<div id="evidences"></div>
+				<br>
+				<img src="misc/present.png" id="button_present" alt="Present" class="client_button" onclick="togglePresent()">
+			</span>
+
+			<!-- Settings section -->
+			<span class="menu_content" id="content_3">
+				<meta name="frame-title" lang="en" content="Settings">
+				<label for="OOC_name">Server chat name:</label>
+				<input id="OOC_name" name="OOC_name" class="short" type="text">
+				<label for="role_select">Role:</label>
+				<select id="role_select" name="role_select" onchange="changeRoleOOC()">
+					<option value="def">Defense</option>
+					<option value="pro">Prosecution</option>
+					<option value="jud">Judge</option>
+					<option value="wit">Witness</option>
+					<option value="hld">Helper Defense</option>
+					<option value="hlp">Helper Prosecution</option>
+				</select>
+				<br>
+				<br>
+				<div class="slider">Music
+					<input id="client_mvolume" class="long" type="range" min="0" max="100" value="80" onchange="changeMusicVolume()">
+				</div>
+				<div class="slider">SFX
+					<input id="client_svolume" class="long" type="range" min="0" max="100" value="70" onchange="changeSFXVolume()">
+				</div>
+				<div class="slider">Blip
+					<input id="client_bvolume" class="long" type="range" min="0" max="100" value="60" onchange="changeBlipVolume()">
+				</div>
+				<br>
+				<img src="misc/character_change.png" id="char_change" alt="Change" class="client_button hover_button" onclick="changeCharacter()">
+				<img src="misc/character_random.png" id="char_random" alt="Random" class="client_button hover_button" onclick="randomCharacterOOC()">
+				<br>
+				<br>
+				<label for="client_encoding"> Client side chat encoding:</label>
+				<select id="client_encoding" name="client_encoding">
+					<option value="none" selected>None</option>
+					<option value="unicode">Unicode</option>
+					<option value="utf16">UTF-16</option>
+				</select>
+				<br>
+				<br>
+				<label for="client_decoding"> Client side chat decoding:</label>
+				<select id="client_decoding" name="client_decoding">
+					<option value="none">None</option>
+					<option value="unicode" selected>Unicode</option>
+					<option value="utf16">UTF-16</option>
+				</select>
+				<br>
+				<br>
+				<span style="color:red">Only touch these settings if you know what you are doing.</span>
+				<br>
+				<br>
+				<label for="bg_command">Change background command:</label>
+				<input id="bg_command" name="bg_command" class="short" type="text" value="bg $1">
+				<br>
+				<br>
+				<label for="role_command">Change role command:</label>
+				<input id="role_command" name="role_command" class="short" type="text" value="pos $1">
+				<br>
+				<br>
+				<label for="randomchar_command">Random character command:</label>
+				<input id="randomchar_command" name="randomchar_command" class="short" type="text" value="randomchar">
+			</span>
+
+			<!-- About section -->
+			<span class="menu_content" id="content_4">
+				<meta name="frame-title" lang="en" content="About">
+				<img id="about-logo" src="images/logo-new.png" alt="Attorney Online logo">
+				<h1 style="line-height: .3em;">webAO</h1>
+				<h3>version 2.3</h3>
+				<p>Client created by
+					<a href="https://github.com/stonedDiscord">@stonedDiscord</a> and fixed up by
+					<a href="https://github.com/oldmud0">@oldmud0</a> and
+					<a href="https://github.com/qubrick">Qubrick</a>.</p>
+				<p>Special thanks to Aleks for reverse engineering the original Delphi client written by FanatSors.</p>
+			</span>
+	</div>
 </template>
 
 <template id="log">
-    <meta name="frame-title" lang="en" content="Log">
-    <div id="client_log">
-        <div class="hrtext">↓ log starts here ↓</div>
-    </div>
-</template>
-
-<template id="misc" style="display: flex; flex-direction: column;">
-    <meta name="frame-title" lang="en" content="Miscellaneous">
-    <div id="client_bars">
-        <span style="background-image: url(&quot;misc/zdoh.png&quot;); width: 90px; height: 20px;">
-            <img class="client_defense" alt="Defense health" id="client_defense_hp" src="misc/advocat.png" style="clip-path: polygon(0px 0px, 90px 0px, 90px 20px, 0px 20px, 0px 0px); clip: rect(0px, 90px, 20px, 0px);">
-        </span>
-        <span style="background-image: url(&quot;misc/zdoh.png&quot;); width: 90px; height: 20px;" misc="">
-            <img class="client_prosecutor" alt="Prosecution health" id="client_prosecutor_hp" src="misc/procuror.png" style="clip-path: polygon(0px 0px, 90px 0px, 90px 20px, 0px 20px, 0px 0px); clip: rect(0px, 90px, 20px, 0px);" misc="">
-        </span>
-    </div>
+	<meta name="frame-title" lang="en" content="Log">
+	<div id="client_log">
+		<div class="hrtext">↓ log starts here ↓</div>
+	</div>
 </template>
 
 <template id="ooc">
-    <meta name="frame-title" lang="en" content="Server">
-    <div style="height: 100%; display: flex; flex-direction: column;">
-        <textarea id="client_ooclog" style="flex: 1 auto"></textarea>
-        <input id="client_oocinputbox" class="long" type="text" onkeypress="onOOCEnter(event)">
-    </div>
+	<meta name="frame-title" lang="en" content="Server">
+	<div style="height: 100%; display: flex; flex-direction: column;">
+		<textarea id="client_ooclog" style="flex: 1 auto" readonly></textarea>
+		<input id="client_oocinputbox" class="long" type="text" onkeypress="onOOCEnter(event)">
+	</div>
 </template>
 
 <template id="music">
-    <meta name="frame-title" lang="en" content="Music">
-    <select id="client_musiclist" size="5" onclick="musiclist_click(event)" style="width: 100%; height: 100%;">
-    </select>
+	<meta name="frame-title" lang="en" content="Music">
+	<select id="client_musiclist" size="5" onclick="musiclist_click(event)" style="width: 100%; height: 100%;">
+	</select>
 </template>
 
-<template id="about">
-    <meta name="frame-title" lang="en" content="About">
-    <img id="about-logo" src="images/logo-new.png" alt="Attorney Online logo">
-    <h1 style="line-height: .3em;">webAO</h1>
-    <h3>version 2.1.1</h3>
-    <p>Client created by <a href="https://github.com/stonedDiscord">@stonedDiscord</a> and fixed up by <a href="https://github.com/oldmud0">@oldmud0</a>.</p>
-    <p>Special thanks to Aleks for reverse engineering the original Delphi client written by FanatSors.</p>
-</template>
+<div id="callmod_dialog" title="Call Mod">
+	<p>
+		<span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>
+		Are you sure you want to call a moderator?
+	</p>
+</div>
 
 <body>
-    <span id="sound"></span>
-    <div id="here"></div>
-    <div id="client_loading">
-        <h1 id="client_loadingtext">Loading</h1>
-        <button onclick="RetryButton()">RETRY</button>
-    </div>
-        <div id="client_charselect">
-        <button onclick="pickchar(1001)">SPECTATE</button>
-        <table id="client_chartable"></table>
-    </div>
-    <div id="client_error" class="error" style="display: none">
-            <p>You were disconnected from the server.</p>
-            <p>Code: <span id="error_id">(none)</span></p>
-            <button onclick="ReconnectButton()">Reconnect</button>
-    </div>
+	<span id="sound"></span>
+	<div id="here"></div>
+	<div id="client_loading">
+		<h1 id="client_loadingtext">Loading</h1>
+		<button onclick="RetryButton()">RETRY</button>
+	</div>
+	<div id="client_charselect">
+		<div id="client_chartable_container">
+			<table id="client_chartable"></table>
+			<button onclick="pickChar(1001)">Spectate</button>
+		</div>
+	</div>
+	<div id="client_error" class="error" style="display: none">
+		<p>You were disconnected from the server.</p>
+		<p>Code:
+			<span id="error_id">(none)</span>
+		</p>
+		<button onclick="ReconnectButton()">Reconnect</button>
+	</div>
 </body>
+
 </html>
