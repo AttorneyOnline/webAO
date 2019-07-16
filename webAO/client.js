@@ -138,6 +138,7 @@ class Client extends EventEmitter {
 		this.on("ID", this.handleID.bind(this));
 		this.on("PN", this.handlePN.bind(this));
 		this.on("SI", this.handleSI.bind(this));
+		this.on("ARUP", this.handleARUP.bind(this));
 		this.on("CharsCheck", this.handleCharsCheck.bind(this));
 		this.on("PV", this.handlePV.bind(this));
 		this.on("CHECK", () => {});
@@ -810,6 +811,15 @@ class Client extends EventEmitter {
 
 	handlePN(_args) {
 		this.serv.send("askchaa#%");
+	}
+
+	/**
+	 * Doesn't handle the change of players in an area.
+	 * webAO doesn't have this feature yet, but i want the warning to go away.
+	 * @param {Array} args packet arguments
+	 */
+	handleARUP(args) {
+		;
 	}
 
 	/**
