@@ -473,7 +473,7 @@ class Client extends EventEmitter {
 				side: args[6],
 				sound: escape(args[7]),
 				type: args[8],
-				// charid: args[9],
+				charid: args[9],
 				snddelay: args[10],
 				objection: args[11],
 				evidence: args[12],
@@ -482,16 +482,8 @@ class Client extends EventEmitter {
 				color: args[15],
 				isnew: true,
 			};
-
-			// The dreaded linear search...
-			for (let i = 0; i < this.chars.length; i++) {
-				if (this.chars[i].name === args[3]) {
-					chatmsg.character = i;
-					break;
-				}
-			}
-
-			if (chatmsg.character === this.charID) {
+			
+			if (chatmsg.charid === this.charID) {
 				resetICParams();
 			}
 
