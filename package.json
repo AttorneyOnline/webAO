@@ -25,8 +25,8 @@
     "babel-loader": "^8.0.6",
     "eslint": "^6.0.1",
     "golden-layout": "^1.5.9",
-    "webpack": "^4.35.2",
-    "webpack-cli": "^3.3.5"
+    "webpack": "^4.35.3",
+    "webpack-cli": "^3.3.6"
   },
   "dependencies": {
     "core-js": "^3.1.4",
