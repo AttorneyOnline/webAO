@@ -31,11 +31,12 @@ const CHAR_SELECT_WIDTH = 8;
 const UPDATE_INTERVAL = 60;
 
 /**
- * Toggles AO1-style loading using paginated music packets.
- * (It is unclear why AO2 loading does not work on mobile platforms.)
+ * Toggles AO1-style loading using paginated music packets for mobile platforms.
+ * The old loading uses more smaller packets instead of a single big one,
+ * which caused problems on low-memory devices in the past.
  */
 let oldLoading = false;
-if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
+if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
 	oldLoading = true;
 }
 
