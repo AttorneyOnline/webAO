@@ -307,6 +307,7 @@ img {
 
 #client_musiclist {
 	width: 99%;
+	height: 100%;
 	background-color: #222;
 	color: white;
 }
