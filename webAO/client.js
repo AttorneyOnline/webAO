@@ -400,7 +400,7 @@ class Client extends EventEmitter {
 	onClose(e) {
 		console.error(`The connection was closed: ${e.reason} (${e.code})`);
 		if (e.code !== 1001) {
-			document.getElementById("client_error").style.display = "block";
+			document.getElementById("client_error").style.display = "flex";
 			document.getElementById("client_loading").style.display = "none";
 			document.getElementById("error_id").textContent = e.code;
 			this.cleanup();
@@ -430,7 +430,7 @@ class Client extends EventEmitter {
 	 */
 	onError(e) {
 		console.error(`A network error occurred: ${e.reason} (${e.code})`);
-		document.getElementById("client_error").style.display = "block";
+		document.getElementById("client_error").style.display = "flex";
 		document.getElementById("client_loading").style.display = "none";
 		document.getElementById("error_id").textContent = e.code;
 		this.cleanup();

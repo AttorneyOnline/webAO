@@ -36,25 +36,21 @@ img {
 	}
 }
 
-.error {
+#client_error {
 	position: absolute;
-	width: 50vw;
-	height: 25vh;
+	display: flex;
+	flex-direction: column;
 	top: 50%;
 	left: 50%;
 	margin-right: -50%;
 	transform: translate(-50%, -50%);
-	display: flex;
-	margin: 0 auto;
 	justify-content: center;
-	align-content: center;
 	align-items: center;
-	text-align: center;
-	background: #4e0e00;
+	background: #a00;
 	color: white;
-	font-size: x-large;
+	font-size: large;
 	animation: error_blink 3s ease-in-out infinite;
-	z-index: 3;
+	z-index: 100;
 }
 
 #client_loading {
@@ -69,7 +65,7 @@ img {
 	align-items: center;
 	background: black;
 	color: lightgreen;
-	font-size: 2em;
+	font-size: large;
 	z-index: 100;
 }
 
