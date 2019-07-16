@@ -688,6 +688,14 @@ class Client extends EventEmitter {
 		this.serv.send("RD#%");
 	}
 
+/**
+	 * Handles the banned packet
+	 * @param {Array} args packet arguments
+	 */
+	handleBD(args) {
+		document.getElementById("client_loadingtext").innerHTML = "Banned: " + args[1];
+	}
+
 	/**
 	 * Handles the banned packet
 	 * @param {Array} args packet arguments
