@@ -59,6 +59,8 @@ img {
 
 #client_loading {
 	position: absolute;
+	display: flex;
+	flex-direction: column;
 	width: 90vw;
 	height: 40vh;
 	top: 50%;
@@ -66,12 +68,15 @@ img {
 	margin-right: -50%;
 	transform: translate(-50%, -50%);
 	justify-content: center;
-	display: flex;
 	align-items: center;
 	background: black;
 	color: lightgreen;
-	font-size: 3em;
+	font-size: 2em;
 	z-index: 100;
+}
+
+#client_loadingtext {
+	margin: 0;
 }
 
 #client_gamewindow {
