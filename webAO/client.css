@@ -306,6 +306,11 @@ img {
 }
 
 #client_musiclist {
+	list-style-type: none;
+	text-align: left;
+	padding-left: 1px;
+	white-space: nowrap;
+	font-size: 0.8em;
 	width: 99%;
 	height: 100%;
 	background-color: #222;

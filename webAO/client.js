@@ -631,9 +631,9 @@ class Client extends EventEmitter {
 		const hmusiclist = document.getElementById("client_musiclist");
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
-				const newentry = document.createElement("OPTION");
-				newentry.text = args[i];
-				hmusiclist.options.add(newentry);
+				const newentry = document.createElement("LI");
+				newentry.appendChild(document.createTextNode(args[i]));
+				hmusiclist.appendChild(newentry);
 			}
 		}
 	}
@@ -656,9 +656,13 @@ class Client extends EventEmitter {
 
 			if (flagAudio) {
 				// After reached the audio put everything in the music list
-				const newentry = document.createElement("OPTION");
-				newentry.text = args[i];
-				hmusiclist.options.add(newentry);
+				const newentry = document.createElement("LI");
+				newentry.appendChild(document.createTextNode(args[i]));
+				// Check for category marker
+				if (args[i].startsWith("=")) {
+					newentry.className = "musiclist_category";
+				}
+				hmusiclist.appendChild(newentry);
 			} else {
 				// Create area button
 				const newarea = document.createElement("SPAN");
@@ -675,8 +679,9 @@ class Client extends EventEmitter {
 		// header for music. If it was, then move it over to the music list.
 		const area_box = document.getElementById("areas");
 		if (area_box.lastChild.textContent.startsWith("=")) {
-			const audio_title = document.createElement("OPTION");
-			audio_title.text = area_box.lastChild.textContent;
+			const audio_title = document.createElement("LI");
+			audio_title.className = "musiclist_category";
+			audio_title.appendChild(document.createTextNode(area_box.lastChild.textContent));
 			hmusiclist.insertBefore(audio_title, hmusiclist.firstChild);
 			area_box.removeChild(area_box.lastChild);
 		}
@@ -1348,15 +1353,8 @@ function resetICParams() {
  * @param {MouseEvent} event
  */
 export function musiclist_click(_event) {
-	const playtrack = document.getElementById("client_musiclist").value;
-	client.sendMusicChange(playtrack);
-
-	// This is here so you can't actually select multiple tracks,
-	// even though the select tag has the multiple option to render differently
-	let musiclist_elements = document.getElementById("client_musiclist").selectedOptions;
-    for(let i = 0; i < musiclist_elements.length; i++){
-      musiclist_elements[i].selected = false;
-    }
+	//target is the clicked item in the UL
+	client.sendMusicChange(_event.target.innerHTML);
 }
 window.musiclist_click = musiclist_click;
 
