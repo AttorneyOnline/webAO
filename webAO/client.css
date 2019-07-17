@@ -299,6 +299,7 @@ img {
 	list-style-type: none;
 	text-align: left;
 	padding-left: 1px;
+	overflow-y: auto;
 	white-space: nowrap;
 	font-size: 0.8em;
 	width: 99%;
