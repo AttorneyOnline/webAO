@@ -84,7 +84,7 @@ img {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	overflow-y: scroll;
+	overflow-y: auto;
 	justify-content: center;
 	align-items: center;
 	vertical-align: middle;
@@ -259,7 +259,7 @@ img {
 	word-break: keep-all;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
-	overflow-y: scroll;
+	overflow-y: auto;
 	font-size: medium;
 	background-color: #242424;
 	text-align: start;
@@ -288,7 +288,7 @@ img {
 	font-family: "Source Code Pro", "Consolas", monospace;
 	font-size: small;
 	overflow-wrap: break-word;
-	overflow-y: scroll;
+	overflow-y: auto;
 	text-rendering: optimizelegibility;
 	resize: none;
 	flex: 1 1 auto;
