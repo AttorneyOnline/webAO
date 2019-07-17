@@ -84,7 +84,7 @@ img {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	overflow-y: scroll;
+	overflow-y: auto;
 	justify-content: center;
 	align-items: center;
 	vertical-align: middle;
@@ -110,12 +110,10 @@ img {
 	border: 1px solid black;
 }
 
-#client_wrapper {
-	background-color: #888888;
-	overflow: auto;
-	overflow-y: hidden;
-	min-width: 256px;
-	resize: horizontal;
+#client_icwrapper {
+	overflow-x: hidden;
+	overflow-y: auto;
+	height: 100%;
 }
 
 @media (max-width: 360px) {
@@ -190,14 +188,6 @@ img {
 	left: 0;
 }
 
-#client_background {
-	position: absolute;
-	background-color: transparent;
-	width: 100%;
-	height: auto;
-	padding-bottom: 75%;
-}
-
 #client_name {
 	display: none;
 	height: 7%;
@@ -269,7 +259,7 @@ img {
 	word-break: keep-all;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
-	overflow-y: scroll;
+	overflow-y: auto;
 	font-size: medium;
 	background-color: #242424;
 	text-align: start;
@@ -298,7 +288,7 @@ img {
 	font-family: "Source Code Pro", "Consolas", monospace;
 	font-size: small;
 	overflow-wrap: break-word;
-	overflow-y: scroll;
+	overflow-y: auto;
 	text-rendering: optimizelegibility;
 	resize: none;
 	flex: 1 1 auto;
@@ -456,6 +446,11 @@ img {
 .hrtext:after {
 	left: 0.5em;
 	margin-right: -50%;
+}
+
+#client_menu {
+	overflow-y: auto;
+	height: 100%;
 }
 
 .menu_content {
