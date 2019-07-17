@@ -110,12 +110,10 @@ img {
 	border: 1px solid black;
 }
 
-#client_wrapper {
-	background-color: #888888;
-	overflow: auto;
-	overflow-y: hidden;
-	min-width: 256px;
-	resize: horizontal;
+#client_icwrapper {
+	overflow-x: hidden;
+	overflow-y: auto;
+	height: 100%;
 }
 
 @media (max-width: 360px) {
@@ -456,6 +454,11 @@ img {
 .hrtext:after {
 	left: 0.5em;
 	margin-right: -50%;
+}
+
+#client_menu {
+	overflow-y: auto;
+	height: 100%;
 }
 
 .menu_content {
