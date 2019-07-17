@@ -243,7 +243,8 @@ img {
 }
 
 #client_inputbox {
-	font-size: 25px;
+	font-size: 21px;
+	padding: 2px 10px;
 }
 
 .long {
