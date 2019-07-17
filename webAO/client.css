@@ -26,13 +26,13 @@ img {
 
 @keyframes error_blink {
 	0% {
-		color: white;
+		color: #fff;
 	}
 	50% {
 		color: red;
 	}
 	100% {
-		color: white;
+		color: #fff;
 	}
 }
 
@@ -47,7 +47,7 @@ img {
 	justify-content: center;
 	align-items: center;
 	background: #a00;
-	color: white;
+	color: #fff;
 	font-size: large;
 	animation: error_blink 3s ease-in-out infinite;
 	z-index: 100;
@@ -94,7 +94,7 @@ img {
 }
 
 #client_chartable {
-	background: #eeeeee;
+	background: #eee;
 }
 
 #client_chartable_container {
@@ -107,7 +107,7 @@ img {
 	height: 60px;
 	width: 60px;
 	margin: 3px;
-	border: 1px solid black;
+	border: 1px solid #000;
 }
 
 #client_icwrapper {
@@ -239,8 +239,8 @@ img {
 
 .long {
 	width: 100%;
-	background-color: #dddddd;
-	border: 1px solid #555555;
+	background-color: #ddd;
+	border: 1px solid #555;
 	border-style: solid;
 	box-sizing: border-box;
 	margin: auto;
@@ -255,7 +255,7 @@ img {
 #client_log {
 	position: relative;
 	height: 100%;
-	color: white;
+	color: #fff;
 	word-break: keep-all;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
@@ -284,7 +284,7 @@ img {
 #client_ooclog {
 	position: relative;
 	background-color: #242424;
-	color: white;
+	color: #fff;
 	font-family: "Source Code Pro", "Consolas", monospace;
 	font-size: small;
 	overflow-wrap: break-word;
@@ -299,7 +299,7 @@ img {
 	width: 99%;
 	height: 100%;
 	background-color: #222;
-	color: white;
+	color: #fff;
 }
 
 #client_bars {
@@ -343,7 +343,7 @@ img {
 	height: 100%;
 	border-style: double;
 	border-radius: 7px;
-	border-color: white;
+	border-color: #fff;
 	border-width: 3px;
 }
 
