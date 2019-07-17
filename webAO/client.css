@@ -188,14 +188,6 @@ img {
 	left: 0;
 }
 
-#client_background {
-	position: absolute;
-	background-color: transparent;
-	width: 100%;
-	height: auto;
-	padding-bottom: 75%;
-}
-
 #client_name {
 	display: none;
 	height: 7%;
