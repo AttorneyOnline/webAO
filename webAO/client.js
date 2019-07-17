@@ -1092,7 +1092,6 @@ class Viewport {
 		const chatBox = document.getElementById("client_chat");
 		const charSprite = document.getElementById("client_char");
 		const eviBox = document.getElementById("client_evi");
-		const background = document.getElementById("client_background");
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
@@ -1108,8 +1107,6 @@ class Viewport {
 		}
 
 		if (this.chatmsg.isnew) {
-			// Reset screen background
-			background.style.backgroundColor = "transparent";
 			// Hide message and evidence window
 			nameBox.style.display = "none";
 			chatBox.style.display = "none";
@@ -1147,7 +1144,6 @@ class Viewport {
 				});
 			} else if (this.chatmsg.flash === 1) {
 				// Flash screen
-				background.style.backgroundColor = "white";
 				this.sfxaudio.pause();
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-realization.wav";
