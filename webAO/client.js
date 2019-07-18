@@ -462,9 +462,7 @@ class Client extends EventEmitter {
 		if (args[4] !== viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
 			const chatmsg = {
-				// pre: escape(args[2]),
-				character: -1, // Will do a linear search
-				preanim: escape(args[2]), // XXX: why again?
+				preanim: escape(args[2]), // get preanim
 				nameplate: args[3], // TODO: parse INI to get this info
 				name: args[3],
 				speaking: "(b)" + escape(args[4]),
@@ -1092,7 +1090,7 @@ class Viewport {
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
 		// Flip the character
-		if (this.chatmsg.flip === 1) {
+		if (this.chatmsg.flip === "1") {
 			charSprite.style.transform = "scaleX(-1)";
 		} else {
 			charSprite.style.transform = "scaleX(1)";
@@ -1131,7 +1129,7 @@ class Viewport {
 
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
 			// Effect stuff
-			if (this.chatmsg.flash === 2) {
+			if (this.chatmsg.flash === "2") {
 				// Shake screen
 				this.sfxaudio.pause();
 				this.sfxplayed = 1;
@@ -1140,7 +1138,7 @@ class Viewport {
 				$("#client_gamewindow").effect("shake", {
 					"direction": "up"
 				});
-			} else if (this.chatmsg.flash === 1) {
+			} else if (this.chatmsg.flash === "1") {
 				// Flash screen
 				background.style.backgroundColor = "white";
 				this.sfxaudio.pause();
