@@ -193,7 +193,9 @@ img {
 	background-color: transparent;
 	width: 100%;
 	height: auto;
-	padding-bottom: 75%;
+	padding-bottom: 71%;
+	top: 0;
+	left: 0;
 }
 
 #client_name {
