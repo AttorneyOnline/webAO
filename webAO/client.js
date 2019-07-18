@@ -1414,9 +1414,20 @@ window.changeCharacter = changeCharacter;
  * Triggered when there was an error loading a character sprite.
  * @param {HTMLImageElement} image the element containing the missing image
  */
-export function imgError(image) {
+export function charError(image) {
 	image.onerror = "";
 	image.src = "misc/placeholder.gif";
+	return true;
+}
+window.imgError = imgError;
+
+/**
+ * Triggered when there was an error loading a generic sprite.
+ * @param {HTMLImageElement} image the element containing the missing image
+ */
+export function imgError(image) {
+	image.onerror = "";
+	image.src = ""; //unload so the old sprite doesn't persist
 	return true;
 }
 window.imgError = imgError;
