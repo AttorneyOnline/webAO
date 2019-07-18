@@ -74,8 +74,7 @@ img {
 }
 
 #client_gamewindow {
-	position: relative;
-	padding-bottom: 75%;
+	width: 100%;
 }
 
 #client_charselect {
@@ -189,11 +188,9 @@ img {
 }
 
 #client_background {
-	position: absolute;
+	position: relative;
+	padding-bottom: 75%;
 	background-color: transparent;
-	width: 100%;
-	height: auto;
-	padding-bottom: 71%;
 	top: 0;
 	left: 0;
 }

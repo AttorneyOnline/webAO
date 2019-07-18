@@ -23,7 +23,7 @@
 <template id="client_wrapper">
 	<meta name="frame-title" lang="en" content="Game">
 	<div id="client_icwrapper">
-	<div id="client_background"></div>
+	<div id="client_background">
 	<div id="client_gamewindow">
 		<img id="client_court" alt="Courtroom backdrop" onerror="imgError(this);">
 		<img id="client_char" alt="Character" onerror="charError(this);">
@@ -38,6 +38,7 @@
 			<p id="client_inner_chat"></p>
 		</div>
 		<img id="client_testimony" alt="Testimony overlay" style="display: none;" onerror="imgError(this);">
+	</div>
 	</div>
 	<input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)" placeholder="Say something&hellip;">
 	<meta name="frame-title" lang="en" content="Miscellaneous">
