@@ -1435,7 +1435,7 @@ window.imgError = imgError;
  */
 export function demoError(image) {
 	image.onerror = "";
-	image.src = "/misc/placeholder.png";
+	image.src = "misc/placeholder.png";
 	return true;
 }
 window.demoError = demoError;
