@@ -28,9 +28,11 @@ img {
 	0% {
 		color: #fff;
 	}
+
 	50% {
 		color: red;
 	}
+
 	100% {
 		color: #fff;
 	}
