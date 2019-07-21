@@ -11,7 +11,7 @@ const onlinec = [];
 function setServ(ID) {
 	console.log(descs[ID]);
 	if (descs[ID] !== undefined) {
-		document.getElementById("serverdescC").innerHTML = "<b>Online: "+onlinec[ID]+"</b><br>" +descs[ID];
+		document.getElementById("serverdescC").innerHTML = "<b>Online: " + onlinec[ID] + "</b><br>" + descs[ID];
 	}
 	else {
 		document.getElementById("serverdescC").innerHTML = "";
@@ -24,7 +24,7 @@ function onOpen(_e) {
 	masterserver.send("VC#%");
 }
 
-function checkOnline(serverID,coIP) {
+function checkOnline(serverID, coIP) {
 	function onCOOpen(_e) {
 		document.getElementById(`server${serverID}`).className = "available";
 		oserv.send("HI#webAO#%");
@@ -43,14 +43,14 @@ function checkOnline(serverID,coIP) {
 
 	var oserv = new WebSocket("ws://" + coIP);
 
-	oserv.onopen = function(evt) {
+	oserv.onopen = function (evt) {
 		onCOOpen(evt);
 	};
 
-	oserv.onmessage = function(evt) {
+	oserv.onmessage = function (evt) {
 		onCOMessage(evt);
 	};
-	
+
 }
 
 function onMessage(e) {
@@ -65,7 +65,7 @@ function onMessage(e) {
 			const args = serverEntry.split("&");
 			const asset = args[4] ? `&asset=${args[4]}` : "";
 
-			document.getElementById("masterlist").innerHTML += 
+			document.getElementById("masterlist").innerHTML +=
 				`<li id="server${i}" class="unavailable" onmouseover="setServ(${i})"><p>${args[0]}</p>`
 				+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[3]}${asset}">Watch</a>`
 				+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[3]}${asset}">Join</a></li><br/>`;

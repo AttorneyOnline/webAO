@@ -14,7 +14,7 @@ export default class Fingerprint {
 		var nativeForEach, nativeMap;
 		nativeForEach = Array.prototype.forEach;
 		nativeMap = Array.prototype.map;
-		this.each = function(obj, iterator, context) {
+		this.each = function (obj, iterator, context) {
 			if (obj === null) {
 				return;
 			}
@@ -34,13 +34,13 @@ export default class Fingerprint {
 				}
 			}
 		};
-		this.map = function(obj, iterator, context) {
+		this.map = function (obj, iterator, context) {
 			var results = [];
 			if (obj == null)
 				return results;
 			if (nativeMap && obj.map === nativeMap)
 				return obj.map(iterator, context);
-			this.each(obj, function(value, index, list) {
+			this.each(obj, function (value, index, list) {
 				results[results.length] = iterator.call(context, value, index, list);
 			});
 			return results;
@@ -57,7 +57,7 @@ export default class Fingerprint {
 	}
 }
 Fingerprint.prototype = {
-	get: function() {
+	get: function () {
 		var keys = [];
 		keys.push(navigator.userAgent);
 		keys.push(navigator.language);
@@ -73,11 +73,11 @@ Fingerprint.prototype = {
 		keys.push(this.hasLocalStorage());
 		keys.push(!!window.indexedDB);
 		if (document.body) {
-			keys.push(typeof(document.body.addBehavior));
+			keys.push(typeof (document.body.addBehavior));
 		} else {
 			keys.push(typeof undefined);
 		}
-		keys.push(typeof(window.openDatabase));
+		keys.push(typeof (window.openDatabase));
 		keys.push(navigator.cpuClass);
 		keys.push(navigator.platform);
 		keys.push(navigator.doNotTrack);
@@ -91,7 +91,7 @@ Fingerprint.prototype = {
 			return this.murmurhash3_32_gc(keys.join("###"), 31);
 		}
 	},
-	murmurhash3_32_gc: function(key, seed) {
+	murmurhash3_32_gc: function (key, seed) {
 		var remainder, bytes, h1, h1b, c1, c2, k1, i;
 		remainder = key.length & 3;
 		bytes = key.length - remainder;
@@ -131,25 +131,25 @@ Fingerprint.prototype = {
 		h1 ^= h1 >>> 16;
 		return h1 >>> 0;
 	},
-	hasLocalStorage: function() {
+	hasLocalStorage: function () {
 		try {
 			return !!window.localStorage;
 		} catch (e) {
 			return true;
 		}
 	},
-	hasSessionStorage: function() {
+	hasSessionStorage: function () {
 		try {
 			return !!window.sessionStorage;
 		} catch (e) {
 			return true;
 		}
 	},
-	isCanvasSupported: function() {
+	isCanvasSupported: function () {
 		var elem = document.createElement("canvas");
 		return !!(elem.getContext && elem.getContext("2d"));
 	},
-	isIE: function() {
+	isIE: function () {
 		if (navigator.appName === "Microsoft Internet Explorer") {
 			return true;
 		} else if (navigator.appName === "Netscape" && /Trident/.test(navigator.userAgent)) {
@@ -157,25 +157,25 @@ Fingerprint.prototype = {
 		}
 		return false;
 	},
-	getPluginsString: function() {
+	getPluginsString: function () {
 		if (this.isIE() && this.ie_activex) {
 			return this.getIEPluginsString();
 		} else {
 			return this.getRegularPluginsString();
 		}
 	},
-	getRegularPluginsString: function() {
-		return this.map(navigator.plugins, function(p) {
-			var mimeTypes = this.map(p, function(mt) {
+	getRegularPluginsString: function () {
+		return this.map(navigator.plugins, function (p) {
+			var mimeTypes = this.map(p, function (mt) {
 				return [mt.type, mt.suffixes].join("~");
 			}).join(",");
 			return [p.name, p.description, mimeTypes].join("::");
 		}, this).join(";");
 	},
-	getIEPluginsString: function() {
+	getIEPluginsString: function () {
 		if (window.ActiveXObject) {
 			var names = ["ShockwaveFlash.ShockwaveFlash", "AcroPDF.PDF", "PDF.PdfCtrl", "QuickTime.QuickTime", "rmocx.RealPlayer G2 Control", "rmocx.RealPlayer G2 Control.1", "RealPlayer.RealPlayer(tm) ActiveX Control (32-bit)", "RealVideo.RealVideo(tm) ActiveX Control (32-bit)", "RealPlayer", "SWCtl.SWCtl", "WMPlayer.OCX", "AgControl.AgControl", "Skype.Detection"];
-			return this.map(names, function(name) {
+			return this.map(names, function (name) {
 				try {
 					new ActiveXObject(name);
 					return name;
@@ -187,7 +187,7 @@ Fingerprint.prototype = {
 			return "";
 		}
 	},
-	getScreenResolution: function() {
+	getScreenResolution: function () {
 		var resolution;
 		if (this.screen_orientation) {
 			resolution = (screen.height > screen.width) ? [screen.height, screen.width] : [screen.width, screen.height];
@@ -196,7 +196,7 @@ Fingerprint.prototype = {
 		}
 		return resolution;
 	},
-	getCanvasFingerprint: function() {
+	getCanvasFingerprint: function () {
 		var canvas = document.createElement("canvas");
 		var ctx = canvas.getContext("2d");
 		var txt = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-={}|[]\:\"<>?;,.";
@@ -434,7 +434,7 @@ function fingerprint_fontsmoothing() {
 	alpha = null;
 	strOut = null;
 
-	if (typeof(screen.fontSmoothingEnabled) !== "undefined") {
+	if (typeof (screen.fontSmoothingEnabled) !== "undefined") {
 		strFontSmoothing = screen.fontSmoothingEnabled;
 	} else {
 		try {
@@ -486,7 +486,7 @@ function fingerprint_fonts() {
 
 	try {
 		style = "position: absolute; visibility: hidden; display: block !important";
-		fonts = ["8bitoperator", "Abadi MT Condensed Light","Ace Attorney", "Adobe Fangsong Std", "Adobe Hebrew", "Adobe Ming Std", "Agency FB", "Aharoni", "Andalus", "Angsana New", "AngsanaUPC", "Aparajita", "Arab", "Arabic Transparent", "Arabic Typesetting", "Arial Baltic", "Arial Black", "Arial CE", "Arial CYR", "Arial Greek", "Arial TUR", "Arial", "Arimo", "Batang", "BatangChe", "Bauhaus 93", "Bell MT", "Berlin Sans FB", "Bitstream Vera Serif", "Bodoni MT", "Bookman Old Style", "Braggadocio", "Broadway", "Browallia New", "BrowalliaUPC", "Calibri Light", "Calibri", "Californian FB", "Cambria Math", "Cambria", "Candara", "Castellar", "Casual", "Centaur", "Century", "Century Gothic", "Chalkduster", "Colonna MT", "Comic Sans MS", "Consolas", "Constantia", "Copperplate Gothic Light", "Corbel", "Cordia New", "CordiaUPC", "Courier New Baltic", "Courier New CE", "Courier New CYR", "Courier New Greek", "Courier New TUR", "Courier New", "DejaVu Sans", "DFKai-SB","DINEngschrift", "DaunPenh", "David", "DejaVu LGC Sans Mono", "Desdemona", "DilleniaUPC", "DokChampa", "Dotum", "DotumChe", "Dubai", "Ebrima", "Engravers MT", "Eras Bold ITC", "Estrangelo Edessa", "EucrosiaUPC", "Euphemia", "Eurostile", "FangSong", "Forte", "FrankRuehl", "Franklin Gothic Heavy", "Franklin Gothic Medium", "FreesiaUPC", "French Script MT", "Gabriola", "Gautami", "Georgia", "Gigi", "Gisha", "Goudy Old Style", "Gulim", "GulimChe", "GungSeo", "Gungsuh", "GungsuhChe", "Haettenschweiler", "Harrington", "Hei S", "HeiT", "Heisei Kaku Gothic", "Hiragino Sans GB", "Impact", "Informal Roman", "IrisUPC", "Iskoola Pota", "JasmineUPC", "KacstOne", "KaiTi", "Kalinga", "Kartika", "Khmer UI", "Kino MT", "KodchiangUPC", "Kokila", "Kozuka Gothic Pr6N", "Lao UI", "Latha", "Leelawadee", "Levenim MT", "LilyUPC", "Lohit Gujarati", "Loma", "Lucida Bright", "Lucida Console", "Lucida Fax", "Lucida Sans Unicode", "MS Gothic", "MS Mincho", "MS PGothic", "MS PMincho", "MS Reference Sans Serif", "MS UI Gothic", "MV Boli", "Magneto", "Malgun Gothic", "Mangal", "Marlett", "Matura MT Script Capitals", "Meiryo UI", "Meiryo", "Menlo", "Microsoft Himalaya", "Microsoft JhengHei", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Sans Serif", "Microsoft Tai Le", "Microsoft Uighur", "Microsoft YaHei", "Microsoft Yi Baiti", "MingLiU", "MingLiU-ExtB", "MingLiU_HKSCS", "MingLiU_HKSCS-ExtB", "Miriam Fixed", "Miriam", "Mongolian Baiti", "MoolBoran", "More Perfect DOS VGA", "MS Outlook", "NSimSun", "Narkisim", "News Gothic MT", "Niagara Solid", "Nyala", "OCR A","Ocean Sans Std", "OpenSymbol", "PMingLiU", "PMingLiU-ExtB", "Palace Script MT", "Palatino Linotype", "Papyrus", "Perpetua", "Plantagenet Cherokee", "Playbill", "Prelude Bold", "Prelude Condensed Bold", "Prelude Condensed Medium", "Prelude Medium", "PreludeCompressedWGL Black", "PreludeCompressedWGL Bold", "PreludeCompressedWGL Light", "PreludeCompressedWGL Medium", "PreludeCondensedWGL Black", "PreludeCondensedWGL Bold", "PreludeCondensedWGL Light", "PreludeCondensedWGL Medium", "PreludeWGL Black", "PreludeWGL Bold", "PreludeWGL Light", "PreludeWGL Medium", "Raavi", "Rachana", "Rockwell", "Rod", "Sakkal Majalla", "Sawasdee", "Script MT Bold", "Segoe Print", "Segoe Script", "Segoe UI Emoji", "Segoe UI Historic", "Segoe UI Light", "Segoe UI Semibold", "Segoe UI Symbol", "Segoe UI", "Shonar Bangla", "Showcard Gothic", "Shruti", "SimHei", "SimSun", "SimSun-ExtB", "Simplified Arabic Fixed", "Simplified Arabic", "Snap ITC", "Sylfaen", "Symbol", "Tahoma", "TeamViewer13", "Times New Roman Baltic", "Times New Roman CE", "Times New Roman CYR", "Times New Roman Greek", "Times New Roman TUR", "Times New Roman", "TlwgMono", "Traditional Arabic", "Trebuchet MS", "Tunga", "Tw Cen MT Condensed Extra Bold", "Ubuntu", "Umpush", "Univers", "Utopia", "Utsaah", "Vani", "Verdana", "Vijaya", "Vladimir Script", "Vrinda", "Webdings", "Wide Latin", "Wingdings", "Yu Gothic", "Zrnic Rg"];
+		fonts = ["8bitoperator", "Abadi MT Condensed Light", "Ace Attorney", "Adobe Fangsong Std", "Adobe Hebrew", "Adobe Ming Std", "Agency FB", "Aharoni", "Andalus", "Angsana New", "AngsanaUPC", "Aparajita", "Arab", "Arabic Transparent", "Arabic Typesetting", "Arial Baltic", "Arial Black", "Arial CE", "Arial CYR", "Arial Greek", "Arial TUR", "Arial", "Arimo", "Batang", "BatangChe", "Bauhaus 93", "Bell MT", "Berlin Sans FB", "Bitstream Vera Serif", "Bodoni MT", "Bookman Old Style", "Braggadocio", "Broadway", "Browallia New", "BrowalliaUPC", "Calibri Light", "Calibri", "Californian FB", "Cambria Math", "Cambria", "Candara", "Castellar", "Casual", "Centaur", "Century", "Century Gothic", "Chalkduster", "Colonna MT", "Comic Sans MS", "Consolas", "Constantia", "Copperplate Gothic Light", "Corbel", "Cordia New", "CordiaUPC", "Courier New Baltic", "Courier New CE", "Courier New CYR", "Courier New Greek", "Courier New TUR", "Courier New", "DejaVu Sans", "DFKai-SB", "DINEngschrift", "DaunPenh", "David", "DejaVu LGC Sans Mono", "Desdemona", "DilleniaUPC", "DokChampa", "Dotum", "DotumChe", "Dubai", "Ebrima", "Engravers MT", "Eras Bold ITC", "Estrangelo Edessa", "EucrosiaUPC", "Euphemia", "Eurostile", "FangSong", "Forte", "FrankRuehl", "Franklin Gothic Heavy", "Franklin Gothic Medium", "FreesiaUPC", "French Script MT", "Gabriola", "Gautami", "Georgia", "Gigi", "Gisha", "Goudy Old Style", "Gulim", "GulimChe", "GungSeo", "Gungsuh", "GungsuhChe", "Haettenschweiler", "Harrington", "Hei S", "HeiT", "Heisei Kaku Gothic", "Hiragino Sans GB", "Impact", "Informal Roman", "IrisUPC", "Iskoola Pota", "JasmineUPC", "KacstOne", "KaiTi", "Kalinga", "Kartika", "Khmer UI", "Kino MT", "KodchiangUPC", "Kokila", "Kozuka Gothic Pr6N", "Lao UI", "Latha", "Leelawadee", "Levenim MT", "LilyUPC", "Lohit Gujarati", "Loma", "Lucida Bright", "Lucida Console", "Lucida Fax", "Lucida Sans Unicode", "MS Gothic", "MS Mincho", "MS PGothic", "MS PMincho", "MS Reference Sans Serif", "MS UI Gothic", "MV Boli", "Magneto", "Malgun Gothic", "Mangal", "Marlett", "Matura MT Script Capitals", "Meiryo UI", "Meiryo", "Menlo", "Microsoft Himalaya", "Microsoft JhengHei", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Sans Serif", "Microsoft Tai Le", "Microsoft Uighur", "Microsoft YaHei", "Microsoft Yi Baiti", "MingLiU", "MingLiU-ExtB", "MingLiU_HKSCS", "MingLiU_HKSCS-ExtB", "Miriam Fixed", "Miriam", "Mongolian Baiti", "MoolBoran", "More Perfect DOS VGA", "MS Outlook", "NSimSun", "Narkisim", "News Gothic MT", "Niagara Solid", "Nyala", "OCR A", "Ocean Sans Std", "OpenSymbol", "PMingLiU", "PMingLiU-ExtB", "Palace Script MT", "Palatino Linotype", "Papyrus", "Perpetua", "Plantagenet Cherokee", "Playbill", "Prelude Bold", "Prelude Condensed Bold", "Prelude Condensed Medium", "Prelude Medium", "PreludeCompressedWGL Black", "PreludeCompressedWGL Bold", "PreludeCompressedWGL Light", "PreludeCompressedWGL Medium", "PreludeCondensedWGL Black", "PreludeCondensedWGL Bold", "PreludeCondensedWGL Light", "PreludeCondensedWGL Medium", "PreludeWGL Black", "PreludeWGL Bold", "PreludeWGL Light", "PreludeWGL Medium", "Raavi", "Rachana", "Rockwell", "Rod", "Sakkal Majalla", "Sawasdee", "Script MT Bold", "Segoe Print", "Segoe Script", "Segoe UI Emoji", "Segoe UI Historic", "Segoe UI Light", "Segoe UI Semibold", "Segoe UI Symbol", "Segoe UI", "Shonar Bangla", "Showcard Gothic", "Shruti", "SimHei", "SimSun", "SimSun-ExtB", "Simplified Arabic Fixed", "Simplified Arabic", "Snap ITC", "Sylfaen", "Symbol", "Tahoma", "TeamViewer13", "Times New Roman Baltic", "Times New Roman CE", "Times New Roman CYR", "Times New Roman Greek", "Times New Roman TUR", "Times New Roman", "TlwgMono", "Traditional Arabic", "Trebuchet MS", "Tunga", "Tw Cen MT Condensed Extra Bold", "Ubuntu", "Umpush", "Univers", "Utopia", "Utsaah", "Vani", "Verdana", "Vijaya", "Vladimir Script", "Vrinda", "Webdings", "Wide Latin", "Wingdings", "Yu Gothic", "Zrnic Rg"];
 		count = fonts.length;
 		template = "<b style=\"display:inline !important; width:auto !important; font:normal 10px/1 'X',sans-serif !important\">ww</b>" + "<b style=\"display:inline !important; width:auto !important; font:normal 10px/1 'X',monospace !important\">ww</b>";
 		fragment = document.createDocumentFragment();
@@ -588,10 +588,10 @@ function fingerprint_language() {
 	strOut = null;
 
 	try {
-		strTypeLng = typeof(navigator.language);
-		strTypeBrLng = typeof(navigator.browserLanguage);
-		strTypeSysLng = typeof(navigator.systemLanguage);
-		strTypeUsrLng = typeof(navigator.userLanguage);
+		strTypeLng = typeof (navigator.language);
+		strTypeBrLng = typeof (navigator.browserLanguage);
+		strTypeSysLng = typeof (navigator.systemLanguage);
+		strTypeUsrLng = typeof (navigator.userLanguage);
 
 		if (strTypeLng !== "undefined") {
 			strLang = "lang" + strPair + navigator.language + strSep;
