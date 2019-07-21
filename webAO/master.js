@@ -72,6 +72,17 @@ function onMessage(e) {
 			descs[i] = args[1];
 			setTimeout(checkOnline(i, args[2] + ":" + args[3]), 3000);
 		}
+	} else if (header === "SN") {
+		const args = msg.split("#");
+		const i = args[1];
+		console.log(args);
+		document.getElementById("masterlist").innerHTML +=
+			`<li id="server${i}" class="unavailable" onmouseover="setServ(${i})"><p>${args[5]}</p>`
+			+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[4]}">Watch</a>`
+			+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[4]}">Join</a></li><br/>`;
+		descs[i] = args[6];
+		masterserver.send("SR#" + i + "#%");
+		setTimeout(checkOnline(i, args[2] + ":" + args[4]), 3000);
 	} else if (header === "servercheok") {
 		const args = msg.split("#").slice(1);
 		console.log(args);
