@@ -1416,7 +1416,7 @@ export function charError(image) {
 	image.src = "misc/placeholder.gif";
 	return true;
 }
-window.imgError = imgError;
+window.charError = charError;
 
 /**
  * Triggered when there was an error loading a generic sprite.
