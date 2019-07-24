@@ -4,11 +4,6 @@
  * credits to aleks for original idea and source
 */
 
-// Uses the Gify library:
-// https://github.com/rfrench/gify
-// The following comment is needed for ESLint:
-/* global gify */
-
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 import Fingerprint from "./fingerprint.js";
@@ -1035,7 +1030,6 @@ class Viewport {
 			const file = await requestBuffer(filename);
 			console.log(filename);
 			return this.calculateGifLength(file);
-			//return gify.getInfo(file).duration;
 		} catch (err) {
 			return 0;
 		}
