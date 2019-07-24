@@ -141,7 +141,7 @@ class Client extends EventEmitter {
 		this.on("ARUP", this.handleARUP.bind(this));
 		this.on("CharsCheck", this.handleCharsCheck.bind(this));
 		this.on("PV", this.handlePV.bind(this));
-		this.on("CHECK", () => {});
+		this.on("CHECK", () => { });
 
 		this._lastTimeICReceived = new Date(0);
 	}
@@ -448,7 +448,7 @@ class Client extends EventEmitter {
 	 * XXX: a nasty hack made by gameboyprinter.
 	 * @param {string} msg chat message to prepare for display 
 	 */
-	prepChat(msg){
+	prepChat(msg) {
 		// TODO: make this less awful
 		return decodeBBCode(unescapeChat(decodeChat(msg)));
 	}
@@ -480,7 +480,7 @@ class Client extends EventEmitter {
 				color: args[15],
 				isnew: true,
 			};
-			
+
 			if (chatmsg.charid === this.charID) {
 				resetICParams();
 			}
@@ -506,7 +506,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleMC(args) {
-		const [ _packet, track, charID ] = args;
+		const [_packet, track, charID] = args;
 		const music = viewport.music;
 		music.pause();
 		music.src = MUSIC_HOST + track.toLowerCase();
@@ -890,7 +890,7 @@ class Client extends EventEmitter {
 				button_off: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_off.png`,
 				button_on: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_on.png`
 			};
-			emotesList.innerHTML += 
+			emotesList.innerHTML +=
 				`<img src=${emotes[i].button_off}
 					id="emo_${i}"
 					alt="${emotes[i].desc}"
@@ -1032,11 +1032,40 @@ class Viewport {
 	 */
 	async getAnimLength(filename) {
 		try {
-			const file = await request(filename);
-			return gify.getInfo(file).duration;
+			const file = await requestBuffer(filename);
+			console.log(filename);
+			return this.calculateGifLength(file);
+			//return gify.getInfo(file).duration;
 		} catch (err) {
 			return 0;
 		}
+	}
+
+	/**
+	 * Adds up the frame delays to find out how long a GIF is
+	 * I totally didn't steal this
+	 * @param {data} gifFile the GIF data
+	 */
+	calculateGifLength(gifFile) {
+		let d = new Uint8Array(gifFile);
+		// Thanks to http://justinsomnia.org/2006/10/gif-animation-duration-calculation/
+		// And http://www.w3.org/Graphics/GIF/spec-gif89a.txt
+		let duration = 0;
+		for (var i = 0; i < d.length; i++) {
+			// Find a Graphic Control Extension hex(21F904__ ____ __00)
+			if (d[i] === 0x21
+				&& d[i + 1] === 0xF9
+				&& d[i + 2] === 0x04
+				&& d[i + 7] === 0x00) {
+				// Swap 5th and 6th bytes to get the delay per frame
+				let delay = (d[i + 5] << 8) | (d[i + 4] & 0xFF);
+
+				// Should be aware browsers have a minimum frame delay 
+				// e.g. 6ms for IE, 2ms modern browsers (50fps)
+				duration += delay < 2 ? 10 : delay;
+			}
+		}
+		return duration*10;
 	}
 
 	/**
@@ -1145,7 +1174,7 @@ class Viewport {
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-realization.wav";
 				this.sfxaudio.play();
-				$("#client_gamewindow").effect("pulsate",{times:1},200);
+				$("#client_gamewindow").effect("pulsate", { times: 1 }, 200);
 			}
 
 			// Pre-animation stuff
@@ -1351,9 +1380,9 @@ export function musiclist_click(_event) {
 	// This is here so you can't actually select multiple tracks,
 	// even though the select tag has the multiple option to render differently
 	let musiclist_elements = document.getElementById("client_musiclist").selectedOptions;
-    for(let i = 0; i < musiclist_elements.length; i++){
-      musiclist_elements[i].selected = false;
-    }
+	for (let i = 0; i < musiclist_elements.length; i++) {
+		musiclist_elements[i].selected = false;
+	}
 }
 window.musiclist_click = musiclist_click;
 
@@ -1446,9 +1475,44 @@ window.demoError = demoError;
  * @returns response data
  * @throws {Error} if status code is not 2xx, or a network error occurs
  */
+async function requestBuffer(url) {
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		xhr.responseType = "arraybuffer";
+		xhr.addEventListener("error", () => {
+			const err = new Error(`Request for ${url} failed: ${xhr.statusText}`);
+			err.code = xhr.status;
+			reject(err);
+		});
+		xhr.addEventListener("abort", () => {
+			const err = new Error(`Request for ${url} was aborted!`);
+			err.code = xhr.status;
+			reject(err);
+		});
+		xhr.addEventListener("load", () => {
+			if (xhr.status < 200 || xhr.status >= 300) {
+				const err = new Error(`Request for ${url} failed with status code ${xhr.status}`);
+				err.code = xhr.status;
+				reject(err);
+			} else {
+				resolve(xhr.response);
+			}
+		});
+		xhr.open("GET", url, true);
+		xhr.send();
+	});
+}
+
+/**
+ * Make a GET request for a specific URI.
+ * @param {string} url the URI to be requested
+ * @returns response data
+ * @throws {Error} if status code is not 2xx, or a network error occurs
+ */
 async function request(url) {
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
+		xhr.responseType = "text";
 		xhr.addEventListener("error", () => {
 			const err = new Error(`Request for ${url} failed: ${xhr.statusText}`);
 			err.code = xhr.status;
@@ -1500,7 +1564,7 @@ async function changeBackground(position) {
 		def: {
 			bg: "defenseempty.png",
 			desk: { ao2: "defensedesk.png", ao1: "bancodefensa.png" },
-			speedLines: "defense_speedlines.gif" 
+			speedLines: "defense_speedlines.gif"
 		},
 		pro: {
 			bg: "prosecutorempty.png",
@@ -1531,7 +1595,7 @@ async function changeBackground(position) {
 
 	const { bg, desk, speedLines } = positions[position];
 	document.getElementById("client_fg").style.display = "none";
-	
+
 	if (viewport.chatmsg.type === 5) {
 		document.getElementById("client_court").src = `${AO_HOST}themes/default/${speedLines}`;
 	} else {
