@@ -2184,10 +2184,11 @@ function decodeBBCode(estring) {
 let client = new Client(serverIP);
 let viewport = new Viewport();
 
-$(document).ready(function () {
+export function onLoad(){
 	client.initialObservBBCode();
 	client.loadResources();
-});
+}
+window.onLoad = onLoad;
 
 // Create dialog and link to button	
 $(function () {
