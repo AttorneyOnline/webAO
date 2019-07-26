@@ -168,7 +168,7 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
 	sendOOC(message) {
-		document.cookie = "OOC_name=" + escapeChat(encodeChat(document.getElementById("OOC_name").value));
+		setCookie("OOC_name",escapeChat(encodeChat(document.getElementById("OOC_name").value)));
 		this.serv.send(`CT#${escapeChat(encodeChat(document.getElementById("OOC_name").value))}#${escapeChat(encodeChat(message))}#%`);
 	}
 
@@ -286,7 +286,7 @@ class Client extends EventEmitter {
 	loadResources() {
 		// Set to playerID to server chat name
 		// TODO: Make a text box for this!
-		document.getElementById("OOC_name").value = getCookie("OOC_name");
+		document.getElementById("OOC_name").value = getCookie("OOC_name") !== "" ? "web" + this.playerID : getCookie("OOC_name");
 
 		// Load evidence array to select
 		const evidence_select = document.getElementById("evi_select");
@@ -1338,6 +1338,16 @@ function getCookie(cname) {
 		}
 	}
 	return "";
+}
+
+/**
+ * set a cookie
+ * the version from w3schools expects these to expire
+ * @param {String} cname The name of the cookie to return
+ * @param {String} value The value of that cookie option
+ */
+function setCookie(cname,value) {
+	document.cookie = cname + "=" + value;
 }
 
 /**
