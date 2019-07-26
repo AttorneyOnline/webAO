@@ -285,13 +285,15 @@ class Client extends EventEmitter {
 	 */
 	loadResources() {
 		// Read cookies and set the UI to its values
-		document.getElementById("OOC_name").value = (getCookie("OOC_name") === "") ? "web" + this.playerID : getCookie("OOC_name");
-
-		document.getElementById("client_mvolume").value = (getCookie("musicVolume") === "") ? 80 : getCookie("musicVolume");
+		document.getElementById("OOC_name").value = getCookie("OOC_name");
+		if (document.getElementById("OOC_name").value==="") {
+			document.getElementById("OOC_name").value = "web"+this.playerID;
+		}
+		document.getElementById("client_mvolume").value = getCookie("musicVolume");
 		changeMusicVolume();
-		document.getElementById("client_svolume").value = (getCookie("sfxVolume") === "") ? 70 : getCookie("sfxVolume");
+		document.getElementById("client_svolume").value = getCookie("sfxVolume");
 		changeSFXVolume();
-		document.getElementById("client_bvolume").value = (getCookie("blipVolume") === "") ? 60 : getCookie("blipVolume");
+		document.getElementById("client_bvolume").value = getCookie("blipVolume");
 		changeBlipVolume();
 
 		// Load evidence array to select
