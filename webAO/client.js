@@ -284,9 +284,12 @@ class Client extends EventEmitter {
 	 * Load game resources.
 	 */
 	loadResources() {
-		// Set to playerID to server chat name
-		// TODO: Make a text box for this!
-		document.getElementById("OOC_name").value = getCookie("OOC_name") !== "" ? "web" + this.playerID : getCookie("OOC_name");
+		// Read cookies and set the UI to its values
+		document.getElementById("OOC_name").value = getCookie("OOC_name") === "" ? "web" + this.playerID : getCookie("OOC_name");
+
+		document.getElementById("client_mvolume").value = getCookie("musicVolume");
+		document.getElementById("client_svolume").value = getCookie("sfxVolume");
+		document.getElementById("client_bvolume").value = getCookie("blipVolume");
 
 		// Load evidence array to select
 		const evidence_select = document.getElementById("evi_select");
@@ -1442,6 +1445,7 @@ window.area_click = area_click;
  */
 export function changeMusicVolume() {
 	viewport.music.volume = document.getElementById("client_mvolume").value / 100;
+	setCookie("musicVolume",document.getElementById("client_mvolume").value);
 }
 window.changeMusicVolume = changeMusicVolume;
 
@@ -1450,6 +1454,7 @@ window.changeMusicVolume = changeMusicVolume;
  */
 export function changeSFXVolume() {
 	viewport.sfxaudio.volume = document.getElementById("client_svolume").value / 100;
+	setCookie("sfxVolume",document.getElementById("client_svolume").value);
 }
 window.changeSFXVolume = changeSFXVolume;
 
@@ -1458,6 +1463,7 @@ window.changeSFXVolume = changeSFXVolume;
  */
 export function changeBlipVolume() {
 	viewport.blipVolume = document.getElementById("client_bvolume").value / 100;
+	setCookie("blipVolume",document.getElementById("client_bvolume").value);
 }
 window.changeBlipVolume = changeBlipVolume;
 
