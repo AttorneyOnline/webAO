@@ -681,12 +681,22 @@ class Client extends EventEmitter {
 	 * Handles the kicked packet
 	 * @param {Array} args packet arguments
 	 */
-	handleKB(args) {
+	handleKK(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Kicked: " + args[1];
 	}
 
 	/**
 	 * Handles the banned packet
+	 * this one is sent when you are kicked off the server
+	 * @param {Array} args packet arguments
+	 */
+	handleKB(args) {
+		document.getElementById("client_loadingtext").innerHTML = "You got banned: " + args[1];
+	}
+
+	/**
+	 * Handles the banned packet
+	 * this one is sent when you try to reconnect but you're banned
 	 * @param {Array} args packet arguments
 	 */
 	handleBD(args) {
