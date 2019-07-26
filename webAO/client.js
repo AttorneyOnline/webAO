@@ -682,6 +682,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleKK(args) {
+		document.getElementById("client_loading").style.display = "flex";
 		document.getElementById("client_loadingtext").innerHTML = "Kicked: " + args[1];
 	}
 
@@ -691,6 +692,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleKB(args) {
+		document.getElementById("client_loading").style.display = "flex";
 		document.getElementById("client_loadingtext").innerHTML = "You got banned: " + args[1];
 	}
 
@@ -700,6 +702,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleBD(args) {
+		document.getElementById("client_loading").style.display = "flex";
 		document.getElementById("client_loadingtext").innerHTML = "Banned: " + args[1];
 	}
 
@@ -1618,8 +1621,9 @@ async function changeBackground(position) {
  * Triggered when the reconnect button is pushed.
  */
 export function ReconnectButton() {
-	client.cleanup();
+	//client.cleanup();
 	client = new Client(serverIP);
+	console.log(client);
 	if (client) {
 		mode = "join"; // HACK: see client.onOpen
 		document.getElementById("client_error").style.display = "none";
