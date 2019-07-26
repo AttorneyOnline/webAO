@@ -1,49 +1,93 @@
 <html>
 
 <head>
-	<title>Attorney Online ONLINE</title>
-	<link rel="stylesheet" type="text/css" href="stylesheet.css" />
-	<link rel="icon" href="images/favicon.ico" />
-	<script src="master.b.js"></script>
+    <title>Attorney Online ONLINE</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Oswald%7CRoboto+Condensed" rel="stylesheet">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="images/favicon.ico" />
+    <script src="master.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113494687-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-113494687-1');
+        
+		/*
+        function onLoad(){
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
+                alert('WARNING: WebAO on mobile is UNSUPPORTED, DOES NOT WORK, AND USES A LOT OF DATA. PROCEED WITH CAUTION.');
+		//window.location.replace("http://aceattorneyonline.com/");
+            }
+        }
+		*/
+    </script>
 </head>
 
-<body>
-	<div id="logo">
-		<p>Mundi optimum</p>
-		<img src="images/logo.png" \>
-		<p>principium drama</p>
-	</div>
-	<div id="header">
-		<p id="serverinfo">Masterserver version - ...</p>
-		<p id="clientinfo">Client version - ...</p>
-		<a class="button" href="https://discord.gg/e8pTAFv" class="button" id="hotlinebtn">
-			Contact Hotline AO
-		</a>
-	</div>
+<body onload="onLoad()">
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://aceattorneyonline.com/#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://aceattorneyonline.com/#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://aceattorneyonline.com/#download">Download</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://aceattorneyonline.com/#faq">FAQ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://aceattorneyonline.com/help.html">Help</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" target="_blank" href="https://discord.gg/wWvQ3pw">Discord</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://aceattorneyonline.com/blog">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://web.aceattorneyonline.com/">Play Online</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div id="header">
+        <p id="serverinfo">Masterserver version - ...</p>
+        <p id="clientinfo">Client version - ...</p>
+    </div>
+    <div id="content">
+        <div id="serverthumb">
+            <div id="serverthumbC">
 
-	<div id="menu">
-		<a class="button" href="https://tiny.cc/getao" target="_blank">
-			Download
-		</a>
-		<a class="button" href="master.html">
-			Play Online
-		</a>
-	</div>
-	<div id="content">
-		<center>
-			<p>This page uses cookies. By clicking on a server you agree that a cookie is saved on your computer.</p>
-			<br>
-			<p style="color:#ff0000;">The downloadable client is recommended</p><br>
-			<p>The green servers are more likely to work, red ones will not</p>
-		</center>
-		<ul class="servs" id="masterlist">
-			<li onmouseover="setServ(99)">
-				<p>Localhost</p> <a class="button" href="client.html?ip=127.0.0.1:27016">Watch</a><a class="button"
-					href="client.html?ip=127.0.0.1:27016&mode=join">Join</a>
-			</li>
+            </div>
 
-		</ul>
-	</div>
+        </div>
+        <div id="serverdesc">
+
+            <p id="serverdescC">
+
+            </p>
+        </div>
+        <ul class="servs" id="masterlist">
+            <li onmouseover="setServ(99)">
+                <p>Localhost</p> <a class="button" href="client.html?ip=127.0.0.1:27016">Watch</a><a class="button" href="client.html?ip=127.0.0.1:27016">Join</a></li>
+
+        </ul>
+    </div>
 </body>
 
 </html>
