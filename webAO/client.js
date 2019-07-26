@@ -431,11 +431,7 @@ class Client extends EventEmitter {
 	}
 
 	cleanup() {
-		try {
-			this.serv.close(1001);
-		} finally {
-			clearInterval(this.checkUpdater);
-		}
+		clearInterval(this.checkUpdater);
 	}
 
 	/**
@@ -1620,7 +1616,7 @@ async function changeBackground(position) {
  * Triggered when the reconnect button is pushed.
  */
 export function ReconnectButton() {
-	//client.cleanup();
+	client.cleanup();
 	client = new Client(serverIP);
 	console.log(client);
 	if (client) {
