@@ -8,6 +8,14 @@ const descs = [];
 descs[99] = "This is your computer on port 27016";
 const onlinec = [];
 
+let oldLoading = false;
+export function onLoad(){
+	if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+		oldLoading = true;
+	}
+}
+window.onLoad = onLoad;
+
 function setServ(ID) {
 	console.log(descs[ID]);
 	if (descs[ID] !== undefined) {
@@ -20,7 +28,12 @@ function setServ(ID) {
 
 function onOpen(_e) {
 	masterserver.send("ID#webAO#webAO#%");
-	masterserver.send("ALL#%");
+	if (oldLoading === true) {
+		masterserver.send("askforservers#%");
+	}
+	else {
+		masterserver.send("ALL#%");
+	}
 	masterserver.send("VC#%");
 }
 
