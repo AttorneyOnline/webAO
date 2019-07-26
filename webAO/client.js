@@ -39,7 +39,6 @@ if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlaySt
 let selectedEffect = 0;
 let selectedMenu = 1;
 let selectedShout = 0;
-document.getElementById("OOC_name").value = getCookie("OOC_name");
 
 const fp = new Fingerprint({
 	canvas: true,
@@ -287,7 +286,7 @@ class Client extends EventEmitter {
 	loadResources() {
 		// Set to playerID to server chat name
 		// TODO: Make a text box for this!
-		document.getElementById("OOC_name").value = "web" + this.playerID;
+		document.getElementById("OOC_name").value = getCookie("OOC_name");
 
 		// Load evidence array to select
 		const evidence_select = document.getElementById("evi_select");
@@ -1331,10 +1330,10 @@ function getCookie(cname) {
 	var ca = decodedCookie.split(';');
 	for (var i = 0; i < ca.length; i++) {
 		var c = ca[i];
-		while (c.charAt(0) == ' ') {
+		while (c.charAt(0) === ' ') {
 			c = c.substring(1);
 		}
-		if (c.indexOf(name) == 0) {
+		if (c.indexOf(name) === 0) {
 			return c.substring(name.length, c.length);
 		}
 	}
