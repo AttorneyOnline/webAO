@@ -35,9 +35,11 @@ if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlaySt
 	oldLoading = true;
 }
 
+/** presettings */
 let selectedEffect = 0;
 let selectedMenu = 1;
 let selectedShout = 0;
+document.getElementById("OOC_name").value = getCookie("OOC_name");
 
 const fp = new Fingerprint({
 	canvas: true,
@@ -167,6 +169,7 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
 	sendOOC(message) {
+		document.cookie = "OOC_name=" + escapeChat(encodeChat(document.getElementById("OOC_name").value));
 		this.serv.send(`CT#${escapeChat(encodeChat(document.getElementById("OOC_name").value))}#${escapeChat(encodeChat(message))}#%`);
 	}
 
@@ -1067,7 +1070,7 @@ class Viewport {
 				duration += delay < 2 ? 10 : delay;
 			}
 		}
-		return duration*10;
+		return duration * 10;
 	}
 
 	/**
@@ -1314,6 +1317,28 @@ class INI {
 		});
 		return value;
 	}
+}
+
+/**
+ * read a cookie from storage
+ * got this from w3schools
+ * https://www.w3schools.com/js/js_cookies.asp
+ * @param {String} cname The name of the cookie to return
+ */
+function getCookie(cname) {
+	var name = cname + "=";
+	var decodedCookie = decodeURIComponent(document.cookie);
+	var ca = decodedCookie.split(';');
+	for (var i = 0; i < ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0) == ' ') {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
+	}
+	return "";
 }
 
 /**
