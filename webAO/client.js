@@ -426,7 +426,6 @@ class Client extends EventEmitter {
 	onError(e) {
 		console.error(`A network error occurred: ${e.reason} (${e.code})`);
 		document.getElementById("client_error").style.display = "flex";
-		document.getElementById("client_loading").style.display = "none";
 		document.getElementById("error_id").textContent = e.code;
 		this.cleanup();
 	}
