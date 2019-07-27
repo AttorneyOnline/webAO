@@ -16,7 +16,7 @@ const descs = [];
 descs[99] = "This is your computer on port 27016";
 const onlinec = [];
 
-function setServ(ID) {
+export function setServ(ID) {
 	console.log(descs[ID]);
 	if (descs[ID] !== undefined) {
 		document.getElementById("serverdescC").innerHTML = "<b>Online: " + onlinec[ID] + "</b><br>" + descs[ID];
@@ -25,6 +25,7 @@ function setServ(ID) {
 		document.getElementById("serverdescC").innerHTML = "";
 	}
 }
+window.setServ = setServ;
 
 function onOpen(_e) {
 	masterserver.send("ID#webAO#webAO#%");
