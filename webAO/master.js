@@ -17,6 +17,7 @@ export function setServ(ID) {
 		document.getElementById("serverdescC").innerHTML = "";
 	}
 }
+window.setServ = setServ;
 
 function onOpen(_e) {
 	masterserver.send("ID#webAO#webAO#%");
