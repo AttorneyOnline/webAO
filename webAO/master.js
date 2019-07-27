@@ -1,5 +1,13 @@
 const MASTERSERVER_IP = "master.aceattorneyonline.com:27014";
 
+let oldLoading = true;
+export function onLoad(){
+	if (!(/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent))) {
+		oldLoading = false;
+	}
+}
+window.onLoad = onLoad;
+
 const masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 masterserver.onopen = (evt) => onOpen(evt);
 masterserver.onmessage = (evt) => onMessage(evt);
@@ -7,14 +15,6 @@ masterserver.onmessage = (evt) => onMessage(evt);
 const descs = [];
 descs[99] = "This is your computer on port 27016";
 const onlinec = [];
-
-let oldLoading = false;
-export function onLoad(){
-	if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-		oldLoading = true;
-	}
-}
-window.onLoad = onLoad;
 
 function setServ(ID) {
 	console.log(descs[ID]);
@@ -83,7 +83,7 @@ function onMessage(e) {
 				+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[3]}${asset}">Watch</a>`
 				+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[3]}${asset}">Join</a></li><br/>`;
 			descs[i] = args[1];
-			setTimeout(checkOnline(i, args[2] + ":" + args[3]), 3000);
+			setTimeout(checkOnline(i, args[2] + ":" + args[3]), 100);
 		}
 	} else if (header === "SN") {
 		const args = msg.split("#");
@@ -95,7 +95,7 @@ function onMessage(e) {
 			+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[4]}">Join</a></li><br/>`;
 		descs[i] = args[6];
 		masterserver.send("SR#" + i + "#%");
-		setTimeout(checkOnline(i, args[2] + ":" + args[4]), 3000);
+		setTimeout(checkOnline(i, args[2] + ":" + args[4]), i*1000);
 	} else if (header === "servercheok") {
 		const args = msg.split("#").slice(1);
 		console.log(args);
