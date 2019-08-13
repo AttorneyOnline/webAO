@@ -2117,7 +2117,7 @@ function escapeHtml(unsafe) {
  */
 function escapeChat(estring) {
 	return estring
-		.replace(/#/g, "<pound>")
+		.replace(/#/g, "<num>")
 		.replace(/&/g, "<and>")
 		.replace(/%/g, "<percent>")
 		.replace(/\$/g, "<dollar>");
@@ -2129,7 +2129,7 @@ function escapeChat(estring) {
  */
 function unescapeChat(estring) {
 	return estring
-		.replace(/<pound>/g, "#")
+		.replace(/<num>/g, "#")
 		.replace(/<and>/g, "&")
 		.replace(/<percent>/g, "%")
 		.replace(/<dollar>/g, "$");
