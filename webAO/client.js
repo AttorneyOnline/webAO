@@ -943,6 +943,8 @@ class Viewport {
 		this.sfxaudio = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
 		this.sfxplayed = 0;
 
+		this.shoutaudio = new Audio();
+
 		this.music = new Audio();
 		this.music.play();
 
@@ -1158,7 +1160,8 @@ class Viewport {
 			const shout = shouts[this.chatmsg.objection];
 			if (shout) {
 				shoutSprite.src = client.resources[shout]["src"];
-				(new Audio(`${AO_HOST}characters/${this.chatmsg.name.toLowerCase()}/${shout}.wav`)).play();
+				this.shoutaudio.src=`${AO_HOST}characters/${this.chatmsg.name.toLowerCase()}/${shout}.wav`;
+				this.shoutaudio.play();
 				this.shoutTimer = 850;
 			} else {
 				this.shoutTimer = 0;
@@ -1459,6 +1462,7 @@ window.changeMusicVolume = changeMusicVolume;
  */
 export function changeSFXVolume() {
 	viewport.sfxaudio.volume = document.getElementById("client_svolume").value / 100;
+	viewport.shoutaudio.volume = document.getElementById("client_svolume").value / 100;
 	setCookie("sfxVolume",document.getElementById("client_svolume").value);
 }
 window.changeSFXVolume = changeSFXVolume;
