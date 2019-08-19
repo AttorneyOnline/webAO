@@ -859,7 +859,7 @@ class Client extends EventEmitter {
 			}
 			td.innerHTML = `<img class='demothing${icon_chosen}' id='demo_${i}' ` +
 				`src='${thispick}' alt='${this.chars[i].name}' onclick='pickChar(${i})' ` +
-				"onerror='demoError(this);'>";
+				`onerror='demoError(this);'>`;
 			tr.appendChild(td);
 			if (i % CHAR_SELECT_WIDTH === 0) {
 				document.getElementById("client_chartable").appendChild(tr);
