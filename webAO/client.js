@@ -890,8 +890,8 @@ class Client extends EventEmitter {
 		updateActionCommands(me.side);
 		for (let i = 1; i <= ini.Emotions.number; i++) {
 			const emoteinfo = ini.Emotions[i].split("#");
-			const esfx = ini.SoundN ? ini.SoundN[i] : "0";
-			const esfxd = ini.SoundT ? ini.SoundT[i] : "0";
+			const esfx = ini.SoundN[i] ? ini.SoundN[i] : "0";
+			const esfxd = ini.SoundT[i] ? ini.SoundT[i] : "0";
 			// Make sure the asset server is case insensitive, or that everything on it is lowercase
 			emotes[i] = {
 				desc: emoteinfo[0].toLowerCase(),
