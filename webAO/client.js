@@ -885,13 +885,13 @@ class Client extends EventEmitter {
 		emotesList.style.display = "";
 
 		const data = await request(AO_HOST + "characters/" + escape(this.character.name.toLowerCase()) + "/char.ini");
-		const ini = INI.parse(data);
-		me.side = ini.Options.side;
+		const ini = INI.parse(data.toLowerCase());
+		me.side = ini.options.side;
 		updateActionCommands(me.side);
-		for (let i = 1; i <= ini.Emotions.number; i++) {
-			const emoteinfo = ini.Emotions[i].split("#");
-			const esfx = ini.SoundN[i] ? ini.SoundN[i] : "0";
-			const esfxd = ini.SoundT[i] ? ini.SoundT[i] : "0";
+		for (let i = 1; i <= ini.emotions.number; i++) {
+			const emoteinfo = ini.emotions[i].split("#");
+			const esfx = ini.soundn[i] ? ini.soundn[i] : "0";
+			const esfxd = ini.soundt[i] ? ini.soundt[i] : "0";
 			// Make sure the asset server is case insensitive, or that everything on it is lowercase
 			emotes[i] = {
 				desc: emoteinfo[0].toLowerCase(),
