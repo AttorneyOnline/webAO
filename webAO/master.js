@@ -1,4 +1,16 @@
+import Fingerprint from "./fingerprint.js";
+
 const MASTERSERVER_IP = "master.aceattorneyonline.com:27014";
+
+const fp = new Fingerprint({
+	canvas: true,
+	ie_activex: true,
+	screen_resolution: true
+});
+
+/** An emulated, semi-unique HDID that is generally safe for HDID bans. */
+const hdid = fp.get();
+console.log(`Your emulated HDID is ${hdid}`);
 
 let oldLoading = true;
 export function onLoad(){
@@ -28,7 +40,7 @@ export function setServ(ID) {
 window.setServ = setServ;
 
 function onOpen(_e) {
-	masterserver.send("ID#webAO#webAO#%");
+	masterserver.send("ID#webAO#2.3#%");
 	if (oldLoading === true) {
 		masterserver.send("askforservers#%");
 	}
@@ -41,8 +53,8 @@ function onOpen(_e) {
 function checkOnline(serverID, coIP) {
 	function onCOOpen(_e) {
 		document.getElementById(`server${serverID}`).className = "available";
-		oserv.send("HI#webAO#%");
-		oserv.send("ID#webAO#webAO#%");
+		oserv.send(`HI#${hdid}#%`);
+		oserv.send("ID#webAO#2.3#%");
 	}
 
 	function onCOMessage(e) {
@@ -82,7 +94,7 @@ function onMessage(e) {
 			document.getElementById("masterlist").innerHTML +=
 				`<li id="server${i}" class="unavailable" onmouseover="setServ(${i})"><p>${args[0]}</p>`
 				+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[3]}${asset}">Watch</a>`
-				+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[3]}${asset}">Join</a></li><br/>`;
+				+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[3]}${asset}">Join</a></li>`;
 			descs[i] = args[1];
 			setTimeout(checkOnline(i, args[2] + ":" + args[3]), 100);
 		}
@@ -93,7 +105,7 @@ function onMessage(e) {
 		document.getElementById("masterlist").innerHTML +=
 			`<li id="server${i}" class="unavailable" onmouseover="setServ(${i})"><p>${args[5]}</p>`
 			+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[4]}">Watch</a>`
-			+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[4]}">Join</a></li><br/>`;
+			+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[4]}">Join</a></li>`;
 		descs[i] = args[6];
 		masterserver.send("SR#" + i + "#%");
 		setTimeout(checkOnline(i, args[2] + ":" + args[4]), i*1000);
