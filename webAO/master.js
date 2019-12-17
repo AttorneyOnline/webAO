@@ -40,7 +40,7 @@ export function setServ(ID) {
 window.setServ = setServ;
 
 function onOpen(_e) {
-	masterserver.send("ID#webAO#2.3#%");
+	masterserver.send("ID#webAO#webAO#%");
 	if (oldLoading === true) {
 		masterserver.send("askforservers#%");
 	}
@@ -54,7 +54,7 @@ function checkOnline(serverID, coIP) {
 	function onCOOpen(_e) {
 		document.getElementById(`server${serverID}`).className = "available";
 		oserv.send(`HI#${hdid}#%`);
-		oserv.send("ID#webAO#2.3#%");
+		oserv.send("ID#webAO#webAO#%");
 	}
 
 	function onCOMessage(e) {
