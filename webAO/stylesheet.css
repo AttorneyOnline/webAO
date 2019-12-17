@@ -47,7 +47,7 @@
 	padding: 1px;
 }
 
-#serverdesc {
+#serverdescription_box {
 	display: inline-block;
 	position: fixed;
 	width: 185px;
@@ -60,7 +60,7 @@
 	border-radius: 5px;
 }
 
-#serverdescC {
+#serverdescription_content {
 	width: 180px;
 	height: 270px;
 	position: relative;
@@ -74,13 +74,13 @@
 }
 
 
-.servs {
+.serverlist {
 	display: block;
 	margin: auto;
 	width: 500px;
 }
 
-.servs li {
+.serverlist li {
 	position: relative;
 	left: -55px;
 	background-color: #FFF;
@@ -98,20 +98,20 @@
 	text-align: center;
 	cursor: default;
 }
-.servs li:hover {
+.serverlist li:hover {
 	background-color: #FFFF6B;
 	border-color: #EFAD21;
 }
 
-.servs li p {
+.serverlist li p {
 	display: inline-block !important;
 }
 
-.servs li a {
+.serverlist li a {
 	float: right;
 }
 
-.servs .button {
+.serverlist .button {
 	position: relative;
 	top: 0px;
 	right: -2px;
@@ -123,18 +123,18 @@
 	box-shadow: 0 0 0 2px #BBB; 
 }
 
-.servs .available {
+.serverlist .available {
 	background-color: #6BFF6B;
 	border-color: #21AD21;
 }
 
-.servs .unavailable {
+.serverlist .unavailable {
 	background-color: #ff6b6B;
 	border-color: #ad2121;
     display: none;
 }
 
-.servs .button:hover {
+.serverlist .button:hover {
 	box-shadow: 0 0 0 1px #EFAD21; 
 }
 
@@ -364,7 +364,7 @@ a.nav-link {
     text-decoration: none !important;
 }
 
-ul.servs p {
+ul.serverlist p {
     color: black;
 }
 

@@ -31,10 +31,10 @@ const online_counter = [];
 export function setServ(ID) {
 	console.log(server_description[ID]);
 	if (server_description[ID] !== undefined) {
-		document.getElementById("serverdescC").innerHTML = "<b>" + online_counter[ID] + "</b><br>" + server_description[ID];
+		document.getElementById("serverdescription_content").innerHTML = "<b>" + online_counter[ID] + "</b><br>" + server_description[ID];
 	}
 	else {
-		document.getElementById("serverdescC").innerHTML = "";
+		document.getElementById("serverdescription_content").innerHTML = "";
 	}
 }
 window.setServ = setServ;
