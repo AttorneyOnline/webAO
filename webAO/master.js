@@ -24,14 +24,14 @@ const masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 masterserver.onopen = (evt) => onOpen(evt);
 masterserver.onmessage = (evt) => onMessage(evt);
 
-const descs = [];
-descs[99] = "This is your computer on port 27016";
+const server_description = [];
+server_description[99] = "This is your computer on port 27016";
 const onlinec = [];
 
 export function setServ(ID) {
-	console.log(descs[ID]);
-	if (descs[ID] !== undefined) {
-		document.getElementById("serverdescC").innerHTML = "<b>Online: " + onlinec[ID] + "</b><br>" + descs[ID];
+	console.log(server_description[ID]);
+	if (server_description[ID] !== undefined) {
+		document.getElementById("serverdescC").innerHTML = "<b>Online: " + onlinec[ID] + "</b><br>" + server_description[ID];
 	}
 	else {
 		document.getElementById("serverdescC").innerHTML = "";
@@ -65,6 +65,11 @@ function checkOnline(serverID, coIP) {
 			onlinec[serverID] = `${coarguments[0]}/${coarguments[1]}`;
 			oserv.close();
 		}
+		else if (coheader === "BD") {
+			onlinec[serverID] = `Banned`;
+			server_description[serverID] = coarguments[0];
+			oserv.close();
+		}
 	}
 
 	var oserv = new WebSocket("ws://" + coIP);
@@ -95,10 +100,11 @@ function onMessage(e) {
 				`<li id="server${i}" class="unavailable" onmouseover="setServ(${i})"><p>${args[0]}</p>`
 				+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[3]}${asset}">Watch</a>`
 				+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[3]}${asset}">Join</a></li>`;
-			descs[i] = args[1];
+			server_description[i] = args[1];
 			setTimeout(checkOnline(i, args[2] + ":" + args[3]), 100);
 		}
-	} else if (header === "SN") {
+	}
+	else if (header === "SN") {
 		const args = msg.split("#");
 		const i = args[1];
 		console.log(args);
@@ -106,14 +112,16 @@ function onMessage(e) {
 			`<li id="server${i}" class="unavailable" onmouseover="setServ(${i})"><p>${args[5]}</p>`
 			+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[4]}">Watch</a>`
 			+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[4]}">Join</a></li>`;
-		descs[i] = args[6];
+		server_description[i] = args[6];
 		masterserver.send("SR#" + i + "#%");
 		setTimeout(checkOnline(i, args[2] + ":" + args[4]), i*1000);
-	} else if (header === "servercheok") {
+	}
+	else if (header === "servercheok") {
 		const args = msg.split("#").slice(1);
 		console.log(args);
 		document.getElementById("clientinfo").innerHTML = `Client version: ${args[0]}`;
-	} else if (header === "SV") {
+	}
+	else if (header === "SV") {
 		const args = msg.split("#").slice(1);
 		console.log(args);
 		document.getElementById("serverinfo").innerHTML = `Master server version: ${args[0]}`;
