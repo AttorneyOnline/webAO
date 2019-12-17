@@ -12,10 +12,10 @@ const fp = new Fingerprint({
 const hdid = fp.get();
 console.log(`Your emulated HDID is ${hdid}`);
 
-let oldLoading = true;
+let oldLoading = false;
 export function onLoad(){
-	if (!(/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent))) {
-		oldLoading = false;
+	if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+		oldLoading = true;
 	}
 }
 window.onLoad = onLoad;
