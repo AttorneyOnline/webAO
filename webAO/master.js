@@ -85,10 +85,10 @@ function checkOnline(serverID, coIP) {
 }
 
 function onMessage(e) {
-	const msg = e.data;
-	console.log(msg);
+	const msg = e.data;	
 	const header = msg.split("#", 2)[0];
-
+	console.log(header);
+	
 	if (header === "ALL") {
 		const servers = msg.split("#").slice(1);
 		for (let i = 0; i < servers.length; i++) {
@@ -107,7 +107,6 @@ function onMessage(e) {
 	else if (header === "SN") {
 		const args = msg.split("#");
 		const i = args[1];
-		console.log(args);
 		document.getElementById("masterlist").innerHTML +=
 			`<li id="server${i}" class="unavailable" onmouseover="setServ(${i})"><p>${args[5]}</p>`
 			+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[4]}">Watch</a>`
@@ -118,12 +117,10 @@ function onMessage(e) {
 	}
 	else if (header === "servercheok") {
 		const args = msg.split("#").slice(1);
-		console.log(args);
 		document.getElementById("clientinfo").innerHTML = `Client version: ${args[0]}`;
 	}
 	else if (header === "SV") {
 		const args = msg.split("#").slice(1);
-		console.log(args);
 		document.getElementById("serverinfo").innerHTML = `Master server version: ${args[0]}`;
 	}
 }
