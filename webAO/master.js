@@ -26,12 +26,12 @@ masterserver.onmessage = (evt) => onMessage(evt);
 
 const server_description = [];
 server_description[99] = "This is your computer on port 27016";
-const onlinec = [];
+const online_counter = [];
 
 export function setServ(ID) {
 	console.log(server_description[ID]);
 	if (server_description[ID] !== undefined) {
-		document.getElementById("serverdescC").innerHTML = "<b>Online: " + onlinec[ID] + "</b><br>" + server_description[ID];
+		document.getElementById("serverdescC").innerHTML = "<b>" + online_counter[ID] + "</b><br>" + server_description[ID];
 	}
 	else {
 		document.getElementById("serverdescC").innerHTML = "";
@@ -62,11 +62,11 @@ function checkOnline(serverID, coIP) {
 		const coheader = comsg.split("#", 2)[0];
 		const coarguments = comsg.split("#").slice(1);
 		if (coheader === "PN") {
-			onlinec[serverID] = `${coarguments[0]}/${coarguments[1]}`;
+			online_counter[serverID] = `Online: ${coarguments[0]}/${coarguments[1]}`;
 			oserv.close();
 		}
 		else if (coheader === "BD") {
-			onlinec[serverID] = `Banned`;
+			online_counter[serverID] = "Banned";
 			server_description[serverID] = coarguments[0];
 			oserv.close();
 		}
