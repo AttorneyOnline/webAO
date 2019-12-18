@@ -669,6 +669,7 @@ class Client extends EventEmitter {
 		const hmusiclist = document.getElementById("client_musiclist");
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
+				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
 				const newentry = document.createElement("OPTION");
 				newentry.text = args[i];
 				hmusiclist.options.add(newentry);
