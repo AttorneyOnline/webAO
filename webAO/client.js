@@ -74,9 +74,6 @@ class Client extends EventEmitter {
 
 		this.playerID = 1;
 		this.charID = -1;
-		this.char_list_length = 0;
-		this.evidence_list_length = 0;
-		this.music_list_length = 0;
 		this.testimonyID = 0;
 
 		this.chars = [];
@@ -540,61 +537,41 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Handles the incoming character information, and downloads the sprite + ini for it
-	 * @param {Array} args packet arguments
-	 */
-	async handleCharacterInfo(chargs, charid) {
-		let cini = {};
-		try {
-			const cinidata = await request(AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char.ini");
-			cini = INI.parse(cinidata.toLowerCase());
-		} catch(err) {
-			cini = {options: {name: chargs[0].toLowerCase(),showname: chargs[0].toLowerCase(),side: "def", gender: "male"}};
-		}
-		console.log(cini);
-		this.chars[charid] = {
-			name: chargs[0],
-			showname: cini.options.showname,
-			desc: chargs[1],
-			gender: cini.options.gender,
-			evidence: chargs[3],
-			icon: AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png",
-			inifile: cini
-		};
-		// need to take care of src alt onclick and onerror when the char comes in
-		let img = document.getElementById(`demo_${charid}`);
-		img.src = AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png";
-		img.alt = chargs[0];
-	}
-
-	/**
 	 * Handles incoming character information, bundling multiple characters
 	 * per packet.
 	 * @param {Array} args packet arguments
 	 */
 	handleCI(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Character " + args[1];
+		this.serv.send("AN#" + ((args[1] / 10) + 1) + "#%");
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
-				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 				const chargs = args[i].split("&");
-				this.handleCharacterInfo(chargs, i-1);
+				this.chars[args[i - 1]] = {
+					name: chargs[0],
+					desc: chargs[1],
+					evidence: chargs[3],
+					icon: AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png"
+				};
 			}
 		}
-		this.serv.send("AN#" + ((args[1] / 10) + 1) + "#%");
 	}
 
 	/**
-	 * Handles incoming character information, containing all characters
-	 * in one packet.
+	 * Handles incoming character information, containing only one character
+	 * per packet.
 	 * @param {Array} args packet arguments
 	 */
 	handleSC(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Characters";
 		for (let i = 1; i < args.length - 1; i++) {
-			document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 			const chargs = args[i].split("&");
-			this.handleCharacterInfo(chargs, i-1);
+			this.chars[i - 1] = {
+				name: chargs[0],
+				desc: chargs[1],
+				evidence: chargs[3],
+				icon: AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png"
+			};
 		}
 		this.serv.send("RM#%");
 	}
@@ -607,7 +584,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleEI(args) {
-		document.getElementById("client_loadingtext").innerHTML = `Loading Evidence ${args[1]}/${this.evidence_list_length}`;
+		document.getElementById("client_loadingtext").innerHTML = "Loading Evidence " + args[1];
 		//serv.send("AE#" + (args[1] + 1) + "#%");
 		this.serv.send("RM#%");
 	}
@@ -855,28 +832,7 @@ class Client extends EventEmitter {
 	 * but we use it as a cue to begin retrieving characters.
 	 * @param {Array} args packet arguments
 	 */
-	handleSI(args) {
-		this.char_list_length = args[1];
-		this.evidence_list_length = args[2];
-		this.music_list_length = args[3];
-
-		// create the charselect grid, to be filled by the character loader
-		document.getElementById("client_chartable").innerHTML = "";
-		let tr;
-		for (let i = 0; i < this.char_list_length; i++) {
-			if (i % CHAR_SELECT_WIDTH === 0) {
-				tr = document.createElement("TR");
-			}
-			const td = document.createElement("TD");
-
-			td.innerHTML = `<img class='demothing' id='demo_${i}' onclick='pickChar(${i})' onerror='demoError(this)'>`;
-			
-			tr.appendChild(td);
-			if (i % CHAR_SELECT_WIDTH === 0) {
-				document.getElementById("client_chartable").appendChild(tr);
-			}
-		}
-
+	handleSI(_args) {
 		if (oldLoading) {
 			this.serv.send("askchar2#%");
 		} else {
@@ -889,15 +845,26 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleCharsCheck(args) {
-		for (let i = 0; i < this.char_list_length; i++) {
-			let icon_chosen = "demothing";
-			if (args[i + 1] === "-1") {
-				icon_chosen += " dark";
+		document.getElementById("client_chartable").innerHTML = "";
+		let tr;
+		for (let i = 0; i < this.chars.length; i++) {
+			if (i % CHAR_SELECT_WIDTH === 0) {
+				tr = document.createElement("TR");
 			}
-			let img = document.getElementById(`demo_${i}`);
-			img.classList = icon_chosen;
+			const td = document.createElement("TD");
+			let icon_chosen = "";
+			const thispick = this.chars[i].icon;
+			if (args[i + 1] === "-1") {
+				icon_chosen = " dark";
+			}
+			td.innerHTML = `<img class='demothing${icon_chosen}' id='demo_${i}' ` +
+				`src='${thispick}' alt='${this.chars[i].name}' onclick='pickChar(${i})' ` +
+				`onerror='demoError(this);'>`;
+			tr.appendChild(td);
+			if (i % CHAR_SELECT_WIDTH === 0) {
+				document.getElementById("client_chartable").appendChild(tr);
+			}
 		}
-
 		//changeBackground("def");
 	}
 
@@ -916,8 +883,8 @@ class Client extends EventEmitter {
 		const emotesList = document.getElementById("client_emo");
 		emotesList.innerHTML = ""; // Clear emote box
 		emotesList.style.display = "";
-		console.log(me.inifile);
-		const data = await request(AO_HOST + "characters/" + escape(me.name.toLowerCase()) + "/char.ini");
+
+		const data = await request(AO_HOST + "characters/" + escape(this.character.name.toLowerCase()) + "/char.ini");
 		const ini = INI.parse(data.toLowerCase());
 		me.side = ini.options.side;
 		updateActionCommands(me.side);
