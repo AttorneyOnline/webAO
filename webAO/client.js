@@ -917,9 +917,7 @@ class Client extends EventEmitter {
 		const emotesList = document.getElementById("client_emo");
 		emotesList.innerHTML = ""; // Clear emote box
 		emotesList.style.display = "";
-		console.log(me.inifile);
-		const data = await request(AO_HOST + "characters/" + escape(me.name.toLowerCase()) + "/char.ini");
-		const ini = INI.parse(data.toLowerCase());
+		const ini = me.cini;
 		me.side = ini.options.side;
 		updateActionCommands(me.side);
 		for (let i = 1; i <= ini.emotions.number; i++) {
