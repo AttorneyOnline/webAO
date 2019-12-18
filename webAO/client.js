@@ -466,13 +466,14 @@ class Client extends EventEmitter {
 			document.getElementById("client_inner_chat").innerHTML = "";
 			const chatmsg = {
 				preanim: escape(args[2]), // get preanim
-				nameplate: args[3], // TODO: parse INI to get this info
+				nameplate: this.chars[args[9]].showname,
 				name: args[3],
 				speaking: "(b)" + escape(args[4]),
 				silent: "(a)" + escape(args[4]),
 				content: this.prepChat(args[5]), // Escape HTML tag, Use BBCode Only!
 				side: args[6],
 				sound: escape(args[7]),
+				blips: this.chars[args[9]].gender,
 				type: args[8],
 				charid: args[9],
 				snddelay: args[10],
@@ -549,7 +550,7 @@ class Client extends EventEmitter {
 			const cinidata = await request(AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char.ini");
 			cini = INI.parse(cinidata.toLowerCase());
 		} catch(err) {
-			cini = {options: {name: chargs[0].toLowerCase(),showname: chargs[0].toLowerCase(),side: "def", gender: "male"}};
+			cini = {options: {name: chargs[0].toLowerCase(),showname: chargs[0],side: "def", gender: "male"}};
 		}
 		console.log(cini);
 		this.chars[charid] = {
@@ -967,7 +968,6 @@ class Viewport {
 
 		// Allocate multiple blip audio channels to make blips less jittery
 
-		// TODO: read blip type ("gender") from ini
 		this.blipChannels = new Array(6);
 		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav"))
 			.forEach(channel => channel.volume = 0.5);
@@ -1024,6 +1024,7 @@ class Viewport {
 		this.chatmsg = chatmsg;
 		appendICLog(chatmsg.content, chatmsg.nameplate);
 		changeBackground(chatmsg.side);
+		this.blipChannels.forEach(channel => channel.src = AO_HOST + `sounds/general/sfx-blip${chatmsg.blips}.wav`);
 		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
