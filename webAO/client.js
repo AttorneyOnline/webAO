@@ -869,7 +869,7 @@ class Client extends EventEmitter {
 			}
 			const td = document.createElement("TD");
 
-			td.innerHTML = `<img class='demothing' id='demo_${i}' onclick='pickChar(${i})' onerror='demoError(this)'>`;
+			td.innerHTML = `<img class='demothing' id='demo_${i}' onclick='pickChar(${i})' >`;
 			
 			tr.appendChild(td);
 			if (i % CHAR_SELECT_WIDTH === 0) {
@@ -1541,17 +1541,6 @@ export function imgError(image) {
 	return true;
 }
 window.imgError = imgError;
-
-/**
- * Triggered when there was an error loading a character icon.
- * @param {HTMLImageElement} image the element containing the missing image
- */
-export function demoError(image) {
-	image.onerror = "";
-	image.src = "misc/placeholder.png";
-	return true;
-}
-window.demoError = demoError;
 
 /**
  * Make a GET request for a specific URI.
