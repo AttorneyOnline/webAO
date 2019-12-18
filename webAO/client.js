@@ -573,7 +573,7 @@ class Client extends EventEmitter {
 		};
 		// need to take care of src alt onclick and onerror when the char comes in
 		let img = document.getElementById(`demo_${charid}`);
-		img.src = AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png";
+		img.src = this.chars[charid].icon;
 		img.alt = chargs[0];
 	}
 
