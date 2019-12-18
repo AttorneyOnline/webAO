@@ -550,8 +550,17 @@ class Client extends EventEmitter {
 			const cinidata = await request(AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char.ini");
 			cini = INI.parse(cinidata.toLowerCase());
 		} catch(err) {
-			cini = {options: {name: chargs[0].toLowerCase(),showname: chargs[0],side: "def", gender: "male"}};
+			cini = {};
 		}
+		if (cini.options.name === undefined)
+			cini.options.name = chargs[0].toLowerCase();
+		if (cini.options.showname === undefined)
+			cini.options.showname = chargs[0];
+		if (cini.options.side === undefined)
+			cini.options.side = "def";
+		if (cini.options.gender === undefined)
+			cini.options.gender = "male";
+
 		console.log(cini);
 		this.chars[charid] = {
 			name: chargs[0],
