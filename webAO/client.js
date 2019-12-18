@@ -465,14 +465,14 @@ class Client extends EventEmitter {
 		if (args[4] !== viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
 			const chatmsg = {
-				preanim: escape(args[2]), // get preanim
+				preanim: escape(args[2]).toLowerCase(), // get preanim
 				nameplate: this.chars[args[9]].showname,
-				name: args[3],
-				speaking: "(b)" + escape(args[4]),
-				silent: "(a)" + escape(args[4]),
+				name: args[3].toLowerCase(),
+				speaking: "(b)" + escape(args[4]).toLowerCase(),
+				silent: "(a)" + escape(args[4]).toLowerCase(),
 				content: this.prepChat(args[5]), // Escape HTML tag, Use BBCode Only!
-				side: args[6],
-				sound: escape(args[7]),
+				side: args[6].toLowerCase(),
+				sound: escape(args[7]).toLowerCase(),
 				blips: this.chars[args[9]].gender,
 				type: args[8],
 				charid: args[9],
@@ -548,7 +548,7 @@ class Client extends EventEmitter {
 		let cini = {};
 		try {
 			const cinidata = await request(AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char.ini");
-			cini = INI.parse(cinidata.toLowerCase());
+			cini = INI.parse(cinidata);
 		} catch(err) {
 			cini = {};
 		}
@@ -563,10 +563,10 @@ class Client extends EventEmitter {
 
 		console.log(cini);
 		this.chars[charid] = {
-			name: chargs[0],
+			name: chargs[0].toLowerCase(),
 			showname: cini.options.showname,
 			desc: chargs[1],
-			gender: cini.options.gender,
+			gender: cini.options.gender.toLowerCase(),
 			evidence: chargs[3],
 			icon: AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png",
 			inifile: cini
@@ -1039,7 +1039,7 @@ class Viewport {
 		clearTimeout(this.updater);
 		// If preanim existed then determine the length
 		if (chatmsg.preanim !== "-") {
-			const delay = await this.getAnimLength(`${AO_HOST}characters/${escape(chatmsg.name.toLowerCase())}/${chatmsg.preanim.toLowerCase()}.gif`);
+			const delay = await this.getAnimLength(`${AO_HOST}characters/${escape(chatmsg.name)}/${chatmsg.preanim}.gif`);
 			chatmsg.preanimdelay = delay;
 			this.initUpdater(delay);
 		} else {
@@ -1356,14 +1356,18 @@ class INI {
 			} else if (regex.param.test(line)) {
 				const match = line.match(regex.param);
 				if (section) {
-					value[section][match[1]] = match[2];
-				} else {
-					value[match[1]] = match[2];
+					if(match[1].toLowerCase() === "showname"){	//don't lowercase the showname
+						value[section][match[1].toLowerCase()] = match[2];
+					} else {
+						value[section][match[1].toLowerCase()] = match[2].toLowerCase();
+					}
+				//} else { // we don't care about attributes without a section
+				//	value[match[1]] = match[2];
 				}
 			} else if (regex.section.test(line)) {
 				const match = line.match(regex.section);
-				value[match[1]] = {};
-				section = match[1];
+				value[match[1].toLowerCase()] = {};				//lowercase everything else
+				section = match[1].toLowerCase();
 			}
 		});
 		return value;
