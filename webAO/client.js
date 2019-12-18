@@ -571,7 +571,6 @@ class Client extends EventEmitter {
 		if (cini.options.gender === undefined)
 			cini.options.gender = "male";
 
-		console.log(cini);
 		this.chars[charid] = {
 			name: chargs[0].toLowerCase(),
 			showname: cini.options.showname,
@@ -910,7 +909,7 @@ class Client extends EventEmitter {
 		for (let i = 0; i < this.char_list_length; i++) {
 			let img = document.getElementById(`demo_${i}`);
 			let icon_chosen = "demothing";
-				console.log(img.classList);
+
 			if (img.classList.contains("noini"))
 				icon_chosen += " noini";
 
@@ -1101,7 +1100,6 @@ class Viewport {
 	async getAnimLength(filename) {
 		try {
 			const file = await requestBuffer(filename);
-			console.log(filename);
 			return this.calculateGifLength(file);
 		} catch (err) {
 			return 0;
@@ -1713,7 +1711,6 @@ async function changeBackground(position) {
 export function ReconnectButton() {
 	client.cleanup();
 	client = new Client(serverIP);
-	console.log(client);
 	if (client) {
 		mode = "join"; // HACK: see client.onOpen
 		document.getElementById("client_error").style.display = "none";
