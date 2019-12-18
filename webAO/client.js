@@ -546,14 +546,22 @@ class Client extends EventEmitter {
 	 */
 	async handleCharacterInfo(chargs, charid) {
 		let cini = {};
+		let icon = AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png";
+		let img = document.getElementById(`demo_${charid}`);
+		img.alt = chargs[0];
+		img.src = icon;	// seems like a good time to load the icon
+
 		try {
 			const cinidata = await request(AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char.ini");
 			cini = INI.parse(cinidata);
 		} catch(err) {
 			cini = {};
+			img.classList.add("noini");
 		}
+
+		// fix all the funny ini business
 		if (cini.options === undefined)
-			cini.options = {}
+			cini.options = {};
 		if (cini.options.name === undefined)
 			cini.options.name = chargs[0].toLowerCase();
 		if (cini.options.showname === undefined)
@@ -570,13 +578,11 @@ class Client extends EventEmitter {
 			desc: chargs[1],
 			gender: cini.options.gender.toLowerCase(),
 			evidence: chargs[3],
-			icon: AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png",
+			icon: icon,
 			inifile: cini
 		};
-		// need to take care of src alt onclick and onerror when the char comes in
-		let img = document.getElementById(`demo_${charid}`);
-		img.src = this.chars[charid].icon;
-		img.alt = chargs[0];
+
+		
 	}
 
 	/**
@@ -902,11 +908,15 @@ class Client extends EventEmitter {
 	 */
 	handleCharsCheck(args) {
 		for (let i = 0; i < this.char_list_length; i++) {
-			let icon_chosen = "demothing";
-			if (args[i + 1] === "-1") {
-				icon_chosen += " dark";
-			}
 			let img = document.getElementById(`demo_${i}`);
+			let icon_chosen = "demothing";
+				console.log(img.classList);
+			if (img.classList.contains("noini"))
+				icon_chosen += " noini";
+
+			if (args[i + 1] === "-1")
+				icon_chosen += " dark";
+			
 			img.classList = icon_chosen;
 		}
 

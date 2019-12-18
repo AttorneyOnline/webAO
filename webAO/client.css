@@ -424,6 +424,10 @@ img {
 	filter: brightness(50%);
 }
 
+.noini {
+	transform: rotate(180deg);
+}
+
 .hrtext {
 	overflow: hidden;
 	text-align: center;
