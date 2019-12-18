@@ -552,6 +552,8 @@ class Client extends EventEmitter {
 		} catch(err) {
 			cini = {};
 		}
+		if (cini.options === undefined)
+			cini.options = {}
 		if (cini.options.name === undefined)
 			cini.options.name = chargs[0].toLowerCase();
 		if (cini.options.showname === undefined)
