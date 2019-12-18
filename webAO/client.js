@@ -309,25 +309,6 @@ class Client extends EventEmitter {
 		background_arr.forEach(background => {
 			background_select.add(new Option(background));
 		});
-
-		this.resources.map(async (resource) => {
-			// Check if image exists and replace `src` with an absolute URL
-			const spriteSrc = `${AO_HOST}themes/default/${resource.src}.gif`;
-			if (await fileExists(spriteSrc)) {
-				Object.assign(resource, {
-					src: spriteSrc,
-					duration: await viewport.getAnimLength(spriteSrc)
-				});
-			}
-
-			// Check if sfx exists and replace `sfx` with an absolute URL
-			if (resource.sfx) {
-				const sfxSrc = AO_HOST + resource.sfx.toLowerCase();
-				if (await fileExists(sfxSrc)) {
-					resource.sfx = sfxSrc;
-				}
-			}
-		});
 	}
 
 	/**
@@ -389,13 +370,9 @@ class Client extends EventEmitter {
 	 * Triggered when a connection is established to the server.
 	 */
 	onOpen(_e) {
-		// XXX: Why does watching mean just SITTING there and doing nothing?
-		if (mode === "watch") {
-			document.getElementById("client_loading").style.display = "none";
-			document.getElementById("client_charselect").style.display = "none";
-		} else {
-			client.joinServer();
-		}
+		client.initialObservBBCode();
+		client.loadResources();
+		client.joinServer();
 	}
 
 	/**
@@ -730,7 +707,11 @@ class Client extends EventEmitter {
 	 */
 	handleDONE(_args) {
 		document.getElementById("client_loading").style.display = "none";
-		document.getElementById("client_charselect").style.display = "block";
+		if (mode === "watch") {		// Spectators don't need to pick a character
+			document.getElementById("client_charselect").style.display = "none";
+		} else {
+			document.getElementById("client_charselect").style.display = "block";
+		}
 	}
 
 	/**
@@ -2208,12 +2189,6 @@ function decodeBBCode(estring) {
 
 let client = new Client(serverIP);
 let viewport = new Viewport();
-
-export function onLoad(){
-	client.initialObservBBCode();
-	client.loadResources();
-}
-window.onLoad = onLoad;
 
 // Create dialog and link to button	
 $(function () {
