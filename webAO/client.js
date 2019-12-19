@@ -879,6 +879,7 @@ class Client extends EventEmitter {
 		document.getElementById("client_inputbox").style.display = "";
 
 		const me = this.character;
+		this.selectedEmote = -1;
 		const emotes = this.emotes;
 		const emotesList = document.getElementById("client_emo");
 		emotesList.innerHTML = ""; // Clear emote box
@@ -1740,8 +1741,12 @@ window.pickChar = pickChar;
  * @param {string} emo the new emotion to be selected
  */
 export function pickEmotion(emo) {
-	if (client.selectedEmote !== -1) {
-		document.getElementById("emo_" + client.selectedEmote).src = client.emote.button_off;
+	try {
+		if (client.selectedEmote !== -1) {
+			document.getElementById("emo_" + client.selectedEmote).src = client.emote.button_off;
+		}
+	} catch (err) {
+		// do nothing
 	}
 	client.selectedEmote = emo;
 	document.getElementById("emo_" + emo).src = client.emote.button_on;
