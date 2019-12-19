@@ -315,38 +315,6 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Create observer to detect BBCode elements
-	 * then manipulate them.
-	 */
-	initialObservBBCode() {
-		const target = document.getElementById("client_inner_chat");
-		const observer = new MutationObserver(mutations => {
-			mutations.forEach(mutation => {
-				const children = mutation.addedNodes;
-				if (children !== null) {
-					children.forEach(function (node) {
-						if (node.tagName === "C") {
-							node.style.color = node.getAttribute("a");
-						} else if (node.tagName === "M") {
-							if (node.hasAttribute("a")) {
-								node.style.backgroundColor = node.getAttribute("a");
-							} else {
-								node.style.backgroundColor = "yellow";
-								node.style.color = "black";
-							}
-						}
-					});
-				}
-			});
-		});
-		const config = {
-			attributes: true,
-			childList: true
-		};
-		observer.observe(target, config);
-	}
-
-	/**
 	 * Requests to play as a specified character.
 	 * @param {number} character the character ID
 	 */
@@ -430,7 +398,7 @@ class Client extends EventEmitter {
 	 */
 	prepChat(msg) {
 		// TODO: make this less awful
-		return decodeBBCode(unescapeChat(decodeChat(msg)));
+		return unescapeChat(decodeChat(msg));
 	}
 
 	/**
@@ -447,7 +415,7 @@ class Client extends EventEmitter {
 				name: args[3].toLowerCase(),
 				speaking: "(b)" + escape(args[4]).toLowerCase(),
 				silent: "(a)" + escape(args[4]).toLowerCase(),
-				content: this.prepChat(args[5]), // Escape HTML tag, Use BBCode Only!
+				content: this.prepChat(args[5]), // Escape HTML tag
 				side: args[6].toLowerCase(),
 				sound: escape(args[7]).toLowerCase(),
 				blips: this.chars[args[9]].gender,
@@ -2209,25 +2177,6 @@ function decodeChat(estring) {
 	} else {
 		return estring;
 	}
-}
-
-/**
- * Decoding text on client side.
- * @param {string} estring the string to be decoded
- */
-function decodeBBCode(estring) {
-	return estring
-		.replace(/\\n/g, "<br>") // Newline \n
-		.replace(/\[(\/?)b\]/g, "<$1b>") // Bold [b][/b]
-		.replace(/\[(\/?)i\]/g, "<$1i>") // Italic [i][/i]
-		.replace(/\[(\/?)s\]/g, "<$1del>") // Strikethrough  [s][/s]
-		.replace(/\[(\/?)u\]/g, "<$1u>") // Underline [u][/u]
-		.replace(/\[(\/?)sub\]/g, "<$1sub>") // Subscript [sub][/sub]
-		.replace(/\[(\/?)sup\]/g, "<$1sup>") // Superscript [sup][/sup]
-		.replace(/\[m=([#a-zA-Z0-9]+)\]/g, "<m a=\"$1\">") // Markup [m=#0ff]
-		.replace(/\[(\/?)m\]/g, "<$1m>") // [m][/m]
-		.replace(/\[c=?([#a-zA-Z0-9]+)\]/g, "<c a=\"$1\">") // Color [c=red]
-		.replace(/\[\/c\]/g, "</c>"); // [/c]
 }
 
 //
