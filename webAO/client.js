@@ -1504,7 +1504,7 @@ window.changeCharacter = changeCharacter;
  * @param {HTMLImageElement} image the element containing the missing image
  */
 export function charError(image) {
-	image.onerror = "";
+	console.warn(image.src+" is missing from webAO");
 	image.src = "misc/placeholder.gif";
 	return true;
 }
