@@ -72,7 +72,6 @@ async function checkOnline(serverID, coIP) {
 		}
 	}
 
-	console.log(coIP);
 	var oserv = new WebSocket("ws://" + coIP);
 
 	oserv.onopen = function (evt) {
@@ -92,7 +91,6 @@ function onMessage(e) {
 	
 	if (header === "ALL") {
 		const servers = msg.split("#").slice(1);
-		console.log(servers);
 		for (let i = 0; i < servers.length-1; i++) {
 			const serverEntry = servers[i];
 			const args = serverEntry.split("&");
