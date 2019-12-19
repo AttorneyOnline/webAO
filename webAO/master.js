@@ -25,7 +25,7 @@ masterserver.onopen = (evt) => onOpen(evt);
 masterserver.onmessage = (evt) => onMessage(evt);
 
 const server_description = [];
-server_description[99] = "This is your computer on port 27016";
+server_description[-1] = "This is your computer on port 50001";
 const online_counter = [];
 
 export function setServ(ID) {
@@ -72,6 +72,10 @@ async function checkOnline(serverID, coIP) {
 		}
 	}
 
+	function onCOError(_e) {
+		console.warn(serverID + " threw an error.");
+	}
+
 	var oserv = new WebSocket("ws://" + coIP);
 
 	oserv.onopen = function (evt) {
@@ -81,6 +85,10 @@ async function checkOnline(serverID, coIP) {
 	oserv.onmessage = function (evt) {
 		onCOMessage(evt);
 	};
+
+	oserv.onerror = function(evt) {
+		onCOError(evt)
+	  };
 
 }
 
@@ -103,6 +111,7 @@ function onMessage(e) {
 			server_description[i] = args[1];
 			checkOnline(i, `${args[2]}:${args[3]}`);
 		}
+		checkOnline(-1, "127.0.0.1:50001");
 	}
 	else if (header === "SN") {
 		const args = msg.split("#");
