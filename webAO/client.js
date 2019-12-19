@@ -341,7 +341,6 @@ class Client extends EventEmitter {
 	 * Triggered when a connection is established to the server.
 	 */
 	onOpen(_e) {
-		client.initialObservBBCode();
 		client.loadResources();
 		client.joinServer();
 	}
