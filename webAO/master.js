@@ -50,7 +50,7 @@ function onOpen(_e) {
 	masterserver.send("VC#%");
 }
 
-function checkOnline(serverID, coIP) {
+async function checkOnline(serverID, coIP) {
 	function onCOOpen(_e) {
 		document.getElementById(`server${serverID}`).className = "available";
 		oserv.send(`HI#${hdid}#%`);
@@ -72,6 +72,7 @@ function checkOnline(serverID, coIP) {
 		}
 	}
 
+	console.log(coIP);
 	var oserv = new WebSocket("ws://" + coIP);
 
 	oserv.onopen = function (evt) {
@@ -91,7 +92,8 @@ function onMessage(e) {
 	
 	if (header === "ALL") {
 		const servers = msg.split("#").slice(1);
-		for (let i = 0; i < servers.length; i++) {
+		console.log(servers);
+		for (let i = 0; i < servers.length-1; i++) {
 			const serverEntry = servers[i];
 			const args = serverEntry.split("&");
 			const asset = args[4] ? `&asset=${args[4]}` : "";
@@ -101,7 +103,7 @@ function onMessage(e) {
 				+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[3]}${asset}">Watch</a>`
 				+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[3]}${asset}">Join</a></li>`;
 			server_description[i] = args[1];
-			setTimeout(checkOnline(i, args[2] + ":" + args[3]), 100);
+			checkOnline(i, `${args[2]}:${args[3]}`);
 		}
 	}
 	else if (header === "SN") {
@@ -113,7 +115,7 @@ function onMessage(e) {
 			+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[4]}">Join</a></li>`;
 		server_description[i] = args[6];
 		masterserver.send("SR#" + i + "#%");
-		setTimeout(checkOnline(i, args[2] + ":" + args[4]), i*1000);
+		checkOnline(i, `${args[2]}:${args[3]}`);
 	}
 	else if (header === "servercheok") {
 		const args = msg.split("#").slice(1);
