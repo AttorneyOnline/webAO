@@ -73,7 +73,7 @@ async function checkOnline(serverID, coIP) {
 	}
 
 	function onCOError(_e) {
-		console.warn(serverID + " threw an error.");
+		console.warn(coIP + " threw an error.");
 	}
 
 	var oserv = new WebSocket("ws://" + coIP);
