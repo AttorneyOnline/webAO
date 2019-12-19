@@ -560,16 +560,13 @@ class Client extends EventEmitter {
 		}
 
 		// fix all the funny ini business
-		if (cini.options === undefined)
-			cini.options = {};
-		if (cini.options.name === undefined)
-			cini.options.name = chargs[0].toLowerCase();
-		if (cini.options.showname === undefined)
-			cini.options.showname = chargs[0];
-		if (cini.options.side === undefined)
-			cini.options.side = "def";
-		if (cini.options.gender === undefined)
-			cini.options.gender = "male";
+		const default_options = {
+			name: chargs[0].toLowerCase(),
+			showname: chargs[0],
+			side: "def",
+			gender: "male"
+		};
+		cini.options = Object.assign(default_options, cini.options);
 
 		this.chars[charid] = {
 			name: chargs[0].toLowerCase(),
