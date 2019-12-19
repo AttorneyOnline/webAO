@@ -214,7 +214,7 @@
 		</span>
 
 		<!-- Settings section -->
-		<span class="menu_content" id="content_3" onload="loadSettings()">
+		<span class="menu_content" id="content_3">
 			<meta name="frame-title" lang="en" content="Settings">
 			<label for="OOC_name">Server chat name:</label>
 			<input id="OOC_name" name="OOC_name" class="short" type="text">
@@ -243,7 +243,7 @@
 			</div>
 			<br>
 			<img src="misc/character_change.png" id="char_change" alt="Change" class="client_button hover_button"
-				onclick="changeCharacter()">
+				onclick="changeCharacter()" onload="loadSettings()">
 			<img src="misc/character_random.png" id="char_random" alt="Random" class="client_button hover_button"
 				onclick="randomCharacterOOC()">
 			<br>
