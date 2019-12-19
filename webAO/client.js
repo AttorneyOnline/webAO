@@ -74,6 +74,9 @@ class Client extends EventEmitter {
 
 		this.playerID = 1;
 		this.charID = -1;
+		this.char_list_length = 0;
+		this.evidence_list_length = 0;
+		this.music_list_length = 0;
 		this.testimonyID = 0;
 
 		this.chars = [];
@@ -439,14 +442,15 @@ class Client extends EventEmitter {
 		if (args[4] !== viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
 			const chatmsg = {
-				preanim: escape(args[2]), // get preanim
-				nameplate: args[3], // TODO: parse INI to get this info
-				name: args[3],
-				speaking: "(b)" + escape(args[4]),
-				silent: "(a)" + escape(args[4]),
+				preanim: escape(args[2]).toLowerCase(), // get preanim
+				nameplate: this.chars[args[9]].showname,
+				name: args[3].toLowerCase(),
+				speaking: "(b)" + escape(args[4]).toLowerCase(),
+				silent: "(a)" + escape(args[4]).toLowerCase(),
 				content: this.prepChat(args[5]), // Escape HTML tag, Use BBCode Only!
-				side: args[6],
-				sound: escape(args[7]),
+				side: args[6].toLowerCase(),
+				sound: escape(args[7]).toLowerCase(),
+				blips: this.chars[args[9]].gender,
 				type: args[8],
 				charid: args[9],
 				snddelay: args[10],
@@ -514,41 +518,74 @@ class Client extends EventEmitter {
 	}
 
 	/**
+	 * Handles the incoming character information, and downloads the sprite + ini for it
+	 * @param {Array} args packet arguments
+	 */
+	async handleCharacterInfo(chargs, charid) {
+		let cini = {};
+		let icon = AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png";
+		let img = document.getElementById(`demo_${charid}`);
+		img.alt = chargs[0];
+		img.src = icon;	// seems like a good time to load the icon
+
+		try {
+			const cinidata = await request(AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char.ini");
+			cini = INI.parse(cinidata);
+		} catch(err) {
+			cini = {};
+			img.classList.add("noini");
+		}
+
+		// fix all the funny ini business
+		const default_options = {
+			name: chargs[0].toLowerCase(),
+			showname: chargs[0],
+			side: "def",
+			gender: "male"
+		};
+		cini.options = Object.assign(default_options, cini.options);
+
+		this.chars[charid] = {
+			name: chargs[0].toLowerCase(),
+			showname: cini.options.showname,
+			desc: chargs[1],
+			gender: cini.options.gender.toLowerCase(),
+			evidence: chargs[3],
+			icon: icon,
+			inifile: cini
+		};
+
+		
+	}
+
+	/**
 	 * Handles incoming character information, bundling multiple characters
 	 * per packet.
 	 * @param {Array} args packet arguments
 	 */
 	handleCI(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Character " + args[1];
-		this.serv.send("AN#" + ((args[1] / 10) + 1) + "#%");
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
+				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 				const chargs = args[i].split("&");
-				this.chars[args[i - 1]] = {
-					name: chargs[0],
-					desc: chargs[1],
-					evidence: chargs[3],
-					icon: AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png"
-				};
+				this.handleCharacterInfo(chargs, i-1);
 			}
 		}
+		this.serv.send("AN#" + ((args[1] / 10) + 1) + "#%");
 	}
 
 	/**
-	 * Handles incoming character information, containing only one character
-	 * per packet.
+	 * Handles incoming character information, containing all characters
+	 * in one packet.
 	 * @param {Array} args packet arguments
 	 */
 	handleSC(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Characters";
 		for (let i = 1; i < args.length - 1; i++) {
+			document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 			const chargs = args[i].split("&");
-			this.chars[i - 1] = {
-				name: chargs[0],
-				desc: chargs[1],
-				evidence: chargs[3],
-				icon: AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png"
-			};
+			this.handleCharacterInfo(chargs, i-1);
 		}
 		this.serv.send("RM#%");
 	}
@@ -561,7 +598,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleEI(args) {
-		document.getElementById("client_loadingtext").innerHTML = "Loading Evidence " + args[1];
+		document.getElementById("client_loadingtext").innerHTML = `Loading Evidence ${args[1]}/${this.evidence_list_length}`;
 		//serv.send("AE#" + (args[1] + 1) + "#%");
 		this.serv.send("RM#%");
 	}
@@ -606,6 +643,7 @@ class Client extends EventEmitter {
 		const hmusiclist = document.getElementById("client_musiclist");
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
+				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
 				const newentry = document.createElement("OPTION");
 				newentry.text = args[i];
 				hmusiclist.options.add(newentry);
@@ -625,6 +663,7 @@ class Client extends EventEmitter {
 
 		for (let i = 1; i < args.length - 1; i++) {
 			// Check when found the song for the first time
+			document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
 			if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(args[i]) && !flagAudio) {
 				flagAudio = true;
 			}
@@ -813,7 +852,28 @@ class Client extends EventEmitter {
 	 * but we use it as a cue to begin retrieving characters.
 	 * @param {Array} args packet arguments
 	 */
-	handleSI(_args) {
+	handleSI(args) {
+		this.char_list_length = args[1];
+		this.evidence_list_length = args[2];
+		this.music_list_length = args[3];
+
+		// create the charselect grid, to be filled by the character loader
+		document.getElementById("client_chartable").innerHTML = "";
+		let tr;
+		for (let i = 0; i < this.char_list_length; i++) {
+			if (i % CHAR_SELECT_WIDTH === 0) {
+				tr = document.createElement("TR");
+			}
+			const td = document.createElement("TD");
+
+			td.innerHTML = `<img class='demothing' id='demo_${i}' onclick='pickChar(${i})' >`;
+			
+			tr.appendChild(td);
+			if (i % CHAR_SELECT_WIDTH === 0) {
+				document.getElementById("client_chartable").appendChild(tr);
+			}
+		}
+
 		if (oldLoading) {
 			this.serv.send("askchar2#%");
 		} else {
@@ -826,26 +886,19 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleCharsCheck(args) {
-		document.getElementById("client_chartable").innerHTML = "";
-		let tr;
-		for (let i = 0; i < this.chars.length; i++) {
-			if (i % CHAR_SELECT_WIDTH === 0) {
-				tr = document.createElement("TR");
-			}
-			const td = document.createElement("TD");
-			let icon_chosen = "";
-			const thispick = this.chars[i].icon;
-			if (args[i + 1] === "-1") {
-				icon_chosen = " dark";
-			}
-			td.innerHTML = `<img class='demothing${icon_chosen}' id='demo_${i}' ` +
-				`src='${thispick}' alt='${this.chars[i].name}' onclick='pickChar(${i})' ` +
-				`onerror='demoError(this);'>`;
-			tr.appendChild(td);
-			if (i % CHAR_SELECT_WIDTH === 0) {
-				document.getElementById("client_chartable").appendChild(tr);
-			}
+		for (let i = 0; i < this.char_list_length; i++) {
+			let img = document.getElementById(`demo_${i}`);
+			let icon_chosen = "demothing";
+
+			if (img.classList.contains("noini"))
+				icon_chosen += " noini";
+
+			if (args[i + 1] === "-1")
+				icon_chosen += " dark";
+			
+			img.classList = icon_chosen;
 		}
+
 		//changeBackground("def");
 	}
 
@@ -865,9 +918,7 @@ class Client extends EventEmitter {
 		const emotesList = document.getElementById("client_emo");
 		emotesList.innerHTML = ""; // Clear emote box
 		emotesList.style.display = "";
-
-		const data = await request(AO_HOST + "characters/" + escape(this.character.name.toLowerCase()) + "/char.ini");
-		const ini = INI.parse(data.toLowerCase());
+		const ini = me.inifile;
 		me.side = ini.options.side;
 		updateActionCommands(me.side);
 		for (let i = 1; i <= ini.emotions.number; i++) {
@@ -916,7 +967,6 @@ class Viewport {
 
 		// Allocate multiple blip audio channels to make blips less jittery
 
-		// TODO: read blip type ("gender") from ini
 		this.blipChannels = new Array(6);
 		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav"))
 			.forEach(channel => channel.volume = 0.5);
@@ -973,6 +1023,7 @@ class Viewport {
 		this.chatmsg = chatmsg;
 		appendICLog(chatmsg.content, chatmsg.nameplate);
 		changeBackground(chatmsg.side);
+		this.blipChannels.forEach(channel => channel.src = AO_HOST + `sounds/general/sfx-blip${chatmsg.blips}.wav`);
 		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
@@ -980,7 +1031,7 @@ class Viewport {
 		clearTimeout(this.updater);
 		// If preanim existed then determine the length
 		if (chatmsg.preanim !== "-") {
-			const delay = await this.getAnimLength(`${AO_HOST}characters/${escape(chatmsg.name.toLowerCase())}/${chatmsg.preanim.toLowerCase()}.gif`);
+			const delay = await this.getAnimLength(`${AO_HOST}characters/${escape(chatmsg.name)}/${chatmsg.preanim}.gif`);
 			chatmsg.preanimdelay = delay;
 			this.initUpdater(delay);
 		} else {
@@ -1030,7 +1081,6 @@ class Viewport {
 	async getAnimLength(filename) {
 		try {
 			const file = await requestBuffer(filename);
-			console.log(filename);
 			return this.calculateGifLength(file);
 		} catch (err) {
 			return 0;
@@ -1297,14 +1347,18 @@ class INI {
 			} else if (regex.param.test(line)) {
 				const match = line.match(regex.param);
 				if (section) {
-					value[section][match[1]] = match[2];
-				} else {
-					value[match[1]] = match[2];
+					if(match[1].toLowerCase() === "showname"){	//don't lowercase the showname
+						value[section][match[1].toLowerCase()] = match[2];
+					} else {
+						value[section][match[1].toLowerCase()] = match[2].toLowerCase();
+					}
+				//} else { // we don't care about attributes without a section
+				//	value[match[1]] = match[2];
 				}
 			} else if (regex.section.test(line)) {
 				const match = line.match(regex.section);
-				value[match[1]] = {};
-				section = match[1];
+				value[match[1].toLowerCase()] = {};				//lowercase everything else
+				section = match[1].toLowerCase();
 			}
 		});
 		return value;
@@ -1492,17 +1546,6 @@ export function imgError(image) {
 window.imgError = imgError;
 
 /**
- * Triggered when there was an error loading a character icon.
- * @param {HTMLImageElement} image the element containing the missing image
- */
-export function demoError(image) {
-	image.onerror = "";
-	image.src = "misc/placeholder.png";
-	return true;
-}
-window.demoError = demoError;
-
-/**
  * Make a GET request for a specific URI.
  * @param {string} url the URI to be requested
  * @returns response data
@@ -1649,7 +1692,6 @@ async function changeBackground(position) {
 export function ReconnectButton() {
 	client.cleanup();
 	client = new Client(serverIP);
-	console.log(client);
 	if (client) {
 		mode = "join"; // HACK: see client.onOpen
 		document.getElementById("client_error").style.display = "none";

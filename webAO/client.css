@@ -105,8 +105,11 @@ img {
 }
 
 .demothing {
+	display: block;
 	height: 60px;
 	width: 60px;
+	max-width: 60px;
+	max-height: 60px;
 	margin: 3px;
 	border: 1px solid #000;
 }
@@ -419,6 +422,10 @@ img {
 
 .dark {
 	filter: brightness(50%);
+}
+
+.noini {
+	transform: rotate(180deg);
 }
 
 .hrtext {
