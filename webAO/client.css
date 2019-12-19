@@ -132,6 +132,14 @@ img {
 	width: 95%;
 }
 
+.emote_button {
+	display: block;
+	width: 40px;
+	height: 40px;
+	padding: 1px;
+	cursor: pointer;
+}
+
 #client_settings {
 	width: 100%;
 }

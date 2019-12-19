@@ -940,7 +940,7 @@ class Client extends EventEmitter {
 				`<img src=${emotes[i].button_off}
 					id="emo_${i}"
 					alt="${emotes[i].desc}"
-					class="client_button"
+					class="emote_button"
 					onclick="pickEmotion(${i})">`;
 		}
 		pickEmotion(1);
