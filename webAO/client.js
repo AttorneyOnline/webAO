@@ -341,7 +341,6 @@ class Client extends EventEmitter {
 	 * Triggered when a connection is established to the server.
 	 */
 	onOpen(_e) {
-		client.loadResources();
 		client.joinServer();
 	}
 
@@ -408,16 +407,26 @@ class Client extends EventEmitter {
 		// TODO: this if-statement might be a bug.
 		if (args[4] !== viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
+
+			let msg_nameplate = args[3];
+			let msg_blips = "male";
+			try {
+				msg_nameplate = this.chars[args[9]].showname;
+				msg_blips = this.chars[args[9]].gender;
+			} catch(e) {
+				//we already set defaults
+			}
+
 			const chatmsg = {
 				preanim: escape(args[2]).toLowerCase(), // get preanim
-				nameplate: this.chars[args[9]].showname,
+				nameplate: msg_nameplate,
 				name: args[3].toLowerCase(),
 				speaking: "(b)" + escape(args[4]).toLowerCase(),
 				silent: "(a)" + escape(args[4]).toLowerCase(),
 				content: this.prepChat(args[5]), // Escape HTML tag
 				side: args[6].toLowerCase(),
 				sound: escape(args[7]).toLowerCase(),
-				blips: this.chars[args[9]].gender,
+				blips: msg_blips,
 				type: args[8],
 				charid: args[9],
 				snddelay: args[10],
@@ -1652,6 +1661,14 @@ async function changeBackground(position) {
 		}
 	}
 }
+
+/**
+ * Triggered when the settings tab is fully loaded.
+ */
+export function loadSettings() {
+	client.loadResources();
+}
+window.loadSettings = loadSettings;
 
 /**
  * Triggered when the reconnect button is pushed.
