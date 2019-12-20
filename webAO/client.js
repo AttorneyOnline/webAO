@@ -133,6 +133,7 @@ class Client extends EventEmitter {
 		this.on("LE", this.handleLE.bind(this));
 		this.on("EM", this.handleEM.bind(this));
 		this.on("SM", this.handleSM.bind(this));
+		this.on("MM", this.handleMM.bind(this));
 		this.on("BD", this.handleBD.bind(this));
 		this.on("DONE", this.handleDONE.bind(this));
 		this.on("BN", this.handleBN.bind(this));
@@ -144,6 +145,7 @@ class Client extends EventEmitter {
 		this.on("SI", this.handleSI.bind(this));
 		this.on("ARUP", this.handleARUP.bind(this));
 		this.on("CharsCheck", this.handleCharsCheck.bind(this));
+		this.on("decryptor", this.handleDecyrptor.bind(this));
 		this.on("PV", this.handlePV.bind(this));
 		this.on("CHECK", () => { });
 
@@ -688,6 +690,14 @@ class Client extends EventEmitter {
 	}
 
 	/**
+	 * Handles the "MusicMode" packet
+	 * @param {Array} args packet arguments
+	 */
+	handleMM(args) {
+		// It's unused nowadays, as preventing people from changing the music is now serverside
+	}
+
+	/**
 	 * Handles the kicked packet
 	 * @param {Array} args kick reason
 	 */
@@ -867,7 +877,7 @@ class Client extends EventEmitter {
 
 	/**
 	 * Handles the list of all used and vacant characters.
-	 * @param {Array} args packet arguments
+	 * @param {Array} args list of all characters represented as a 0 for free or a -1 for taken
 	 */
 	handleCharsCheck(args) {
 		for (let i = 0; i < this.char_list_length; i++) {
@@ -884,6 +894,14 @@ class Client extends EventEmitter {
 		}
 
 		//changeBackground("def");
+	}
+
+	/**
+	 * Decryptor for the command headers
+	 * @param {Array} args packet arguments
+	 */
+	handleDecryptor(_args) {
+		// unused since AO2
 	}
 
 	/**
