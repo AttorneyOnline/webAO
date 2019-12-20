@@ -703,7 +703,7 @@ class Client extends EventEmitter {
 	 */
 	handleKK(args) {
 		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "Kicked: " + args[1];
+		document.getElementById("client_loadingtext").innerHTML = "Kicked: " + escape(args[1]);
 	}
 
 	/**
@@ -713,7 +713,7 @@ class Client extends EventEmitter {
 	 */
 	handleKB(args) {
 		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "You got banned: " + args[1];
+		document.getElementById("client_loadingtext").innerHTML = "You got banned: " + escape(args[1]);
 	}
 
 	/**
@@ -723,7 +723,7 @@ class Client extends EventEmitter {
 	 */
 	handleBD(args) {
 		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "Banned: " + args[1];
+		document.getElementById("client_loadingtext").innerHTML = "Banned: " + escape(args[1]);
 	}
 
 	/**
