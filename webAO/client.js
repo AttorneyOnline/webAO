@@ -1229,7 +1229,7 @@ class Viewport {
 
 			// Pre-animation stuff
 			if (this.chatmsg.preanimdelay > 0) {
-				shoutSprite.src = "misc/placeholder.gif";
+				shoutSprite.src = "";
 				const charName = escape(this.chatmsg.name.toLowerCase());
 				const preanim = this.chatmsg.preanim.toLowerCase();
 				charSprite.src = `${AO_HOST}characters/${charName}/${preanim}.gif`;
@@ -1286,7 +1286,7 @@ class Viewport {
 				this.chatmsg.startspeaking = false;
 
 				if (this.chatmsg.preanimdelay === 0) {
-					shoutSprite.src = "misc/placeholder.gif";
+					shoutSprite.src = "";
 					changeBackground(this.chatmsg.side);
 				}
 
@@ -1531,9 +1531,23 @@ window.changeCharacter = changeCharacter;
  * Triggered when there was an error loading a character sprite.
  * @param {HTMLImageElement} image the element containing the missing image
  */
+export function pngFallback(image) {
+	console.warn(image.src+" is missing from webAO");
+	image.src = AO_HOST + "characters/" + viewport.chatmsg.name + "/" + viewport.chatmsg.emoteName + ".png";
+	image.onerror = charError;
+	return true;
+}
+window.pngFallback = pngFallback;
+
+/**
+ * Triggered when there was an error loading the fallback png.
+ * @param {HTMLImageElement} image the element containing the missing image
+ */
 export function charError(image) {
 	console.warn(image.src+" is missing from webAO");
-	image.src = "misc/placeholder.gif";
+	image.src = AO_HOST + "misc/placeholder.gif";
+	// we didn't find a png this time, next time might be different
+	image.onerror = pngFallback;
 	return true;
 }
 window.charError = charError;
@@ -1543,7 +1557,6 @@ window.charError = charError;
  * @param {HTMLImageElement} image the element containing the missing image
  */
 export function imgError(image) {
-	image.onerror = "";
 	image.src = ""; //unload so the old sprite doesn't persist
 	return true;
 }
