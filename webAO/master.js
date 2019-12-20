@@ -50,7 +50,11 @@ function onOpen(_e) {
 	masterserver.send("VC#%");
 }
 
-async function checkOnline(serverID, coIP) {
+function checkOnline(serverID, coIP) {
+
+	var oserv = new WebSocket("ws://" + coIP);
+
+	// define what the callbacks do
 	function onCOOpen(_e) {
 		document.getElementById(`server${serverID}`).className = "available";
 		oserv.send(`HI#${hdid}#%`);
@@ -76,8 +80,7 @@ async function checkOnline(serverID, coIP) {
 		console.warn(coIP + " threw an error.");
 	}
 
-	var oserv = new WebSocket("ws://" + coIP);
-
+	// assign the callbacks
 	oserv.onopen = function (evt) {
 		onCOOpen(evt);
 	};
