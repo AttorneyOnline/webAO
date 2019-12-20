@@ -1651,8 +1651,17 @@ async function changeBackground(position) {
 			bg: "judgestand.png",
 			desk: null,
 			speedLines: "prosecution_speedlines.gif"
+		},
+		jur: {
+			bg: "jurystand.png",
+			desk: { ao2: "jurydesk.png", ao1: "estrado.png" },
+			speedLines: "defense_speedlines.gif"
+		},
+		sea: {
+			bg: "seancestand.png",
+			desk: { ao2: "seancedesk.png", ao1: "estrado.png" },
+			speedLines: "prosecution_speedlines.gif"
 		}
-		// TODO: add the new seance and jury positions
 	};
 
 	const { bg, desk, speedLines } = positions[position];
