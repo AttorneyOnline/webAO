@@ -1615,7 +1615,7 @@ async function fileExists(url) {
 /**
  * Changes the viewport background based on a given position.
  * 
- * Valid positions: `def, pro, hld, hlp, wit, jud`
+ * Valid positions: `def, pro, hld, hlp, wit, jud, jur, sea`
  * @param {string} position the position to change into
  */
 async function changeBackground(position) {
