@@ -51,7 +51,7 @@ const fp = new Fingerprint({
 
 // An emulated, semi-unique HDID that is generally safe for HDID bans.
 const hdid = fp.get();
-console.log(`Your emulated HDID is ${hdid}`);
+console.info(`Your emulated HDID is ${hdid}`);
 
 let lastICMessageTime = new Date(0);
 
@@ -129,6 +129,7 @@ class Client extends EventEmitter {
 		this.on("CI", this.handleCI.bind(this));
 		this.on("SC", this.handleSC.bind(this));
 		this.on("EI", this.handleEI.bind(this));
+		this.on("FL", this.handleFL.bind(this));
 		this.on("LE", this.handleLE.bind(this));
 		this.on("EM", this.handleEM.bind(this));
 		this.on("SM", this.handleSM.bind(this));
@@ -818,6 +819,14 @@ class Client extends EventEmitter {
 	 */
 	handleARUP(args) {
 		// TODO: webAO doesn't have this feature yet
+	}
+
+	/**
+	 * With this the server tells us which features it supports
+	 * @param {Array} args list of features
+	 */
+	handleFL(args) {
+		console.info(args);
 	}
 
 	/**
