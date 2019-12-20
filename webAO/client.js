@@ -1229,7 +1229,7 @@ class Viewport {
 
 			// Pre-animation stuff
 			if (this.chatmsg.preanimdelay > 0) {
-				shoutSprite.src = "";
+				shoutSprite.src = "misc/placeholder.gif";
 				const charName = escape(this.chatmsg.name.toLowerCase());
 				const preanim = this.chatmsg.preanim.toLowerCase();
 				charSprite.src = `${AO_HOST}characters/${charName}/${preanim}.gif`;
@@ -1286,7 +1286,7 @@ class Viewport {
 				this.chatmsg.startspeaking = false;
 
 				if (this.chatmsg.preanimdelay === 0) {
-					shoutSprite.src = "";
+					shoutSprite.src = "misc/placeholder.gif";
 					changeBackground(this.chatmsg.side);
 				}
 
