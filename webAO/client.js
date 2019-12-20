@@ -427,14 +427,14 @@ class Client extends EventEmitter {
 				//we already set defaults
 			}
 
+			// excuse the escape() mess, but i'm not going to take any chances
 			const chatmsg = {
 				preanim: escape(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
-				name: args[3].toLowerCase(),
-				speaking: "(b)" + escape(args[4]).toLowerCase(),
-				silent: "(a)" + escape(args[4]).toLowerCase(),
+				name: escape(args[3]).toLowerCase(),
+				emoteName: escape(args[4]).toLowerCase(),
 				content: this.prepChat(args[5]), // Escape HTML tags
-				side: args[6].toLowerCase(),
+				side: escape(args[6]).toLowerCase(),
 				sound: escape(args[7]).toLowerCase(),
 				blips: msg_blips,
 				type: args[8],
@@ -1290,10 +1290,10 @@ class Viewport {
 					changeBackground(this.chatmsg.side);
 				}
 
-				charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.speaking.toLowerCase() + ".gif";
+				charSprite.src = AO_HOST + "characters/" + this.chatmsg.name + "/(b)" + this.chatmsg.emoteName + ".gif";
 
 				if (this.textnow === this.chatmsg.content) {
-					charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
+					charSprite.src = AO_HOST + "characters/" + this.chatmsg.name + "/(a)" + this.chatmsg.emoteName + ".gif";
 					this._animating = false;
 					clearTimeout(this.updater);
 				}
@@ -1314,7 +1314,7 @@ class Viewport {
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
+						charSprite.src = `${AO_HOST}characters/${this.chatmsg.name}/(a)${this.chatmsg.emoteName}.gif`;
 						clearTimeout(this.updater);
 					}
 				}
@@ -1325,7 +1325,7 @@ class Viewport {
 			this.sfxaudio.pause();
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1") {
-				this.sfxaudio.src = AO_HOST + "sounds/general/" + escape(this.chatmsg.sound.toLowerCase()) + ".wav";
+				this.sfxaudio.src = `${AO_HOST}sounds/general/${this.chatmsg.sound}.wav`;
 				this.sfxaudio.play();
 			}
 		}
