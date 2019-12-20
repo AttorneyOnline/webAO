@@ -826,6 +826,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args list of features
 	 */
 	handleFL(args) {
+		console.info("Server-supported features:");
 		console.info(args);
 	}
 
