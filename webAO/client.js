@@ -133,10 +133,8 @@ class Client extends EventEmitter {
 		this.on("EM", this.handleEM.bind(this));
 		this.on("SM", this.handleSM.bind(this));
 		this.on("BD", this.handleBD.bind(this));
-		this.on("music", this.handlemusic.bind(this));
 		this.on("DONE", this.handleDONE.bind(this));
 		this.on("BN", this.handleBN.bind(this));
-		this.on("NBG", this.handleNBG.bind(this));
 		this.on("HP", this.handleHP.bind(this));
 		this.on("RT", this.handleRT.bind(this));
 		this.on("ZZ", this.handleZZ.bind(this));
@@ -686,17 +684,6 @@ class Client extends EventEmitter {
 
 		// Music done, carry on
 		this.serv.send("RD#%");
-	}
-
-	/**
-	 * Handles incoming music information, containing all entries
-	 * in the same packet.
-	 * @param {Array} args packet arguments
-	 */
-	handlemusic(args) {
-		for (let i = 0; i < args.length / 2; i++) {
-			this.musicList[args[2 * i]] = args[2 * i + 1];
-		}
 	}
 
 	/**
