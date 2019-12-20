@@ -1532,25 +1532,17 @@ window.changeCharacter = changeCharacter;
  * @param {HTMLImageElement} image the element containing the missing image
  */
 export function pngFallback(image) {
-	console.warn(image.src+" is missing from webAO");
-	image.src = AO_HOST + "characters/" + viewport.chatmsg.name + "/" + viewport.chatmsg.emoteName + ".png";
-	image.onerror = charError;
+	console.info("sprite " + image.src + " is missing from webAO");
+	if (image.src.slice(-4) === ".gif") {
+		console.info("trying " + AO_HOST + "characters/" + viewport.chatmsg.name + "/" + viewport.chatmsg.emoteName + ".png");
+		image.src = AO_HOST + "characters/" + viewport.chatmsg.name + "/" + viewport.chatmsg.emoteName + ".png";
+	} else if (image.src.slice(-4) === ".png") {
+		console.info("that didn't work");
+		image.src = AO_HOST + "misc/placeholder.gif";
+	}
 	return true;
 }
 window.pngFallback = pngFallback;
-
-/**
- * Triggered when there was an error loading the fallback png.
- * @param {HTMLImageElement} image the element containing the missing image
- */
-export function charError(image) {
-	console.warn(image.src+" is missing from webAO");
-	image.src = AO_HOST + "misc/placeholder.gif";
-	// we didn't find a png this time, next time might be different
-	image.onerror = pngFallback;
-	return true;
-}
-window.charError = charError;
 
 /**
  * Triggered when there was an error loading a generic sprite.
