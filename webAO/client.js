@@ -4,22 +4,25 @@
  * credits to aleks for original idea and source
 */
 
+// Load some defaults for the background and evidence dropdowns
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
+
 import Fingerprint from "./fingerprint.js";
 
 import { EventEmitter } from "events";
 
+
+// Get the arguments from the URL bar
 const queryDict = {};
 location.search.substr(1).split("&").forEach(function (item) {
 	queryDict[item.split("=")[0]] = item.split("=")[1];
 });
 
-/* Server magic */
-
 const serverIP = queryDict.ip;
 let mode = queryDict.mode;
 
+// Unless there is an asset URL specified, use the wasabi one
 const AO_HOST = queryDict.asset || "http://s3.wasabisys.com/webao/base/";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
 const CHAR_SELECT_WIDTH = 8;
@@ -35,7 +38,7 @@ if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlaySt
 	oldLoading = true;
 }
 
-/** presettings */
+// presettings
 let selectedEffect = 0;
 let selectedMenu = 1;
 let selectedShout = 0;
@@ -46,7 +49,7 @@ const fp = new Fingerprint({
 	screen_resolution: true
 });
 
-/** An emulated, semi-unique HDID that is generally safe for HDID bans. */
+// An emulated, semi-unique HDID that is generally safe for HDID bans.
 const hdid = fp.get();
 console.log(`Your emulated HDID is ${hdid}`);
 
@@ -56,7 +59,7 @@ class Client extends EventEmitter {
 	constructor(address) {
 		super();
 		this.serv = new WebSocket("ws://" + address);
-
+		// Assign the websocket events
 		this.serv.addEventListener("open", this.emit.bind(this, "open"));
 		this.serv.addEventListener("close", this.emit.bind(this, "close"));
 		this.serv.addEventListener("message", this.emit.bind(this, "message"));
@@ -66,7 +69,7 @@ class Client extends EventEmitter {
 		this.on("close", this.onClose.bind(this));
 		this.on("message", this.onMessage.bind(this));
 		this.on("error", this.onError.bind(this));
-
+		// Preset some of the variables
 		this.flip = false;
 		this.presentable = false;
 
@@ -113,9 +116,12 @@ class Client extends EventEmitter {
 
 		this.checkUpdater = null;
 
-		// Only used for RMC/`music` packets, not EM/SM/MC packets.
+		// Only used for RMC/'music' packets, not EM/SM/MC packets.
 		this.musicList = Object();
-
+		/**
+		 * Assign handlers for all commands
+		 * If you implement a new command, you need to add it here
+		 */
 		this.on("MS", this.handleMS.bind(this));
 		this.on("CT", this.handleCT.bind(this));
 		this.on("MC", this.handleMC.bind(this));
@@ -284,7 +290,7 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Load game resources.
+	 * Load game resources and stored settings.
 	 */
 	loadResources() {
 		// Read cookies and set the UI to its values
@@ -386,6 +392,9 @@ class Client extends EventEmitter {
 		this.cleanup();
 	}
 
+	/**
+	 * Stop sending keepalives to the server.
+	 */
 	cleanup() {
 		clearInterval(this.checkUpdater);
 	}
@@ -419,11 +428,11 @@ class Client extends EventEmitter {
 
 			const chatmsg = {
 				preanim: escape(args[2]).toLowerCase(), // get preanim
-				nameplate: msg_nameplate,
+				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
 				name: args[3].toLowerCase(),
 				speaking: "(b)" + escape(args[4]).toLowerCase(),
 				silent: "(a)" + escape(args[4]).toLowerCase(),
-				content: this.prepChat(args[5]), // Escape HTML tag
+				content: this.prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
 				sound: escape(args[7]).toLowerCase(),
 				blips: msg_blips,
@@ -495,7 +504,8 @@ class Client extends EventEmitter {
 
 	/**
 	 * Handles the incoming character information, and downloads the sprite + ini for it
-	 * @param {Array} args packet arguments
+	 * @param {Array} chargs packet arguments
+	 * @param {Number} charid character ID
 	 */
 	async handleCharacterInfo(chargs, charid) {
 		let cini = {};
@@ -504,15 +514,17 @@ class Client extends EventEmitter {
 		img.alt = chargs[0];
 		img.src = icon;	// seems like a good time to load the icon
 
+		// If the ini doesn't exist on the server this will throw an error
 		try {
 			const cinidata = await request(AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char.ini");
 			cini = INI.parse(cinidata);
 		} catch(err) {
 			cini = {};
 			img.classList.add("noini");
+			// If it does, give the user a visual indication that the character is unusable
 		}
 
-		// fix all the funny ini business
+		// sometimes ini files lack important settings
 		const default_options = {
 			name: chargs[0].toLowerCase(),
 			showname: chargs[0],
@@ -541,6 +553,7 @@ class Client extends EventEmitter {
 	 */
 	handleCI(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Character " + args[1];
+		// Loop through the 10 characters that were sent
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
@@ -548,6 +561,7 @@ class Client extends EventEmitter {
 				this.handleCharacterInfo(chargs, i-1);
 			}
 		}
+		// Request the next pack
 		this.serv.send("AN#" + ((args[1] / 10) + 1) + "#%");
 	}
 
@@ -563,6 +577,7 @@ class Client extends EventEmitter {
 			const chargs = args[i].split("&");
 			this.handleCharacterInfo(chargs, i-1);
 		}
+		// We're done with the characters, request the music
 		this.serv.send("RM#%");
 	}
 
@@ -575,7 +590,6 @@ class Client extends EventEmitter {
 	 */
 	handleEI(args) {
 		document.getElementById("client_loadingtext").innerHTML = `Loading Evidence ${args[1]}/${this.evidence_list_length}`;
-		//serv.send("AE#" + (args[1] + 1) + "#%");
 		this.serv.send("RM#%");
 	}
 
@@ -628,8 +642,7 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Handles incoming music information, containing only one entry
-	 * per packet.
+	 * Handles incoming music information, containing all music in one packet.
 	 * @param {Array} args packet arguments
 	 */
 	handleSM(args) {
@@ -671,36 +684,8 @@ class Client extends EventEmitter {
 			area_box.removeChild(area_box.lastChild);
 		}
 
+		// Music done, carry on
 		this.serv.send("RD#%");
-	}
-
-	/**
-	 * Handles the kicked packet
-	 * @param {Array} args packet arguments
-	 */
-	handleKK(args) {
-		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "Kicked: " + args[1];
-	}
-
-	/**
-	 * Handles the banned packet
-	 * this one is sent when you are kicked off the server
-	 * @param {Array} args packet arguments
-	 */
-	handleKB(args) {
-		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "You got banned: " + args[1];
-	}
-
-	/**
-	 * Handles the banned packet
-	 * this one is sent when you try to reconnect but you're banned
-	 * @param {Array} args packet arguments
-	 */
-	handleBD(args) {
-		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "Banned: " + args[1];
 	}
 
 	/**
@@ -712,6 +697,35 @@ class Client extends EventEmitter {
 		for (let i = 0; i < args.length / 2; i++) {
 			this.musicList[args[2 * i]] = args[2 * i + 1];
 		}
+	}
+
+	/**
+	 * Handles the kicked packet
+	 * @param {Array} args kick reason
+	 */
+	handleKK(args) {
+		document.getElementById("client_loading").style.display = "flex";
+		document.getElementById("client_loadingtext").innerHTML = "Kicked: " + args[1];
+	}
+
+	/**
+	 * Handles the banned packet
+	 * this one is sent when you are kicked off the server
+	 * @param {Array} args ban reason
+	 */
+	handleKB(args) {
+		document.getElementById("client_loading").style.display = "flex";
+		document.getElementById("client_loadingtext").innerHTML = "You got banned: " + args[1];
+	}
+
+	/**
+	 * Handles the banned packet
+	 * this one is sent when you try to reconnect but you're banned
+	 * @param {Array} args ban reason
+	 */
+	handleBD(args) {
+		document.getElementById("client_loading").style.display = "flex";
+		document.getElementById("client_loadingtext").innerHTML = "Banned: " + args[1];
 	}
 
 	/**
@@ -748,10 +762,6 @@ class Client extends EventEmitter {
 			changeBackground(this.chars[this.charID].side);
 		}
 
-	}
-
-	handleNBG(_args) {
-		// TODO (set by sD)
 	}
 
 	/**
@@ -815,12 +825,12 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Doesn't handle the change of players in an area.
+	 * Handle the change of players in an area.
 	 * webAO doesn't have this feature yet, but i want the warning to go away.
 	 * @param {Array} args packet arguments
 	 */
 	handleARUP(args) {
-		;
+		// TODO: webAO doesn't have this feature yet
 	}
 
 	/**
@@ -850,6 +860,7 @@ class Client extends EventEmitter {
 			}
 		}
 
+		// this is determined at the top of this file
 		if (oldLoading) {
 			this.serv.send("askchar2#%");
 		} else {
@@ -1165,6 +1176,7 @@ class Viewport {
 				"3": "takethat"
 			};
 
+			// gets which shout shall played
 			const shout = shouts[this.chatmsg.objection];
 			if (shout) {
 				shoutSprite.src = client.resources[shout]["src"];
@@ -1245,6 +1257,7 @@ class Viewport {
 				chatBox.style.display = "block";
 				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
 
+				// TODO: add missing colors
 				const colors = {
 					"0": "#ffffff",
 					"1": "#00ff00",
@@ -1643,6 +1656,7 @@ async function changeBackground(position) {
 			desk: null,
 			speedLines: "prosecution_speedlines.gif"
 		}
+		// TODO: add the new seance and jury positions
 	};
 
 	const { bg, desk, speedLines } = positions[position];
