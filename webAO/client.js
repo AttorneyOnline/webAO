@@ -145,7 +145,7 @@ class Client extends EventEmitter {
 		this.on("SI", this.handleSI.bind(this));
 		this.on("ARUP", this.handleARUP.bind(this));
 		this.on("CharsCheck", this.handleCharsCheck.bind(this));
-		this.on("decryptor", this.handleDecyrptor.bind(this));
+		this.on("decryptor", this.handleDecryptor.bind(this));
 		this.on("PV", this.handlePV.bind(this));
 		this.on("CHECK", () => { });
 
