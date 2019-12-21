@@ -1309,6 +1309,7 @@ class Viewport {
 					const pairName = this.chatmsg.other_name.toLowerCase();
 					const pairEmote = this.chatmsg.other_emote.toLowerCase();
 					pairSprite.style.display = "";
+					pairSprite.style.left = this.chatmsg.other_offset+"%";
 					pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
 				} else {
 					pairSprite.style.display = "none";
