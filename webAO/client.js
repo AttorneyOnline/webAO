@@ -56,7 +56,8 @@ console.info(`Your emulated HDID is ${hdid}`);
 let lastICMessageTime = new Date(0);
 
 function safe_tags(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') ;
+	if (str)
+		return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') ;
 }
 
 class Client extends EventEmitter {
@@ -514,14 +515,14 @@ class Client extends EventEmitter {
 	 */
 	async handleCharacterInfo(chargs, charid) {
 		let cini = {};
-		let icon = AO_HOST + "characters/" + safe_tags(chargs[0]).toLowerCase() + "/char_icon.png";
+		let icon = AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char_icon.png";
 		let img = document.getElementById(`demo_${charid}`);
 		img.alt = chargs[0];
 		img.src = icon;	// seems like a good time to load the icon
 
 		// If the ini doesn't exist on the server this will throw an error
 		try {
-			const cinidata = await request(AO_HOST + "characters/" + safe_tags(chargs[0]).toLowerCase() + "/char.ini");
+			const cinidata = await request(AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char.ini");
 			cini = INI.parse(cinidata);
 		} catch(err) {
 			cini = {};
@@ -612,7 +613,7 @@ class Client extends EventEmitter {
 				name: decodeChat(unescapeChat(arg[0])),
 				desc: decodeChat(unescapeChat(arg[1])),
 				filename: safe_tags(arg[2]),
-				icon: AO_HOST + "evidence/" + safe_tags(arg[2].toLowerCase())
+				icon: AO_HOST + "evidence/" + encodeURI(arg[2].toLowerCase())
 			};
 		}
 
@@ -757,7 +758,7 @@ class Client extends EventEmitter {
 		if (bg_index === 0) {
 			document.getElementById("bg_filename").value = args[1];
 		}
-		document.getElementById("bg_preview").src = AO_HOST + "background/" + safe_tags(args[1].toLowerCase()) + "/defenseempty.png";
+		document.getElementById("bg_preview").src = AO_HOST + "background/" + encodeURI(args[1].toLowerCase()) + "/defenseempty.png";
 		if (this.charID === -1) {
 			changeBackground("jud");
 		} else {
@@ -939,8 +940,8 @@ class Client extends EventEmitter {
 				zoom: emoteinfo[3],
 				sfx: esfx.toLowerCase(),
 				sfxdelay: esfxd,
-				button_off: AO_HOST + `characters/${me.name.toLowerCase()}/emotions/button${i}_off.png`,
-				button_on: AO_HOST + `characters/${me.name.toLowerCase()}/emotions/button${i}_on.png`
+				button_off: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
+				button_on: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_on.png`
 			};
 			emotesList.innerHTML +=
 				`<img src=${emotes[i].button_off}
@@ -1018,7 +1019,7 @@ class Viewport {
 	 * Returns the path which the background is located in.
 	 */
 	get bgFolder() {
-		return `${AO_HOST}background/${this.bgname.toLowerCase()}/`;
+		return `${AO_HOST}background/${encodeURI(this.bgname.toLowerCase())}/`;
 	}
 
 	/**
@@ -1029,7 +1030,7 @@ class Viewport {
 		this.chatmsg = chatmsg;
 		appendICLog(chatmsg.content, chatmsg.nameplate);
 		changeBackground(chatmsg.side);
-		this.blipChannels.forEach(channel => channel.src = AO_HOST + `sounds/general/sfx-blip${chatmsg.blips}.wav`);
+		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(chatmsg.blips.toLowerCase())}.wav`);
 		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
@@ -1037,7 +1038,7 @@ class Viewport {
 		clearTimeout(this.updater);
 		// If preanim existed then determine the length
 		if (chatmsg.preanim !== "-") {
-			const delay = await this.getAnimLength(`${AO_HOST}characters/${chatmsg.name.toLowerCase()}/${chatmsg.preanim}.gif`);
+			const delay = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
 			chatmsg.preanimdelay = delay;
 			this.initUpdater(delay);
 		} else {
@@ -1199,7 +1200,7 @@ class Viewport {
 			const shout = shouts[this.chatmsg.objection];
 			if (shout) {
 				shoutSprite.src = client.resources[shout]["src"];
-				this.shoutaudio.src=`${AO_HOST}characters/${this.chatmsg.name.toLowerCase()}/${shout}.wav`;
+				this.shoutaudio.src=`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
 				this.shoutaudio.play();
 				this.shoutTimer = 850;
 			} else {
@@ -1236,7 +1237,7 @@ class Viewport {
 				shoutSprite.src = "misc/placeholder.gif";
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
-				charSprite.src = `${AO_HOST}characters/${charName}/${preanim}.gif`;
+				charSprite.src = `${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`;
 			}
 
 			this.chatmsg.startpreanim = false;
@@ -1294,10 +1295,10 @@ class Viewport {
 					changeBackground(this.chatmsg.side);
 				}
 
-				charSprite.src = AO_HOST + "characters/" + this.chatmsg.name.toLowerCase() + "/" + this.chatmsg.speaking.toLowerCase() + ".gif";
+				charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.speaking.toLowerCase()) + ".gif";
 
 				if (this.textnow === this.chatmsg.content) {
-					charSprite.src = AO_HOST + "characters/" + this.chatmsg.name.toLowerCase() + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
+					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent.toLowerCase()) + ".gif";
 					this._animating = false;
 					clearTimeout(this.updater);
 				}
@@ -1318,7 +1319,7 @@ class Viewport {
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						charSprite.src = AO_HOST + "characters/" + this.chatmsg.name.toLowerCase() + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
+						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent.toLowerCase()) + ".gif";
 						clearTimeout(this.updater);
 					}
 				}
@@ -1329,7 +1330,7 @@ class Viewport {
 			this.sfxaudio.pause();
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1") {
-				this.sfxaudio.src = AO_HOST + "sounds/general/" + safe_tags(this.chatmsg.sound.toLowerCase()) + ".wav";
+				this.sfxaudio.src = AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav";
 				this.sfxaudio.play();
 			}
 		}
@@ -1691,7 +1692,7 @@ async function changeBackground(position) {
 	document.getElementById("client_fg").style.display = "none";
 
 	if (viewport.chatmsg.type === 5) {
-		document.getElementById("client_court").src = `${AO_HOST}themes/default/${speedLines}`;
+		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
 	} else {
 		document.getElementById("client_court").src = bgfolder + bg;
 		if (desk) {
@@ -1933,10 +1934,10 @@ export function updateEvidenceIcon() {
 
 	if (evidence_select.selectedIndex === 0) {
 		evidence_filename.style.display = "initial";
-		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${evidence_filename.value.toLowerCase()})`;
+		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${encodeURI(evidence_filename.value.toLowerCase())})`;
 	} else {
 		evidence_filename.style.display = "none";
-		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${evidence_select.value.toLowerCase()})`;
+		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${encodeURI(evidence_select.value.toLowerCase())})`;
 	}
 }
 window.updateEvidenceIcon = updateEvidenceIcon;
@@ -2067,10 +2068,10 @@ export function updateBackgroundPreview() {
 
 	if (background_select.selectedIndex === 0) {
 		background_filename.style.display = "initial";
-		background_preview.src = AO_HOST + "background/" + background_filename.value.toLowerCase() + "/defenseempty.png";
+		background_preview.src = AO_HOST + "background/" + encodeURI(background_filename.value.toLowerCase()) + "/defenseempty.png";
 	} else {
 		background_filename.style.display = "none";
-		background_preview.src = AO_HOST + "background/" + background_select.value.toLowerCase() + "/defenseempty.png";
+		background_preview.src = AO_HOST + "background/" + encodeURI(background_select.value.toLowerCase()) + "/defenseempty.png";
 	}
 }
 window.updateBackgroundPreview = updateBackgroundPreview;
