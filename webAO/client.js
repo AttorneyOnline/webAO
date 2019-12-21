@@ -51,6 +51,10 @@ const fp = new Fingerprint({
 	screen_resolution: true
 });
 
+function safe_tags(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') ;
+}
+
 // An emulated, semi-unique HDID that is generally safe for HDID bans.
 const hdid = fp.get();
 console.info(`Your emulated HDID is ${hdid}`);
@@ -326,7 +330,7 @@ class Client extends EventEmitter {
 		changeBlipVolume();
 
 		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
-		document.getElementById("showname").value = getCookie("showname");
+		document.getElementById("showname").checked = getCookie("showname");
 
 		// Load evidence array to select
 		const evidence_select = document.getElementById("evi_select");
@@ -450,15 +454,15 @@ class Client extends EventEmitter {
 			}
 
 			let chatmsg = {
-				deskmod: escape(args[1]),
-				preanim: escape(args[2]).toLowerCase(), // get preanim
+				deskmod: safe_tags(args[1]),
+				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
 				name: args[3].toLowerCase(),
-				speaking: "(b)" + escape(args[4]).toLowerCase(),
-				silent: "(a)" + escape(args[4]).toLowerCase(),
+				speaking: "(b)" + safe_tags(args[4]).toLowerCase(),
+				silent: "(a)" + safe_tags(args[4]).toLowerCase(),
 				content: this.prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
-				sound: escape(args[7]).toLowerCase(),
+				sound: safe_tags(args[7]).toLowerCase(),
 				blips: msg_blips,
 				type: args[8],
 				charid: args[9],
@@ -473,7 +477,7 @@ class Client extends EventEmitter {
 
 			if (extrafeatures.includes("cccc_ic_support")) {
 				const extra_options = {
-					showname: escape(args[16]),
+					showname: safe_tags(args[16]),
 					other_charid: args[17],
 					other_name: args[18],
 					other_emote: args[19],
@@ -550,14 +554,14 @@ class Client extends EventEmitter {
 	 */
 	async handleCharacterInfo(chargs, charid) {
 		let cini = {};
-		let icon = AO_HOST + "characters/" + escape(chargs[0]).toLowerCase() + "/char_icon.png";
+		let icon = AO_HOST + "characters/" + safe_tags(chargs[0]).toLowerCase() + "/char_icon.png";
 		let img = document.getElementById(`demo_${charid}`);
 		img.alt = chargs[0];
 		img.src = icon;	// seems like a good time to load the icon
 
 		// If the ini doesn't exist on the server this will throw an error
 		try {
-			const cinidata = await request(AO_HOST + "characters/" + escape(chargs[0]).toLowerCase() + "/char.ini");
+			const cinidata = await request(AO_HOST + "characters/" + safe_tags(chargs[0]).toLowerCase() + "/char.ini");
 			cini = INI.parse(cinidata);
 		} catch(err) {
 			cini = {};
@@ -566,9 +570,9 @@ class Client extends EventEmitter {
 		}
 
 		const mute_select = document.getElementById("mute_select");
-		mute_select.add(new Option(escape(chargs[0]), charid));
+		mute_select.add(new Option(safe_tags(chargs[0]), charid));
 		const pair_select = document.getElementById("pair_select");
-		pair_select.add(new Option(escape(chargs[0]), charid));
+		pair_select.add(new Option(safe_tags(chargs[0]), charid));
 
 		// sometimes ini files lack important settings
 		const default_options = {
@@ -580,10 +584,10 @@ class Client extends EventEmitter {
 		cini.options = Object.assign(default_options, cini.options);
 
 		this.chars[charid] = {
-			name: escape(chargs[0]),
-			showname: escape(cini.options.showname),
-			desc: escape(chargs[1]),
-			gender: escape(cini.options.gender).toLowerCase(),
+			name: safe_tags(chargs[0]),
+			showname: safe_tags(cini.options.showname),
+			desc: safe_tags(chargs[1]),
+			gender: safe_tags(cini.options.gender).toLowerCase(),
 			evidence: chargs[3],
 			icon: icon,
 			inifile: cini
@@ -652,8 +656,8 @@ class Client extends EventEmitter {
 			this.evidences[i - 1] = {
 				name: decodeChat(unescapeChat(arg[0])),
 				desc: decodeChat(unescapeChat(arg[1])),
-				filename: escape(arg[2]),
-				icon: AO_HOST + "evidence/" + escape(arg[2].toLowerCase())
+				filename: safe_tags(arg[2]),
+				icon: AO_HOST + "evidence/" + safe_tags(arg[2].toLowerCase())
 			};
 		}
 
@@ -748,7 +752,7 @@ class Client extends EventEmitter {
 	 */
 	handleKK(args) {
 		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "Kicked: " + escape(args[1]);
+		document.getElementById("client_loadingtext").innerHTML = "Kicked: " + safe_tags(args[1]);
 	}
 
 	/**
@@ -758,7 +762,7 @@ class Client extends EventEmitter {
 	 */
 	handleKB(args) {
 		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "You got banned: " + escape(args[1]);
+		document.getElementById("client_loadingtext").innerHTML = "You got banned: " + safe_tags(args[1]);
 	}
 
 	/**
@@ -768,7 +772,7 @@ class Client extends EventEmitter {
 	 */
 	handleBD(args) {
 		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "Banned: " + escape(args[1]);
+		document.getElementById("client_loadingtext").innerHTML = "Banned: " + safe_tags(args[1]);
 	}
 
 	/**
@@ -791,14 +795,14 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleBN(args) {
-		viewport.bgname = escape(args[1]);
-		const bg_index = getIndexFromSelect("bg_select", escape(args[1]));
+		viewport.bgname = safe_tags(args[1]);
+		const bg_index = getIndexFromSelect("bg_select", safe_tags(args[1]));
 		document.getElementById("bg_select").selectedIndex = bg_index;
 		updateBackgroundPreview();
 		if (bg_index === 0) {
 			document.getElementById("bg_filename").value = args[1];
 		}
-		document.getElementById("bg_preview").src = AO_HOST + "background/" + escape(args[1].toLowerCase()) + "/defenseempty.png";
+		document.getElementById("bg_preview").src = AO_HOST + "background/" + safe_tags(args[1].toLowerCase()) + "/defenseempty.png";
 		if (this.charID === -1) {
 			changeBackground("jud");
 		} else {
@@ -1433,7 +1437,7 @@ class Viewport {
 			this.sfxaudio.pause();
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1") {
-				this.sfxaudio.src = AO_HOST + "sounds/general/" + escape(this.chatmsg.sound.toLowerCase()) + ".wav";
+				this.sfxaudio.src = AO_HOST + "sounds/general/" + safe_tags(this.chatmsg.sound.toLowerCase()) + ".wav";
 				this.sfxaudio.play();
 			}
 		}
@@ -1601,7 +1605,7 @@ window.musiclist_click = mutelist_click;
  * @param {MouseEvent} event
  */
 export function showname_click(_event) {
-	setCookie("showname", document.getElementById("showname").value);
+	setCookie("showname", document.getElementById("showname").checked);
 	setCookie("ic_chat_name", document.getElementById("ic_chat_name").value);
 }
 window.showname_click = showname_click;
