@@ -1691,8 +1691,9 @@ async function changeBackground(position) {
 	const { bg, desk, speedLines } = positions[position];
 	document.getElementById("client_fg").style.display = "none";
 
-	if (viewport.chatmsg.type === 5) {
+	if (viewport.chatmsg.type === "5") {
 		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
+		document.getElementById("client_bench").style.display = "none";
 	} else {
 		document.getElementById("client_court").src = bgfolder + bg;
 		if (desk) {
