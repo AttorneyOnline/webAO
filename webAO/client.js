@@ -458,7 +458,7 @@ class Client extends EventEmitter {
         		deskmod: safe_tags(args[1]).toLowerCase(),
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
-				name: args[3].toLowerCase(),
+				name: safe_tags(args[3]),
 				speaking: "(b)" + safe_tags(args[4]).toLowerCase(),
 				silent: "(a)" + safe_tags(args[4]).toLowerCase(),
 				content: this.prepChat(args[5]), // Escape HTML tags
@@ -478,10 +478,10 @@ class Client extends EventEmitter {
 
 			if (extrafeatures.includes("cccc_ic_support")) {
 				const extra_options = {
-					showname: escape(args[16]),
+					showname: safe_tags(args[16]),
 					other_charid: args[17],
-					other_name: args[18],
-					other_emote: args[19],
+					other_name: safe_tags(args[18]),
+					other_emote: safe_tags(args[19]),
 					self_offset: args[20],
 					other_offset: args[21],
 					other_flip: args[22],
@@ -1464,7 +1464,7 @@ class INI {
 				const match = line.match(regex.param);
 				if (section) {
 					if(match[1].toLowerCase() === "showname"){	//don't lowercase the showname
-						value[section][match[1].toLowerCase()] = match[2];
+						value[section]["showname"] = match[2];
 					} else {
 						value[section][match[1].toLowerCase()] = match[2].toLowerCase();
 					}
