@@ -43,6 +43,8 @@ let selectedEffect = 0;
 let selectedMenu = 1;
 let selectedShout = 0;
 
+let extrafeatures = [];
+
 const fp = new Fingerprint({
 	canvas: true,
 	ie_activex: true,
@@ -74,7 +76,9 @@ class Client extends EventEmitter {
 		this.on("close", this.onClose.bind(this));
 		this.on("message", this.onMessage.bind(this));
 		this.on("error", this.onError.bind(this));
+
 		// Preset some of the variables
+
 		this.flip = false;
 		this.presentable = false;
 
@@ -189,25 +193,39 @@ class Client extends EventEmitter {
 
 	/**
 	 * Sends an in-character chat message.
+	 * @param {string} deskmod currently unused
 	 * @param {string} speaking who is speaking
 	 * @param {string} name the name of the current character
 	 * @param {string} silent whether or not it's silent
 	 * @param {string} message the message to be sent
 	 * @param {string} side the name of the side in the background
-	 * @param {string} ssfxname the name of the sound effect
-	 * @param {string} zoom whether or not to zoom
-	 * @param {number} ssfxdelay the delay (in milliseconds) to play the sound effect
-	 * @param {string} objection the number of the shout to play
+	 * @param {string} sfx_name the name of the sound effect
+	 * @param {string} emote_modifier whether or not to zoom
+	 * @param {number} sfx_delay the delay (in milliseconds) to play the sound effect
+	 * @param {string} objection_modifier the number of the shout to play
 	 * @param {string} evidence the filename of evidence to show
 	 * @param {number} flip change to 1 to reverse sprite for position changes
-	 * @param {string} flash screen flash effect
-	 * @param {string} color text color
+	 * @param {number} realization screen flash effect
+	 * @param {number} text_color text color
+	 * @param {string} showname custom name to be displayed (optional)
+	 * @param {number} other_charid paired character (optional)
+	 * @param {number} self_offset offset to paired character (optional)
+	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
-	sendIC(speaking, name, silent, message, side, ssfxname, zoom, ssfxdelay, objection, evidence, flip, flash, color) {
+	sendIC(deskmod, speaking, name, silent, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim) {
+		let extra_cccc = ``;
+		if (extrafeatures.includes("cccc_ic_support") ) {
+			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
+		}
+		console.log(
+			`MS#${deskmod}#${speaking}#${name}#${silent}` +
+			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
+			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}%`
+		);
 		this.serv.send(
-			`MS#chat#${speaking}#${name}#${silent}` +
-			`#${escapeChat(encodeChat(message))}#${side}#${ssfxname}#${zoom}` +
-			`#${this.charID}#${ssfxdelay}#${selectedShout}#${evidence}#${flip}#${flash}#${color}#%`
+			`MS#${deskmod}#${speaking}#${name}#${silent}` +
+			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
+			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}%`
 		);
 	}
 
@@ -304,12 +322,16 @@ class Client extends EventEmitter {
 		if (document.getElementById("OOC_name").value==="") {
 			document.getElementById("OOC_name").value = "web"+this.playerID;
 		}
+
 		document.getElementById("client_mvolume").value = getCookie("musicVolume");
 		changeMusicVolume();
 		document.getElementById("client_svolume").value = getCookie("sfxVolume");
 		changeSFXVolume();
 		document.getElementById("client_bvolume").value = getCookie("blipVolume");
 		changeBlipVolume();
+
+		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
+		document.getElementById("showname").checked = getCookie("showname");
 
 		// Load evidence array to select
 		const evidence_select = document.getElementById("evi_select");
@@ -433,6 +455,7 @@ class Client extends EventEmitter {
 			}
 
 			const chatmsg = {
+        deskmod: safe_tags(args[1]).toLowerCase(),
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
 				name: args[3].toLowerCase(),
@@ -452,6 +475,23 @@ class Client extends EventEmitter {
 				color: args[15],
 				isnew: true,
 			};
+
+			if (extrafeatures.includes("cccc_ic_support")) {
+				const extra_options = {
+					showname: escape(args[16]),
+					other_charid: args[17],
+					other_name: args[18],
+					other_emote: args[19],
+					self_offset: args[20],
+					other_offset: args[21],
+					other_flip: args[22],
+					noninterrupting_preanim: args[23]
+				};
+				chatmsg = Object.assign(extra_options, chatmsg);
+				if (chatmsg.showname && document.getElementById("showname").checked) {
+					chatmsg.nameplate = chatmsg.showname;
+				}
+			}
 
 			if (chatmsg.charid === this.charID) {
 				resetICParams();
@@ -529,6 +569,11 @@ class Client extends EventEmitter {
 			img.classList.add("noini");
 			// If it does, give the user a visual indication that the character is unusable
 		}
+
+		const mute_select = document.getElementById("mute_select");
+		mute_select.add(new Option(escape(chargs[0]), charid));
+		const pair_select = document.getElementById("pair_select");
+		pair_select.add(new Option(escape(chargs[0]), charid));
 
 		// sometimes ini files lack important settings
 		const default_options = {
@@ -816,13 +861,17 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Handles the issuance of a player ID by the server.
+	 * Identifies the server and issues a playerID
 	 * @param {Array} args packet arguments
 	 */
 	handleID(args) {
 		this.playerID = args[1];
 	}
 
+	/**
+	 * Indicates how many users are on this server
+	 * @param {Array} args packet arguments
+	 */
 	handlePN(_args) {
 		this.serv.send("askchaa#%");
 	}
@@ -832,7 +881,7 @@ class Client extends EventEmitter {
 	 * webAO doesn't have this feature yet, but i want the warning to go away.
 	 * @param {Array} args packet arguments
 	 */
-	handleARUP(args) {
+	handleARUP(_args) {
 		// TODO: webAO doesn't have this feature yet
 	}
 
@@ -843,6 +892,20 @@ class Client extends EventEmitter {
 	handleFL(args) {
 		console.info("Server-supported features:");
 		console.info(args);
+		extrafeatures = args;
+
+		if (args.includes("yellowtext")) {
+			let colorselect = document.getElementById("textcolor");
+
+			colorselect.options[colorselect.options.length] = new Option("Yellow", 5);
+			colorselect.options[colorselect.options.length] = new Option("Pink", 7);
+			colorselect.options[colorselect.options.length] = new Option("Cyan", 8);
+		}
+
+		if (args.includes("cccc_ic_support")) {
+			document.getElementById("cccc").style.display = "";
+			document.getElementById("pairing").style.display = "";
+		}
 	}
 
 	/**
@@ -1166,6 +1229,7 @@ class Viewport {
 		const nameBox = document.getElementById("client_name");
 		const chatBox = document.getElementById("client_chat");
 		const charSprite = document.getElementById("client_char");
+		const pairSprite = document.getElementById("client_pair_char");
 		const eviBox = document.getElementById("client_evi");
 		const background = document.getElementById("client_background");
 		const shoutSprite = document.getElementById("client_shout");
@@ -1176,6 +1240,15 @@ class Viewport {
 			charSprite.style.transform = "scaleX(-1)";
 		} else {
 			charSprite.style.transform = "scaleX(1)";
+		}
+
+		if (extrafeatures.includes("cccc_ic_support")) {
+			// Flip the pair character
+			if (this.chatmsg.other_flip === "1") {
+			pairSprite.style.transform = "scaleX(-1)";
+			} else {
+				pairSprite.style.transform = "scaleX(1)";
+			}
 		}
 
 		if (this._animating) {
@@ -1195,6 +1268,9 @@ class Viewport {
 				"2": "objection",
 				"3": "takethat"
 			};
+			// Hide old characters
+			charSprite.style.display = "none";
+			pairSprite.style.display = "none";
 
 			// gets which shout shall played
 			const shout = shouts[this.chatmsg.objection];
@@ -1238,6 +1314,22 @@ class Viewport {
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
 				charSprite.src = `${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`;
+				charSprite.style.display = "";
+			}
+
+			if (extrafeatures.includes("cccc_ic_support")) {
+				if (this.chatmsg.other_name) {
+					const pairName = this.chatmsg.other_name.toLowerCase();
+					const pairEmote = this.chatmsg.other_emote.toLowerCase();
+					pairSprite.style.left = this.chatmsg.other_offset+"%";
+					charSprite.style.left = this.chatmsg.self_offset+"%";
+					pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
+					pairSprite.style.display = "";
+				} else {
+					pairSprite.style.display = "none";
+					charSprite.style.left = 0;
+				}
+
 			}
 
 			this.chatmsg.startpreanim = false;
@@ -1277,15 +1369,16 @@ class Viewport {
 				chatBox.style.display = "block";
 				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
 
-				// TODO: add missing colors
-				const colors = {
-					"0": "#ffffff",
-					"1": "#00ff00",
-					"2": "#ff0000",
-					"3": "#ffaa00",
-					"4": "#0000ff",
-					"5": "#ffff00",
-					"6": "#aa00aa"
+				let colors = {
+					"0": "#ffffff", // white
+					"1": "#00ff00", // green
+					"2": "#ff0000", // red
+					"3": "#ffa500", // orange
+					"4": "#4596ff", // blue
+					"5": "#ffff00", // yellow
+					"6": "#fedcba", // 6 is rainbow.
+					"7": "#aac0cb", // pink
+					"8": "#00ffff"  // cyan
 				};
 				chatBoxInner.style.color = colors[this.chatmsg.color] || "#ffffff";
 				this.chatmsg.startspeaking = false;
@@ -1295,10 +1388,25 @@ class Viewport {
 					changeBackground(this.chatmsg.side);
 				}
 
+				if (extrafeatures.includes("cccc_ic_support")) {
+					if (this.chatmsg.other_name) {
+						const pairName = this.chatmsg.other_name.toLowerCase();
+						const pairEmote = this.chatmsg.other_emote.toLowerCase();
+						pairSprite.style.left = this.chatmsg.other_offset+"%";
+						charSprite.style.left = this.chatmsg.self_offset+"%";
+						pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
+						pairSprite.style.display = "";
+					} else {
+						pairSprite.style.display = "none";
+					}
+				}
+
 				charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.speaking.toLowerCase()) + ".gif";
+				charSprite.style.display = "";
 
 				if (this.textnow === this.chatmsg.content) {
 					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent.toLowerCase()) + ".gif";
+					charSprite.style.display = "";
 					this._animating = false;
 					clearTimeout(this.updater);
 				}
@@ -1320,6 +1428,7 @@ class Viewport {
 						this.textTimer = 0;
 						this._animating = false;
 						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent.toLowerCase()) + ".gif";
+            charSprite.style.display = "";
 						clearTimeout(this.updater);
 					}
 				}
@@ -1429,17 +1538,21 @@ export function onEnter(event) {
 		const myevi = client.evidence;
 		const myflip = ((client.flip) ? 1 : 0);
 		const mycolor = document.getElementById("textcolor").value;
-		let ssfxname = "0";
-		let ssfxdelay = "0";
+		const showname = document.getElementById("ic_chat_name").value;
+		const mytext = document.getElementById("client_inputbox").value;
+		const pairchar = document.getElementById("pair_select").value;
+		const pairoffset = document.getElementById("pair_offset").value;
+		let sfxname = "0";
+		let sfxdelay = "0";
 		if (document.getElementById("sendsfx").checked) {
-			ssfxname = myemo.sfx;
-			ssfxdelay = myemo.sfxdelay;
+			sfxname = myemo.sfx;
+			sfxdelay = myemo.sfxdelay;
 		}
 
-		client.sendIC(myemo.speaking, mychar.name, myemo.silent,
-			document.getElementById("client_inputbox").value, mychar.side,
-			ssfxname, myemo.zoom, ssfxdelay, selectedShout, myevi, myflip,
-			selectedEffect, mycolor);
+		client.sendIC("chat", myemo.speaking, mychar.name, myemo.silent,
+			mytext, mychar.side,
+			sfxname, myemo.zoom, sfxdelay, selectedShout, myevi, myflip,
+			selectedEffect, mycolor, showname, pairchar, pairoffset, 0);
 	}
 }
 window.onEnter = onEnter;
@@ -1477,6 +1590,27 @@ export function musiclist_click(_event) {
 	}
 }
 window.musiclist_click = musiclist_click;
+
+/**
+ * Triggered when a character in the mute list is clicked
+ * @param {MouseEvent} event
+ */
+export function mutelist_click(_event) {
+	const select_character = document.getElementById("mute_select").value;
+
+	// TODO: i don't feel like writing this rn
+}
+window.musiclist_click = mutelist_click;
+
+/**
+ * Triggered when the showname checkboc is clicked
+ * @param {MouseEvent} event
+ */
+export function showname_click(_event) {
+	setCookie("showname", document.getElementById("showname").checked);
+	setCookie("ic_chat_name", document.getElementById("ic_chat_name").value);
+}
+window.showname_click = showname_click;
 
 /**
  * Triggered when an item on the area list is clicked.

@@ -27,6 +27,7 @@
 		<div id="client_background">
 			<div id="client_gamewindow">
 				<img id="client_court" alt="Courtroom backdrop" onerror="imgError(this);">
+				<img id="client_pair_char" alt="Paired character" style="display: none;" onerror="charError(this);">
 				<img id="client_char" alt="Character" onerror="charError(this);">
 				<img id="client_bench">
 				<img id="client_fg" alt="Various overlay" onerror="imgError(this);">
@@ -64,13 +65,11 @@
 			<br>
 			<label for="textcolor">Text Color:</label>
 			<select id="textcolor" name="textcolor">
-				<option value="0">Default</option>
+				<option value="0">White</option>
 				<option value="1">Green</option>
 				<option value="2">Red</option>
 				<option value="3">Orange</option>
 				<option value="4">Blue</option>
-				<option value="5">Yellow</option>
-				<option value="6">Margenta</option>
 			</select>
 			<label for="sendsfx">SFX</label>
 			<input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
@@ -116,7 +115,21 @@
 			</span>
 			<!-- No Commands -->
 			<span id="no_action">
-				No actions available for this role.
+				No judge actions available for this role.
+			</span>
+			<br>
+			<span id="muting" style="display: none">
+					<label for="mute_select">Mute a character:</label>
+					<select name="mute_select" id="mute_select" onchange="mutelist_click(event)"></select>
+			</span>
+			<br>
+			<span id="pairing" style="display: none">
+				<label for="pair_select">Pairing partner:</label>
+				<select name="pair_select" id="pair_select">
+					<option value="-1">None</option>
+				</select>
+				<label for="pair_offset">Pairing offset:</label>
+				<input type="range" name="pair_offset" id="pair_offset" min="-100" max="100" value="0">
 			</span>
 		</fieldset>
 	</div>
@@ -229,6 +242,14 @@
 				<option value="jur">Jury</option>
 				<option value="sea">Seance</option>
 			</select>
+			<br>
+			<br>
+			<span id="cccc" style="display: none">
+				<label for="ic_chat_name">Custom Showname:</label>
+				<input id="ic_chat_name" name="ic_chat_name" class="short" type="text">
+				<label for="showname">Show others:</label>
+				<input id="showname" name="showname" type="checkbox" onclick="showname_click()">
+			</span>
 			<br>
 			<br>
 			<div class="slider">Music
