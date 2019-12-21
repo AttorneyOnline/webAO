@@ -94,6 +94,7 @@ class Client extends EventEmitter {
 		this.chars = [];
 		this.emotes = [];
 		this.evidences = [];
+		this.areas = [];
 
 		this.resources = {
 			"holdit": {
@@ -716,8 +717,15 @@ class Client extends EventEmitter {
 			} else {
 				// Create area button
 				const newarea = document.createElement("SPAN");
-				newarea.className = "location-box";
+				newarea.classList = "area-button area-default";
+				newarea.id = "area" + i;
 				newarea.textContent = args[i];
+				this.areas[i] = {
+					name: safe_tags(args[i]),
+					players: 0,
+					status: "IDLE"
+				};
+
 				newarea.onclick = function () {
 					area_click(this);
 				};
@@ -878,11 +886,55 @@ class Client extends EventEmitter {
 
 	/**
 	 * Handle the change of players in an area.
-	 * webAO doesn't have this feature yet, but i want the warning to go away.
+	 * ARUP#0#20#8#2#0#5#2#4#1#5#%
 	 * @param {Array} args packet arguments
 	 */
-	handleARUP(_args) {
-		// TODO: webAO doesn't have this feature yet
+	handleARUP(args) {
+		args = args.slice(1);
+
+		switch(args[0]) {
+			case "0":
+				for (let i = 1; i < args.length - 1; i++) {
+					this.areas[i].players = args[i];
+					const thisarea = document.getElementById("area" + i);
+					thisarea.textContent = `${this.areas[i].name} (${args[i]})` ;
+					}
+				break;
+			case "1":
+				for (let i = 1; i < args.length - 1; i++) {
+					this.areas[i].status = args[i];
+					const thisarea = document.getElementById("area" + i);
+
+					switch (args[i]) {
+						case "LOOKING-FOR-PLAYERS":
+							thisarea.classList = "area-button area-looking";
+							break;
+						case "CASING":
+							thisarea.classList = "area-button area-casing";
+							break;
+						case "RECESS":
+							thisarea.classList = "area-button area-recess";
+							break;
+						case "RP":
+							thisarea.classList = "area-button area-rp";
+							break;
+						case "GAMING":
+							thisarea.classList = "area-button area-gaming";
+							break;
+						default:
+							thisarea.classList = "area-button area-default";
+							break;
+					}
+
+				}
+				break;
+			case "2":
+				break;
+			case "3":
+				break;
+		}
+
+
 	}
 
 	/**
