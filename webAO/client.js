@@ -197,18 +197,27 @@ class Client extends EventEmitter {
 	 * @param {string} objection_modifier the number of the shout to play
 	 * @param {string} evidence the filename of evidence to show
 	 * @param {number} flip change to 1 to reverse sprite for position changes
-	 * @param {string} realization screen flash effect
-	 * @param {string} text_color text color
+	 * @param {number} realization screen flash effect
+	 * @param {number} text_color text color
 	 * @param {string} showname custom name to be displayed (optional)
-	 * @param {string} other_charid paired character (optional)
-	 * @param {string} self_offset offset to paired character (optional)
-	 * @param {string} noninterrupting_preanim play the full preanim (optional)
+	 * @param {number} other_charid paired character (optional)
+	 * @param {string} other_name offset to paired character (optional)
+	 * @param {string} other_emote offset to paired character (optional)
+	 * @param {number} self_offset offset to paired character (optional)
+	 * @param {number} other_offset offset to paired character (optional)
+	 * @param {number} other_flip offset to paired character (optional)
+	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
-	sendIC(deskmod, speaking, name, silent, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim) {
+	sendIC(deskmod, speaking, name, silent, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, other_name, other_emote, self_offset, other_offset, other_flip, noninterrupting_preanim) {
 		let extra_cccc = ``;
-		if (this.extrafeatures.includes("cccc_ic_support")) {
+		if (this.extrafeatures.includes("cccc_ic_support") ) {
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
 		}
+		console.log(
+			`MS#${deskmod}#${speaking}#${name}#${silent}` +
+			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
+			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}%`
+		);
 		this.serv.send(
 			`MS#${deskmod}#${speaking}#${name}#${silent}` +
 			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
@@ -479,7 +488,7 @@ class Client extends EventEmitter {
 			if (chatmsg.charid === this.charID) {
 				resetICParams();
 			}
-			console.log(chatmsg);
+
 			viewport.say(chatmsg); // no await
 		}
 	}
@@ -859,7 +868,7 @@ class Client extends EventEmitter {
 	 * webAO doesn't have this feature yet, but i want the warning to go away.
 	 * @param {Array} args packet arguments
 	 */
-	handleARUP(args) {
+	handleARUP(_args) {
 		// TODO: webAO doesn't have this feature yet
 	}
 
@@ -871,6 +880,15 @@ class Client extends EventEmitter {
 		console.info("Server-supported features:");
 		console.info(args);
 		this.extrafeatures = args;
+
+		if (args.includes("yellowtext")) {
+			let colorselect = document.getElementById("textcolor");
+
+			colorselect.options[colorselect.options.length] = new Option("Yellow", 5);
+			colorselect.options[colorselect.options.length] = new Option("Pink", 7);
+			colorselect.options[colorselect.options.length] = new Option("Cyan", 8);
+		}
+
 		if (args.includes("cccc_ic_support")) {
 			document.getElementById("cccc").style.display = "";
 		}
@@ -1462,17 +1480,18 @@ export function onEnter(event) {
 		const myflip = ((client.flip) ? 1 : 0);
 		const mycolor = document.getElementById("textcolor").value;
 		const showname = document.getElementById("ic_chat_name").value;
-		let ssfxname = "0";
-		let ssfxdelay = "0";
+		const mytext = document.getElementById("client_inputbox").value;
+		let sfxname = "0";
+		let sfxdelay = "0";
 		if (document.getElementById("sendsfx").checked) {
-			ssfxname = myemo.sfx;
-			ssfxdelay = myemo.sfxdelay;
+			sfxname = myemo.sfx;
+			sfxdelay = myemo.sfxdelay;
 		}
 
-		client.sendIC(myemo.speaking, mychar.name, myemo.silent,
-			document.getElementById("client_inputbox").value, mychar.side,
-			ssfxname, myemo.zoom, ssfxdelay, selectedShout, myevi, myflip,
-			selectedEffect, mycolor, showname);
+		client.sendIC("chat", myemo.speaking, mychar.name, myemo.silent,
+			mytext, mychar.side,
+			sfxname, myemo.zoom, sfxdelay, selectedShout, myevi, myflip,
+			selectedEffect, mycolor, showname, -1, "", "", 0, 0, 0, 0);
 	}
 }
 window.onEnter = onEnter;
