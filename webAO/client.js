@@ -70,6 +70,7 @@ class Client extends EventEmitter {
 		this.on("message", this.onMessage.bind(this));
 		this.on("error", this.onError.bind(this));
 		// Preset some of the variables
+		this.extrafeatures = [];
 		this.flip = false;
 		this.presentable = false;
 
@@ -184,25 +185,34 @@ class Client extends EventEmitter {
 
 	/**
 	 * Sends an in-character chat message.
+	 * @param {string} deskmod currently unused
 	 * @param {string} speaking who is speaking
 	 * @param {string} name the name of the current character
 	 * @param {string} silent whether or not it's silent
 	 * @param {string} message the message to be sent
 	 * @param {string} side the name of the side in the background
-	 * @param {string} ssfxname the name of the sound effect
-	 * @param {string} zoom whether or not to zoom
-	 * @param {number} ssfxdelay the delay (in milliseconds) to play the sound effect
-	 * @param {string} objection the number of the shout to play
+	 * @param {string} sfx_name the name of the sound effect
+	 * @param {string} emote_modifier whether or not to zoom
+	 * @param {number} sfx_delay the delay (in milliseconds) to play the sound effect
+	 * @param {string} objection_modifier the number of the shout to play
 	 * @param {string} evidence the filename of evidence to show
 	 * @param {number} flip change to 1 to reverse sprite for position changes
-	 * @param {string} flash screen flash effect
-	 * @param {string} color text color
+	 * @param {string} realization screen flash effect
+	 * @param {string} text_color text color
+	 * @param {string} showname custom name to be displayed (optional)
+	 * @param {string} other_charid paired character (optional)
+	 * @param {string} self_offset offset to paired character (optional)
+	 * @param {string} noninterrupting_preanim play the full preanim (optional)
 	 */
-	sendIC(speaking, name, silent, message, side, ssfxname, zoom, ssfxdelay, objection, evidence, flip, flash, color) {
+	sendIC(deskmod, speaking, name, silent, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim) {
+		let extra_cccc = ``;
+		if (this.extrafeatures.includes("cccc_ic_support")) {
+			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
+		}
 		this.serv.send(
-			`MS#chat#${speaking}#${name}#${silent}` +
-			`#${escapeChat(encodeChat(message))}#${side}#${ssfxname}#${zoom}` +
-			`#${this.charID}#${ssfxdelay}#${selectedShout}#${evidence}#${flip}#${flash}#${color}#%`
+			`MS#${deskmod}#${speaking}#${name}#${silent}` +
+			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
+			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}%`
 		);
 	}
 
@@ -427,7 +437,8 @@ class Client extends EventEmitter {
 				//we already set defaults
 			}
 
-			const chatmsg = {
+			let chatmsg = {
+				deskmod: escape(args[1]),
 				preanim: escape(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
 				name: args[3].toLowerCase(),
@@ -448,10 +459,27 @@ class Client extends EventEmitter {
 				isnew: true,
 			};
 
+			if (this.extrafeatures.includes("cccc_ic_support")) {
+				const extra_options = {
+					showname: escape(args[16]),
+					other_charid: args[17],
+					other_name: args[18],
+					other_emote: args[19],
+					self_offset: args[20],
+					other_offset: args[21],
+					other_flip: args[22],
+					noninterrupting_preanim: args[23]
+				};
+				chatmsg = Object.assign(extra_options, chatmsg);
+				if (chatmsg.showname && document.getElementById("showname").checked) {
+					chatmsg.nameplate = chatmsg.showname;
+				}
+			}
+
 			if (chatmsg.charid === this.charID) {
 				resetICParams();
 			}
-
+			console.log(chatmsg);
 			viewport.say(chatmsg); // no await
 		}
 	}
@@ -811,13 +839,17 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Handles the issuance of a player ID by the server.
+	 * Identifies the server and issues a playerID
 	 * @param {Array} args packet arguments
 	 */
 	handleID(args) {
 		this.playerID = args[1];
 	}
 
+	/**
+	 * Indicates how many users are on this server
+	 * @param {Array} args packet arguments
+	 */
 	handlePN(_args) {
 		this.serv.send("askchaa#%");
 	}
@@ -838,7 +870,8 @@ class Client extends EventEmitter {
 	handleFL(args) {
 		console.info("Server-supported features:");
 		console.info(args);
-		if (args.contains("cccc_ic_support")) {
+		this.extrafeatures = args;
+		if (args.includes("cccc_ic_support")) {
 			document.getElementById("cccc").style.display = "";
 		}
 	}
@@ -1427,6 +1460,7 @@ export function onEnter(event) {
 		const myevi = client.evidence;
 		const myflip = ((client.flip) ? 1 : 0);
 		const mycolor = document.getElementById("textcolor").value;
+		const showname = document.getElementById("ic_chat_name").value;
 		let ssfxname = "0";
 		let ssfxdelay = "0";
 		if (document.getElementById("sendsfx").checked) {
@@ -1437,7 +1471,7 @@ export function onEnter(event) {
 		client.sendIC(myemo.speaking, mychar.name, myemo.silent,
 			document.getElementById("client_inputbox").value, mychar.side,
 			ssfxname, myemo.zoom, ssfxdelay, selectedShout, myevi, myflip,
-			selectedEffect, mycolor);
+			selectedEffect, mycolor, showname);
 	}
 }
 window.onEnter = onEnter;
