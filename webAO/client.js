@@ -510,14 +510,14 @@ class Client extends EventEmitter {
 	 */
 	async handleCharacterInfo(chargs, charid) {
 		let cini = {};
-		let icon = AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char_icon.png";
+		let icon = AO_HOST + "characters/" + escape(chargs[0]).toLowerCase() + "/char_icon.png";
 		let img = document.getElementById(`demo_${charid}`);
 		img.alt = chargs[0];
 		img.src = icon;	// seems like a good time to load the icon
 
 		// If the ini doesn't exist on the server this will throw an error
 		try {
-			const cinidata = await request(AO_HOST + "characters/" + escape(chargs[0].toLowerCase()) + "/char.ini");
+			const cinidata = await request(AO_HOST + "characters/" + escape(chargs[0]).toLowerCase() + "/char.ini");
 			cini = INI.parse(cinidata);
 		} catch(err) {
 			cini = {};
@@ -527,7 +527,7 @@ class Client extends EventEmitter {
 
 		// sometimes ini files lack important settings
 		const default_options = {
-			name: chargs[0].toLowerCase(),
+			name: chargs[0],
 			showname: chargs[0],
 			side: "def",
 			gender: "male"
@@ -535,10 +535,10 @@ class Client extends EventEmitter {
 		cini.options = Object.assign(default_options, cini.options);
 
 		this.chars[charid] = {
-			name: chargs[0].toLowerCase(),
-			showname: cini.options.showname,
-			desc: chargs[1],
-			gender: cini.options.gender.toLowerCase(),
+			name: escape(chargs[0]),
+			showname: escape(cini.options.showname),
+			desc: escape(chargs[1]),
+			gender: escape(cini.options.gender).toLowerCase(),
 			evidence: chargs[3],
 			icon: icon,
 			inifile: cini
@@ -935,8 +935,8 @@ class Client extends EventEmitter {
 				zoom: emoteinfo[3],
 				sfx: esfx.toLowerCase(),
 				sfxdelay: esfxd,
-				button_off: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_off.png`,
-				button_on: AO_HOST + `characters/${escape(me.name).toLowerCase()}/emotions/button${i}_on.png`
+				button_off: AO_HOST + `characters/${me.name.toLowerCase()}/emotions/button${i}_off.png`,
+				button_on: AO_HOST + `characters/${me.name.toLowerCase()}/emotions/button${i}_on.png`
 			};
 			emotesList.innerHTML +=
 				`<img src=${emotes[i].button_off}
@@ -1033,7 +1033,7 @@ class Viewport {
 		clearTimeout(this.updater);
 		// If preanim existed then determine the length
 		if (chatmsg.preanim !== "-") {
-			const delay = await this.getAnimLength(`${AO_HOST}characters/${escape(chatmsg.name)}/${chatmsg.preanim}.gif`);
+			const delay = await this.getAnimLength(`${AO_HOST}characters/${chatmsg.name.toLowerCase()}/${chatmsg.preanim}.gif`);
 			chatmsg.preanimdelay = delay;
 			this.initUpdater(delay);
 		} else {
@@ -1230,7 +1230,7 @@ class Viewport {
 			// Pre-animation stuff
 			if (this.chatmsg.preanimdelay > 0) {
 				shoutSprite.src = "misc/placeholder.gif";
-				const charName = escape(this.chatmsg.name.toLowerCase());
+				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
 				charSprite.src = `${AO_HOST}characters/${charName}/${preanim}.gif`;
 			}
@@ -1290,10 +1290,10 @@ class Viewport {
 					changeBackground(this.chatmsg.side);
 				}
 
-				charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.speaking.toLowerCase() + ".gif";
+				charSprite.src = AO_HOST + "characters/" + this.chatmsg.name.toLowerCase() + "/" + this.chatmsg.speaking.toLowerCase() + ".gif";
 
 				if (this.textnow === this.chatmsg.content) {
-					charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
+					charSprite.src = AO_HOST + "characters/" + this.chatmsg.name.toLowerCase() + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
 					this._animating = false;
 					clearTimeout(this.updater);
 				}
@@ -1314,7 +1314,7 @@ class Viewport {
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						charSprite.src = AO_HOST + "characters/" + escape(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
+						charSprite.src = AO_HOST + "characters/" + this.chatmsg.name.toLowerCase() + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
 						clearTimeout(this.updater);
 					}
 				}
