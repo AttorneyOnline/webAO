@@ -1268,9 +1268,6 @@ class Viewport {
 				"2": "objection",
 				"3": "takethat"
 			};
-			// Hide old characters
-			charSprite.style.display = "none";
-			pairSprite.style.display = "none";
 
 			// gets which shout shall played
 			const shout = shouts[this.chatmsg.objection];
@@ -1398,6 +1395,7 @@ class Viewport {
 						pairSprite.style.display = "";
 					} else {
 						pairSprite.style.display = "none";
+						charSprite.style.left = 0;
 					}
 				}
 
