@@ -57,11 +57,6 @@ console.info(`Your emulated HDID is ${hdid}`);
 
 let lastICMessageTime = new Date(0);
 
-function safe_tags(str) {
-	if (str)
-		return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') ;
-}
-
 class Client extends EventEmitter {
 	constructor(address) {
 		super();
@@ -454,16 +449,16 @@ class Client extends EventEmitter {
 				//we already set defaults
 			}
 
-			const chatmsg = {
-        deskmod: safe_tags(args[1]).toLowerCase(),
-				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
+			let chatmsg = {
+				deskmod: escape(args[1]),
+				preanim: escape(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
 				name: args[3].toLowerCase(),
-				speaking: "(b)" + safe_tags(args[4]).toLowerCase(),
-				silent: "(a)" + safe_tags(args[4]).toLowerCase(),
+				speaking: "(b)" + escape(args[4]).toLowerCase(),
+				silent: "(a)" + escape(args[4]).toLowerCase(),
 				content: this.prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
-				sound: safe_tags(args[7]).toLowerCase(),
+				sound: escape(args[7]).toLowerCase(),
 				blips: msg_blips,
 				type: args[8],
 				charid: args[9],
@@ -555,14 +550,14 @@ class Client extends EventEmitter {
 	 */
 	async handleCharacterInfo(chargs, charid) {
 		let cini = {};
-		let icon = AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char_icon.png";
+		let icon = AO_HOST + "characters/" + escape(chargs[0]).toLowerCase() + "/char_icon.png";
 		let img = document.getElementById(`demo_${charid}`);
 		img.alt = chargs[0];
 		img.src = icon;	// seems like a good time to load the icon
 
 		// If the ini doesn't exist on the server this will throw an error
 		try {
-			const cinidata = await request(AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char.ini");
+			const cinidata = await request(AO_HOST + "characters/" + escape(chargs[0]).toLowerCase() + "/char.ini");
 			cini = INI.parse(cinidata);
 		} catch(err) {
 			cini = {};
@@ -585,10 +580,10 @@ class Client extends EventEmitter {
 		cini.options = Object.assign(default_options, cini.options);
 
 		this.chars[charid] = {
-			name: safe_tags(chargs[0]),
-			showname: safe_tags(cini.options.showname),
-			desc: safe_tags(chargs[1]),
-			gender: safe_tags(cini.options.gender).toLowerCase(),
+			name: escape(chargs[0]),
+			showname: escape(cini.options.showname),
+			desc: escape(chargs[1]),
+			gender: escape(cini.options.gender).toLowerCase(),
 			evidence: chargs[3],
 			icon: icon,
 			inifile: cini
@@ -657,8 +652,8 @@ class Client extends EventEmitter {
 			this.evidences[i - 1] = {
 				name: decodeChat(unescapeChat(arg[0])),
 				desc: decodeChat(unescapeChat(arg[1])),
-				filename: safe_tags(arg[2]),
-				icon: AO_HOST + "evidence/" + encodeURI(arg[2].toLowerCase())
+				filename: escape(arg[2]),
+				icon: AO_HOST + "evidence/" + escape(arg[2].toLowerCase())
 			};
 		}
 
@@ -753,7 +748,7 @@ class Client extends EventEmitter {
 	 */
 	handleKK(args) {
 		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "Kicked: " + safe_tags(args[1]);
+		document.getElementById("client_loadingtext").innerHTML = "Kicked: " + escape(args[1]);
 	}
 
 	/**
@@ -763,7 +758,7 @@ class Client extends EventEmitter {
 	 */
 	handleKB(args) {
 		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "You got banned: " + safe_tags(args[1]);
+		document.getElementById("client_loadingtext").innerHTML = "You got banned: " + escape(args[1]);
 	}
 
 	/**
@@ -773,7 +768,7 @@ class Client extends EventEmitter {
 	 */
 	handleBD(args) {
 		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "Banned: " + safe_tags(args[1]);
+		document.getElementById("client_loadingtext").innerHTML = "Banned: " + escape(args[1]);
 	}
 
 	/**
@@ -796,14 +791,14 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleBN(args) {
-		viewport.bgname = safe_tags(args[1]);
-		const bg_index = getIndexFromSelect("bg_select", safe_tags(args[1]));
+		viewport.bgname = escape(args[1]);
+		const bg_index = getIndexFromSelect("bg_select", escape(args[1]));
 		document.getElementById("bg_select").selectedIndex = bg_index;
 		updateBackgroundPreview();
 		if (bg_index === 0) {
 			document.getElementById("bg_filename").value = args[1];
 		}
-		document.getElementById("bg_preview").src = AO_HOST + "background/" + encodeURI(args[1].toLowerCase()) + "/defenseempty.png";
+		document.getElementById("bg_preview").src = AO_HOST + "background/" + escape(args[1].toLowerCase()) + "/defenseempty.png";
 		if (this.charID === -1) {
 			changeBackground("jud");
 		} else {
@@ -1003,8 +998,8 @@ class Client extends EventEmitter {
 				zoom: emoteinfo[3],
 				sfx: esfx.toLowerCase(),
 				sfxdelay: esfxd,
-				button_off: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
-				button_on: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_on.png`
+				button_off: AO_HOST + `characters/${me.name.toLowerCase()}/emotions/button${i}_off.png`,
+				button_on: AO_HOST + `characters/${me.name.toLowerCase()}/emotions/button${i}_on.png`
 			};
 			emotesList.innerHTML +=
 				`<img src=${emotes[i].button_off}
@@ -1082,7 +1077,7 @@ class Viewport {
 	 * Returns the path which the background is located in.
 	 */
 	get bgFolder() {
-		return `${AO_HOST}background/${encodeURI(this.bgname.toLowerCase())}/`;
+		return `${AO_HOST}background/${this.bgname.toLowerCase()}/`;
 	}
 
 	/**
@@ -1093,7 +1088,7 @@ class Viewport {
 		this.chatmsg = chatmsg;
 		appendICLog(chatmsg.content, chatmsg.nameplate);
 		changeBackground(chatmsg.side);
-		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(chatmsg.blips.toLowerCase())}.wav`);
+		this.blipChannels.forEach(channel => channel.src = AO_HOST + `sounds/general/sfx-blip${chatmsg.blips}.wav`);
 		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
@@ -1101,7 +1096,7 @@ class Viewport {
 		clearTimeout(this.updater);
 		// If preanim existed then determine the length
 		if (chatmsg.preanim !== "-") {
-			const delay = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
+			const delay = await this.getAnimLength(`${AO_HOST}characters/${chatmsg.name.toLowerCase()}/${chatmsg.preanim}.gif`);
 			chatmsg.preanimdelay = delay;
 			this.initUpdater(delay);
 		} else {
@@ -1276,7 +1271,7 @@ class Viewport {
 			const shout = shouts[this.chatmsg.objection];
 			if (shout) {
 				shoutSprite.src = client.resources[shout]["src"];
-				this.shoutaudio.src=`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
+				this.shoutaudio.src=`${AO_HOST}characters/${this.chatmsg.name.toLowerCase()}/${shout}.wav`;
 				this.shoutaudio.play();
 				this.shoutTimer = 850;
 			} else {
@@ -1313,7 +1308,7 @@ class Viewport {
 				shoutSprite.src = "misc/placeholder.gif";
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
-				charSprite.src = `${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`;
+				charSprite.src = `${AO_HOST}characters/${charName}/${preanim}.gif`;
 				charSprite.style.display = "";
 			}
 
@@ -1329,7 +1324,6 @@ class Viewport {
 					pairSprite.style.display = "none";
 					charSprite.style.left = 0;
 				}
-
 			}
 
 			this.chatmsg.startpreanim = false;
@@ -1401,11 +1395,11 @@ class Viewport {
 					}
 				}
 
-				charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.speaking.toLowerCase()) + ".gif";
+				charSprite.src = AO_HOST + "characters/" + this.chatmsg.name.toLowerCase() + "/" + this.chatmsg.speaking.toLowerCase() + ".gif";
 				charSprite.style.display = "";
 
 				if (this.textnow === this.chatmsg.content) {
-					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent.toLowerCase()) + ".gif";
+					charSprite.src = AO_HOST + "characters/" + this.chatmsg.name.toLowerCase() + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
 					charSprite.style.display = "";
 					this._animating = false;
 					clearTimeout(this.updater);
@@ -1427,8 +1421,8 @@ class Viewport {
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent.toLowerCase()) + ".gif";
-            charSprite.style.display = "";
+						charSprite.src = AO_HOST + "characters/" + this.chatmsg.name.toLowerCase() + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
+						charSprite.style.display = "";
 						clearTimeout(this.updater);
 					}
 				}
@@ -1439,7 +1433,7 @@ class Viewport {
 			this.sfxaudio.pause();
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1") {
-				this.sfxaudio.src = AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav";
+				this.sfxaudio.src = AO_HOST + "sounds/general/" + escape(this.chatmsg.sound.toLowerCase()) + ".wav";
 				this.sfxaudio.play();
 			}
 		}
@@ -1825,9 +1819,8 @@ async function changeBackground(position) {
 	const { bg, desk, speedLines } = positions[position];
 	document.getElementById("client_fg").style.display = "none";
 
-	if (viewport.chatmsg.type === "5") {
-		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
-		document.getElementById("client_bench").style.display = "none";
+	if (viewport.chatmsg.type === 5) {
+		document.getElementById("client_court").src = `${AO_HOST}themes/default/${speedLines}`;
 	} else {
 		document.getElementById("client_court").src = bgfolder + bg;
 		if (desk) {
@@ -2069,10 +2062,10 @@ export function updateEvidenceIcon() {
 
 	if (evidence_select.selectedIndex === 0) {
 		evidence_filename.style.display = "initial";
-		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${encodeURI(evidence_filename.value.toLowerCase())})`;
+		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${evidence_filename.value.toLowerCase()})`;
 	} else {
 		evidence_filename.style.display = "none";
-		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${encodeURI(evidence_select.value.toLowerCase())})`;
+		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${evidence_select.value.toLowerCase()})`;
 	}
 }
 window.updateEvidenceIcon = updateEvidenceIcon;
@@ -2203,10 +2196,10 @@ export function updateBackgroundPreview() {
 
 	if (background_select.selectedIndex === 0) {
 		background_filename.style.display = "initial";
-		background_preview.src = AO_HOST + "background/" + encodeURI(background_filename.value.toLowerCase()) + "/defenseempty.png";
+		background_preview.src = AO_HOST + "background/" + background_filename.value.toLowerCase() + "/defenseempty.png";
 	} else {
 		background_filename.style.display = "none";
-		background_preview.src = AO_HOST + "background/" + encodeURI(background_select.value.toLowerCase()) + "/defenseempty.png";
+		background_preview.src = AO_HOST + "background/" + background_select.value.toLowerCase() + "/defenseempty.png";
 	}
 }
 window.updateBackgroundPreview = updateBackgroundPreview;
