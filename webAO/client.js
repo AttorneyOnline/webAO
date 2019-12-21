@@ -838,6 +838,9 @@ class Client extends EventEmitter {
 	handleFL(args) {
 		console.info("Server-supported features:");
 		console.info(args);
+		if (args.contains("cccc_ic_support")) {
+			document.getElementById("cccc").style.display = "";
+		}
 	}
 
 	/**
