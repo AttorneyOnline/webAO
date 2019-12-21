@@ -164,6 +164,14 @@ img {
 	left: 0;
 }
 
+#client_pair_char {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	bottom: 0;
+	left: 0;
+}
+
 #client_bench {
 	display: none;
 	position: absolute;
