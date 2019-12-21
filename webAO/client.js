@@ -1308,15 +1308,16 @@ class Viewport {
 				chatBox.style.display = "block";
 				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
 
-				// TODO: add missing colors
-				const colors = {
-					"0": "#ffffff",
-					"1": "#00ff00",
-					"2": "#ff0000",
-					"3": "#ffaa00",
-					"4": "#0000ff",
-					"5": "#ffff00",
-					"6": "#aa00aa"
+				let colors = {
+					"0": "#ffffff", // white
+					"1": "#00ff00", // green
+					"2": "#ff0000", // red
+					"3": "#ffa500", // orange
+					"4": "#4596ff", // blue
+					"5": "#ffff00", // yellow
+					"6": "#fedcba", // 6 is rainbow.
+					"7": "#aac0cb", // pink
+					"8": "#00ffff"  // cyan
 				};
 				chatBoxInner.style.color = colors[this.chatmsg.color] || "#ffffff";
 				this.chatmsg.startspeaking = false;
