@@ -201,14 +201,10 @@ class Client extends EventEmitter {
 	 * @param {number} text_color text color
 	 * @param {string} showname custom name to be displayed (optional)
 	 * @param {number} other_charid paired character (optional)
-	 * @param {string} other_name offset to paired character (optional)
-	 * @param {string} other_emote offset to paired character (optional)
 	 * @param {number} self_offset offset to paired character (optional)
-	 * @param {number} other_offset offset to paired character (optional)
-	 * @param {number} other_flip offset to paired character (optional)
 	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
-	sendIC(deskmod, speaking, name, silent, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, other_name, other_emote, self_offset, other_offset, other_flip, noninterrupting_preanim) {
+	sendIC(deskmod, speaking, name, silent, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim) {
 		let extra_cccc = ``;
 		if (this.extrafeatures.includes("cccc_ic_support") ) {
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
@@ -1487,6 +1483,8 @@ export function onEnter(event) {
 		const mycolor = document.getElementById("textcolor").value;
 		const showname = document.getElementById("ic_chat_name").value;
 		const mytext = document.getElementById("client_inputbox").value;
+		const pairchar = document.getElementById("pair_select").value;
+		const pairoffset = document.getElementById("pair_offset").value;
 		let sfxname = "0";
 		let sfxdelay = "0";
 		if (document.getElementById("sendsfx").checked) {
@@ -1497,7 +1495,7 @@ export function onEnter(event) {
 		client.sendIC("chat", myemo.speaking, mychar.name, myemo.silent,
 			mytext, mychar.side,
 			sfxname, myemo.zoom, sfxdelay, selectedShout, myevi, myflip,
-			selectedEffect, mycolor, showname, -1, "", "", 0, 0, 0, 0);
+			selectedEffect, mycolor, showname, pairchar, pairoffset, 0);
 	}
 }
 window.onEnter = onEnter;
@@ -1535,6 +1533,17 @@ export function musiclist_click(_event) {
 	}
 }
 window.musiclist_click = musiclist_click;
+
+/**
+ * Triggered when a character in the mute list is clicked
+ * @param {MouseEvent} event
+ */
+export function mutelist_click(_event) {
+	const select_character = document.getElementById("mute_select").value;
+
+	// TODO: i don't feel like writing this rn
+}
+window.musiclist_click = mutelist_click;
 
 /**
  * Triggered when an item on the area list is clicked.
