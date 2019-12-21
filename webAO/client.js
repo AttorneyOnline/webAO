@@ -1284,6 +1284,7 @@ class Viewport {
 			this.chatmsg.startpreanim = true;
 		}
 
+		// TODO: preanims sometimes play when they're not supposed to
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
 			// Effect stuff
 			if (this.chatmsg.flash === "2") {
