@@ -317,12 +317,16 @@ class Client extends EventEmitter {
 		if (document.getElementById("OOC_name").value==="") {
 			document.getElementById("OOC_name").value = "web"+this.playerID;
 		}
+
 		document.getElementById("client_mvolume").value = getCookie("musicVolume");
 		changeMusicVolume();
 		document.getElementById("client_svolume").value = getCookie("sfxVolume");
 		changeSFXVolume();
 		document.getElementById("client_bvolume").value = getCookie("blipVolume");
 		changeBlipVolume();
+
+		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
+		document.getElementById("showname").value = getCookie("showname");
 
 		// Load evidence array to select
 		const evidence_select = document.getElementById("evi_select");
@@ -1318,6 +1322,7 @@ class Viewport {
 					pairSprite.style.display = "";
 				} else {
 					pairSprite.style.display = "none";
+					charSprite.style.left = 0;
 				}
 			}
 
@@ -1590,6 +1595,16 @@ export function mutelist_click(_event) {
 	// TODO: i don't feel like writing this rn
 }
 window.musiclist_click = mutelist_click;
+
+/**
+ * Triggered when the showname checkboc is clicked
+ * @param {MouseEvent} event
+ */
+export function showname_click(_event) {
+	setCookie("showname", document.getElementById("showname").value);
+	setCookie("ic_chat_name", document.getElementById("ic_chat_name").value);
+}
+window.showname_click = showname_click;
 
 /**
  * Triggered when an item on the area list is clicked.

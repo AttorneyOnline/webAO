@@ -118,7 +118,7 @@
 				No judge actions available for this role.
 			</span>
 			<br>
-			<span id="muting">
+			<span id="muting" style="display: none">
 					<label for="mute_select">Mute a character:</label>
 					<select name="mute_select" id="mute_select" onchange="mutelist_click(event)"></select>
 			</span>
@@ -246,7 +246,7 @@
 				<label for="ic_chat_name">Custom Showname:</label>
 				<input id="ic_chat_name" name="ic_chat_name" class="short" type="text">
 				<label for="showname">Show others:</label>
-				<input id="showname" name="showname" type="checkbox">
+				<input id="showname" name="showname" type="checkbox" onclick="showname_click()">
 			</span>
 			<br>
 			<br>
