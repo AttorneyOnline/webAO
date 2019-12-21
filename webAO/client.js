@@ -326,7 +326,7 @@ class Client extends EventEmitter {
 		changeBlipVolume();
 
 		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
-		document.getElementById("showname").value = getCookie("showname");
+		document.getElementById("showname").checked = getCookie("showname");
 
 		// Load evidence array to select
 		const evidence_select = document.getElementById("evi_select");
@@ -1601,7 +1601,7 @@ window.musiclist_click = mutelist_click;
  * @param {MouseEvent} event
  */
 export function showname_click(_event) {
-	setCookie("showname", document.getElementById("showname").value);
+	setCookie("showname", document.getElementById("showname").checked);
 	setCookie("ic_chat_name", document.getElementById("ic_chat_name").value);
 }
 window.showname_click = showname_click;
