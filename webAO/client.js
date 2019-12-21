@@ -1259,6 +1259,9 @@ class Viewport {
 				"2": "objection",
 				"3": "takethat"
 			};
+			// Hide old characters
+			charSprite.style.display = "none";
+			pairSprite.style.display = "none";
 
 			// gets which shout shall played
 			const shout = shouts[this.chatmsg.objection];
@@ -1302,15 +1305,17 @@ class Viewport {
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
 				charSprite.src = `${AO_HOST}characters/${charName}/${preanim}.gif`;
+				charSprite.style.display = "";
 			}
 
 			if (extrafeatures.includes("cccc_ic_support")) {
 				if (this.chatmsg.other_name) {
 					const pairName = this.chatmsg.other_name.toLowerCase();
 					const pairEmote = this.chatmsg.other_emote.toLowerCase();
-					pairSprite.style.display = "";
 					pairSprite.style.left = this.chatmsg.other_offset+"%";
+					charSprite.style.left = this.chatmsg.self_offset+"%";
 					pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
+					pairSprite.style.display = "";
 				} else {
 					pairSprite.style.display = "none";
 				}
@@ -1372,10 +1377,25 @@ class Viewport {
 					changeBackground(this.chatmsg.side);
 				}
 
+				if (extrafeatures.includes("cccc_ic_support")) {
+					if (this.chatmsg.other_name) {
+						const pairName = this.chatmsg.other_name.toLowerCase();
+						const pairEmote = this.chatmsg.other_emote.toLowerCase();
+						pairSprite.style.left = this.chatmsg.other_offset+"%";
+						charSprite.style.left = this.chatmsg.self_offset+"%";
+						pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
+						pairSprite.style.display = "";
+					} else {
+						pairSprite.style.display = "none";
+					}
+				}
+
 				charSprite.src = AO_HOST + "characters/" + this.chatmsg.name.toLowerCase() + "/" + this.chatmsg.speaking.toLowerCase() + ".gif";
+				charSprite.style.display = "";
 
 				if (this.textnow === this.chatmsg.content) {
 					charSprite.src = AO_HOST + "characters/" + this.chatmsg.name.toLowerCase() + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
+					charSprite.style.display = "";
 					this._animating = false;
 					clearTimeout(this.updater);
 				}
@@ -1397,6 +1417,7 @@ class Viewport {
 						this.textTimer = 0;
 						this._animating = false;
 						charSprite.src = AO_HOST + "characters/" + this.chatmsg.name.toLowerCase() + "/" + this.chatmsg.silent.toLowerCase() + ".gif";
+						charSprite.style.display = "";
 						clearTimeout(this.updater);
 					}
 				}
