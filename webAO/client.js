@@ -562,6 +562,11 @@ class Client extends EventEmitter {
 			// If it does, give the user a visual indication that the character is unusable
 		}
 
+		const mute_select = document.getElementById("mute_select");
+		mute_select.add(new Option(escape(chargs[0]), charid));
+		const pair_select = document.getElementById("pair_select");
+		pair_select.add(new Option(escape(chargs[0]), charid));
+
 		// sometimes ini files lack important settings
 		const default_options = {
 			name: chargs[0],
@@ -891,6 +896,7 @@ class Client extends EventEmitter {
 
 		if (args.includes("cccc_ic_support")) {
 			document.getElementById("cccc").style.display = "";
+			document.getElementById("pairing").style.display = "";
 		}
 	}
 
