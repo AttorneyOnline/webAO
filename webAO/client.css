@@ -251,22 +251,26 @@ img {
 }
 
 .rainbow-text {
-	background-image: repeating-linear-gradient(to right, red, orange, yellow, green, blue, red, orange, yellow, green, blue, red, orange, yellow, green, blue, red, orange, yellow, green, blue, red, orange);
-	background-size: 200% 200%;
+	background-color: rgb(255, 255, 255);
+	background-image: repeating-linear-gradient(to right,
+	red  0%  8%, orange  8% 16%, yellow 16% 24%, green 24% 32%, blue 32% 40%,
+	red 40% 48%, orange 48% 56%, yellow 56% 64%, green 64% 72%, blue 72% 80%,
+	red 80% 88%, orange 88% 96%, yellow 96% 100% );
+	background-size: 40% 40%;
 	background-clip: text;
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
-	animation: rainbow_alt 1s linear infinite;
+	animation: rainbow 4s linear infinite;
   }
   
-  @keyframes rainbow { 
-    0%,100% {background-position: 0 0;    }
-    50%     {background-position: 100% 0; }
+  @keyframes rainbow_alt { 
+    0%,100% {background-position:    0 0; }
+    50%     {background-position: 400% 0; }
   }
 
-  @keyframes rainbow_alt { 
-    0%   {background-position: 0 0;        }
-    100% {    background-position: 100% 0; }
+  @keyframes rainbow { 
+    0%   {background-position:    0 0; }
+    100% {background-position: 400% 0; }
   }
 
 #client_inputbox {
