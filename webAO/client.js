@@ -1667,7 +1667,7 @@ window.showname_click = showname_click;
  * @param {MouseEvent} event
  */
 export function area_click(el) {
-	const area = el.textContent;
+	const area = client.areas[el.id.substr(4)].name;
 	client.sendMusicChange(area);
 
 	const areaHr = document.createElement("div");
