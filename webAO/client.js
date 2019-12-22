@@ -906,6 +906,9 @@ class Client extends EventEmitter {
 					const thisarea = document.getElementById("area" + i);
 
 					switch (args[i]) {
+						case "LOCKED":
+							thisarea.classList = "area-button area-locked";
+							break;
 						case "LOOKING-FOR-PLAYERS":
 							thisarea.classList = "area-button area-looking";
 							break;
@@ -920,6 +923,9 @@ class Client extends EventEmitter {
 							break;
 						case "GAMING":
 							thisarea.classList = "area-button area-gaming";
+							break;
+						case "SPECTATABLE":
+							thisarea.classList = "area-button area-spectatable";
 							break;
 						default:
 							thisarea.classList = "area-button area-default";

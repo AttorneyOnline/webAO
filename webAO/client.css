@@ -144,10 +144,6 @@ img {
 	width: 100%;
 }
 
-.area_btn {
-	width: 20%;
-}
-
 #client_court {
 	position: absolute;
 	height: 100%;
@@ -524,6 +520,7 @@ img {
 .area-button:hover {
 	border-color: #FFD081;
 }
+
 .area-default {
 	background-color: rgb(54,198,68);
 }
@@ -546,4 +543,12 @@ img {
 
 .area-gaming {
 	background-color: rgb(55,255,255);
+}
+
+.area-locked {
+	background-color: rgb(127,127,127);
+}
+
+.area-spectatable {
+	background-color: rgb(54,198,68);
 }
