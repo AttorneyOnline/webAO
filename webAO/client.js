@@ -1043,7 +1043,7 @@ class Viewport {
 			"4": "#4596ff", // blue
 			"5": "#ffff00", // yellow
 			"6": "#fedcba", // 6 is rainbow.
-			"7": "#aac0cb", // pink
+			"7": "#ffc0cb", // pink
 			"8": "#00ffff"  // cyan
 		};
 
