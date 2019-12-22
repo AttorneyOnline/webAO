@@ -188,7 +188,7 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
 	sendOOC(message) {
-		setCookie("OOC_name",escapeChat(encodeChat(document.getElementById("OOC_name").value)));
+		setCookie("OOC_name",document.getElementById("OOC_name").value);
 		this.serv.send(`CT#${escapeChat(encodeChat(document.getElementById("OOC_name").value))}#${escapeChat(encodeChat(message))}#%`);
 	}
 
@@ -354,7 +354,8 @@ class Client extends EventEmitter {
 	 * @param {number} character the character ID
 	 */
 	sendCharacter(character) {
-		this.serv.send(`CC#${this.playerID}#${character}#web#%`);
+		if (this.chars[character].name)
+			this.serv.send(`CC#${this.playerID}#${character}#web#%`);
 	}
 
 	/**
@@ -572,9 +573,9 @@ class Client extends EventEmitter {
 		}
 
 		const mute_select = document.getElementById("mute_select");
-		mute_select.add(new Option(escape(chargs[0]), charid));
+		mute_select.add(new Option(safe_tags(chargs[0]), charid));
 		const pair_select = document.getElementById("pair_select");
-		pair_select.add(new Option(escape(chargs[0]), charid));
+		pair_select.add(new Option(safe_tags(chargs[0]), charid));
 
 		// sometimes ini files lack important settings
 		const default_options = {
@@ -1342,6 +1343,7 @@ class Viewport {
 			this.chatmsg.startpreanim = true;
 		}
 
+		// TODO: preanims sometimes play when they're not supposed to
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
 			// Effect stuff
 			if (this.chatmsg.flash === "2") {
@@ -1656,7 +1658,7 @@ export function mutelist_click(_event) {
 
 	// TODO: i don't feel like writing this rn
 }
-window.musiclist_click = mutelist_click;
+window.mutelist_click = mutelist_click;
 
 /**
  * Triggered when the showname checkboc is clicked
