@@ -899,6 +899,7 @@ class Client extends EventEmitter {
 			let colorselect = document.getElementById("textcolor");
 
 			colorselect.options[colorselect.options.length] = new Option("Yellow", 5);
+			colorselect.options[colorselect.options.length] = new Option("Rainbow", 6);
 			colorselect.options[colorselect.options.length] = new Option("Pink", 7);
 			colorselect.options[colorselect.options.length] = new Option("Cyan", 8);
 		}
@@ -1033,6 +1034,19 @@ class Viewport {
 			"snddelay": 0,
 			"preanimdelay": 0
 		};
+
+		this.colors = {
+			"0": "#ffffff", // white
+			"1": "#00ff00", // green
+			"2": "#ff0000", // red
+			"3": "#ffa500", // orange
+			"4": "#4596ff", // blue
+			"5": "#ffff00", // yellow
+			"6": "#fedcba", // 6 is rainbow.
+			"7": "#aac0cb", // pink
+			"8": "#00ffff"  // cyan
+		};
+
 		this.blip = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
 		this.blip.volume = 0.5;
 
@@ -1262,6 +1276,7 @@ class Viewport {
 			// Hide message and evidence window
 			nameBox.style.display = "none";
 			chatBox.style.display = "none";
+			chatBoxInner.className = "";
 			eviBox.style.opacity = "0";
 			eviBox.style.height = "0%";
 			const shouts = {
@@ -1368,18 +1383,12 @@ class Viewport {
 				chatBox.style.display = "block";
 				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
 
-				let colors = {
-					"0": "#ffffff", // white
-					"1": "#00ff00", // green
-					"2": "#ff0000", // red
-					"3": "#ffa500", // orange
-					"4": "#4596ff", // blue
-					"5": "#ffff00", // yellow
-					"6": "#fedcba", // 6 is rainbow.
-					"7": "#aac0cb", // pink
-					"8": "#00ffff"  // cyan
-				};
-				chatBoxInner.style.color = colors[this.chatmsg.color] || "#ffffff";
+				if (this.chatmsg.color === "6")
+					chatBoxInner.className = "rainbow-text";
+				else {
+					chatBoxInner.className = "";
+					chatBoxInner.style.color = this.colors[this.chatmsg.color] || "#ffffff";
+				}
 				this.chatmsg.startspeaking = false;
 
 				if (this.chatmsg.preanimdelay === 0) {
