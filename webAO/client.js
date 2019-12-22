@@ -353,7 +353,8 @@ class Client extends EventEmitter {
 	 * @param {number} character the character ID
 	 */
 	sendCharacter(character) {
-		this.serv.send(`CC#${this.playerID}#${character}#web#%`);
+		if (this.chars[character].name)
+			this.serv.send(`CC#${this.playerID}#${character}#web#%`);
 	}
 
 	/**
