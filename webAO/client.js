@@ -572,9 +572,9 @@ class Client extends EventEmitter {
 		}
 
 		const mute_select = document.getElementById("mute_select");
-		mute_select.add(new Option(escape(chargs[0]), charid));
+		mute_select.add(new Option(safe_tags(chargs[0]), charid));
 		const pair_select = document.getElementById("pair_select");
-		pair_select.add(new Option(escape(chargs[0]), charid));
+		pair_select.add(new Option(safe_tags(chargs[0]), charid));
 
 		// sometimes ini files lack important settings
 		const default_options = {
