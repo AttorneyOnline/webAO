@@ -187,7 +187,7 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
 	sendOOC(message) {
-		setCookie("OOC_name",escapeChat(encodeChat(document.getElementById("OOC_name").value)));
+		setCookie("OOC_name",document.getElementById("OOC_name").value);
 		this.serv.send(`CT#${escapeChat(encodeChat(document.getElementById("OOC_name").value))}#${escapeChat(encodeChat(message))}#%`);
 	}
 
@@ -1600,7 +1600,7 @@ export function mutelist_click(_event) {
 
 	// TODO: i don't feel like writing this rn
 }
-window.musiclist_click = mutelist_click;
+window.mutelist_click = mutelist_click;
 
 /**
  * Triggered when the showname checkboc is clicked
