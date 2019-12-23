@@ -178,12 +178,21 @@ class Client extends EventEmitter {
 	}
 
 	/**
+	 * Hook for sending messages to the server
+	 * @param {string} message the message to send
+	 */
+	sendServer(message) {
+		// console.log(message);
+		this.serv.send(message);
+	}
+
+	/**
 	 * Sends an out-of-character chat message.
 	 * @param {string} message the message to send
 	 */
 	sendOOC(message) {
 		setCookie("OOC_name",document.getElementById("OOC_name").value);
-		this.serv.send(`CT#${escapeChat(encodeChat(document.getElementById("OOC_name").value))}#${escapeChat(encodeChat(message))}#%`);
+		this.sendServer(`CT#${escapeChat(encodeChat(document.getElementById("OOC_name").value))}#${escapeChat(encodeChat(message))}#%`);
 	}
 
 	/**
@@ -217,7 +226,7 @@ class Client extends EventEmitter {
 			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
 			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}%`
 		);
-		this.serv.send(
+		this.sendServer(
 			`MS#${deskmod}#${speaking}#${name}#${silent}` +
 			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
 			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}%`
@@ -231,7 +240,7 @@ class Client extends EventEmitter {
 	 * @param {string} evidence image filename
 	 */
 	sendPE(name, desc, img) {
-		this.serv.send(`PE#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
+		this.sendServer(`PE#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
 	}
 
 	/**
@@ -242,7 +251,7 @@ class Client extends EventEmitter {
 	 * @param {string} evidence image filename
 	 */
 	sendEE(id, name, desc, img) {
-		this.serv.send(`EE#${id}#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
+		this.sendServer(`EE#${id}#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
 	}
 
 	/**
@@ -250,7 +259,7 @@ class Client extends EventEmitter {
 	 * @param {number} evidence id
 	 */
 	sendDE(id) {
-		this.serv.send(`DE#${id}#%`);
+		this.sendServer(`DE#${id}#%`);
 	}
 
 	/**
@@ -259,7 +268,7 @@ class Client extends EventEmitter {
 	 * @param {number} hp the health point
 	 */
 	sendHP(side, hp) {
-		this.serv.send(`HP#${side}#${hp}#%`);
+		this.sendServer(`HP#${side}#${hp}#%`);
 	}
 
 	/**
@@ -267,7 +276,7 @@ class Client extends EventEmitter {
 	 * @param {string} message to mod
 	 */
 	sendZZ(msg) {
-		this.serv.send(`ZZ#${msg}#%`);
+		this.sendServer(`ZZ#${msg}#%`);
 	}
 
 	/**
@@ -276,7 +285,7 @@ class Client extends EventEmitter {
 	 */
 	sendRT(testimony) {
 		if (this.chars[this.charID].side === "jud") {
-			this.serv.send(`RT#${testimony}#%`);
+			this.sendServer(`RT#${testimony}#%`);
 		}
 	}
 
@@ -285,7 +294,7 @@ class Client extends EventEmitter {
 	 * @param {string} track the track ID
 	 */
 	sendMusicChange(track) {
-		this.serv.send(`MC#${track}#${this.charID}#%`);
+		this.sendServer(`MC#${track}#${this.charID}#%`);
 	}
 
 	/**
@@ -295,7 +304,7 @@ class Client extends EventEmitter {
 	 * either the AO2 client or tsuserver.
 	 */
 	sendLeaveRoom() {
-		this.serv.send("FC#%");
+		this.sendServer("FC#%");
 	}
 
 	/**
@@ -303,8 +312,8 @@ class Client extends EventEmitter {
 	 * to the server.
 	 */
 	joinServer() {
-		this.serv.send(`HI#${hdid}#%`);
-		this.serv.send("ID#webAO#2.3#%");
+		this.sendServer(`HI#${hdid}#%`);
+		this.sendServer("ID#webAO#2.3#%");
 		this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
 	}
 
@@ -349,7 +358,7 @@ class Client extends EventEmitter {
 	 */
 	sendCharacter(character) {
 		if (this.chars[character].name)
-			this.serv.send(`CC#${this.playerID}#${character}#web#%`);
+			this.sendServer(`CC#${this.playerID}#${character}#web#%`);
 	}
 
 	/**
@@ -357,14 +366,14 @@ class Client extends EventEmitter {
 	 * @param {number?} song the song to be played
 	 */
 	sendMusic(song) {
-		this.serv.send(`MC#${song}`);
+		this.sendServer(`MC#${song}`);
 	}
 
 	/**
 	 * Sends a keepalive packet.
 	 */
 	sendCheck() {
-		this.serv.send(`CH#${this.charID}#%`);
+		this.sendServer(`CH#${this.charID}#%`);
 	}
 
 	/**
@@ -615,7 +624,7 @@ class Client extends EventEmitter {
 			}
 		}
 		// Request the next pack
-		this.serv.send("AN#" + ((args[1] / 10) + 1) + "#%");
+		this.sendServer("AN#" + ((args[1] / 10) + 1) + "#%");
 	}
 
 	/**
@@ -631,7 +640,7 @@ class Client extends EventEmitter {
 			this.handleCharacterInfo(chargs, i-1);
 		}
 		// We're done with the characters, request the music
-		this.serv.send("RM#%");
+		this.sendServer("RM#%");
 	}
 
 	/**
@@ -643,7 +652,7 @@ class Client extends EventEmitter {
 	 */
 	handleEI(args) {
 		document.getElementById("client_loadingtext").innerHTML = `Loading Evidence ${args[1]}/${this.evidence_list_length}`;
-		this.serv.send("RM#%");
+		this.sendServer("RM#%");
 	}
 
 	/**
@@ -682,7 +691,7 @@ class Client extends EventEmitter {
 	 */
 	handleEM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music " + args[1];
-		this.serv.send("AM#" + ((args[1] / 10) + 1) + "#%");
+		this.sendServer("AM#" + ((args[1] / 10) + 1) + "#%");
 		const hmusiclist = document.getElementById("client_musiclist");
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
@@ -738,7 +747,7 @@ class Client extends EventEmitter {
 		}
 
 		// Music done, carry on
-		this.serv.send("RD#%");
+		this.sendServer("RD#%");
 	}
 
 	/**
@@ -868,6 +877,14 @@ class Client extends EventEmitter {
 	 */
 	handleID(args) {
 		this.playerID = args[1];
+		this.serverSoftware = args[2].split("&")[0];
+		if (this.serverSoftware === "serverD")
+			this.serverVersion = args[2].split("&")[1];
+		else
+			this.serverVersion = args[3];
+
+		if (this.serverSoftware === "serverD" && this.serverVersion === "1377.152")
+			oldLoading = true; // bugged version
 	}
 
 	/**
@@ -875,7 +892,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handlePN(_args) {
-		this.serv.send("askchaa#%");
+		this.sendServer("askchaa#%");
 	}
 
 	/**
@@ -939,10 +956,10 @@ class Client extends EventEmitter {
 		}
 
 		// this is determined at the top of this file
-		if (oldLoading) {
-			this.serv.send("askchar2#%");
+		if (!oldLoading && extrafeatures.includes("fastloading")) {
+			this.sendServer("RC#%");
 		} else {
-			this.serv.send("RC#%");
+			this.sendServer("askchar2#%");
 		}
 	}
 
