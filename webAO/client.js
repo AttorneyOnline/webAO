@@ -1300,6 +1300,7 @@ class Viewport {
 			eviBox.style.opacity = "0";
 			eviBox.style.height = "0%";
 			const shouts = [
+				undefined,
 				"holdit",
 				"objection",
 				"takethat"
