@@ -887,52 +887,24 @@ class Client extends EventEmitter {
 
 	/**
 	 * Handle the change of players in an area.
-	 * ARUP#0#20#8#2#0#5#2#4#1#5#%
 	 * @param {Array} args packet arguments
 	 */
 	handleARUP(args) {
 		args = args.slice(1);
 
 		switch(args[0]) {
-			case "0":
+			case "0": // playercount
 				for (let i = 1; i < args.length - 1; i++) {
 					this.areas[i].players = args[i];
 					const thisarea = document.getElementById("area" + i);
 					thisarea.textContent = `${this.areas[i].name} (${args[i]})` ;
 					}
 				break;
-			case "1":
+			case "1": // status
 				for (let i = 1; i < args.length - 1; i++) {
 					this.areas[i].status = args[i];
 					const thisarea = document.getElementById("area" + i);
-
-					switch (args[i]) {
-						case "LOCKED":
-							thisarea.classList = "area-button area-locked";
-							break;
-						case "LOOKING-FOR-PLAYERS":
-							thisarea.classList = "area-button area-looking";
-							break;
-						case "CASING":
-							thisarea.classList = "area-button area-casing";
-							break;
-						case "RECESS":
-							thisarea.classList = "area-button area-recess";
-							break;
-						case "RP":
-							thisarea.classList = "area-button area-rp";
-							break;
-						case "GAMING":
-							thisarea.classList = "area-button area-gaming";
-							break;
-						case "SPECTATABLE":
-							thisarea.classList = "area-button area-spectatable";
-							break;
-						default:
-							thisarea.classList = "area-button area-default";
-							break;
-					}
-
+					thisarea.classList = "area-button " + args[i];
 				}
 				break;
 			case "2":
