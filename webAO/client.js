@@ -601,6 +601,7 @@ class Client extends EventEmitter {
 	/**
 	 * Handles incoming character information, bundling multiple characters
 	 * per packet.
+	 * CI#0#Phoenix&description&&&&&#1#Miles ...
 	 * @param {Array} args packet arguments
 	 */
 	handleCI(args) {
@@ -610,7 +611,7 @@ class Client extends EventEmitter {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 				const chargs = args[i].split("&");
-				this.handleCharacterInfo(chargs, i-1);
+				this.handleCharacterInfo(chargs, args[i-1]);
 			}
 		}
 		// Request the next pack
