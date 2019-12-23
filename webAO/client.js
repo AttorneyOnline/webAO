@@ -57,11 +57,6 @@ console.info(`Your emulated HDID is ${hdid}`);
 
 let lastICMessageTime = new Date(0);
 
-function safe_tags(str) {
-	if (str)
-		return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') ;
-}
-
 class Client extends EventEmitter {
 	constructor(address) {
 		super();
@@ -456,7 +451,7 @@ class Client extends EventEmitter {
 			}
 
 			let chatmsg = {
-        		deskmod: safe_tags(args[1]).toLowerCase(),
+				deskmod: safe_tags(args[1]).toLowerCase(),
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
 				name: safe_tags(args[3]),
@@ -555,6 +550,7 @@ class Client extends EventEmitter {
 	 * @param {Number} charid character ID
 	 */
 	async handleCharacterInfo(chargs, charid) {
+		if (chargs[0]) {
 		let cini = {};
 		let icon = AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char_icon.png";
 		let img = document.getElementById(`demo_${charid}`);
@@ -594,6 +590,10 @@ class Client extends EventEmitter {
 			icon: icon,
 			inifile: cini
 		};
+		} else {
+			let img = document.getElementById(`demo_${charid}`);
+			img.style.display = "none";
+		}
 
 		
 	}
@@ -607,7 +607,7 @@ class Client extends EventEmitter {
 	handleCI(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Character " + args[1];
 		// Loop through the 10 characters that were sent
-		for (let i = 2; i < args.length - 1; i++) {
+		for (let i = 2; i <= args.length - 1; i++) {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 				const chargs = args[i].split("&");
@@ -625,7 +625,7 @@ class Client extends EventEmitter {
 	 */
 	handleSC(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Characters";
-		for (let i = 1; i < args.length - 1; i++) {
+		for (let i = 1; i < args.length; i++) {
 			document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 			const chargs = args[i].split("&");
 			this.handleCharacterInfo(chargs, i-1);
@@ -745,7 +745,7 @@ class Client extends EventEmitter {
 	 * Handles the "MusicMode" packet
 	 * @param {Array} args packet arguments
 	 */
-	handleMM(args) {
+	handleMM(_args) {
 		// It's unused nowadays, as preventing people from changing the music is now serverside
 	}
 
@@ -924,7 +924,7 @@ class Client extends EventEmitter {
 		// create the charselect grid, to be filled by the character loader
 		document.getElementById("client_chartable").innerHTML = "";
 		let tr;
-		for (let i = 0; i < this.char_list_length; i++) {
+		for (let i = 0; i <= this.char_list_length; i++) {
 			if (i % CHAR_SELECT_WIDTH === 0) {
 				tr = document.createElement("TR");
 			}
@@ -2306,8 +2306,9 @@ window.toggleShout = toggleShout;
  * XXX: This is unnecessary if we use `createTextNode` instead!
  * @param {string} unsafe an unsanitized string
  */
-function escapeHtml(unsafe) {
-	return unsafe
+function safe_tags(unsafe) {
+	if (unsafe)
+		return unsafe
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")
 		.replace(/>/g, "&gt;")
