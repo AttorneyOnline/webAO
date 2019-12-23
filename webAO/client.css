@@ -525,6 +525,10 @@ img {
 	background-color: rgb(54,198,68);
 }
 
+.area-idle {
+	background-color: rgb(54,198,68);
+}
+
 .area-looking-for-players {
 	background-color: rgb(255,255,0);
 }
