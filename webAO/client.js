@@ -600,6 +600,7 @@ class Client extends EventEmitter {
 			inifile: cini
 		};
 		} else {
+			console.warn("missing charid "+charid);
 			let img = document.getElementById(`demo_${charid}`);
 			img.style.display = "none";
 		}
@@ -616,7 +617,7 @@ class Client extends EventEmitter {
 	handleCI(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Character " + args[1];
 		// Loop through the 10 characters that were sent
-		for (let i = 2; i <= args.length - 1; i++) {
+		for (let i = 2; i <= args.length - 2; i++) {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 				const chargs = args[i].split("&");
@@ -934,14 +935,15 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleSI(args) {
-		this.char_list_length = args[1];
+		this.char_list_length = Number(args[1]);
+		this.char_list_length += 1; // some servers count starting from 0 some from 1...
 		this.evidence_list_length = args[2];
 		this.music_list_length = args[3];
 
 		// create the charselect grid, to be filled by the character loader
 		document.getElementById("client_chartable").innerHTML = "";
 		let tr;
-		for (let i = 0; i <= this.char_list_length; i++) {
+		for (let i = 0; i < this.char_list_length; i++) {
 			if (i % CHAR_SELECT_WIDTH === 0) {
 				tr = document.createElement("TR");
 			}
