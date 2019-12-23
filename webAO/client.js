@@ -904,7 +904,7 @@ class Client extends EventEmitter {
 				for (let i = 1; i < args.length - 1; i++) {
 					this.areas[i].status = args[i];
 					const thisarea = document.getElementById("area" + i);
-					thisarea.classList = "area-button " + args[i];
+					thisarea.classList = "area-button area-" + args[i];
 				}
 				break;
 			case "2":
