@@ -469,28 +469,28 @@ class Client extends EventEmitter {
 				content: this.prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
 				sound: safe_tags(args[7]).toLowerCase(),
-				blips: msg_blips,
-				type: args[8],
-				charid: args[9],
-				snddelay: args[10],
-				objection: args[11],
-				evidence: args[12],
-				flip: args[13],
-				flash: args[14],
-				color: args[15],
+				blips: safe_tags(msg_blips),
+				type: Number(args[8]),
+				charid: Number(args[9]),
+				snddelay: Number(args[10]),
+				objection: Number(args[11]),
+				evidence: safe_tags(args[12]),
+				flip: Number(args[13]),
+				flash: Number(args[14]),
+				color: Number(args[15]),
 				isnew: true,
 			};
 
 			if (extrafeatures.includes("cccc_ic_support")) {
 				const extra_options = {
 					showname: safe_tags(args[16]),
-					other_charid: args[17],
+					other_charid: Number(args[17]),
 					other_name: safe_tags(args[18]),
 					other_emote: safe_tags(args[19]),
-					self_offset: args[20],
-					other_offset: args[21],
-					other_flip: args[22],
-					noninterrupting_preanim: args[23]
+					self_offset: Number(args[20]),
+					other_offset: Number(args[21]),
+					other_flip: Number(args[22]),
+					noninterrupting_preanim: Number(args[23])
 				};
 				chatmsg = Object.assign(extra_options, chatmsg);
 				if (chatmsg.showname && document.getElementById("showname").checked) {
@@ -1045,27 +1045,27 @@ class Viewport {
 		this.chatmsg = {
 			"isnew": false,
 			"content": "",
-			"objection": "0",
+			"objection": 0,
 			"sound": "",
 			"startpreanim": false,
 			"startspeaking": false,
 			"side": null,
-			"color": "0",
+			"color": 0,
 			"snddelay": 0,
 			"preanimdelay": 0
 		};
 
-		this.colors = {
-			"0": "#ffffff", // white
-			"1": "#00ff00", // green
-			"2": "#ff0000", // red
-			"3": "#ffa500", // orange
-			"4": "#4596ff", // blue
-			"5": "#ffff00", // yellow
-			"6": "#fedcba", // 6 is rainbow.
-			"7": "#ffc0cb", // pink
-			"8": "#00ffff"  // cyan
-		};
+		this.colors = [
+			"#ffffff", // white
+			"#00ff00", // green
+			"#ff0000", // red
+			"#ffa500", // orange
+			"#4596ff", // blue
+			"#ffff00", // yellow
+			"#fedcba", // 6 is rainbow.
+			"#ffc0cb", // pink
+			"#00ffff"  // cyan
+		];
 
 		this.blip = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
 		this.blip.volume = 0.5;
@@ -1271,7 +1271,7 @@ class Viewport {
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
 		// Flip the character
-		if (this.chatmsg.flip === "1") {
+		if (this.chatmsg.flip === 1) {
 			charSprite.style.transform = "scaleX(-1)";
 		} else {
 			charSprite.style.transform = "scaleX(1)";
@@ -1279,7 +1279,7 @@ class Viewport {
 
 		if (extrafeatures.includes("cccc_ic_support")) {
 			// Flip the pair character
-			if (this.chatmsg.other_flip === "1") {
+			if (this.chatmsg.other_flip === 1) {
 			pairSprite.style.transform = "scaleX(-1)";
 			} else {
 				pairSprite.style.transform = "scaleX(1)";
@@ -1299,11 +1299,11 @@ class Viewport {
 			chatBoxInner.className = "";
 			eviBox.style.opacity = "0";
 			eviBox.style.height = "0%";
-			const shouts = {
-				"1": "holdit",
-				"2": "objection",
-				"3": "takethat"
-			};
+			const shouts = [
+				"holdit",
+				"objection",
+				"takethat"
+			];
 
 			// gets which shout shall played
 			const shout = shouts[this.chatmsg.objection];
@@ -1323,7 +1323,7 @@ class Viewport {
 		// TODO: preanims sometimes play when they're not supposed to
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
 			// Effect stuff
-			if (this.chatmsg.flash === "2") {
+			if (this.chatmsg.flash === 2) {
 				// Shake screen
 				this.sfxaudio.pause();
 				this.sfxplayed = 1;
@@ -1332,7 +1332,7 @@ class Viewport {
 				$("#client_gamewindow").effect("shake", {
 					"direction": "up"
 				});
-			} else if (this.chatmsg.flash === "1") {
+			} else if (this.chatmsg.flash === 1) {
 				// Flash screen
 				background.style.backgroundColor = "white";
 				this.sfxaudio.pause();
@@ -1403,7 +1403,7 @@ class Viewport {
 				chatBox.style.display = "block";
 				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
 
-				if (this.chatmsg.color === "6")
+				if (this.chatmsg.color === 6)
 					chatBoxInner.className = "rainbow-text";
 				else {
 					chatBoxInner.className = "";
@@ -1854,7 +1854,7 @@ async function changeBackground(position) {
 	const { bg, desk, speedLines } = positions[position];
 	document.getElementById("client_fg").style.display = "none";
 
-	if (viewport.chatmsg.type === "5") {
+	if (viewport.chatmsg.type === 5) {
 		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
 		document.getElementById("client_bench").style.display = "none";
 	} else {
