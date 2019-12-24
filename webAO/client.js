@@ -1284,6 +1284,17 @@ class Viewport {
 	 * and the main characters preanim gif is loaded
 	 * If pairing is supported the paired character will just stand around with his idle sprite
 	 * 
+	 * 6 preanimdelay over
+	 * this animates the evidence popup and finally shows the character name and message box
+	 * it sets the text color , changes the background (again TODO) and sets the character speaking sprite
+	 * 
+	 * 7 textnow != content
+	 * this adds a character to the textbox and stops the animations if the entire message is present in the textbox
+	 * 
+	 * 8 sfx
+	 * independent of the stuff above, this will play any sound effects specified by the emote the character sent.
+	 * happens after the shout delay + an sfx delay that comes with the message packet
+	 * 
 	 * XXX: This relies on a global variable `this.chatmsg`!
 	 */
 	tick() {
