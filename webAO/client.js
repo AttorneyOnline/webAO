@@ -2211,7 +2211,12 @@ window.randomCharacterOOC = randomCharacterOOC;
  * Call mod.
  */
 export function callMod() {
-	$("#callmod_dialog").dialog("open");
+	let modcall = prompt("Please enter the reason for the modcall","");
+	if (modcall == null || modcall === "") {
+		// cancel
+	} else {
+		client.sendZZ(modcall);
+	} 
 }
 window.callMod = callMod;
 
@@ -2450,34 +2455,3 @@ function decodeChat(estring) {
 
 let client = new Client(serverIP);
 let viewport = new Viewport();
-
-// Create dialog and link to button	
-$(function () {
-	$("#callmod_dialog").dialog({
-		autoOpen: false,
-		resizable: false,
-		show: {
-			effect: "drop",
-			direction: "down",
-			duration: 500
-		},
-		hide: {
-			effect: "drop",
-			direction: "down",
-			duration: 500
-		},
-		height: "auto",
-		width: 400,
-		modal: true,
-		buttons: {
-			Sure: function () {
-				const reason = prompt("Please enter the reason", "");
-				client.sendZZ(reason);
-				$(this).dialog("close");
-			},
-			Cancel: function () {
-				$(this).dialog("close");
-			}
-		}
-	});
-});
