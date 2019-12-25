@@ -430,6 +430,8 @@ img {
 	bottom: 0;
 	position: relative;
 	display: inline-block;
+	transition: 0.4s linear;  
+  	transition-property: width;
 }
 
 .client_button {
