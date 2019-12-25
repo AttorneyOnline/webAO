@@ -716,20 +716,26 @@ class Client extends EventEmitter {
 				newentry.text = args[i];
 				hmusiclist.options.add(newentry);
 			} else {
-				// Create area button
-				const newarea = document.createElement("SPAN");
-				newarea.classList = "area-button area-default";
-				newarea.id = "area" + i;
-				newarea.textContent = args[i];
 				this.areas[i] = {
 					name: safe_tags(args[i]),
 					players: 0,
-					status: "IDLE"
+					status: "IDLE",
+					cm: "",
+					locked: "FREE"
 				};
 
+				// Create area button
+				let newarea = document.createElement("SPAN");
+				newarea.classList = "area-button area-default";
+				newarea.id = "area" + i;
+				newarea.innerText = this.areas[i].name;
+				newarea.title = "Players: <br>" +
+								"Status: <br>" +
+								"CM: ";
 				newarea.onclick = function () {
 					area_click(this);
 				};
+				
 				document.getElementById("areas").appendChild(newarea);
 			}
 		}
@@ -891,29 +897,32 @@ class Client extends EventEmitter {
 	 */
 	handleARUP(args) {
 		args = args.slice(1);
+		for (let i = 1; i < args.length - 1; i++) {
+			if (this.areas[i]) { // the server sends us ARUP before we even get the area list
+			const thisarea = document.getElementById("area" + i);
+			switch(args[0]) {
+				case "0": // playercount				
+					this.areas[i].players = Number(args[i]);
+					thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players})`;					
+					break;
+				case "1": // status
+					this.areas[i].status = safe_tags(args[i]);
+					thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();				
+					break;
+				case "2":
+					this.areas[i].cm = safe_tags(args[i]);
+					break;
+				case "3":
+					this.areas[i].locked = safe_tags(args[i]);
+					break;
+			}
 
-		switch(args[0]) {
-			case "0": // playercount
-				for (let i = 1; i < args.length - 1; i++) {
-					this.areas[i].players = args[i];
-					const thisarea = document.getElementById("area" + i);
-					thisarea.textContent = `${this.areas[i].name} (${args[i]})` ;
-					}
-				break;
-			case "1": // status
-				for (let i = 1; i < args.length - 1; i++) {
-					this.areas[i].status = args[i];
-					const thisarea = document.getElementById("area" + i);
-					thisarea.classList = "area-button area-" + safe_tags(args[i]).toLowerCase();
-				}
-				break;
-			case "2":
-				break;
-			case "3":
-				break;
+			thisarea.title = 	`Players: ${this.areas[i].players}\n` +
+								`Status: ${this.areas[i].status}\n` +
+								`CM: ${this.areas[i].cm}\n` +
+								`Area lock: ${this.areas[i].locked}`;
 		}
-
-
+		}
 	}
 
 	/**
