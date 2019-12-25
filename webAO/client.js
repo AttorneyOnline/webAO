@@ -89,6 +89,7 @@ class Client extends EventEmitter {
 		this.chars = [];
 		this.emotes = [];
 		this.evidences = [];
+		this.areas = [];
 
 		this.resources = {
 			"holdit": {
@@ -726,13 +727,26 @@ class Client extends EventEmitter {
 				newentry.text = args[i];
 				hmusiclist.options.add(newentry);
 			} else {
+				this.areas[i] = {
+					name: safe_tags(args[i]),
+					players: 0,
+					status: "IDLE",
+					cm: "",
+					locked: "FREE"
+				};
+
 				// Create area button
-				const newarea = document.createElement("SPAN");
-				newarea.className = "location-box";
-				newarea.textContent = args[i];
+				let newarea = document.createElement("SPAN");
+				newarea.classList = "area-button area-default";
+				newarea.id = "area" + i;
+				newarea.innerText = this.areas[i].name;
+				newarea.title = "Players: <br>" +
+								"Status: <br>" +
+								"CM: ";
 				newarea.onclick = function () {
 					area_click(this);
 				};
+				
 				document.getElementById("areas").appendChild(newarea);
 			}
 		}
@@ -898,11 +912,36 @@ class Client extends EventEmitter {
 
 	/**
 	 * Handle the change of players in an area.
-	 * webAO doesn't have this feature yet, but i want the warning to go away.
 	 * @param {Array} args packet arguments
 	 */
-	handleARUP(_args) {
-		// TODO: webAO doesn't have this feature yet
+	handleARUP(args) {
+		args = args.slice(1);
+		for (let i = 1; i < args.length - 1; i++) {
+			if (this.areas[i]) { // the server sends us ARUP before we even get the area list
+			const thisarea = document.getElementById("area" + i);
+			switch(args[0]) {
+				case "0": // playercount				
+					this.areas[i].players = Number(args[i]);
+					thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players})`;					
+					break;
+				case "1": // status
+					this.areas[i].status = safe_tags(args[i]);
+					thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();				
+					break;
+				case "2":
+					this.areas[i].cm = safe_tags(args[i]);
+					break;
+				case "3":
+					this.areas[i].locked = safe_tags(args[i]);
+					break;
+			}
+
+			thisarea.title = 	`Players: ${this.areas[i].players}\n` +
+								`Status: ${this.areas[i].status}\n` +
+								`CM: ${this.areas[i].cm}\n` +
+								`Area lock: ${this.areas[i].locked}`;
+		}
+		}
 	}
 
 	/**
@@ -1687,7 +1726,7 @@ window.showname_click = showname_click;
  * @param {MouseEvent} event
  */
 export function area_click(el) {
-	const area = el.textContent;
+	const area = client.areas[el.id.substr(4)].name;
 	client.sendMusicChange(area);
 
 	const areaHr = document.createElement("div");
