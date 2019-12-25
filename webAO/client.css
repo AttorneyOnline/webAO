@@ -79,6 +79,19 @@ img {
 	width: 100%;
 }
 
+@keyframes shake { 
+    0%,100%	{left: 0; }
+	20%		{left: -10%; }
+	40%		{left: +10%; }
+	60%		{left: -10%; }
+	80%		{left: +10%; }
+}
+
+@keyframes flash { 
+    0%,100%	{background-color: transparent; }
+    50%		{background-color: white; }
+}
+
 #client_charselect {
 	position: fixed;
 	top: 0;
