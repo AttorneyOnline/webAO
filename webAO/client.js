@@ -830,19 +830,17 @@ class Client extends EventEmitter {
 	 */
 	handleHP(args) {
 		const percent_hp = args[2] * 10;
-		if (args[1] === 1) {
+		let healthbox;
+		if (args[1] === "1") {
 			// Def hp
 			this.hp[0] = args[2];
-			$("#client_defense_hp > .health-bar").animate({
-				"width": percent_hp + "%"
-			}, 500);
+			healthbox = document.getElementById("client_defense_hp");
 		} else {
 			// Pro hp
 			this.hp[1] = args[2];
-			$("#client_prosecutor_hp > .health-bar").animate({
-				"width": percent_hp + "%"
-			}, 500);
+			healthbox = document.getElementById("client_prosecutor_hp");
 		}
+		healthbox.getElementsByClassName("health-bar")[0].style.width = percent_hp + "%";
 	}
 
 	/**
