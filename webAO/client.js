@@ -1376,7 +1376,7 @@ class Viewport {
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-realization.wav";
 				this.sfxaudio.play();
-				$("#client_gamewindow").effect("pulsate", { times: 1 }, 200);
+				document.getElementById("client_fg").style.animation = "flash 0.4s 1";
 			}
 
 			// Pre-animation stuff
@@ -1889,7 +1889,6 @@ async function changeBackground(position) {
 	};
 
 	const { bg, desk, speedLines } = positions[position];
-	document.getElementById("client_fg").style.display = "none";
 
 	if (viewport.chatmsg.type === "5") {
 		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
