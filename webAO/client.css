@@ -79,6 +79,19 @@ img {
 	width: 100%;
 }
 
+@keyframes shake { 
+    0%,100%	{left: 0; }
+	20%		{left: -10%; }
+	40%		{left: +10%; }
+	60%		{left: -10%; }
+	80%		{left: +10%; }
+}
+
+@keyframes flash { 
+    0%,100%	{background-color: transparent; }
+    50%		{background-color: white; }
+}
+
 #client_charselect {
 	position: fixed;
 	top: 0;
@@ -176,7 +189,6 @@ img {
 }
 
 #client_fg {
-	display: none;
 	position: absolute;
 	height: 100%;
 	width: 100%;
@@ -192,6 +204,8 @@ img {
 	height: 0%;
 	width: auto;
 	top: 1.5em;
+	transition: 0.25s linear;  
+	transition-property: height, opacity;
 }
 
 #client_shout {
@@ -426,6 +440,8 @@ img {
 	bottom: 0;
 	position: relative;
 	display: inline-block;
+	transition: 1s linear;  
+  	transition-property: width;
 }
 
 .client_button {

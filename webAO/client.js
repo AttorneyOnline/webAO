@@ -844,19 +844,17 @@ class Client extends EventEmitter {
 	 */
 	handleHP(args) {
 		const percent_hp = args[2] * 10;
-		if (args[1] === 1) {
+		let healthbox;
+		if (args[1] === "1") {
 			// Def hp
 			this.hp[0] = args[2];
-			$("#client_defense_hp > .health-bar").animate({
-				"width": percent_hp + "%"
-			}, 500);
+			healthbox = document.getElementById("client_defense_hp");
 		} else {
 			// Pro hp
 			this.hp[1] = args[2];
-			$("#client_prosecutor_hp > .health-bar").animate({
-				"width": percent_hp + "%"
-			}, 500);
+			healthbox = document.getElementById("client_prosecutor_hp");
 		}
+		healthbox.getElementsByClassName("health-bar")[0].style.width = percent_hp + "%";
 	}
 
 	/**
@@ -1176,6 +1174,11 @@ class Viewport {
 		this.sfxplayed = 0;
 		this.textTimer = 0;
 		this._animating = true;
+
+		// Reset CSS animation
+		document.getElementById("client_fg").style.animation = "";
+		document.getElementById("client_gamewindow").style.animation = "";
+
 		clearTimeout(this.updater);
 		// If preanim existed then determine the length
 		if (chatmsg.preanim !== "-") {
@@ -1409,17 +1412,14 @@ class Viewport {
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-stab.wav";
 				this.sfxaudio.play();
-				$("#client_gamewindow").effect("shake", {
-					"direction": "up"
-				});
+				document.getElementById("client_gamewindow").style.animation = "shake 0.2s 1";
 			} else if (this.chatmsg.flash === "1") {
 				// Flash screen
-				background.style.backgroundColor = "white";
 				this.sfxaudio.pause();
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-realization.wav";
 				this.sfxaudio.play();
-				$("#client_gamewindow").effect("pulsate", { times: 1 }, 200);
+				document.getElementById("client_fg").style.animation = "flash 0.4s 1";
 			}
 
 			// Pre-animation stuff
@@ -1458,17 +1458,13 @@ class Viewport {
 						// Only def show evidence on right
 						eviBox.style.right = "1.5em";
 						eviBox.style.left = "initial";
-						$("#client_evi").animate({
-							height: "30%",
-							opacity: 1
-						}, 250);
+						eviBox.style.height = "30%";
+						eviBox.style.opacity = 1;
 					} else {
 						eviBox.style.right = "initial";
 						eviBox.style.left = "1.5em";
-						$("#client_evi").animate({
-							height: "30%",
-							opacity: 1
-						}, 250);
+						eviBox.style.height = "30%";
+						eviBox.style.opacity = 1;
 					}
 				}
 
@@ -1932,7 +1928,6 @@ async function changeBackground(position) {
 	};
 
 	const { bg, desk, speedLines } = positions[position];
-	document.getElementById("client_fg").style.display = "none";
 
 	if (viewport.chatmsg.type === "5") {
 		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
@@ -2250,7 +2245,12 @@ window.randomCharacterOOC = randomCharacterOOC;
  * Call mod.
  */
 export function callMod() {
-	$("#callmod_dialog").dialog("open");
+	let modcall = prompt("Please enter the reason for the modcall","");
+	if (modcall == null || modcall === "") {
+		// cancel
+	} else {
+		client.sendZZ(modcall);
+	} 
 }
 window.callMod = callMod;
 
@@ -2489,34 +2489,3 @@ function decodeChat(estring) {
 
 let client = new Client(serverIP);
 let viewport = new Viewport();
-
-// Create dialog and link to button	
-$(function () {
-	$("#callmod_dialog").dialog({
-		autoOpen: false,
-		resizable: false,
-		show: {
-			effect: "drop",
-			direction: "down",
-			duration: 500
-		},
-		hide: {
-			effect: "drop",
-			direction: "down",
-			duration: 500
-		},
-		height: "auto",
-		width: 400,
-		modal: true,
-		buttons: {
-			Sure: function () {
-				const reason = prompt("Please enter the reason", "");
-				client.sendZZ(reason);
-				$(this).dialog("close");
-			},
-			Cancel: function () {
-				$(this).dialog("close");
-			}
-		}
-	});
-});
