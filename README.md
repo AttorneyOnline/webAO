@@ -5,12 +5,10 @@ It works with the tsuserver3/serverD software when the server has WebSockets ena
 
 webAO-only features:
  - BBcode
- - Screen shake
  - Asset URLs
  - Automated testimony control
 
 Desktop-only features:
- - Pairing
  - 2.6+ markup
  - Non-interrupting preanimations
  - Guilty/not guilty
