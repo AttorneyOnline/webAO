@@ -1135,6 +1135,11 @@ class Viewport {
 		this.sfxplayed = 0;
 		this.textTimer = 0;
 		this._animating = true;
+
+		// Reset CSS animation
+		document.getElementById("client_fg").style.animation = "";
+		document.getElementById("client_gamewindow").style.animation = "";
+
 		clearTimeout(this.updater);
 		// If preanim existed then determine the length
 		if (chatmsg.preanim !== "-") {
