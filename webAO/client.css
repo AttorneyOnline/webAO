@@ -157,10 +157,6 @@ img {
 	width: 100%;
 }
 
-.area_btn {
-	width: 20%;
-}
-
 #client_court {
 	position: absolute;
 	height: 100%;
@@ -547,9 +543,8 @@ img {
 	font-size: 1.5em;
 }
 
-.location-box {
+.area-button {
 	border-style: solid;
-	background-color: #7B2900;
 	min-width: 120px;
 	margin: 5px;
 	display: inline-block;
@@ -558,8 +553,45 @@ img {
 	border-color: white;
 	border-width: 1px;
 	cursor: pointer;
+	color: #000;
 }
 
-.location-box:hover {
+.area-button:hover {
 	border-color: #FFD081;
+}
+
+.area-default {
+	background-color: rgb(54,198,68);
+}
+
+.area-idle {
+	background-color: rgb(54,198,68);
+}
+
+.area-looking-for-players {
+	background-color: rgb(255,255,0);
+}
+
+.area-casing {
+	background-color: rgb(255,166,0);
+}
+
+.area-recess {
+	background-color: rgb(255,190,30);
+}
+
+.area-rp {
+	background-color: rgb(200,52,252);
+}
+
+.area-gaming {
+	background-color: rgb(55,255,255);
+}
+
+.area-locked {
+	background-color: rgb(127,127,127);
+}
+
+.area-spectatable {
+	background-color: rgb(54,198,68);
 }
