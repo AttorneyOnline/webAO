@@ -79,6 +79,19 @@ img {
 	width: 100%;
 }
 
+@keyframes shake { 
+    0%,100%	{left: 0; }
+	20%		{left: -10%; }
+	40%		{left: +10%; }
+	60%		{left: -10%; }
+	80%		{left: +10%; }
+}
+
+@keyframes flash { 
+    0%,100%	{background-color: transparent; }
+    50%		{background-color: white; }
+}
+
 #client_charselect {
 	position: fixed;
 	top: 0;
@@ -144,10 +157,6 @@ img {
 	width: 100%;
 }
 
-.area_btn {
-	width: 20%;
-}
-
 #client_court {
 	position: absolute;
 	height: 100%;
@@ -180,7 +189,6 @@ img {
 }
 
 #client_fg {
-	display: none;
 	position: absolute;
 	height: 100%;
 	width: 100%;
@@ -196,6 +204,8 @@ img {
 	height: 0%;
 	width: auto;
 	top: 1.5em;
+	transition: 0.25s linear;  
+	transition-property: height, opacity;
 }
 
 #client_shout {
@@ -430,6 +440,8 @@ img {
 	bottom: 0;
 	position: relative;
 	display: inline-block;
+	transition: 1s linear;  
+  	transition-property: width;
 }
 
 .client_button {
@@ -531,9 +543,8 @@ img {
 	font-size: 1.5em;
 }
 
-.location-box {
+.area-button {
 	border-style: solid;
-	background-color: #7B2900;
 	min-width: 120px;
 	margin: 5px;
 	display: inline-block;
@@ -542,8 +553,45 @@ img {
 	border-color: white;
 	border-width: 1px;
 	cursor: pointer;
+	color: #000;
 }
 
-.location-box:hover {
+.area-button:hover {
 	border-color: #FFD081;
+}
+
+.area-default {
+	background-color: rgb(54,198,68);
+}
+
+.area-idle {
+	background-color: rgb(54,198,68);
+}
+
+.area-looking-for-players {
+	background-color: rgb(255,255,0);
+}
+
+.area-casing {
+	background-color: rgb(255,166,0);
+}
+
+.area-recess {
+	background-color: rgb(255,190,30);
+}
+
+.area-rp {
+	background-color: rgb(200,52,252);
+}
+
+.area-gaming {
+	background-color: rgb(55,255,255);
+}
+
+.area-locked {
+	background-color: rgb(127,127,127);
+}
+
+.area-spectatable {
+	background-color: rgb(54,198,68);
 }

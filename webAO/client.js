@@ -89,6 +89,7 @@ class Client extends EventEmitter {
 		this.chars = [];
 		this.emotes = [];
 		this.evidences = [];
+		this.areas = [];
 
 		this.resources = {
 			"holdit": {
@@ -726,13 +727,26 @@ class Client extends EventEmitter {
 				newentry.text = args[i];
 				hmusiclist.options.add(newentry);
 			} else {
+				this.areas[i] = {
+					name: safe_tags(args[i]),
+					players: 0,
+					status: "IDLE",
+					cm: "",
+					locked: "FREE"
+				};
+
 				// Create area button
-				const newarea = document.createElement("SPAN");
-				newarea.className = "location-box";
-				newarea.textContent = args[i];
+				let newarea = document.createElement("SPAN");
+				newarea.classList = "area-button area-default";
+				newarea.id = "area" + i;
+				newarea.innerText = this.areas[i].name;
+				newarea.title = "Players: <br>" +
+								"Status: <br>" +
+								"CM: ";
 				newarea.onclick = function () {
 					area_click(this);
 				};
+				
 				document.getElementById("areas").appendChild(newarea);
 			}
 		}
@@ -830,19 +844,17 @@ class Client extends EventEmitter {
 	 */
 	handleHP(args) {
 		const percent_hp = args[2] * 10;
-		if (args[1] === 1) {
+		let healthbox;
+		if (args[1] === "1") {
 			// Def hp
 			this.hp[0] = args[2];
-			$("#client_defense_hp > .health-bar").animate({
-				"width": percent_hp + "%"
-			}, 500);
+			healthbox = document.getElementById("client_defense_hp");
 		} else {
 			// Pro hp
 			this.hp[1] = args[2];
-			$("#client_prosecutor_hp > .health-bar").animate({
-				"width": percent_hp + "%"
-			}, 500);
+			healthbox = document.getElementById("client_prosecutor_hp");
 		}
+		healthbox.getElementsByClassName("health-bar")[0].style.width = percent_hp + "%";
 	}
 
 	/**
@@ -898,11 +910,36 @@ class Client extends EventEmitter {
 
 	/**
 	 * Handle the change of players in an area.
-	 * webAO doesn't have this feature yet, but i want the warning to go away.
 	 * @param {Array} args packet arguments
 	 */
-	handleARUP(_args) {
-		// TODO: webAO doesn't have this feature yet
+	handleARUP(args) {
+		args = args.slice(1);
+		for (let i = 1; i < args.length - 1; i++) {
+			if (this.areas[i]) { // the server sends us ARUP before we even get the area list
+			const thisarea = document.getElementById("area" + i);
+			switch(args[0]) {
+				case "0": // playercount				
+					this.areas[i].players = Number(args[i]);
+					thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players})`;					
+					break;
+				case "1": // status
+					this.areas[i].status = safe_tags(args[i]);
+					thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();				
+					break;
+				case "2":
+					this.areas[i].cm = safe_tags(args[i]);
+					break;
+				case "3":
+					this.areas[i].locked = safe_tags(args[i]);
+					break;
+			}
+
+			thisarea.title = 	`Players: ${this.areas[i].players}\n` +
+								`Status: ${this.areas[i].status}\n` +
+								`CM: ${this.areas[i].cm}\n` +
+								`Area lock: ${this.areas[i].locked}`;
+		}
+		}
 	}
 
 	/**
@@ -1122,6 +1159,10 @@ class Viewport {
 
 	/**
 	 * Sets a new emote.
+	 * TODO: merge this and initUpdater
+	 * This sets up everything before the tick() loops starts
+	 * a lot of things can probably be moved here, like starting the shout animation if there is one
+	 * TODO: the preanim logic, on the other hand, should probably be moved to tick()
 	 * @param {object} chatmsg the new chat message
 	 */
 	async say(chatmsg) {
@@ -1133,6 +1174,11 @@ class Viewport {
 		this.sfxplayed = 0;
 		this.textTimer = 0;
 		this._animating = true;
+
+		// Reset CSS animation
+		document.getElementById("client_fg").style.animation = "";
+		document.getElementById("client_gamewindow").style.animation = "";
+
 		clearTimeout(this.updater);
 		// If preanim existed then determine the length
 		if (chatmsg.preanim !== "-") {
@@ -1258,6 +1304,43 @@ class Viewport {
 	/**
 	 * Updates the chatbox based on the given text.
 	 * 
+	 * OK, here's the documentation on how this works:
+	 * 
+	 * 1 flip
+	 * For whatever reason it starts off by checking if the character is flipped, every time this is called
+	 * This is probably a TODO to move this somewhere else
+	 * 
+	 * 2 flip
+	 * If the server supports it, the same is done for the paired character
+	 * Both of these should probably be moved to say()
+	 * 
+	 * 3 _animating
+	 * If we're not done with this characters animation, i.e. his text isn't fully there, set a timeout for the next tick/step to happen
+	 * 
+	 * 4 isnew
+	 * This is run once for every new message
+	 * The chatbox and evidence is hidden (TODO even if there is no shout)
+	 * and if there is a shout it's audio starts playing
+	 * 
+	 * 5 startpreanim
+	 * If the shout timer is over it starts with the preanim
+	 * The first thing it checks for is the shake effect (TODO on client this is handled by the @ symbol and not a flag )
+	 * Then is the flash/realization effect
+	 * After that, the shout image is set to a transparent placeholder gif (TODO just hide it with CSS)
+	 * and the main characters preanim gif is loaded
+	 * If pairing is supported the paired character will just stand around with his idle sprite
+	 * 
+	 * 6 preanimdelay over
+	 * this animates the evidence popup and finally shows the character name and message box
+	 * it sets the text color , changes the background (again TODO) and sets the character speaking sprite
+	 * 
+	 * 7 textnow != content
+	 * this adds a character to the textbox and stops the animations if the entire message is present in the textbox
+	 * 
+	 * 8 sfx
+	 * independent of the stuff above, this will play any sound effects specified by the emote the character sent.
+	 * happens after the shout delay + an sfx delay that comes with the message packet
+	 * 
 	 * XXX: This relies on a global variable `this.chatmsg`!
 	 */
 	tick() {
@@ -1330,17 +1413,14 @@ class Viewport {
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-stab.wav";
 				this.sfxaudio.play();
-				$("#client_gamewindow").effect("shake", {
-					"direction": "up"
-				});
+				document.getElementById("client_gamewindow").style.animation = "shake 0.2s 1";
 			} else if (this.chatmsg.flash === 1) {
 				// Flash screen
-				background.style.backgroundColor = "white";
 				this.sfxaudio.pause();
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-realization.wav";
 				this.sfxaudio.play();
-				$("#client_gamewindow").effect("pulsate", { times: 1 }, 200);
+				document.getElementById("client_fg").style.animation = "flash 0.4s 1";
 			}
 
 			// Pre-animation stuff
@@ -1379,17 +1459,13 @@ class Viewport {
 						// Only def show evidence on right
 						eviBox.style.right = "1.5em";
 						eviBox.style.left = "initial";
-						$("#client_evi").animate({
-							height: "30%",
-							opacity: 1
-						}, 250);
+						eviBox.style.height = "30%";
+						eviBox.style.opacity = 1;
 					} else {
 						eviBox.style.right = "initial";
 						eviBox.style.left = "1.5em";
-						$("#client_evi").animate({
-							height: "30%",
-							opacity: 1
-						}, 250);
+						eviBox.style.height = "30%";
+						eviBox.style.opacity = 1;
 					}
 				}
 
@@ -1647,7 +1723,7 @@ window.showname_click = showname_click;
  * @param {MouseEvent} event
  */
 export function area_click(el) {
-	const area = el.textContent;
+	const area = client.areas[el.id.substr(4)].name;
 	client.sendMusicChange(area);
 
 	const areaHr = document.createElement("div");
@@ -1853,7 +1929,6 @@ async function changeBackground(position) {
 	};
 
 	const { bg, desk, speedLines } = positions[position];
-	document.getElementById("client_fg").style.display = "none";
 
 	if (viewport.chatmsg.type === 5) {
 		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
@@ -2171,7 +2246,12 @@ window.randomCharacterOOC = randomCharacterOOC;
  * Call mod.
  */
 export function callMod() {
-	$("#callmod_dialog").dialog("open");
+	let modcall = prompt("Please enter the reason for the modcall","");
+	if (modcall == null || modcall === "") {
+		// cancel
+	} else {
+		client.sendZZ(modcall);
+	} 
 }
 window.callMod = callMod;
 
@@ -2410,34 +2490,3 @@ function decodeChat(estring) {
 
 let client = new Client(serverIP);
 let viewport = new Viewport();
-
-// Create dialog and link to button	
-$(function () {
-	$("#callmod_dialog").dialog({
-		autoOpen: false,
-		resizable: false,
-		show: {
-			effect: "drop",
-			direction: "down",
-			duration: 500
-		},
-		hide: {
-			effect: "drop",
-			direction: "down",
-			duration: 500
-		},
-		height: "auto",
-		width: 400,
-		modal: true,
-		buttons: {
-			Sure: function () {
-				const reason = prompt("Please enter the reason", "");
-				client.sendZZ(reason);
-				$(this).dialog("close");
-			},
-			Cancel: function () {
-				$(this).dialog("close");
-			}
-		}
-	});
-});
