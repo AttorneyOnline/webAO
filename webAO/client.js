@@ -1016,7 +1016,7 @@ class Client extends EventEmitter {
 		for (let i = 1; i <= ini.emotions.number; i++) {
 			const emoteinfo = ini.emotions[i].split("#");
 			const esfx = ini.soundn[i] ? ini.soundn[i] : "0";
-			const esfxd = ini.soundt[i] ? ini.soundt[i] : "0";
+			const esfxd = Number(ini.soundt[i] ? ini.soundt[i] : 0);
 			// Make sure the asset server is case insensitive, or that everything on it is lowercase
 			emotes[i] = {
 				desc: emoteinfo[0].toLowerCase(),
@@ -1024,7 +1024,7 @@ class Client extends EventEmitter {
 				silent: emoteinfo[2].toLowerCase(),
 				zoom: emoteinfo[3],
 				sfx: esfx.toLowerCase(),
-				sfxdelay: esfxd,
+				sfxdelay: Number(esfxd),
 				button_off: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
 				button_on: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_on.png`
 			};
@@ -1573,7 +1573,7 @@ export function onEnter(event) {
 		const pairchar = document.getElementById("pair_select").value;
 		const pairoffset = document.getElementById("pair_offset").value;
 		let sfxname = "0";
-		let sfxdelay = "0";
+		let sfxdelay = 0;
 		if (document.getElementById("sendsfx").checked) {
 			sfxname = myemo.sfx;
 			sfxdelay = myemo.sfxdelay;
