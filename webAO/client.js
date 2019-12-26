@@ -1415,7 +1415,6 @@ class Viewport {
 				document.getElementById("client_gamewindow").style.animation = "shake 0.2s 1";
 			} else if (this.chatmsg.flash === "1") {
 				// Flash screen
-				background.style.backgroundColor = "white";
 				this.sfxaudio.pause();
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-realization.wav";
