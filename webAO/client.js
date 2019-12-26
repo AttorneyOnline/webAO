@@ -1167,27 +1167,71 @@ class Viewport {
 	 */
 	async say(chatmsg) {
 		this.chatmsg = chatmsg;
-		appendICLog(chatmsg.content, chatmsg.nameplate);
-		changeBackground(chatmsg.side);
 		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(chatmsg.blips.toLowerCase())}.wav`);
 		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
 		this._animating = true;
 
-		// Reset CSS animation
-		document.getElementById("client_fg").style.animation = "";
-		document.getElementById("client_gamewindow").style.animation = "";
+		const nameBox = document.getElementById("client_name");
+		const chatBox = document.getElementById("client_chat");
+		const eviBox = document.getElementById("client_evi");
+		const shoutSprite = document.getElementById("client_shout");
+		const chatBoxInner = document.getElementById("client_inner_chat");
+		const fg = document.getElementById("client_fg");
+		const gamewindow = document.getElementById("client_gamewindow");
 
+		// Reset CSS animation
+		fg.style.animation = "";
+		gamewindow.style.animation = "";
+		chatBoxInner.className = "";
+		eviBox.style.opacity = "0";
+		eviBox.style.height = "0%";
+
+		appendICLog(chatmsg.content, chatmsg.nameplate);
+		changeBackground(chatmsg.side);
 		clearTimeout(this.updater);
+
+		const shouts = [
+			undefined,
+			"holdit",
+			"objection",
+			"takethat"
+		];
+
+		// gets which shout shall played
+		const shout = shouts[this.chatmsg.objection];
+		if (shout) {
+			// Hide message box
+			nameBox.style.display = "none";
+			chatBox.style.display = "none";
+			shoutSprite.src = client.resources[shout]["src"];
+			this.shoutaudio.src=`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
+			this.shoutaudio.play();
+			this.shoutTimer = 850;
+		} else {
+			this.shoutTimer = 0;
+		}
+
+		this.chatmsg.isnew = false;
+		this.chatmsg.startpreanim = true;
+
 		// If preanim existed then determine the length
-		if (chatmsg.preanim !== "-") {
+		if (this.chatmsg.preanim !== "-") {
+			// Hide message box
+			nameBox.style.display = "none";
+			chatBox.style.display = "none";
 			const delay = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
 			chatmsg.preanimdelay = delay;
 			this.initUpdater(delay);
 		} else {
 			this.initUpdater(0);
 		}
+
+		//Set the nameplate after it (might) have been hidden
+		nameBox.innerText = this.chatmsg.nameplate;
+		//Clear out the last message
+		chatBoxInner.innerText = this.textnow;
 	}
 
 	/**
@@ -1349,7 +1393,6 @@ class Viewport {
 		const charSprite = document.getElementById("client_char");
 		const pairSprite = document.getElementById("client_pair_char");
 		const eviBox = document.getElementById("client_evi");
-		const background = document.getElementById("client_background");
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
@@ -1371,37 +1414,6 @@ class Viewport {
 
 		if (this._animating) {
 			this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
-		}
-
-		if (this.chatmsg.isnew) {
-			// Reset screen background
-			background.style.backgroundColor = "transparent";
-			// Hide message and evidence window
-			nameBox.style.display = "none";
-			chatBox.style.display = "none";
-			chatBoxInner.className = "";
-			eviBox.style.opacity = "0";
-			eviBox.style.height = "0%";
-			const shouts = [
-				undefined,
-				"holdit",
-				"objection",
-				"takethat"
-			];
-
-			// gets which shout shall played
-			const shout = shouts[this.chatmsg.objection];
-			if (shout) {
-				shoutSprite.src = client.resources[shout]["src"];
-				this.shoutaudio.src=`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
-				this.shoutaudio.play();
-				this.shoutTimer = 850;
-			} else {
-				this.shoutTimer = 0;
-			}
-
-			this.chatmsg.isnew = false;
-			this.chatmsg.startpreanim = true;
 		}
 
 		// TODO: preanims sometimes play when they're not supposed to
@@ -1472,11 +1484,6 @@ class Viewport {
 				nameBox.style.display = "block";
 				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
 
-				while (nameBox.hasChildNodes()) {
-					nameBox.removeChild(nameBox.firstChild);
-				}
-				nameBox.appendChild(document.createTextNode(this.chatmsg.nameplate));
-
 				chatBox.style.display = "block";
 				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
 
@@ -1525,10 +1532,7 @@ class Viewport {
 					}
 					this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
 
-					while (chatBoxInner.hasChildNodes()) {
-						chatBoxInner.removeChild(chatBoxInner.firstChild);
-					}
-					chatBoxInner.appendChild(document.createTextNode(this.textnow));
+					chatBoxInner.innerText = this.textnow;
 
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
