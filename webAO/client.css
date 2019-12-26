@@ -465,8 +465,7 @@ img {
 	background: #7b2900;
 	display: inline-block;
 	height: 30px;
-	margin-left: 20px;
-	margin-top: 55px;
+	margin: 10px 5px;
 	position: relative;
 	width: 100px;
   }
