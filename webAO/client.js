@@ -1420,17 +1420,13 @@ class Viewport {
 						// Only def show evidence on right
 						eviBox.style.right = "1.5em";
 						eviBox.style.left = "initial";
-						$("#client_evi").animate({
-							height: "30%",
-							opacity: 1
-						}, 250);
+						eviBox.style.height = "30%";
+						eviBox.style.opacity = 1;
 					} else {
 						eviBox.style.right = "initial";
 						eviBox.style.left = "1.5em";
-						$("#client_evi").animate({
-							height: "30%",
-							opacity: 1
-						}, 250);
+						eviBox.style.height = "30%";
+						eviBox.style.opacity = 1;
 					}
 				}
 
