@@ -1368,9 +1368,7 @@ class Viewport {
 				this.sfxplayed = 1;
 				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-stab.wav";
 				this.sfxaudio.play();
-				$("#client_gamewindow").effect("shake", {
-					"direction": "up"
-				});
+				document.getElementById("client_gamewindow").style.animation = "shake 0.2s 1";
 			} else if (this.chatmsg.flash === "1") {
 				// Flash screen
 				background.style.backgroundColor = "white";
