@@ -368,7 +368,7 @@ img {
 }
 
 #evi_icon {
-	background-image: url('misc/empty.png');
+	background-image: url("/misc/empty.png");
 	background-repeat: no-repeat;
 	background-size: contain;
 }
