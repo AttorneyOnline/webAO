@@ -42,7 +42,7 @@
 #menu .chosen:before {
 	height: 200px;
 	width: 200px;
-	border-image: url("/images/sel.png") 11 stretch !important;
+	border-color: #bdb521;
 	border-width:11px;
 	padding: 1px;
 }
@@ -55,7 +55,7 @@
 	top: 35%;
 	right: 0px;
 	padding: 0px;
-	background: url("/images/desc.png") no-repeat;
+	background: url("./images/desc.png") no-repeat;
 	border: 2px solid #888;
 	border-radius: 5px;
 }
