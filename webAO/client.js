@@ -1036,10 +1036,9 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	async handlePV(args) {
-		this.charID = args[3];
+		this.charID = Number(args[3]);
 
 		document.getElementById("client_charselect").style.display = "none";
-		document.getElementById("client_inputbox").style.display = "";
 
 		const me = this.character;
 		this.selectedEmote = -1;
@@ -2020,8 +2019,6 @@ export function pickChar(ccharacter) {
 	} else {
 		// Spectator
 		document.getElementById("client_charselect").style.display = "none";
-		document.getElementById("client_inputbox").style.display = "none";
-		document.getElementById("client_emo").style.display = "none";
 	}
 }
 window.pickChar = pickChar;
