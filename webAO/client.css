@@ -459,28 +459,6 @@ img {
 	box-shadow: 1px inset;
 }
 
-.trapezoid_button {
-	color: white;
-	text-align: center;
-	background: #7b2900;
-	display: inline-block;
-	height: 30px;
-	margin: 10px 5px;
-	position: relative;
-	width: 100px;
-  }
-  .trapezoid_button:before {
-	border-bottom: 15px solid #7b2900;
-	border-left: 50px solid transparent;
-	border-right: 50px solid transparent;
-	content: "";
-	height: 0;
-	left: 0;
-	position: absolute;
-	top: -15px;
-	width: 0;
-  }
-
 .client_button.hover_button.inactive {
 	display: none;
 }
