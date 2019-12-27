@@ -13,10 +13,6 @@
 	font-size:0.6em;
 }
 
-.buttonbg {
-	background: repeating-linear-gradient(to bottom #792c01, #792c01 3px, #9a491c 1px) repeat;
-}
-
 .button {
 	padding: 5px;
 	vertical-align: middle;
@@ -39,7 +35,7 @@
 }
 
 .button:hover {
-	background-image: url("/images/buttonH.png");
+	background: repeating-linear-gradient(#a57318, #a57318 3px, #c68c39 3px, #c68c39 4px);
 	border: 1px solid #bdb521;
 }
 
