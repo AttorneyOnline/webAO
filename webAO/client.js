@@ -529,7 +529,7 @@ class Client extends EventEmitter {
 		music.pause();
 		music.src = MUSIC_HOST + track.toLowerCase();
 		music.play();
-		if (args[2] >= 0) {
+		if (Number(args[2]) >= 0) {
 			const musicname = this.chars[charID].name;
 			appendICLog(`${musicname} changed music to ${track}`);
 		} else {
@@ -843,7 +843,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleHP(args) {
-		const percent_hp = args[2] * 10;
+		const percent_hp = Number(args[2]) * 10;
 		let healthbox;
 		if (args[1] === "1") {
 			// Def hp
@@ -889,7 +889,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleID(args) {
-		this.playerID = args[1];
+		this.playerID = Number(args[1]);
 		this.serverSoftware = args[2].split("&")[0];
 		if (this.serverSoftware === "serverD")
 			this.serverVersion = args[2].split("&")[1];
@@ -917,19 +917,19 @@ class Client extends EventEmitter {
 		for (let i = 1; i < args.length - 1; i++) {
 			if (this.areas[i]) { // the server sends us ARUP before we even get the area list
 			const thisarea = document.getElementById("area" + i);
-			switch(args[0]) {
-				case "0": // playercount				
+			switch(Number(args[0])) {
+				case 0: // playercount				
 					this.areas[i].players = Number(args[i]);
 					thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players})`;					
 					break;
-				case "1": // status
+				case 1: // status
 					this.areas[i].status = safe_tags(args[i]);
 					thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();				
 					break;
-				case "2":
+				case 2:
 					this.areas[i].cm = safe_tags(args[i]);
 					break;
-				case "3":
+				case 3:
 					this.areas[i].locked = safe_tags(args[i]);
 					break;
 			}
@@ -974,8 +974,8 @@ class Client extends EventEmitter {
 	handleSI(args) {
 		this.char_list_length = Number(args[1]);
 		this.char_list_length += 1; // some servers count starting from 0 some from 1...
-		this.evidence_list_length = args[2];
-		this.music_list_length = args[3];
+		this.evidence_list_length = Number(args[2]);
+		this.music_list_length = Number(args[3]);
 
 		// create the charselect grid, to be filled by the character loader
 		document.getElementById("client_chartable").innerHTML = "";
