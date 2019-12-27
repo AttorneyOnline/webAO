@@ -1063,13 +1063,14 @@ class Client extends EventEmitter {
 				zoom: emoteinfo[3],
 				sfx: esfx.toLowerCase(),
 				sfxdelay: esfxd,
-				emote_icon: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_on.png`
+				button_off: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
+				button_on: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_on.png`
 			};
 			emotesList.innerHTML +=
-				`<img src=${emotes[i].emote_icon}
+				`<img src=${emotes[i].button_off}
 					id="emo_${i}"
 					alt="${emotes[i].desc}"
-					class="emote_button dark"
+					class="emote_button"
 					onclick="pickEmotion(${i})">`;
 		}
 		pickEmotion(1);
@@ -2034,13 +2035,13 @@ window.pickChar = pickChar;
 export function pickEmotion(emo) {
 	try {
 		if (client.selectedEmote !== -1) {
-			document.getElementById("emo_" + client.selectedEmote).classList = "emote_button dark";
+			document.getElementById("emo_" + client.selectedEmote).src = client.emote.button_off;
 		}
 	} catch (err) {
 		// do nothing
 	}
 	client.selectedEmote = emo;
-	document.getElementById("emo_" + emo).classList = "emote_button";
+	document.getElementById("emo_" + emo).src = client.emote.button_on;
 }
 window.pickEmotion = pickEmotion;
 
