@@ -341,6 +341,7 @@ class Client extends EventEmitter {
 		// Load evidence array to select
 		const evidence_select = document.getElementById("evi_select");
 		evidence_select.add(new Option("Custom", 0));
+		console.log(evidence_arr);
 		evidence_arr.forEach(evidence => {
 			evidence_select.add(new Option(evidence));
 		});
@@ -681,7 +682,7 @@ class Client extends EventEmitter {
 			evidence_box.innerHTML += `<img src="${this.evidences[i - 1].icon}" 
 				id="evi_${i}" 
 				alt="${this.evidences[i - 1].name}"
-				class="client_button"
+				class="evi_icon"
 				onclick="pickEvidence(${i})">`;
 		}
 	}
@@ -1381,7 +1382,7 @@ class Viewport {
 			chatBox.style.display = "none";
 			chatBoxInner.className = "";
 			eviBox.style.opacity = "0";
-			eviBox.style.height = "0%";
+			eviBox.style.height = "0";
 			const shouts = [
 				undefined,
 				"holdit",
@@ -1453,19 +1454,20 @@ class Viewport {
 			if (this.chatmsg.startspeaking) {
 				if (this.chatmsg.evidence > 0) {
 					// Prepare evidence
-					eviBox.style.backgroundImage = "url('" + client.evidences[this.chatmsg.evidence - 1].icon + "')";
+					eviBox.src = safe_tags(client.evidences[this.chatmsg.evidence - 1].icon);
+
+					eviBox.style.width = "auto";
+					eviBox.style.height = "30%";
+					eviBox.style.opacity = 1;
 
 					if (this.chatmsg.side === "def") {
 						// Only def show evidence on right
 						eviBox.style.right = "1.5em";
 						eviBox.style.left = "initial";
-						eviBox.style.height = "30%";
-						eviBox.style.opacity = 1;
-					} else {
+						} else {
 						eviBox.style.right = "initial";
 						eviBox.style.left = "1.5em";
-						eviBox.style.height = "30%";
-						eviBox.style.opacity = 1;
+						
 					}
 				}
 
@@ -2047,13 +2049,14 @@ window.pickEmotion = pickEmotion;
  * Highlights and selects an evidence for in-character chat.
  * @param {string} evidence the evidence to be presented
  */
-export function pickEvidence(evidence) {
+export function pickEvidence(evidenceID) {
+	const evidence = Number(evidenceID);
 	if (client.selectedEvidence !== evidence) {
 		//Update selected evidence		
 		if (client.selectedEvidence > 0) {
-			document.getElementById("evi_" + client.selectedEvidence).className = "client_button";
+			document.getElementById("evi_" + client.selectedEvidence).className = "evi_icon";
 		}
-		document.getElementById("evi_" + evidence).className = "client_button dark";
+		document.getElementById("evi_" + evidence).className = "evi_icon dark";
 		client.selectedEvidence = evidence;
 
 		// Show evidence on information window
@@ -2127,7 +2130,7 @@ window.deleteEvidence = deleteEvidence;
 export function cancelEvidence() {
 	//Clear evidence data
 	if (client.selectedEvidence > 0) {
-		document.getElementById("evi_" + client.selectedEvidence).className = "client_button";
+		document.getElementById("evi_" + client.selectedEvidence).className = "evi_icon";
 	}
 	client.selectedEvidence = 0;
 
@@ -2137,7 +2140,7 @@ export function cancelEvidence() {
 	document.getElementById("evi_filename").value = "";
 	document.getElementById("evi_name").value = "";
 	document.getElementById("evi_desc").value = "";
-	document.getElementById("evi_icon").style.backgroundImage = "url('misc/empty.png')"; //Clear icon
+	document.getElementById("evi_preview").src = "misc/empty.png"; //Clear icon
 
 	// Update button
 	document.getElementById("evi_add").className = "client_button hover_button";
@@ -2170,14 +2173,14 @@ window.getIndexFromSelect = getIndexFromSelect;
 export function updateEvidenceIcon() {
 	const evidence_select = document.getElementById("evi_select");
 	const evidence_filename = document.getElementById("evi_filename");
-	const evidence_iconbox = document.getElementById("evi_icon");
+	const evidence_iconbox = document.getElementById("evi_preview");
 
 	if (evidence_select.selectedIndex === 0) {
 		evidence_filename.style.display = "initial";
-		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${encodeURI(evidence_filename.value.toLowerCase())})`;
+		evidence_iconbox.src = AO_HOST + "evidence/" + encodeURI(evidence_filename.value.toLowerCase());
 	} else {
 		evidence_filename.style.display = "none";
-		evidence_iconbox.style.backgroundImage = `url(${AO_HOST}evidence/${encodeURI(evidence_select.value.toLowerCase())})`;
+		evidence_iconbox.src = AO_HOST + "evidence/" + encodeURI(evidence_select.value.toLowerCase());
 	}
 }
 window.updateEvidenceIcon = updateEvidenceIcon;

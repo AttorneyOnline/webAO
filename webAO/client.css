@@ -367,10 +367,14 @@ img {
 	height: auto;
 }
 
-#evi_icon {
-	background-image: url("/misc/empty.png");
-	background-repeat: no-repeat;
-	background-size: contain;
+.evi_icon {
+	width: 70px;
+	height: 70px;
+	background-color: #787878;
+	outline-color:#886060;  
+	outline-width: 1px;
+	outline-style: inset;
+	outline-offset: -1px;
 }
 
 #evi_options {

@@ -27,7 +27,7 @@
 				<img id="client_char" alt="Character" onerror="charError(this);">
 				<img id="client_bench">
 				<img id="client_fg" alt="Various overlay" src="misc/placeholder.gif" onerror="imgError(this);">
-				<img id="client_evi" src="misc/evidence_selector.png" alt="Character Evidence"
+				<img id="client_evi" src="" alt="Character Evidence"
 					onerror="imgError(this);">
 				<img id="client_shout" alt="Shout overlay" src="misc/placeholder.gif" onerror="imgError(this);">
 				<div id="client_name">
@@ -189,7 +189,7 @@
 			<fieldset style="text-align: left; display: flex; flex-direction: column;">
 				<legend>Information</legend>
 				<div style="display: flex;">
-					<img id="evi_icon" src="misc/evidence_selector.png" alt="Evidence Icon" onerror="imgError(this);">
+					<img id="evi_preview" class="evi_icon" src="" alt="Evidence Icon" onerror="imgError(this);">
 					<div id="evi_options">
 						<label for="evi_filename">Icon:</label>
 						<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
@@ -262,7 +262,7 @@
 			</div>
 			<br>
 			<button id="char_change" alt="Change" class="client_button hover_button"
-				onclick="changeCharacter()" onload="loadSettings()">Change Character</button>
+				onclick="changeCharacter()">Change Character</button>
 			<button id="char_random" alt="Random" class="client_button hover_button"
 				onclick="randomCharacterOOC()">Random Character</button>
 			<br>
@@ -301,7 +301,7 @@
 		<!-- About section -->
 		<span class="menu_content" id="content_4">
 			<meta name="frame-title" lang="en" content="About">
-			<img id="about-logo" src="images/logo-new.png" alt="Attorney Online logo">
+			<img id="about-logo" src="images/logo-new.png" onload="loadSettings()" alt="Attorney Online logo">
 			<h1 style="line-height: .3em;">webAO</h1>
 			<h3>version 2.4</h3>
 			<p>Client created by
