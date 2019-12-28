@@ -367,10 +367,14 @@ img {
 	height: auto;
 }
 
-#evi_icon {
-	background-image: url('misc/empty.png');
-	background-repeat: no-repeat;
-	background-size: contain;
+.evi_icon {
+	width: 70px;
+	height: 70px;
+	background-color: #787878;
+	outline-color:#886060;  
+	outline-width: 1px;
+	outline-style: inset;
+	outline-offset: -1px;
 }
 
 #evi_options {
@@ -445,8 +449,18 @@ img {
 }
 
 .client_button {
-	padding: 1px;
+	margin: 1px;
+	padding: 2px 15px;
 	cursor: pointer;
+	text-align: center;
+	font-weight: bold;
+	color: white;
+	background-color: #7b2900;
+	border-radius: 3px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #fffbf1;
+	box-shadow: 1px inset;
 }
 
 .client_button.hover_button.inactive {
@@ -454,18 +468,6 @@ img {
 }
 
 .client_button.hover_button:hover {
-	margin: -2px;
-	border-radius: 5px;
-	border-style: dashed;
-	border-width: 2px;
-	border-color: #FFD081;
-}
-
-.client_button.hover_button:hover {
-	margin: -2px;
-	border-radius: 5px;
-	border-style: dashed;
-	border-width: 2px;
 	border-color: #FFD081;
 }
 

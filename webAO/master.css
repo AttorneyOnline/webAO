@@ -18,7 +18,7 @@
 	vertical-align: middle;
 	text-decoration: none;
 	cursor: pointer;
-	background-image: url(images/button.png);
+	background: repeating-linear-gradient(#792c01, #792c01 3px, #9a491c 3px, #9a491c 4px);
 	border: 1px solid #553e30;
 	border-radius: 5px;
 	box-shadow: 0 0 0 1px #FFFFFF; 
@@ -35,14 +35,14 @@
 }
 
 .button:hover {
-	background-image: url(images/buttonH.png);
+	background: repeating-linear-gradient(#a57318, #a57318 3px, #c68c39 3px, #c68c39 4px);
 	border: 1px solid #bdb521;
 }
 
 #menu .chosen:before {
 	height: 200px;
 	width: 200px;
-	border-image: url(images/sel.png) 11 stretch !important;
+	border-color: #bdb521;
 	border-width:11px;
 	padding: 1px;
 }
@@ -55,7 +55,7 @@
 	top: 35%;
 	right: 0px;
 	padding: 0px;
-	background: url('images/desc.png') no-repeat;
+	background: url("./images/desc.png") no-repeat;
 	border: 2px solid #888;
 	border-radius: 5px;
 }

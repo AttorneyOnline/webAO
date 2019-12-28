@@ -27,7 +27,7 @@
 				<img id="client_char" alt="Character" onerror="charError(this);">
 				<img id="client_bench">
 				<img id="client_fg" alt="Various overlay" src="misc/placeholder.gif" onerror="imgError(this);">
-				<img id="client_evi" src="misc/evidence_selector.png" alt="Character Evidence"
+				<img id="client_evi" src="" alt="Character Evidence"
 					onerror="imgError(this);">
 				<img id="client_shout" alt="Shout overlay" src="misc/placeholder.gif" onerror="imgError(this);">
 				<div id="client_name">
@@ -54,9 +54,9 @@
 		</div>
 		<br>
 		<div id="client_buttons">
-			<img src="misc/holdit.png" id="button_1" alt="Hold it!" class="client_button" onclick="toggleShout(1)">
-			<img src="misc/objection.png" id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleShout(2)">
-			<img src="misc/takethat.png" id="button_3" alt="Take That!" class="client_button" onclick="toggleShout(3)">
+			<button id="button_1" alt="Hold it!" class="client_button" onclick="toggleShout(1)">Hold it!</button>
+			<button id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleShout(2)">OBJECTION!</button>
+			<button id="button_3" alt="Take That!" class="client_button" onclick="toggleShout(3)">Take That!</button>
 			<br>
 			<br>
 			<label for="textcolor">Text Color:</label>
@@ -71,9 +71,9 @@
 			<input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
 			<br>
 			<br>
-			<img src="misc/flip.png" id="button_flip" alt="Flip" class="client_button" onclick="toggleFlip()">
-			<img src="misc/flash.png" id="button_effect_1" alt="Flash" class="client_button" onclick="toggleEffect(1)">
-			<img src="misc/shake.png" id="button_effect_2" alt="Shake" class="client_button" onclick="toggleEffect(2)">
+			<button id="button_flip" alt="Flip" class="client_button" onclick="toggleFlip()"><b>Flip</b></button>
+			<button id="button_effect_1" alt="Flash" class="client_button" onclick="toggleEffect(1)"><b>Flash</b></button>
+			<button id="button_effect_2" alt="Shake" class="client_button" onclick="toggleEffect(2)"><b>Shake</b></button>
 		</div>
 		<fieldset style="margin:10px;">
 			<legend>Actions</legend>
@@ -177,8 +177,8 @@
 					<input id="bg_filename" name="bg_filename" class="short" type="text" style="margin-top:10px">
 					<br>
 					<br>
-					<img src="misc/location_change.png" id="bg_change" alt="Change" class="client_button hover_button"
-						onclick="changeBackgroundOOC()">
+					<button id="bg_change" alt="Change" class="client_button hover_button"
+						onclick="changeBackgroundOOC()">Change</button>
 				</span>
 			</fieldset>
 		</span>
@@ -189,7 +189,7 @@
 			<fieldset style="text-align: left; display: flex; flex-direction: column;">
 				<legend>Information</legend>
 				<div style="display: flex;">
-					<img id="evi_icon" src="misc/evidence_selector.png" alt="Evidence Icon" onerror="imgError(this);">
+					<img id="evi_preview" class="evi_icon" src="" alt="Evidence Icon" onerror="imgError(this);">
 					<div id="evi_options">
 						<label for="evi_filename">Icon:</label>
 						<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
@@ -205,21 +205,21 @@
 						placeholder="Evidence description"></textarea>
 				</div>
 				<div style="display: block; text-align: center; padding-top: 20px;">
-					<img src="misc/evidence_add.png" id="evi_add" alt="Add Evidence" class="client_button hover_button"
-						onclick="addEvidence()">
-					<img src="misc/evidence_edit.png" id="evi_edit" alt="Edit Evidence"
-						class="client_button hover_button inactive" onclick="editEvidence()">
-					<img src="misc/evidence_cancel.png" id="evi_cancel" alt="Cancel Evidence"
-						class="client_button hover_button inactive" onclick="cancelEvidence()">
-					<img src="misc/evidence_remove.png" id="evi_del" alt="Remove Evidence"
-						class="client_button hover_button inactive" onclick="deleteEvidence()">
+					<button id="evi_add" alt="Add Evidence" class="client_button hover_button"
+						onclick="addEvidence()">Add</button>
+					<button id="evi_edit" alt="Edit Evidence"
+						class="client_button hover_button inactive" onclick="editEvidence()">Edit</button>
+					<button id="evi_cancel" alt="Cancel Evidence"
+						class="client_button hover_button inactive" onclick="cancelEvidence()">Cancel</button>
+					<button id="evi_del" alt="Remove Evidence"
+						class="client_button hover_button inactive" onclick="deleteEvidence()">Remove</button>
 				</div>
 			</fieldset>
 			<br>
 			<div id="evidences"></div>
 			<br>
-			<img src="misc/present.png" id="button_present" alt="Present" class="client_button"
-				onclick="togglePresent()">
+			<button id="button_present" alt="Present" class="client_button"
+				onclick="togglePresent()"><i>Present</i></button>
 		</span>
 
 		<!-- Settings section -->
@@ -261,10 +261,10 @@
 					onchange="changeBlipVolume()">
 			</div>
 			<br>
-			<img src="misc/character_change.png" id="char_change" alt="Change" class="client_button hover_button"
-				onclick="changeCharacter()" onload="loadSettings()">
-			<img src="misc/character_random.png" id="char_random" alt="Random" class="client_button hover_button"
-				onclick="randomCharacterOOC()">
+			<button id="char_change" alt="Change" class="client_button hover_button"
+				onclick="changeCharacter()">Change Character</button>
+			<button id="char_random" alt="Random" class="client_button hover_button"
+				onclick="randomCharacterOOC()">Random Character</button>
 			<br>
 			<br>
 			<span style="color:red">Only touch these settings if you know what you are doing.</span>
@@ -301,7 +301,7 @@
 		<!-- About section -->
 		<span class="menu_content" id="content_4">
 			<meta name="frame-title" lang="en" content="About">
-			<img id="about-logo" src="images/logo-new.png" alt="Attorney Online logo">
+			<img id="about-logo" src="images/logo-new.png" onload="loadSettings()" alt="Attorney Online logo">
 			<h1 style="line-height: .3em;">webAO</h1>
 			<h3>version 2.4</h3>
 			<p>Client created by
