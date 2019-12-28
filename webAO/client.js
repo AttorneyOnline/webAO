@@ -51,9 +51,16 @@ const fp = new Fingerprint({
 	screen_resolution: true
 });
 
-// An emulated, semi-unique HDID that is generally safe for HDID bans.
-const hdid = fp.get();
-console.info(`Your emulated HDID is ${hdid}`);
+/** An emulated, semi-unique HDID that is generally safe for HDID bans. */
+const cookieid = getCookie("fingerprint");
+let hdid;
+if (cookieid) {
+	hdid = cookieid;
+} else {
+	hdid = fp.get();
+	setCookie("fingerprint",hdid);
+}
+console.log(`Your emulated HDID is ${hdid}`);
 
 let lastICMessageTime = new Date(0);
 
@@ -530,7 +537,7 @@ class Client extends EventEmitter {
 		music.pause();
 		music.src = MUSIC_HOST + track.toLowerCase();
 		music.play();
-		if (args[2] >= 0) {
+		if (Number(args[2]) >= 0) {
 			const musicname = this.chars[charID].name;
 			appendICLog(`${musicname} changed music to ${track}`);
 		} else {
@@ -844,7 +851,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleHP(args) {
-		const percent_hp = args[2] * 10;
+		const percent_hp = Number(args[2]) * 10;
 		let healthbox;
 		if (args[1] === "1") {
 			// Def hp
@@ -890,7 +897,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleID(args) {
-		this.playerID = args[1];
+		this.playerID = Number(args[1]);
 		this.serverSoftware = args[2].split("&")[0];
 		if (this.serverSoftware === "serverD")
 			this.serverVersion = args[2].split("&")[1];
@@ -918,19 +925,19 @@ class Client extends EventEmitter {
 		for (let i = 1; i < args.length - 1; i++) {
 			if (this.areas[i]) { // the server sends us ARUP before we even get the area list
 			const thisarea = document.getElementById("area" + i);
-			switch(args[0]) {
-				case "0": // playercount				
+			switch(Number(args[0])) {
+				case 0: // playercount				
 					this.areas[i].players = Number(args[i]);
 					thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players})`;					
 					break;
-				case "1": // status
+				case 1: // status
 					this.areas[i].status = safe_tags(args[i]);
 					thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();				
 					break;
-				case "2":
+				case 2:
 					this.areas[i].cm = safe_tags(args[i]);
 					break;
-				case "3":
+				case 3:
 					this.areas[i].locked = safe_tags(args[i]);
 					break;
 			}
@@ -975,8 +982,8 @@ class Client extends EventEmitter {
 	handleSI(args) {
 		this.char_list_length = Number(args[1]);
 		this.char_list_length += 1; // some servers count starting from 0 some from 1...
-		this.evidence_list_length = args[2];
-		this.music_list_length = args[3];
+		this.evidence_list_length = Number(args[2]);
+		this.music_list_length = Number(args[3]);
 
 		// create the charselect grid, to be filled by the character loader
 		document.getElementById("client_chartable").innerHTML = "";
@@ -1037,10 +1044,9 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	async handlePV(args) {
-		this.charID = args[3];
+		this.charID = Number(args[3]);
 
 		document.getElementById("client_charselect").style.display = "none";
-		document.getElementById("client_inputbox").style.display = "";
 
 		const me = this.character;
 		this.selectedEmote = -1;
@@ -1168,27 +1174,71 @@ class Viewport {
 	 */
 	async say(chatmsg) {
 		this.chatmsg = chatmsg;
-		appendICLog(chatmsg.content, chatmsg.nameplate);
-		changeBackground(chatmsg.side);
 		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(chatmsg.blips.toLowerCase())}.wav`);
 		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
 		this._animating = true;
 
-		// Reset CSS animation
-		document.getElementById("client_fg").style.animation = "";
-		document.getElementById("client_gamewindow").style.animation = "";
+		const nameBox = document.getElementById("client_name");
+		const chatBox = document.getElementById("client_chat");
+		const eviBox = document.getElementById("client_evi");
+		const shoutSprite = document.getElementById("client_shout");
+		const chatBoxInner = document.getElementById("client_inner_chat");
+		const fg = document.getElementById("client_fg");
+		const gamewindow = document.getElementById("client_gamewindow");
 
+		// Reset CSS animation
+		fg.style.animation = "";
+		gamewindow.style.animation = "";
+		chatBoxInner.className = "";
+		eviBox.style.opacity = "0";
+		eviBox.style.height = "0%";
+
+		appendICLog(chatmsg.content, chatmsg.nameplate);
+		changeBackground(chatmsg.side);
 		clearTimeout(this.updater);
+
+		const shouts = [
+			undefined,
+			"holdit",
+			"objection",
+			"takethat"
+		];
+
+		// gets which shout shall played
+		const shout = shouts[this.chatmsg.objection];
+		if (shout) {
+			// Hide message box
+			nameBox.style.display = "none";
+			chatBox.style.display = "none";
+			shoutSprite.src = client.resources[shout]["src"];
+			this.shoutaudio.src=`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
+			this.shoutaudio.play();
+			this.shoutTimer = 850;
+		} else {
+			this.shoutTimer = 0;
+		}
+
+		this.chatmsg.isnew = false;
+		this.chatmsg.startpreanim = true;
+
 		// If preanim existed then determine the length
-		if (chatmsg.preanim !== "-") {
+		if (this.chatmsg.preanim !== "-") {
+			// Hide message box
+			nameBox.style.display = "none";
+			chatBox.style.display = "none";
 			const delay = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
 			chatmsg.preanimdelay = delay;
 			this.initUpdater(delay);
 		} else {
 			this.initUpdater(0);
 		}
+
+		//Set the nameplate after it (might) have been hidden
+		nameBox.innerText = this.chatmsg.nameplate;
+		//Clear out the last message
+		chatBoxInner.innerText = this.textnow;
 	}
 
 	/**
@@ -1350,7 +1400,6 @@ class Viewport {
 		const charSprite = document.getElementById("client_char");
 		const pairSprite = document.getElementById("client_pair_char");
 		const eviBox = document.getElementById("client_evi");
-		const background = document.getElementById("client_background");
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
@@ -1372,37 +1421,6 @@ class Viewport {
 
 		if (this._animating) {
 			this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
-		}
-
-		if (this.chatmsg.isnew) {
-			// Reset screen background
-			background.style.backgroundColor = "transparent";
-			// Hide message and evidence window
-			nameBox.style.display = "none";
-			chatBox.style.display = "none";
-			chatBoxInner.className = "";
-			eviBox.style.opacity = "0";
-			eviBox.style.height = "0";
-			const shouts = [
-				undefined,
-				"holdit",
-				"objection",
-				"takethat"
-			];
-
-			// gets which shout shall played
-			const shout = shouts[this.chatmsg.objection];
-			if (shout) {
-				shoutSprite.src = client.resources[shout]["src"];
-				this.shoutaudio.src=`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
-				this.shoutaudio.play();
-				this.shoutTimer = 850;
-			} else {
-				this.shoutTimer = 0;
-			}
-
-			this.chatmsg.isnew = false;
-			this.chatmsg.startpreanim = true;
 		}
 
 		// TODO: preanims sometimes play when they're not supposed to
@@ -1474,11 +1492,6 @@ class Viewport {
 				nameBox.style.display = "block";
 				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
 
-				while (nameBox.hasChildNodes()) {
-					nameBox.removeChild(nameBox.firstChild);
-				}
-				nameBox.appendChild(document.createTextNode(this.chatmsg.nameplate));
-
 				chatBox.style.display = "block";
 				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
 
@@ -1527,10 +1540,7 @@ class Viewport {
 					}
 					this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
 
-					while (chatBoxInner.hasChildNodes()) {
-						chatBoxInner.removeChild(chatBoxInner.firstChild);
-					}
-					chatBoxInner.appendChild(document.createTextNode(this.textnow));
+					chatBoxInner.innerText = this.textnow;
 
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
@@ -2022,8 +2032,6 @@ export function pickChar(ccharacter) {
 	} else {
 		// Spectator
 		document.getElementById("client_charselect").style.display = "none";
-		document.getElementById("client_inputbox").style.display = "none";
-		document.getElementById("client_emo").style.display = "none";
 	}
 }
 window.pickChar = pickChar;
