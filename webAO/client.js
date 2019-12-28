@@ -51,9 +51,16 @@ const fp = new Fingerprint({
 	screen_resolution: true
 });
 
-// An emulated, semi-unique HDID that is generally safe for HDID bans.
-const hdid = fp.get();
-console.info(`Your emulated HDID is ${hdid}`);
+/** An emulated, semi-unique HDID that is generally safe for HDID bans. */
+const cookieid = getCookie("fingerprint");
+let hdid;
+if (cookieid) {
+	hdid = cookieid;
+} else {
+	hdid = fp.get();
+	setCookie("fingerprint",hdid);
+}
+console.log(`Your emulated HDID is ${hdid}`);
 
 let lastICMessageTime = new Date(0);
 
