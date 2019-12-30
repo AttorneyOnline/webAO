@@ -54,12 +54,13 @@ const fp = new Fingerprint({
 /** An emulated, semi-unique HDID that is generally safe for HDID bans. */
 const cookieid = getCookie("fingerprint");
 let hdid;
-if (cookieid) {
-	hdid = cookieid;
-} else {
+
+
+
+
 	hdid = fp.get();
 	setCookie("fingerprint",hdid);
-}
+
 console.log(`Your emulated HDID is ${hdid}`);
 
 let lastICMessageTime = new Date(0);
