@@ -1,35 +1,44 @@
-import Fingerprint from "./fingerprint.js";
-
 const MASTERSERVER_IP = "master.aceattorneyonline.com:27014";
+const version = 2.4;
 
-const fp = new Fingerprint({
-	canvas: true,
-	ie_activex: true,
-	screen_resolution: true
-});
+import Fingerprint2 from 'fingerprintjs2';
 
-/** An emulated, semi-unique HDID that is generally safe for HDID bans. */
-const cookieid = getCookie("fingerprint");
+let masterserver;
+
 let hdid;
-
-
-
-	hdid = fp.get();
-	setCookie("fingerprint",hdid);
-
-console.log(`Your emulated HDID is ${hdid}`);
+const options = {fonts: {extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"]}, excludes: {userAgent: true}};
 
 let oldLoading = false;
-export function onLoad(){
-	if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-		oldLoading = true;
-	}
-}
-window.onLoad = onLoad;
 
-const masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
-masterserver.onopen = (evt) => onOpen(evt);
-masterserver.onmessage = (evt) => onMessage(evt);
+if (window.requestIdleCallback) {
+    requestIdleCallback(function () {
+        Fingerprint2.get(options, function (components) {
+			hdid = Fingerprint2.x64hash128(components.join(''), 31);
+
+			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
+			masterserver.onopen = (evt) => onOpen(evt);
+			masterserver.onmessage = (evt) => onMessage(evt);
+
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+				oldLoading = true;
+			}
+        });
+    });
+} else {
+    setTimeout(function () {
+        Fingerprint2.get(options, function (components) {
+			hdid = Fingerprint2.x64hash128(components.join(''), 31);
+
+			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
+			masterserver.onopen = (evt) => onOpen(evt);
+			masterserver.onmessage = (evt) => onMessage(evt);
+
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+				oldLoading = true;
+			}
+        });
+    }, 500);
+}
 
 const server_description = [];
 server_description[-1] = "This is your computer on port 50001";
@@ -79,7 +88,9 @@ export function setServ(ID) {
 window.setServ = setServ;
 
 function onOpen(_e) {
-	masterserver.send("ID#webAO#webAO#%");
+	console.log(`Your emulated HDID is ${hdid}`);
+	masterserver.send(`ID#webAO#webAO#%`);
+
 	if (oldLoading === true) {
 		masterserver.send("askforservers#%");
 	}
@@ -97,7 +108,7 @@ function checkOnline(serverID, coIP) {
 	function onCOOpen(_e) {
 		document.getElementById(`server${serverID}`).className = "available";
 		oserv.send(`HI#${hdid}#%`);
-		oserv.send("ID#webAO#webAO#%");
+		oserv.send(`ID#webAO#webAO#%`);
 	}
 
 	function onCOMessage(e) {

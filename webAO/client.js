@@ -4,14 +4,18 @@
  * credits to aleks for original idea and source
 */
 
+import Fingerprint2 from 'fingerprintjs2';
+
 // Load some defaults for the background and evidence dropdowns
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 
-import Fingerprint from "./fingerprint.js";
-
 import { EventEmitter } from "events";
 
+const version = 2.4;
+
+let client;
+let viewport;
 
 // Get the arguments from the URL bar
 const queryDict = {};
@@ -34,9 +38,6 @@ const UPDATE_INTERVAL = 60;
  * which caused problems on low-memory devices in the past.
  */
 let oldLoading = false;
-if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-	oldLoading = true;
-}
 
 // presettings
 let selectedEffect = 0;
@@ -45,23 +46,37 @@ let selectedShout = 0;
 
 let extrafeatures = [];
 
-const fp = new Fingerprint({
-	canvas: true,
-	ie_activex: true,
-	screen_resolution: true
-});
-
-/** An emulated, semi-unique HDID that is generally safe for HDID bans. */
-const cookieid = getCookie("fingerprint");
 let hdid;
+const options = {fonts: {extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"]}, excludes: {userAgent: true}};
 
+if (window.requestIdleCallback) {
+    requestIdleCallback(function () {
+        Fingerprint2.get(options, function (components) {
+			hdid = Fingerprint2.x64hash128(components.join(''), 31);
+			client = new Client(serverIP);
+			viewport = new Viewport();
 
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+				oldLoading = true;
+			}
+			client.loadResources();
+        });
+    });
+} else {
+    setTimeout(function () {
+        Fingerprint2.get(options, function (components) {
+			hdid = Fingerprint2.x64hash128(components.join(''), 31);
+			client = new Client(serverIP);
+			viewport = new Viewport();
 
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+				oldLoading = true;
+			}
+			client.loadResources();
+        });
+    }, 500);
+}
 
-	hdid = fp.get();
-	setCookie("fingerprint",hdid);
-
-console.log(`Your emulated HDID is ${hdid}`);
 
 let lastICMessageTime = new Date(0);
 
@@ -321,8 +336,10 @@ class Client extends EventEmitter {
 	 * to the server.
 	 */
 	joinServer() {
+		console.log(`Your emulated HDID is ${hdid}`);
+
 		this.sendServer(`HI#${hdid}#%`);
-		this.sendServer("ID#webAO#2.3#%");
+		this.sendServer(`ID#webAO#webAO#%`);
 		this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
 	}
 
@@ -1959,14 +1976,6 @@ async function changeBackground(position) {
 }
 
 /**
- * Triggered when the settings tab is fully loaded.
- */
-export function loadSettings() {
-	client.loadResources();
-}
-window.loadSettings = loadSettings;
-
-/**
  * Triggered when the reconnect button is pushed.
  */
 export function ReconnectButton() {
@@ -2495,10 +2504,3 @@ function decodeChat(estring) {
 		return estring;
 	}
 }
-
-//
-// Client code
-//
-
-let client = new Client(serverIP);
-let viewport = new Viewport();
