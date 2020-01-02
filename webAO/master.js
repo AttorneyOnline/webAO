@@ -6,14 +6,14 @@ import Fingerprint2 from 'fingerprintjs2';
 let masterserver;
 
 let hdid;
-const options = {fonts: {extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"]}, excludes: {userAgent: true}};
+const options = {fonts: {extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"]}, excludes: {userAgent: true, enumerateDevices: true}};
 
 let oldLoading = false;
 
 if (window.requestIdleCallback) {
     requestIdleCallback(function () {
         Fingerprint2.get(options, function (components) {
-			hdid = Fingerprint2.x64hash128(components.join(''), 31);
+			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`),31);
 
 			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 			masterserver.onopen = (evt) => onOpen(evt);
@@ -27,7 +27,7 @@ if (window.requestIdleCallback) {
 } else {
     setTimeout(function () {
         Fingerprint2.get(options, function (components) {
-			hdid = Fingerprint2.x64hash128(components.join(''), 31);
+			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`),31);
 
 			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 			masterserver.onopen = (evt) => onOpen(evt);

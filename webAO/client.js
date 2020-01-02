@@ -47,12 +47,12 @@ let selectedShout = 0;
 let extrafeatures = [];
 
 let hdid;
-const options = {fonts: {extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"]}, excludes: {userAgent: true}};
+const options = {fonts: {extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"]}, excludes: {userAgent: true, enumerateDevices: true}};
 
 if (window.requestIdleCallback) {
     requestIdleCallback(function () {
         Fingerprint2.get(options, function (components) {
-			hdid = Fingerprint2.x64hash128(components.join(''), 31);
+			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`),31);
 			client = new Client(serverIP);
 			viewport = new Viewport();
 
@@ -65,7 +65,7 @@ if (window.requestIdleCallback) {
 } else {
     setTimeout(function () {
         Fingerprint2.get(options, function (components) {
-			hdid = Fingerprint2.x64hash128(components.join(''), 31);
+			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`),31);
 			client = new Client(serverIP);
 			viewport = new Viewport();
 
