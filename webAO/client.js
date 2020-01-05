@@ -801,11 +801,22 @@ class Client extends EventEmitter {
 
 	/**
 	 * Handles the kicked packet
+	 * @param {String} type is it a kick or a ban
+	 * @param {String} reason why
+	 */
+	handleBans(type, reason) {
+		document.getElementById("client_error").style.display = "flex";
+		document.getElementById("client_errortext").innerHTML = type + ":<br>" + reason.replace(/\n/g, "<br />");
+		document.getElementsByClassName("client_reconnect")[0].style.display = "none";
+		document.getElementsByClassName("client_reconnect")[1].style.display = "none";
+	}
+
+	/**
+	 * Handles the kicked packet
 	 * @param {Array} args kick reason
 	 */
 	handleKK(args) {
-		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "Kicked: " + safe_tags(args[1]);
+		this.handleBans("Kicked",safe_tags(args[1]));
 	}
 
 	/**
@@ -814,8 +825,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args ban reason
 	 */
 	handleKB(args) {
-		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "You got banned: " + safe_tags(args[1]);
+		this.handleBans("Banned",safe_tags(args[1]));
 	}
 
 	/**
@@ -824,8 +834,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args ban reason
 	 */
 	handleBD(args) {
-		document.getElementById("client_loading").style.display = "flex";
-		document.getElementById("client_loadingtext").innerHTML = "Banned: " + safe_tags(args[1]);
+		this.handleBans("Banned",safe_tags(args[1]));
 	}
 
 	/**
@@ -1987,14 +1996,6 @@ export function ReconnectButton() {
 	}
 }
 window.ReconnectButton = ReconnectButton;
-
-/**
- * Triggered when the retry button is pushed (during the loading process).
- */
-export function RetryButton() {
-	client.joinServer();
-}
-window.RetryButton = RetryButton;
 
 /**
  * Appends a message to the in-character chat log.
