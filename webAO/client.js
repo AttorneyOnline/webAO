@@ -163,6 +163,8 @@ class Client extends EventEmitter {
 		this.on("SM", this.handleSM.bind(this));
 		this.on("MM", this.handleMM.bind(this));
 		this.on("BD", this.handleBD.bind(this));
+		this.on("KB", this.handleKB.bind(this));
+		this.on("KK", this.handleKK.bind(this));
 		this.on("DONE", this.handleDONE.bind(this));
 		this.on("BN", this.handleBN.bind(this));
 		this.on("HP", this.handleHP.bind(this));
