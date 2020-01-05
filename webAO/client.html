@@ -339,7 +339,7 @@
 	<div id="here"></div>
 	<div id="client_loading">
 		<h1 id="client_loadingtext">Loading</h1>
-		<button onclick="RetryButton()">RETRY</button>
+		<button class="client_reconnect" onclick="ReconnectButton()">Reconnect</button>
 	</div>
 	<div id="client_charselect">
 		<div id="client_chartable_container">
@@ -348,11 +348,11 @@
 		</div>
 	</div>
 	<div id="client_error" class="error" style="display: none">
-		<p>You were disconnected from the server.</p>
+		<h1 id="client_errortext">You were disconnected from the server.</h1>
 		<p>Code:
 			<span id="error_id">(none)</span>
 		</p>
-		<button onclick="ReconnectButton()">Reconnect</button>
+		<button class="client_reconnect" onclick="ReconnectButton()">Reconnect</button>
 	</div>
 </body>
 
