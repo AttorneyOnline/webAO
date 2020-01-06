@@ -2431,13 +2431,16 @@ window.toggleShout = toggleShout;
  * @param {string} unsafe an unsanitized string
  */
 function safe_tags(unsafe) {
-	if (unsafe)
+	if (unsafe) {
 		return unsafe
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")
 		.replace(/>/g, "&gt;");
 		//.replace(/"/g, "&quot;")
 		//.replace(/'/g, "&#039;");
+	} else {
+		return "";
+	}
 }
 
 /**
