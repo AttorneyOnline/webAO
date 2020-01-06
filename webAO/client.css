@@ -153,6 +153,7 @@ img {
 	height: 40px;
 	padding: 1px;
 	cursor: pointer;
+	border: 1px solid #000;
 }
 
 #client_settings {
