@@ -1253,7 +1253,7 @@ class Viewport {
 		this.chatmsg.startpreanim = true;
 
 		// If preanim existed then determine the length
-		if (this.chatmsg.preanim !== "-") {
+		if (this.chatmsg.preanim !== "-" && this.chatmsg.preanim !== "" && this.chatmsg.preanim !== undefined) {
 			// Hide message box
 			nameBox.style.display = "none";
 			chatBox.style.display = "none";
