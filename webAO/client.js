@@ -5,6 +5,7 @@
 */
 
 import Fingerprint2 from 'fingerprintjs2';
+import assets from 'grubbit';
 
 // Load some defaults for the background and evidence dropdowns
 import background_arr from "./backgrounds.js";
@@ -1476,7 +1477,10 @@ class Viewport {
 				shoutSprite.src = "misc/placeholder.gif";
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
-				charSprite.src = `${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`;
+				const blob = assets.getAsset(`characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`);
+				const url = URL.makeObjectURL(blob);
+				charSprite.src = url;
+				URL.deleteObjectURL(url);
 				charSprite.style.display = "";
 			}
 
