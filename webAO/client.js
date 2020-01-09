@@ -1478,7 +1478,7 @@ class Viewport {
 				shoutSprite.src = "misc/placeholder.gif";
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
-				const blob = assetdb.getAsset(`characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`);
+				const blob = assetdb.getAsset(`${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`);
 				const url = URL.makeObjectURL(blob);
 				charSprite.src = url;
 				URL.deleteObjectURL(url);
@@ -1491,7 +1491,10 @@ class Viewport {
 					const pairEmote = this.chatmsg.other_emote.toLowerCase();
 					pairSprite.style.left = this.chatmsg.other_offset+"%";
 					charSprite.style.left = this.chatmsg.self_offset+"%";
-					pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
+					const blob = assetdb.getAsset(`${AO_HOST}characters/${encodeURI(pairName)}/${encodeURI(pairEmote)}.gif`);
+					const url = URL.makeObjectURL(blob);
+					pairSprite.src = url;
+					URL.deleteObjectURL(url);
 					pairSprite.style.display = "";
 				} else {
 					pairSprite.style.display = "none";
