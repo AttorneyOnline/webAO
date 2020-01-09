@@ -33,6 +33,7 @@ const MUSIC_HOST = AO_HOST + "sounds/music/";
 const CHAR_SELECT_WIDTH = 8;
 const UPDATE_INTERVAL = 60;
 
+let assetdb = new assets.AssetDB();
 /**
  * Toggles AO1-style loading using paginated music packets for mobile platforms.
  * The old loading uses more smaller packets instead of a single big one,
@@ -1477,7 +1478,7 @@ class Viewport {
 				shoutSprite.src = "misc/placeholder.gif";
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
-				const blob = assets.getAsset(`characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`);
+				const blob = assetdb.getAsset(`characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`);
 				const url = URL.makeObjectURL(blob);
 				charSprite.src = url;
 				URL.deleteObjectURL(url);
