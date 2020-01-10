@@ -33,7 +33,7 @@ const MUSIC_HOST = AO_HOST + "sounds/music/";
 const CHAR_SELECT_WIDTH = 8;
 const UPDATE_INTERVAL = 60;
 
-const assetdb = new grubbit.AssetDB('assets', { virtualBase: AO_HOST });
+const assetdb = new grubbit.AssetDB('assets', { virtualBase: AO_HOST.substring(0, AO_HOST.length - 1) });
 /**
  * Toggles AO1-style loading using paginated music packets for mobile platforms.
  * The old loading uses more smaller packets instead of a single big one,
@@ -1478,12 +1478,11 @@ class Viewport {
 				shoutSprite.src = "misc/placeholder.gif";
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
-				let url;
 				assetdb.getAsset(`characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`).then(blob => {
-					url = URL.createObjectURL(blob);
+					const url = URL.createObjectURL(blob);
+					charSprite.src = url;
+					URL.revokeObjectURL(url);
 				});
-				charSprite.src = url;
-				URL.revokeObjectURL(url);
 				charSprite.style.display = "";
 			}
 
@@ -1493,12 +1492,11 @@ class Viewport {
 					const pairEmote = this.chatmsg.other_emote.toLowerCase();
 					pairSprite.style.left = this.chatmsg.other_offset+"%";
 					charSprite.style.left = this.chatmsg.self_offset+"%";
-					let url;
 					assetdb.getAsset(`characters/${encodeURI(pairName)}/${encodeURI(pairEmote)}.gif`).then(blob => {
-						url = URL.createObjectURL(blob);
-					});
-					pairSprite.src = url;
-					URL.revokeObjectURL(url);
+						const url = URL.createObjectURL(blob);
+						pairSprite.src = url;
+						URL.revokeObjectURL(url);
+					});					
 					pairSprite.style.display = "";
 				} else {
 					pairSprite.style.display = "none";
@@ -1555,12 +1553,11 @@ class Viewport {
 						const pairEmote = this.chatmsg.other_emote.toLowerCase();
 						pairSprite.style.left = this.chatmsg.other_offset+"%";
 						charSprite.style.left = this.chatmsg.self_offset+"%";
-						let url;
 						assetdb.getAsset(`characters/${encodeURI(pairName)}/${encodeURI(pairEmote)}.gif`).then(blob => {
-							url = URL.createObjectURL(blob);
+							const url = URL.createObjectURL(blob);
+							pairSprite.src = url;
+							URL.revokeObjectURL(url);
 						});
-						pairSprite.src = url;
-						URL.revokeObjectURL(url);
 						pairSprite.style.display = "";
 					} else {
 						pairSprite.style.display = "none";
@@ -1568,21 +1565,20 @@ class Viewport {
 					}
 				}
 
-				let url;
 				assetdb.getAsset(`characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.speaking.toLowerCase())}.gif`).then(blob => {
-					url = URL.createObjectURL(blob);
+					const url = URL.createObjectURL(blob);
+					charSprite.src = url;
+					URL.revokeObjectURL(url);
 				});
-				charSprite.src = url;
-				URL.revokeObjectURL(url);
+				
 				charSprite.style.display = "";
 
 				if (this.textnow === this.chatmsg.content) {
-					let url;
 					assetdb.getAsset(`characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.silent.toLowerCase())}.gif`).then(blob => {
-						url = URL.createObjectURL(blob);
+						const url = URL.createObjectURL(blob);
+						charSprite.src = url;
+						URL.revokeObjectURL(url);
 					});
-					charSprite.src = url;
-					URL.revokeObjectURL(url);
 					charSprite.style.display = "";
 					this._animating = false;
 					clearTimeout(this.updater);
@@ -1601,12 +1597,12 @@ class Viewport {
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						let url;
 						assetdb.getAsset(`characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.silent.toLowerCase())}.gif`).then(blob => {
-							url = URL.createObjectURL(blob);
+							const url = URL.createObjectURL(blob);
+							charSprite.src = url;
+							URL.revokeObjectURL(url);
 						});
-						charSprite.src = url;
-						URL.revokeObjectURL(url);
+						
 						charSprite.style.display = "";
 						clearTimeout(this.updater);
 					}
