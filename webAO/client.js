@@ -5,7 +5,7 @@
 */
 
 import Fingerprint2 from 'fingerprintjs2';
-import assets from 'grubbit';
+import * as grubbit from 'grubbit';
 
 // Load some defaults for the background and evidence dropdowns
 import background_arr from "./backgrounds.js";
@@ -33,7 +33,7 @@ const MUSIC_HOST = AO_HOST + "sounds/music/";
 const CHAR_SELECT_WIDTH = 8;
 const UPDATE_INTERVAL = 60;
 
-let assetdb = new assets.AssetDB();
+const assetdb = new grubbit.AssetDB('assets', { virtualBase: AO_HOST });
 /**
  * Toggles AO1-style loading using paginated music packets for mobile platforms.
  * The old loading uses more smaller packets instead of a single big one,
@@ -1478,10 +1478,13 @@ class Viewport {
 				shoutSprite.src = "misc/placeholder.gif";
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
-				const blob = assetdb.getAsset(`${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`);
-				const url = URL.makeObjectURL(blob);
+				let url;
+				assetdb.getAsset(`characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`).then(blob => {
+					console.log(blob);
+					url = URL.createObjectURL(blob);
+				});
 				charSprite.src = url;
-				URL.deleteObjectURL(url);
+				URL.revokeObjectURL(url);
 				charSprite.style.display = "";
 			}
 
@@ -1491,10 +1494,13 @@ class Viewport {
 					const pairEmote = this.chatmsg.other_emote.toLowerCase();
 					pairSprite.style.left = this.chatmsg.other_offset+"%";
 					charSprite.style.left = this.chatmsg.self_offset+"%";
-					const blob = assetdb.getAsset(`${AO_HOST}characters/${encodeURI(pairName)}/${encodeURI(pairEmote)}.gif`);
-					const url = URL.makeObjectURL(blob);
+					let url;
+					assetdb.getAsset(`characters/${encodeURI(pairName)}/${encodeURI(pairEmote)}.gif`).then(blob => {
+						console.log(blob);
+						url = URL.createObjectURL(blob);
+					});
 					pairSprite.src = url;
-					URL.deleteObjectURL(url);
+					URL.revokeObjectURL(url);
 					pairSprite.style.display = "";
 				} else {
 					pairSprite.style.display = "none";
