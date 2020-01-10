@@ -1480,7 +1480,6 @@ class Viewport {
 				const preanim = this.chatmsg.preanim.toLowerCase();
 				let url;
 				assetdb.getAsset(`characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`).then(blob => {
-					console.log(blob);
 					url = URL.createObjectURL(blob);
 				});
 				charSprite.src = url;
@@ -1496,7 +1495,6 @@ class Viewport {
 					charSprite.style.left = this.chatmsg.self_offset+"%";
 					let url;
 					assetdb.getAsset(`characters/${encodeURI(pairName)}/${encodeURI(pairEmote)}.gif`).then(blob => {
-						console.log(blob);
 						url = URL.createObjectURL(blob);
 					});
 					pairSprite.src = url;
@@ -1557,7 +1555,12 @@ class Viewport {
 						const pairEmote = this.chatmsg.other_emote.toLowerCase();
 						pairSprite.style.left = this.chatmsg.other_offset+"%";
 						charSprite.style.left = this.chatmsg.self_offset+"%";
-						pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
+						let url;
+						assetdb.getAsset(`characters/${encodeURI(pairName)}/${encodeURI(pairEmote)}.gif`).then(blob => {
+							url = URL.createObjectURL(blob);
+						});
+						pairSprite.src = url;
+						URL.revokeObjectURL(url);
 						pairSprite.style.display = "";
 					} else {
 						pairSprite.style.display = "none";
@@ -1565,11 +1568,21 @@ class Viewport {
 					}
 				}
 
-				charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.speaking.toLowerCase()) + ".gif";
+				let url;
+				assetdb.getAsset(`characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.speaking.toLowerCase())}.gif`).then(blob => {
+					url = URL.createObjectURL(blob);
+				});
+				charSprite.src = url;
+				URL.revokeObjectURL(url);
 				charSprite.style.display = "";
 
 				if (this.textnow === this.chatmsg.content) {
-					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent.toLowerCase()) + ".gif";
+					let url;
+					assetdb.getAsset(`characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.silent.toLowerCase())}.gif`).then(blob => {
+						url = URL.createObjectURL(blob);
+					});
+					charSprite.src = url;
+					URL.revokeObjectURL(url);
 					charSprite.style.display = "";
 					this._animating = false;
 					clearTimeout(this.updater);
@@ -1588,8 +1601,13 @@ class Viewport {
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent.toLowerCase()) + ".gif";
-            charSprite.style.display = "";
+						let url;
+						assetdb.getAsset(`characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.silent.toLowerCase())}.gif`).then(blob => {
+							url = URL.createObjectURL(blob);
+						});
+						charSprite.src = url;
+						URL.revokeObjectURL(url);
+						charSprite.style.display = "";
 						clearTimeout(this.updater);
 					}
 				}
