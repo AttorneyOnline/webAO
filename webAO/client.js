@@ -552,12 +552,13 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleMC(args) {
-		const [_packet, track, charID] = args;
+		const track = args[1];
+		const charID = Number(args[2]);
 		const music = viewport.music;
 		music.pause();
 		music.src = MUSIC_HOST + track.toLowerCase();
 		music.play();
-		if (Number(args[2]) >= 0) {
+		if (charID >= 0) {
 			const musicname = this.chars[charID].name;
 			appendICLog(`${musicname} changed music to ${track}`);
 		} else {
