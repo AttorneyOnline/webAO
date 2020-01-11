@@ -29,7 +29,6 @@ let mode = queryDict.mode;
 
 // Unless there is an asset URL specified, use the wasabi one
 const AO_HOST = queryDict.asset || "http://s3.wasabisys.com/webao/base/";
-const MUSIC_HOST = AO_HOST + "sounds/music/";
 const CHAR_SELECT_WIDTH = 8;
 const UPDATE_INTERVAL = 60;
 
@@ -556,9 +555,17 @@ class Client extends EventEmitter {
 	handleMC(args) {
 		const [_packet, track, charID] = args;
 		const music = viewport.music;
+
 		music.pause();
-		music.src = MUSIC_HOST + track.toLowerCase();
+
+		assetdb.getAsset(`sounds/music/${encodeURI(track.toLowerCase())}`).then(blob => {
+			const url = URL.createObjectURL(blob);
+			music.src = url;
+			URL.revokeObjectURL(url);
+		});
+
 		music.play();
+
 		if (Number(args[2]) >= 0) {
 			const musicname = this.chars[charID].name;
 			appendICLog(`${musicname} changed music to ${track}`);
@@ -1244,7 +1251,13 @@ class Viewport {
 			nameBox.style.display = "none";
 			chatBox.style.display = "none";
 			shoutSprite.src = client.resources[shout]["src"];
-			this.shoutaudio.src=`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
+			
+			assetdb.getAsset(`characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`).then(blob => {
+				const url = URL.createObjectURL(blob);
+				this.shoutaudio.src = url;
+				URL.revokeObjectURL(url);
+			});
+			
 			this.shoutaudio.play();
 			this.shoutTimer = 850;
 		} else {
