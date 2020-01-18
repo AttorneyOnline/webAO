@@ -1088,6 +1088,7 @@ class Client extends EventEmitter {
 		me.side = ini.options.side;
 		updateActionCommands(me.side);
 		for (let i = 1; i <= ini.emotions.number; i++) {
+			try {
 			const emoteinfo = ini.emotions[i].split("#");
 			const esfx = ini.soundn[i] || "0";
 			const esfxd = Number(ini.soundt[i] || 0);
@@ -1108,6 +1109,9 @@ class Client extends EventEmitter {
 					alt="${emotes[i].desc}"
 					class="emote_button"
 					onclick="pickEmotion(${i})">`;
+			} catch(e) {
+				console.error("missing emote "+i);
+			}
 		}
 		pickEmotion(1);
 	}
