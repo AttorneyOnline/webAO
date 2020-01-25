@@ -116,24 +116,24 @@ class Client extends EventEmitter {
 
 		this.resources = {
 			"holdit": {
-				"src": "misc/holdit.gif",
+				"src": AO_HOST + "misc/holdit.gif",
 				"duration": 720
 			},
 			"objection": {
-				"src": "misc/objection.gif",
+				"src": AO_HOST + "misc/objection.gif",
 				"duration": 720
 			},
 			"takethat": {
-				"src": "misc/takethat.gif",
+				"src": AO_HOST + "misc/takethat.gif",
 				"duration": 840
 			},
 			"witnesstestimony": {
-				"src": "misc/witnesstestimony.gif",
+				"src": AO_HOST + "misc/witnesstestimony.gif",
 				"duration": 1560,
 				"sfx": AO_HOST + "sounds/general/sfx-testimony.wav"
 			},
 			"crossexamination": {
-				"src": "misc/crossexamination.gif",
+				"src": AO_HOST + "misc/crossexamination.gif",
 				"duration": 1600,
 				"sfx": AO_HOST + "sounds/general/sfx-testimony2.wav"
 			}
@@ -1478,7 +1478,7 @@ class Viewport {
 
 			// Pre-animation stuff
 			if (this.chatmsg.preanimdelay > 0) {
-				shoutSprite.src = "misc/placeholder.gif";
+				shoutSprite.src = AO_HOST + "misc/placeholder.gif";
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
 				charSprite.src = `${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`;
@@ -1538,7 +1538,7 @@ class Viewport {
 				this.chatmsg.startspeaking = false;
 
 				if (this.chatmsg.preanimdelay === 0) {
-					shoutSprite.src = "misc/placeholder.gif";
+					shoutSprite.src = AO_HOST + "misc/placeholder.gif";
 					changeBackground(this.chatmsg.side);
 				}
 
@@ -1824,7 +1824,7 @@ window.changeCharacter = changeCharacter;
  */
 export function charError(image) {
 	console.warn(image.src+" is missing from webAO");
-	image.src = "misc/placeholder.gif";
+	image.src = AO_HOST + "misc/placeholder.gif";
 	return true;
 }
 window.charError = charError;
@@ -2166,7 +2166,7 @@ export function cancelEvidence() {
 	document.getElementById("evi_filename").value = "";
 	document.getElementById("evi_name").value = "";
 	document.getElementById("evi_desc").value = "";
-	document.getElementById("evi_preview").src = "misc/empty.png"; //Clear icon
+	document.getElementById("evi_preview").src = AO_HOST + "misc/empty.png"; //Clear icon
 
 	// Update button
 	document.getElementById("evi_add").className = "client_button hover_button";
