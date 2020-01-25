@@ -130,12 +130,12 @@ class Client extends EventEmitter {
 			"witnesstestimony": {
 				"src": "misc/witnesstestimony.gif",
 				"duration": 1560,
-				"sfx": "sounds/general/sfx-testimony.wav"
+				"sfx": AO_HOST + "sounds/general/sfx-testimony.wav"
 			},
 			"crossexamination": {
 				"src": "misc/crossexamination.gif",
 				"duration": 1600,
-				"sfx": "sounds/general/sfx-testimony2.wav"
+				"sfx": AO_HOST + "sounds/general/sfx-testimony2.wav"
 			}
 		};
 
