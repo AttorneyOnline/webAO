@@ -547,7 +547,6 @@ img {
 
 .menu_icon {
 	cursor: pointer;
-	line-height: 15px;
 	display: inline-table;
 	margin: 10px 15px;
 	opacity: 1;
@@ -561,12 +560,8 @@ img {
 	color: #FFD081;
 }
 
-.material-icons.em-3 {
+.em-3 {
 	font-size: 3em;
-}
-
-.material-icons.em-1-5 {
-	font-size: 1.5em;
 }
 
 .area-button {
