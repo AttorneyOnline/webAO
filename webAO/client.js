@@ -2323,6 +2323,22 @@ export function initCE() {
 window.initCE = initCE;
 
 /**
+ * Declare the defendant not guilty
+ */
+export function notguilty() {
+	client.sendRT("judgeruling#0");
+}
+window.notguilty = notguilty;
+
+/**
+ * Declare the defendant not guilty
+ */
+export function guilty() {
+	client.sendRT("judgeruling#1");
+}
+window.guilty = guilty;
+
+/**
  * Increment defense health point.
  */
 export function addHPD() {
