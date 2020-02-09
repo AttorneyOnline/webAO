@@ -79,33 +79,31 @@
 			<legend>Actions</legend>
 			<!-- Judge Commands -->
 			<span id="judge_action" style="display:none">
-				<span id="menu_wt" onclick="initWT()" class="menu_icon">
-					<i class="material-icons em-3">record_voice_over</i>
-					<div>Witness
-						<br>Testimony</div>
-				</span>
-				<span id="menu_ce" onclick="initCE()" class="menu_icon">
-					<i class="material-icons em-3">question_answer</i>
-					<div>Cross
-						<br>Examination</div>
-				</span>
+				<img id="menu_wt" onclick="initWT()" class="menu_icon" src="http://s3.wasabisys.com/webao/base/themes/default/witnesstestimony.png">
+
+				<img id="menu_ce" onclick="initCE()" class="menu_icon" src="http://s3.wasabisys.com/webao/base/themes/default/crossexamination.png">
+
+				<img id="menu_nguilty" onclick="notguilty()" class="menu_icon" src="http://s3.wasabisys.com/webao/base/themes/default/notguilty.png">
+
+				<img id="menu_guilty" onclick="guilty()" class="menu_icon" src="http://s3.wasabisys.com/webao/base/themes/default/guilty.png">
+
 				<br>
 				<span style="display:inline-block; vertical-align: middle;">
 					<span id="menu_rhpd" onclick="redHPD()" class="menu_icon">
-						<i class="material-icons em1-5">remove_circle</i>
+						⊟
 					</span>					
 					<span style="font-size: 1.25em">Defense</span>
 					<span id="menu_ahpd" onclick="addHPD()" class="menu_icon">
-						<i class="material-icons em1-5">add_circle</i>
+						⊞
 					</span>
 				</span>
 				<span style="display:inline-block; vertical-align: middle;">
 					<span id="menu_ahpp" onclick="addHPP()" class="menu_icon">
-						<i class="material-icons em-1-5">add_circle</i>
+						⊞
 					</span>
 					<span style="font-size: 1.25em">Prosecution</span>
 					<span id="menu_rhpp" onclick="redHPP()" class="menu_icon">
-						<i class="material-icons em-1-5">remove_circle</i>
+						⊟
 					</span>
 				</span>
 			</span>

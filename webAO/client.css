@@ -527,6 +527,7 @@ img {
 
 .menu_icon {
 	cursor: pointer;
+	font-size: 2em;
 	line-height: 15px;
 	display: inline-table;
 	margin: 10px 15px;
