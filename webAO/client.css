@@ -212,6 +212,7 @@ img {
 }
 
 #client_shout {
+	display: block;
 	position: absolute;
 	height: 100%;
 	width: 100%;

@@ -28,6 +28,7 @@ let mode = queryDict.mode;
 
 // Unless there is an asset URL specified, use the wasabi one
 const AO_HOST = queryDict.asset || "http://s3.wasabisys.com/webao/base/";
+const THEME = queryDict.theme || "default";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
 const CHAR_SELECT_WIDTH = 8;
 const UPDATE_INTERVAL = 60;
@@ -116,24 +117,24 @@ class Client extends EventEmitter {
 
 		this.resources = {
 			"holdit": {
-				"src": AO_HOST + "misc/holdit.gif",
+				"src": AO_HOST + "themes/" + THEME + "/holdit.gif",
 				"duration": 720
 			},
 			"objection": {
-				"src": AO_HOST + "misc/objection.gif",
+				"src": AO_HOST + "themes/" + THEME + "/objection.gif",
 				"duration": 720
 			},
 			"takethat": {
-				"src": AO_HOST + "misc/takethat.gif",
+				"src": AO_HOST + "themes/" + THEME + "/takethat.gif",
 				"duration": 840
 			},
 			"witnesstestimony": {
-				"src": AO_HOST + "misc/witnesstestimony.gif",
+				"src": AO_HOST + "themes/" + THEME + "/witnesstestimony.gif",
 				"duration": 1560,
 				"sfx": AO_HOST + "sounds/general/sfx-testimony.wav"
 			},
 			"crossexamination": {
-				"src": AO_HOST + "misc/crossexamination.gif",
+				"src": AO_HOST + "themes/" + THEME + "/crossexamination.gif",
 				"duration": 1600,
 				"sfx": AO_HOST + "sounds/general/sfx-testimony2.wav"
 			}
@@ -1247,6 +1248,7 @@ class Viewport {
 			nameBox.style.display = "none";
 			chatBox.style.display = "none";
 			shoutSprite.src = client.resources[shout]["src"];
+			shoutSprite.style.display = "block";
 			this.shoutaudio.src=`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
 			this.shoutaudio.play();
 			this.shoutTimer = 850;
@@ -1478,7 +1480,7 @@ class Viewport {
 
 			// Pre-animation stuff
 			if (this.chatmsg.preanimdelay > 0) {
-				shoutSprite.src = AO_HOST + "misc/placeholder.gif";
+				shoutSprite.style.display = "none";
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
 				charSprite.src = `${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`;
@@ -1538,7 +1540,7 @@ class Viewport {
 				this.chatmsg.startspeaking = false;
 
 				if (this.chatmsg.preanimdelay === 0) {
-					shoutSprite.src = AO_HOST + "misc/placeholder.gif";
+					shoutSprite.style.display = "none";
 					changeBackground(this.chatmsg.side);
 				}
 
