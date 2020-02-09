@@ -452,6 +452,26 @@ img {
   	transition-property: width;
 }
 
+.judge_button {
+	display: inline-block;
+	min-width: 85px;
+	min-height: 42px;
+	margin: 5px 1px;
+	padding: 2px;
+	cursor: pointer;
+	text-align: center;
+	font-weight: bold;
+	font-family: sans-serif;
+	text-shadow: -2px 0 #fff, 0 2px #fff, 2px 0 #fff, 0 -2px #fff;
+	background-color: #c1c1c1;
+	border-radius: 5px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #919191;
+	box-shadow: 1px 1px white inset;
+	vertical-align: middle;
+}
+
 .client_button {
 	margin: 1px;
 	padding: 2px 15px;
@@ -463,8 +483,8 @@ img {
 	border-radius: 3px;
 	border-style: solid;
 	border-width: 1px;
-	border-color: #fffbf1;
-	box-shadow: 1px inset;
+	border-color: #fff;
+	box-shadow: 1px 1px inset;
 }
 
 .client_button.hover_button.inactive {
@@ -527,7 +547,6 @@ img {
 
 .menu_icon {
 	cursor: pointer;
-	font-size: 2em;
 	line-height: 15px;
 	display: inline-table;
 	margin: 10px 15px;

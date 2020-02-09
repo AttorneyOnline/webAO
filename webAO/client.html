@@ -79,30 +79,30 @@
 			<legend>Actions</legend>
 			<!-- Judge Commands -->
 			<span id="judge_action" style="display:none">
-				<img id="menu_wt" onclick="initWT()" class="menu_icon" src="http://s3.wasabisys.com/webao/base/themes/default/witnesstestimony.png">
+				<span id="menu_wt" onclick="initWT()" class="judge_button" style="color: blue"><i>Witness<br>Testimony</i></span>
 
-				<img id="menu_ce" onclick="initCE()" class="menu_icon" src="http://s3.wasabisys.com/webao/base/themes/default/crossexamination.png">
+				<span id="menu_ce" onclick="initCE()" class="judge_button" style="color: red"><i>Cross<br>Examination</i></span>
 
-				<img id="menu_nguilty" onclick="notguilty()" class="menu_icon" src="http://s3.wasabisys.com/webao/base/themes/default/notguilty.png">
+				<span id="menu_nguilty" onclick="notguilty()" class="judge_button" style="color: white; font-family: serif; text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; font-size: 1.5em; line-height: 0.75;">Not<br>Guilty</span>
 
-				<img id="menu_guilty" onclick="guilty()" class="menu_icon" src="http://s3.wasabisys.com/webao/base/themes/default/guilty.png">
+				<span id="menu_guilty" onclick="guilty()" class="judge_button" style="color: black; font-family: serif; font-size: 1.5em;">Guilty</span>
 
 				<br>
 				<span style="display:inline-block; vertical-align: middle;">
-					<span id="menu_rhpd" onclick="redHPD()" class="menu_icon">
+					<span id="menu_rhpd" onclick="redHPD()" class="menu_icon" style="font-size: 2em">
 						⊟
 					</span>					
 					<span style="font-size: 1.25em">Defense</span>
-					<span id="menu_ahpd" onclick="addHPD()" class="menu_icon">
+					<span id="menu_ahpd" onclick="addHPD()" class="menu_icon" style="font-size: 2em">
 						⊞
 					</span>
 				</span>
 				<span style="display:inline-block; vertical-align: middle;">
-					<span id="menu_ahpp" onclick="addHPP()" class="menu_icon">
+					<span id="menu_ahpp" onclick="addHPP()" class="menu_icon" style="font-size: 2em">
 						⊞
 					</span>
 					<span style="font-size: 1.25em">Prosecution</span>
-					<span id="menu_rhpp" onclick="redHPP()" class="menu_icon">
+					<span id="menu_rhpp" onclick="redHPP()" class="menu_icon" style="font-size: 2em">
 						⊟
 					</span>
 				</span>
