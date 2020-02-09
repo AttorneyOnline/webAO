@@ -137,6 +137,14 @@ class Client extends EventEmitter {
 				"src": AO_HOST + "themes/" + THEME + "/crossexamination.gif",
 				"duration": 1600,
 				"sfx": AO_HOST + "sounds/general/sfx-testimony2.wav"
+			},
+			"notguilty": {
+				"src": AO_HOST + "themes/" + THEME + "/notguilty.gif",
+				"duration": 2440
+			},
+			"guilty": {
+				"src": AO_HOST + "themes/" + THEME + "/guilty.gif",
+				"duration": 2870
 			}
 		};
 
@@ -901,12 +909,20 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleRT(args) {
-		if (args[1] === "testimony1") {
-			//Witness Testimony
-			this.testimonyID = 1;
-		} else {
-			//Cross Examination
-			this.testimonyID = 2;
+		const judgeid = Number(args[2]);
+		switch(args[1]) {
+			case "testimony1":
+				this.testimonyID = 1;
+				break;
+			case "testimony2":
+				//Cross Examination
+				this.testimonyID = 2;
+				break;
+			case "judgeruling":
+				this.testimonyID = 3 + judgeid;
+				break;
+			default:
+				console.warn("Invalid testimony");
 		}
 		viewport.initTestimonyUpdater();
 	}
@@ -1292,7 +1308,9 @@ class Viewport {
 	initTestimonyUpdater() {
 		const testimonyFilenames = {
 			1: "witnesstestimony",
-			2: "crossexamination"
+			2: "crossexamination",
+			3: "notguilty",
+			4: "guilty"
 		};
 
 		const testimony = testimonyFilenames[client.testimonyID];
@@ -1358,7 +1376,9 @@ class Viewport {
 	updateTestimony() {
 		const testimonyFilenames = {
 			1: "witnesstestimony",
-			2: "crossexamination"
+			2: "crossexamination",
+			3: "notguilty",
+			4: "guilty"
 		};
 
 		// Update timer
