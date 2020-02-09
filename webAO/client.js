@@ -358,6 +358,8 @@ class Client extends EventEmitter {
 	 * Load game resources and stored settings.
 	 */
 	loadResources() {
+		document.getElementById("client_version").innerText = "version " + version;
+
 		// Read cookies and set the UI to its values
 		document.getElementById("OOC_name").value = getCookie("OOC_name");
 		if (document.getElementById("OOC_name").value==="") {
