@@ -44,38 +44,6 @@ const server_description = [];
 server_description[-1] = "This is your computer on port 50001";
 const online_counter = [];
 
-/**
- * read a cookie from storage
- * got this from w3schools
- * https://www.w3schools.com/js/js_cookies.asp
- * @param {String} cname The name of the cookie to return
- */
-function getCookie(cname) {
-	var name = cname + "=";
-	var decodedCookie = decodeURIComponent(document.cookie);
-	var ca = decodedCookie.split(';');
-	for (var i = 0; i < ca.length; i++) {
-		var c = ca[i];
-		while (c.charAt(0) === ' ') {
-			c = c.substring(1);
-		}
-		if (c.indexOf(name) === 0) {
-			return c.substring(name.length, c.length);
-		}
-	}
-	return "";
-}
-
-/**
- * set a cookie
- * the version from w3schools expects these to expire
- * @param {String} cname The name of the cookie to return
- * @param {String} value The value of that cookie option
- */
-function setCookie(cname,value) {
-	document.cookie = cname + "=" + value;
-}
-
 export function setServ(ID) {
 	console.log(server_description[ID]);
 	if (server_description[ID] !== undefined) {
@@ -140,8 +108,8 @@ function checkOnline(serverID, coIP) {
 	};
 
 	oserv.onerror = function(evt) {
-		onCOError(evt)
-	  };
+		onCOError(evt);
+	};
 
 }
 
