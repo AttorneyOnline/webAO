@@ -872,11 +872,11 @@ class Client extends EventEmitter {
 	 */
 	handleBN(args) {
 		viewport.bgname = safe_tags(args[1]);
-		const bg_index = getIndexFromSelect("bg_select", safe_tags(args[1]));
+		const bg_index = getIndexFromSelect("bg_select", viewport.bgname);
 		document.getElementById("bg_select").selectedIndex = bg_index;
 		updateBackgroundPreview();
 		if (bg_index === 0) {
-			document.getElementById("bg_filename").value = args[1];
+			document.getElementById("bg_filename").value = viewport.bgname;
 		}
 		document.getElementById("bg_preview").src = AO_HOST + "background/" + encodeURI(args[1].toLowerCase()) + "/defenseempty.png";
 		if (this.charID === -1) {
