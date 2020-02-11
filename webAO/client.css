@@ -473,18 +473,16 @@ img {
 }
 
 .client_button {
+	min-width: 6em;
 	margin: 1px;
-	padding: 2px 15px;
+	padding: 6px 2px;
+	clip-path: polygon(75% 0, 100% 50%, 100% 100%, 0 100%, 0 50%, 25% 0);
 	cursor: pointer;
 	text-align: center;
-	font-weight: bold;
 	color: white;
 	background-color: #7b2900;
-	border-radius: 3px;
-	border-style: solid;
-	border-width: 1px;
-	border-color: #fff;
-	box-shadow: 1px 1px inset;
+	text-shadow: 0 0 4px #000;
+	border: 1px solid #000;
 }
 
 .client_button.hover_button.inactive {
