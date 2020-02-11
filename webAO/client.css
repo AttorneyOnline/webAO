@@ -228,13 +228,23 @@ img {
 	left: 0;
 }
 
+
+#client_chatcontainer {
+	position: absolute;
+	top: 70%;
+	height: 30%;
+	width: 98%;
+	width: calc(100% - 4px);
+}
+
 #client_name {
 	display: none;
 	padding: 0px 6px;
-	height: 7%;
+	height: 20%;
 	border: 1px solid rgba(255, 255, 255, 0.7);
 	background: rgba(73, 0, 254, 0.5);
-	top: 63%;
+	top: 0;
+	left: 0;
 	border-radius: 3px;
 	position: absolute;
 }
@@ -242,13 +252,12 @@ img {
 #client_chat {
 	font-size: 1em;
 	display: none;
-	width: 98%;
-	width: calc(100% - 4px);
+	width: 100%;
 	margin: auto;
-	height: 30%;
+	height: 90%;
 	border: 2px solid rgba(255, 255, 255, 0.7);
 	background-color: rgba(0, 0, 0, 0.5);
-	top: 70%;
+	top: 20%;
 	border-radius: 4px;
 	position: absolute;
 	word-break: keep-all;
