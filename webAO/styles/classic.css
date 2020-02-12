@@ -40,7 +40,7 @@ img {
 	width: 98%;
 	width: calc(100% - 4px);
 	margin: auto;
-	height: 32.3%;
+	height: 31.25%;
 	border: rgb(255, 255, 255, 0.5) solid 2px;
 	background-color: rgb(0, 0, 0, 0.5);
 	top: 66.5%;
@@ -48,7 +48,8 @@ img {
 	position: absolute;
 	word-break: keep-all;
 	overflow-wrap: break-word;
-	text-align: left;
+	text-align: justify;
+  	text-justify: inter-word;
 	overflow: hidden;
 	scroll-behavior: smooth;
 }
