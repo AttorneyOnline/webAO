@@ -69,7 +69,7 @@ img {
 
 @keyframes idling {
 	0%   {right: -4px;}
-  	50%  {right: -6px;}
+  	50%  {right: -8px;}
   	100% {right: -4px;}
   }
 
