@@ -45,3 +45,7 @@ img {
 	margin: 4px;
 	color: white;
 }
+
+#client_chatwaiting {
+	display: none;
+}
