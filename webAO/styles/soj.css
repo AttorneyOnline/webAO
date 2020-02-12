@@ -43,3 +43,12 @@ body {
 	padding: 5px 10px;
 	color: white;
 }
+
+#evi_name {
+	background-color: #242e25;
+}
+
+#evi_desc {
+	flex: 1 auto;
+	background: repeating-linear-gradient(#83b893, #83b893 14px, #222 14px, #222 15px);
+}
