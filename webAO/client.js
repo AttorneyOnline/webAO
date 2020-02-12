@@ -1567,10 +1567,10 @@ class Viewport {
 				chatContainerBox.style.display = "block";
 
 				nameBox.style.display = "block";
-				nameBox.style.fontSize = (nameBox.offsetHeight * 0.75) + "px";
+				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
 
 				chatBox.style.display = "block";
-				chatBox.style.fontSize = (chatBox.offsetHeight * 0.3) + "px";				
+				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";				
 
 				if (this.chatmsg.color === 6)
 					chatBoxInner.className = "rainbow-text";
