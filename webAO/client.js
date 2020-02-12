@@ -1246,6 +1246,7 @@ class Viewport {
 		const nameBox = document.getElementById("client_name");
 		const chatBox = document.getElementById("client_chat");
 		const chatContainerBox = document.getElementById("client_chatcontainer");
+		const waitingBox = document.getElementById("client_chatwaiting");
 		const eviBox = document.getElementById("client_evi");
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
@@ -1305,6 +1306,7 @@ class Viewport {
 		//Set the nameplate after it (might) have been hidden
 		nameBox.innerText = this.chatmsg.nameplate;
 		//Clear out the last message
+		waitingBox.innerText = "";
 		chatBoxInner.innerText = this.textnow;
 	}
 
@@ -1469,6 +1471,7 @@ class Viewport {
 		const nameBox = document.getElementById("client_name");
 		const chatBox = document.getElementById("client_chat");
 		const chatContainerBox = document.getElementById("client_chatcontainer");
+		const waitingBox = document.getElementById("client_chatwaiting");
 		const charSprite = document.getElementById("client_char");
 		const pairSprite = document.getElementById("client_pair_char");
 		const eviBox = document.getElementById("client_evi");
@@ -1602,6 +1605,7 @@ class Viewport {
 				if (this.textnow === this.chatmsg.content) {
 					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent.toLowerCase()) + ".gif";
 					charSprite.style.display = "";
+					waitingBox.innerHTML = "&#9654;";
 					this._animating = false;
 					clearTimeout(this.updater);
 				}
@@ -1620,7 +1624,8 @@ class Viewport {
 						this.textTimer = 0;
 						this._animating = false;
 						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent.toLowerCase()) + ".gif";
-            charSprite.style.display = "";
+						charSprite.style.display = "";
+						waitingBox.innerHTML = "&#9654;";
 						clearTimeout(this.updater);
 					}
 				}

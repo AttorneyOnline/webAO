@@ -14,6 +14,8 @@ img {
 	display: none;
 	padding: 0px 6px;
 	height: 7%;
+	min-width: 3em;
+	text-justify: distribute;
 	border: 1px solid rgba(255, 255, 255, 0.7);
 	background: rgba(73, 0, 254, 0.5);
 	top: 63%;
@@ -25,10 +27,10 @@ img {
 	font-size: 1em;
 	display: none;
 	width: 98%;
-	width: calc(100% - 4px);
+	width: calc(100% - 2px);
 	margin: auto;
 	height: 30%;
-	border: 2px solid rgba(255, 255, 255, 0.7);
+	border: 1px solid rgba(255, 255, 255, 0.7);
 	background-color: rgba(0, 0, 0, 0.5);
 	top: 70%;
 	border-radius: 4px;
@@ -45,6 +47,21 @@ img {
 	margin: 4px;
 	color: white;
 }
+
+#client_chatwaiting {
+	display: block;
+	right: 0px;
+	bottom: 0.25em;
+	width: 1em;
+	position: absolute;
+	animation: idling 0.4s linear infinite;
+}
+
+@keyframes idling {
+	0%   {right: -2px;}
+  	50%  {right: 2px;}
+  	100% {right: -2px;}
+  }
 
 #evi_name {
 	background-color: #393939;

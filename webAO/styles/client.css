@@ -171,7 +171,6 @@
 }
 
 #client_bench {
-	display: none;
 	position: absolute;
 	height: auto;
 	width: 100%;
