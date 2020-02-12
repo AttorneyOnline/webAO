@@ -13,12 +13,18 @@ img {
 #client_name {
 	display: none;
 	padding: 0px 6px;
-	height: 7%;
-	min-width: 3em;
+	height: 5%;
+	min-width: 3.25em;
 	text-justify: distribute;
-	border: 1px solid rgba(255, 255, 255, 0.7);
-	background: rgba(73, 0, 254, 0.5);
-	top: 61%;
+	letter-spacing: 1px;
+	outline: 1px solid rgba(255, 255, 255, 0.5);
+	border: 1px solid rgba(33, 33, 33, 0.5);
+	background: rgba(56, 56, 163, 0.5);
+	box-shadow: 1px 1px rgba(0, 56, 163, 0.5) inset;
+	left: 1px;
+	top: 60.5%;
+	top: calc(60.5% + 1px);
+	-moz-outline-radius: 3px;
 	border-radius: 3px;
 	position: absolute;
 	z-index: 1;
@@ -30,10 +36,10 @@ img {
 	width: 98%;
 	width: calc(100% - 2px);
 	margin: auto;
-	height: 32%;
-	border: 1px solid rgba(255, 255, 255, 0.7);
+	height: 33%;
+	border: 2px solid rgba(255, 255, 255, 0.5);
 	background-color: rgba(0, 0, 0, 0.5);
-	top: 68%;
+	top: 66.5%;
 	border-radius: 4px;
 	position: absolute;
 	word-break: keep-all;
@@ -45,23 +51,26 @@ img {
 }
 
 #client_chat p {
-	margin: 4px;
+	padding: 3px 8px;
 	color: white;
+	margin: 1px;
+	letter-spacing: 1px;
+	line-height: 90%;
 }
 
 #client_chatwaiting {
 	display: block;
-	right: 0px;
-	bottom: 0.25em;
+	right: -6px;
+	bottom: 0.4em;
 	width: 1em;
 	position: absolute;
 	animation: idling 0.4s linear infinite;
 }
 
 @keyframes idling {
-	0%   {right: -2px;}
-  	50%  {right: 2px;}
-  	100% {right: -2px;}
+	0%   {right: -4px;}
+  	50%  {right: -6px;}
+  	100% {right: -4px;}
   }
 
 #evi_name {

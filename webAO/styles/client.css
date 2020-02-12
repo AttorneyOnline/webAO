@@ -193,7 +193,7 @@
 	background-size: contain;
 	height: 0%;
 	width: auto;
-	top: 1.5em;
+	top: 1em;
 	transition: 0.25s linear;  
 	transition-property: height, opacity;
 }

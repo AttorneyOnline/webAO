@@ -1550,17 +1550,16 @@ class Viewport {
 					eviBox.src = safe_tags(client.evidences[this.chatmsg.evidence - 1].icon);
 
 					eviBox.style.width = "auto";
-					eviBox.style.height = "30%";
+					eviBox.style.height = "36.5%";
 					eviBox.style.opacity = 1;
 
 					if (this.chatmsg.side === "def") {
 						// Only def show evidence on right
-						eviBox.style.right = "1.5em";
+						eviBox.style.right = "1em";
 						eviBox.style.left = "initial";
 						} else {
 						eviBox.style.right = "initial";
-						eviBox.style.left = "1.5em";
-						
+						eviBox.style.left = "1em";						
 					}
 				}
 
