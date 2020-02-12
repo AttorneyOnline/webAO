@@ -2480,9 +2480,9 @@ window.togglePresent = togglePresent;
  */
 export function toggleMenu(menu) {
 	if (menu !== selectedMenu) {
-		document.getElementById("menu_" + menu).className = "menu_icon active";
+		document.getElementById("menu_" + menu).className = "menu_button active";
 		document.getElementById("content_" + menu).className = "menu_content active";
-		document.getElementById("menu_" + selectedMenu).className = "menu_icon";
+		document.getElementById("menu_" + selectedMenu).className = "menu_button";
 		document.getElementById("content_" + selectedMenu).className = "menu_content";
 		selectedMenu = menu;
 	}

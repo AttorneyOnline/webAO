@@ -94,3 +94,16 @@ img {
 .menu_content {
 	background-color: #847342;
 }
+
+.client_button {
+	min-width: 6em;
+	margin: 1px;
+	padding: 6px 2px;
+	clip-path: polygon(75% 0, 100% 50%, 100% 100%, 0 100%, 0 50%, 25% 0);
+	cursor: pointer;
+	text-align: center;
+	color: white;
+	background-color: #7b2900;
+	text-shadow: 0 0 4px #000;
+	border: 1px solid #000;
+}

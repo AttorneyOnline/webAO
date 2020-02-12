@@ -403,6 +403,10 @@
   	transition-property: width;
 }
 
+.healthchange_button {
+	font-size: 1.5em;
+}
+
 .judge_button {
 	display: inline-block;
 	min-width: 85px;
@@ -421,19 +425,6 @@
 	border-color: #919191;
 	box-shadow: 1px 1px white inset;
 	vertical-align: middle;
-}
-
-.client_button {
-	min-width: 6em;
-	margin: 1px;
-	padding: 6px 2px;
-	clip-path: polygon(75% 0, 100% 50%, 100% 100%, 0 100%, 0 50%, 25% 0);
-	cursor: pointer;
-	text-align: center;
-	color: white;
-	background-color: #7b2900;
-	text-shadow: 0 0 4px #000;
-	border: 1px solid #000;
 }
 
 .client_button.hover_button.inactive {
@@ -494,23 +485,23 @@
 	display: block;
 }
 
-.menu_icon {
+.menu_button {
 	cursor: pointer;
 	display: inline-table;
 	margin: 10px 15px;
 	opacity: 1;
 }
 
-.menu_icon.active {
+.menu_button.active {
 	opacity: 0.25;
 }
 
-.menu_icon:hover {
+.menu_button:hover {
 	color: #FFD081;
 }
 
-.em-3 {
-	font-size: 3em;
+.menu_icon {
+	font-size: 2em;
 }
 
 .area-button {
