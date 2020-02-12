@@ -1838,6 +1838,16 @@ export function changeBlipVolume() {
 window.changeBlipVolume = changeBlipVolume;
 
 /**
+ * Triggered by the theme selector.
+ */
+export function reloadTheme() {
+	viewport.theme = document.getElementById("client_themeselect").value;
+	setCookie("theme",viewport.theme);
+	document.getElementById("client_theme").href = viewport.theme + ".css";
+}
+window.reloadTheme = reloadTheme;
+
+/**
  * Triggered when a character icon is clicked in the character selection menu.
  * @param {MouseEvent} event
  */
