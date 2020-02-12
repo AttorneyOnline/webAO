@@ -7,7 +7,7 @@ body {
 	top: 73%;
 	height: 27%;
 	width: 100%;
-	background-image: url("images/chatbox.svg");
+	background-image: url("/images/chatbox.svg");
 	background-size: cover;
  	background-repeat: no-repeat;
 }
