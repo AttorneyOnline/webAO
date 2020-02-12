@@ -18,9 +18,10 @@ img {
 	text-justify: distribute;
 	border: 1px solid rgba(255, 255, 255, 0.7);
 	background: rgba(73, 0, 254, 0.5);
-	top: 63%;
+	top: 61%;
 	border-radius: 3px;
 	position: absolute;
+	z-index: 1;
 }
 
 #client_chat {
@@ -29,10 +30,10 @@ img {
 	width: 98%;
 	width: calc(100% - 2px);
 	margin: auto;
-	height: 30%;
+	height: 32%;
 	border: 1px solid rgba(255, 255, 255, 0.7);
 	background-color: rgba(0, 0, 0, 0.5);
-	top: 70%;
+	top: 68%;
 	border-radius: 4px;
 	position: absolute;
 	word-break: keep-all;
