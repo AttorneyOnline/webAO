@@ -1,5 +1,5 @@
 body {
-	font-family: "Ace Attorney", "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "Osaka", "MS Gothic", "ＭＳ Ｐゴシック", "Tahoma", Sans;
+	font-family: sans-serif;
 }
 
 img {
@@ -231,20 +231,19 @@ img {
 
 #client_chatcontainer {
 	position: absolute;
-	top: 70%;
-	height: 30%;
-	width: 98%;
-	width: calc(100% - 4px);
+	top: 73%;
+	height: 27%;
+	width: 100%;
+	background-image: url("images/chatbox.svg");
+	background-size: cover;
+ 	background-repeat: no-repeat;
 }
 
 #client_name {
 	display: none;
-	padding: 0px 6px;
+	top: 5%;
+	padding: 0px 10px;
 	height: 20%;
-	border: 1px solid rgba(255, 255, 255, 0.7);
-	background: rgba(73, 0, 254, 0.5);
-	top: 0;
-	left: 0;
 	border-radius: 3px;
 	position: absolute;
 }
@@ -255,8 +254,6 @@ img {
 	width: 100%;
 	margin: auto;
 	height: 90%;
-	border: 2px solid rgba(255, 255, 255, 0.7);
-	background-color: rgba(0, 0, 0, 0.5);
 	top: 20%;
 	border-radius: 4px;
 	position: absolute;
@@ -270,6 +267,7 @@ img {
 
 #client_chat p {
 	margin: 4px;
+	padding: 5px 10px;
 	color: white;
 }
 

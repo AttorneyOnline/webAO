@@ -1548,10 +1548,10 @@ class Viewport {
 				}
 
 				nameBox.style.display = "block";
-				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
+				nameBox.style.fontSize = (nameBox.offsetHeight * 0.75) + "px";
 
 				chatBox.style.display = "block";
-				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
+				chatBox.style.fontSize = (chatBox.offsetHeight * 0.3) + "px";
 
 				if (this.chatmsg.color === 6)
 					chatBoxInner.className = "rainbow-text";
