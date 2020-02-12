@@ -254,7 +254,7 @@ img {
 	word-break: keep-all;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
-	text-align: start;
+	text-align: left;
 	overflow: hidden;
 	scroll-behavior: smooth;
 }
