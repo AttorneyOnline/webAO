@@ -366,6 +366,14 @@ class Client extends EventEmitter {
 			document.getElementById("OOC_name").value = "web"+this.playerID;
 		}
 
+		// Read cookies and set the UI to its values
+		var cookietheme = getCookie("theme");
+		if (cookietheme==="") {
+			cookietheme = "default";
+		}
+		document.querySelector('#client_themeselect [value="' + cookietheme + '"]').selected = true;
+		reloadTheme();
+
 		document.getElementById("client_mvolume").value = getCookie("musicVolume");
 		changeMusicVolume();
 		document.getElementById("client_svolume").value = getCookie("sfxVolume");
