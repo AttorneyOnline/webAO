@@ -542,7 +542,8 @@ class Client extends EventEmitter {
 				resetICParams();
 			}
 
-			viewport.say(chatmsg); // no await
+			if (client.chars[chatmsg.charid].muted === false)
+				viewport.say(chatmsg); // no await
 		}
 	}
 
@@ -638,7 +639,8 @@ class Client extends EventEmitter {
 			gender: safe_tags(cini.options.gender).toLowerCase(),
 			evidence: chargs[3],
 			icon: icon,
-			inifile: cini
+			inifile: cini,
+			muted: false
 		};
 		} else {
 			console.warn("missing charid "+charid);
@@ -1778,9 +1780,17 @@ window.musiclist_click = musiclist_click;
  * @param {MouseEvent} event
  */
 export function mutelist_click(_event) {
-	const select_character = document.getElementById("mute_select").value;
+	const mutelist = document.getElementById("mute_select");
+	const selected_character = mutelist.options[mutelist.selectedIndex];
 
-	// TODO: i don't feel like writing this rn
+	if(client.chars[selected_character.value].muted === false) {
+		client.chars[selected_character.value].muted = true;
+		selected_character.text = client.chars[selected_character.value].name + " (muted)";
+		console.info("muted "+client.chars[selected_character.value].name);
+	} else {
+		client.chars[selected_character.value].muted = false;
+		selected_character.text = client.chars[selected_character.value].name;
+	}
 }
 window.mutelist_click = mutelist_click;
 
