@@ -2,6 +2,15 @@ body {
 	font-family: "Ace Attorney", "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "Osaka", "MS Gothic", "ＭＳ Ｐゴシック", "Tahoma", Sans;
 }
 
+@font-face {font-family: "Ace Attorney";
+    src: url("http://db.onlinewebfonts.com/t/87d085871afb0367e9da0e9d1e3de089.eot"); /* IE9*/
+    src: url("http://db.onlinewebfonts.com/t/87d085871afb0367e9da0e9d1e3de089.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("http://db.onlinewebfonts.com/t/87d085871afb0367e9da0e9d1e3de089.woff2") format("woff2"), /* chrome firefox */
+    url("http://db.onlinewebfonts.com/t/87d085871afb0367e9da0e9d1e3de089.woff") format("woff"), /* chrome firefox */
+    url("http://db.onlinewebfonts.com/t/87d085871afb0367e9da0e9d1e3de089.ttf") format("truetype"), /* chrome firefox opera Safari, Android, iOS 4.2+*/
+    url("http://db.onlinewebfonts.com/t/87d085871afb0367e9da0e9d1e3de089.svg#Ace Attorney") format("svg"); /* iOS 4.1- */
+}
+
 img {
 	image-rendering: -moz-crisp-edges;
 	image-rendering: -o-crisp-edges;
