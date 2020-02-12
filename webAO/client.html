@@ -49,8 +49,7 @@
 				<img id="client_char" alt="Character" onerror="charError(this);">
 				<img id="client_bench">
 				<img id="client_fg" alt="Various overlay" src="misc/placeholder.gif" onerror="imgError(this);">
-				<img id="client_evi" src="" alt="Character Evidence"
-					onerror="imgError(this);">
+				<img id="client_evi" src="" alt="Character Evidence" onerror="imgError(this);">
 				<img id="client_shout" alt="Shout overlay" src="misc/placeholder.gif" onerror="imgError(this);">
 				<div id="client_chatcontainer">
 					<div id="client_name"></div>
@@ -101,19 +100,23 @@
 			<legend>Actions</legend>
 			<!-- Judge Commands -->
 			<span id="judge_action" style="display:none">
-				<span id="menu_wt" onclick="initWT()" class="judge_button" style="color: blue"><i>Witness<br>Testimony</i></span>
+				<span id="menu_wt" onclick="initWT()" class="judge_button"
+					style="color: blue"><i>Witness<br>Testimony</i></span>
 
-				<span id="menu_ce" onclick="initCE()" class="judge_button" style="color: red"><i>Cross<br>Examination</i></span>
+				<span id="menu_ce" onclick="initCE()" class="judge_button"
+					style="color: red"><i>Cross<br>Examination</i></span>
 
-				<span id="menu_nguilty" onclick="notguilty()" class="judge_button" style="color: white; font-family: serif; text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; font-size: 1.5em; line-height: 0.75;">Not<br>Guilty</span>
+				<span id="menu_nguilty" onclick="notguilty()" class="judge_button"
+					style="color: white; font-family: serif; text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; font-size: 1.5em; line-height: 0.75;">Not<br>Guilty</span>
 
-				<span id="menu_guilty" onclick="guilty()" class="judge_button" style="color: black; font-family: serif; font-size: 1.5em;">Guilty</span>
+				<span id="menu_guilty" onclick="guilty()" class="judge_button"
+					style="color: black; font-family: serif; font-size: 1.5em;">Guilty</span>
 
 				<br>
 				<span style="display:inline-block; vertical-align: middle;">
 					<span id="menu_rhpd" onclick="redHPD()" class="menu_icon" style="font-size: 2em">
 						⊟
-					</span>					
+					</span>
 					<span style="font-size: 1.25em">Defense</span>
 					<span id="menu_ahpd" onclick="addHPD()" class="menu_icon" style="font-size: 2em">
 						⊞
@@ -134,11 +137,6 @@
 				No judge actions available for this role.
 			</span>
 			<br>
-			<span id="muting" style="display: none">
-					<label for="mute_select">Mute a character:</label>
-					<select name="mute_select" id="mute_select" onchange="mutelist_click(event)"></select>
-			</span>
-			<br>
 			<span id="pairing" style="display: none">
 				<label for="pair_select">Pairing partner:</label>
 				<select name="pair_select" id="pair_select">
@@ -146,6 +144,11 @@
 				</select>
 				<label for="pair_offset">Pairing offset:</label>
 				<input type="range" name="pair_offset" id="pair_offset" min="-100" max="100" value="0">
+			</span>
+			<br>
+			<span id="muting" style="display: none">
+				<label for="mute_select">Mute a character:</label>
+				<select name="mute_select" id="mute_select" size="2" onchange="mutelist_click(event)"></select>
 			</span>
 		</fieldset>
 	</div>
@@ -227,19 +230,19 @@
 				<div style="display: block; text-align: center; padding-top: 20px;">
 					<button id="evi_add" alt="Add Evidence" class="client_button hover_button"
 						onclick="addEvidence()">Add</button>
-					<button id="evi_edit" alt="Edit Evidence"
-						class="client_button hover_button inactive" onclick="editEvidence()">Edit</button>
-					<button id="evi_cancel" alt="Cancel Evidence"
-						class="client_button hover_button inactive" onclick="cancelEvidence()">Cancel</button>
-					<button id="evi_del" alt="Remove Evidence"
-						class="client_button hover_button inactive" onclick="deleteEvidence()">Remove</button>
+					<button id="evi_edit" alt="Edit Evidence" class="client_button hover_button inactive"
+						onclick="editEvidence()">Edit</button>
+					<button id="evi_cancel" alt="Cancel Evidence" class="client_button hover_button inactive"
+						onclick="cancelEvidence()">Cancel</button>
+					<button id="evi_del" alt="Remove Evidence" class="client_button hover_button inactive"
+						onclick="deleteEvidence()">Remove</button>
 				</div>
 			</fieldset>
 			<br>
 			<div id="evidences"></div>
 			<br>
-			<button id="button_present" alt="Present" class="client_button"
-				onclick="togglePresent()" style="letter-spacing: 3px; width: 8em;"><i>Present</i></button>
+			<button id="button_present" alt="Present" class="client_button" onclick="togglePresent()"
+				style="letter-spacing: 3px; width: 8em;"><i>Present</i></button>
 		</span>
 
 		<!-- Settings section -->
@@ -281,8 +284,8 @@
 					onchange="changeBlipVolume()">
 			</div>
 			<br>
-			<button id="char_change" alt="Change" class="client_button hover_button"
-				onclick="changeCharacter()">Change Character</button>
+			<button id="char_change" alt="Change" class="client_button hover_button" onclick="changeCharacter()">Change
+				Character</button>
 			<button id="char_random" alt="Random" class="client_button hover_button"
 				onclick="randomCharacterOOC()">Random Character</button>
 			<br>
