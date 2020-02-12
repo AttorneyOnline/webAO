@@ -1,3 +1,15 @@
+body {
+	font-family: "Ace Attorney", "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "Osaka", "MS Gothic", "ＭＳ Ｐゴシック", "Tahoma", Sans;
+}
+
+img {
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -o-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: crisp-edges;
+	-ms-interpolation-mode: nearest-neighbor;
+}
+
 #client_name {
 	display: none;
 	padding: 0px 6px;
