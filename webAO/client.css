@@ -1,15 +1,3 @@
-body {
-	font-family: "Ace Attorney", "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "Osaka", "MS Gothic", "ＭＳ Ｐゴシック", "Tahoma", Sans;
-}
-
-img {
-	image-rendering: -moz-crisp-edges;
-	image-rendering: -o-crisp-edges;
-	image-rendering: -webkit-optimize-contrast;
-	image-rendering: crisp-edges;
-	-ms-interpolation-mode: nearest-neighbor;
-}
-
 #about-logo {
 	padding-top: 5px;
 	height: 30%;
@@ -226,42 +214,6 @@ img {
 	background-color: transparent;
 	top: 0;
 	left: 0;
-}
-
-#client_name {
-	display: none;
-	padding: 0px 6px;
-	height: 7%;
-	border: 1px solid rgba(255, 255, 255, 0.7);
-	background: rgba(73, 0, 254, 0.5);
-	top: 63%;
-	border-radius: 3px;
-	position: absolute;
-}
-
-#client_chat {
-	font-size: 1em;
-	display: none;
-	width: 98%;
-	width: calc(100% - 4px);
-	margin: auto;
-	height: 30%;
-	border: 2px solid rgba(255, 255, 255, 0.7);
-	background-color: rgba(0, 0, 0, 0.5);
-	top: 70%;
-	border-radius: 4px;
-	position: absolute;
-	word-break: keep-all;
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	text-align: left;
-	overflow: hidden;
-	scroll-behavior: smooth;
-}
-
-#client_chat p {
-	margin: 4px;
-	color: white;
 }
 
 .rainbow-text {

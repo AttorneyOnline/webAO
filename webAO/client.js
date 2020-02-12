@@ -1235,6 +1235,7 @@ class Viewport {
 
 		const nameBox = document.getElementById("client_name");
 		const chatBox = document.getElementById("client_chat");
+		const chatContainerBox = document.getElementById("client_chatcontainer");
 		const eviBox = document.getElementById("client_evi");
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
@@ -1265,6 +1266,7 @@ class Viewport {
 			// Hide message box
 			nameBox.style.display = "none";
 			chatBox.style.display = "none";
+			chatContainerBox.style.display = "none";
 			shoutSprite.src = client.resources[shout]["src"];
 			shoutSprite.style.display = "block";
 			this.shoutaudio.src=`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
@@ -1282,6 +1284,7 @@ class Viewport {
 			// Hide message box
 			nameBox.style.display = "none";
 			chatBox.style.display = "none";
+			chatContainerBox.style.display = "none";
 			const delay = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
 			chatmsg.preanimdelay = delay;
 			this.initUpdater(delay);
@@ -1455,6 +1458,7 @@ class Viewport {
 	tick() {
 		const nameBox = document.getElementById("client_name");
 		const chatBox = document.getElementById("client_chat");
+		const chatContainerBox = document.getElementById("client_chatcontainer");
 		const charSprite = document.getElementById("client_char");
 		const pairSprite = document.getElementById("client_pair_char");
 		const eviBox = document.getElementById("client_evi");
@@ -1547,11 +1551,13 @@ class Viewport {
 					}
 				}
 
+				chatContainerBox.style.display = "block";
+
 				nameBox.style.display = "block";
-				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
+				nameBox.style.fontSize = (nameBox.offsetHeight * 0.75) + "px";
 
 				chatBox.style.display = "block";
-				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
+				chatBox.style.fontSize = (chatBox.offsetHeight * 0.3) + "px";				
 
 				if (this.chatmsg.color === 6)
 					chatBoxInner.className = "rainbow-text";
@@ -1830,6 +1836,16 @@ export function changeBlipVolume() {
 	setCookie("blipVolume",document.getElementById("client_bvolume").value);
 }
 window.changeBlipVolume = changeBlipVolume;
+
+/**
+ * Triggered by the theme selector.
+ */
+export function reloadTheme() {
+	viewport.theme = document.getElementById("client_themeselect").value;
+	setCookie("theme",viewport.theme);
+	document.getElementById("client_theme").href = viewport.theme + ".css";
+}
+window.reloadTheme = reloadTheme;
 
 /**
  * Triggered when a character icon is clicked in the character selection menu.

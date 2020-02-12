@@ -6,7 +6,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="client.css?v=1.0.0" id="client_stylesheet">
-	<link rel="stylesheet" type="text/css" href="default.css?v=1.0.0" id="client_theme">
+	<link rel="stylesheet" type="text/css" href="classic.css?v=1.0.0" id="client_theme">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
 	<link type="text/css" rel="stylesheet"
@@ -287,10 +287,17 @@
 				onclick="randomCharacterOOC()">Random Character</button>
 			<br>
 			<br>
+			<label for="client_themeselect">Theme:</label>
+			<select id="client_themeselect" name="client_themeselect" onchange="reloadTheme()">
+				<option value="classic" selected>Classic</option>
+				<option value="soj">SoJ</option>
+			</select>
+			<br>
+			<br>
 			<span style="color:red">Only touch these settings if you know what you are doing.</span>
 			<br>
 			<br>
-			<label for="client_encoding"> Client side chat encoding:</label>
+			<label for="client_encoding">Client side chat encoding:</label>
 			<select id="client_encoding" name="client_encoding">
 				<option value="none" selected>None</option>
 				<option value="unicode">Unicode</option>
@@ -298,7 +305,7 @@
 			</select>
 			<br>
 			<br>
-			<label for="client_decoding"> Client side chat decoding:</label>
+			<label for="client_decoding">Client side chat decoding:</label>
 			<select id="client_decoding" name="client_decoding">
 				<option value="none">None</option>
 				<option value="unicode" selected>Unicode</option>
