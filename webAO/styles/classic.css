@@ -16,20 +16,19 @@ img {
 
 #client_name {
 	display: none;
-	padding: 0 6px;
-	height: 5%;
+	padding: 0 0.45em;
+	height: 5.2%;
 	min-width: 3.25em;
 	text-justify: distribute;
-	letter-spacing: 1px;
-	outline: 1px solid rgb(255, 255, 255, 0.5);
-	border: rgb(33, 33, 33, 0.5) solid 1px;
+	letter-spacing: 0.075em;
 	background: rgb(56, 56, 163, 0.5);
-	box-shadow: 1px 1px rgb(0, 56, 163, 0.5) inset;
-	left: 1px;
-	top: 60.93%;
-	border-radius: 3px;
-	-moz-outline-radius: 3px;
-	outline-radius: 3px;
+	box-shadow: 0.075em 0.075em rgb(0, 56, 163, 0.5) inset;
+	left: 0;
+	top: 60.4%;
+	border-color: rgb(255, 255, 255, 0.5);
+	border-style: ridge groove groove ridge;
+	border-width: 0.2em;
+	border-radius: 0.2em;
 	position: absolute;
 	z-index: 1;
 }
@@ -38,13 +37,15 @@ img {
 	font-size: 1em;
 	display: none;
 	width: 98.4375%;
-	width: calc(100% - 0.3em);
+	width: calc(100% - 0.275em);
 	margin: auto;
 	height: 31.25%;
-	border: rgb(255, 255, 255, 0.5) solid 0.15em;
-	background-color: rgb(0, 0, 0, 0.5);
-	top: 66.5%;
+	border-color: rgb(255, 255, 255, 0.5);
+	border-style: ridge groove groove ridge;
+	border-width: 0.15em;
 	border-radius: 0.3em;
+	background-color: rgb(0, 0, 0, 0.5);
+	top: 66.5%;	
 	position: absolute;
 	word-break: keep-all;
 	overflow-wrap: break-word;
