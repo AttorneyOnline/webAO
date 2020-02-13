@@ -1100,19 +1100,19 @@ class Client extends EventEmitter {
 
 	/**
 	 * Handles the server's assignment of a character for the player to use.
+	 * PV # playerID (unused) # CID # character ID
 	 * @param {Array} args packet arguments
 	 */
 	async handlePV(args) {
 		this.charID = Number(args[3]);
-
 		document.getElementById("client_charselect").style.display = "none";
 
 		const me = this.character;
 		this.selectedEmote = -1;
 		const emotes = this.emotes;
 		const emotesList = document.getElementById("client_emo");
-		emotesList.innerHTML = ""; // Clear emote box
 		emotesList.style.display = "";
+		emotesList.innerHTML = ""; // Clear emote box
 		const ini = me.inifile;
 		me.side = ini.options.side;
 		updateActionCommands(me.side);
@@ -1868,6 +1868,17 @@ export function reloadTheme() {
 	document.getElementById("client_theme").href = "styles/" + viewport.theme + ".css";
 }
 window.reloadTheme = reloadTheme;
+
+/**
+ * Triggered by the ini button.
+ */
+export async function iniedit() {
+	const ininame = document.getElementById("client_ininame").value;
+	const inicharID = client.charID;
+	await client.handleCharacterInfo(ininame.split("&"),inicharID);
+	client.handlePV(("PV#0#CID#" + inicharID).split("#"));
+}
+window.iniedit = iniedit;
 
 /**
  * Triggered when a character icon is clicked in the character selection menu.
