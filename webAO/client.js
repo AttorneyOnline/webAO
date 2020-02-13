@@ -1256,7 +1256,6 @@ class Viewport {
 		// Reset CSS animation
 		fg.style.animation = "";
 		gamewindow.style.animation = "";
-		chatBoxInner.className = "";
 		eviBox.style.opacity = "0";
 		eviBox.style.height = "0%";
 
@@ -1568,10 +1567,10 @@ class Viewport {
 				nameBox.style.display = "block";
 				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
 
+				chatBoxInner.className = this.colors[this.chatmsg.color];
+
 				chatBox.style.display = "block";
 				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";				
-
-				chatBoxInner.className = this.colors[this.chatmsg.color];
 
 				this.chatmsg.startspeaking = false;
 
