@@ -69,17 +69,40 @@
 	width: 100%;
 }
 
-@keyframes shake { 
-    0%,100%	{left: 0; }
-	20%		{left: -10%; }
-	40%		{left: +10%; }
-	60%		{left: -10%; }
-	80%		{left: +10%; }
+@keyframes shake {
+
+	0%,
+	100% {
+		left: 0;
+	}
+
+	20% {
+		left: -10%;
+	}
+
+	40% {
+		left: +10%;
+	}
+
+	60% {
+		left: -10%;
+	}
+
+	80% {
+		left: +10%;
+	}
 }
 
-@keyframes flash { 
-    0%,100%	{background-color: transparent; }
-    50%		{background-color: white; }
+@keyframes flash {
+
+	0%,
+	100% {
+		background-color: transparent;
+	}
+
+	50% {
+		background-color: white;
+	}
 }
 
 #client_charselect {
@@ -194,7 +217,7 @@
 	height: 0%;
 	width: auto;
 	top: 1em;
-	transition: 0.25s linear;  
+	transition: 0.25s linear;
 	transition-property: height, opacity;
 }
 
@@ -214,29 +237,6 @@
 	top: 0;
 	left: 0;
 }
-
-.rainbow-text {
-	background-color: rgb(255, 255, 255);
-	background-image: repeating-linear-gradient(to right,
-	red  0%  8%, orange  8% 16%, yellow 16% 24%, green 24% 32%, blue 32% 40%,
-	red 40% 48%, orange 48% 56%, yellow 56% 64%, green 64% 72%, blue 72% 80%,
-	red 80% 88%, orange 88% 96%, yellow 96% 100% );
-	background-size: 40% 40%;
-	background-clip: text;
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	animation: rainbow 4s linear infinite;
-  }
-  
-  @keyframes rainbow_alt { 
-    0%,100% {background-position:    0 0; }
-    50%     {background-position: 400% 0; }
-  }
-
-  @keyframes rainbow { 
-    0%   {background-position:    0 0; }
-    100% {background-position: 400% 0; }
-  }
 
 #client_inputbox {
 	font-size: 21px;
@@ -326,7 +326,7 @@
 	width: 70px;
 	height: 70px;
 	background-color: #787878;
-	outline-color:#886060;  
+	outline-color: #886060;
 	outline-width: 1px;
 	outline-style: inset;
 	outline-offset: -1px;
@@ -399,8 +399,8 @@
 	bottom: 0;
 	position: relative;
 	display: inline-block;
-	transition: 1s linear;  
-  	transition-property: width;
+	transition: 1s linear;
+	transition-property: width;
 }
 
 .healthchange_button {
@@ -522,37 +522,37 @@
 }
 
 .area-default {
-	background-color: rgb(54,198,68);
+	background-color: rgb(54, 198, 68);
 }
 
 .area-idle {
-	background-color: rgb(54,198,68);
+	background-color: rgb(54, 198, 68);
 }
 
 .area-looking-for-players {
-	background-color: rgb(255,255,0);
+	background-color: rgb(255, 255, 0);
 }
 
 .area-casing {
-	background-color: rgb(255,166,0);
+	background-color: rgb(255, 166, 0);
 }
 
 .area-recess {
-	background-color: rgb(255,190,30);
+	background-color: rgb(255, 190, 30);
 }
 
 .area-rp {
-	background-color: rgb(200,52,252);
+	background-color: rgb(200, 52, 252);
 }
 
 .area-gaming {
-	background-color: rgb(55,255,255);
+	background-color: rgb(55, 255, 255);
 }
 
 .area-locked {
-	background-color: rgb(127,127,127);
+	background-color: rgb(127, 127, 127);
 }
 
 .area-spectatable {
-	background-color: rgb(54,198,68);
+	background-color: rgb(54, 198, 68);
 }
