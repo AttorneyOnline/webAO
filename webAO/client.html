@@ -56,103 +56,108 @@
 					<div id="client_chat">
 						<p id="client_inner_chat"></p>
 						<div id="client_chatwaiting">&#9654;</div>
-					</div>					
+					</div>
 				</div>
 				<img id="client_testimony" alt="Testimony overlay" style="display: none;" onerror="imgError(this);">
 			</div>
 		</div>
-		<input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)"
-			placeholder="Say something&hellip;">
-		<meta name="frame-title" lang="en" content="Miscellaneous">
-		<div id="client_bars">
-			<span id="client_defense_hp" class="health-box">
-				<div class="health-bar"></div>
-			</span>
-			<span id="client_prosecutor_hp" class="health-box">
-				<div class="health-bar"></div>
-			</span>
-		</div>
-		<div id="client_emo">
-		</div>
-		<br>
-		<div id="client_buttons">
-			<button id="button_1" alt="Hold it!" class="client_button" onclick="toggleShout(1)">Hold it!</button>
-			<button id="button_2" alt="OBJECTION!" class="client_button" onclick="toggleShout(2)">OBJECTION!</button>
-			<button id="button_3" alt="Take That!" class="client_button" onclick="toggleShout(3)">Take That!</button>
+		<div id="client_iccontrols">
+			<input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)"
+				placeholder="Say something&hellip;">
+			<meta name="frame-title" lang="en" content="Miscellaneous">
+			<div id="client_bars">
+				<span id="client_defense_hp" class="health-box">
+					<div class="health-bar"></div>
+				</span>
+				<span id="client_prosecutor_hp" class="health-box">
+					<div class="health-bar"></div>
+				</span>
+			</div>
+			<div id="client_emo">
+			</div>
 			<br>
-			<br>
-			<label for="textcolor">Text Color:</label>
-			<select id="textcolor" name="textcolor">
-				<option value="0">White</option>
-				<option value="1">Green</option>
-				<option value="2">Red</option>
-				<option value="3">Orange</option>
-				<option value="4">Blue</option>
-			</select>
-			<label for="sendsfx">SFX</label>
-			<input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
-			<br>
-			<br>
-			<button id="button_flip" alt="Flip" class="client_button" onclick="toggleFlip()">Flip</button>
-			<button id="button_effect_1" alt="Flash" class="client_button" onclick="toggleEffect(1)">Flash</button>
-			<button id="button_effect_2" alt="Shake" class="client_button" onclick="toggleEffect(2)">Shake</button>
-		</div>
-		<fieldset style="margin:10px;">
-			<legend>Actions</legend>
-			<!-- Judge Commands -->
-			<span id="judge_action" style="display:none">
-				<span id="menu_wt" onclick="initWT()" class="judge_button"
-					style="color: blue"><i>Witness<br>Testimony</i></span>
-
-				<span id="menu_ce" onclick="initCE()" class="judge_button"
-					style="color: red"><i>Cross<br>Examination</i></span>
-
-				<span id="menu_nguilty" onclick="notguilty()" class="judge_button"
-					style="color: white; font-family: serif; text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; font-size: 1.5em; line-height: 0.75;">Not<br>Guilty</span>
-
-				<span id="menu_guilty" onclick="guilty()" class="judge_button"
-					style="color: black; font-family: serif; font-size: 1.5em;">Guilty</span>
-
+			<div id="client_buttons">
+				<button id="button_1" alt="Hold it!" class="client_button" onclick="toggleShout(1)">Hold it!</button>
+				<button id="button_2" alt="OBJECTION!" class="client_button"
+					onclick="toggleShout(2)">OBJECTION!</button>
+				<button id="button_3" alt="Take That!" class="client_button" onclick="toggleShout(3)">Take
+					That!</button>
 				<br>
-				<span style="display:inline-block; vertical-align: middle;">
-					<span id="menu_rhpd" onclick="redHPD()" class="healthchange_button">
-						⊟
-					</span>
-					<span style="font-size: 1.25em">Defense</span>
-					<span id="menu_ahpd" onclick="addHPD()" class="healthchange_button">
-						⊞
-					</span>
-				</span>
-				<span style="display:inline-block; vertical-align: middle;">
-					<span id="menu_ahpp" onclick="addHPP()" class="healthchange_button">
-						⊞
-					</span>
-					<span style="font-size: 1.25em">Prosecution</span>
-					<span id="menu_rhpp" onclick="redHPP()" class="healthchange_button">
-						⊟
-					</span>
-				</span>
-			</span>
-			<!-- No Commands -->
-			<span id="no_action">
-				No judge actions available for this role.
-			</span>
-			<br>
-			<span id="pairing" style="display: none">
-				<label for="pair_select">Pairing partner:</label>
-				<select name="pair_select" id="pair_select">
-					<option value="-1">None</option>
+				<br>
+				<label for="textcolor">Text Color:</label>
+				<select id="textcolor" name="textcolor">
+					<option value="0">White</option>
+					<option value="1">Green</option>
+					<option value="2">Red</option>
+					<option value="3">Orange</option>
+					<option value="4">Blue</option>
 				</select>
-				<label for="pair_offset">Pairing offset:</label>
-				<input type="range" name="pair_offset" id="pair_offset" min="-100" max="100" value="0">
-			</span>
-			<br>
-			<br>
-			<span id="muting">
-				<label for="mute_select" style="float: left">Mute a character: </label>
-				<select name="mute_select" id="mute_select" size="15" style="float: left" onchange="mutelist_click(event)"></select>
-			</span>
-		</fieldset>
+				<label for="sendsfx">SFX</label>
+				<input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx">
+				<br>
+				<br>
+				<button id="button_flip" alt="Flip" class="client_button" onclick="toggleFlip()">Flip</button>
+				<button id="button_effect_1" alt="Flash" class="client_button" onclick="toggleEffect(1)">Flash</button>
+				<button id="button_effect_2" alt="Shake" class="client_button" onclick="toggleEffect(2)">Shake</button>
+			</div>
+			<fieldset style="margin:10px;">
+				<legend>Actions</legend>
+				<!-- Judge Commands -->
+				<span id="judge_action" style="display:none">
+					<span id="menu_wt" onclick="initWT()" class="judge_button"
+						style="color: blue"><i>Witness<br>Testimony</i></span>
+
+					<span id="menu_ce" onclick="initCE()" class="judge_button"
+						style="color: red"><i>Cross<br>Examination</i></span>
+
+					<span id="menu_nguilty" onclick="notguilty()" class="judge_button"
+						style="color: white; font-family: serif; text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; font-size: 1.5em; line-height: 0.75;">Not<br>Guilty</span>
+
+					<span id="menu_guilty" onclick="guilty()" class="judge_button"
+						style="color: black; font-family: serif; font-size: 1.5em;">Guilty</span>
+
+					<br>
+					<span style="display:inline-block; vertical-align: middle;">
+						<span id="menu_rhpd" onclick="redHPD()" class="healthchange_button">
+							⊟
+						</span>
+						<span style="font-size: 1.25em">Defense</span>
+						<span id="menu_ahpd" onclick="addHPD()" class="healthchange_button">
+							⊞
+						</span>
+					</span>
+					<span style="display:inline-block; vertical-align: middle;">
+						<span id="menu_ahpp" onclick="addHPP()" class="healthchange_button">
+							⊞
+						</span>
+						<span style="font-size: 1.25em">Prosecution</span>
+						<span id="menu_rhpp" onclick="redHPP()" class="healthchange_button">
+							⊟
+						</span>
+					</span>
+				</span>
+				<!-- No Commands -->
+				<span id="no_action">
+					No judge actions available for this role.
+				</span>
+				<br>
+				<span id="pairing" style="display: none">
+					<label for="pair_select">Pairing partner:</label>
+					<select name="pair_select" id="pair_select">
+						<option value="-1">None</option>
+					</select>
+					<label for="pair_offset">Pairing offset:</label>
+					<input type="range" name="pair_offset" id="pair_offset" min="-100" max="100" value="0">
+				</span>
+				<br>
+				<br>
+				<span id="muting">
+					<label for="mute_select" style="float: left">Mute a character: </label>
+					<select name="mute_select" id="mute_select" size="15" style="float: left"
+						onchange="mutelist_click(event)"></select>
+				</span>
+			</fieldset>
+		</div>
 	</div>
 </template>
 
