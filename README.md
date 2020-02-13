@@ -4,14 +4,12 @@ This is a client for the Attorney Online roleplaying chatroom written in HTML an
 It works with the tsuserver3/serverD software when the server has WebSockets enabled.
 
 webAO-only features:
- - BBcode
  - Asset URLs
  - Automated testimony control
 
 Desktop-only features:
  - 2.6+ markup
  - Non-interrupting preanimations
- - Guilty/not guilty
 
 In short, webAO is in disrepair. Again.
  
