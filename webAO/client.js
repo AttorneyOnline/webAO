@@ -1870,6 +1870,16 @@ export function reloadTheme() {
 window.reloadTheme = reloadTheme;
 
 /**
+ * Triggered by the ini button.
+ */
+export function iniedit() {
+	const ininame = document.getElementById("client_ininame").value;
+	client.handleCharacterInfo(ininame.split("&"),client.charID);
+	client.handlePV(("0#CID#" + client.charID).split("#"));
+}
+window.iniedit = iniedit;
+
+/**
  * Triggered when a character icon is clicked in the character selection menu.
  * @param {MouseEvent} event
  */
