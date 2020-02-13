@@ -14,10 +14,9 @@ body {
 
 #client_name {
 	display: none;
-	top: 5%;
-	padding: 0px 10px;
-	height: 20%;
-	border-radius: 3px;
+	top: 4%;
+	padding: 0 10px;
+	height: 22%;
 	position: absolute;
 }
 
@@ -28,7 +27,6 @@ body {
 	margin: auto;
 	height: 90%;
 	top: 20%;
-	border-radius: 4px;
 	position: absolute;
 	word-break: keep-all;
 	word-wrap: break-word;
@@ -40,8 +38,31 @@ body {
 
 #client_chat p {
 	margin: 4px;
-	padding: 5px 10px;
+	padding: 5px 3%;
 	color: white;
+}
+
+#client_chatwaiting {
+	display: block;
+	right: 1em;
+	bottom: 0.6em;
+	width: 1em;
+	position: absolute;
+	animation: idling 1s linear infinite;
+}
+
+@keyframes idling {
+	0% {
+		right: 0.4em;
+	}
+
+	50% {
+		right: 0.8em;
+	}
+
+	100% {
+		right: 0.4em;
+	}
 }
 
 #evi_name {
