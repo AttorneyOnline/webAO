@@ -48,12 +48,12 @@ let selectedShout = 0;
 let extrafeatures = [];
 
 let hdid;
-const options = {fonts: {extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"]}, excludes: {userAgent: true, enumerateDevices: true}};
+const options = { fonts: { extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"] }, excludes: { userAgent: true, enumerateDevices: true } };
 
 if (window.requestIdleCallback) {
-    requestIdleCallback(function () {
-        Fingerprint2.get(options, function (components) {
-			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`),31);
+	requestIdleCallback(function () {
+		Fingerprint2.get(options, function (components) {
+			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
 			client = new Client(serverIP);
 			viewport = new Viewport();
 
@@ -61,12 +61,12 @@ if (window.requestIdleCallback) {
 				oldLoading = true;
 			}
 			client.loadResources();
-        });
-    });
+		});
+	});
 } else {
-    setTimeout(function () {
-        Fingerprint2.get(options, function (components) {
-			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`),31);
+	setTimeout(function () {
+		Fingerprint2.get(options, function (components) {
+			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
 			client = new Client(serverIP);
 			viewport = new Viewport();
 
@@ -74,8 +74,8 @@ if (window.requestIdleCallback) {
 				oldLoading = true;
 			}
 			client.loadResources();
-        });
-    }, 500);
+		});
+	}, 500);
 }
 
 
@@ -226,7 +226,7 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
 	sendOOC(message) {
-		setCookie("OOC_name",document.getElementById("OOC_name").value);
+		setCookie("OOC_name", document.getElementById("OOC_name").value);
 		this.sendServer(`CT#${escapeChat(encodeChat(document.getElementById("OOC_name").value))}#${escapeChat(encodeChat(message))}#%`);
 	}
 
@@ -253,7 +253,7 @@ class Client extends EventEmitter {
 	 */
 	sendIC(deskmod, speaking, name, silent, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim) {
 		let extra_cccc = ``;
-		if (extrafeatures.includes("cccc_ic_support") ) {
+		if (extrafeatures.includes("cccc_ic_support")) {
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
 		}
 		console.log(
@@ -362,13 +362,13 @@ class Client extends EventEmitter {
 
 		// Read cookies and set the UI to its values
 		document.getElementById("OOC_name").value = getCookie("OOC_name");
-		if (document.getElementById("OOC_name").value==="") {
-			document.getElementById("OOC_name").value = "web"+this.playerID;
+		if (document.getElementById("OOC_name").value === "") {
+			document.getElementById("OOC_name").value = "web" + this.playerID;
 		}
 
 		// Read cookies and set the UI to its values
 		var cookietheme = getCookie("theme");
-		if (cookietheme==="") {
+		if (cookietheme === "") {
 			cookietheme = "default";
 		}
 		document.querySelector('#client_themeselect [value="' + cookietheme + '"]').selected = true;
@@ -503,7 +503,7 @@ class Client extends EventEmitter {
 			try {
 				msg_nameplate = this.chars[args[9]].showname;
 				msg_blips = this.chars[args[9]].gender;
-			} catch(e) {
+			} catch (e) {
 				//we already set defaults
 			}
 
@@ -623,53 +623,53 @@ class Client extends EventEmitter {
 	 */
 	async handleCharacterInfo(chargs, charid) {
 		if (chargs[0]) {
-		let cini = {};
-		let icon = AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char_icon.png";
-		let img = document.getElementById(`demo_${charid}`);
-		img.alt = chargs[0];
-		img.src = icon;	// seems like a good time to load the icon
+			let cini = {};
+			let icon = AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char_icon.png";
+			let img = document.getElementById(`demo_${charid}`);
+			img.alt = chargs[0];
+			img.src = icon;	// seems like a good time to load the icon
 
-		// If the ini doesn't exist on the server this will throw an error
-		try {
-			const cinidata = await request(AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char.ini");
-			cini = INI.parse(cinidata);
-		} catch(err) {
-			cini = {};
-			img.classList.add("noini");
-			// If it does, give the user a visual indication that the character is unusable
-		}
+			// If the ini doesn't exist on the server this will throw an error
+			try {
+				const cinidata = await request(AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char.ini");
+				cini = INI.parse(cinidata);
+			} catch (err) {
+				cini = {};
+				img.classList.add("noini");
+				// If it does, give the user a visual indication that the character is unusable
+			}
 
-		const mute_select = document.getElementById("mute_select");
-		mute_select.add(new Option(safe_tags(chargs[0]), charid));
-		const pair_select = document.getElementById("pair_select");
-		pair_select.add(new Option(safe_tags(chargs[0]), charid));
+			const mute_select = document.getElementById("mute_select");
+			mute_select.add(new Option(safe_tags(chargs[0]), charid));
+			const pair_select = document.getElementById("pair_select");
+			pair_select.add(new Option(safe_tags(chargs[0]), charid));
 
-		// sometimes ini files lack important settings
-		const default_options = {
-			name: chargs[0],
-			showname: chargs[0],
-			side: "def",
-			gender: "male"
-		};
-		cini.options = Object.assign(default_options, cini.options);
+			// sometimes ini files lack important settings
+			const default_options = {
+				name: chargs[0],
+				showname: chargs[0],
+				side: "def",
+				gender: "male"
+			};
+			cini.options = Object.assign(default_options, cini.options);
 
-		this.chars[charid] = {
-			name: safe_tags(chargs[0]),
-			showname: safe_tags(cini.options.showname),
-			desc: safe_tags(chargs[1]),
-			gender: safe_tags(cini.options.gender).toLowerCase(),
-			evidence: chargs[3],
-			icon: icon,
-			inifile: cini,
-			muted: false
-		};
+			this.chars[charid] = {
+				name: safe_tags(chargs[0]),
+				showname: safe_tags(cini.options.showname),
+				desc: safe_tags(chargs[1]),
+				gender: safe_tags(cini.options.gender).toLowerCase(),
+				evidence: chargs[3],
+				icon: icon,
+				inifile: cini,
+				muted: false
+			};
 		} else {
-			console.warn("missing charid "+charid);
+			console.warn("missing charid " + charid);
 			let img = document.getElementById(`demo_${charid}`);
 			img.style.display = "none";
 		}
 
-		
+
 	}
 
 	/**
@@ -685,7 +685,7 @@ class Client extends EventEmitter {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 				const chargs = args[i].split("&");
-				this.handleCharacterInfo(chargs, args[i-1]);
+				this.handleCharacterInfo(chargs, args[i - 1]);
 			}
 		}
 		// Request the next pack
@@ -702,7 +702,7 @@ class Client extends EventEmitter {
 		for (let i = 1; i < args.length; i++) {
 			document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 			const chargs = args[i].split("&");
-			this.handleCharacterInfo(chargs, i-1);
+			this.handleCharacterInfo(chargs, i - 1);
 		}
 		// We're done with the characters, request the music
 		this.sendServer("RM#%");
@@ -804,12 +804,12 @@ class Client extends EventEmitter {
 				newarea.id = "area" + i;
 				newarea.innerText = this.areas[i].name;
 				newarea.title = "Players: <br>" +
-								"Status: <br>" +
-								"CM: ";
+					"Status: <br>" +
+					"CM: ";
 				newarea.onclick = function () {
 					area_click(this);
 				};
-				
+
 				document.getElementById("areas").appendChild(newarea);
 			}
 		}
@@ -853,7 +853,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args kick reason
 	 */
 	handleKK(args) {
-		this.handleBans("Kicked",safe_tags(args[1]));
+		this.handleBans("Kicked", safe_tags(args[1]));
 	}
 
 	/**
@@ -862,7 +862,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args ban reason
 	 */
 	handleKB(args) {
-		this.handleBans("Banned",safe_tags(args[1]));
+		this.handleBans("Banned", safe_tags(args[1]));
 	}
 
 	/**
@@ -871,7 +871,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args ban reason
 	 */
 	handleBD(args) {
-		this.handleBans("Banned",safe_tags(args[1]));
+		this.handleBans("Banned", safe_tags(args[1]));
 	}
 
 	/**
@@ -935,7 +935,7 @@ class Client extends EventEmitter {
 	 */
 	handleRT(args) {
 		const judgeid = Number(args[2]);
-		switch(args[1]) {
+		switch (args[1]) {
 			case "testimony1":
 				this.testimonyID = 1;
 				break;
@@ -996,29 +996,29 @@ class Client extends EventEmitter {
 		args = args.slice(1);
 		for (let i = 1; i < args.length - 1; i++) {
 			if (this.areas[i]) { // the server sends us ARUP before we even get the area list
-			const thisarea = document.getElementById("area" + i);
-			switch(Number(args[0])) {
-				case 0: // playercount				
-					this.areas[i].players = Number(args[i]);
-					thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players})`;					
-					break;
-				case 1: // status
-					this.areas[i].status = safe_tags(args[i]);
-					thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();				
-					break;
-				case 2:
-					this.areas[i].cm = safe_tags(args[i]);
-					break;
-				case 3:
-					this.areas[i].locked = safe_tags(args[i]);
-					break;
-			}
+				const thisarea = document.getElementById("area" + i);
+				switch (Number(args[0])) {
+					case 0: // playercount				
+						this.areas[i].players = Number(args[i]);
+						thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players})`;
+						break;
+					case 1: // status
+						this.areas[i].status = safe_tags(args[i]);
+						thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();
+						break;
+					case 2:
+						this.areas[i].cm = safe_tags(args[i]);
+						break;
+					case 3:
+						this.areas[i].locked = safe_tags(args[i]);
+						break;
+				}
 
-			thisarea.title = 	`Players: ${this.areas[i].players}\n` +
-								`Status: ${this.areas[i].status}\n` +
-								`CM: ${this.areas[i].cm}\n` +
-								`Area lock: ${this.areas[i].locked}`;
-		}
+				thisarea.title = `Players: ${this.areas[i].players}\n` +
+					`Status: ${this.areas[i].status}\n` +
+					`CM: ${this.areas[i].cm}\n` +
+					`Area lock: ${this.areas[i].locked}`;
+			}
 		}
 	}
 
@@ -1067,7 +1067,7 @@ class Client extends EventEmitter {
 			const td = document.createElement("TD");
 
 			td.innerHTML = `<img class='demothing' id='demo_${i}' onclick='pickChar(${i})' >`;
-			
+
 			tr.appendChild(td);
 			if (i % CHAR_SELECT_WIDTH === 0) {
 				document.getElementById("client_chartable").appendChild(tr);
@@ -1096,7 +1096,7 @@ class Client extends EventEmitter {
 
 			if (args[i + 1] === "-1")
 				icon_chosen += " dark";
-			
+
 			img.classList = icon_chosen;
 		}
 
@@ -1131,28 +1131,28 @@ class Client extends EventEmitter {
 		updateActionCommands(me.side);
 		for (let i = 1; i <= ini.emotions.number; i++) {
 			try {
-			const emoteinfo = ini.emotions[i].split("#");
-			const esfx = ini.soundn[i] || "0";
-			const esfxd = Number(ini.soundt[i]) || 0;
-			// Make sure the asset server is case insensitive, or that everything on it is lowercase
-			emotes[i] = {
-				desc: emoteinfo[0].toLowerCase(),
-				speaking: emoteinfo[1].toLowerCase(),
-				silent: emoteinfo[2].toLowerCase(),
-				zoom: emoteinfo[3],
-				sfx: esfx.toLowerCase(),
-				sfxdelay: esfxd,
-				button_off: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
-				button_on: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_on.png`
-			};
-			emotesList.innerHTML +=
-				`<img src=${emotes[i].button_off}
+				const emoteinfo = ini.emotions[i].split("#");
+				const esfx = ini.soundn[i] || "0";
+				const esfxd = Number(ini.soundt[i]) || 0;
+				// Make sure the asset server is case insensitive, or that everything on it is lowercase
+				emotes[i] = {
+					desc: emoteinfo[0].toLowerCase(),
+					speaking: emoteinfo[1].toLowerCase(),
+					silent: emoteinfo[2].toLowerCase(),
+					zoom: emoteinfo[3],
+					sfx: esfx.toLowerCase(),
+					sfxdelay: esfxd,
+					button_off: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
+					button_on: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_on.png`
+				};
+				emotesList.innerHTML +=
+					`<img src=${emotes[i].button_off}
 					id="emo_${i}"
 					alt="${emotes[i].desc}"
 					class="emote_button"
 					onclick="pickEmotion(${i})">`;
-			} catch(e) {
-				console.error("missing emote "+i);
+			} catch (e) {
+				console.error("missing emote " + i);
 			}
 		}
 		pickEmotion(1);
@@ -1292,7 +1292,7 @@ class Viewport {
 			chatContainerBox.style.display = "none";
 			shoutSprite.src = client.resources[shout]["src"];
 			shoutSprite.style.display = "block";
-			this.shoutaudio.src=`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
+			this.shoutaudio.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
 			this.shoutaudio.play();
 			this.shoutTimer = 850;
 		} else {
@@ -1500,7 +1500,7 @@ class Viewport {
 		if (extrafeatures.includes("cccc_ic_support")) {
 			// Flip the pair character
 			if (this.chatmsg.other_flip === 1) {
-			pairSprite.style.transform = "scaleX(-1)";
+				pairSprite.style.transform = "scaleX(-1)";
 			} else {
 				pairSprite.style.transform = "scaleX(1)";
 			}
@@ -1542,8 +1542,8 @@ class Viewport {
 				if (this.chatmsg.other_name) {
 					const pairName = this.chatmsg.other_name.toLowerCase();
 					const pairEmote = this.chatmsg.other_emote.toLowerCase();
-					pairSprite.style.left = this.chatmsg.other_offset+"%";
-					charSprite.style.left = this.chatmsg.self_offset+"%";
+					pairSprite.style.left = this.chatmsg.other_offset + "%";
+					charSprite.style.left = this.chatmsg.self_offset + "%";
 					pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
 					pairSprite.style.display = "";
 				} else {
@@ -1569,9 +1569,9 @@ class Viewport {
 						// Only def show evidence on right
 						eviBox.style.right = "1em";
 						eviBox.style.left = "initial";
-						} else {
+					} else {
 						eviBox.style.right = "initial";
-						eviBox.style.left = "1em";						
+						eviBox.style.left = "1em";
 					}
 				}
 
@@ -1583,7 +1583,7 @@ class Viewport {
 				chatBoxInner.className = this.colors[this.chatmsg.color];
 
 				chatBox.style.display = "block";
-				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";				
+				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
 
 				this.chatmsg.startspeaking = false;
 
@@ -1596,8 +1596,8 @@ class Viewport {
 					if (this.chatmsg.other_name) {
 						const pairName = this.chatmsg.other_name.toLowerCase();
 						const pairEmote = this.chatmsg.other_emote.toLowerCase();
-						pairSprite.style.left = this.chatmsg.other_offset+"%";
-						charSprite.style.left = this.chatmsg.self_offset+"%";
+						pairSprite.style.left = this.chatmsg.other_offset + "%";
+						charSprite.style.left = this.chatmsg.self_offset + "%";
 						pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
 						pairSprite.style.display = "";
 					} else {
@@ -1669,13 +1669,13 @@ class INI {
 			} else if (regex.param.test(line)) {
 				const match = line.match(regex.param);
 				if (section) {
-					if(match[1].toLowerCase() === "showname"){	//don't lowercase the showname
+					if (match[1].toLowerCase() === "showname") {	//don't lowercase the showname
 						value[section]["showname"] = match[2];
 					} else {
 						value[section][match[1].toLowerCase()] = match[2].toLowerCase();
 					}
-				//} else { // we don't care about attributes without a section
-				//	value[match[1]] = match[2];
+					//} else { // we don't care about attributes without a section
+					//	value[match[1]] = match[2];
 				}
 			} else if (regex.section.test(line)) {
 				const match = line.match(regex.section);
@@ -1715,7 +1715,7 @@ function getCookie(cname) {
  * @param {String} cname The name of the cookie to return
  * @param {String} value The value of that cookie option
  */
-function setCookie(cname,value) {
+function setCookie(cname, value) {
 	document.cookie = cname + "=" + value;
 }
 
@@ -1803,10 +1803,10 @@ export function mutelist_click(_event) {
 	const mutelist = document.getElementById("mute_select");
 	const selected_character = mutelist.options[mutelist.selectedIndex];
 
-	if(client.chars[selected_character.value].muted === false) {
+	if (client.chars[selected_character.value].muted === false) {
 		client.chars[selected_character.value].muted = true;
 		selected_character.text = client.chars[selected_character.value].name + " (muted)";
-		console.info("muted "+client.chars[selected_character.value].name);
+		console.info("muted " + client.chars[selected_character.value].name);
 	} else {
 		client.chars[selected_character.value].muted = false;
 		selected_character.text = client.chars[selected_character.value].name;
@@ -1844,7 +1844,7 @@ window.area_click = area_click;
  */
 export function changeMusicVolume() {
 	viewport.music.volume = document.getElementById("client_mvolume").value / 100;
-	setCookie("musicVolume",document.getElementById("client_mvolume").value);
+	setCookie("musicVolume", document.getElementById("client_mvolume").value);
 }
 window.changeMusicVolume = changeMusicVolume;
 
@@ -1854,7 +1854,7 @@ window.changeMusicVolume = changeMusicVolume;
 export function changeSFXVolume() {
 	viewport.sfxaudio.volume = document.getElementById("client_svolume").value / 100;
 	viewport.shoutaudio.volume = document.getElementById("client_svolume").value / 100;
-	setCookie("sfxVolume",document.getElementById("client_svolume").value);
+	setCookie("sfxVolume", document.getElementById("client_svolume").value);
 }
 window.changeSFXVolume = changeSFXVolume;
 
@@ -1863,7 +1863,7 @@ window.changeSFXVolume = changeSFXVolume;
  */
 export function changeBlipVolume() {
 	viewport.blipVolume = document.getElementById("client_bvolume").value / 100;
-	setCookie("blipVolume",document.getElementById("client_bvolume").value);
+	setCookie("blipVolume", document.getElementById("client_bvolume").value);
 }
 window.changeBlipVolume = changeBlipVolume;
 
@@ -1872,7 +1872,7 @@ window.changeBlipVolume = changeBlipVolume;
  */
 export function reloadTheme() {
 	viewport.theme = document.getElementById("client_themeselect").value;
-	setCookie("theme",viewport.theme);
+	setCookie("theme", viewport.theme);
 	document.getElementById("client_theme").href = "styles/" + viewport.theme + ".css";
 }
 window.reloadTheme = reloadTheme;
@@ -1883,7 +1883,7 @@ window.reloadTheme = reloadTheme;
 export async function iniedit() {
 	const ininame = document.getElementById("client_ininame").value;
 	const inicharID = client.charID;
-	await client.handleCharacterInfo(ininame.split("&"),inicharID);
+	await client.handleCharacterInfo(ininame.split("&"), inicharID);
 	client.handlePV(("PV#0#CID#" + inicharID).split("#"));
 }
 window.iniedit = iniedit;
@@ -1904,7 +1904,7 @@ window.changeCharacter = changeCharacter;
  * @param {HTMLImageElement} image the element containing the missing image
  */
 export function charError(image) {
-	console.warn(image.src+" is missing from webAO");
+	console.warn(image.src + " is missing from webAO");
 	image.src = AO_HOST + "misc/placeholder.gif";
 	return true;
 }
@@ -2356,12 +2356,12 @@ window.randomCharacterOOC = randomCharacterOOC;
  * Call mod.
  */
 export function callMod() {
-	let modcall = prompt("Please enter the reason for the modcall","");
+	let modcall = prompt("Please enter the reason for the modcall", "");
 	if (modcall == null || modcall === "") {
 		// cancel
 	} else {
 		client.sendZZ(modcall);
-	} 
+	}
 }
 window.callMod = callMod;
 
@@ -2535,8 +2535,8 @@ window.toggleShout = toggleShout;
 function safe_tags(unsafe) {
 	if (unsafe) {
 		return unsafe
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;");
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;");
 		//.replace(/"/g, "&quot;")
 		//.replace(/'/g, "&#039;");
 	} else {
