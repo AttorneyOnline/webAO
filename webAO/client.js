@@ -1184,15 +1184,15 @@ class Viewport {
 		};
 
 		this.colors = [
-			"text_white",
-			"text_green",
-			"text_red",
-			"text_orange",
-			"text_blue",
-			"text_yellow",
-			"text_rainbow",
-			"text_pink",
-			"text_cyan"
+			"white",
+			"green",
+			"red",
+			"orange",
+			"blue",
+			"yellow",
+			"rainbow",
+			"pink",
+			"cyan"
 		];
 
 		this.blip = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
@@ -1588,7 +1588,7 @@ class Viewport {
 				nameBox.style.display = "block";
 				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
 
-				chatBoxInner.className = this.colors[this.chatmsg.color];
+				chatBoxInner.className = "text_" + this.colors[this.chatmsg.color];
 
 				chatBox.style.display = "block";
 				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
