@@ -507,13 +507,26 @@ class Client extends EventEmitter {
 				//we already set defaults
 			}
 
+			let characterName = safe_tags(args[3]);
+			let spriteName = safe_tags(args[4]).toLowerCase();
+			let speakingsprite;
+			let silentsprite;
+
+			if (characterName.toLowerCase().endsWith("_hd")) {
+				speakingsprite = spriteName + ".png";
+				silentsprite = spriteName + ".png";
+			} else {
+				speakingsprite = "(b)" + spriteName + ".gif";
+				silentsprite = "(a)" + spriteName + ".gif";
+			}
+
 			let chatmsg = {
 				deskmod: safe_tags(args[1]).toLowerCase(),
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
-				name: safe_tags(args[3]),
-				speaking: "(b)" + safe_tags(args[4]).toLowerCase(),
-				silent: "(a)" + safe_tags(args[4]).toLowerCase(),
+				name: characterName,
+				speaking: speakingsprite,
+				silent: silentsprite,
 				content: this.prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
 				sound: safe_tags(args[7]).toLowerCase(),
@@ -1593,11 +1606,11 @@ class Viewport {
 					}
 				}
 
-				charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.speaking.toLowerCase()) + ".gif";
+				charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.speaking);
 				charSprite.style.display = "";
 
 				if (this.textnow === this.chatmsg.content) {
-					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent.toLowerCase()) + ".gif";
+					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent);
 					charSprite.style.display = "";
 					waitingBox.innerHTML = "&#9654;";
 					this._animating = false;
@@ -1617,7 +1630,7 @@ class Viewport {
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent.toLowerCase()) + ".gif";
+						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent);
 						charSprite.style.display = "";
 						waitingBox.innerHTML = "&#9654;";
 						clearTimeout(this.updater);
@@ -2523,7 +2536,7 @@ function safe_tags(unsafe) {
 	if (unsafe) {
 		return unsafe
 		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
+		.replace(/</g, "&lt;");
 		//.replace(/"/g, "&quot;")
 		//.replace(/'/g, "&#039;");
 	} else {
