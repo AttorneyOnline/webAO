@@ -1132,7 +1132,7 @@ class Client extends EventEmitter {
 		for (let i = 1; i <= ini.emotions.number; i++) {
 			try {
 			const emoteinfo = ini.emotions[i].split("#");
-			const esfx = ini.soundn[i] || 0;
+			const esfx = ini.soundn[i] || "0";
 			const esfxd = Number(ini.soundt[i]) || 0;
 			// Make sure the asset server is case insensitive, or that everything on it is lowercase
 			emotes[i] = {
