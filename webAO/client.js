@@ -1177,9 +1177,6 @@ class Viewport {
 			"cyan"
 		];
 
-		this.blip = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
-		this.blip.volume = 0.5;
-
 		// Allocate multiple blip audio channels to make blips less jittery
 
 		this.blipChannels = new Array(6);
