@@ -588,7 +588,6 @@ class Client extends EventEmitter {
 	 */
 	handleRMC(args) {
 		viewport.music.pause();
-		viewport.music = new Audio(this.musicList[args[1]]);
 		const music = viewport.music;
 		// Music offset + drift from song loading
 		music.totime = args[1];
@@ -1188,7 +1187,7 @@ class Viewport {
 			.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
 
-		this.sfxaudio = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
+		this.sfxaudio = document.getElementById("client_sfxaudio");
 		this.sfxplayed = 0;
 
 		this.shoutaudio = new Audio();
