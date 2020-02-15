@@ -371,9 +371,9 @@ class Client extends EventEmitter {
 		document.querySelector('#client_themeselect [value="' + cookietheme + '"]').selected = true;
 		reloadTheme();
 
-		document.getElementById("client_mvolume").value = getCookie("musicVolume");
+		document.getElementById("client_musicaudio").volume = getCookie("musicVolume");
 		changeMusicVolume();
-		document.getElementById("client_svolume").value = getCookie("sfxVolume");
+		document.getElementById("client_sfxaudio").volume = getCookie("sfxVolume");
 		changeSFXVolume();
 		document.getElementById("client_bvolume").value = getCookie("blipVolume");
 		changeBlipVolume();
@@ -1847,8 +1847,7 @@ window.area_click = area_click;
  * Triggered by the music volume slider.
  */
 export function changeMusicVolume() {
-	viewport.music.volume = document.getElementById("client_mvolume").value / 100;
-	setCookie("musicVolume", document.getElementById("client_mvolume").value);
+	setCookie("musicVolume", document.getElementById("client_musicaudio").volume);
 }
 window.changeMusicVolume = changeMusicVolume;
 
@@ -1856,9 +1855,8 @@ window.changeMusicVolume = changeMusicVolume;
  * Triggered by the sound effect volume slider.
  */
 export function changeSFXVolume() {
-	viewport.sfxaudio.volume = document.getElementById("client_svolume").value / 100;
-	viewport.shoutaudio.volume = document.getElementById("client_svolume").value / 100;
-	setCookie("sfxVolume", document.getElementById("client_svolume").value);
+	viewport.shoutaudio.volume = document.getElementById("client_sfxaudio").volume;
+	setCookie("sfxVolume", document.getElementById("client_sfxaudio").volume);
 }
 window.changeSFXVolume = changeSFXVolume;
 
