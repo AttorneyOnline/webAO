@@ -287,8 +287,10 @@
 			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" controls></audio>
 
 			<p>Blip</p>
-			<input id="client_bvolume" class="long" type="range" min="0" max="100" value="60"
-					onchange="changeBlipVolume()">
+			<audio id="client_blipaudio0" onvolumechange="changeBlipVolume()" controls></audio>
+			<audio id="client_blipaudio1"></audio>
+			<audio id="client_blipaudio2"></audio>
+			<audio id="client_blipaudio3"></audio>
 			<br>
 			<br>
 			<button id="char_change" alt="Change" class="client_button hover_button" onclick="changeCharacter()">Change
