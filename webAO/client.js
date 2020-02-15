@@ -411,7 +411,7 @@ class Client extends EventEmitter {
 	 * @param {number?} song the song to be played
 	 */
 	sendMusic(song) {
-		this.sendServer(`MC#${song}`);
+		this.sendServer(`MC#${song}#${this.charID}#%`);
 	}
 
 	/**
