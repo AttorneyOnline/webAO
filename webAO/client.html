@@ -25,11 +25,11 @@
 		<button class="client_reconnect" onclick="ReconnectButton()">Reconnect</button>
 	</div>
 	<div id="client_charselect">
-		<h1 style="text-align: center;">Choose your character</h1>
+		<p>Choose your character</p>
+		<button onclick="pickChar(1001)">Or spectate</button>
+		<br>
 		<br>
 		<div id="client_chartable"></div>
-		<br>
-		<button onclick="pickChar(1001)">Spectate</button>
 	</div>
 	<div id="client_error" class="error" style="display: none">
 		<h1 id="client_errortext">You were disconnected from the server.</h1>
