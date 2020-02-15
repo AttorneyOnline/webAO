@@ -45,15 +45,15 @@
 }
 
 #client_loading {
-	position: absolute;
-	display: flex;
+	display: block;
 	flex-direction: column;
-	padding: 10px;
-	top: 50%;
-	left: 50%;
-	margin-right: -50%;
-	transform: translate(-50%, -50%);
+	position: fixed;
+  	top: 30vh;
+  	left: 30vw;
+	width: 40vw;
+	height: 15vh;
 	justify-content: center;
+	text-align: center;
 	align-items: center;
 	background: black;
 	color: lightgreen;
