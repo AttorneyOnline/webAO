@@ -1747,12 +1747,17 @@ export function onEnter(event) {
 		const pairoffset = document.getElementById("pair_offset").value;
 		let sfxname = "0";
 		let sfxdelay = 0;
+		let preanim = "-";
 		if (document.getElementById("sendsfx").checked) {
 			sfxname = myemo.sfx;
 			sfxdelay = myemo.sfxdelay;
 		}
 
-		client.sendIC("chat", myemo.preanim, mychar.name, myemo.emote,
+		if (document.getElementById("sendpreanim").checked) {
+			preanim = myemo.preanim;
+		}
+
+		client.sendIC("chat", preanim, mychar.name, myemo.emote,
 			mytext, mychar.side,
 			sfxname, myemo.zoom, sfxdelay, selectedShout, myevi, myflip,
 			selectedEffect, mycolor, showname, pairchar, pairoffset, 0);
