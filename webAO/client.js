@@ -371,7 +371,7 @@ class Client extends EventEmitter {
 		document.querySelector('#client_themeselect [value="' + cookietheme + '"]').selected = true;
 		reloadTheme();
 
-		document.getElementById("client_mvolume").value = getCookie("musicVolume");
+		document.getElementById("client_musicaudio").volume = getCookie("musicVolume");
 		changeMusicVolume();
 		document.getElementById("client_svolume").value = getCookie("sfxVolume");
 		changeSFXVolume();
@@ -588,7 +588,6 @@ class Client extends EventEmitter {
 	 */
 	handleRMC(args) {
 		viewport.music.pause();
-		viewport.music = new Audio(this.musicList[args[1]]);
 		const music = viewport.music;
 		// Music offset + drift from song loading
 		music.totime = args[1];
@@ -1178,9 +1177,6 @@ class Viewport {
 			"cyan"
 		];
 
-		this.blip = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
-		this.blip.volume = 0.5;
-
 		// Allocate multiple blip audio channels to make blips less jittery
 
 		this.blipChannels = new Array(6);
@@ -1193,7 +1189,7 @@ class Viewport {
 
 		this.shoutaudio = new Audio();
 
-		this.music = new Audio();
+		this.music = document.getElementById("client_musicaudio");
 		this.music.play();
 
 		this.updater = null;
@@ -1847,8 +1843,7 @@ window.area_click = area_click;
  * Triggered by the music volume slider.
  */
 export function changeMusicVolume() {
-	viewport.music.volume = document.getElementById("client_mvolume").value / 100;
-	setCookie("musicVolume", document.getElementById("client_mvolume").value);
+	setCookie("musicVolume", document.getElementById("client_musicaudio").volume);
 }
 window.changeMusicVolume = changeMusicVolume;
 

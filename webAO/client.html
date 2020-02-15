@@ -18,7 +18,6 @@
 </head>
 
 <body>
-	<span id="sound"></span>
 	<div id="client_loading">
 		<h1 id="client_loadingtext">Loading</h1>
 		<button class="client_reconnect" onclick="ReconnectButton()">Reconnect</button>
@@ -281,18 +280,17 @@
 			</span>
 			<br>
 			<br>
-			<div class="slider">Music
-				<input id="client_mvolume" class="long" type="range" min="0" max="100" value="80"
-					onchange="changeMusicVolume()">
-			</div>
-			<div class="slider">SFX
-				<input id="client_svolume" class="long" type="range" min="0" max="100" value="70"
+			<p>Music</p>
+			<audio id="client_musicaudio" onvolumechange="changeMusicVolume()" controls loop></audio>
+
+			<p>SFX</p>
+			<input id="client_svolume" class="long" type="range" min="0" max="100" value="70"
 					onchange="changeSFXVolume()">
-			</div>
-			<div class="slider">Blip
-				<input id="client_bvolume" class="long" type="range" min="0" max="100" value="60"
+
+			<p>Blip</p>
+			<input id="client_bvolume" class="long" type="range" min="0" max="100" value="60"
 					onchange="changeBlipVolume()">
-			</div>
+			<br>
 			<br>
 			<button id="char_change" alt="Change" class="client_button hover_button" onclick="changeCharacter()">Change
 				Character</button>
@@ -377,6 +375,7 @@
 
 <template id="music">
 	<meta name="frame-title" lang="en" content="Music">
+	<input id="client_musicsearch" style="display:none"></input>
 	<select id="client_musiclist" size="5" onchange="musiclist_click(event)">
 	</select>
 </template>
