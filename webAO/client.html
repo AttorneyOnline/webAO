@@ -18,7 +18,6 @@
 </head>
 
 <body>
-	<span id="sound"></span>
 	<div id="client_loading">
 		<h1 id="client_loadingtext">Loading</h1>
 		<button class="client_reconnect" onclick="ReconnectButton()">Reconnect</button>
@@ -377,8 +376,16 @@
 
 <template id="music">
 	<meta name="frame-title" lang="en" content="Music">
+	<input id="client_musicsearch" style="display:none"></input>
 	<select id="client_musiclist" size="5" onchange="musiclist_click(event)">
 	</select>
+	<span id="client_musiccontrol">
+		<audio id="client_musicaudio" controls loop></audio>
+	</span>
+	<span id="client_sound" style="display:none">
+	
+	
+	</span>
 </template>
 
 </html>

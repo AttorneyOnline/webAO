@@ -1193,7 +1193,7 @@ class Viewport {
 
 		this.shoutaudio = new Audio();
 
-		this.music = new Audio();
+		this.music = document.getElementById("client_musicaudio");
 		this.music.play();
 
 		this.updater = null;
