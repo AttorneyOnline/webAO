@@ -45,15 +45,14 @@
 }
 
 #client_loading {
-	position: absolute;
-	display: flex;
+	display: block;
 	flex-direction: column;
-	padding: 10px;
-	top: 50%;
-	left: 50%;
-	margin-right: -50%;
-	transform: translate(-50%, -50%);
+	position: fixed;
+  	top: 30vh;
+  	left: 30vw;
+	width: 40vw;
 	justify-content: center;
+	text-align: center;
 	align-items: center;
 	background: black;
 	color: lightgreen;
@@ -106,32 +105,21 @@
 }
 
 #client_charselect {
+	display: block;
 	position: fixed;
-	top: 0;
-	left: 0;
-	width: 98vw;
-	height: 100%;
-	overflow-y: auto;
-	justify-content: center;
-	align-items: center;
-	vertical-align: middle;
+  	top: 5vh;
+  	left: 10vw;
+	width: 80vw;
+	max-height: 90vh;
+	overflow-y: scroll;
+	text-align: center;
 	margin: 0 auto;
-	background: rgba(70, 70, 70, 0.5);
+	background: #444;
 	z-index: 50;
 }
 
-#client_chartable {
-	background: #eee;
-}
-
-#client_chartable_container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
 .demothing {
-	display: block;
+	display: inline-block;
 	height: 60px;
 	width: 60px;
 	max-width: 60px;
@@ -426,10 +414,6 @@
 
 .client_button.hover_button:hover {
 	border-color: #FFD081;
-}
-
-.dark {
-	filter: brightness(50%);
 }
 
 .noini {

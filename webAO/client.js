@@ -30,7 +30,7 @@ let mode = queryDict.mode;
 const AO_HOST = queryDict.asset || "http://s3.wasabisys.com/webao/base/";
 const THEME = queryDict.theme || "default";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
-const CHAR_SELECT_WIDTH = 8;
+
 const UPDATE_INTERVAL = 60;
 
 /**
@@ -1041,19 +1041,17 @@ class Client extends EventEmitter {
 
 		// create the charselect grid, to be filled by the character loader
 		document.getElementById("client_chartable").innerHTML = "";
-		let tr;
+
 		for (let i = 0; i < this.char_list_length; i++) {
-			if (i % CHAR_SELECT_WIDTH === 0) {
-				tr = document.createElement("TR");
-			}
-			const td = document.createElement("TD");
+			const demothing = document.createElement("img");
 
-			td.innerHTML = `<img class='demothing' id='demo_${i}' onclick='pickChar(${i})' >`;
+			demothing.className = "demothing";
+			demothing.id = `demo_${i}`;
+			const demoonclick = document.createAttribute("onclick");
+			demoonclick.value = `pickChar(${i})`;
+			demothing.setAttributeNode(demoonclick);
 
-			tr.appendChild(td);
-			if (i % CHAR_SELECT_WIDTH === 0) {
-				document.getElementById("client_chartable").appendChild(tr);
-			}
+			document.getElementById("client_chartable").appendChild(demothing);
 		}
 
 		// this is determined at the top of this file
@@ -1071,18 +1069,12 @@ class Client extends EventEmitter {
 	handleCharsCheck(args) {
 		for (let i = 0; i < this.char_list_length; i++) {
 			let img = document.getElementById(`demo_${i}`);
-			let icon_chosen = "demothing";
-
-			if (img.classList.contains("noini"))
-				icon_chosen += " noini";
 
 			if (args[i + 1] === "-1")
-				icon_chosen += " dark";
-
-			img.classList = icon_chosen;
+				img.style = "opacity: 0.25";
+			else if (args[i + 1] === "0")
+				img.style = "";			
 		}
-
-		//changeBackground("def");
 	}
 
 	/**
