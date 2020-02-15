@@ -251,21 +251,18 @@ class Client extends EventEmitter {
 	 * @param {number} self_offset offset to paired character (optional)
 	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
-	sendIC(deskmod, speaking, name, silent, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim) {
+	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim) {
 		let extra_cccc = ``;
 		if (extrafeatures.includes("cccc_ic_support")) {
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
 		}
-		console.log(
-			`MS#${deskmod}#${speaking}#${name}#${silent}` +
+		const serverMessage = `MS#${deskmod}#${preanim}#${name}#${emote}` +
 			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
-			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}%`
-		);
-		this.sendServer(
-			`MS#${deskmod}#${speaking}#${name}#${silent}` +
-			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
-			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}%`
-		);
+			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}%`;
+		
+		console.log(serverMessage);
+		
+		this.sendServer(serverMessage);
 	}
 
 	/**
@@ -507,26 +504,12 @@ class Client extends EventEmitter {
 				//we already set defaults
 			}
 
-			let characterName = safe_tags(args[3]);
-			let spriteName = safe_tags(args[4]).toLowerCase();
-			let speakingsprite;
-			let silentsprite;
-
-			if (characterName.toLowerCase().endsWith("_hd")) {
-				speakingsprite = spriteName + ".png";
-				silentsprite = spriteName + ".png";
-			} else {
-				speakingsprite = "(b)" + spriteName + ".gif";
-				silentsprite = "(a)" + spriteName + ".gif";
-			}
-
 			let chatmsg = {
 				deskmod: safe_tags(args[1]).toLowerCase(),
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
-				name: characterName,
-				speaking: speakingsprite,
-				silent: silentsprite,
+				name: safe_tags(args[3]),
+				sprite: safe_tags(args[4]),
 				content: this.prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
 				sound: safe_tags(args[7]).toLowerCase(),
@@ -1145,9 +1128,9 @@ class Client extends EventEmitter {
 				// Make sure the asset server is case insensitive, or that everything on it is lowercase
 				emotes[i] = {
 					desc: emoteinfo[0].toLowerCase(),
-					speaking: emoteinfo[1].toLowerCase(),
-					silent: emoteinfo[2].toLowerCase(),
-					zoom: emoteinfo[3],
+					preanim: emoteinfo[1].toLowerCase(),
+					emote: emoteinfo[2].toLowerCase(),
+					zoom: Number(emoteinfo[3]) || 0,
 					sfx: esfx.toLowerCase(),
 					sfxdelay: esfxd,
 					button_off: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
@@ -1498,6 +1481,17 @@ class Viewport {
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
+		let speakingSprite;
+		let silentSprite;
+
+		if (this.chatmsg.name.toLowerCase().endsWith("_hd")) {
+			speakingSprite = this.chatmsg.sprite + ".png";
+			silentSprite = this.chatmsg.sprite + ".png";
+		} else {
+			speakingSprite = "(b)" + this.chatmsg.sprite + ".gif";
+			silentSprite = "(a)" + this.chatmsg.sprite + ".gif";
+		}
+
 		// Flip the character
 		if (this.chatmsg.flip === 1) {
 			charSprite.style.transform = "scaleX(-1)";
@@ -1614,11 +1608,11 @@ class Viewport {
 					}
 				}
 
-				charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.speaking);
+				charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(speakingSprite);
 				charSprite.style.display = "";
 
 				if (this.textnow === this.chatmsg.content) {
-					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent);
+					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(silentSprite);
 					charSprite.style.display = "";
 					waitingBox.innerHTML = "&#9654;";
 					this._animating = false;
@@ -1638,7 +1632,7 @@ class Viewport {
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.chatmsg.silent);
+						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(silentSprite);
 						charSprite.style.display = "";
 						waitingBox.innerHTML = "&#9654;";
 						clearTimeout(this.updater);
@@ -1761,7 +1755,7 @@ export function onEnter(event) {
 			sfxdelay = myemo.sfxdelay;
 		}
 
-		client.sendIC("chat", myemo.speaking, mychar.name, myemo.silent,
+		client.sendIC("chat", myemo.preanim, mychar.name, myemo.emote,
 			mytext, mychar.side,
 			sfxname, myemo.zoom, sfxdelay, selectedShout, myevi, myflip,
 			selectedEffect, mycolor, showname, pairchar, pairoffset, 0);
