@@ -280,16 +280,16 @@
 			</span>
 			<br>
 			<br>
-			<div class="slider">Music
-				<audio id="client_musicaudio" onvolumechange="changeMusicVolume()" controls loop></audio>
-			</div>
-			<div class="slider">SFX
-				<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" controls></audio>
-			</div>
-			<div class="slider">Blip
-				<input id="client_bvolume" class="long" type="range" min="0" max="100" value="60"
+			<p>Music</p>
+			<audio id="client_musicaudio" onvolumechange="changeMusicVolume()" controls loop></audio>
+
+			<p>SFX</p>
+			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" controls></audio>
+
+			<p>Blip</p>
+			<input id="client_bvolume" class="long" type="range" min="0" max="100" value="60"
 					onchange="changeBlipVolume()">
-			</div>
+			<br>
 			<br>
 			<button id="char_change" alt="Change" class="client_button hover_button" onclick="changeCharacter()">Change
 				Character</button>
