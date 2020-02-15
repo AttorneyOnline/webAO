@@ -868,7 +868,7 @@ class Client extends EventEmitter {
 		if (mode === "watch") {		// Spectators don't need to pick a character
 			document.getElementById("client_charselect").style.display = "none";
 		} else {
-			document.getElementById("client_charselect").style.display = "grid";
+			document.getElementById("client_charselect").style.display = "";
 		}
 	}
 
@@ -1890,7 +1890,7 @@ window.iniedit = iniedit;
  */
 export function changeCharacter(_event) {
 	client.sendLeaveRoom();
-	document.getElementById("client_charselect").style.display = "grid";
+	document.getElementById("client_charselect").style.display = "";
 	document.getElementById("client_emo").innerHTML = "";
 }
 window.changeCharacter = changeCharacter;
