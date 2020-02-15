@@ -375,7 +375,7 @@ class Client extends EventEmitter {
 		changeMusicVolume();
 		document.getElementById("client_sfxaudio").volume = getCookie("sfxVolume");
 		changeSFXVolume();
-		document.getElementById("client_blipaudio0").volume = getCookie("blipVolume");
+		document.getElementById("client_blipaudio0").value = getCookie("blipVolume");
 		changeBlipVolume();
 
 		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
