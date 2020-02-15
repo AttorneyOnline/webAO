@@ -121,10 +121,6 @@
 	z-index: 50;
 }
 
-#client_chartable {
-	background: #eee;
-}
-
 .demothing {
 	display: inline-block;
 	height: 60px;
@@ -429,10 +425,6 @@
 
 .client_button.hover_button:hover {
 	border-color: #FFD081;
-}
-
-.dark {
-	filter: brightness(50%);
 }
 
 .noini {

@@ -1070,18 +1070,12 @@ class Client extends EventEmitter {
 	handleCharsCheck(args) {
 		for (let i = 0; i < this.char_list_length; i++) {
 			let img = document.getElementById(`demo_${i}`);
-			let icon_chosen = "demothing";
-
-			if (img.classList.contains("noini"))
-				icon_chosen += " noini";
 
 			if (args[i + 1] === "-1")
-				icon_chosen += " dark";
-
-			img.classList = icon_chosen;
+				img.style = "opacity: 0.25";
+			else if (args[i + 1] === "0")
+				img.style = "";			
 		}
-
-		//changeBackground("def");
 	}
 
 	/**
