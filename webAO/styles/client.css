@@ -112,7 +112,8 @@
   	left: 50%;
 	transform: translate(-50%, -50%);
 	width: 75vw;
-	overflow-y: auto;
+	max-height: 90vh;
+	overflow-y: scroll;
 	justify-content: center;
 	align-items: center;
 	vertical-align: middle;
