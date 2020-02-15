@@ -106,17 +106,18 @@
 }
 
 #client_charselect {
+	display: grid;
 	position: fixed;
-	top: 0;
-	left: 0;
-	width: 98vw;
-	height: 100%;
+  	top: 50%;
+  	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 75vw;
 	overflow-y: auto;
 	justify-content: center;
 	align-items: center;
 	vertical-align: middle;
 	margin: 0 auto;
-	background: rgba(70, 70, 70, 0.5);
+	background: #444;
 	z-index: 50;
 }
 
@@ -124,14 +125,8 @@
 	background: #eee;
 }
 
-#client_chartable_container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
 .demothing {
-	display: block;
+	display: inline-block;
 	height: 60px;
 	width: 60px;
 	max-width: 60px;
