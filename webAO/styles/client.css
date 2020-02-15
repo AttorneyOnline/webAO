@@ -106,7 +106,7 @@
 }
 
 #client_charselect {
-	display: grid;
+	display: block;
 	position: fixed;
   	top: 5vh;
   	left: 10vw;
