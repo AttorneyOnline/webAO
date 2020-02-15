@@ -113,9 +113,7 @@
 	width: 80vw;
 	max-height: 90vh;
 	overflow-y: scroll;
-	justify-content: center;
-	align-items: center;
-	vertical-align: middle;
+	text-align: center;
 	margin: 0 auto;
 	background: #444;
 	z-index: 50;
