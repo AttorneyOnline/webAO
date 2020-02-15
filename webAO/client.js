@@ -373,7 +373,7 @@ class Client extends EventEmitter {
 
 		document.getElementById("client_musicaudio").volume = getCookie("musicVolume");
 		changeMusicVolume();
-		document.getElementById("client_sfxaudio").volume = getCookie("sfxVolume");
+		document.getElementById("client_svolume").value = getCookie("sfxVolume");
 		changeSFXVolume();
 		document.getElementById("client_bvolume").value = getCookie("blipVolume");
 		changeBlipVolume();
@@ -1184,7 +1184,7 @@ class Viewport {
 			.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
 
-		this.sfxaudio = document.getElementById("client_sfxaudio");
+		this.sfxaudio = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
 		this.sfxplayed = 0;
 
 		this.shoutaudio = new Audio();
@@ -1851,8 +1851,9 @@ window.changeMusicVolume = changeMusicVolume;
  * Triggered by the sound effect volume slider.
  */
 export function changeSFXVolume() {
-	viewport.shoutaudio.volume = document.getElementById("client_sfxaudio").volume;
-	setCookie("sfxVolume", document.getElementById("client_sfxaudio").volume);
+	viewport.sfxaudio.volume = document.getElementById("client_svolume").value / 100;
+	viewport.shoutaudio.volume = document.getElementById("client_svolume").value / 100;
+	setCookie("sfxVolume", document.getElementById("client_svolume").value);
 }
 window.changeSFXVolume = changeSFXVolume;
 

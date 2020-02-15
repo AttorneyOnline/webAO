@@ -284,7 +284,8 @@
 			<audio id="client_musicaudio" onvolumechange="changeMusicVolume()" controls loop></audio>
 
 			<p>SFX</p>
-			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" controls></audio>
+			<input id="client_svolume" class="long" type="range" min="0" max="100" value="70"
+					onchange="changeSFXVolume()">
 
 			<p>Blip</p>
 			<input id="client_bvolume" class="long" type="range" min="0" max="100" value="60"
