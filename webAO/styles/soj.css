@@ -35,7 +35,7 @@ body {
 }
 
 .text_rainbow {
-	background-color: rgb(255, 255, 255);
+	background-color: #fff;
 	background-image: repeating-linear-gradient(to right,
 			red 0% 8%, orange 8% 16%, yellow 16% 24%, green 24% 32%, blue 32% 40%,
 			red 40% 48%, orange 48% 56%, yellow 56% 64%, green 64% 72%, blue 72% 80%,

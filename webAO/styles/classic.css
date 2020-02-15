@@ -43,7 +43,7 @@ img {
 }
 
 .text_rainbow {
-	background-color: rgb(255, 255, 255);
+	background-color: #fff;
 	background-image: repeating-linear-gradient(to right,
 			red 0% 8%, orange 8% 16%, yellow 16% 24%, green 24% 32%, blue 32% 40%,
 			red 40% 48%, orange 48% 56%, yellow 56% 64%, green 64% 72%, blue 72% 80%,
@@ -88,11 +88,11 @@ img {
 	min-width: 3.25em;
 	text-justify: distribute;
 	letter-spacing: 0.075em;
-	background: rgb(56, 56, 163, 0.5);
-	box-shadow: 0.075em 0.075em rgb(0, 56, 163, 0.5) inset;
+	background: rgba(56, 56, 163, 0.5);
+	box-shadow: 0.075em 0.075em rgba(0, 56, 163, 0.5) inset;
 	left: 0;
 	top: 60.4%;
-	border-color: rgb(255, 255, 255, 0.5);
+	border-color: rgba(255, 255, 255, 0.5);
 	border-style: ridge groove groove ridge;
 	border-width: 0.2em;
 	border-radius: 0.2em;
@@ -107,11 +107,11 @@ img {
 	width: calc(100% - 0.275em);
 	margin: auto;
 	height: 31.25%;
-	border-color: rgb(255, 255, 255, 0.5);
+	border-color: rgba(255, 255, 255, 0.5);
 	border-style: ridge groove groove ridge;
 	border-width: 0.15em;
 	border-radius: 0.3em;
-	background-color: rgb(0, 0, 16, 0.5);
+	background-color: rgba(0, 0, 16, 0.5);
 	top: 66.5%;
 	position: absolute;
 	word-break: keep-all;
@@ -170,7 +170,7 @@ img {
 	position: absolute;
 	content: "";
 	pointer-events: none;
-	background: repeating-linear-gradient(transparent, transparent 3px, rgb(255, 255, 255, 0.2) 3px, rgb(255, 255, 255, 0.2) 4px);
+	background: repeating-linear-gradient(transparent, transparent 3px, rgba(255, 255, 255, 0.2) 3px, rgba(255, 255, 255, 0.2) 4px);
 	top: 0;
 	left: 0;
 	width: 100%;
@@ -185,7 +185,7 @@ img {
 #client_iccontrols:after {
 	content: "";
 	pointer-events: none;
-	background: repeating-linear-gradient(transparent, transparent 3px, rgb(255, 255, 255, 0.2) 3px, rgb(255, 255, 255, 0.2) 4px);
+	background: repeating-linear-gradient(transparent, transparent 3px, rgba(255, 255, 255, 0.2) 3px, rgba(255, 255, 255, 0.2) 4px);
 	top: 0;
 	left: 0;
 	width: 100%;
