@@ -375,7 +375,7 @@ class Client extends EventEmitter {
 		changeMusicVolume();
 		document.getElementById("client_sfxaudio").volume = getCookie("sfxVolume");
 		changeSFXVolume();
-		document.getElementById("client_blipaudio0").value = getCookie("blipVolume");
+		document.getElementById("client_bvolume").value = getCookie("blipVolume");
 		changeBlipVolume();
 
 		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
@@ -1179,11 +1179,9 @@ class Viewport {
 
 		// Allocate multiple blip audio channels to make blips less jittery
 
-		this.blipChannels = [document.getElementById("client_blipaudio0"),
-							document.getElementById("client_blipaudio1"),
-							document.getElementById("client_blipaudio2"),
-							document.getElementById("client_blipaudio3")];
-
+		this.blipChannels = new Array(6);
+		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav"))
+			.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
 
 		this.sfxaudio = document.getElementById("client_sfxaudio");
@@ -1862,8 +1860,8 @@ window.changeSFXVolume = changeSFXVolume;
  * Triggered by the blip volume slider.
  */
 export function changeBlipVolume() {
-	viewport.blipVolume = document.getElementById("client_blipaudio0").volume;
-	setCookie("blipVolume", document.getElementById("client_blipaudio0").volume);
+	viewport.blipVolume = document.getElementById("client_bvolume").value / 100;
+	setCookie("blipVolume", document.getElementById("client_bvolume").value);
 }
 window.changeBlipVolume = changeBlipVolume;
 
