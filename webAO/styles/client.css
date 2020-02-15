@@ -108,10 +108,9 @@
 #client_charselect {
 	display: grid;
 	position: fixed;
-  	top: 50%;
-  	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 75vw;
+  	top: 5vh;
+  	left: 10vw;
+	width: 80vw;
 	max-height: 90vh;
 	overflow-y: scroll;
 	justify-content: center;
