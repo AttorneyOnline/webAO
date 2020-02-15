@@ -1267,6 +1267,14 @@ class Viewport {
 		changeBackground(chatmsg.side);
 		clearTimeout(this.updater);
 
+		if (this.chatmsg.name.toLowerCase().endsWith("_hd")) {
+			this.speakingSprite = this.chatmsg.sprite + ".png";
+			this.silentSprite = this.chatmsg.sprite + ".png";
+		} else {
+			this.speakingSprite = "(b)" + this.chatmsg.sprite + ".gif";
+			this.silentSprite = "(a)" + this.chatmsg.sprite + ".gif";
+		}
+
 		const shouts = [
 			undefined,
 			"holdit",
@@ -1481,17 +1489,6 @@ class Viewport {
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
-		let speakingSprite;
-		let silentSprite;
-
-		if (this.chatmsg.name.toLowerCase().endsWith("_hd")) {
-			speakingSprite = this.chatmsg.sprite + ".png";
-			silentSprite = this.chatmsg.sprite + ".png";
-		} else {
-			speakingSprite = "(b)" + this.chatmsg.sprite + ".gif";
-			silentSprite = "(a)" + this.chatmsg.sprite + ".gif";
-		}
-
 		// Flip the character
 		if (this.chatmsg.flip === 1) {
 			charSprite.style.transform = "scaleX(-1)";
@@ -1608,11 +1605,11 @@ class Viewport {
 					}
 				}
 
-				charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(speakingSprite);
+				charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.speakingSprite);
 				charSprite.style.display = "";
 
 				if (this.textnow === this.chatmsg.content) {
-					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(silentSprite);
+					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.silentSprite);
 					charSprite.style.display = "";
 					waitingBox.innerHTML = "&#9654;";
 					this._animating = false;
@@ -1632,7 +1629,7 @@ class Viewport {
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(silentSprite);
+						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.silentSprite);
 						charSprite.style.display = "";
 						waitingBox.innerHTML = "&#9654;";
 						clearTimeout(this.updater);
