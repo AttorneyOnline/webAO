@@ -133,6 +133,7 @@ function onMessage(e) {
 			checkOnline(i, `${args[2]}:${args[3]}`);
 		}
 		checkOnline(-1, "127.0.0.1:50001");
+		masterserver.close();
 	}
 	else if (header === "SN") {
 		const args = msg.split("#");
