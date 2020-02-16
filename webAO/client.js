@@ -358,24 +358,19 @@ class Client extends EventEmitter {
 		document.getElementById("client_version").innerText = "version " + version;
 
 		// Read cookies and set the UI to its values
-		document.getElementById("OOC_name").value = getCookie("OOC_name");
-		if (document.getElementById("OOC_name").value === "") {
-			document.getElementById("OOC_name").value = "web" + this.playerID;
-		}
+		document.getElementById("OOC_name").value = getCookie("OOC_name") || "web"+parseInt(Math.random()*100+10);
 
 		// Read cookies and set the UI to its values
-		var cookietheme = getCookie("theme");
-		if (cookietheme === "") {
-			cookietheme = "default";
-		}
+		var cookietheme = getCookie("theme") || "default";
+
 		document.querySelector('#client_themeselect [value="' + cookietheme + '"]').selected = true;
 		reloadTheme();
 
-		document.getElementById("client_musicaudio").volume = getCookie("musicVolume");
+		document.getElementById("client_musicaudio").volume = getCookie("musicVolume") || 1;
 		changeMusicVolume();
-		document.getElementById("client_svolume").value = getCookie("sfxVolume");
+		document.getElementById("client_svolume").value = getCookie("sfxVolume") || 100;
 		changeSFXVolume();
-		document.getElementById("client_bvolume").value = getCookie("blipVolume");
+		document.getElementById("client_bvolume").value = getCookie("blipVolume") || 100;
 		changeBlipVolume();
 
 		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
