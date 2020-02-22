@@ -357,6 +357,21 @@ class Client extends EventEmitter {
 	loadResources() {
 		document.getElementById("client_version").innerText = "version " + version;
 
+		// Load evidence array to select
+		const evidence_select = document.getElementById("evi_select");
+		evidence_select.add(new Option("Custom", 0));
+		console.log(evidence_arr);
+		evidence_arr.forEach(evidence => {
+			evidence_select.add(new Option(evidence));
+		});
+
+		// Load background array to select
+		const background_select = document.getElementById("bg_select");
+		background_select.add(new Option("Custom", 0));
+		background_arr.forEach(background => {
+			background_select.add(new Option(background));
+		});
+
 		// Read cookies and set the UI to its values
 		document.getElementById("OOC_name").value = getCookie("OOC_name") || "web"+parseInt(Math.random()*100+10);
 
@@ -375,21 +390,6 @@ class Client extends EventEmitter {
 
 		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
 		document.getElementById("showname").checked = getCookie("showname");
-
-		// Load evidence array to select
-		const evidence_select = document.getElementById("evi_select");
-		evidence_select.add(new Option("Custom", 0));
-		console.log(evidence_arr);
-		evidence_arr.forEach(evidence => {
-			evidence_select.add(new Option(evidence));
-		});
-
-		// Load background array to select
-		const background_select = document.getElementById("bg_select");
-		background_select.add(new Option("Custom", 0));
-		background_arr.forEach(background => {
-			background_select.add(new Option(background));
-		});
 	}
 
 	/**
