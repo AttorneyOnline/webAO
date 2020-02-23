@@ -7,6 +7,7 @@
 import Fingerprint2 from 'fingerprintjs2';
 
 // Load some defaults for the background and evidence dropdowns
+import character_arr from "./characters.js";
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 
@@ -357,12 +358,10 @@ class Client extends EventEmitter {
 	loadResources() {
 		document.getElementById("client_version").innerText = "version " + version;
 
-		// Load evidence array to select
-		const evidence_select = document.getElementById("evi_select");
-		evidence_select.add(new Option("Custom", 0));
-		console.log(evidence_arr);
-		evidence_arr.forEach(evidence => {
-			evidence_select.add(new Option(evidence));
+		// Load iniedit character array to select
+		const iniedit_select = document.getElementById("client_ininame");
+		character_arr.forEach(inicharacter => {
+			iniedit_select.add(new Option(inicharacter));
 		});
 
 		// Load background array to select
@@ -370,6 +369,13 @@ class Client extends EventEmitter {
 		background_select.add(new Option("Custom", 0));
 		background_arr.forEach(background => {
 			background_select.add(new Option(background));
+		});
+
+		// Load evidence array to select
+		const evidence_select = document.getElementById("evi_select");
+		evidence_select.add(new Option("Custom", 0));
+		evidence_arr.forEach(evidence => {
+			evidence_select.add(new Option(evidence));
 		});
 
 		// Read cookies and set the UI to its values

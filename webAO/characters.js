@@ -1,4 +1,4 @@
-export default [
+ï»¿export default [
     "(jury)ace",
     "(jury)armstrong",
     "(jury)balmung",
@@ -501,7 +501,7 @@ export default [
     "derpy",
     "descole",
     "desiree",
-    "desirée delite",
+    "desirÃ©e delite",
     "dewott",
     "dezel",
     "dhurke",
@@ -1460,7 +1460,7 @@ export default [
     "munehisa iwai",
     "musey kellins-trumend",
     "myrina",
-    "mòrag ladair",
+    "mÃ²rag ladair",
     "naegi",
     "nagisa",
     "nagisa shingetsu",
@@ -2255,5 +2255,5 @@ export default [
     "zettaslow",
     "zinc",
     "zinc lablanc",
-    "zonetan",
+    "zonetan"
 ];
