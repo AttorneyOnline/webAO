@@ -1246,6 +1246,8 @@ class Viewport {
 		const fg = document.getElementById("client_fg");
 		const gamewindow = document.getElementById("client_gamewindow");
 
+		let delay=0;
+
 		// Reset CSS animation
 		fg.style.animation = "";
 		gamewindow.style.animation = "";
@@ -1254,6 +1256,7 @@ class Viewport {
 
 		appendICLog(chatmsg.content, chatmsg.nameplate);
 		changeBackground(chatmsg.side);
+
 		clearTimeout(this.updater);
 
 		if (this.chatmsg.name.toLowerCase().endsWith("_hd")) {
@@ -1290,18 +1293,28 @@ class Viewport {
 		this.chatmsg.isnew = false;
 		this.chatmsg.startpreanim = true;
 
-		// If preanim existed then determine the length
-		if (this.chatmsg.preanim !== "-" && this.chatmsg.preanim !== "" && this.chatmsg.preanim !== undefined) {
-			// Hide message box
-			nameBox.style.display = "none";
-			chatBox.style.display = "none";
-			chatContainerBox.style.display = "none";
-			const delay = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
-			chatmsg.preanimdelay = delay;
-			this.initUpdater(delay);
-		} else {
-			this.initUpdater(0);
+		switch (this.chatmsg.type) {
+			// case 0:
+				// normal emote, no preanim
+			case 1:
+				// play preanim
+				// Hide message box
+				nameBox.style.display = "none";
+				chatBox.style.display = "none";
+				chatContainerBox.style.display = "none";
+				// If preanim existed then determine the length
+				delay = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
+				chatmsg.preanimdelay = delay;
+				break;
+			// case 5:
+				// zoom
+			default:
+				// due to a retarded client bug, we need to strip the sfx from the MS, if the preanim isn't playing
+				chatmsg.sound = "";				
+				break;
 		}
+
+		this.initUpdater(delay);
 
 		//Set the nameplate after it (might) have been hidden
 		nameBox.innerText = this.chatmsg.nameplate;
