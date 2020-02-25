@@ -636,6 +636,12 @@ class Client extends EventEmitter {
 			};
 			cini.options = Object.assign(default_options, cini.options);
 
+			// sometimes ini files lack important settings
+			const default_emotions = {
+				number: 0
+			};
+			cini.emotions = Object.assign(default_emotions, cini.emotions);
+
 			this.chars[charid] = {
 				name: safe_tags(chargs[0]),
 				showname: safe_tags(cini.options.showname),
@@ -1104,6 +1110,13 @@ class Client extends EventEmitter {
 		const ini = me.inifile;
 		me.side = ini.options.side;
 		updateActionCommands(me.side);
+		if(ini.emotions.number === 0) {
+			emotesList.innerHTML =
+					`<span
+					id="emo_0"
+					alt="unavailable"
+					class="emote_button">No emotes available</span>`;
+		}else{
 		for (let i = 1; i <= ini.emotions.number; i++) {
 			try {
 				const emoteinfo = ini.emotions[i].split("#");
@@ -1139,6 +1152,7 @@ class Client extends EventEmitter {
 			}
 		}
 		pickEmotion(1);
+		}
 	}
 }
 
