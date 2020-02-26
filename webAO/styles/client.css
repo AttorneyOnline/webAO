@@ -416,6 +416,10 @@
 	border-color: #FFD081;
 }
 
+.client_button.dark {
+	opacity: 0.5;
+}
+
 .noini {
 	transform: rotate(180deg);
 }
