@@ -94,10 +94,9 @@ img {
     animation: bg-scrolling 0.2s infinite linear;
     left: 0;
 	top: 60.4%;
-	border-color: rgba(0, 255, 0, 0.5);
-	border-style: ridge groove groove ridge;
-	border-width: 0.2em;
-	border-radius: 0.2em;
+	border-color: green;
+    border-width: 0.2em;
+    border-style: solid;
 	position: absolute;
     z-index: 1;    
 }
@@ -109,10 +108,9 @@ img {
 	width: calc(100% - 0.275em);
 	margin: auto;
 	height: 31.25%;
-	border-color: rgba(0, 255, 0, 0.5);
-	border-style: ridge groove groove ridge;
+	border-color: green;
+	border-style: solid;
 	border-width: 0.15em;
-	border-radius: 0.3em;
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAFElEQVQImWNgYGDYjAVTV/A/w2YAfxQSe53wkNkAAAAASUVORK5CYII=) repeat;
     animation: bg-scrolling 0.2s infinite linear;
     top: 66.5%;
