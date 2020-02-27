@@ -130,3 +130,41 @@ img {
 	border-color: #fff;
 	box-shadow: 1px 1px inset;
 }
+
+#client_defense_hp {
+	text-align: left;
+}
+
+#client_defense_hp>.health-bar {
+	background-color: #169de0;
+}
+
+#client_prosecutor_hp {
+	text-align: right;
+}
+
+#client_prosecutor_hp>.health-bar {
+	background-color: #e01f5f;
+}
+
+.health-box {
+	background-color: #555;
+	height: 20px;
+	width: 50%;
+	margin: 0 auto;
+	border: solid 2px #aaa;
+	border-radius: 5px;
+	box-sizing: border-box;
+	display: block;
+}
+
+.health-bar {
+	width: 100%;
+	height: 100%;
+	border-radius: 3px;
+	bottom: 0;
+	position: relative;
+	display: inline-block;
+	transition: 1s linear;
+	transition-property: width;
+}
