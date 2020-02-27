@@ -215,3 +215,37 @@ img {
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAFElEQVQImWNgYGDYjAVTV/A/w2YAfxQSe53wkNkAAAAASUVORK5CYII=) repeat;
     animation: bg-scrolling 0.2s infinite linear;
 }
+
+#client_defense_hp {
+	text-align: left;
+}
+
+#client_prosecutor_hp {
+	text-align: right;
+}
+
+.health-box {
+	background-color: #292929;
+	height: 18px;
+	width: 50%;
+	margin: 0 auto;
+	border: ridge 2px #dedede;
+	border-radius: 2px;
+	box-sizing: border-box;
+	display: block;
+}
+
+.health-bar {
+	width: 100%;
+	height: 60%;
+	height: calc(100% - 4px);
+	bottom: 0;
+	border-width: 2px;
+	border-style: groove none ridge none;
+	position: relative;
+	display: inline-block;
+	transition: 1s linear;
+    transition-property: width;
+    background-color: #00b800;
+	border-color: #84ff84 transparent #009c00 transparent;
+}
