@@ -163,11 +163,17 @@ img {
 	height: 100%;
 }
 
+@keyframes shutter-effect {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 4px; }
+}
+
 #client_menu:after {
 	position: absolute;
 	content: "";
 	pointer-events: none;
 	background: repeating-linear-gradient(transparent, transparent 3px, rgba(255, 255, 255, 0.2) 3px, rgba(255, 255, 255, 0.2) 4px);
+	animation: shutter-effect 0.15s linear infinite;
 	top: 0;
 	left: 0;
 	width: 100%;
@@ -177,17 +183,8 @@ img {
 
 #client_iccontrols {
 	width: 100%;
-}
-
-#client_iccontrols:after {
-	content: "";
-	pointer-events: none;
 	background: repeating-linear-gradient(transparent, transparent 3px, rgba(255, 255, 255, 0.2) 3px, rgba(255, 255, 255, 0.2) 4px);
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	opacity: 0.5;
+	animation: shutter-effect 0.15s linear infinite;
 }
 
 .menu_content {
