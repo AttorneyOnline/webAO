@@ -1657,7 +1657,7 @@ class Viewport {
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
 			this.sfxaudio.pause();
 			this.sfxplayed = 1;
-			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1") {
+			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1" && this.chatmsg.sound !== "" && this.chatmsg.sound !== undefined) {
 				this.sfxaudio.src = AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav";
 				this.sfxaudio.play();
 			}
