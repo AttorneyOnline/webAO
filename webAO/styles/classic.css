@@ -226,6 +226,7 @@ img {
 #client_log {
 	color: white;
 	background: repeating-linear-gradient(black, black 3px, #181818 3px, #181818 4px);
+	animation: shutter-effect 0.15s linear infinite;
 }
 
 .lm_tab {
