@@ -1,5 +1,13 @@
 body {
-	font-family: "Ace Attorney", "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "Osaka", "MS Gothic", "ＭＳ Ｐゴシック", "Tahoma", Sans;
+	font-family: "Ace Attorney", "ace_attorneyregular", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi" , sans-serif;
+}
+
+@font-face {
+    font-family: 'ace_attorneyregular';
+    src: url('ace-attorney.woff2') format('woff2'),
+         url('ace-attorney.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
 }
 
 img {
