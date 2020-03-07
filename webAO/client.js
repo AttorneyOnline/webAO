@@ -738,13 +738,22 @@ class Client extends EventEmitter {
 		}
 	}
 
+	resetMusiclist() {
+		const hmusiclist = document.getElementById("client_musiclist");
+		hmusiclist.innerHTML = "";
+		this.areas = [];
+	}
+
 	/**
 	 * Handles incoming music information, containing multiple entries
 	 * per packet.
 	 * @param {Array} args packet arguments
 	 */
 	handleEM(args) {
-		document.getElementById("client_loadingtext").innerHTML = "Loading Music " + args[1];
+		document.getElementById("client_loadingtext").innerHTML = "Loading Music";
+		if(args[1] === "0") {
+			this.resetMusiclist();
+		}
 		this.sendServer("AM#" + ((args[1] / 10) + 1) + "#%");
 		const hmusiclist = document.getElementById("client_musiclist");
 		for (let i = 2; i < args.length - 1; i++) {
@@ -763,6 +772,7 @@ class Client extends EventEmitter {
 	 */
 	handleSM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
+		this.resetMusiclist();
 		const hmusiclist = document.getElementById("client_musiclist");
 		let flagAudio = false;
 
