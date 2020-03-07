@@ -13,24 +13,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stonedDiscord/stonedDiscord.github.io.git"
+    "url": "git+https://github.com/AttorneyOnline/webAO.git"
   },
   "author": "stonedDiscord",
   "bugs": {
-    "url": "https://github.com/stonedDiscord/stonedDiscord.github.io/issues"
+    "url": "https://github.com/AttorneyOnline/webAO/issues"
   },
-  "homepage": "https://github.com/stonedDiscord/stonedDiscord.github.io#readme",
+  "homepage": "https://github.com/AttorneyOnline/webAO#readme",
   "devDependencies": {
-    "@babel/core": "^7.7.7",
-    "@babel/preset-env": "^7.7.7",
+    "@babel/core": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
     "babel-loader": "^8.0.6",
     "eslint": "^6.8.0",
     "golden-layout": "^1.5.9",
-    "webpack": "^4.41.4",
-    "webpack-cli": "^3.3.10"
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11"
   },
   "dependencies": {
-    "core-js": "^3.1.4",
+    "core-js": "^3.6.4",
     "fingerprintjs2": "^2.1.0",
     "regenerator-runtime": "^0.13.2"
   }
