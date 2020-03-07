@@ -1924,7 +1924,7 @@ window.changeCharacter = changeCharacter;
  */
 export function charError(image) {
 	console.warn(image.src + " is missing from webAO");
-	image.src = AO_HOST + "misc/placeholder.gif";
+	image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 	return true;
 }
 window.charError = charError;
