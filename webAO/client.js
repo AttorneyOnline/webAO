@@ -523,8 +523,7 @@ class Client extends EventEmitter {
 				evidence: safe_tags(args[12]),
 				flip: Number(args[13]),
 				flash: Number(args[14]),
-				color: Number(args[15]),
-				isnew: true,
+				color: Number(args[15])
 			};
 
 			if (extrafeatures.includes("cccc_ic_support")) {
@@ -1171,7 +1170,6 @@ class Viewport {
 	constructor() {
 		this.textnow = "";
 		this.chatmsg = {
-			"isnew": false,
 			"content": "",
 			"objection": 0,
 			"sound": "",
@@ -1182,6 +1180,13 @@ class Viewport {
 			"snddelay": 0,
 			"preanimdelay": 0
 		};
+
+		this.shouts = [
+			undefined,
+			"holdit",
+			"objection",
+			"takethat"
+		];
 
 		this.colors = [
 			"white",
@@ -1273,16 +1278,20 @@ class Viewport {
 
 		let delay=0;
 
+		// stop updater
+		clearTimeout(this.updater);
+
 		// Reset CSS animation
 		fg.style.animation = "";
 		gamewindow.style.animation = "";
 		eviBox.style.opacity = "0";
 		eviBox.style.height = "0%";
 
-		appendICLog(chatmsg.content, chatmsg.nameplate);
-		changeBackground(chatmsg.side);
+		//Clear out the last message
+		waitingBox.innerText = "";
+		chatBoxInner.innerText = this.textnow;
 
-		clearTimeout(this.updater);
+		changeBackground(chatmsg.side);
 
 		if (this.chatmsg.name.toLowerCase().endsWith("_hd")) {
 			this.speakingSprite = this.chatmsg.sprite + ".png";
@@ -1292,15 +1301,8 @@ class Viewport {
 			this.silentSprite = "(a)" + this.chatmsg.sprite + ".gif";
 		}
 
-		const shouts = [
-			undefined,
-			"holdit",
-			"objection",
-			"takethat"
-		];
-
 		// gets which shout shall played
-		const shout = shouts[this.chatmsg.objection];
+		const shout = this.shouts[this.chatmsg.objection];
 		if (shout) {
 			// Hide message box
 			nameBox.style.display = "none";
@@ -1315,9 +1317,6 @@ class Viewport {
 			this.shoutTimer = 0;
 		}
 
-		this.chatmsg.isnew = false;
-		this.chatmsg.startpreanim = true;
-
 		switch (this.chatmsg.type) {
 			// case 0:
 				// normal emote, no preanim
@@ -1330,22 +1329,24 @@ class Viewport {
 				// If preanim existed then determine the length
 				delay = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
 				chatmsg.preanimdelay = delay;
+				this.chatmsg.startpreanim = true;
+				this.chatmsg.startspeaking = false;
 				break;
 			// case 5:
 				// zoom
 			default:
 				// due to a retarded client bug, we need to strip the sfx from the MS, if the preanim isn't playing
-				chatmsg.sound = "";				
+				chatmsg.sound = "";	
+				this.chatmsg.startpreanim = false;
+				this.chatmsg.startspeaking = true;			
 				break;
 		}
 
 		this.initUpdater(delay);
 
+		appendICLog(chatmsg.content, chatmsg.nameplate);
 		//Set the nameplate after it (might) have been hidden
 		nameBox.innerText = this.chatmsg.nameplate;
-		//Clear out the last message
-		waitingBox.innerText = "";
-		chatBoxInner.innerText = this.textnow;
 	}
 
 	/**
@@ -1478,11 +1479,6 @@ class Viewport {
 	 * 
 	 * 3 _animating
 	 * If we're not done with this characters animation, i.e. his text isn't fully there, set a timeout for the next tick/step to happen
-	 * 
-	 * 4 isnew
-	 * This is run once for every new message
-	 * The chatbox and evidence is hidden (TODO even if there is no shout)
-	 * and if there is a shout it's audio starts playing
 	 * 
 	 * 5 startpreanim
 	 * If the shout timer is over it starts with the preanim
