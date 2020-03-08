@@ -903,9 +903,9 @@ class Client extends EventEmitter {
 		}
 		document.getElementById("bg_preview").src = AO_HOST + "background/" + encodeURI(args[1].toLowerCase()) + "/defenseempty.png";
 		if (this.charID === -1) {
-			changeBackground("jud");
+			viewport.changeBackground("jud");
 		} else {
-			changeBackground(this.chars[this.charID].side);
+			viewport.changeBackground(this.chars[this.charID].side);
 		}
 
 	}
@@ -1252,6 +1252,75 @@ class Viewport {
 	}
 
 	/**
+ * Changes the viewport background based on a given position.
+ * 
+ * Valid positions: `def, pro, hld, hlp, wit, jud, jur, sea`
+ * @param {string} position the position to change into
+ */
+async changeBackground(position) {
+	const bgfolder = viewport.bgFolder;
+
+	const positions = {
+		def: {
+			bg: "defenseempty.png",
+			desk: { ao2: "defensedesk.png", ao1: "bancodefensa.png" },
+			speedLines: "defense_speedlines.gif"
+		},
+		pro: {
+			bg: "prosecutorempty.png",
+			desk: { ao2: "prosecutiondesk.png", ao1: "bancoacusacion.png" },
+			speedLines: "prosecution_speedlines.gif"
+		},
+		hld: {
+			bg: "helperstand.png",
+			desk: null,
+			speedLines: "defense_speedlines.gif"
+		},
+		hlp: {
+			bg: "prohelperstand.png",
+			desk: null,
+			speedLines: "prosecution_speedlines.gif"
+		},
+		wit: {
+			bg: "witnessempty.png",
+			desk: { ao2: "stand.png", ao1: "estrado.png" },
+			speedLines: "prosecution_speedlines.gif"
+		},
+		jud: {
+			bg: "judgestand.png",
+			desk: null,
+			speedLines: "prosecution_speedlines.gif"
+		},
+		jur: {
+			bg: "jurystand.png",
+			desk: { ao2: "jurydesk.png", ao1: "estrado.png" },
+			speedLines: "defense_speedlines.gif"
+		},
+		sea: {
+			bg: "seancestand.png",
+			desk: { ao2: "seancedesk.png", ao1: "estrado.png" },
+			speedLines: "prosecution_speedlines.gif"
+		}
+	};
+
+	const { bg, desk, speedLines } = positions[position];
+
+	if (viewport.chatmsg.type === 5) {
+		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
+		document.getElementById("client_bench").style.display = "none";
+	} else {
+		document.getElementById("client_court").src = bgfolder + bg;
+		if (desk) {
+			const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
+			document.getElementById("client_bench").src = bgfolder + deskFilename;
+			document.getElementById("client_bench").style.display = "block";
+		} else {
+			document.getElementById("client_bench").style.display = "none";
+		}
+	}
+	}
+
+	/**
 	 * Sets a new emote.
 	 * TODO: merge this and initUpdater
 	 * This sets up everything before the tick() loops starts
@@ -1292,7 +1361,7 @@ class Viewport {
 		waitingBox.innerText = "";
 		chatBoxInner.innerText = this.textnow;
 
-		changeBackground(chatmsg.side);
+		this.changeBackground(chatmsg.side);
 
 		const { url: speakUrl } = await this.oneSuccess([
 			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
@@ -1644,7 +1713,7 @@ class Viewport {
 
 				if (this.chatmsg.preanimdelay === 0) {
 					shoutSprite.style.display = "none";
-					changeBackground(this.chatmsg.side);
+					this.changeBackground(this.chatmsg.side);
 				}
 
 				if (extrafeatures.includes("cccc_ic_support")) {
@@ -2059,75 +2128,6 @@ async function fileExists(url) {
 	} catch (err) {
 		if (err.code >= 400) return false;
 		else throw err;
-	}
-}
-
-/**
- * Changes the viewport background based on a given position.
- * 
- * Valid positions: `def, pro, hld, hlp, wit, jud, jur, sea`
- * @param {string} position the position to change into
- */
-async function changeBackground(position) {
-	const bgfolder = viewport.bgFolder;
-
-	const positions = {
-		def: {
-			bg: "defenseempty.png",
-			desk: { ao2: "defensedesk.png", ao1: "bancodefensa.png" },
-			speedLines: "defense_speedlines.gif"
-		},
-		pro: {
-			bg: "prosecutorempty.png",
-			desk: { ao2: "prosecutiondesk.png", ao1: "bancoacusacion.png" },
-			speedLines: "prosecution_speedlines.gif"
-		},
-		hld: {
-			bg: "helperstand.png",
-			desk: null,
-			speedLines: "defense_speedlines.gif"
-		},
-		hlp: {
-			bg: "prohelperstand.png",
-			desk: null,
-			speedLines: "prosecution_speedlines.gif"
-		},
-		wit: {
-			bg: "witnessempty.png",
-			desk: { ao2: "stand.png", ao1: "estrado.png" },
-			speedLines: "prosecution_speedlines.gif"
-		},
-		jud: {
-			bg: "judgestand.png",
-			desk: null,
-			speedLines: "prosecution_speedlines.gif"
-		},
-		jur: {
-			bg: "jurystand.png",
-			desk: { ao2: "jurydesk.png", ao1: "estrado.png" },
-			speedLines: "defense_speedlines.gif"
-		},
-		sea: {
-			bg: "seancestand.png",
-			desk: { ao2: "seancedesk.png", ao1: "estrado.png" },
-			speedLines: "prosecution_speedlines.gif"
-		}
-	};
-
-	const { bg, desk, speedLines } = positions[position];
-
-	if (viewport.chatmsg.type === 5) {
-		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
-		document.getElementById("client_bench").style.display = "none";
-	} else {
-		document.getElementById("client_court").src = bgfolder + bg;
-		if (desk) {
-			const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
-			document.getElementById("client_bench").src = bgfolder + deskFilename;
-			document.getElementById("client_bench").style.display = "block";
-		} else {
-			document.getElementById("client_bench").style.display = "none";
-		}
 	}
 }
 
