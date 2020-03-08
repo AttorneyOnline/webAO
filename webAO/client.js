@@ -1293,13 +1293,19 @@ class Viewport {
 
 		changeBackground(chatmsg.side);
 
-		if (this.chatmsg.name.toLowerCase().endsWith("_hd")) {
-			this.speakingSprite = this.chatmsg.sprite + ".png";
-			this.silentSprite = this.chatmsg.sprite + ".png";
-		} else {
-			this.speakingSprite = "(b)" + this.chatmsg.sprite + ".gif";
-			this.silentSprite = "(a)" + this.chatmsg.sprite + ".gif";
-		}
+		const { speakUrl } = await Promise.any([
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif")),
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png"))
+		]);
+
+		this.speakingSprite = speakUrl;
+
+		const { silentUrl } = await Promise.any([
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif")),
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png"))
+		]);
+
+		this.silentSprite = silentUrl;
 
 		// gets which shout shall played
 		const shout = this.shouts[this.chatmsg.objection];
@@ -1397,6 +1403,15 @@ class Viewport {
 		} catch (err) {
 			return 0;
 		}
+	}
+
+	rejectOnError(f) {
+		return new Promise((resolve, reject) =>
+			f.then((res) => {
+				if (res.ok) resolve(f);
+				else reject(f);
+			})
+		);
 	}
 
 	/**
@@ -1628,11 +1643,11 @@ class Viewport {
 					}
 				}
 
-				charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.speakingSprite);
+				charSprite.src = this.speakingSprite;
 				charSprite.style.display = "";
 
 				if (this.textnow === this.chatmsg.content) {
-					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.silentSprite);
+					charSprite.src = this.silentSprite;
 					charSprite.style.display = "";
 					waitingBox.innerHTML = "&#9654;";
 					this._animating = false;
