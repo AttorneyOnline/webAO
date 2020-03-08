@@ -1386,7 +1386,13 @@ async changeBackground(position) {
 			chatContainerBox.style.display = "none";
 			shoutSprite.src = client.resources[shout]["src"];
 			shoutSprite.style.display = "block";
-			this.shoutaudio.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
+
+			const { url: shoutUrl } = await this.oneSuccess([
+				this.rejectOnError(fetch(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`)),
+				this.rejectOnError(fetch(`${AO_HOST}misc/default/objection.wav`))			
+			]);
+
+			this.shoutaudio.src = shoutUrl;
 			this.shoutaudio.play();
 			this.shoutTimer = 850;
 		} else {
