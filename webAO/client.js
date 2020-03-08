@@ -35,6 +35,7 @@ const MUSIC_HOST = AO_HOST + "sounds/music/";
 
 const UPDATE_INTERVAL = 60;
 
+const transparentPNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 /**
  * Toggles AO1-style loading using paginated music packets for mobile platforms.
  * The old loading uses more smaller packets instead of a single big one,
@@ -1295,17 +1296,17 @@ class Viewport {
 
 		const { url: speakUrl } = await this.oneSuccess([
 			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif")),
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png"))
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png"))
 		]);
 
-		this.speakingSprite = speakUrl ? speakUrl : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+		this.speakingSprite = speakUrl ? speakUrl : transparentPNG;
 
-		const { url: silentUrl } = this.oneSuccess([
+		const { url: silentUrl } = await this.oneSuccess([
 			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif")),
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png"))
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png"))
 		]);
 
-		this.silentSprite = silentUrl ? silentUrl : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+		this.silentSprite = silentUrl ? silentUrl : transparentPNG;
 
 		// gets which shout shall played
 		const shout = this.shouts[this.chatmsg.objection];
@@ -1963,7 +1964,7 @@ window.changeCharacter = changeCharacter;
  */
 export function charError(image) {
 	console.warn(image.src + " is missing from webAO");
-	image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+	//image.src = transparentPNG;
 	return true;
 }
 window.charError = charError;
