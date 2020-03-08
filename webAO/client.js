@@ -1293,19 +1293,19 @@ class Viewport {
 
 		changeBackground(chatmsg.side);
 
-		const { speakUrl } = await Promise.any([
+		const { url: speakUrl } = await this.oneSuccess([
 			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif")),
 			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png"))
 		]);
 
-		this.speakingSprite = speakUrl;
+		this.speakingSprite = speakUrl ? speakUrl : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
-		const { silentUrl } = await Promise.any([
+		const { url: silentUrl } = this.oneSuccess([
 			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif")),
 			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png"))
 		]);
 
-		this.silentSprite = silentUrl;
+		this.silentSprite = silentUrl ? silentUrl : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 		// gets which shout shall played
 		const shout = this.shouts[this.chatmsg.objection];
@@ -1403,6 +1403,23 @@ class Viewport {
 		} catch (err) {
 			return 0;
 		}
+	}
+
+	oneSuccess(promises){
+		return Promise.all(promises.map(p => {
+		// If a request fails, count that as a resolution so it will keep
+		// waiting for other possible successes. If a request succeeds,
+		// treat it as a rejection so Promise.all immediately bails out.
+		return p.then(
+			val => Promise.reject(val),
+			err => Promise.resolve(err)
+		);
+		})).then(
+		// If '.all' resolved, we've just got an array of errors.
+		errors => Promise.reject(errors),
+		// If '.all' rejected, we've got the result we wanted.
+		val => Promise.resolve(val)
+		);
 	}
 
 	rejectOnError(f) {
@@ -1667,7 +1684,7 @@ class Viewport {
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.silentSprite);
+						charSprite.src = this.silentSprite;
 						charSprite.style.display = "";
 						waitingBox.innerHTML = "&#9654;";
 						clearTimeout(this.updater);
