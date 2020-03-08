@@ -1295,15 +1295,15 @@ class Viewport {
 		changeBackground(chatmsg.side);
 
 		const { url: speakUrl } = await this.oneSuccess([
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif")),
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png"))
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif"))
 		]);
 
 		this.speakingSprite = speakUrl ? speakUrl : transparentPNG;
 
 		const { url: silentUrl } = await this.oneSuccess([
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif")),
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png"))
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif"))			
 		]);
 
 		this.silentSprite = silentUrl ? silentUrl : transparentPNG;
