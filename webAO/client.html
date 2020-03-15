@@ -6,10 +6,13 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<meta http-equiv="Content-Security-Policy"      content="default-src 'self' 'unsafe-inline' 'unsafe-eval' file: data: ws: *.aceattorneyonline.com *.wasabisys.com *.animatedchatroom.net golden-layout.com ajax.googleapis.com;">
-    <meta http-equiv="X-Content-Security-Policy"    content="default-src 'self' 'unsafe-inline' 'unsafe-eval' file: data: ws: *.aceattorneyonline.com *.wasabisys.com *.animatedchatroom.net golden-layout.com ajax.googleapis.com;">
-    <meta http-equiv="X-WebKit-CSP"                 content="default-src 'self' 'unsafe-inline' 'unsafe-eval' file: data: ws: *.aceattorneyonline.com *.wasabisys.com *.animatedchatroom.net golden-layout.com ajax.googleapis.com;">
-
+	<meta http-equiv="Content-Security-Policy" content="script-src-elem 'self' https://ajax.googleapis.com;
+														script-src 'self' 'unsafe-inline' 'unsafe-eval' https://ajax.googleapis.com;
+														style-src-elem 'self' https://golden-layout.com;
+														style-src 'self' 'unsafe-inline' https://golden-layout.com;
+														img-src 'self' data: https://webao.animatedchatroom.net https://s3.wasabisys.com;
+														connect-src 'self' ws: https://webao.animatedchatroom.net https://s3.wasabisys.com;
+														media-src 'self' https://webao.animatedchatroom.net https://s3.wasabisys.com;">
 
 	<link rel="stylesheet" type="text/css" href="styles/client.css?v=1.0.0" id="client_stylesheet">
 	<link rel="stylesheet" type="text/css" href="styles/default.css?v=1.0.0" id="client_theme">
@@ -20,7 +23,7 @@
 	<script src="lib/jdataview.min.js"></script>
 	<script src="lib/gify.min.js"></script>
 	<script src="ui.b.js"></script>
-	<script src="client.b.js?v=1.0.0"></script>
+	<script src="client.b.js?v=1.0.1"></script>
 </head>
 
 <body>
