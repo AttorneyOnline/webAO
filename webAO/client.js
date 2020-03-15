@@ -390,9 +390,9 @@ class Client extends EventEmitter {
 
 		document.getElementById("client_musicaudio").volume = getCookie("musicVolume") || 1;
 		changeMusicVolume();
-		document.getElementById("client_svolume").value = getCookie("sfxVolume") || 100;
+		document.getElementById("client_svolume").value = getCookie("sfxVolume") || 1;
 		changeSFXVolume();
-		document.getElementById("client_bvolume").value = getCookie("blipVolume") || 100;
+		document.getElementById("client_bvolume").value = getCookie("blipVolume") || 1;
 		changeBlipVolume();
 
 		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
@@ -1878,8 +1878,8 @@ window.changeMusicVolume = changeMusicVolume;
  * Triggered by the sound effect volume slider.
  */
 export function changeSFXVolume() {
-	viewport.sfxaudio.volume = document.getElementById("client_svolume").value / 100;
-	viewport.shoutaudio.volume = document.getElementById("client_svolume").value / 100;
+	viewport.sfxaudio.volume = document.getElementById("client_svolume").value;
+	viewport.shoutaudio.volume = document.getElementById("client_svolume").value;
 	setCookie("sfxVolume", document.getElementById("client_svolume").value);
 }
 window.changeSFXVolume = changeSFXVolume;
@@ -1888,7 +1888,7 @@ window.changeSFXVolume = changeSFXVolume;
  * Triggered by the blip volume slider.
  */
 export function changeBlipVolume() {
-	viewport.blipVolume = document.getElementById("client_bvolume").value / 100;
+	viewport.blipVolume = document.getElementById("client_bvolume").value;
 	setCookie("blipVolume", document.getElementById("client_bvolume").value);
 }
 window.changeBlipVolume = changeBlipVolume;
