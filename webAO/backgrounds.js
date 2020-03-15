@@ -5,7 +5,7 @@ export default [
 	"CountyCourt",
 	"CruiseCourt",
 	"default",
-	"DGDEnglishCourt",
+	"DGSEnglishCourt",
 	"DGSJapanCourt",
 	"DualDestinies",
 	"EnglishCourt",
