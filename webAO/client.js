@@ -1321,123 +1321,6 @@ async changeBackground(position) {
 	}
 
 	/**
-	 * Sets a new emote.
-	 * TODO: merge this and initUpdater
-	 * This sets up everything before the tick() loops starts
-	 * a lot of things can probably be moved here, like starting the shout animation if there is one
-	 * TODO: the preanim logic, on the other hand, should probably be moved to tick()
-	 * @param {object} chatmsg the new chat message
-	 */
-	async say(chatmsg) {
-		this.chatmsg = chatmsg;
-		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(chatmsg.blips.toLowerCase())}.wav`);
-		this.textnow = "";
-		this.sfxplayed = 0;
-		this.textTimer = 0;
-		this._animating = true;
-
-		const nameBox = document.getElementById("client_name");
-		const chatBox = document.getElementById("client_chat");
-		const chatContainerBox = document.getElementById("client_chatcontainer");
-		const waitingBox = document.getElementById("client_chatwaiting");
-		const eviBox = document.getElementById("client_evi");
-		const shoutSprite = document.getElementById("client_shout");
-		const chatBoxInner = document.getElementById("client_inner_chat");
-		const fg = document.getElementById("client_fg");
-		const gamewindow = document.getElementById("client_gamewindow");
-
-		let delay=0;
-
-		// stop updater
-		clearTimeout(this.updater);
-
-		// Reset CSS animation
-		fg.style.animation = "";
-		gamewindow.style.animation = "";
-		eviBox.style.opacity = "0";
-		eviBox.style.height = "0%";
-
-		//Clear out the last message
-		waitingBox.innerText = "";
-		chatBoxInner.innerText = this.textnow;
-
-		this.changeBackground(chatmsg.side);
-
-		try {
-		const { url: speakUrl } = await this.oneSuccess([
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif"))
-		]);
-		this.speakingSprite = speakUrl ? speakUrl : transparentPNG;
-		} catch (error) {
-			this.speakingSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif";
-		}
-
-		try {
-		const { url: silentUrl } = await this.oneSuccess([
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif"))			
-		]);
-		this.silentSprite = silentUrl ? silentUrl : transparentPNG;
-		} catch (error) {
-			this.silentSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif";
-		}
-
-		// gets which shout shall played
-		const shout = this.shouts[this.chatmsg.objection];
-		if (shout) {
-			// Hide message box
-			nameBox.style.display = "none";
-			chatBox.style.display = "none";
-			chatContainerBox.style.display = "none";
-			shoutSprite.src = client.resources[shout]["src"];
-			shoutSprite.style.display = "block";
-
-			const { url: shoutUrl } = await this.oneSuccess([
-				this.rejectOnError(fetch(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`)),
-				this.rejectOnError(fetch(`${AO_HOST}misc/default/objection.wav`))			
-			]);
-
-			this.shoutaudio.src = shoutUrl;
-			this.shoutaudio.play();
-			this.shoutTimer = 850;
-		} else {
-			this.shoutTimer = 0;
-		}
-
-		switch (this.chatmsg.type) {
-			// case 0:
-				// normal emote, no preanim
-			case 1:
-				// play preanim
-				// Hide message box
-				nameBox.style.display = "none";
-				chatBox.style.display = "none";
-				chatContainerBox.style.display = "none";
-				// If preanim existed then determine the length
-				delay = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
-				chatmsg.preanimdelay = delay;
-				this.chatmsg.startpreanim = true;
-				this.chatmsg.startspeaking = false;
-				break;
-			// case 5:
-				// zoom
-			default:
-				// due to a retarded client bug, we need to strip the sfx from the MS, if the preanim isn't playing
-				chatmsg.sound = "";	
-				this.chatmsg.startpreanim = false;
-				this.chatmsg.startspeaking = true;			
-				break;
-		}
-
-		this.initUpdater(delay);
-
-		appendICLog(chatmsg.content, chatmsg.nameplate);
-		//Set the nameplate after it (might) have been hidden
-		nameBox.innerText = this.chatmsg.nameplate;
-	}
-
-	/**
 	 * Intialize updater
 	 * @param {number} animdelay the length of pre-animation 
 	 */
@@ -1576,6 +1459,124 @@ async changeBackground(position) {
 		this.testimonyTimer = 0;
 		document.getElementById("client_testimony").style.display = "none";
 		clearTimeout(this.testimonyUpdater);
+	}
+
+
+	/**
+	 * Sets a new emote.
+	 * TODO: merge this and initUpdater
+	 * This sets up everything before the tick() loops starts
+	 * a lot of things can probably be moved here, like starting the shout animation if there is one
+	 * TODO: the preanim logic, on the other hand, should probably be moved to tick()
+	 * @param {object} chatmsg the new chat message
+	 */
+	async say(chatmsg) {
+		this.chatmsg = chatmsg;
+		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(chatmsg.blips.toLowerCase())}.wav`);
+		this.textnow = "";
+		this.sfxplayed = 0;
+		this.textTimer = 0;
+		this._animating = true;
+
+		const nameBox = document.getElementById("client_name");
+		const chatBox = document.getElementById("client_chat");
+		const chatContainerBox = document.getElementById("client_chatcontainer");
+		const waitingBox = document.getElementById("client_chatwaiting");
+		const eviBox = document.getElementById("client_evi");
+		const shoutSprite = document.getElementById("client_shout");
+		const chatBoxInner = document.getElementById("client_inner_chat");
+		const fg = document.getElementById("client_fg");
+		const gamewindow = document.getElementById("client_gamewindow");
+
+		let delay=0;
+
+		// stop updater
+		clearTimeout(this.updater);
+
+		// Reset CSS animation
+		fg.style.animation = "";
+		gamewindow.style.animation = "";
+		eviBox.style.opacity = "0";
+		eviBox.style.height = "0%";
+
+		//Clear out the last message
+		waitingBox.innerText = "";
+		chatBoxInner.innerText = this.textnow;
+
+		this.changeBackground(chatmsg.side);
+
+		try {
+		const { url: speakUrl } = await this.oneSuccess([
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif"))
+		]);
+		this.speakingSprite = speakUrl ? speakUrl : transparentPNG;
+		} catch (error) {
+			this.speakingSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif";
+		}
+
+		try {
+		const { url: silentUrl } = await this.oneSuccess([
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif"))			
+		]);
+		this.silentSprite = silentUrl ? silentUrl : transparentPNG;
+		} catch (error) {
+			this.silentSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif";
+		}
+
+		// gets which shout shall played
+		const shout = this.shouts[this.chatmsg.objection];
+		if (shout) {
+			// Hide message box
+			nameBox.style.display = "none";
+			chatBox.style.display = "none";
+			chatContainerBox.style.display = "none";
+			shoutSprite.src = client.resources[shout]["src"];
+			shoutSprite.style.display = "block";
+
+			const { url: shoutUrl } = await this.oneSuccess([
+				this.rejectOnError(fetch(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`)),
+				this.rejectOnError(fetch(`${AO_HOST}misc/default/objection.wav`))			
+			]);
+
+			this.shoutaudio.src = shoutUrl;
+			this.shoutaudio.play();
+			this.shoutTimer = 850;
+		} else {
+			this.shoutTimer = 0;
+		}
+
+		switch (this.chatmsg.type) {
+			// case 0:
+				// normal emote, no preanim
+			case 1:
+				// play preanim
+				// Hide message box
+				nameBox.style.display = "none";
+				chatBox.style.display = "none";
+				chatContainerBox.style.display = "none";
+				// If preanim existed then determine the length
+				delay = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
+				chatmsg.preanimdelay = delay;
+				this.chatmsg.startpreanim = true;
+				this.chatmsg.startspeaking = false;
+				break;
+			// case 5:
+				// zoom
+			default:
+				// due to a retarded client bug, we need to strip the sfx from the MS, if the preanim isn't playing
+				chatmsg.sound = "";	
+				this.chatmsg.startpreanim = false;
+				this.chatmsg.startspeaking = true;			
+				break;
+		}
+
+		this.initUpdater(delay);
+
+		appendICLog(chatmsg.content, chatmsg.nameplate);
+		//Set the nameplate after it (might) have been hidden
+		nameBox.innerText = this.chatmsg.nameplate;
 	}
 
 	/**
