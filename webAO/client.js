@@ -35,6 +35,7 @@ const MUSIC_HOST = AO_HOST + "sounds/music/";
 
 const UPDATE_INTERVAL = 60;
 
+const transparentPNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 /**
  * Toggles AO1-style loading using paginated music packets for mobile platforms.
  * The old loading uses more smaller packets instead of a single big one,
@@ -511,7 +512,7 @@ class Client extends EventEmitter {
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
 				name: safe_tags(args[3]),
-				sprite: safe_tags(args[4]),
+				sprite: safe_tags(args[4]).toLowerCase(),
 				content: this.prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
 				sound: safe_tags(args[7]).toLowerCase(),
@@ -902,9 +903,9 @@ class Client extends EventEmitter {
 		}
 		document.getElementById("bg_preview").src = AO_HOST + "background/" + encodeURI(args[1].toLowerCase()) + "/defenseempty.png";
 		if (this.charID === -1) {
-			changeBackground("jud");
+			viewport.changeBackground("jud");
 		} else {
-			changeBackground(this.chars[this.charID].side);
+			viewport.changeBackground(this.chars[this.charID].side);
 		}
 
 	}
@@ -1251,6 +1252,75 @@ class Viewport {
 	}
 
 	/**
+ * Changes the viewport background based on a given position.
+ * 
+ * Valid positions: `def, pro, hld, hlp, wit, jud, jur, sea`
+ * @param {string} position the position to change into
+ */
+async changeBackground(position) {
+	const bgfolder = viewport.bgFolder;
+
+	const positions = {
+		def: {
+			bg: "defenseempty.png",
+			desk: { ao2: "defensedesk.png", ao1: "bancodefensa.png" },
+			speedLines: "defense_speedlines.gif"
+		},
+		pro: {
+			bg: "prosecutorempty.png",
+			desk: { ao2: "prosecutiondesk.png", ao1: "bancoacusacion.png" },
+			speedLines: "prosecution_speedlines.gif"
+		},
+		hld: {
+			bg: "helperstand.png",
+			desk: null,
+			speedLines: "defense_speedlines.gif"
+		},
+		hlp: {
+			bg: "prohelperstand.png",
+			desk: null,
+			speedLines: "prosecution_speedlines.gif"
+		},
+		wit: {
+			bg: "witnessempty.png",
+			desk: { ao2: "stand.png", ao1: "estrado.png" },
+			speedLines: "prosecution_speedlines.gif"
+		},
+		jud: {
+			bg: "judgestand.png",
+			desk: null,
+			speedLines: "prosecution_speedlines.gif"
+		},
+		jur: {
+			bg: "jurystand.png",
+			desk: { ao2: "jurydesk.png", ao1: "estrado.png" },
+			speedLines: "defense_speedlines.gif"
+		},
+		sea: {
+			bg: "seancestand.png",
+			desk: { ao2: "seancedesk.png", ao1: "estrado.png" },
+			speedLines: "prosecution_speedlines.gif"
+		}
+	};
+
+	const { bg, desk, speedLines } = positions[position];
+
+	if (viewport.chatmsg.type === 5) {
+		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
+		document.getElementById("client_bench").style.display = "none";
+	} else {
+		document.getElementById("client_court").src = bgfolder + bg;
+		if (desk) {
+			const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
+			document.getElementById("client_bench").src = bgfolder + deskFilename;
+			document.getElementById("client_bench").style.display = "block";
+		} else {
+			document.getElementById("client_bench").style.display = "none";
+		}
+	}
+	}
+
+	/**
 	 * Sets a new emote.
 	 * TODO: merge this and initUpdater
 	 * This sets up everything before the tick() loops starts
@@ -1291,14 +1361,26 @@ class Viewport {
 		waitingBox.innerText = "";
 		chatBoxInner.innerText = this.textnow;
 
-		changeBackground(chatmsg.side);
+		this.changeBackground(chatmsg.side);
 
-		if (this.chatmsg.name.toLowerCase().endsWith("_hd")) {
-			this.speakingSprite = this.chatmsg.sprite + ".png";
-			this.silentSprite = this.chatmsg.sprite + ".png";
-		} else {
-			this.speakingSprite = "(b)" + this.chatmsg.sprite + ".gif";
-			this.silentSprite = "(a)" + this.chatmsg.sprite + ".gif";
+		try {
+		const { url: speakUrl } = await this.oneSuccess([
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif"))
+		]);
+		this.speakingSprite = speakUrl ? speakUrl : transparentPNG;
+		} catch (error) {
+			this.speakingSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif";
+		}
+
+		try {
+		const { url: silentUrl } = await this.oneSuccess([
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
+			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif"))			
+		]);
+		this.silentSprite = silentUrl ? silentUrl : transparentPNG;
+		} catch (error) {
+			this.silentSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif";
 		}
 
 		// gets which shout shall played
@@ -1310,7 +1392,13 @@ class Viewport {
 			chatContainerBox.style.display = "none";
 			shoutSprite.src = client.resources[shout]["src"];
 			shoutSprite.style.display = "block";
-			this.shoutaudio.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
+
+			const { url: shoutUrl } = await this.oneSuccess([
+				this.rejectOnError(fetch(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`)),
+				this.rejectOnError(fetch(`${AO_HOST}misc/default/objection.wav`))			
+			]);
+
+			this.shoutaudio.src = shoutUrl;
 			this.shoutaudio.play();
 			this.shoutTimer = 850;
 		} else {
@@ -1397,6 +1485,32 @@ class Viewport {
 		} catch (err) {
 			return 0;
 		}
+	}
+
+	oneSuccess(promises){
+		return Promise.all(promises.map(p => {
+		// If a request fails, count that as a resolution so it will keep
+		// waiting for other possible successes. If a request succeeds,
+		// treat it as a rejection so Promise.all immediately bails out.
+		return p.then(
+			val => Promise.reject(val),
+			err => Promise.resolve(err)
+		);
+		})).then(
+		// If '.all' resolved, we've just got an array of errors.
+		errors => Promise.reject(errors),
+		// If '.all' rejected, we've got the result we wanted.
+		val => Promise.resolve(val)
+		);
+	}
+
+	rejectOnError(f) {
+		return new Promise((resolve, reject) =>
+			f.then((res) => {
+				if (res.ok) resolve(f);
+				else reject(f);
+			})
+		);
 	}
 
 	/**
@@ -1611,7 +1725,7 @@ class Viewport {
 
 				if (this.chatmsg.preanimdelay === 0) {
 					shoutSprite.style.display = "none";
-					changeBackground(this.chatmsg.side);
+					this.changeBackground(this.chatmsg.side);
 				}
 
 				if (extrafeatures.includes("cccc_ic_support")) {
@@ -1628,11 +1742,11 @@ class Viewport {
 					}
 				}
 
-				charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.speakingSprite);
+				charSprite.src = this.speakingSprite;
 				charSprite.style.display = "";
 
 				if (this.textnow === this.chatmsg.content) {
-					charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.silentSprite);
+					charSprite.src = this.silentSprite;
 					charSprite.style.display = "";
 					waitingBox.innerHTML = "&#9654;";
 					this._animating = false;
@@ -1652,7 +1766,7 @@ class Viewport {
 					if (this.textnow === this.chatmsg.content) {
 						this.textTimer = 0;
 						this._animating = false;
-						charSprite.src = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + encodeURI(this.silentSprite);
+						charSprite.src = this.silentSprite;
 						charSprite.style.display = "";
 						waitingBox.innerHTML = "&#9654;";
 						clearTimeout(this.updater);
@@ -1931,7 +2045,7 @@ window.changeCharacter = changeCharacter;
  */
 export function charError(image) {
 	console.warn(image.src + " is missing from webAO");
-	image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+	//image.src = transparentPNG;
 	return true;
 }
 window.charError = charError;
@@ -2026,75 +2140,6 @@ async function fileExists(url) {
 	} catch (err) {
 		if (err.code >= 400) return false;
 		else throw err;
-	}
-}
-
-/**
- * Changes the viewport background based on a given position.
- * 
- * Valid positions: `def, pro, hld, hlp, wit, jud, jur, sea`
- * @param {string} position the position to change into
- */
-async function changeBackground(position) {
-	const bgfolder = viewport.bgFolder;
-
-	const positions = {
-		def: {
-			bg: "defenseempty.png",
-			desk: { ao2: "defensedesk.png", ao1: "bancodefensa.png" },
-			speedLines: "defense_speedlines.gif"
-		},
-		pro: {
-			bg: "prosecutorempty.png",
-			desk: { ao2: "prosecutiondesk.png", ao1: "bancoacusacion.png" },
-			speedLines: "prosecution_speedlines.gif"
-		},
-		hld: {
-			bg: "helperstand.png",
-			desk: null,
-			speedLines: "defense_speedlines.gif"
-		},
-		hlp: {
-			bg: "prohelperstand.png",
-			desk: null,
-			speedLines: "prosecution_speedlines.gif"
-		},
-		wit: {
-			bg: "witnessempty.png",
-			desk: { ao2: "stand.png", ao1: "estrado.png" },
-			speedLines: "prosecution_speedlines.gif"
-		},
-		jud: {
-			bg: "judgestand.png",
-			desk: null,
-			speedLines: "prosecution_speedlines.gif"
-		},
-		jur: {
-			bg: "jurystand.png",
-			desk: { ao2: "jurydesk.png", ao1: "estrado.png" },
-			speedLines: "defense_speedlines.gif"
-		},
-		sea: {
-			bg: "seancestand.png",
-			desk: { ao2: "seancedesk.png", ao1: "estrado.png" },
-			speedLines: "prosecution_speedlines.gif"
-		}
-	};
-
-	const { bg, desk, speedLines } = positions[position];
-
-	if (viewport.chatmsg.type === 5) {
-		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
-		document.getElementById("client_bench").style.display = "none";
-	} else {
-		document.getElementById("client_court").src = bgfolder + bg;
-		if (desk) {
-			const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
-			document.getElementById("client_bench").src = bgfolder + deskFilename;
-			document.getElementById("client_bench").style.display = "block";
-		} else {
-			document.getElementById("client_bench").style.display = "none";
-		}
 	}
 }
 
