@@ -1488,7 +1488,7 @@ async changeBackground(position) {
 		const fg = document.getElementById("client_fg");
 		const gamewindow = document.getElementById("client_gamewindow");
 
-		let delay=0;
+		let delay = 0;
 
 		// stop updater
 		clearTimeout(this.updater);
@@ -1499,28 +1499,23 @@ async changeBackground(position) {
 		eviBox.style.opacity = "0";
 		eviBox.style.height = "0%";
 
-		//Clear out the last message
-		waitingBox.innerText = "";
-		chatBoxInner.innerText = this.textnow;
-
-		this.changeBackground(chatmsg.side);
-
+		// start checking the files
 		try {
-		const { url: speakUrl } = await this.oneSuccess([
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif"))
-		]);
-		this.speakingSprite = speakUrl ? speakUrl : transparentPNG;
+			const { url: speakUrl } = await this.oneSuccess([
+				this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png")),
+				this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif"))
+			]);
+			this.speakingSprite = speakUrl ? speakUrl : transparentPNG;
 		} catch (error) {
 			this.speakingSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif";
 		}
 
 		try {
-		const { url: silentUrl } = await this.oneSuccess([
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
-			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif"))			
-		]);
-		this.silentSprite = silentUrl ? silentUrl : transparentPNG;
+			const { url: silentUrl } = await this.oneSuccess([
+				this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png")),
+				this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif"))
+			]);
+			this.silentSprite = silentUrl ? silentUrl : transparentPNG;
 		} catch (error) {
 			this.silentSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif";
 		}
@@ -1537,7 +1532,7 @@ async changeBackground(position) {
 
 			const { url: shoutUrl } = await this.oneSuccess([
 				this.rejectOnError(fetch(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`)),
-				this.rejectOnError(fetch(`${AO_HOST}misc/default/objection.wav`))			
+				this.rejectOnError(fetch(`${AO_HOST}misc/default/objection.wav`))
 			]);
 
 			this.shoutaudio.src = shoutUrl;
@@ -1550,7 +1545,7 @@ async changeBackground(position) {
 		this.chatmsg.startpreanim = true;
 		switch (this.chatmsg.type) {
 			// case 0:
-				// normal emote, no preanim
+			// normal emote, no preanim
 			case 1:
 				// play preanim
 				// Hide message box
@@ -1563,19 +1558,24 @@ async changeBackground(position) {
 				this.chatmsg.startspeaking = false;
 				break;
 			// case 5:
-				// zoom
+			// zoom
 			default:
 				// due to a retarded client bug, we need to strip the sfx from the MS, if the preanim isn't playing
 				chatmsg.sound = "";
-				this.chatmsg.startspeaking = true;			
+				this.chatmsg.startspeaking = true;
 				break;
 		}
+
+		//Clear out the last message
+		waitingBox.innerText = "";
+		chatBoxInner.innerText = this.textnow;
+		nameBox.innerText = this.chatmsg.nameplate;
+
+		this.changeBackground(chatmsg.side);
 
 		this.initUpdater(delay);
 
 		appendICLog(chatmsg.content, chatmsg.nameplate);
-		//Set the nameplate after it (might) have been hidden
-		nameBox.innerText = this.chatmsg.nameplate;
 	}
 
 	/**
