@@ -512,7 +512,7 @@ class Client extends EventEmitter {
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
 				name: safe_tags(args[3]),
-				sprite: safe_tags(args[4]),
+				sprite: safe_tags(args[4]).toLowerCase(),
 				content: this.prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
 				sound: safe_tags(args[7]).toLowerCase(),
