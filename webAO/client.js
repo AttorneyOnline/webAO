@@ -1174,7 +1174,7 @@ class Viewport {
 			"content": "",
 			"objection": 0,
 			"sound": "",
-			"startpreanim": false,
+			"startpreanim": true,
 			"startspeaking": false,
 			"side": null,
 			"color": 0,
@@ -1547,6 +1547,7 @@ async changeBackground(position) {
 			this.shoutTimer = 0;
 		}
 
+		this.chatmsg.startpreanim = true;
 		switch (this.chatmsg.type) {
 			// case 0:
 				// normal emote, no preanim
@@ -1559,15 +1560,13 @@ async changeBackground(position) {
 				// If preanim existed then determine the length
 				delay = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
 				chatmsg.preanimdelay = delay;
-				this.chatmsg.startpreanim = true;
 				this.chatmsg.startspeaking = false;
 				break;
 			// case 5:
 				// zoom
 			default:
 				// due to a retarded client bug, we need to strip the sfx from the MS, if the preanim isn't playing
-				chatmsg.sound = "";	
-				this.chatmsg.startpreanim = false;
+				chatmsg.sound = "";
 				this.chatmsg.startspeaking = true;			
 				break;
 		}
