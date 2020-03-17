@@ -1363,19 +1363,25 @@ async changeBackground(position) {
 
 		this.changeBackground(chatmsg.side);
 
+		try {
 		const { url: speakUrl } = await this.oneSuccess([
 			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
 			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif"))
 		]);
-
 		this.speakingSprite = speakUrl ? speakUrl : transparentPNG;
+		} catch (error) {
+			this.speakingSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif";
+		}
 
+		try {
 		const { url: silentUrl } = await this.oneSuccess([
 			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/"    + this.chatmsg.sprite + ".png")),
 			this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif"))			
 		]);
-
 		this.silentSprite = silentUrl ? silentUrl : transparentPNG;
+		} catch (error) {
+			this.silentSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif";
+		}
 
 		// gets which shout shall played
 		const shout = this.shouts[this.chatmsg.objection];
