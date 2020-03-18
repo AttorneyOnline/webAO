@@ -1221,6 +1221,8 @@ class Viewport {
 
 		this.bgname = "gs4";
 
+		this.lastChar = "";
+
 		this.testimonyTimer = 0;
 		this.shoutTimer = 0;
 		this.textTimer = 0;
@@ -1478,6 +1480,8 @@ async changeBackground(position) {
 		this.textTimer = 0;
 		this._animating = true;
 
+		const charSprite = document.getElementById("client_char");
+		const pairSprite = document.getElementById("client_pair_char");
 		const nameBox = document.getElementById("client_name");
 		const chatBox = document.getElementById("client_chat");
 		const chatContainerBox = document.getElementById("client_chatcontainer");
@@ -1496,8 +1500,9 @@ async changeBackground(position) {
 		// Reset CSS animation
 		fg.style.animation = "";
 		gamewindow.style.animation = "";
+		waitingBox.innerText = "";
 		eviBox.style.opacity = "0";
-		eviBox.style.height = "0%";
+		eviBox.style.height = "0%";	
 
 		// start checking the files
 		try {
@@ -1530,10 +1535,17 @@ async changeBackground(position) {
 			shoutSprite.src = client.resources[shout]["src"];
 			shoutSprite.style.display = "block";
 
-			const { url: shoutUrl } = await this.oneSuccess([
+			let shoutUrl;
+
+			try {
+			const { url: soundUrl } = await this.oneSuccess([
 				this.rejectOnError(fetch(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`)),
 				this.rejectOnError(fetch(`${AO_HOST}misc/default/objection.wav`))
 			]);
+			shoutUrl = soundUrl;
+			} catch (error) {
+				shoutUrl = AO_HOST + `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
+			}
 
 			this.shoutaudio.src = shoutUrl;
 			this.shoutaudio.play();
@@ -1566,16 +1578,23 @@ async changeBackground(position) {
 				break;
 		}
 
+		appendICLog(chatmsg.content, chatmsg.nameplate);
+
 		//Clear out the last message
-		waitingBox.innerText = "";
 		chatBoxInner.innerText = this.textnow;
 		nameBox.innerText = this.chatmsg.nameplate;
+
+		if (this.lastChar !== this.chatmsg.name) {
+			charSprite.style.display = "none";
+			charSprite.src = transparentPNG;
+			pairSprite.style.display = "none";	
+			pairSprite.src = transparentPNG;
+		}
+		this.lastChar = this.chatmsg.name;
 
 		this.changeBackground(chatmsg.side);
 
 		this.initUpdater(delay);
-
-		appendICLog(chatmsg.content, chatmsg.nameplate);
 	}
 
 	/**
