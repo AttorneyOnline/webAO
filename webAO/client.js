@@ -1324,14 +1324,6 @@ async changeBackground(position) {
 	}
 
 	/**
-	 * Intialize updater
-	 * @param {number} animdelay the length of pre-animation 
-	 */
-	initUpdater() {
-		viewport.updater = setTimeout(() => viewport.tick(), UPDATE_INTERVAL);
-	}
-
-	/**
 	 * Intialize testimony updater 
 	 */
 	initTestimonyUpdater() {
@@ -1614,7 +1606,7 @@ async changeBackground(position) {
 			}
 		}
 
-		this.initUpdater();
+		this.tick();
 	}
 
 	/**
