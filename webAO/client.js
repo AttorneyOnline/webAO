@@ -1291,7 +1291,7 @@ async changeBackground(position) {
 		},
 		jud: {
 			bg: "judgestand.png",
-			desk: null,
+			desk: { ao2: "judgedesk.png", ao1: "judgedesk.gif" },
 			speedLines: "prosecution_speedlines.gif"
 		},
 		jur: {
