@@ -1222,6 +1222,7 @@ class Viewport {
 		this.bgname = "gs4";
 
 		this.lastChar = "";
+		this.lastEvi = 0;
 
 		this.testimonyTimer = 0;
 		this.shoutTimer = 0;
@@ -1501,8 +1502,26 @@ async changeBackground(position) {
 		fg.style.animation = "";
 		gamewindow.style.animation = "";
 		waitingBox.innerText = "";
-		eviBox.style.opacity = "0";
-		eviBox.style.height = "0%";	
+
+		if (this.lastEvi !== this.chatmsg.evidence) {
+			eviBox.style.opacity = "0";
+			eviBox.style.height = "0%";	
+		}
+		this.lastEvi = this.chatmsg.evidence;
+
+		//Clear out the last message
+		chatBoxInner.innerText = this.textnow;
+		nameBox.innerText = this.chatmsg.nameplate;		
+
+		if (this.lastChar !== this.chatmsg.name) {
+			charSprite.style.display = "none";
+			charSprite.src = transparentPNG;
+			pairSprite.style.display = "none";	
+			pairSprite.src = transparentPNG;
+		}
+		this.lastChar = this.chatmsg.name;
+
+		appendICLog(chatmsg.content, chatmsg.nameplate);
 
 		// start checking the files
 		try {
@@ -1578,21 +1597,23 @@ async changeBackground(position) {
 				break;
 		}
 
-		appendICLog(chatmsg.content, chatmsg.nameplate);
-
-		//Clear out the last message
-		chatBoxInner.innerText = this.textnow;
-		nameBox.innerText = this.chatmsg.nameplate;
-
-		if (this.lastChar !== this.chatmsg.name) {
-			charSprite.style.display = "none";
-			charSprite.src = transparentPNG;
-			pairSprite.style.display = "none";	
-			pairSprite.src = transparentPNG;
-		}
-		this.lastChar = this.chatmsg.name;
-
 		this.changeBackground(chatmsg.side);
+
+		// Flip the character
+		if (this.chatmsg.flip === 1) {
+			charSprite.style.transform = "scaleX(-1)";
+		} else {
+			charSprite.style.transform = "scaleX(1)";
+		}
+
+		if (extrafeatures.includes("cccc_ic_support")) {
+			// Flip the pair character
+			if (this.chatmsg.other_flip === 1) {
+				pairSprite.style.transform = "scaleX(-1)";
+			} else {
+				pairSprite.style.transform = "scaleX(1)";
+			}
+		}
 
 		this.initUpdater(delay);
 	}
@@ -1644,22 +1665,6 @@ async changeBackground(position) {
 		const eviBox = document.getElementById("client_evi");
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
-
-		// Flip the character
-		if (this.chatmsg.flip === 1) {
-			charSprite.style.transform = "scaleX(-1)";
-		} else {
-			charSprite.style.transform = "scaleX(1)";
-		}
-
-		if (extrafeatures.includes("cccc_ic_support")) {
-			// Flip the pair character
-			if (this.chatmsg.other_flip === 1) {
-				pairSprite.style.transform = "scaleX(-1)";
-			} else {
-				pairSprite.style.transform = "scaleX(1)";
-			}
-		}
 
 		if (this._animating) {
 			this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
