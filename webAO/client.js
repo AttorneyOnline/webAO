@@ -1327,8 +1327,7 @@ async changeBackground(position) {
 	 * Intialize updater
 	 * @param {number} animdelay the length of pre-animation 
 	 */
-	initUpdater(animdelay) {
-		viewport.chatmsg.preanimdelay = parseInt(animdelay);
+	initUpdater() {
 		viewport.updater = setTimeout(() => viewport.tick(), UPDATE_INTERVAL);
 	}
 
@@ -1493,7 +1492,7 @@ async changeBackground(position) {
 		const fg = document.getElementById("client_fg");
 		const gamewindow = document.getElementById("client_gamewindow");
 
-		let delay = 0;
+		let gifLength = 0;
 
 		// stop updater
 		clearTimeout(this.updater);
@@ -1584,8 +1583,7 @@ async changeBackground(position) {
 				chatBox.style.display = "none";
 				chatContainerBox.style.display = "none";
 				// If preanim existed then determine the length
-				delay = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
-				chatmsg.preanimdelay = delay;
+				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
 				this.chatmsg.startspeaking = false;
 				break;
 			// case 5:
@@ -1596,6 +1594,7 @@ async changeBackground(position) {
 				this.chatmsg.startspeaking = true;
 				break;
 		}
+		this.chatmsg.preanimdelay = parseInt(gifLength);
 
 		this.changeBackground(chatmsg.side);
 
@@ -1615,7 +1614,7 @@ async changeBackground(position) {
 			}
 		}
 
-		this.initUpdater(delay);
+		this.initUpdater();
 	}
 
 	/**
