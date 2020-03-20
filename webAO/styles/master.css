@@ -47,6 +47,11 @@
 	padding: 1px;
 }
 
+#header {
+	position: absolute;
+	left: 0;
+}
+
 #serverdescription_box {
 	display: inline-block;
 	position: fixed;
