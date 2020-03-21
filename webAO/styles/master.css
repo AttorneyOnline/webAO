@@ -41,6 +41,14 @@
 	font-size: 0.8em;
 }
 
+#masterchat {
+	width: 260px;
+	height: 260px;
+	font-size: inherit;
+	background-color: darkgrey;
+	color: black;
+}
+
 #serverdescription_box {
 	display: inline-block;
 	position: fixed;
