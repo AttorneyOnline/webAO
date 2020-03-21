@@ -478,6 +478,11 @@ class Client extends EventEmitter {
 	 */
 	cleanup() {
 		clearInterval(this.checkUpdater);
+
+		// the connection got rekt, get rid of the old musiclist
+		document.getElementById("areas").innerHTML = "";
+		document.getElementById("client_musiclist").innerHTML = "";
+		document.getElementById("client_chartable").innerHTML = "";
 	}
 
 	/**
@@ -2166,7 +2171,9 @@ export function ReconnectButton() {
 	client = new Client(serverIP);
 	if (client) {
 		mode = "join"; // HACK: see client.onOpen
+
 		document.getElementById("client_error").style.display = "none";
+
 	}
 }
 window.ReconnectButton = ReconnectButton;
