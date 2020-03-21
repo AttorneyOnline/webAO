@@ -1,18 +1,3 @@
-#serverinfo {
-	margin-top: 75px;
-	margin-bottom: 0px;
-	float: left;
-	font-size:0.6em;
-}
-
-#clientinfo {
-	margin: 0px;
-	display: block;
-	float: left;
-	clear: both;
-	font-size:0.6em;
-}
-
 .button {
 	padding: 5px;
 	vertical-align: middle;
@@ -45,6 +30,23 @@
 	border-color: #bdb521;
 	border-width:11px;
 	padding: 1px;
+}
+
+#header {
+	display: block;
+	float: left;
+	margin-top: 75px;
+	position: absolute;
+	left: 0;
+	font-size: 0.8em;
+}
+
+#masterchat {
+	width: 260px;
+	height: 260px;
+	font-size: inherit;
+	background-color: darkgrey;
+	color: black;
 }
 
 #serverdescription_box {

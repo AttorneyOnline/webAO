@@ -10,6 +10,22 @@ const options = {fonts: {extendedJsFonts: true, userDefinedFonts: ["Ace Attorney
 
 let oldLoading = false;
 
+const server_description = [];
+server_description[-1] = "This is your computer on port 50001";
+const online_counter = [];
+
+/**
+ * Unescapes a string to AO1 escape codes.
+ * @param {string} estring the string to be unescaped
+ */
+function unescapeChat(estring) {
+	return estring
+		.replace(/<num>/g, "#")
+		.replace(/<and>/g, "&")
+		.replace(/<percent>/g, "%")
+		.replace(/<dollar>/g, "$");
+}
+
 if (window.requestIdleCallback) {
     requestIdleCallback(function () {
         Fingerprint2.get(options, function (components) {
@@ -39,10 +55,6 @@ if (window.requestIdleCallback) {
         });
     }, 500);
 }
-
-const server_description = [];
-server_description[-1] = "This is your computer on port 50001";
-const online_counter = [];
 
 export function setServ(ID) {
 	console.log(server_description[ID]);
@@ -153,5 +165,13 @@ function onMessage(e) {
 	else if (header === "SV") {
 		const args = msg.split("#").slice(1);
 		document.getElementById("serverinfo").innerHTML = `Master server version: ${args[0]}`;
+	}
+	else if (header === "CT") {
+		const args = msg.split("#").slice(1);
+		const msChat = document.getElementById("masterchat");
+		msChat.innerHTML += `${unescapeChat(args[0])}: ${unescapeChat(args[1])}\r\n`;
+		if (msChat.scrollTop > msChat.scrollHeight - 600) {
+			msChat.scrollTop = msChat.scrollHeight;
+		}
 	}
 }
