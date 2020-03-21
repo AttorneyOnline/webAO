@@ -32,30 +32,26 @@
 	padding: 1px;
 }
 
-#header {
+#info_container {
 	display: block;
-	float: left;
-	margin-top: 75px;
-	position: absolute;
-	left: 0;
 	font-size: 0.8em;
 }
 
 #masterchat {
-	width: 260px;
+	width: 100%;
 	height: 260px;
 	font-size: inherit;
 	background-color: darkgrey;
 	color: black;
 }
 
-#serverdescription_box {
-	display: inline-block;
+#serverdescription_container {
+	display: block;
+	top: 100px;
 	position: fixed;
+	right: 0;
 	width: 185px;
 	height: 276px;
-	top: 35%;
-	right: 0px;
 	padding: 0px;
 	background: url("../images/desc.png") no-repeat;
 	border: 2px solid #888;
@@ -75,28 +71,29 @@
 	overflow-y: auto;
 }
 
+#serverlist_container {
+	margin-right: 200px;
+}
 
 .serverlist {
 	display: block;
 	margin: auto;
-	width: 500px;
 }
 
 .serverlist li {
 	position: relative;
-	left: -55px;
+	right: 0;
 	background-color: #FFF;
 	border: 2px solid #BBB;
 	border-radius: 5px;
 	padding: 0px;
 	padding-left: 10px;
 	display: block;
-	width: 500px;
+	min-width: 400px;
 	height: 50px;
 	margin: 10px;
 	margin-left: auto;
 	margin-right: auto;
-	float: left;
 	text-align: center;
 	cursor: default;
 }
@@ -111,6 +108,12 @@
 
 .serverlist li a {
 	float: right;
+}
+
+#serverlist_container h2 {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .serverlist .button {
@@ -140,20 +143,8 @@
 	box-shadow: 0 0 0 1px #EFAD21; 
 }
 
-#content h2 {
-	vertical-align: top;
-	display: inline-block;
-	margin-top: 0px;
-	margin-left: auto;
-	margin-right: auto;
-}
-#content p {
-	vertical-align: top;
-	display: inline-block;
-}
+#content {
 
-#content > p {
-	margin-right: 50px;
 }
 
 ul.navbar-nav.ml-auto {

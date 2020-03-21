@@ -11,6 +11,8 @@
     <meta http-equiv="X-Content-Security-Policy"    content="default-src 'self' 'unsafe-inline' 'unsafe-eval' *.aceattorneyonline.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws:;">
     <meta http-equiv="X-WebKit-CSP"                 content="default-src 'self' 'unsafe-inline' 'unsafe-eval' *.aceattorneyonline.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws:;">
 
+    <meta name="viewport" content="width=700, initial-scale=1">
+
     <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Oswald%7CRoboto+Condensed" rel="stylesheet">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
@@ -53,25 +55,24 @@
             </div>
         </div>
     </nav>
-    <div id="header">
-        <p id="serverinfo">Masterserver version - ...</p>
-        <p id="clientinfo">Client version - ...</p>
-        <br>
-        <textarea id="masterchat" readonly></textarea>
-    </div>
-    <div id="content">
-        <div id="serverdescription_box">
-
-            <p id="serverdescription_content">
-
-            </p>
-        </div>
+    <div id="serverlist_container">
+        <h2>Server List</h2>
         <ul class="serverlist" id="masterlist">
             <li id="server-1" class="unavailable" onmouseover="setServ(-1)"><p>Localhost</p>
 				<a class="button" href="client.html?mode=watch&ip=127.0.0.1:50001">Watch</a>
                 <a class="button" href="client.html?mode=join&ip=127.0.0.1:50001">Join</a>
             </li>
         </ul>
+        <div id="info_container">
+            <p id="serverinfo">Masterserver version - ...</p>
+            <p id="clientinfo">Client version - ...</p>
+            <br>
+            <textarea id="masterchat" readonly></textarea>
+        </div>
+    </div>
+    <div id="serverdescription_container">
+        <p id="serverdescription_content">
+        </p>
     </div>
 </body>
 
