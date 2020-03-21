@@ -6,7 +6,7 @@ import Fingerprint2 from 'fingerprintjs2';
 let masterserver;
 
 let hdid;
-const options = {fonts: {extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"]}, excludes: {userAgent: true, enumerateDevices: true}};
+const options = { fonts: { extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"] }, excludes: { userAgent: true, enumerateDevices: true } };
 
 let oldLoading = false;
 
@@ -27,9 +27,9 @@ function unescapeChat(estring) {
 }
 
 if (window.requestIdleCallback) {
-    requestIdleCallback(function () {
-        Fingerprint2.get(options, function (components) {
-			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`),31);
+	requestIdleCallback(function () {
+		Fingerprint2.get(options, function (components) {
+			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
 
 			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 			masterserver.onopen = (evt) => onOpen(evt);
@@ -38,12 +38,12 @@ if (window.requestIdleCallback) {
 			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
 				oldLoading = true;
 			}
-        });
-    });
+		});
+	});
 } else {
-    setTimeout(function () {
-        Fingerprint2.get(options, function (components) {
-			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`),31);
+	setTimeout(function () {
+		Fingerprint2.get(options, function (components) {
+			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
 
 			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 			masterserver.onopen = (evt) => onOpen(evt);
@@ -52,8 +52,8 @@ if (window.requestIdleCallback) {
 			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
 				oldLoading = true;
 			}
-        });
-    }, 500);
+		});
+	}, 500);
 }
 
 export function setServ(ID) {
@@ -119,20 +119,20 @@ function checkOnline(serverID, coIP) {
 		onCOMessage(evt);
 	};
 
-	oserv.onerror = function(evt) {
+	oserv.onerror = function (evt) {
 		onCOError(evt);
 	};
 
 }
 
 function onMessage(e) {
-	const msg = e.data;	
+	const msg = e.data;
 	const header = msg.split("#", 2)[0];
 	console.log(header);
-	
+
 	if (header === "ALL") {
 		const servers = msg.split("#").slice(1);
-		for (let i = 0; i < servers.length-1; i++) {
+		for (let i = 0; i < servers.length - 1; i++) {
 			const serverEntry = servers[i];
 			const args = serverEntry.split("&");
 			const asset = args[4] ? `&asset=${args[4]}` : "";
