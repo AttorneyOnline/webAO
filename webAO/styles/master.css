@@ -6,14 +6,14 @@
 	background: repeating-linear-gradient(#792c01, #792c01 3px, #9a491c 3px, #9a491c 4px);
 	border: 1px solid #553e30;
 	border-radius: 5px;
-	box-shadow: 0 0 0 1px #FFFFFF; 
+	box-shadow: 0 0 0 1px #FFFFFF;
 	color: white;
 	text-align: center;
-    text-shadow:
-    0px -1px 0 #612000,
-    1px 0px 0 #612000,
-    -1px 0px 0 #612000,
-    0px 1px 0 #612000;
+	text-shadow:
+		0px -1px 0 #612000,
+		1px 0px 0 #612000,
+		-1px 0px 0 #612000,
+		0px 1px 0 #612000;
 	padding: 11px;
 	font-family: Times New Roman, sans;
 	font-weight: normal;
@@ -28,34 +28,30 @@
 	height: 200px;
 	width: 200px;
 	border-color: #bdb521;
-	border-width:11px;
+	border-width: 11px;
 	padding: 1px;
 }
 
-#header {
+#info_container {
 	display: block;
-	float: left;
-	margin-top: 75px;
-	position: absolute;
-	left: 0;
 	font-size: 0.8em;
 }
 
 #masterchat {
-	width: 260px;
-	height: 260px;
+	width: 100%;
+	height: 200px;
 	font-size: inherit;
 	background-color: darkgrey;
 	color: black;
 }
 
-#serverdescription_box {
-	display: inline-block;
+#serverdescription_container {
+	display: block;
+	top: 100px;
 	position: fixed;
+	right: 0;
 	width: 185px;
 	height: 276px;
-	top: 35%;
-	right: 0px;
 	padding: 0px;
 	background: url("../images/desc.png") no-repeat;
 	border: 2px solid #888;
@@ -75,31 +71,33 @@
 	overflow-y: auto;
 }
 
+#serverlist_container {
+	margin-right: 200px;
+}
 
 .serverlist {
 	display: block;
 	margin: auto;
-	width: 500px;
 }
 
 .serverlist li {
 	position: relative;
-	left: -55px;
+	right: 0;
 	background-color: #FFF;
 	border: 2px solid #BBB;
 	border-radius: 5px;
 	padding: 0px;
 	padding-left: 10px;
 	display: block;
-	width: 500px;
+	min-width: 400px;
 	height: 50px;
 	margin: 10px;
 	margin-left: auto;
 	margin-right: auto;
-	float: left;
 	text-align: center;
 	cursor: default;
 }
+
 .serverlist li:hover {
 	background-color: #FFFF6B;
 	border-color: #EFAD21;
@@ -113,6 +111,12 @@
 	float: right;
 }
 
+#serverlist_container h2 {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .serverlist .button {
 	position: relative;
 	top: 0px;
@@ -122,7 +126,7 @@
 	padding-top: 10px;
 	border-radius: 0px 5px 5px 0px;
 	width: 50px;
-	box-shadow: 0 0 0 2px #BBB; 
+	box-shadow: 0 0 0 2px #BBB;
 }
 
 .serverlist .available {
@@ -133,40 +137,26 @@
 .serverlist .unavailable {
 	background-color: #ff6b6B;
 	border-color: #ad2121;
-    display: none;
+	display: none;
 }
 
 .serverlist .button:hover {
-	box-shadow: 0 0 0 1px #EFAD21; 
+	box-shadow: 0 0 0 1px #EFAD21;
 }
 
-#content h2 {
-	vertical-align: top;
-	display: inline-block;
-	margin-top: 0px;
-	margin-left: auto;
-	margin-right: auto;
-}
-#content p {
-	vertical-align: top;
-	display: inline-block;
-}
-
-#content > p {
-	margin-right: 50px;
-}
+#content {}
 
 ul.navbar-nav.ml-auto {
-    display: inline-flex;
-    list-style-type: none;
+	display: inline-flex;
+	list-style-type: none;
 }
 
-nav.navbar.fixed-top.navbar-expand-lg.navbar-dark.bg-dark.fixed-top{
-    background: black;
+nav.navbar.fixed-top.navbar-expand-lg.navbar-dark.bg-dark.fixed-top {
+	background: black;
 }
 
-body{
-    margin: 0px;
+body {
+	margin: 0px;
 }
 
 /*!
@@ -176,209 +166,217 @@ body{
  */
 
 .carousel-item {
-  height: 65vh;
-  min-height: 300px;
-  background: no-repeat center center scroll;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
+	height: 65vh;
+	min-height: 300px;
+	background: no-repeat center center scroll;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
 }
 
 .portfolio-item {
-  margin-bottom: 30px;
+	margin-bottom: 30px;
 }
 
 .navbar {
- font-family: 'Poiret One', cursive;
- text-transform: uppercase;
- font-size:22px;
+	font-family: 'Poiret One', cursive;
+	text-transform: uppercase;
+	font-size: 22px;
 }
 
 .navbar-dark .navbar-nav .nav-link {
-  margin-right: 25px;
-  color: white !important;
+	margin-right: 25px;
+	color: white !important;
 }
 
-.navbar-dark .navbar-nav .nav-link:focus, .navbar-dark .navbar-nav .nav-link:hover {
- color: rgba(255, 229, 145, .75)!important;
- opacity: 100 !important;
+.navbar-dark .navbar-nav .nav-link:focus,
+.navbar-dark .navbar-nav .nav-link:hover {
+	color: rgba(255, 229, 145, .75) !important;
+	opacity: 100 !important;
 }
 
 body {
-  background: #2c3d51;
-  color: white;
-  font-family: 'Roboto Condensed', sans-serif;
+	background: #2c3d51;
+	color: white;
+	font-family: 'Roboto Condensed', sans-serif;
 }
 
-.page-heading{
- font-family: 'Oswald', sans-serif;
- text-transform: uppercase;
- margin-top: 5px;
- text-align: center;
+.page-heading {
+	font-family: 'Oswald', sans-serif;
+	text-transform: uppercase;
+	margin-top: 5px;
+	text-align: center;
 }
 
 hr.gold {
-border-top: 10px solid #f3b137;
-width: 250px;
+	border-top: 10px solid #f3b137;
+	width: 250px;
 }
 
 .about {
-  text-align: center;
+	text-align: center;
 }
 
 .card-body {
-background-color: #473322; 
-font-family: 'Roboto Condensed', sans-serif;
+	background-color: #473322;
+	font-family: 'Roboto Condensed', sans-serif;
 }
 
 .card-header {
-background-color: #2f2216;
-border-bottom: 1px solid #ffe591;
-font-family: 'Roboto Condensed', sans-serif;
-border-radius: 0px !important;
+	background-color: #2f2216;
+	border-bottom: 1px solid #ffe591;
+	font-family: 'Roboto Condensed', sans-serif;
+	border-radius: 0px !important;
 }
 
 .card-header a {
-  color: #ffe591 !important;
+	color: #ffe591 !important;
 }
 
 .card {
-  border: 1px solid #ffe591;
-  border-radius: 0px !important;
+	border: 1px solid #ffe591;
+	border-radius: 0px !important;
 }
 
 @media (max-width:411px) {
-  .top-bois {
-    display: none !important;
-  }
+	.top-bois {
+		display: none !important;
+	}
 }
 
 .top-bois {
-  display: inline-table;
-  width: 100%;
+	display: inline-table;
+	width: 100%;
 }
 
 .carousel-item {
-  height: 90vh;
-  background-size: contain;
+	height: 90vh;
+	background-size: contain;
 }
 
 .carousel-inner {
-  background-color: #2c3d51;
+	background-color: #2c3d51;
 }
 
-@media (max-width:980px){
-  .carousel-item {
-  background-size: cover;
-}
+@media (max-width:980px) {
+	.carousel-item {
+		background-size: cover;
+	}
 }
 
 h1 {
- font-family: 'Poiret One', cursive;
- text-transform: uppercase;
+	font-family: 'Poiret One', cursive;
+	text-transform: uppercase;
 }
 
 a {
-  color: #ffe591!important;
+	color: #ffe591 !important;
 }
 
-@media (max-width:576px){
-.borderbox{
-  padding: 0px 20px 0px 20px;
-}
+@media (max-width:576px) {
+	.borderbox {
+		padding: 0px 20px 0px 20px;
+	}
 }
 
 .inside-carousel {
-  position:relative;
+	position: relative;
 }
 
-.button-carousel, .tagline-carousel {
-  right: 0;
-  bottom: 0;
-  left: 0;
-  position: absolute;
-  margin: auto;
-  text-align: center;
+.button-carousel,
+.tagline-carousel {
+	right: 0;
+	bottom: 0;
+	left: 0;
+	position: absolute;
+	margin: auto;
+	text-align: center;
 }
 
 .button-carousel {
-      background-color: #2f2216;
-    max-width: 200px;
-    padding: 30px;
-    border: 2px solid #ffe591;
-    color: white !important;
-    border-radius: 15px;
+	background-color: #2f2216;
+	max-width: 200px;
+	padding: 30px;
+	border: 2px solid #ffe591;
+	color: white !important;
+	border-radius: 15px;
 }
 
-.button-carousel p{
-  margin-top: -17px;
-  font-family: 'Poiret One', cursive;
- text-transform: uppercase;
-     font-size: 24px;
+.button-carousel p {
+	margin-top: -17px;
+	font-family: 'Poiret One', cursive;
+	text-transform: uppercase;
+	font-size: 24px;
 }
 
 .download-button h4 {
-  font-family: 'Poiret One', cursive;
- text-transform: uppercase;
- margin-bottom:0px;
+	font-family: 'Poiret One', cursive;
+	text-transform: uppercase;
+	margin-bottom: 0px;
 }
 
-.button-carousel a, .download-button a {
-  color: white !important;
+.button-carousel a,
+.download-button a {
+	color: white !important;
 }
 
-.download-button{
-  background-color: #2f2216;
-    max-width: 400px;
-    padding: 10px;
-    text-align: center;
-    border: 2px solid #ffe591;
-    color: white !important;
-    border-radius: 15px;
-    margin: 0 auto;
+.download-button {
+	background-color: #2f2216;
+	max-width: 400px;
+	padding: 10px;
+	text-align: center;
+	border: 2px solid #ffe591;
+	color: white !important;
+	border-radius: 15px;
+	margin: 0 auto;
 }
 
 .card {
-  background-color: #2c3d51;;
+	background-color: #2c3d51;
+	;
 }
 
 .download-box strong {
-  color:#ffe591;
+	color: #ffe591;
 }
-.download-box a, .download-button a, .links a, .card a {
-  text-decoration: underline;
+
+.download-box a,
+.download-button a,
+.links a,
+.card a {
+	text-decoration: underline;
 }
 
 .acc {
-  text-decoration: none !important;
+	text-decoration: none !important;
 }
 
-a:hover{
-  opacity: 0.8;
+a:hover {
+	opacity: 0.8;
 }
 
 .navbar .container {
-    text-align: center;
+	text-align: center;
 }
 
 a.nav-link {
-    text-decoration: none !important;
+	text-decoration: none !important;
 }
 
 ul.serverlist p {
-    color: black;
+	color: black;
 }
 
 a.nav-link {
-    padding: 8px;
+	padding: 8px;
 }
 
-ul.navbar-nav.ml-auto{
-    margin-top: 19px;
- padding: 0;
+ul.navbar-nav.ml-auto {
+	margin-top: 19px;
+	padding: 0;
 }
 
-nav.navbar.fixed-top.navbar-expand-lg.navbar-dark.bg-dark.fixed-top{
-    height: 65px;
+nav.navbar.fixed-top.navbar-expand-lg.navbar-dark.bg-dark.fixed-top {
+	height: 65px;
 }
