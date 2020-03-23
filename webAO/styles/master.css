@@ -144,6 +144,10 @@
 	box-shadow: 0 0 0 1px #EFAD21;
 }
 
+.error {
+	color: orangered;
+}
+
 #content {}
 
 ul.navbar-nav.ml-auto {

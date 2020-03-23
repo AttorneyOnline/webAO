@@ -60,6 +60,15 @@
     </nav>
     <div id="serverlist_container">
         <h2>Server List</h2>
+        <div id="https_error" class="error" style="display: none;">
+            <p>https is not supported</p>
+            <p>Please <a href="http://web.aceattorneyonline.com/">click here</a> to be redirected to the http version</p>
+        </div>
+        <noscript>
+        <div id="js_error" class="error">
+            <p>webAO requires JavaScript to work</p>
+        </div>
+        </noscript>
         <ul class="serverlist" id="masterlist">
             <li id="server-1" class="unavailable" onmouseover="setServ(-1)">
                 <p>Localhost</p>

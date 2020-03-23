@@ -31,6 +31,8 @@ if (window.requestIdleCallback) {
 		Fingerprint2.get(options, function (components) {
 			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
 
+			check_https();
+
 			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 			masterserver.onopen = (evt) => onOpen(evt);
 			masterserver.onmessage = (evt) => onMessage(evt);
@@ -45,6 +47,8 @@ if (window.requestIdleCallback) {
 		Fingerprint2.get(options, function (components) {
 			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
 
+			check_https();
+
 			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 			masterserver.onopen = (evt) => onOpen(evt);
 			masterserver.onmessage = (evt) => onMessage(evt);
@@ -54,6 +58,12 @@ if (window.requestIdleCallback) {
 			}
 		});
 	}, 500);
+}
+
+export function check_https() {
+	if (document.location.protocol === "https:") {
+		document.getElementById("https_error").style.display = "";
+	}
 }
 
 export function setServ(ID) {
