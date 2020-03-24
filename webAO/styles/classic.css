@@ -93,6 +93,7 @@ img {
 	min-width: 3.25em;
 	text-justify: distribute;
 	letter-spacing: 0.075em;
+	font-weight: bold;
 	background: rgba(56, 56, 163, 0.5);
 	box-shadow: 0.075em 0.075em rgba(0, 56, 163, 0.5) inset;
 	left: 0;
@@ -137,7 +138,7 @@ img {
 #client_chatwaiting {
 	display: block;
 	right: -6px;
-	bottom: 0.24em;
+	bottom: 0.2em;
 	width: 1em;
 	position: absolute;
 	animation: idling 0.4s linear infinite;
