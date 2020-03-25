@@ -6,14 +6,14 @@
 
 import Fingerprint2 from 'fingerprintjs2';
 
+import { unescapeChat, escapeChat, encodeChat, decodeChat, safe_tags } from './encoding.js';
+
 // Load some defaults for the background and evidence dropdowns
 import character_arr from "./characters.js";
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 
 import { EventEmitter } from "events";
-
-const version = 2.4;
 
 let client;
 let viewport;
@@ -2618,89 +2618,3 @@ export function toggleShout(shout) {
 	}
 }
 window.toggleShout = toggleShout;
-
-/**
- * Escapes a string to be HTML-safe.
- * 
- * XXX: This is unnecessary if we use `createTextNode` instead!
- * @param {string} unsafe an unsanitized string
- */
-function safe_tags(unsafe) {
-	if (unsafe) {
-		return unsafe
-			.replace(/&/g, "&amp;")
-			.replace(/</g, "&lt;");
-		//.replace(/"/g, "&quot;")
-		//.replace(/'/g, "&#039;");
-	} else {
-		return "";
-	}
-}
-
-/**
- * Escapes a string to AO1 escape codes.
- * @param {string} estring the string to be escaped
- */
-function escapeChat(estring) {
-	return estring
-		.replace(/#/g, "<num>")
-		.replace(/&/g, "<and>")
-		.replace(/%/g, "<percent>")
-		.replace(/\$/g, "<dollar>");
-}
-
-/**
- * Unescapes a string to AO1 escape codes.
- * @param {string} estring the string to be unescaped
- */
-function unescapeChat(estring) {
-	return estring
-		.replace(/<num>/g, "#")
-		.replace(/<and>/g, "&")
-		.replace(/<percent>/g, "%")
-		.replace(/<dollar>/g, "$");
-}
-
-/**
- * Encode text on client side.
- * @param {string} estring the string to be encoded
- */
-function encodeChat(estring) {
-	const selectedEncoding = document.getElementById("client_encoding").value;
-	if (selectedEncoding === "unicode") {
-		// This approach works by escaping all special characters to Unicode escape sequences.
-		// Source: https://gist.github.com/mathiasbynens/1243213
-		return estring.replace(/[^\0-~]/g, function (ch) {
-			return "\\u" + ("000" + ch.charCodeAt().toString(16)).slice(-4);
-		});
-	} else if (selectedEncoding === "utf16") {
-		// Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
-		const buffer = new ArrayBuffer(estring.length * 2);
-		const result = new Uint16Array(buffer);
-		for (let i = 0, strLen = estring.length; i < strLen; i++) {
-			result[i] = estring.charCodeAt(i);
-		}
-		return String(result);
-	} else {
-		return estring;
-	}
-}
-
-/**
- * Decodes text on client side.
- * @param {string} estring the string to be decoded
- */
-function decodeChat(estring) {
-	const selectedDecoding = document.getElementById("client_decoding").value;
-	if (selectedDecoding === "unicode") {
-		// Source: https://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode
-		return estring.replace(/\\u([\d\w]{1,})/gi, function (match, group) {
-			return String.fromCharCode(parseInt(group, 16));
-		});
-	} else if (selectedDecoding === "utf16") {
-		// Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
-		return String.fromCharCode.apply(null, new Uint16Array(estring.split(",")));
-	} else {
-		return estring;
-	}
-}

@@ -1,7 +1,7 @@
 const MASTERSERVER_IP = "master.aceattorneyonline.com:27014";
-const version = 2.4;
 
 import Fingerprint2 from 'fingerprintjs2';
+import { unescapeChat } from './encoding.js';
 
 let masterserver;
 
@@ -13,18 +13,6 @@ let oldLoading = false;
 const server_description = [];
 server_description[-1] = "This is your computer on port 50001";
 const online_counter = [];
-
-/**
- * Unescapes a string to AO1 escape codes.
- * @param {string} estring the string to be unescaped
- */
-function unescapeChat(estring) {
-	return estring
-		.replace(/<num>/g, "#")
-		.replace(/<and>/g, "&")
-		.replace(/<percent>/g, "%")
-		.replace(/<dollar>/g, "$");
-}
 
 if (window.requestIdleCallback) {
 	requestIdleCallback(function () {
@@ -170,7 +158,7 @@ function onMessage(e) {
 	}
 	else if (header === "servercheok") {
 		const args = msg.split("#").slice(1);
-		document.getElementById("clientinfo").innerHTML = `Client version: ${args[0]}`;
+		document.getElementById("clientinfo").innerHTML = `Client version: ${version} expected: ${args[0]}`;
 	}
 	else if (header === "SV") {
 		const args = msg.split("#").slice(1);
