@@ -1,4 +1,5 @@
 const MASTERSERVER_IP = "master.aceattorneyonline.com:27014";
+const version = require('../package.json').version;
 
 import Fingerprint2 from 'fingerprintjs2';
 import { unescapeChat } from './encoding.js';
