@@ -48,6 +48,7 @@ Temporary Items
 
 # Node module directory
 node_modules
+package-lock.json
 
 # Minified files in the wrong folder (this is for testing)
 *.b.js
