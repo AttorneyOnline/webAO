@@ -218,7 +218,7 @@
 					<select id="bg_select" name="bg_select" onchange="updateBackgroundPreview()"
 						style="margin-top:10px"></select>
 					<br>
-					<input id="bg_filename" name="bg_filename" class="short" type="text" style="margin-top:10px">
+					<input id="bg_filename" name="bg_filename" type="text" style="margin-top:10px">
 					<br>
 					<br>
 					<button id="bg_change" alt="Change" class="client_button hover_button"
@@ -237,11 +237,11 @@
 					<div id="evi_options">
 						<label for="evi_filename">Icon:</label>
 						<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
-						<input id="evi_filename" name="evi_filename" class="short" type="text"
+						<input id="evi_filename" name="evi_filename" type="text"
 							placeholder="Custom filename">
 						<br>
 						<label for="evi_name">Name:</label>
-						<input id="evi_name" name="evi_name" class="short" type="text" placeholder="Evidence name">
+						<input id="evi_name" name="evi_name" type="text" placeholder="Evidence name">
 					</div>
 				</div>
 				<div style="display: flex; padding-top: 5px;">
@@ -269,8 +269,6 @@
 		<!-- Settings section -->
 		<span class="menu_content" id="content_3">
 			<meta name="frame-title" lang="en" content="Settings">
-			<label for="OOC_name">Server chat name:</label>
-			<input id="OOC_name" name="OOC_name" class="short" type="text">
 			<label for="role_select">Role:</label>
 			<select id="role_select" name="role_select" onchange="changeRoleOOC()">
 				<option value="def">Defense</option>
@@ -286,7 +284,7 @@
 			<br>
 			<span id="cccc" style="display: none">
 				<label for="ic_chat_name">Custom Showname:</label>
-				<input id="ic_chat_name" name="ic_chat_name" class="short" type="text">
+				<input id="ic_chat_name" name="ic_chat_name" type="text">
 				<label for="showname">Show others:</label>
 				<input id="showname" name="showname" type="checkbox" onclick="showname_click()">
 			</span>
@@ -345,15 +343,15 @@
 			<br>
 			<br>
 			<label for="bg_command">Change background command:</label>
-			<input id="bg_command" name="bg_command" class="short" type="text" value="bg $1">
+			<input id="bg_command" name="bg_command" type="text" value="bg $1">
 			<br>
 			<br>
 			<label for="role_command">Change role command:</label>
-			<input id="role_command" name="role_command" class="short" type="text" value="pos $1">
+			<input id="role_command" name="role_command" type="text" value="pos $1">
 			<br>
 			<br>
 			<label for="randomchar_command">Random character command:</label>
-			<input id="randomchar_command" name="randomchar_command" class="short" type="text" value="randomchar">
+			<input id="randomchar_command" name="randomchar_command" type="text" value="randomchar">
 			<br>
 			<br>
 			<span style="color:blue">Changing these settings will save them as a cookie.<br>
@@ -387,7 +385,10 @@
 	<meta name="frame-title" lang="en" content="Server">
 	<div style="height: 100%; display: flex; flex-direction: column;">
 		<textarea id="client_ooclog" style="flex: 1 auto" readonly></textarea>
-		<input id="client_oocinputbox" class="long" type="text" onkeypress="onOOCEnter(event)">
+		<span style="display: inline-block; white-space: nowrap;">
+			<input id="OOC_name" style="width: 15%;" name="OOC_name" type="text">
+			<input id="client_oocinputbox" style="width: 85%;" type="text" onkeypress="onOOCEnter(event)">
+		</span>
 	</div>
 </template>
 
