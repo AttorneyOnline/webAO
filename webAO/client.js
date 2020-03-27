@@ -15,7 +15,7 @@ import evidence_arr from "./evidence.js";
 
 import { EventEmitter } from "events";
 
-const version = require('../package.json').version;
+import { version } from '../package.json';
 
 let client;
 let viewport;
