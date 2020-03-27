@@ -70,12 +70,7 @@ function onOpen(_e) {
 	console.log(`Your emulated HDID is ${hdid}`);
 	masterserver.send(`ID#webAO#webAO#%`);
 
-	if (oldLoading === true) {
-		masterserver.send("askforservers#%");
-	}
-	else {
-		masterserver.send("ALL#%");
-	}
+	masterserver.send("ALL#%");
 	masterserver.send("VC#%");
 }
 
