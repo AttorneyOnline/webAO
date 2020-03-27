@@ -12,6 +12,7 @@ import { unescapeChat, escapeChat, encodeChat, decodeChat, safe_tags } from './e
 import character_arr from "./characters.js";
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
+import sfx_arr from "./sounds.js";
 
 import { EventEmitter } from "events";
 
@@ -381,6 +382,13 @@ class Client extends EventEmitter {
 		evidence_arr.forEach(evidence => {
 			evidence_select.add(new Option(evidence));
 		});
+
+		// Load sfx for modcalls
+		const modcall_select = document.getElementById("client_modcall");
+		sfx_arr.forEach(evidence => {
+			modcall_select.add(new Option(evidence));
+		});
+		document.getElementById("client_modcall").value = getCookie("modcall_sfx") || "sfx-gallery.wav";
 
 		// Read cookies and set the UI to its values
 		document.getElementById("OOC_name").value = getCookie("OOC_name") || "web"+parseInt(Math.random()*100+10);
@@ -975,9 +983,13 @@ class Client extends EventEmitter {
 		if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
+		const sfxname = document.getElementById("client_modcall").value;
 		viewport.sfxaudio.pause();
-		viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
+		const oldvolume = viewport.sfxaudio.volume;
+		viewport.sfxaudio.volume = 1;
+		viewport.sfxaudio.src = AO_HOST + "sounds/general/" + sfxname + ".wav";
 		viewport.sfxaudio.play();
+		viewport.sfxaudio.volume = oldvolume;
 	}
 
 	/**
@@ -2047,6 +2059,14 @@ export function reloadTheme() {
 	document.getElementById("client_theme").href = "styles/" + viewport.theme + ".css";
 }
 window.reloadTheme = reloadTheme;
+
+/**
+ * Triggered by the modcall sfx dropdown
+ */
+export function changeModcall() {
+	setCookie("modcall_sfx", document.getElementById("client_modcall").value);
+}
+window.changeModcall = changeModcall;
 
 /**
  * Triggered by the ini button.
