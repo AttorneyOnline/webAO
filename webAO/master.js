@@ -75,9 +75,7 @@ function onOpen(_e) {
 }
 
 function checkOnline(serverID, coIP) {
-	let oserv;
-	if (lowMemory===false)
-		oserv = new WebSocket("ws://" + coIP);
+	let oserv = new WebSocket("ws://" + coIP);
 
 	// define what the callbacks do
 	function onCOOpen(_e) {
@@ -131,15 +129,18 @@ function onMessage(e) {
 			const serverEntry = servers[i];
 			const args = serverEntry.split("&");
 			const asset = args[4] ? `&asset=${args[4]}` : "";
+			const liclass = lowMemory ? "" : "unavailable"; // don't hide the entries if we're not checking them
 
 			document.getElementById("masterlist").innerHTML +=
-				`<li id="server${i}" class="unavailable" onmouseover="setServ(${i})"><p>${args[0]}</p>`
+				`<li id="server${i}" class="${liclass}" onmouseover="setServ(${i})"><p>${args[0]}</p>`
 				+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[3]}${asset}">Watch</a>`
 				+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[3]}${asset}">Join</a></li>`;
 			server_description[i] = args[1];
-			checkOnline(i, `${args[2]}:${args[3]}`);
+			if (lowMemory===false)
+				checkOnline(i, `${args[2]}:${args[3]}`);
 		}
-		checkOnline(-1, "127.0.0.1:50001");
+		if (lowMemory===false)
+			checkOnline(-1, "127.0.0.1:50001");
 		masterserver.close();
 	}
 	else if (header === "servercheok") {
