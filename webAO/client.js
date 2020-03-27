@@ -975,6 +975,9 @@ class Client extends EventEmitter {
 		if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
+		viewport.sfxaudio.pause();
+		viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
+		viewport.sfxaudio.play();
 	}
 
 	/**
