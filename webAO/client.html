@@ -135,6 +135,16 @@
 					onclick="randomCharacterOOC()">Random Character</button>
 				<br>
 				<br>
+				<span id="pairing" style="display: none">
+					<label for="pair_select">Pairing partner:</label>
+					<select name="pair_select" id="pair_select">
+						<option value="-1">None</option>
+					</select>
+					<label for="pair_offset">Pairing offset:</label>
+					<input type="range" name="pair_offset" id="pair_offset" min="-100" max="100" value="0">
+				</span>
+				<br>
+				<br>
 				<span id="cccc" style="display: none">
 					<label for="ic_chat_name">Custom Showname:</label>
 					<input id="ic_chat_name" name="ic_chat_name" type="text">
@@ -182,15 +192,6 @@
 				<!-- No Commands -->
 				<span id="no_action">
 					No judge actions available for this role.
-				</span>
-				<br>
-				<span id="pairing" style="display: none">
-					<label for="pair_select">Pairing partner:</label>
-					<select name="pair_select" id="pair_select">
-						<option value="-1">None</option>
-					</select>
-					<label for="pair_offset">Pairing offset:</label>
-					<input type="range" name="pair_offset" id="pair_offset" min="-100" max="100" value="0">
 				</span>
 				<br>
 				<br>
