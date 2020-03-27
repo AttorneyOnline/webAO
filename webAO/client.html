@@ -111,6 +111,19 @@
 				<button id="button_flip" alt="Flip" class="client_button" onclick="toggleFlip()">Flip</button>
 				<button id="button_effect_1" alt="Flash" class="client_button" onclick="toggleEffect(1)">Flash</button>
 				<button id="button_effect_2" alt="Shake" class="client_button" onclick="toggleEffect(2)">Shake</button>
+				<br>
+				<br>
+				<label for="role_select">Role:</label>
+				<select id="role_select" name="role_select" onchange="changeRoleOOC()">
+					<option value="def">Defense</option>
+					<option value="pro">Prosecution</option>
+					<option value="jud">Judge</option>
+					<option value="wit">Witness</option>
+					<option value="hld">Helper Defense</option>
+					<option value="hlp">Helper Prosecution</option>
+					<option value="jur">Jury</option>
+					<option value="sea">Seance</option>
+				</select>
 			</div>
 			<fieldset style="margin:10px;">
 				<legend>Actions</legend>
@@ -269,19 +282,6 @@
 		<!-- Settings section -->
 		<span class="menu_content" id="content_3">
 			<meta name="frame-title" lang="en" content="Settings">
-			<label for="role_select">Role:</label>
-			<select id="role_select" name="role_select" onchange="changeRoleOOC()">
-				<option value="def">Defense</option>
-				<option value="pro">Prosecution</option>
-				<option value="jud">Judge</option>
-				<option value="wit">Witness</option>
-				<option value="hld">Helper Defense</option>
-				<option value="hlp">Helper Prosecution</option>
-				<option value="jur">Jury</option>
-				<option value="sea">Seance</option>
-			</select>
-			<br>
-			<br>
 			<span id="cccc" style="display: none">
 				<label for="ic_chat_name">Custom Showname:</label>
 				<input id="ic_chat_name" name="ic_chat_name" type="text">
