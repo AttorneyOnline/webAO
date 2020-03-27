@@ -86,7 +86,8 @@
 			<div id="client_emo">
 			</div>
 			<br>
-			<div id="client_buttons">
+			<div id="character_options">
+				<div id="emote_options">
 				<button id="button_1" alt="Hold it!" class="client_button" onclick="toggleShout(1)">Hold it!</button>
 				<button id="button_2" alt="OBJECTION!" class="client_button"
 					onclick="toggleShout(2)">OBJECTION!</button>
@@ -111,8 +112,10 @@
 				<button id="button_flip" alt="Flip" class="client_button" onclick="toggleFlip()">Flip</button>
 				<button id="button_effect_1" alt="Flash" class="client_button" onclick="toggleEffect(1)">Flash</button>
 				<button id="button_effect_2" alt="Shake" class="client_button" onclick="toggleEffect(2)">Shake</button>
-				<br>
-				<br>
+			</div>
+			<br>
+			<br>
+			<div id="character_options">
 				<label for="role_select">Role:</label>
 				<select id="role_select" name="role_select" onchange="changeRoleOOC()">
 					<option value="def">Defense</option>
@@ -137,7 +140,8 @@
 					<input id="ic_chat_name" name="ic_chat_name" type="text">
 					<label for="showname">Show others:</label>
 					<input id="showname" name="showname" type="checkbox" onclick="showname_click()">
-				</span>				
+				</span>	
+			</div>			
 			</div>
 			<fieldset style="margin:10px;">
 				<legend>Actions</legend>
