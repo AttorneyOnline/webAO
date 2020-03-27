@@ -9,7 +9,7 @@ let masterserver;
 let hdid;
 const options = { fonts: { extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"] }, excludes: { userAgent: true, enumerateDevices: true } };
 
-let oldLoading = false;
+let lowMemory = false;
 
 const server_description = [];
 server_description[-1] = "This is your computer on port 50001";
@@ -27,7 +27,7 @@ if (window.requestIdleCallback) {
 			masterserver.onmessage = (evt) => onMessage(evt);
 
 			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-				oldLoading = true;
+				lowMemory = true;
 			}
 		});
 	});
@@ -43,7 +43,7 @@ if (window.requestIdleCallback) {
 			masterserver.onmessage = (evt) => onMessage(evt);
 
 			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-				oldLoading = true;
+				lowMemory = true;
 			}
 		});
 	}, 500);
@@ -75,8 +75,9 @@ function onOpen(_e) {
 }
 
 function checkOnline(serverID, coIP) {
-
-	var oserv = new WebSocket("ws://" + coIP);
+	let oserv;
+	if (lowMemory===false)
+		oserv = new WebSocket("ws://" + coIP);
 
 	// define what the callbacks do
 	function onCOOpen(_e) {
