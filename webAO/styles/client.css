@@ -166,14 +166,16 @@
 	width: 100%;
 	top: 0;
 	left: 0;
+	object-fit: cover;
 }
 
 #client_char {
 	position: absolute;
-	height: auto;
+	height: 100%;
 	width: 100%;
 	bottom: 0;
 	left: 0;
+	object-fit: cover;
 }
 
 #client_pair_char {
@@ -181,6 +183,7 @@
 	height: 100%;
 	width: 100%;
 	bottom: 0;
+	object-fit: cover;
 }
 
 #client_bench {
