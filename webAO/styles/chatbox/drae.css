@@ -1,0 +1,48 @@
+#client_chatcontainer {
+    font-family: sans-serif;
+}
+
+#client_name {
+	display: none;
+	padding: 0 0.45em;
+	height: 5.2%;
+	width: 40%;
+	text-align: left;
+	letter-spacing: 0.075em;
+	font-weight: bold;
+	background: rgba(255, 0, 187, 0.9);
+	left: 0;
+	bottom: 31.25%;
+	position: absolute;
+	z-index: 1;
+}
+
+#client_chat {
+	font-size: 1em;
+	display: none;
+	width: 100%;
+	margin: auto;
+	height: 31.25%;
+    border-top: 2px solid #ff00ab;
+    border-bottom: 2px solid #e9019e;
+	background-image: linear-gradient(rgba(33,18,28,0.75),rgba(45,18,36,0.75));
+	bottom: 0;
+	position: absolute;
+	word-break: keep-all;
+	overflow-wrap: break-word;
+	text-align: left;
+	overflow: hidden;
+	scroll-behavior: smooth;
+}
+
+#client_chat p {
+	padding: 1% 3.13%;
+	margin: 1px;
+	line-height: 97%;
+	letter-spacing: 0.05em;
+	word-spacing: 0.3em;
+}
+
+#client_chatwaiting {
+	display: none;
+}
