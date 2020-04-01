@@ -589,7 +589,11 @@ class Client extends EventEmitter {
 		const charID = Number(args[2]);
 		const music = viewport.music;
 		music.pause();
-		music.src = MUSIC_HOST + track.toLowerCase();
+		if(track.startsWith("http")) {
+			music.src = track;
+		} else {
+			music.src = MUSIC_HOST + track.toLowerCase();
+		}
 		music.play();
 		if (charID >= 0) {
 			const musicname = this.chars[charID].name;
