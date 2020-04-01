@@ -14,6 +14,8 @@ import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 import sfx_arr from "./sounds.js";
 
+import chatbox_arr from "./styles/chatbox/chatboxes.js";
+
 import { EventEmitter } from "events";
 
 import { version } from '../package.json';
@@ -515,9 +517,11 @@ class Client extends EventEmitter {
 
 			let msg_nameplate = args[3];
 			let msg_blips = "male";
+			let char_chatbox = "default";
 			try {
 				msg_nameplate = this.chars[args[9]].showname;
 				msg_blips = this.chars[args[9]].gender;
+				char_chatbox = this.chars[args[9]].chat;
 			} catch (e) {
 				//we already set defaults
 			}
@@ -526,6 +530,7 @@ class Client extends EventEmitter {
 				deskmod: safe_tags(args[1]).toLowerCase(),
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
+				chatbox: char_chatbox,
 				name: safe_tags(args[3]),
 				sprite: safe_tags(args[4]).toLowerCase(),
 				content: this.prepChat(args[5]), // Escape HTML tags
@@ -652,7 +657,8 @@ class Client extends EventEmitter {
 				name: chargs[0],
 				showname: chargs[0],
 				side: "def",
-				gender: "male"
+				gender: "male",
+				chat: "default"
 			};
 			cini.options = Object.assign(default_options, cini.options);
 
@@ -667,6 +673,8 @@ class Client extends EventEmitter {
 				showname: safe_tags(cini.options.showname),
 				desc: safe_tags(chargs[1]),
 				gender: safe_tags(cini.options.gender).toLowerCase(),
+				side: safe_tags(cini.options.side).toLowerCase(),
+				chat: safe_tags(cini.options.chat).toLowerCase(),
 				evidence: chargs[3],
 				icon: icon,
 				inifile: cini,
@@ -1508,6 +1516,7 @@ async changeBackground(position) {
 		const pairSprite = document.getElementById("client_pair_char");
 		const nameBox = document.getElementById("client_name");
 		const chatBox = document.getElementById("client_chat");
+		const chatbox_theme = document.getElementById("chatbox_theme");
 		const chatContainerBox = document.getElementById("client_chatcontainer");
 		const waitingBox = document.getElementById("client_chatwaiting");
 		const eviBox = document.getElementById("client_evi");
@@ -1621,6 +1630,12 @@ async changeBackground(position) {
 		this.chatmsg.preanimdelay = parseInt(gifLength);
 
 		this.changeBackground(chatmsg.side);
+
+		if (chatbox_arr.includes(chatmsg.chatbox)) {
+			chatbox_theme.href = "styles/chatbox/" + chatmsg.chatbox + ".css";
+		} else {
+			chatbox_theme.href = "styles/chatbox/default.css";
+		}
 
 		// Flip the character
 		if (this.chatmsg.flip === 1) {
