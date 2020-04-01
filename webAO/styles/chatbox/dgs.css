@@ -1,0 +1,41 @@
+#client_name {
+	display: none;
+	padding: 0px 6px;
+	height: 5.2%;
+	border: 1px solid #a59252;
+    background-image: linear-gradient(#635529, #8c7d42);
+    left: 1.5%;
+	top: 63%;
+	border-radius: 3px;
+	position: absolute;
+}
+
+#client_chat {
+	font-size: 1em;
+	display: none;
+	width: 98%;
+	width: calc(100% - 4px);
+	margin: auto;
+	height: 30%;
+	border-image-source: url("dgs_chat_bg.png");
+    border-image-slice: 12;
+    border-image-width: 12px;
+    border-width: 12px;
+	background-color: rgba(8, 22, 33, 0.75);
+	top: 70%;
+	position: absolute;
+	word-break: keep-all;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	text-align: left;
+	overflow: hidden;
+	scroll-behavior: smooth;
+}
+
+#client_chat p {
+	margin: 4px;
+}
+
+#client_chatwaiting {
+	display: none;
+}
