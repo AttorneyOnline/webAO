@@ -2,5 +2,8 @@ export default [
 	"aa",
 	"chatdd",
 	"cyber",
-	"default"
+	"default",
+	"dgs",
+	"drae",
+	"yttd"
 ];
