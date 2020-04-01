@@ -1,0 +1,48 @@
+#client_chatcontainer {
+	position: absolute;
+	top: 73%;
+	height: 27%;
+    width: 100%;
+    font-family: sans-serif;
+	background-image: url("../images/chatbox.svg");
+	background-size: cover;
+ 	background-repeat: no-repeat;
+}
+
+#client_name {
+	display: none;
+	top: 4%;
+	padding: 0 10px;
+	height: 22%;
+	position: absolute;
+}
+
+#client_chat {
+	font-size: 1em;
+	display: none;
+	width: 100%;
+	margin: auto;
+	height: 90%;
+	top: 20%;
+	position: absolute;
+	word-break: keep-all;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	text-align: left;
+	overflow: hidden;
+	scroll-behavior: smooth;
+}
+
+#client_chat p {
+	margin: 4px;
+	padding: 5px 3%;
+}
+
+#client_chatwaiting {
+	display: block;
+	right: 1em;
+	bottom: 0.6em;
+	width: 1em;
+	position: absolute;
+	animation: idling 1s linear infinite;
+}
