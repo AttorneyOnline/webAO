@@ -513,14 +513,21 @@ class Client extends EventEmitter {
 		if (args[4] !== viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
 
+			const char_id = Number(args[9])
+
 			let msg_nameplate = args[3];
 			let msg_blips = "male";
+			let char_muted = false;
+
 			try {
-				msg_nameplate = this.chars[args[9]].showname;
-				msg_blips = this.chars[args[9]].gender;
+				msg_nameplate = this.chars[char_id].showname;
+				msg_blips = this.chars[char_id].gender;
+				char_muted = this.chars[char_id].muted;
 			} catch (e) {
 				//we already set defaults
 			}
+
+			if (char_muted === false) {
 
 			let chatmsg = {
 				deskmod: safe_tags(args[1]).toLowerCase(),
@@ -533,7 +540,7 @@ class Client extends EventEmitter {
 				sound: safe_tags(args[7]).toLowerCase(),
 				blips: safe_tags(msg_blips),
 				type: Number(args[8]),
-				charid: Number(args[9]),
+				charid: char_id,
 				snddelay: Number(args[10]),
 				objection: Number(args[11]),
 				evidence: safe_tags(args[12]),
@@ -559,12 +566,13 @@ class Client extends EventEmitter {
 				}
 			}
 
+			// our own message appeared, reset the buttons
 			if (chatmsg.charid === this.charID) {
 				resetICParams();
 			}
 
-			if (client.chars[chatmsg.charid].muted === false)
-				viewport.say(chatmsg); // no await
+			viewport.say(chatmsg); // no await
+			}
 		}
 	}
 
