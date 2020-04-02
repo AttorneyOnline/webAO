@@ -525,12 +525,13 @@ class Client extends EventEmitter {
 				msg_blips = this.chars[char_id].gender;
 				char_muted = this.chars[char_id].muted;
 
-				if(this.chars[char_id].showname !== char_name) {
-					// someone is iniediting
+				if(this.chars[char_id].name !== char_name) {
+					console.info(this.chars[char_id].name + " is iniediting to " + char_name);
 					this.handleCharacterInfo(char_name,char_id);
 				}
 			} catch (e) {
 				//we already set defaults
+				console.error("we're still missing some character data");
 			}
 
 			if (char_muted === false) {
