@@ -1,3 +1,15 @@
+@font-face {
+	font-family: 'Cabin Condensed';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: local('Cabin Condensed'), local('CabinCondensed-Regular'), url(https://fonts.gstatic.com/s/cabincondensed/v13/nwpMtK6mNhBK2err_hqkYhHRqmwqZ-LY.woff2) format('woff2');
+}
+
+#chatcontainer {
+	font-family: 'Cabin Condensed', sans-serif;
+}
+
 #client_name {
 	display: none;
 	padding: 0px 6px;
