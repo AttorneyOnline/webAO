@@ -1525,7 +1525,7 @@ async changeBackground(position) {
 	 */
 	async say(chatmsg) {
 		this.chatmsg = chatmsg;
-		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(chatmsg.blips.toLowerCase())}.wav`);
+		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
 		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
@@ -1571,7 +1571,7 @@ async changeBackground(position) {
 		}
 		this.lastChar = this.chatmsg.name;
 
-		appendICLog(chatmsg.content, chatmsg.nameplate);
+		appendICLog(this.chatmsg.content, this.chatmsg.nameplate);
 
 		// start checking the files
 		try {
@@ -1634,14 +1634,14 @@ async changeBackground(position) {
 				chatBox.style.display = "none";
 				chatContainerBox.style.display = "none";
 				// If preanim existed then determine the length
-				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
+				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}.gif`);
 				this.chatmsg.startspeaking = false;
 				break;
 			// case 5:
 			// zoom
 			default:
 				// due to a retarded client bug, we need to strip the sfx from the MS, if the preanim isn't playing
-				chatmsg.sound = "";
+				this.chatmsg.sound = "";
 				this.chatmsg.startspeaking = true;
 				break;
 		}
