@@ -513,7 +513,8 @@ class Client extends EventEmitter {
 		if (args[4] !== viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
 
-			const char_id = Number(args[9])
+			const char_id = Number(args[9]);
+			const char_name = safe_tags(args[3]);
 
 			let msg_nameplate = args[3];
 			let msg_blips = "male";
@@ -523,6 +524,11 @@ class Client extends EventEmitter {
 				msg_nameplate = this.chars[char_id].showname;
 				msg_blips = this.chars[char_id].gender;
 				char_muted = this.chars[char_id].muted;
+
+				if(this.chars[char_id].showname !== char_name) {
+					// someone is iniediting
+					this.handleCharacterInfo(char_name,char_id);
+				}
 			} catch (e) {
 				//we already set defaults
 			}
@@ -533,7 +539,7 @@ class Client extends EventEmitter {
 				deskmod: safe_tags(args[1]).toLowerCase(),
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
-				name: safe_tags(args[3]),
+				name: char_name,
 				sprite: safe_tags(args[4]).toLowerCase(),
 				content: this.prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
