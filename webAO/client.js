@@ -144,14 +144,16 @@ class Client extends EventEmitter {
 				"duration": 1600,
 				"sfx": AO_HOST + "sounds/general/sfx-testimony2.wav"
 			},
-			"notguilty": {
-				"src": AO_HOST + "themes/" + THEME + "/notguilty.gif",
-				"duration": 2440
-			},
 			"guilty": {
 				"src": AO_HOST + "themes/" + THEME + "/guilty.gif",
-				"duration": 2870
-			}
+				"duration": 2870,
+				"sfx": AO_HOST + "sounds/general/sfx-guilty.wav"
+			},
+			"notguilty": {
+				"src": AO_HOST + "themes/" + THEME + "/notguilty.gif",
+				"duration": 2440,
+				"sfx": AO_HOST + "sounds/general/sfx-notguilty.wav"
+			},
 		};
 
 		this.selectedEmote = -1;
