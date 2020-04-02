@@ -622,7 +622,7 @@ class Client extends EventEmitter {
 		}
 
 		if (charID >= 0) {
-			const musicname = this.chars[charID].name;
+			musicname = this.chars[charID].name;
 			appendICLog(`${musicname} changed music to ${track}`);
 		} else {
 			appendICLog(`The music was changed to ${track}`);
