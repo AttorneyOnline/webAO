@@ -527,10 +527,13 @@ class Client extends EventEmitter {
 
 				if(this.chars[char_id].name !== char_name) {
 					console.info(this.chars[char_id].name + " is iniediting to " + char_name);
-					this.handleCharacterInfo(char_name,char_id);
+					const chargs = (char_name + "&" + "filthy iniedtier").split("&");
+					this.handleCharacterInfo(chargs,char_id);
 				}
 			} catch (e) {
-				//we already set defaults
+				msg_nameplate = args[3];
+				msg_blips = "male";
+				char_muted = false;
 				console.error("we're still missing some character data");
 			}
 
@@ -654,6 +657,7 @@ class Client extends EventEmitter {
 			} catch (err) {
 				cini = {};
 				img.classList.add("noini");
+				console.warn("character " + chargs[0] + " is missing from webAO")
 				// If it does, give the user a visual indication that the character is unusable
 			}
 
