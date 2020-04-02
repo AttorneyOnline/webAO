@@ -604,8 +604,9 @@ class Client extends EventEmitter {
 	 */
 	handleMC(args) {
 		const track = args[1];
-		const charID = Number(args[2]);
+		let charID = Number(args[2]);
 		const music = viewport.music;
+		let musicname;
 		music.pause();
 		if(track.startsWith("http")) {
 			music.src = track;
@@ -613,6 +614,13 @@ class Client extends EventEmitter {
 			music.src = MUSIC_HOST + track.toLowerCase();
 		}
 		music.play();
+
+		try {
+			musicname = this.chars[charID].name;
+		} catch(e) {
+			charID = -1;
+		}
+
 		if (charID >= 0) {
 			const musicname = this.chars[charID].name;
 			appendICLog(`${musicname} changed music to ${track}`);
@@ -657,7 +665,7 @@ class Client extends EventEmitter {
 			} catch (err) {
 				cini = {};
 				img.classList.add("noini");
-				console.warn("character " + chargs[0] + " is missing from webAO")
+				console.warn("character " + chargs[0] + " is missing from webAO");
 				// If it does, give the user a visual indication that the character is unusable
 			}
 
