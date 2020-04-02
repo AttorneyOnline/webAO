@@ -6,34 +6,34 @@
 	src: local('Cabin Condensed'), local('CabinCondensed-Regular'), url(https://fonts.gstatic.com/s/cabincondensed/v13/nwpMtK6mNhBK2err_hqkYhHRqmwqZ-LY.woff2) format('woff2');
 }
 
-#chatcontainer {
+#client_chatcontainer {
 	font-family: 'Cabin Condensed', sans-serif;
 }
 
 #client_name {
 	display: none;
 	padding: 0px 6px;
-	height: 5.2%;
+	height: 5%;
 	border: 1px solid #a59252;
     background-image: linear-gradient(#635529, #8c7d42);
-    left: 1.5%;
-	top: 63%;
+    left: 2%;
+	top: 65%;
 	border-radius: 3px;
 	position: absolute;
+	z-index: 1;
 }
 
 #client_chat {
 	font-size: 1em;
 	display: none;
-	width: 98%;
-	width: calc(100% - 4px);
+	width: 100%;
 	margin: auto;
 	height: 30%;
 	border-image-source: url("dgs_chat_bg.png");
     border-image-slice: 12;
     border-image-width: 12px;
     border-width: 12px;
-	background-color: rgba(8, 22, 33, 0.75);
+	background-color: #101821;
 	top: 70%;
 	position: absolute;
 	word-break: keep-all;
@@ -45,7 +45,8 @@
 }
 
 #client_chat p {
-	margin: 4px;
+	margin: 6px;
+	padding: 6px 20px;
 }
 
 #client_chatwaiting {
