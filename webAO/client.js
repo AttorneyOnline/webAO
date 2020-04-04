@@ -6,7 +6,7 @@
 
 import Fingerprint2 from 'fingerprintjs2';
 
-import { unescapeChat, escapeChat, encodeChat, decodeChat, safe_tags } from './encoding.js';
+import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
 import character_arr from "./characters.js";
@@ -491,15 +491,6 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * XXX: a nasty hack made by gameboyprinter.
-	 * @param {string} msg chat message to prepare for display 
-	 */
-	prepChat(msg) {
-		// TODO: make this less awful
-		return unescapeChat(decodeChat(msg));
-	}
-
-	/**
 	 * Handles an in-character chat message.
 	 * @param {*} args packet arguments
 	 */
@@ -523,7 +514,7 @@ class Client extends EventEmitter {
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
 				name: safe_tags(args[3]),
 				sprite: safe_tags(args[4]).toLowerCase(),
-				content: this.prepChat(args[5]), // Escape HTML tags
+				content: prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
 				sound: safe_tags(args[7]).toLowerCase(),
 				blips: safe_tags(msg_blips),
@@ -569,7 +560,7 @@ class Client extends EventEmitter {
 	 */
 	handleCT(args) {
 		const oocLog = document.getElementById("client_ooclog");
-		oocLog.innerHTML += `${decodeChat(unescapeChat(args[1]))}: ${decodeChat(unescapeChat(args[2]))}\r\n`;
+		oocLog.innerHTML += `${prepChat(args[1])}: ${prepChat(args[2])}\r\n`;
 		if (oocLog.scrollTop > oocLog.scrollHeight - 600) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
@@ -580,14 +571,14 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleMC(args) {
-		const track = args[1];
+		const track = prepChat(args[1]);
 		const charID = Number(args[2]);
 		const music = viewport.music;
 		music.pause();
 		if(track.startsWith("http")) {
 			music.src = track;
 		} else {
-			music.src = MUSIC_HOST + track.toLowerCase();
+			music.src = MUSIC_HOST + encodeURI(track.toLowerCase());
 		}
 		music.play();
 		if (charID >= 0) {
@@ -735,8 +726,8 @@ class Client extends EventEmitter {
 		for (let i = 1; i < args.length - 1; i++) {
 			const arg = args[i].split("&");
 			this.evidences[i - 1] = {
-				name: decodeChat(unescapeChat(arg[0])),
-				desc: decodeChat(unescapeChat(arg[1])),
+				name: prepChat(arg[0]),
+				desc: prepChat(arg[1]),
 				filename: safe_tags(arg[2]),
 				icon: AO_HOST + "evidence/" + encodeURI(arg[2].toLowerCase())
 			};
@@ -978,7 +969,7 @@ class Client extends EventEmitter {
 	 */
 	handleZZ(args) {
 		const oocLog = document.getElementById("client_ooclog");
-		oocLog.innerHTML += `$Alert: ${decodeChat(unescapeChat(args[1]))}\r\n`;
+		oocLog.innerHTML += `$Alert: ${prepChat(args[1])}\r\n`;
 		if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
@@ -1608,7 +1599,7 @@ async changeBackground(position) {
 			// zoom
 			default:
 				// due to a retarded client bug, we need to strip the sfx from the MS, if the preanim isn't playing
-				chatmsg.sound = "";
+				this.chatmsg.sound = "";
 				this.chatmsg.startspeaking = true;
 				break;
 		}

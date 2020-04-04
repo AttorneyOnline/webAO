@@ -83,3 +83,12 @@ export function decodeChat(estring) {
 		return estring;
 	}
 }
+
+/**
+ * XXX: a nasty hack made by gameboyprinter.
+ * @param {string} msg chat message to prepare for display 
+ */
+export function prepChat(msg) {
+	// TODO: make this less awful
+	return unescapeChat(decodeChat(msg));
+}
