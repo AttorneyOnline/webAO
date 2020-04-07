@@ -1,9 +1,9 @@
 export default [
 	"aa",
 	"chatdd",
-	"default",
 	"dgs",
 	"drae",
+	"legacy",
 	"triology",
 	"yttd"
 ];

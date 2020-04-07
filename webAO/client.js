@@ -672,7 +672,7 @@ class Client extends EventEmitter {
 				showname: chargs[0],
 				side: "def",
 				gender: "male",
-				chat: "default"
+				chat: "aa"
 			};
 			cini.options = Object.assign(default_options, cini.options);
 
@@ -1654,7 +1654,7 @@ async changeBackground(position) {
 		if (chatbox_arr.includes(chatmsg.chatbox)) {
 			chatbox_theme.href = "styles/chatbox/" + chatmsg.chatbox + ".css";
 		} else {
-			chatbox_theme.href = "styles/chatbox/default.css";
+			chatbox_theme.href = "styles/chatbox/aa.css";
 		}
 
 		// Flip the character
