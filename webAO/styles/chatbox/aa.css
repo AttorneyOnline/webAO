@@ -1,9 +1,9 @@
 @font-face {
-    font-family: 'ace_attorneyregular';
-    src: url('ace-attorney.woff2') format('woff2'),
-         url('ace-attorney.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
+	font-family: 'ace_attorneyregular';
+	src: url('ace-attorney.woff2') format('woff2'),
+		url('ace-attorney.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
 }
 
 .text_white {
@@ -62,44 +62,50 @@
 }
 
 #client_chatcontainer {
-    filter: none;
-    font-family: "Ace Attorney", "ace_attorneyregular", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi" , sans-serif;
+	position: absolute;
+	top: 60%;
+	left: 0;
+	height: 40%;
+	width: 100%;
+	filter: none;
+	font-family: "Ace Attorney", "ace_attorneyregular", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 #client_name {
 	display: none;
-	padding: 0 0.45em;
-	height: 5.2%;
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 13%;
 	min-width: 3.25em;
 	text-justify: distribute;
 	letter-spacing: 0.075em;
 	font-weight: bold;
 	background: rgba(56, 56, 163, 0.5);
 	box-shadow: 0.075em 0.075em rgba(0, 56, 163, 0.5) inset;
-	left: 0;
-	top: 60.4%;
+	padding: 0 0.45em;
 	border-color: rgba(255, 255, 255, 0.5);
 	border-style: ridge groove groove ridge;
 	border-width: 0.2em;
-	border-radius: 0.2em;
-	position: absolute;
+	border-radius: 0.2em;	
 	z-index: 1;
 }
 
 #client_chat {
 	font-size: 1em;
 	display: none;
-	width: 98.4375%;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 98%;
 	width: calc(100% - 0.275em);
+	height: 78%;
 	margin: auto;
-	height: 31.25%;
 	border-color: rgba(255, 255, 255, 0.5);
 	border-style: ridge groove groove ridge;
 	border-width: 0.15em;
 	border-radius: 0.3em;
 	background-color: rgba(0, 0, 16, 0.5);
-	top: 66.5%;
-	position: absolute;
 	word-break: keep-all;
 	overflow-wrap: break-word;
 	text-align: left;
