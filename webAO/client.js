@@ -1516,33 +1516,33 @@ async changeBackground(position) {
 		this.textTimer = 0;
 		this._animating = true;
 
-		const charSprite = document.getElementById("client_char");
-		const pairSprite = document.getElementById("client_pair_char");
-		const nameBox = document.getElementById("client_name");
-		const chatBox = document.getElementById("client_chat");
-		const chatContainerBox = document.getElementById("client_chatcontainer");
-		const waitingBox = document.getElementById("client_chatwaiting");
-		const eviBox = document.getElementById("client_evi");
-		const shoutSprite = document.getElementById("client_shout");
-		const chatBoxInner = document.getElementById("client_inner_chat");
-		const fg = document.getElementById("client_fg");
-		const gamewindow = document.getElementById("client_gamewindow");
-
-		let gifLength = 0;
-
 		// stop updater
 		clearTimeout(this.updater);
+
+		const fg = document.getElementById("client_fg");
+		const gamewindow = document.getElementById("client_gamewindow");
+		const waitingBox = document.getElementById("client_chatwaiting");
 
 		// Reset CSS animation
 		fg.style.animation = "";
 		gamewindow.style.animation = "";
 		waitingBox.innerText = "";
+		
+		const eviBox = document.getElementById("client_evi");		
 
 		if (this.lastEvi !== this.chatmsg.evidence) {
 			eviBox.style.opacity = "0";
 			eviBox.style.height = "0%";	
 		}
 		this.lastEvi = this.chatmsg.evidence;
+
+		const charSprite = document.getElementById("client_char");
+		const pairSprite = document.getElementById("client_pair_char");
+
+		const nameBox = document.getElementById("client_name");
+		const chatBox = document.getElementById("client_chat");
+		const chatContainerBox = document.getElementById("client_chatcontainer");		
+		const chatBoxInner = document.getElementById("client_inner_chat");
 
 		//Clear out the last message
 		chatBoxInner.innerText = this.textnow;
@@ -1580,6 +1580,7 @@ async changeBackground(position) {
 		}
 
 		// gets which shout shall played
+		const shoutSprite = document.getElementById("client_shout");
 		const shout = this.shouts[this.chatmsg.objection];
 		if (shout) {
 			// Hide message box
@@ -1609,6 +1610,7 @@ async changeBackground(position) {
 		}
 
 		this.chatmsg.startpreanim = true;
+		let gifLength = 0;
 		switch (this.chatmsg.type) {
 			// case 0:
 			// normal emote, no preanim
