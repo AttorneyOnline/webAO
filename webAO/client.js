@@ -499,27 +499,44 @@ class Client extends EventEmitter {
 		if (args[4] !== viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
 
+			const char_id = Number(args[9]);
+			const char_name = safe_tags(args[3]);
+
 			let msg_nameplate = args[3];
 			let msg_blips = "male";
+			let char_muted = false;
+
 			try {
-				msg_nameplate = this.chars[args[9]].showname;
-				msg_blips = this.chars[args[9]].gender;
+				msg_nameplate = this.chars[char_id].showname;
+				msg_blips = this.chars[char_id].gender;
+				char_muted = this.chars[char_id].muted;
+
+				if(this.chars[char_id].name !== char_name) {
+					console.info(this.chars[char_id].name + " is iniediting to " + char_name);
+					const chargs = (char_name + "&" + "filthy iniedtier").split("&");
+					this.handleCharacterInfo(chargs,char_id);
+				}
 			} catch (e) {
-				//we already set defaults
+				msg_nameplate = args[3];
+				msg_blips = "male";
+				char_muted = false;
+				console.error("we're still missing some character data");
 			}
+
+			if (char_muted === false) {
 
 			let chatmsg = {
 				deskmod: safe_tags(args[1]).toLowerCase(),
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
-				name: safe_tags(args[3]),
+				name: char_name,
 				sprite: safe_tags(args[4]).toLowerCase(),
 				content: prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
 				sound: safe_tags(args[7]).toLowerCase(),
 				blips: safe_tags(msg_blips),
 				type: Number(args[8]),
-				charid: Number(args[9]),
+				charid: char_id,
 				snddelay: Number(args[10]),
 				objection: Number(args[11]),
 				evidence: safe_tags(args[12]),
@@ -545,12 +562,13 @@ class Client extends EventEmitter {
 				}
 			}
 
+			// our own message appeared, reset the buttons
 			if (chatmsg.charid === this.charID) {
 				resetICParams();
 			}
 
-			if (client.chars[chatmsg.charid].muted === false)
-				viewport.say(chatmsg); // no await
+			viewport.say(chatmsg); // no await
+			}
 		}
 	}
 
@@ -572,8 +590,10 @@ class Client extends EventEmitter {
 	 */
 	handleMC(args) {
 		const track = prepChat(args[1]);
-		const charID = Number(args[2]);
+		let charID = Number(args[2]);
+   
 		const music = viewport.music;
+		let musicname;
 		music.pause();
 		if(track.startsWith("http")) {
 			music.src = track;
@@ -581,8 +601,15 @@ class Client extends EventEmitter {
 			music.src = MUSIC_HOST + encodeURI(track.toLowerCase());
 		}
 		music.play();
+
+		try {
+			musicname = this.chars[charID].name;
+		} catch(e) {
+			charID = -1;
+		}
+
 		if (charID >= 0) {
-			const musicname = this.chars[charID].name;
+			musicname = this.chars[charID].name;
 			appendICLog(`${musicname} changed music to ${track}`);
 		} else {
 			appendICLog(`The music was changed to ${track}`);
@@ -625,6 +652,7 @@ class Client extends EventEmitter {
 			} catch (err) {
 				cini = {};
 				img.classList.add("noini");
+				console.warn("character " + chargs[0] + " is missing from webAO");
 				// If it does, give the user a visual indication that the character is unusable
 			}
 
@@ -1483,7 +1511,7 @@ async changeBackground(position) {
 	 */
 	async say(chatmsg) {
 		this.chatmsg = chatmsg;
-		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(chatmsg.blips.toLowerCase())}.wav`);
+		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
 		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
@@ -1529,7 +1557,7 @@ async changeBackground(position) {
 		}
 		this.lastChar = this.chatmsg.name;
 
-		appendICLog(chatmsg.content, chatmsg.nameplate);
+		appendICLog(this.chatmsg.content, this.chatmsg.nameplate);
 
 		// start checking the files
 		try {
@@ -1592,7 +1620,7 @@ async changeBackground(position) {
 				chatBox.style.display = "none";
 				chatContainerBox.style.display = "none";
 				// If preanim existed then determine the length
-				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
+				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}.gif`);
 				this.chatmsg.startspeaking = false;
 				break;
 			// case 5:
