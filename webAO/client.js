@@ -1539,9 +1539,9 @@ async changeBackground(position) {
 		const charSprite = document.getElementById("client_char");
 		const pairSprite = document.getElementById("client_pair_char");
 
+		const chatContainerBox = document.getElementById("client_chatcontainer");	
 		const nameBox = document.getElementById("client_name");
-		const chatBox = document.getElementById("client_chat");
-		const chatContainerBox = document.getElementById("client_chatcontainer");		
+		const chatBox = document.getElementById("client_chat");			
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
 		//Clear out the last message
@@ -1701,7 +1701,6 @@ async changeBackground(position) {
 
 		const nameBox = document.getElementById("client_name");
 		const chatBox = document.getElementById("client_chat");
-		const chatContainerBox = document.getElementById("client_chatcontainer");
 		const waitingBox = document.getElementById("client_chatwaiting");
 		const charSprite = document.getElementById("client_char");
 		const pairSprite = document.getElementById("client_pair_char");
@@ -1774,7 +1773,7 @@ async changeBackground(position) {
 					}
 				}
 
-				chatContainerBox.style.display = "block";
+				document.getElementById("client_chatcontainer").style.display = "block";
 
 				nameBox.style.display = "block";
 				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
