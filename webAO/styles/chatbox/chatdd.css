@@ -1,6 +1,6 @@
 #client_chatcontainer {
 	position: absolute;
-	top: 73%;
+	bottom: 0;
 	height: 27%;
     width: 100%;
     font-family: sans-serif;
