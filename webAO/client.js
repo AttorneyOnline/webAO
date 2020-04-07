@@ -1604,7 +1604,7 @@ async changeBackground(position) {
 
 			this.shoutaudio.src = shoutUrl;
 			this.shoutaudio.play();
-			this.shoutTimer = 850;
+			this.shoutTimer = client.resources[shout]["duration"];
 		} else {
 			this.shoutTimer = 0;
 		}
