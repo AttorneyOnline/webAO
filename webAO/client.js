@@ -1695,6 +1695,10 @@ async changeBackground(position) {
 	 * XXX: This relies on a global variable `this.chatmsg`!
 	 */
 	tick() {
+		if (this._animating) {
+			this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
+		}
+
 		const nameBox = document.getElementById("client_name");
 		const chatBox = document.getElementById("client_chat");
 		const chatContainerBox = document.getElementById("client_chatcontainer");
@@ -1703,11 +1707,7 @@ async changeBackground(position) {
 		const pairSprite = document.getElementById("client_pair_char");
 		const eviBox = document.getElementById("client_evi");
 		const shoutSprite = document.getElementById("client_shout");
-		const chatBoxInner = document.getElementById("client_inner_chat");
-
-		if (this._animating) {
-			this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
-		}
+		const chatBoxInner = document.getElementById("client_inner_chat");		
 
 		// TODO: preanims sometimes play when they're not supposed to
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
