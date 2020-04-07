@@ -1299,6 +1299,18 @@ class Viewport {
 		return `${AO_HOST}background/${encodeURI(this.bgname.toLowerCase())}/`;
 	}
 
+
+	/**
+	 * Play any SFX
+	 * 
+	 * @param {string} sfxname
+	 */
+	async playSFX(sfxname) {
+		this.sfxaudio.pause();
+		this.sfxaudio.src = sfxname;
+		this.sfxaudio.play();
+	}
+
 	/**
  * Changes the viewport background based on a given position.
  * 
@@ -1713,17 +1725,11 @@ async changeBackground(position) {
 			// Effect stuff
 			if (this.chatmsg.flash === 2) {
 				// Shake screen
-				this.sfxaudio.pause();
-				this.sfxplayed = 1;
-				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-stab.wav";
-				this.sfxaudio.play();
+				this.playSFX(AO_HOST + "sounds/general/sfx-stab.wav");
 				document.getElementById("client_gamewindow").style.animation = "shake 0.2s 1";
 			} else if (this.chatmsg.flash === 1) {
 				// Flash screen
-				this.sfxaudio.pause();
-				this.sfxplayed = 1;
-				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-realization.wav";
-				this.sfxaudio.play();
+				this.playSFX(AO_HOST + "sounds/general/sfx-realization.wav");
 				document.getElementById("client_fg").style.animation = "flash 0.4s 1";
 			}
 
@@ -1838,11 +1844,9 @@ async changeBackground(position) {
 		}
 
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
-			this.sfxaudio.pause();
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1" && this.chatmsg.sound !== "" && this.chatmsg.sound !== undefined) {
-				this.sfxaudio.src = AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav";
-				this.sfxaudio.play();
+				this.playSFX(AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav");
 			}
 		}
 		this.textTimer = this.textTimer + UPDATE_INTERVAL;
