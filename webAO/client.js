@@ -927,12 +927,6 @@ class Client extends EventEmitter {
 			document.getElementById("client_charselect").style.display = "none";
 		} else {
 			document.getElementById("client_charselect").style.display = "block";
-			viewport.sfxaudio.pause();
-			viewport.sfxaudio.src = "https://s3.wasabisys.com/webao/base/sounds/general/nr_select04.dsp.wav";
-			viewport.sfxaudio.play();
-			const musicaudio = document.getElementById("client_musicaudio");
-			musicaudio.src = "https://s3.wasabisys.com/webao/base/sounds/music/[ssbm] menu 1.mp3";
-			musicaudio.play();
 		}
 	}
 
@@ -1307,6 +1301,18 @@ class Viewport {
 		return `${AO_HOST}background/${encodeURI(this.bgname.toLowerCase())}/`;
 	}
 
+
+	/**
+	 * Play any SFX
+	 * 
+	 * @param {string} sfxname
+	 */
+	async playSFX(sfxname) {
+		this.sfxaudio.pause();
+		this.sfxaudio.src = sfxname;
+		this.sfxaudio.play();
+	}
+
 	/**
  * Changes the viewport background based on a given position.
  * 
@@ -1519,40 +1525,38 @@ async changeBackground(position) {
 	 */
 	async say(chatmsg) {
 		this.chatmsg = chatmsg;
-		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
 		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
 		this._animating = true;
 
-		const charSprite = document.getElementById("client_char");
-		const pairSprite = document.getElementById("client_pair_char");
-		const nameBox = document.getElementById("client_name");
-		const chatBox = document.getElementById("client_chat");
-		const chatbox_theme = document.getElementById("chatbox_theme");
-		const chatContainerBox = document.getElementById("client_chatcontainer");
-		const waitingBox = document.getElementById("client_chatwaiting");
-		const eviBox = document.getElementById("client_evi");
-		const shoutSprite = document.getElementById("client_shout");
-		const chatBoxInner = document.getElementById("client_inner_chat");
-		const fg = document.getElementById("client_fg");
-		const gamewindow = document.getElementById("client_gamewindow");
-
-		let gifLength = 0;
-
 		// stop updater
 		clearTimeout(this.updater);
+
+		const fg = document.getElementById("client_fg");
+		const gamewindow = document.getElementById("client_gamewindow");
+		const waitingBox = document.getElementById("client_chatwaiting");
 
 		// Reset CSS animation
 		fg.style.animation = "";
 		gamewindow.style.animation = "";
 		waitingBox.innerText = "";
+		
+		const eviBox = document.getElementById("client_evi");		
 
 		if (this.lastEvi !== this.chatmsg.evidence) {
 			eviBox.style.opacity = "0";
 			eviBox.style.height = "0%";	
 		}
 		this.lastEvi = this.chatmsg.evidence;
+
+		const charSprite = document.getElementById("client_char");
+		const pairSprite = document.getElementById("client_pair_char");
+
+		const chatContainerBox = document.getElementById("client_chatcontainer");	
+		const nameBox = document.getElementById("client_name");
+		const chatBox = document.getElementById("client_chat");			
+		const chatBoxInner = document.getElementById("client_inner_chat");
 
 		//Clear out the last message
 		chatBoxInner.innerText = this.textnow;
@@ -1590,6 +1594,7 @@ async changeBackground(position) {
 		}
 
 		// gets which shout shall played
+		const shoutSprite = document.getElementById("client_shout");
 		const shout = this.shouts[this.chatmsg.objection];
 		if (shout) {
 			// Hide message box
@@ -1613,12 +1618,13 @@ async changeBackground(position) {
 
 			this.shoutaudio.src = shoutUrl;
 			this.shoutaudio.play();
-			this.shoutTimer = 850;
+			this.shoutTimer = client.resources[shout]["duration"];
 		} else {
 			this.shoutTimer = 0;
 		}
 
 		this.chatmsg.startpreanim = true;
+		let gifLength = 0;
 		switch (this.chatmsg.type) {
 			// case 0:
 			// normal emote, no preanim
@@ -1644,6 +1650,7 @@ async changeBackground(position) {
 
 		this.changeBackground(chatmsg.side);
 
+		const chatbox_theme = document.getElementById("chatbox_theme");
 		if (chatbox_arr.includes(chatmsg.chatbox)) {
 			chatbox_theme.href = "styles/chatbox/" + chatmsg.chatbox + ".css";
 		} else {
@@ -1665,6 +1672,8 @@ async changeBackground(position) {
 				pairSprite.style.transform = "scaleX(1)";
 			}
 		}
+
+		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
 
 		this.tick();
 	}
@@ -1707,36 +1716,29 @@ async changeBackground(position) {
 	 * XXX: This relies on a global variable `this.chatmsg`!
 	 */
 	tick() {
+		if (this._animating) {
+			this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
+		}
+
 		const nameBox = document.getElementById("client_name");
 		const chatBox = document.getElementById("client_chat");
-		const chatContainerBox = document.getElementById("client_chatcontainer");
 		const waitingBox = document.getElementById("client_chatwaiting");
 		const charSprite = document.getElementById("client_char");
 		const pairSprite = document.getElementById("client_pair_char");
 		const eviBox = document.getElementById("client_evi");
 		const shoutSprite = document.getElementById("client_shout");
-		const chatBoxInner = document.getElementById("client_inner_chat");
-
-		if (this._animating) {
-			this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
-		}
+		const chatBoxInner = document.getElementById("client_inner_chat");		
 
 		// TODO: preanims sometimes play when they're not supposed to
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
 			// Effect stuff
 			if (this.chatmsg.flash === 2) {
 				// Shake screen
-				this.sfxaudio.pause();
-				this.sfxplayed = 1;
-				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-stab.wav";
-				this.sfxaudio.play();
+				this.playSFX(AO_HOST + "sounds/general/sfx-stab.wav");
 				document.getElementById("client_gamewindow").style.animation = "shake 0.2s 1";
 			} else if (this.chatmsg.flash === 1) {
 				// Flash screen
-				this.sfxaudio.pause();
-				this.sfxplayed = 1;
-				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-realization.wav";
-				this.sfxaudio.play();
+				this.playSFX(AO_HOST + "sounds/general/sfx-realization.wav");
 				document.getElementById("client_fg").style.animation = "flash 0.4s 1";
 			}
 
@@ -1786,7 +1788,7 @@ async changeBackground(position) {
 					}
 				}
 
-				chatContainerBox.style.display = "block";
+				document.getElementById("client_chatcontainer").style.display = "block";
 
 				nameBox.style.display = "block";
 				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
@@ -1851,11 +1853,9 @@ async changeBackground(position) {
 		}
 
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
-			this.sfxaudio.pause();
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1" && this.chatmsg.sound !== "" && this.chatmsg.sound !== undefined) {
-				this.sfxaudio.src = AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav";
-				this.sfxaudio.play();
+				this.playSFX(AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav");
 			}
 		}
 		this.textTimer = this.textTimer + UPDATE_INTERVAL;
