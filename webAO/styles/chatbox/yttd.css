@@ -9,6 +9,40 @@
 	font-family: "MS PGothic", sans-serif;
 }
 
+.text_white {
+	color: #fff;
+}
+
+.text_blue {
+	color: #93bbe6;
+}
+
+.text_green {
+	color: #6ab057;
+}
+
+.text_red {
+	color: #e1522a;
+}
+
+.text_orange {
+	color: #cf714c;
+}
+
+.text_yellow {
+	color: #fef9ad;
+}
+
+.text_pink {
+	color: #ffc0cb;
+}
+
+.text_cyan {
+	color: #0ff;
+}
+
+
+
 #client_name {
 	display: none;
 	top: 0;
@@ -19,6 +53,7 @@
 	letter-spacing: 0.075em;
 	font-weight: bold;
 	background-color: rgba(0, 0, 0, 0.5);
+	color: #fef9ad;
 	padding: 0.5 0.5em;
     border-style: double;
     border-color: #ffa500;
@@ -55,9 +90,23 @@
 
 #client_chatwaiting {
 	display: block;
-	right: -6px;
-	bottom: 0.2em;
-	width: 1em;
+	transform: rotate(90deg);
+	left: 50%;
+	bottom: 0px;
 	position: absolute;
-	animation: idling 0.4s linear infinite;
+	animation: idling 1s linear infinite;
+}
+
+@keyframes idling {
+	0% {
+		bottom: 2px;
+	}
+
+	50% {
+		bottom: 0px;
+	}
+
+	100% {
+		bottom: 2px;
+	}
 }
