@@ -919,12 +919,6 @@ class Client extends EventEmitter {
 			document.getElementById("client_charselect").style.display = "none";
 		} else {
 			document.getElementById("client_charselect").style.display = "block";
-			viewport.sfxaudio.pause();
-			viewport.sfxaudio.src = "https://s3.wasabisys.com/webao/base/sounds/general/nr_select04.dsp.wav";
-			viewport.sfxaudio.play();
-			const musicaudio = document.getElementById("client_musicaudio");
-			musicaudio.src = "https://s3.wasabisys.com/webao/base/sounds/music/[ssbm] menu 1.mp3";
-			musicaudio.play();
 		}
 	}
 
