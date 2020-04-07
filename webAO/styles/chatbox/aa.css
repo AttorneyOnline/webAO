@@ -123,7 +123,7 @@
 
 #client_chatwaiting {
 	display: block;
-	right: -6px;
+	right: 4px;
 	bottom: 0.2em;
 	width: 1em;
 	position: absolute;
@@ -132,14 +132,14 @@
 
 @keyframes idling {
 	0% {
-		right: -4px;
+		right: 0px;
 	}
 
 	50% {
-		right: -8px;
+		right: 4px;
 	}
 
 	100% {
-		right: -4px;
+		right: 0px;
 	}
 }
