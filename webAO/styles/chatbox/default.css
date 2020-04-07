@@ -1,26 +1,36 @@
+#client_chatcontainer {
+	position: absolute;
+	top: 60%;
+	left: 0;
+	height: 40%;
+	width: 100%;
+}
+
 #client_name {
 	display: none;
-	padding: 0px 6px;
-	height: 7%;
-	border: 1px solid rgba(255, 255, 255, 0.7);
-	background: rgba(73, 0, 254, 0.5);
-	top: 63%;
-	border-radius: 3px;
 	position: absolute;
+	top: 0;
+	left: 0;
+	height: 15%;
+	border: 1px solid rgba(255, 255, 255, 0.7);
+	border-radius: 3px;
+	background: rgba(73, 0, 254, 0.5);	
+	padding: 0px 6px;
 }
 
 #client_chat {
-	font-size: 1em;
-	display: none;
-	width: 98%;
-	width: calc(100% - 4px);
-	margin: auto;
-	height: 30%;
-	border: 2px solid rgba(255, 255, 255, 0.7);
-	background-color: rgba(0, 0, 0, 0.5);
-	top: 70%;
-	border-radius: 4px;
 	position: absolute;
+	display: none;
+	bottom: 0;
+	left: 0;
+	width: 98%;
+	width: calc(100% - 4px);	
+	height: 82%;
+	border: 2px solid rgba(255, 255, 255, 0.7);
+	border-radius: 4px;
+	background-color: rgba(0, 0, 0, 0.5);
+	margin: auto;		
+	font-size: 1em;
 	word-break: keep-all;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
