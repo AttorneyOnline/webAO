@@ -1,16 +1,25 @@
 
+#client_chatcontainer {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	height: 50%;
+	width: 100%;
+	filter: none;
+	font-family: "MS PGothic", sans-serif;
+}
+
 #client_name {
 	display: none;
-	padding: 0 0.45em;
-	height: 5.2%;
+	top: 0;
+	left: 0;	
+	height: 25%;
 	min-width: 3.25em;
 	text-justify: distribute;
 	letter-spacing: 0.075em;
 	font-weight: bold;
-	background-color: black;
-	box-shadow: 0.075em 0.075em rgba(0, 56, 163, 0.5) inset;
-	left: 0;
-	top: 60.4%;
+	background-color: rgba(0, 0, 0, 0.5);
+	padding: 0.5 0.5em;
     border-style: double;
     border-color: #ffa500;
 	position: absolute;
@@ -20,14 +29,14 @@
 #client_chat {
 	font-size: 1em;
 	display: none;
-	width: 98.4375%;
-	width: calc(100% - 0.275em);
+	bottom: 0;
+	width: 99%;
+	width: calc(100% - 6px);
 	margin: auto;
-	height: 31.25%;
+	height: 70%;
 	border-style: double;
     border-color: #ffa500;
-	background-color: black;
-	top: 66.5%;
+	background-color: rgba(0, 0, 0, 0.5);
 	position: absolute;
 	word-break: keep-all;
 	overflow-wrap: break-word;
