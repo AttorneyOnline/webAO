@@ -91,10 +91,11 @@
 
 #client_chatwaiting {
 	display: block;
+	position: absolute;
 	transform: rotate(90deg);
 	left: 50%;
-	bottom: 0px;
-	position: absolute;
+	bottom: 0px;	
+	line-height: 0.5;
 	animation: idling 1s linear infinite;
 }
 
