@@ -1511,7 +1511,6 @@ async changeBackground(position) {
 	 */
 	async say(chatmsg) {
 		this.chatmsg = chatmsg;
-		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
 		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
@@ -1650,6 +1649,8 @@ async changeBackground(position) {
 				pairSprite.style.transform = "scaleX(1)";
 			}
 		}
+
+		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
 
 		this.tick();
 	}
