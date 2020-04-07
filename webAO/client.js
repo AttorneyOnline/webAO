@@ -6,7 +6,7 @@
 
 import Fingerprint2 from 'fingerprintjs2';
 
-import { unescapeChat, escapeChat, encodeChat, decodeChat, safe_tags } from './encoding.js';
+import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
 import character_arr from "./characters.js";
@@ -144,14 +144,16 @@ class Client extends EventEmitter {
 				"duration": 1600,
 				"sfx": AO_HOST + "sounds/general/sfx-testimony2.wav"
 			},
-			"notguilty": {
-				"src": AO_HOST + "themes/" + THEME + "/notguilty.gif",
-				"duration": 2440
-			},
 			"guilty": {
 				"src": AO_HOST + "themes/" + THEME + "/guilty.gif",
-				"duration": 2870
-			}
+				"duration": 2870,
+				"sfx": AO_HOST + "sounds/general/sfx-guilty.wav"
+			},
+			"notguilty": {
+				"src": AO_HOST + "themes/" + THEME + "/notguilty.gif",
+				"duration": 2440,
+				"sfx": AO_HOST + "sounds/general/sfx-notguilty.wav"
+			},
 		};
 
 		this.selectedEmote = -1;
@@ -383,13 +385,6 @@ class Client extends EventEmitter {
 			evidence_select.add(new Option(evidence));
 		});
 
-		// Load sfx for modcalls
-		const modcall_select = document.getElementById("client_modcall");
-		sfx_arr.forEach(evidence => {
-			modcall_select.add(new Option(evidence));
-		});
-		document.getElementById("client_modcall").value = getCookie("modcall_sfx") || "sfx-gallery.wav";
-
 		// Read cookies and set the UI to its values
 		document.getElementById("OOC_name").value = getCookie("OOC_name") || "web"+parseInt(Math.random()*100+10);
 
@@ -496,15 +491,6 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * XXX: a nasty hack made by gameboyprinter.
-	 * @param {string} msg chat message to prepare for display 
-	 */
-	prepChat(msg) {
-		// TODO: make this less awful
-		return unescapeChat(decodeChat(msg));
-	}
-
-	/**
 	 * Handles an in-character chat message.
 	 * @param {*} args packet arguments
 	 */
@@ -545,7 +531,7 @@ class Client extends EventEmitter {
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
 				name: char_name,
 				sprite: safe_tags(args[4]).toLowerCase(),
-				content: this.prepChat(args[5]), // Escape HTML tags
+				content: prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
 				sound: safe_tags(args[7]).toLowerCase(),
 				blips: safe_tags(msg_blips),
@@ -592,7 +578,7 @@ class Client extends EventEmitter {
 	 */
 	handleCT(args) {
 		const oocLog = document.getElementById("client_ooclog");
-		oocLog.innerHTML += `${decodeChat(unescapeChat(args[1]))}: ${decodeChat(unescapeChat(args[2]))}\r\n`;
+		oocLog.innerHTML += `${prepChat(args[1])}: ${prepChat(args[2])}\r\n`;
 		if (oocLog.scrollTop > oocLog.scrollHeight - 600) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
@@ -603,15 +589,16 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleMC(args) {
-		const track = args[1];
+		const track = prepChat(args[1]);
 		let charID = Number(args[2]);
+   
 		const music = viewport.music;
 		let musicname;
 		music.pause();
 		if(track.startsWith("http")) {
 			music.src = track;
 		} else {
-			music.src = MUSIC_HOST + track.toLowerCase();
+			music.src = MUSIC_HOST + encodeURI(track.toLowerCase());
 		}
 		music.play();
 
@@ -767,8 +754,8 @@ class Client extends EventEmitter {
 		for (let i = 1; i < args.length - 1; i++) {
 			const arg = args[i].split("&");
 			this.evidences[i - 1] = {
-				name: decodeChat(unescapeChat(arg[0])),
-				desc: decodeChat(unescapeChat(arg[1])),
+				name: prepChat(arg[0]),
+				desc: prepChat(arg[1]),
 				filename: safe_tags(arg[2]),
 				icon: AO_HOST + "evidence/" + encodeURI(arg[2].toLowerCase())
 			};
@@ -1005,20 +992,19 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Handles a call mod message.
+	 * Handles a modcall
 	 * @param {Array} args packet arguments
 	 */
 	handleZZ(args) {
 		const oocLog = document.getElementById("client_ooclog");
-		oocLog.innerHTML += `$Alert: ${decodeChat(unescapeChat(args[1]))}\r\n`;
+		oocLog.innerHTML += `$Alert: ${prepChat(args[1])}\r\n`;
 		if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
-		const sfxname = document.getElementById("client_modcall").value;
 		viewport.sfxaudio.pause();
 		const oldvolume = viewport.sfxaudio.volume;
 		viewport.sfxaudio.volume = 1;
-		viewport.sfxaudio.src = AO_HOST + "sounds/general/" + sfxname + ".wav";
+		viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
 		viewport.sfxaudio.play();
 		viewport.sfxaudio.volume = oldvolume;
 	}
@@ -2094,10 +2080,10 @@ window.reloadTheme = reloadTheme;
 /**
  * Triggered by the modcall sfx dropdown
  */
-export function changeModcall() {
-	setCookie("modcall_sfx", document.getElementById("client_modcall").value);
+export function modcall_test() {
+	client.handleZZ("test#test".split("#"));
 }
-window.changeModcall = changeModcall;
+window.modcall_test = modcall_test;
 
 /**
  * Triggered by the ini button.
