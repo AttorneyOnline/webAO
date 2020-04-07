@@ -6,7 +6,7 @@
 
 import Fingerprint2 from 'fingerprintjs2';
 
-import { unescapeChat, escapeChat, encodeChat, decodeChat, safe_tags } from './encoding.js';
+import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
 import character_arr from "./characters.js";
@@ -146,14 +146,16 @@ class Client extends EventEmitter {
 				"duration": 1600,
 				"sfx": AO_HOST + "sounds/general/sfx-testimony2.wav"
 			},
-			"notguilty": {
-				"src": AO_HOST + "themes/" + THEME + "/notguilty.gif",
-				"duration": 2440
-			},
 			"guilty": {
 				"src": AO_HOST + "themes/" + THEME + "/guilty.gif",
-				"duration": 2870
-			}
+				"duration": 2870,
+				"sfx": AO_HOST + "sounds/general/sfx-guilty.wav"
+			},
+			"notguilty": {
+				"src": AO_HOST + "themes/" + THEME + "/notguilty.gif",
+				"duration": 2440,
+				"sfx": AO_HOST + "sounds/general/sfx-notguilty.wav"
+			},
 		};
 
 		this.selectedEmote = -1;
@@ -385,13 +387,6 @@ class Client extends EventEmitter {
 			evidence_select.add(new Option(evidence));
 		});
 
-		// Load sfx for modcalls
-		const modcall_select = document.getElementById("client_modcall");
-		sfx_arr.forEach(evidence => {
-			modcall_select.add(new Option(evidence));
-		});
-		document.getElementById("client_modcall").value = getCookie("modcall_sfx") || "sfx-gallery.wav";
-
 		// Read cookies and set the UI to its values
 		document.getElementById("OOC_name").value = getCookie("OOC_name") || "web"+parseInt(Math.random()*100+10);
 
@@ -498,15 +493,6 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * XXX: a nasty hack made by gameboyprinter.
-	 * @param {string} msg chat message to prepare for display 
-	 */
-	prepChat(msg) {
-		// TODO: make this less awful
-		return unescapeChat(decodeChat(msg));
-	}
-
-	/**
 	 * Handles an in-character chat message.
 	 * @param {*} args packet arguments
 	 */
@@ -515,30 +501,47 @@ class Client extends EventEmitter {
 		if (args[4] !== viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
 
+			const char_id = Number(args[9]);
+			const char_name = safe_tags(args[3]);
+
 			let msg_nameplate = args[3];
 			let msg_blips = "male";
 			let char_chatbox = "default";
+			let char_muted = false;
+
 			try {
-				msg_nameplate = this.chars[args[9]].showname;
-				msg_blips = this.chars[args[9]].gender;
-				char_chatbox = this.chars[args[9]].chat;
+				msg_nameplate = this.chars[char_id].showname;
+				msg_blips = this.chars[char_id].gender;
+				char_chatbox = this.chars[char_id].chat;
+				char_muted = this.chars[char_id].muted;				
+
+				if(this.chars[char_id].name !== char_name) {
+					console.info(this.chars[char_id].name + " is iniediting to " + char_name);
+					const chargs = (char_name + "&" + "filthy iniedtier").split("&");
+					this.handleCharacterInfo(chargs,char_id);
+				}
 			} catch (e) {
-				//we already set defaults
+				msg_nameplate = args[3];
+				msg_blips = "male";
+				char_muted = false;
+				console.error("we're still missing some character data");
 			}
+
+			if (char_muted === false) {
 
 			let chatmsg = {
 				deskmod: safe_tags(args[1]).toLowerCase(),
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
 				chatbox: char_chatbox,
-				name: safe_tags(args[3]),
+				name: char_name,
 				sprite: safe_tags(args[4]).toLowerCase(),
-				content: this.prepChat(args[5]), // Escape HTML tags
+				content: prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
 				sound: safe_tags(args[7]).toLowerCase(),
 				blips: safe_tags(msg_blips),
 				type: Number(args[8]),
-				charid: Number(args[9]),
+				charid: char_id,
 				snddelay: Number(args[10]),
 				objection: Number(args[11]),
 				evidence: safe_tags(args[12]),
@@ -564,12 +567,13 @@ class Client extends EventEmitter {
 				}
 			}
 
+			// our own message appeared, reset the buttons
 			if (chatmsg.charid === this.charID) {
 				resetICParams();
 			}
 
-			if (client.chars[chatmsg.charid].muted === false)
-				viewport.say(chatmsg); // no await
+			viewport.say(chatmsg); // no await
+			}
 		}
 	}
 
@@ -579,7 +583,7 @@ class Client extends EventEmitter {
 	 */
 	handleCT(args) {
 		const oocLog = document.getElementById("client_ooclog");
-		oocLog.innerHTML += `${decodeChat(unescapeChat(args[1]))}: ${decodeChat(unescapeChat(args[2]))}\r\n`;
+		oocLog.innerHTML += `${prepChat(args[1])}: ${prepChat(args[2])}\r\n`;
 		if (oocLog.scrollTop > oocLog.scrollHeight - 600) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
@@ -590,18 +594,27 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleMC(args) {
-		const track = args[1];
-		const charID = Number(args[2]);
+		const track = prepChat(args[1]);
+		let charID = Number(args[2]);
+   
 		const music = viewport.music;
+		let musicname;
 		music.pause();
 		if(track.startsWith("http")) {
 			music.src = track;
 		} else {
-			music.src = MUSIC_HOST + track.toLowerCase();
+			music.src = MUSIC_HOST + encodeURI(track.toLowerCase());
 		}
 		music.play();
+
+		try {
+			musicname = this.chars[charID].name;
+		} catch(e) {
+			charID = -1;
+		}
+
 		if (charID >= 0) {
-			const musicname = this.chars[charID].name;
+			musicname = this.chars[charID].name;
 			appendICLog(`${musicname} changed music to ${track}`);
 		} else {
 			appendICLog(`The music was changed to ${track}`);
@@ -644,6 +657,7 @@ class Client extends EventEmitter {
 			} catch (err) {
 				cini = {};
 				img.classList.add("noini");
+				console.warn("character " + chargs[0] + " is missing from webAO");
 				// If it does, give the user a visual indication that the character is unusable
 			}
 
@@ -748,8 +762,8 @@ class Client extends EventEmitter {
 		for (let i = 1; i < args.length - 1; i++) {
 			const arg = args[i].split("&");
 			this.evidences[i - 1] = {
-				name: decodeChat(unescapeChat(arg[0])),
-				desc: decodeChat(unescapeChat(arg[1])),
+				name: prepChat(arg[0]),
+				desc: prepChat(arg[1]),
 				filename: safe_tags(arg[2]),
 				icon: AO_HOST + "evidence/" + encodeURI(arg[2].toLowerCase())
 			};
@@ -986,20 +1000,19 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Handles a call mod message.
+	 * Handles a modcall
 	 * @param {Array} args packet arguments
 	 */
 	handleZZ(args) {
 		const oocLog = document.getElementById("client_ooclog");
-		oocLog.innerHTML += `$Alert: ${decodeChat(unescapeChat(args[1]))}\r\n`;
+		oocLog.innerHTML += `$Alert: ${prepChat(args[1])}\r\n`;
 		if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
-		const sfxname = document.getElementById("client_modcall").value;
 		viewport.sfxaudio.pause();
 		const oldvolume = viewport.sfxaudio.volume;
 		viewport.sfxaudio.volume = 1;
-		viewport.sfxaudio.src = AO_HOST + "sounds/general/" + sfxname + ".wav";
+		viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
 		viewport.sfxaudio.play();
 		viewport.sfxaudio.volume = oldvolume;
 	}
@@ -1506,7 +1519,7 @@ async changeBackground(position) {
 	 */
 	async say(chatmsg) {
 		this.chatmsg = chatmsg;
-		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(chatmsg.blips.toLowerCase())}.wav`);
+		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
 		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
@@ -1553,7 +1566,7 @@ async changeBackground(position) {
 		}
 		this.lastChar = this.chatmsg.name;
 
-		appendICLog(chatmsg.content, chatmsg.nameplate);
+		appendICLog(this.chatmsg.content, this.chatmsg.nameplate);
 
 		// start checking the files
 		try {
@@ -1616,14 +1629,14 @@ async changeBackground(position) {
 				chatBox.style.display = "none";
 				chatContainerBox.style.display = "none";
 				// If preanim existed then determine the length
-				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
+				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}.gif`);
 				this.chatmsg.startspeaking = false;
 				break;
 			// case 5:
 			// zoom
 			default:
 				// due to a retarded client bug, we need to strip the sfx from the MS, if the preanim isn't playing
-				chatmsg.sound = "";
+				this.chatmsg.sound = "";
 				this.chatmsg.startspeaking = true;
 				break;
 		}
@@ -2082,10 +2095,10 @@ window.reloadTheme = reloadTheme;
 /**
  * Triggered by the modcall sfx dropdown
  */
-export function changeModcall() {
-	setCookie("modcall_sfx", document.getElementById("client_modcall").value);
+export function modcall_test() {
+	client.handleZZ("test#test".split("#"));
 }
-window.changeModcall = changeModcall;
+window.modcall_test = modcall_test;
 
 /**
  * Triggered by the ini button.
