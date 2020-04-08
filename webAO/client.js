@@ -1555,7 +1555,6 @@ async changeBackground(position) {
 
 		const chatContainerBox = document.getElementById("client_chatcontainer");	
 		const nameBox = document.getElementById("client_name");
-		const chatBox = document.getElementById("client_chat");			
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
 		//Clear out the last message
@@ -1598,8 +1597,6 @@ async changeBackground(position) {
 		const shout = this.shouts[this.chatmsg.objection];
 		if (shout) {
 			// Hide message box
-			nameBox.style.display = "none";
-			chatBox.style.display = "none";
 			chatContainerBox.style.display = "none";
 			shoutSprite.src = client.resources[shout]["src"];
 			shoutSprite.style.display = "block";
@@ -1631,8 +1628,6 @@ async changeBackground(position) {
 			case 1:
 				// play preanim
 				// Hide message box
-				nameBox.style.display = "none";
-				chatBox.style.display = "none";
 				chatContainerBox.style.display = "none";
 				// If preanim existed then determine the length
 				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}.gif`);
@@ -1720,8 +1715,7 @@ async changeBackground(position) {
 			this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
 		}
 
-		const nameBox = document.getElementById("client_name");
-		const chatBox = document.getElementById("client_chat");
+		const gamewindow = document.getElementById("client_gamewindow");
 		const waitingBox = document.getElementById("client_chatwaiting");
 		const charSprite = document.getElementById("client_char");
 		const pairSprite = document.getElementById("client_pair_char");
@@ -1735,7 +1729,7 @@ async changeBackground(position) {
 			if (this.chatmsg.flash === 2) {
 				// Shake screen
 				this.playSFX(AO_HOST + "sounds/general/sfx-stab.wav");
-				document.getElementById("client_gamewindow").style.animation = "shake 0.2s 1";
+				gamewindow.style.animation = "shake 0.2s 1";
 			} else if (this.chatmsg.flash === 1) {
 				// Flash screen
 				this.playSFX(AO_HOST + "sounds/general/sfx-realization.wav");
@@ -1788,15 +1782,13 @@ async changeBackground(position) {
 					}
 				}
 
-				document.getElementById("client_chatcontainer").style.display = "block";
+				const chatContainerBox = document.getElementById("client_chatcontainer");
+				const gameHeight = document.getElementById("client_background").offsetHeight;
+				chatContainerBox.style.display = "block";
 
-				nameBox.style.display = "block";
-				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
+				chatContainerBox.style.fontSize = (gameHeight * 0.05) + "px";
 
 				chatBoxInner.className = "text_" + this.colors[this.chatmsg.color];
-
-				chatBox.style.display = "block";
-				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
 
 				this.chatmsg.startspeaking = false;
 
