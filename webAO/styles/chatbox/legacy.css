@@ -7,7 +7,7 @@
 }
 
 #client_name {
-	display: none;
+	display: block;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -21,7 +21,7 @@
 
 #client_chat {
 	position: absolute;
-	display: none;
+	display: block;
 	bottom: 0;
 	left: 0;
 	width: 98%;

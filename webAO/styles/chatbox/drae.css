@@ -3,7 +3,7 @@
 }
 
 #client_name {
-	display: none;
+	display: block;
 	padding: 0 0.45em;
 	height: 5.2%;
 	width: 40%;
@@ -19,7 +19,7 @@
 
 #client_chat {
 	font-size: 1em;
-	display: none;
+	display: block;
 	width: 100%;
 	margin: auto;
 	height: 31.25%;

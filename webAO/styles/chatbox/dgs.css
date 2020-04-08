@@ -11,7 +11,7 @@
 }
 
 #client_name {
-	display: none;
+	display: block;
 	padding: 0px 6px;
 	height: 5%;
 	border: 1px solid #a59252;
@@ -25,7 +25,7 @@
 
 #client_chat {
 	font-size: 1em;
-	display: none;
+	display: block;
 	width: 100%;
 	margin: auto;
 	height: 30%;

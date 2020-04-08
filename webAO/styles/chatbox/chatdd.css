@@ -10,7 +10,7 @@
 }
 
 #client_name {
-	display: none;
+	display: block;
 	top: 4%;
 	padding: 0 10px;
 	height: 22%;
@@ -19,7 +19,7 @@
 
 #client_chat {
 	font-size: 1em;
-	display: none;
+	display: block;
 	width: 100%;
 	margin: auto;
 	height: 90%;
