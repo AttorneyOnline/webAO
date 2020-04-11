@@ -387,7 +387,6 @@ class Client extends EventEmitter {
 
 		// Read cookies and set the UI to its values
 		document.getElementById("OOC_name").value = getCookie("OOC_name") || "web"+parseInt(Math.random()*100+10);
-		document.getElementById("ic_chat_name").value = getCookie("showname") || "";
 
 		// Read cookies and set the UI to its values
 		var cookietheme = getCookie("theme") || "default";
@@ -1921,7 +1920,7 @@ function setCookie(cname, value) {
  * @param {KeyboardEvent} event
  */
 export function onShownameChange(event) {
-		setCookie("showname",document.getElementById("ic_chat_name").value);
+		setCookie("showname",document.getElementById("client_oocinputbox").value);
 }
 window.onShownameChange = onShownameChange;
 
