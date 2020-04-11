@@ -1916,6 +1916,15 @@ function setCookie(cname, value) {
 }
 
 /**
+ * Triggered when the showname is changed
+ * @param {KeyboardEvent} event
+ */
+export function onShownameChange(event) {
+		setCookie("showname",document.getElementById("client_oocinputbox").value);
+}
+window.onShownameChange = onShownameChange;
+
+/**
  * Triggered when the Return key is pressed on the out-of-character chat input box.
  * @param {KeyboardEvent} event
  */
