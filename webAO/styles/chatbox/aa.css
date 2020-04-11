@@ -78,10 +78,7 @@
 	left: 0;
 	top: 0;
 	height: 13%;
-	min-width: 3.25em;
-	text-justify: distribute;
-	letter-spacing: 0.075em;
-	font-weight: bold;
+	min-width: 3.25em;	
 	background: rgba(56, 56, 163, 0.5);
 	box-shadow: 0.075em 0.075em rgba(0, 56, 163, 0.5) inset;
 	padding: 0 2%;
@@ -90,6 +87,13 @@
 	border-width: 0.2em;
 	border-radius: 0.2em;	
 	z-index: 1;
+}
+
+#client_name p {
+	text-justify: distribute;
+	letter-spacing: 0.075em;
+	margin: 1px;
+	font-weight: bold;
 }
 
 #client_chat {

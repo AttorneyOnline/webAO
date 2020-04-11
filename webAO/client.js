@@ -1554,12 +1554,12 @@ async changeBackground(position) {
 		const pairSprite = document.getElementById("client_pair_char");
 
 		const chatContainerBox = document.getElementById("client_chatcontainer");	
-		const nameBox = document.getElementById("client_name");
+		const nameBoxInner = document.getElementById("client_inner_name");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
 		//Clear out the last message
 		chatBoxInner.innerText = this.textnow;
-		nameBox.innerText = this.chatmsg.nameplate;		
+		nameBoxInner.innerText = this.chatmsg.nameplate;		
 
 		if (this.lastChar !== this.chatmsg.name) {
 			charSprite.style.display = "none";
@@ -1651,6 +1651,7 @@ async changeBackground(position) {
 		} else {
 			chatbox_theme.href = "styles/chatbox/aa.css";
 		}
+		resizeChatbox();
 
 		// Flip the character
 		if (this.chatmsg.flip === 1) {
@@ -1782,11 +1783,10 @@ async changeBackground(position) {
 					}
 				}
 
-				const chatContainerBox = document.getElementById("client_chatcontainer");
-				const gameHeight = document.getElementById("client_background").offsetHeight;
-				chatContainerBox.style.display = "block";
+				resizeChatbox();
 
-				chatContainerBox.style.fontSize = (gameHeight * 0.05) + "px";
+				const chatContainerBox = document.getElementById("client_chatcontainer");
+				chatContainerBox.style.display = "block";
 
 				chatBoxInner.className = "text_" + this.colors[this.chatmsg.color];
 
@@ -2421,6 +2421,17 @@ export function getIndexFromSelect(select_box, value) {
 	return 0;
 }
 window.getIndexFromSelect = getIndexFromSelect;
+
+/**
+ * Set the font size for the chatbox
+ */
+export function resizeChatbox() {
+	const chatContainerBox = document.getElementById("client_chatcontainer");
+	const gameHeight = document.getElementById("client_background").offsetHeight;
+                
+	chatContainerBox.style.fontSize = (gameHeight * 0.05) + "px";
+}
+window.resizeChatbox = resizeChatbox;
 
 /**
  * Update evidence icon.
