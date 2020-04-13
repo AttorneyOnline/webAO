@@ -327,12 +327,12 @@
 	background-color: #7b7b7b;
 	outline: 2px ridge #fff;
 	outline-offset: -2px;
+	margin-right: 2px;
 }
 
 #evi_options {
 	display: inline-block;
 	width: 100%;
-	margin-left: 2px;
 	border: 2px ridge white;
 }
 
