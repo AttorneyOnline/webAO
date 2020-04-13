@@ -82,6 +82,14 @@ img {
 	}
 }
 
+hr {
+	height: 6px;
+	width: 100%;
+	background-color: #c6c6c6;
+	background: repeating-linear-gradient(to right,#f7f7f7, #f7f7f7 1px, #8c8c8c 1px, #8c8c8c 2px, #c6c6c6 2px, #c6c6c6 16px);
+	margin: 0;
+}
+
 #client_chatcontainer {
 	filter: none;
 }
