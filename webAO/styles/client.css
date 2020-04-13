@@ -322,14 +322,18 @@
 
 .evi_icon {
 	width: 70px;
+	min-width: 70px;
 	height: 70px;
 	background-color: #7b7b7b;
-	border: 2px ridge #ffffff;
+	outline: 2px ridge #fff;
+	outline-offset: -2px;
 }
 
 #evi_options {
 	display: inline-block;
-	padding-left: 5px;
+	width: 100%;
+	margin-left: 2px;
+	border: 2px ridge white;
 }
 
 #evi_options label {
