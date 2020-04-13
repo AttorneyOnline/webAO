@@ -773,8 +773,8 @@ class Client extends EventEmitter {
 	}
 
 	resetMusiclist() {
-		const hmusiclist = document.getElementById("client_musiclist");
-		hmusiclist.innerHTML = "";
+		const musiclist_element = document.getElementById("client_musiclist");
+		musiclist_element.innerHTML = "";
 		this.areas = [];
 	}
 
@@ -789,13 +789,13 @@ class Client extends EventEmitter {
 			this.resetMusiclist();
 		}
 		this.sendServer("AM#" + ((args[1] / 10) + 1) + "#%");
-		const hmusiclist = document.getElementById("client_musiclist");
+		const musiclist_element = document.getElementById("client_musiclist");
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
 				const newentry = document.createElement("OPTION");
 				newentry.text = args[i];
-				hmusiclist.options.add(newentry);
+				musiclist_element.options.add(newentry);
 			}
 		}
 	}
@@ -807,7 +807,7 @@ class Client extends EventEmitter {
 	handleSM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
 		this.resetMusiclist();
-		const hmusiclist = document.getElementById("client_musiclist");
+		const musiclist_element = document.getElementById("client_musiclist");
 		let flagAudio = false;
 
 		for (let i = 1; i < args.length - 1; i++) {
@@ -821,7 +821,7 @@ class Client extends EventEmitter {
 				// After reached the audio put everything in the music list
 				const newentry = document.createElement("OPTION");
 				newentry.text = args[i];
-				hmusiclist.options.add(newentry);
+				musiclist_element.options.add(newentry);
 			} else {
 				this.areas[i] = {
 					name: safe_tags(args[i]),
@@ -853,7 +853,7 @@ class Client extends EventEmitter {
 		if (area_box.lastChild.textContent.startsWith("=")) {
 			const audio_title = document.createElement("OPTION");
 			audio_title.text = area_box.lastChild.textContent;
-			hmusiclist.insertBefore(audio_title, hmusiclist.firstChild);
+			musiclist_element.insertBefore(audio_title, musiclist_element.firstChild);
 			area_box.removeChild(area_box.lastChild);
 		}
 
