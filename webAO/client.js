@@ -1985,6 +1985,18 @@ function resetICParams() {
 }
 
 /**
+ * Triggered when the music search bar is changed
+ * @param {MouseEvent} event
+ */
+export function musiclist_filter(_event) {
+	const musiclist_element = document.getElementById("client_musiclist");
+	musiclist_element.innerHTML = "";
+
+		
+}
+window.musiclist_filter = musiclist_filter;
+
+/**
  * Triggered when an item on the music list is clicked.
  * @param {MouseEvent} event
  */

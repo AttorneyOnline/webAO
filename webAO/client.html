@@ -419,7 +419,7 @@
 
 <template id="music">
 	<meta name="frame-title" lang="en" content="Music">
-	<input id="client_musicsearch" style="display:none"></input>
+	<input id="client_musicsearch" onchange="musiclist_filter(event)"></input>
 	<select id="client_musiclist" size="5" onchange="musiclist_click(event)">
 	</select>
 </template>
