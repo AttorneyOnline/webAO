@@ -850,7 +850,7 @@ class Client extends EventEmitter {
 		for (let i = 1; i < args.length - 1; i++) {
 			// Check when found the song for the first time
 			document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-			this.handleMusicInfo(i,safe_tags(args[i]));
+			this.handleMusicInfo(i-1,safe_tags(args[i]));
 		}
 
 		// Music done, carry on
