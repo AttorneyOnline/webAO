@@ -323,11 +323,8 @@
 .evi_icon {
 	width: 70px;
 	height: 70px;
-	background-color: #787878;
-	outline-color: #886060;
-	outline-width: 1px;
-	outline-style: inset;
-	outline-offset: -1px;
+	background-color: #7b7b7b;
+	border: 2px ridge #ffffff;
 }
 
 #evi_options {
