@@ -294,6 +294,10 @@
 	border: none;
 }
 
+#client_musicsearch {
+	width: 100%;
+}
+
 #client_musiclist {
 	width: 99%;
 	height: 100%;

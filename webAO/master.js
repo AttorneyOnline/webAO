@@ -24,6 +24,7 @@ if (window.requestIdleCallback) {
 
 			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 			masterserver.onopen = (evt) => onOpen(evt);
+			masterserver.onerror = (evt) => onError(evt);
 			masterserver.onmessage = (evt) => onMessage(evt);
 
 			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
@@ -40,6 +41,7 @@ if (window.requestIdleCallback) {
 
 			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 			masterserver.onopen = (evt) => onOpen(evt);
+			masterserver.onerror = (evt) => onError(evt);
 			masterserver.onmessage = (evt) => onMessage(evt);
 
 			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
@@ -72,6 +74,15 @@ function onOpen(_e) {
 
 	masterserver.send("ALL#%");
 	masterserver.send("VC#%");
+}
+
+/**
+ * Triggered when an network error occurs.
+ * @param {ErrorEvent} e 
+ */
+function onError(evt) {
+	document.getElementById("ms_error").style.display = "block";
+	document.getElementById("ms_error_code").innerText = `A network error occurred: ${evt.reason} (${evt.code})`;
 }
 
 function checkOnline(serverID, coIP) {
