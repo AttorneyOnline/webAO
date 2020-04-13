@@ -778,10 +778,9 @@ class Client extends EventEmitter {
 	}
 
 	handleMusicInfo(trackindex,trackname) {
-		const musiclist_element = document.getElementById("client_musiclist");
 		let flagAudio = false;
 
-		if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(trackname) && !flagAudio) {
+		if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(trackname) || trackname.startsWith("=")) {
 			flagAudio = true;
 		}
 
@@ -789,7 +788,7 @@ class Client extends EventEmitter {
 			// After reached the audio put everything in the music list
 			const newentry = document.createElement("OPTION");
 			newentry.text = trackname;
-			musiclist_element.options.add(newentry);
+			document.getElementById("client_musiclist").options.add(newentry);
 			this.musics.push(trackname);
 		} else {
 			const thisarea = {
@@ -828,7 +827,6 @@ class Client extends EventEmitter {
 		if(args[1] === "0") {
 			this.resetMusiclist();
 		}
-		this.sendServer("AM#" + ((args[1] / 10) + 1) + "#%");
 
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
@@ -836,6 +834,9 @@ class Client extends EventEmitter {
 				this.handleMusicInfo(i,safe_tags(args[i]));
 			}
 		}
+
+		// get the next batch of tracks
+		this.sendServer("AM#" + ((args[1] / 10) + 1) + "#%");
 	}
 
 	/**
@@ -850,16 +851,6 @@ class Client extends EventEmitter {
 			// Check when found the song for the first time
 			document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
 			this.handleMusicInfo(i,safe_tags(args[i]));
-		}
-
-		// We need to check if the last area that we got was actually a category
-		// header for music. If it was, then move it over to the music list.
-		const area_box = document.getElementById("areas");
-		if (area_box.lastChild.textContent.startsWith("=")) {
-			const audio_title = document.createElement("OPTION");
-			audio_title.text = area_box.lastChild.textContent;
-			musiclist_element.insertBefore(audio_title, musiclist_element.firstChild);
-			area_box.removeChild(area_box.lastChild);
 		}
 
 		// Music done, carry on
