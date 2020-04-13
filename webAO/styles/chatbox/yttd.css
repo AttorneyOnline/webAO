@@ -46,6 +46,7 @@
 
 #client_name {
 	display: block;
+	position: absolute;
 	top: 0;
 	left: 0;	
 	height: 27%;
@@ -53,14 +54,13 @@
 	min-width: 10%;
 	background-color: rgba(0, 0, 0, 0.5);	
     border-style: double;
-    border-color: #ffa500;
-	position: absolute;
+	border-color: #ffa500;
+	padding: 0 2%;
 	z-index: 1;
 }
 
 #client_name p{
-	margin: 0;
-	padding: 2% 3%;
+	line-height: 1em;
 	color: #fef9ad;
 }
 
