@@ -120,6 +120,7 @@ class Client extends EventEmitter {
 		this.emotes = [];
 		this.evidences = [];
 		this.areas = [];
+		this.musics = [];
 
 		this.resources = {
 			"holdit": {
@@ -161,8 +162,6 @@ class Client extends EventEmitter {
 
 		this.checkUpdater = null;
 
-		// Only used for RMC/'music' packets, not EM/SM/MC packets.
-		this.musicList = Object();
 		/**
 		 * Assign handlers for all commands
 		 * If you implement a new command, you need to add it here
@@ -485,8 +484,7 @@ class Client extends EventEmitter {
 		clearInterval(this.checkUpdater);
 
 		// the connection got rekt, get rid of the old musiclist
-		document.getElementById("areas").innerHTML = "";
-		document.getElementById("client_musiclist").innerHTML = "";
+		this.resetMusiclist();
 		document.getElementById("client_chartable").innerHTML = "";
 	}
 
@@ -773,9 +771,50 @@ class Client extends EventEmitter {
 	}
 
 	resetMusiclist() {
-		const hmusiclist = document.getElementById("client_musiclist");
-		hmusiclist.innerHTML = "";
+		this.musics = [];
 		this.areas = [];
+		document.getElementById("client_musiclist").innerHTML = "";
+		document.getElementById("areas").innerHTML = "";		
+	}
+
+	handleMusicInfo(trackindex,trackname) {
+		let flagAudio = false;
+
+		if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(trackname) || trackname.startsWith("=")) {
+			flagAudio = true;
+		}
+
+		if (flagAudio) {
+			// After reached the audio put everything in the music list
+			const newentry = document.createElement("OPTION");
+			newentry.text = trackname;
+			document.getElementById("client_musiclist").options.add(newentry);
+			this.musics.push(trackname);
+		} else {
+			const thisarea = {
+				name: trackname,
+				players: 0,
+				status: "IDLE",
+				cm: "",
+				locked: "FREE"
+			};
+
+			this.areas.push(thisarea);
+
+			// Create area button
+			let newarea = document.createElement("SPAN");
+			newarea.classList = "area-button area-default";
+			newarea.id = "area" + trackindex;
+			newarea.innerText = thisarea.name;
+			newarea.title = "Players: <br>" +
+				"Status: <br>" +
+				"CM: ";
+			newarea.onclick = function () {
+				area_click(this);
+			};
+
+			document.getElementById("areas").appendChild(newarea);
+		}
 	}
 
 	/**
@@ -788,16 +827,16 @@ class Client extends EventEmitter {
 		if(args[1] === "0") {
 			this.resetMusiclist();
 		}
-		this.sendServer("AM#" + ((args[1] / 10) + 1) + "#%");
-		const hmusiclist = document.getElementById("client_musiclist");
+
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-				const newentry = document.createElement("OPTION");
-				newentry.text = args[i];
-				hmusiclist.options.add(newentry);
+				this.handleMusicInfo(args[i-1],safe_tags(args[i]));
 			}
 		}
+
+		// get the next batch of tracks
+		this.sendServer("AM#" + ((args[1] / 10) + 1) + "#%");
 	}
 
 	/**
@@ -807,54 +846,11 @@ class Client extends EventEmitter {
 	handleSM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
 		this.resetMusiclist();
-		const hmusiclist = document.getElementById("client_musiclist");
-		let flagAudio = false;
 
 		for (let i = 1; i < args.length - 1; i++) {
 			// Check when found the song for the first time
 			document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-			if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(args[i]) && !flagAudio) {
-				flagAudio = true;
-			}
-
-			if (flagAudio) {
-				// After reached the audio put everything in the music list
-				const newentry = document.createElement("OPTION");
-				newentry.text = args[i];
-				hmusiclist.options.add(newentry);
-			} else {
-				this.areas[i] = {
-					name: safe_tags(args[i]),
-					players: 0,
-					status: "IDLE",
-					cm: "",
-					locked: "FREE"
-				};
-
-				// Create area button
-				let newarea = document.createElement("SPAN");
-				newarea.classList = "area-button area-default";
-				newarea.id = "area" + i;
-				newarea.innerText = this.areas[i].name;
-				newarea.title = "Players: <br>" +
-					"Status: <br>" +
-					"CM: ";
-				newarea.onclick = function () {
-					area_click(this);
-				};
-
-				document.getElementById("areas").appendChild(newarea);
-			}
-		}
-
-		// We need to check if the last area that we got was actually a category
-		// header for music. If it was, then move it over to the music list.
-		const area_box = document.getElementById("areas");
-		if (area_box.lastChild.textContent.startsWith("=")) {
-			const audio_title = document.createElement("OPTION");
-			audio_title.text = area_box.lastChild.textContent;
-			hmusiclist.insertBefore(audio_title, hmusiclist.firstChild);
-			area_box.removeChild(area_box.lastChild);
+			this.handleMusicInfo(i-1,safe_tags(args[i]));
 		}
 
 		// Music done, carry on
@@ -1978,6 +1974,26 @@ function resetICParams() {
 		selectedShout = 0;
 	}
 }
+
+/**
+ * Triggered when the music search bar is changed
+ * @param {MouseEvent} event
+ */
+export function musiclist_filter(_event) {
+	const musiclist_element = document.getElementById("client_musiclist");
+	const searchname = document.getElementById("client_musicsearch").value;
+
+	musiclist_element.innerHTML = "";
+
+	for (const trackname of client.musics){
+		if (trackname.toLowerCase().indexOf(searchname.toLowerCase()) !== -1) { 
+			const newentry = document.createElement("OPTION");
+			newentry.text = trackname;
+			musiclist_element.options.add(newentry);
+		}
+	}		
+}
+window.musiclist_filter = musiclist_filter;
 
 /**
  * Triggered when an item on the music list is clicked.
