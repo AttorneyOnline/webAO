@@ -777,6 +777,47 @@ class Client extends EventEmitter {
 		document.getElementById("areas").innerHTML = "";		
 	}
 
+	handleMusicInfo(trackindex,trackname) {
+		const musiclist_element = document.getElementById("client_musiclist");
+		let flagAudio = false;
+
+		if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(trackname) && !flagAudio) {
+			flagAudio = true;
+		}
+
+		if (flagAudio) {
+			// After reached the audio put everything in the music list
+			const newentry = document.createElement("OPTION");
+			newentry.text = trackname;
+			musiclist_element.options.add(newentry);
+			this.musics.push(trackname);
+		} else {
+			const thisarea = {
+				name: trackname,
+				players: 0,
+				status: "IDLE",
+				cm: "",
+				locked: "FREE"
+			};
+
+			this.areas.push(thisarea);
+
+			// Create area button
+			let newarea = document.createElement("SPAN");
+			newarea.classList = "area-button area-default";
+			newarea.id = "area" + trackindex;
+			newarea.innerText = thisarea.name;
+			newarea.title = "Players: <br>" +
+				"Status: <br>" +
+				"CM: ";
+			newarea.onclick = function () {
+				area_click(this);
+			};
+
+			document.getElementById("areas").appendChild(newarea);
+		}
+	}
+
 	/**
 	 * Handles incoming music information, containing multiple entries
 	 * per packet.
@@ -788,14 +829,11 @@ class Client extends EventEmitter {
 			this.resetMusiclist();
 		}
 		this.sendServer("AM#" + ((args[1] / 10) + 1) + "#%");
-		const musiclist_element = document.getElementById("client_musiclist");
+
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-				const newentry = document.createElement("OPTION");
-				newentry.text = args[i];
-				musiclist_element.options.add(newentry);
-				this.musics.push(args[i]);
+				this.handleMusicInfo(i,safe_tags(args[i]));
 			}
 		}
 	}
@@ -807,45 +845,11 @@ class Client extends EventEmitter {
 	handleSM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
 		this.resetMusiclist();
-		const musiclist_element = document.getElementById("client_musiclist");
-		let flagAudio = false;
 
 		for (let i = 1; i < args.length - 1; i++) {
 			// Check when found the song for the first time
 			document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-			if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(args[i]) && !flagAudio) {
-				flagAudio = true;
-			}
-
-			if (flagAudio) {
-				// After reached the audio put everything in the music list
-				const newentry = document.createElement("OPTION");
-				newentry.text = args[i];
-				musiclist_element.options.add(newentry);
-				this.musics.push(args[i]);
-			} else {
-				this.areas[i] = {
-					name: safe_tags(args[i]),
-					players: 0,
-					status: "IDLE",
-					cm: "",
-					locked: "FREE"
-				};
-
-				// Create area button
-				let newarea = document.createElement("SPAN");
-				newarea.classList = "area-button area-default";
-				newarea.id = "area" + i;
-				newarea.innerText = this.areas[i].name;
-				newarea.title = "Players: <br>" +
-					"Status: <br>" +
-					"CM: ";
-				newarea.onclick = function () {
-					area_click(this);
-				};
-
-				document.getElementById("areas").appendChild(newarea);
-			}
+			this.handleMusicInfo(i,safe_tags(args[i]));
 		}
 
 		// We need to check if the last area that we got was actually a category
