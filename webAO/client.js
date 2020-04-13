@@ -120,6 +120,7 @@ class Client extends EventEmitter {
 		this.emotes = [];
 		this.evidences = [];
 		this.areas = [];
+		this.musics = [];
 
 		this.resources = {
 			"holdit": {
@@ -161,8 +162,6 @@ class Client extends EventEmitter {
 
 		this.checkUpdater = null;
 
-		// Only used for RMC/'music' packets, not EM/SM/MC packets.
-		this.musicList = Object();
 		/**
 		 * Assign handlers for all commands
 		 * If you implement a new command, you need to add it here
@@ -485,8 +484,7 @@ class Client extends EventEmitter {
 		clearInterval(this.checkUpdater);
 
 		// the connection got rekt, get rid of the old musiclist
-		document.getElementById("areas").innerHTML = "";
-		document.getElementById("client_musiclist").innerHTML = "";
+		this.resetMusiclist();
 		document.getElementById("client_chartable").innerHTML = "";
 	}
 
@@ -773,9 +771,10 @@ class Client extends EventEmitter {
 	}
 
 	resetMusiclist() {
-		const musiclist_element = document.getElementById("client_musiclist");
-		musiclist_element.innerHTML = "";
+		this.musics = [];
 		this.areas = [];
+		document.getElementById("client_musiclist").innerHTML = "";
+		document.getElementById("areas").innerHTML = "";		
 	}
 
 	/**
@@ -796,6 +795,7 @@ class Client extends EventEmitter {
 				const newentry = document.createElement("OPTION");
 				newentry.text = args[i];
 				musiclist_element.options.add(newentry);
+				this.musics.push(args[i]);
 			}
 		}
 	}
@@ -822,6 +822,7 @@ class Client extends EventEmitter {
 				const newentry = document.createElement("OPTION");
 				newentry.text = args[i];
 				musiclist_element.options.add(newentry);
+				this.musics.push(args[i]);
 			} else {
 				this.areas[i] = {
 					name: safe_tags(args[i]),
