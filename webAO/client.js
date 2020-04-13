@@ -831,7 +831,7 @@ class Client extends EventEmitter {
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-				this.handleMusicInfo(i,safe_tags(args[i]));
+				this.handleMusicInfo(args[i-1],safe_tags(args[i]));
 			}
 		}
 
