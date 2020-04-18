@@ -33,7 +33,7 @@
 	scroll-behavior: smooth;
 }
 
-#client_chat p {
+#client_inner_name {
 	margin: 4px;
 	padding: 5px 3%;
 }

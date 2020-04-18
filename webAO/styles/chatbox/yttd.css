@@ -59,7 +59,7 @@
 	z-index: 1;
 }
 
-#client_name p{
+#client_inner_name {
 	line-height: 1em;
 	color: #fef9ad;
 }

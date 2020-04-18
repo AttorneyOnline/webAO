@@ -28,7 +28,7 @@
 	z-index: 1;
 }
 
-#client_name p {
+#client_inner_name {
 	padding: 0 2%;
 	margin: 1px;
 }

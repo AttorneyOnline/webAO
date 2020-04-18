@@ -89,10 +89,10 @@
 	z-index: 1;
 }
 
-#client_name p {
+#client_inner_name {
 	text-justify: distribute;
 	letter-spacing: 0.075em;
-	margin: 1px;
+	margin: 0;
 	font-weight: bold;
 }
 
