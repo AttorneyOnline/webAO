@@ -331,12 +331,24 @@
 					onchange="changeBlipVolume()">
 			<br>
 			<br>
-			<label for="client_themeselect">Theme:</label>
+			<label for="client_themeselect">Menu theme:</label>
 			<select id="client_themeselect" name="client_themeselect" onchange="reloadTheme()">
 				<option value="default" selected>Default</option>
 				<option value="classic">Classic</option>
 				<option value="soj">DD / SoJ</option>
 				<option value="cyber">Cyber (WIP)</option>
+			</select>
+			<br>
+			<br>
+			<label for="client_chatboxselect">Chatbox theme:</label>
+			<select id="client_chatboxselect" name="client_chatboxselect" onchange="setChatbox()">
+				<option value="dynamic" selected>Use characters</option>
+				<option value="aa">AA</option>
+				<option value="chatdd">DD / SoJ</option>
+				<option value="dgs">DGS</option>
+				<option value="triology">Triology</option>
+				<option value="drae">Dangan Ronpa</option>
+				<option value="yttd">YTTD</option>
 			</select>
 			<!--
 			<br>

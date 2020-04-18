@@ -1641,12 +1641,7 @@ async changeBackground(position) {
 
 		this.changeBackground(chatmsg.side);
 
-		const chatbox_theme = document.getElementById("chatbox_theme");
-		if (chatbox_arr.includes(chatmsg.chatbox)) {
-			chatbox_theme.href = "styles/chatbox/" + chatmsg.chatbox + ".css";
-		} else {
-			chatbox_theme.href = "styles/chatbox/aa.css";
-		}
+		setChatbox(chatmsg.chatbox);
 		resizeChatbox();
 
 		// Flip the character
@@ -2437,6 +2432,20 @@ export function getIndexFromSelect(select_box, value) {
 	return 0;
 }
 window.getIndexFromSelect = getIndexFromSelect;
+
+export function setChatbox(style) {
+	const chatbox_theme = document.getElementById("chatbox_theme");
+	const selected_theme = document.getElementById("client_chatboxselect").value;
+	if(selected_theme === "dynamic") {
+		if (chatbox_arr.includes(style)) {
+			chatbox_theme.href = "styles/chatbox/" + style + ".css";
+		} else {
+			chatbox_theme.href = "styles/chatbox/aa.css";
+		}
+	} else {
+		chatbox_theme.href = "styles/chatbox/" + selected_theme + ".css";
+	}
+}
 
 /**
  * Set the font size for the chatbox
