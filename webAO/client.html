@@ -51,8 +51,9 @@
 	<div id="client_charselect">
 		<p>Choose your character</p>
 		<button onclick="pickChar(1001)">Or spectate</button>
-		<br>
-		<br>
+		<br><br>
+		<input id="client_charactersearch" placeholder="Search" oninput="chartable_filter(event)"></input>
+		<br><br>
 		<div id="client_chartable"></div>
 	</div>
 	<div id="client_error" class="error" style="display: none">
@@ -281,18 +282,19 @@
 			<meta name="frame-title" lang="en" content="Evidence">
 			<fieldset style="text-align: left; display: flex; flex-direction: column;">
 				<legend>Information</legend>
-				<div style="display: flex;">
+				<hr>
+				<div style="display: flex;">					
 					<img id="evi_preview" class="evi_icon" src="" alt="Evidence Icon" onerror="imgError(this);">
 					<div id="evi_options">
+						<input id="evi_name" name="evi_name" type="text" placeholder="Evidence name">
+						<br>
 						<label for="evi_filename">Icon:</label>
 						<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
 						<input id="evi_filename" name="evi_filename" type="text"
 							placeholder="Custom filename">
-						<br>
-						<label for="evi_name">Name:</label>
-						<input id="evi_name" name="evi_name" type="text" placeholder="Evidence name">
 					</div>
 				</div>
+				<hr>
 				<div style="display: flex; padding-top: 5px;">
 					<textarea id="evi_desc" name="evi_desc" rows="2" cols="20"
 						placeholder="Evidence description"></textarea>
@@ -311,8 +313,7 @@
 			<br>
 			<div id="evidences"></div>
 			<br>
-			<button id="button_present" alt="Present" class="client_button" onclick="togglePresent()"
-				style="letter-spacing: 3px; width: 8em;"><i>Present</i></button>
+			<button id="button_present" alt="Present" class="client_button" onclick="togglePresent()">Present</button>
 		</span>
 
 		<!-- Settings section -->

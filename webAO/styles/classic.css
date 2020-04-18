@@ -15,13 +15,26 @@ img {
 	image-rendering: pixelated;
 }
 
+hr {
+	height: 6px;
+	width: 100%;
+	background-color: #c6c6c6;
+	background: repeating-linear-gradient(to right,#f7f7f7, #f7f7f7 1px, #8c8c8c 1px, #8c8c8c 2px, #c6c6c6 2px, #c6c6c6 16px);
+	margin: 0;
+}
+
 #evi_name {
 	background-color: #393939;
 	color: #ffad18;
+	border: none;
 }
 
 #evi_desc {
 	flex: 1 auto;
+	border-top: 1px solid #6b946b;
+	border-left: 1px solid #6b946b;
+	border-right: none;
+	border-bottom: none;
 	background-color: #9cc694;
 }
 

@@ -1137,9 +1137,9 @@ class Client extends EventEmitter {
 			let img = document.getElementById(`demo_${i}`);
 
 			if (args[i + 1] === "-1")
-				img.style = "opacity: 0.25";
+				img.style.opacity = 0.25;
 			else if (args[i + 1] === "0")
-				img.style = "";			
+				img.style.opacity = 1;			
 		}
 	}
 
@@ -2283,6 +2283,24 @@ function appendICLog(msg, name = "", time = new Date()) {
 
 	lastICMessageTime = new Date();
 }
+
+/**
+ * Triggered when the music search bar is changed
+ * @param {MouseEvent} event
+ */
+export function chartable_filter(_event) {
+	const searchname = document.getElementById("client_charactersearch").value;
+
+	client.chars.forEach(function (character, charid) {
+		const demothing = document.getElementById(`demo_${charid}`);
+		if (character.name.toLowerCase().indexOf(searchname.toLowerCase()) === -1) { 
+			demothing.style.display = "none";
+		} else {
+			demothing.style.display = "inline-block";
+		}
+	});
+}
+window.chartable_filter = chartable_filter;
 
 /**
  * Requests to play as a character.
