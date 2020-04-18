@@ -395,6 +395,11 @@ class Client extends EventEmitter {
 		document.querySelector('#client_themeselect [value="' + cookietheme + '"]').selected = true;
 		reloadTheme();
 
+		var cookiechatbox = getCookie("chatbox") || "dynamic";
+
+		document.querySelector('#client_chatboxselect [value="' + cookiechatbox + '"]').selected = true;
+		setChatbox(cookiechatbox);
+
 		document.getElementById("client_musicaudio").volume = getCookie("musicVolume") || 1;
 		changeMusicVolume();
 		document.getElementById("client_svolume").value = getCookie("sfxVolume") || 1;
@@ -2436,6 +2441,7 @@ window.getIndexFromSelect = getIndexFromSelect;
 export function setChatbox(style) {
 	const chatbox_theme = document.getElementById("chatbox_theme");
 	const selected_theme = document.getElementById("client_chatboxselect").value;
+	setCookie("chatbox", selected_theme);
 	if(selected_theme === "dynamic") {
 		if (chatbox_arr.includes(style)) {
 			chatbox_theme.href = "styles/chatbox/" + style + ".css";
