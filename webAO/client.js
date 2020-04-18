@@ -2438,6 +2438,9 @@ export function getIndexFromSelect(select_box, value) {
 }
 window.getIndexFromSelect = getIndexFromSelect;
 
+/**
+ * Set the style of the chatbox
+ */
 export function setChatbox(style) {
 	const chatbox_theme = document.getElementById("chatbox_theme");
 	const selected_theme = document.getElementById("client_chatboxselect").value;
@@ -2452,6 +2455,7 @@ export function setChatbox(style) {
 		chatbox_theme.href = "styles/chatbox/" + selected_theme + ".css";
 	}
 }
+window.setChatbox = setChatbox;
 
 /**
  * Set the font size for the chatbox
