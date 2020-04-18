@@ -215,6 +215,13 @@
 	transition-property: height, opacity;
 }
 
+#client_chatcontainer {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	left: 0;
+}
+
 #client_shout {
 	display: block;
 	position: absolute;
