@@ -6,6 +6,7 @@ export default [
 	"drv3",
 	"drae",
 	"legacy",
+	"chatplvsaa",
 	"triology",
 	"yttd"
 ];
