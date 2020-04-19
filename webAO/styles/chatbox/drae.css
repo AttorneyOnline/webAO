@@ -11,7 +11,7 @@
 	display: block;
 	padding: 0 0.45em;
 	height: 24%;
-	width: 50%;
+	min-width: 50%;
 	text-align: left;
 	letter-spacing: 0.075em;
 	font-weight: bold;
