@@ -87,6 +87,10 @@
     z-index: 1;
 }
 
+#client_inner_name {
+	margin: 0;
+}
+
 #client_chat {
 	font-size: 1em;
 	display: block;
