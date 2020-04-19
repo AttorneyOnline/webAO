@@ -8,6 +8,6 @@ export default [
 	"legacy",
 	"p4",
 	"chatplvsaa",
-	"triology",
+	"trilogy",
 	"yttd"
 ];
