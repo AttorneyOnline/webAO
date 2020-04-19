@@ -14,6 +14,8 @@ import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 import sfx_arr from "./sounds.js";
 
+import chatbox_arr from "./styles/chatbox/chatboxes.js";
+
 import { EventEmitter } from "events";
 
 import { version } from '../package.json';
@@ -393,6 +395,11 @@ class Client extends EventEmitter {
 		document.querySelector('#client_themeselect [value="' + cookietheme + '"]').selected = true;
 		reloadTheme();
 
+		var cookiechatbox = getCookie("chatbox") || "dynamic";
+
+		document.querySelector('#client_chatboxselect [value="' + cookiechatbox + '"]').selected = true;
+		setChatbox(cookiechatbox);
+
 		document.getElementById("client_musicaudio").volume = getCookie("musicVolume") || 1;
 		changeMusicVolume();
 		document.getElementById("client_svolume").value = getCookie("sfxVolume") || 1;
@@ -502,12 +509,14 @@ class Client extends EventEmitter {
 
 			let msg_nameplate = args[3];
 			let msg_blips = "male";
+			let char_chatbox = "default";
 			let char_muted = false;
 
 			try {
 				msg_nameplate = this.chars[char_id].showname;
 				msg_blips = this.chars[char_id].gender;
-				char_muted = this.chars[char_id].muted;
+				char_chatbox = this.chars[char_id].chat;
+				char_muted = this.chars[char_id].muted;				
 
 				if(this.chars[char_id].name !== char_name) {
 					console.info(this.chars[char_id].name + " is iniediting to " + char_name);
@@ -527,6 +536,7 @@ class Client extends EventEmitter {
 				deskmod: safe_tags(args[1]).toLowerCase(),
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
 				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
+				chatbox: char_chatbox,
 				name: char_name,
 				sprite: safe_tags(args[4]).toLowerCase(),
 				content: prepChat(args[5]), // Escape HTML tags
@@ -664,7 +674,8 @@ class Client extends EventEmitter {
 				name: chargs[0],
 				showname: chargs[0],
 				side: "def",
-				gender: "male"
+				gender: "male",
+				chat: "aa"
 			};
 			cini.options = Object.assign(default_options, cini.options);
 
@@ -679,6 +690,8 @@ class Client extends EventEmitter {
 				showname: safe_tags(cini.options.showname),
 				desc: safe_tags(chargs[1]),
 				gender: safe_tags(cini.options.gender).toLowerCase(),
+				side: safe_tags(cini.options.side).toLowerCase(),
+				chat: safe_tags(cini.options.chat).toLowerCase(),
 				evidence: chargs[3],
 				icon: icon,
 				inifile: cini,
@@ -1542,13 +1555,12 @@ async changeBackground(position) {
 		const pairSprite = document.getElementById("client_pair_char");
 
 		const chatContainerBox = document.getElementById("client_chatcontainer");	
-		const nameBox = document.getElementById("client_name");
-		const chatBox = document.getElementById("client_chat");			
+		const nameBoxInner = document.getElementById("client_inner_name");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
 		//Clear out the last message
 		chatBoxInner.innerText = this.textnow;
-		nameBox.innerText = this.chatmsg.nameplate;		
+		nameBoxInner.innerText = this.chatmsg.nameplate;		
 
 		if (this.lastChar !== this.chatmsg.name) {
 			charSprite.style.display = "none";
@@ -1586,8 +1598,6 @@ async changeBackground(position) {
 		const shout = this.shouts[this.chatmsg.objection];
 		if (shout) {
 			// Hide message box
-			nameBox.style.display = "none";
-			chatBox.style.display = "none";
 			chatContainerBox.style.display = "none";
 			shoutSprite.src = client.resources[shout]["src"];
 			shoutSprite.style.display = "block";
@@ -1619,8 +1629,6 @@ async changeBackground(position) {
 			case 1:
 				// play preanim
 				// Hide message box
-				nameBox.style.display = "none";
-				chatBox.style.display = "none";
 				chatContainerBox.style.display = "none";
 				// If preanim existed then determine the length
 				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}.gif`);
@@ -1637,6 +1645,9 @@ async changeBackground(position) {
 		this.chatmsg.preanimdelay = parseInt(gifLength);
 
 		this.changeBackground(chatmsg.side);
+
+		setChatbox(chatmsg.chatbox);
+		resizeChatbox();
 
 		// Flip the character
 		if (this.chatmsg.flip === 1) {
@@ -1701,8 +1712,7 @@ async changeBackground(position) {
 			this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
 		}
 
-		const nameBox = document.getElementById("client_name");
-		const chatBox = document.getElementById("client_chat");
+		const gamewindow = document.getElementById("client_gamewindow");
 		const waitingBox = document.getElementById("client_chatwaiting");
 		const charSprite = document.getElementById("client_char");
 		const pairSprite = document.getElementById("client_pair_char");
@@ -1716,7 +1726,7 @@ async changeBackground(position) {
 			if (this.chatmsg.flash === 2) {
 				// Shake screen
 				this.playSFX(AO_HOST + "sounds/general/sfx-stab.wav");
-				document.getElementById("client_gamewindow").style.animation = "shake 0.2s 1";
+				gamewindow.style.animation = "shake 0.2s 1";
 			} else if (this.chatmsg.flash === 1) {
 				// Flash screen
 				this.playSFX(AO_HOST + "sounds/general/sfx-realization.wav");
@@ -1769,15 +1779,12 @@ async changeBackground(position) {
 					}
 				}
 
-				document.getElementById("client_chatcontainer").style.display = "block";
+				resizeChatbox();
 
-				nameBox.style.display = "block";
-				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
+				const chatContainerBox = document.getElementById("client_chatcontainer");
+				chatContainerBox.style.display = "block";
 
 				chatBoxInner.className = "text_" + this.colors[this.chatmsg.color];
-
-				chatBox.style.display = "block";
-				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
 
 				this.chatmsg.startspeaking = false;
 
@@ -2448,6 +2455,36 @@ export function getIndexFromSelect(select_box, value) {
 	return 0;
 }
 window.getIndexFromSelect = getIndexFromSelect;
+
+/**
+ * Set the style of the chatbox
+ */
+export function setChatbox(style) {
+	const chatbox_theme = document.getElementById("chatbox_theme");
+	const selected_theme = document.getElementById("client_chatboxselect").value;
+	setCookie("chatbox", selected_theme);
+	if(selected_theme === "dynamic") {
+		if (chatbox_arr.includes(style)) {
+			chatbox_theme.href = "styles/chatbox/" + style + ".css";
+		} else {
+			chatbox_theme.href = "styles/chatbox/aa.css";
+		}
+	} else {
+		chatbox_theme.href = "styles/chatbox/" + selected_theme + ".css";
+	}
+}
+window.setChatbox = setChatbox;
+
+/**
+ * Set the font size for the chatbox
+ */
+export function resizeChatbox() {
+	const chatContainerBox = document.getElementById("client_chatcontainer");
+	const gameHeight = document.getElementById("client_background").offsetHeight;
+                
+	chatContainerBox.style.fontSize = (gameHeight * 0.05) + "px";
+}
+window.resizeChatbox = resizeChatbox;
 
 /**
  * Update evidence icon.
