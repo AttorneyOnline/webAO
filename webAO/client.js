@@ -1667,6 +1667,14 @@ async changeBackground(position) {
 
 		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
 
+		// process markup
+		if(this.chatmsg.content.startsWith("~~")) {
+			chatBoxInner.style.textAlign = "center";
+			this.chatmsg.content = this.chatmsg.content.substring(2, this.chatmsg.content.length);
+		} else {
+			chatBoxInner.style.textAlign = "initial";
+		}
+
 		this.tick();
 	}
 
