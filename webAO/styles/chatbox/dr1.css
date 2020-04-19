@@ -14,14 +14,14 @@
 	width: 90%;
 	text-align: left;
     letter-spacing: 0.075em;
-    color: black;
-    font-style: italic;
+    color: #3d3c3f;
+    font-weight: bold;
     border-radius: 0 2em 0 0;
     background: #fb9800;
-    background: linear-gradient(45deg,
-    #f8c007, #fae06e 40%, 
-    #fec001 40% 42%, #fadf69 42% 44%,
-    #fb9800 44%);
+    background: linear-gradient(25deg,
+    #f7ffdb, #f7ffdb 60%, 
+    #febf01 60% 63%, #fdffd7 63% 65%,
+    #fd9900 65%);
 	left: 0;
 	top: 0;
 	position: absolute;
@@ -33,6 +33,17 @@
 	margin: 1px;
 }
 
+#client_name::after {
+	content: "SPEAKING";
+	position: absolute;
+	left: 75%;
+	top: 0;
+	z-index: 2;
+	margin: 0;
+	color: #ffd786;
+	transform: scale(50%, 100%)
+}
+
 #client_chat {
 	font-size: 1em;
 	display: block;
@@ -40,7 +51,7 @@
 	margin: auto;
 	height: 80%;
     border-radius: 0 3em 3em 0;
-	background: rgba(48,48,48,0.6);
+	background: rgba(48,48,48,0.8);
 	bottom: 0;
 	left: 0;
 	position: absolute;
