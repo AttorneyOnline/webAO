@@ -1,3 +1,35 @@
+.text_white {
+	color: #fff;
+}
+
+.text_blue {
+	color: #93bbe6;
+}
+
+.text_green {
+	color: #6ab057;
+}
+
+.text_red {
+	color: #e1522a;
+}
+
+.text_orange {
+	color: #cf714c;
+}
+
+.text_yellow {
+	color: #fef9ad;
+}
+
+.text_pink {
+	color: #ffc0cb;
+}
+
+.text_cyan {
+	color: #0ff;
+}
+
 #client_chatcontainer {
 	position: absolute;
 	width: 100%;
