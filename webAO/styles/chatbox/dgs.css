@@ -86,9 +86,11 @@
 }
 
 #client_chat p {
-	margin: 6px;
+	display: block;
+	margin: 12px;
 	padding: 6px 20px;
-	height: 80%;
+	height: 84%;
+	height: calc(100% - 36px);
 	background-color: #101821;
 }
 
