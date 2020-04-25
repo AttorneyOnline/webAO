@@ -36,7 +36,8 @@
 	height: 30%;
 	bottom: 0;
 	left: 0;
-    font-family: Arial, sans-serif;
+	font-family: "FOT-Skip Std", Arial, sans-serif;
+	line-height: 1;
 }
 
 #client_name {
