@@ -93,5 +93,25 @@
 }
 
 #client_chatwaiting {
-	display: none;
+	display: block;
+	position: absolute;
+	color: #ded7a2;
+	right: 0.7em;
+	top: 50%;
+	line-height: 0.5;
+	animation: idling 0.4s linear infinite;
+}
+
+@keyframes idling {
+	0% {
+		right: 0.6em;
+	}
+
+	25% {
+		right: 0.7em;
+    }
+
+	100% {
+		right: 0.6em;
+	}
 }
