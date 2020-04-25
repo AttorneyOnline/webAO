@@ -3,11 +3,11 @@
 }
 
 .text_blue {
-	color: #93bbe6;
+	color: #18d7ff;
 }
 
 .text_green {
-	color: #6ab057;
+	color: #84fb08;
 }
 
 .text_red {
@@ -15,7 +15,7 @@
 }
 
 .text_orange {
-	color: #cf714c;
+	color: #ff7118;
 }
 
 .text_yellow {
@@ -45,6 +45,7 @@
 	left: 0;
 	height: 35%;
 	width: 100%;
+	transition-property: height, opacity;
 }
 
 #client_name {
@@ -52,9 +53,11 @@
 	padding: 0px 6px;
 	height: 20%;
 	min-width: 10%;
+	color: #fff7de;
+	text-shadow: 0 0 4px #000;
 	border: 1px solid #a59252;
     background-image: linear-gradient(#635529, #8c7d42);
-    left: 2%;
+    left: 0.5em;
 	top: 0;
 	border-radius: 3px;
 	position: absolute;
