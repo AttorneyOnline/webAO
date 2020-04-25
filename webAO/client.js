@@ -1370,15 +1370,15 @@ async changeBackground(position) {
 
 	if (viewport.chatmsg.type === 5) {
 		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
-		document.getElementById("client_bench").style.display = "none";
+		document.getElementById("client_bench").style.opacity = 0;
 	} else {
 		document.getElementById("client_court").src = bgfolder + bg;
 		if (desk) {
 			const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
 			document.getElementById("client_bench").src = bgfolder + deskFilename;
-			document.getElementById("client_bench").style.display = "block";
+			document.getElementById("client_bench").style.opacity = 1;
 		} else {
-			document.getElementById("client_bench").style.display = "none";
+			document.getElementById("client_bench").style.opacity = 0;
 		}
 	}
 	}
@@ -1404,7 +1404,7 @@ async changeBackground(position) {
 
 		const testimonyOverlay = document.getElementById("client_testimony");
 		testimonyOverlay.src = client.resources[testimony].src;
-		testimonyOverlay.style.display = "";
+		testimonyOverlay.style.opacity = 1;
 
 		this.testimonyTimer = 0;
 		this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
@@ -1511,7 +1511,7 @@ async changeBackground(position) {
 	disposeTestimony() {
 		client.testimonyID = 0;
 		this.testimonyTimer = 0;
-		document.getElementById("client_testimony").style.display = "none";
+		document.getElementById("client_testimony").style.opacity = 0;
 		clearTimeout(this.testimonyUpdater);
 	}
 
@@ -1563,9 +1563,9 @@ async changeBackground(position) {
 		nameBoxInner.innerText = this.chatmsg.nameplate;		
 
 		if (this.lastChar !== this.chatmsg.name) {
-			charSprite.style.display = "none";
+			charSprite.style.opacity = 0;
 			charSprite.src = transparentPNG;
-			pairSprite.style.display = "none";	
+			pairSprite.style.opacity = 0;
 			pairSprite.src = transparentPNG;
 		}
 		this.lastChar = this.chatmsg.name;
@@ -1598,9 +1598,9 @@ async changeBackground(position) {
 		const shout = this.shouts[this.chatmsg.objection];
 		if (shout) {
 			// Hide message box
-			chatContainerBox.style.display = "none";
+			chatContainerBox.style.opacity = 0;
 			shoutSprite.src = client.resources[shout]["src"];
-			shoutSprite.style.display = "block";
+			shoutSprite.style.opacity = 1;
 
 			let shoutUrl;
 
@@ -1629,7 +1629,7 @@ async changeBackground(position) {
 			case 1:
 				// play preanim
 				// Hide message box
-				chatContainerBox.style.display = "none";
+				chatContainerBox.style.opacity = 0;
 				// If preanim existed then determine the length
 				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}.gif`);
 				this.chatmsg.startspeaking = false;
@@ -1743,11 +1743,11 @@ async changeBackground(position) {
 
 			// Pre-animation stuff
 			if (this.chatmsg.preanimdelay > 0) {
-				shoutSprite.style.display = "none";
+				shoutSprite.style.opacity = 0;
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
 				charSprite.src = `${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`;
-				charSprite.style.display = "";
+				charSprite.style.opacity = 1;
 			}
 
 			if (extrafeatures.includes("cccc_ic_support")) {
@@ -1757,9 +1757,9 @@ async changeBackground(position) {
 					pairSprite.style.left = this.chatmsg.other_offset + "%";
 					charSprite.style.left = this.chatmsg.self_offset + "%";
 					pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
-					pairSprite.style.display = "";
+					pairSprite.style.opacity = 1;
 				} else {
-					pairSprite.style.display = "none";
+					pairSprite.style.opacity = 0;
 					charSprite.style.left = 0;
 				}
 
@@ -1790,14 +1790,14 @@ async changeBackground(position) {
 				resizeChatbox();
 
 				const chatContainerBox = document.getElementById("client_chatcontainer");
-				chatContainerBox.style.display = "block";
+				chatContainerBox.style.opacity = 1;
 
 				chatBoxInner.className = "text_" + this.colors[this.chatmsg.color];
 
 				this.chatmsg.startspeaking = false;
 
 				if (this.chatmsg.preanimdelay === 0) {
-					shoutSprite.style.display = "none";
+					shoutSprite.style.opacity = 0;
 					this.changeBackground(this.chatmsg.side);
 				}
 
@@ -1808,19 +1808,19 @@ async changeBackground(position) {
 						pairSprite.style.left = this.chatmsg.other_offset + "%";
 						charSprite.style.left = this.chatmsg.self_offset + "%";
 						pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
-						pairSprite.style.display = "";
+						pairSprite.style.opacity = 1;
 					} else {
-						pairSprite.style.display = "none";
+						pairSprite.style.opacity = 0;
 						charSprite.style.left = 0;
 					}
 				}
 
 				charSprite.src = this.speakingSprite;
-				charSprite.style.display = "";
+				charSprite.style.opacity = 1;
 
 				if (this.textnow === this.chatmsg.content) {
 					charSprite.src = this.silentSprite;
-					charSprite.style.display = "";
+					charSprite.style.opacity = 1;
 					waitingBox.innerHTML = "&#9658;";
 					this._animating = false;
 					clearTimeout(this.updater);
@@ -1840,7 +1840,7 @@ async changeBackground(position) {
 						this.textTimer = 0;
 						this._animating = false;
 						charSprite.src = this.silentSprite;
-						charSprite.style.display = "";
+						charSprite.style.opacity = 1;
 						waitingBox.innerHTML = "&#9654;";
 						clearTimeout(this.updater);
 					}
