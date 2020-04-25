@@ -39,7 +39,6 @@
 }
 
 #client_chatcontainer {
-	font-family: 'Cabin Condensed', sans-serif;
 	position: absolute;
 	bottom: 0;
 	left: 0;
@@ -62,6 +61,7 @@
 	top: 0;
 	border-radius: 3px;
 	position: absolute;
+	font-family: "Times New Roman", serif;
 }
 
 #client_inner_name {
@@ -87,6 +87,7 @@
 	text-align: left;
 	overflow: hidden;
 	scroll-behavior: smooth;
+	font-family: 'Cabin Condensed', sans-serif;
 }
 
 #client_chat p {
