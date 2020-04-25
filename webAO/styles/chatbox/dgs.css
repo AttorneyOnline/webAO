@@ -45,7 +45,7 @@
 	left: 0;
 	height: 35%;
 	width: 100%;
-	transition-property: height, opacity;
+	transition-property: opacity 0.5s;
 }
 
 #client_name {
@@ -61,7 +61,6 @@
 	top: 0;
 	border-radius: 3px;
 	position: absolute;
-	z-index: 1;
 }
 
 #client_inner_name {
