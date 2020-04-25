@@ -1841,7 +1841,7 @@ async changeBackground(position) {
 						this._animating = false;
 						charSprite.src = this.silentSprite;
 						charSprite.style.opacity = 1;
-						waitingBox.innerHTML = "&#9654;";
+						waitingBox.innerHTML = "&#9658;";
 						clearTimeout(this.updater);
 					}
 				}
