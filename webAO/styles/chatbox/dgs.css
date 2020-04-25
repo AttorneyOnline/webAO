@@ -45,7 +45,8 @@
 	left: 0;
 	height: 35%;
 	width: 100%;
-	transition-property: opacity 0.5s;
+	transition-property: opacity;
+	transition: 0.1s linear;
 }
 
 #client_name {
