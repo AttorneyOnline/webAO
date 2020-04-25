@@ -1821,7 +1821,7 @@ async changeBackground(position) {
 				if (this.textnow === this.chatmsg.content) {
 					charSprite.src = this.silentSprite;
 					charSprite.style.display = "";
-					waitingBox.innerHTML = "&#9654;";
+					waitingBox.innerHTML = "&#9658;";
 					this._animating = false;
 					clearTimeout(this.updater);
 				}
