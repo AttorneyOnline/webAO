@@ -73,8 +73,7 @@
 	height: 80%;
 	border-image-source: url("dgs_chat_bg.png");
     border-image-slice: 12;
-    border-image-width: 12px;
-    border-width: 12px;
+    border-image-width: 0.5em;
 	bottom: 0;
 	position: absolute;
 	word-break: keep-all;
@@ -87,10 +86,10 @@
 
 #client_chat p {
 	display: block;
-	margin: 12px;
-	padding: 6px 20px;
+	margin: 0.4em;
+	padding: 0.1em 1em;
 	height: 84%;
-	height: calc(100% - 36px);
+	height: calc(100% - 1.1em);
 	background-color: #101821;
 }
 
