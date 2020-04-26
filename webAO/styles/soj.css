@@ -2,13 +2,38 @@ body {
 	font-family: sans-serif;
 }
 
+.evi_icon {
+	width: 70px;
+	min-width: 70px;
+	height: 70px;
+	background-color: #848284;
+	outline: 2px ridge #fff;
+	border: 1px solid #181818;
+	outline-offset: -2px;
+	margin-right: 2px;
+}
+
 #evi_name {
-	background-color: #242e25;
+	color: #e7e3c6;
+	background-color: #293431;
 }
 
 #evi_desc {
 	flex: 1 auto;
-	background: repeating-linear-gradient(#83b893, #83b893 14px, #222 14px, #222 15px);
+	background: repeating-linear-gradient(#84ae8c, #84ae8c 14px, #4a6952 14px, #4a6952 15px);
+}
+
+.client_button {
+	margin: 1px;
+	padding: 2px 15px;
+	cursor: pointer;
+	text-align: center;
+	font-weight: bold;
+	color: #fff;
+	background: linear-gradient(to bottom, #6b3c10, #422008);
+	border: 1px solid #211408;
+	outline: 1px solid #846129;
+	outline-offset: -1px;
 }
 
 #client_defense_hp {
