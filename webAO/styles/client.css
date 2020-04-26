@@ -127,6 +127,75 @@
 	}
 }
 
+@keyframes bubble {
+
+	0% {
+		left: 0;
+		top: 0;
+		opacity: 0;
+	}
+
+	10% {
+		left: 0;
+		top: 0;
+		opacity: 1;
+	}
+
+	20% {
+		left: -1%;
+		top: 0;
+		opacity: 1;
+	}
+
+	30% {
+		left: 1%;
+		top: 1%;
+		opacity: 1;
+	}
+
+	40% {
+		left: -1%;
+		top: -1%;
+		opacity: 1;
+	}
+
+	50% {
+		left: 1%;
+		top: 0;
+		opacity: 1;
+	}
+
+	60% {
+		left: -1%;
+		top: -1%;
+		opacity: 1;
+	}
+
+	70% {
+		left: 1%;
+		top: 0;
+		opacity: 1;
+	}
+
+	80% {
+		left: -1%;
+		top: 1%;
+		opacity: 1;
+	}
+
+	90% {
+		left: 0;
+		top: 0;
+		opacity: 1;
+	}
+
+	100% {
+		left: 0;
+		top: 0;
+		opacity: 1;
+	}
+}
+
 @keyframes flash {
 
 	0%,
