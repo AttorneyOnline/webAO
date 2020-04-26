@@ -126,15 +126,15 @@ class Client extends EventEmitter {
 
 		this.resources = {
 			"holdit": {
-				"src": AO_HOST + "themes/" + THEME + "/holdit.gif",
+				"src": AO_HOST + "misc/default/holdit_bubble.png",
 				"duration": 720
 			},
 			"objection": {
-				"src": AO_HOST + "themes/" + THEME + "/objection.gif",
+				"src": AO_HOST + "misc/default/objection_bubble.png",
 				"duration": 720
 			},
 			"takethat": {
-				"src": AO_HOST + "themes/" + THEME + "/takethat.gif",
+				"src": AO_HOST + "misc/default/takethat_bubble.png",
 				"duration": 840
 			},
 			"witnesstestimony": {
@@ -1607,6 +1607,7 @@ async changeBackground(position) {
 			chatContainerBox.style.opacity = 0;
 			shoutSprite.src = client.resources[shout]["src"];
 			shoutSprite.style.opacity = 1;
+			shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
 
 			let shoutUrl;
 
@@ -1750,6 +1751,7 @@ async changeBackground(position) {
 			// Pre-animation stuff
 			if (this.chatmsg.preanimdelay > 0) {
 				shoutSprite.style.opacity = 0;
+				shoutSprite.style.animation = "";
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
 				charSprite.src = `${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`;
@@ -1804,6 +1806,7 @@ async changeBackground(position) {
 
 				if (this.chatmsg.preanimdelay === 0) {
 					shoutSprite.style.opacity = 0;
+					shoutSprite.style.animation = "";
 					this.changeBackground(this.chatmsg.side);
 				}
 
