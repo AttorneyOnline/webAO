@@ -2274,10 +2274,15 @@ window.ReconnectButton = ReconnectButton;
 function appendICLog(msg, name = "", time = new Date()) {
 	const entry = document.createElement("p");
 	const nameField = document.createElement("span");
+	const textField = document.createElement("span");
 	nameField.className = "iclog_name";
 	nameField.appendChild(document.createTextNode(name));
+
+	textField.className = "iclog_text";
+	textField.appendChild(document.createTextNode(msg));
+
 	entry.appendChild(nameField);
-	entry.appendChild(document.createTextNode(msg));
+	entry.appendChild(textField);
 
 	// Only put a timestamp if the minute has changed.
 	if (lastICMessageTime.getMinutes() !== time.getMinutes()) {
