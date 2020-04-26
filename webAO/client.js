@@ -1372,6 +1372,7 @@ async changeBackground(position) {
 	const { bg, desk, speedLines } = positions[position];
 
 	bench.className = position + "_bench";
+	court.className = position + "_court";
 
 	if (viewport.chatmsg.type === 5) {
 		court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
