@@ -370,12 +370,12 @@
 	line-height: 1.1em;
 }
 
-#iclog_name {
+.iclog_name {
 	font-weight: bold;
 	padding-right: .35em;
 }
 
-#iclog_time {
+.iclog_time {
 	float: right;
 	padding-right: .5em;
 	color: #dbdbdb;
