@@ -1323,6 +1323,9 @@ class Viewport {
 async changeBackground(position) {
 	const bgfolder = viewport.bgFolder;
 
+	const bench = document.getElementById("client_bench");
+	const court = document.getElementById("client_court");
+
 	const positions = {
 		def: {
 			bg: "defenseempty.png",
@@ -1368,17 +1371,19 @@ async changeBackground(position) {
 
 	const { bg, desk, speedLines } = positions[position];
 
+	bench.className = position + "_bench";
+
 	if (viewport.chatmsg.type === 5) {
-		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
-		document.getElementById("client_bench").style.opacity = 0;
+		court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
+		bench.style.opacity = 0;
 	} else {
-		document.getElementById("client_court").src = bgfolder + bg;
+		court.src = bgfolder + bg;
 		if (desk) {
 			const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
-			document.getElementById("client_bench").src = bgfolder + deskFilename;
-			document.getElementById("client_bench").style.opacity = 1;
+			bench.src = bgfolder + deskFilename;
+			bench.style.opacity = 1;
 		} else {
-			document.getElementById("client_bench").style.opacity = 0;
+			bench.style.opacity = 0;
 		}
 	}
 	}
