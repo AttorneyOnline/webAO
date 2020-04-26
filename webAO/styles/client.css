@@ -421,16 +421,6 @@
 	height: auto;
 }
 
-.evi_icon {
-	width: 70px;
-	min-width: 70px;
-	height: 70px;
-	background-color: #7b7b7b;
-	outline: 2px ridge #fff;
-	outline-offset: -2px;
-	margin-right: 2px;
-}
-
 #evi_options {
 	display: inline-block;
 	width: 100%;

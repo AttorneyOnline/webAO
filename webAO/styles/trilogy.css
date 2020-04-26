@@ -69,3 +69,10 @@ body {
     background-image: url("trilogy_bg.png");
     background-repeat: repeat;
 }
+
+.evi_icon {
+	background-color: #bebfbc;
+	border: 0.1em solid #f8f5f2;
+	outline: 0.2em solid #2988bc;
+	outline-offset: -0.2em;
+}

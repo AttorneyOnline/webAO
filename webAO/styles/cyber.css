@@ -37,6 +37,16 @@ img {
     animation: bg-scrolling 0.2s infinite linear;
 }
 
+.evi_icon {
+	width: 70px;
+	min-width: 70px;
+	height: 70px;
+	background-color: #7b7b7b;
+	outline: 2px ridge #fff;
+	outline-offset: -2px;
+	margin-right: 2px;
+}
+
 #client_menu {
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAFElEQVQImWNgYGDYjAVTV/A/w2YAfxQSe53wkNkAAAAASUVORK5CYII=) repeat;
     animation: bg-scrolling 0.2s infinite linear;

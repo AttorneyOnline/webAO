@@ -38,6 +38,16 @@ hr {
 	background-color: #9cc694;
 }
 
+.evi_icon {
+	width: 70px;
+	min-width: 70px;
+	height: 70px;
+	background-color: #7b7b7b;
+	outline: 2px ridge #fff;
+	outline-offset: -2px;
+	margin-right: 2px;
+}
+
 #client_menu {
 	background-color: #5a5a5a;
 	overflow-y: auto;
