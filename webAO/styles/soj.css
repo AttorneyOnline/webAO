@@ -36,6 +36,48 @@ body {
 	outline-offset: -1px;
 }
 
+#client_log {
+	position: relative;
+	height: 100%;
+	color: #fff;
+	word-break: keep-all;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	overflow-y: auto;
+	font-size: medium;
+	background-color: rgba(0,0,0,0.8);
+	text-align: start;
+	line-height: .85em;
+}
+
+#client_log>p {
+	line-height: 1.1em;
+	border-top: 1px solid rgba(255,255,255,0.2);
+	border-bottom: 1px solid #000;
+}
+
+.iclog_name {
+	font-weight: initial;
+	padding-right: .35em;
+	text-shadow:
+	0 0 3px #39307b,
+	-1px -1px 0 #39307b,  
+	 1px -1px 0 #39307b,
+	 -1px 1px 0 #39307b,
+	  1px 1px 0 #39307b;
+}
+
+.iclog_text::before {
+	content: "\A";
+	white-space: pre;
+}
+
+.iclog_time {
+	float: right;
+	padding-right: .5em;
+	color: #dbdbdb;
+}
+
 #client_defense_hp {
 	text-align: left;
 }
