@@ -91,7 +91,7 @@
 	font-family: 'Cabin Condensed', sans-serif;
 }
 
-#client_chat p {
+#client_inner_chat {
 	display: block;
 	position: absolute;
 	margin: 0.4em;

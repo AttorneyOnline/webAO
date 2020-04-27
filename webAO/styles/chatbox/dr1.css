@@ -98,7 +98,7 @@
 	border-color: #fd9900;
 }
 
-#client_chat p {
+#client_inner_chat {
 	padding: 2% 4%;
 	margin: 0;
 	line-height: 97%;

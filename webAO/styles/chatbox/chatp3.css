@@ -78,7 +78,7 @@ body {
 	scroll-behavior: smooth;
 }
 
-#client_chat p {
+#client_inner_chat {
 	padding: 0;
 	margin: 0;
 	line-height: 97%;

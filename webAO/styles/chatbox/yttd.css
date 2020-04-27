@@ -79,7 +79,7 @@
 	scroll-behavior: smooth;
 }
 
-#client_chat p {
+#client_inner_chat {
 	padding: 1% 3.13%;
 	margin: 1px;
 	font-size: 1.3em;

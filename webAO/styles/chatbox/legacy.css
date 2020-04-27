@@ -76,7 +76,7 @@
 	scroll-behavior: smooth;
 }
 
-#client_chat p {
+#client_inner_chat {
 	margin: 4px;
 }
 
