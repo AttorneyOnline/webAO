@@ -6,6 +6,7 @@ export default [
 	"drv3",
 	"drae",
 	"legacy",
+	"chatfuture",
 	"chatp3",
 	"p4",
 	"chatplvsaa",
