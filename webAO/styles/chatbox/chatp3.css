@@ -58,7 +58,6 @@ body {
 
 #client_inner_name {
 	text-justify: distribute;
-	letter-spacing: 0.075em;
 	margin: 0;
 	font-weight: bold;
 }
