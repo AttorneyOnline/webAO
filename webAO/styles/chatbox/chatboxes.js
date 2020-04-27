@@ -3,6 +3,7 @@ export default [
 	"chatdd",
 	"dgs",
 	"dr1",
+	"chatdr2",
 	"drv3",
 	"drae",
 	"legacy",
