@@ -7,6 +7,7 @@ export default [
 	"drae",
 	"legacy",
 	"chatfuture",
+	"halla",
 	"chatp3",
 	"p4",
 	"chatplvsaa",
