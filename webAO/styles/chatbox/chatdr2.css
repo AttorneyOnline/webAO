@@ -47,7 +47,8 @@
     color: #3d3c3f;
     font-weight: bold;
     background-image: linear-gradient(to top,#fe9500,#fee303,transparent);
-    border-right: 0.3em solid #e0d8b4;
+	border-right: 0.3em solid #dfd8b8;
+	box-shadow: 0.3em 0px 0 #ff9700;
 	left: 0;
     bottom: 0;
 	position: absolute;
@@ -66,7 +67,7 @@
 #client_chat {
 	font-size: 1em;
 	display: block;
-	width: 93%;
+	width: 91%;
 	margin: auto;
 	height: 25%;
     border-top: 0.1em solid white;    
