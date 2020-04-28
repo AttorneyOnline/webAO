@@ -263,16 +263,16 @@ class Client extends EventEmitter {
 	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim) {
 		let extra_cccc = ``;
 		let extra_27 = ``;
-		
+
 		if (extrafeatures.includes("cccc_ic_support")) {
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
 
 			if (extrafeatures.includes("looping_sfx")) {
 				const looping_sfx = 0;
 				const screenshake = 0;
-				const frame_screenshake = 0;
-				const frame_realization = 0;
-				const frame_sfx = 0;
+				const frame_screenshake = "";
+				const frame_realization = "";
+				const frame_sfx = "";
 	
 				extra_27 = `${looping_sfx}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
 				// looping_sfx, screenshake, frame_screenshake, frame_realization, frame_sfx = args
@@ -1215,6 +1215,9 @@ class Client extends EventEmitter {
 					zoom: Number(emoteinfo[3]) || 0,
 					sfx: esfx.toLowerCase(),
 					sfxdelay: esfxd,
+					frame_screenshake: "",
+					frame_realization: "",
+					frame_sfx: "",
 					button_off: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
 					button_on: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_on.png`
 				};
