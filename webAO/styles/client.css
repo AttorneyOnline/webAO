@@ -285,7 +285,14 @@
 	height: auto;
 	width: 100%;
 	bottom: 0;
+}
+
+.def_bench, .hld_bench, .jur_bench, .sea_bench {
 	left: 0;
+}
+
+.pro_bench, .hlp_bench, .wit_bench, .jud_bench {
+	right: 0;
 }
 
 #client_fg {
