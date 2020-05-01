@@ -106,7 +106,6 @@ class Client extends EventEmitter {
 
 		// Preset some of the variables
 
-		this.flip = false;
 		this.presentable = false;
 
 		this.hp = [0, 0];
@@ -260,7 +259,7 @@ class Client extends EventEmitter {
 	 * @param {number} self_offset offset to paired character (optional)
 	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
-	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim) {
+	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim, looping_sfx, screenshake) {
 		let extra_cccc = ``;
 		let extra_27 = ``;
 
@@ -268,14 +267,11 @@ class Client extends EventEmitter {
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
 
 			if (extrafeatures.includes("looping_sfx")) {
-				const looping_sfx = 0;
-				const screenshake = 0;
 				const frame_screenshake = "";
 				const frame_realization = "";
 				const frame_sfx = "";
 	
 				extra_27 = `${looping_sfx}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
-				// looping_sfx, screenshake, frame_screenshake, frame_realization, frame_sfx = args
 			}
 		}
 		
@@ -538,12 +534,13 @@ class Client extends EventEmitter {
 
 				if(this.chars[char_id].name !== char_name) {
 					console.info(this.chars[char_id].name + " is iniediting to " + char_name);
-					const chargs = (char_name + "&" + "filthy iniedtier").split("&");
+					const chargs = (char_name + "&" + "iniediter").split("&");
 					this.handleCharacterInfo(chargs,char_id);
 				}
 			} catch (e) {
 				msg_nameplate = args[3];
 				msg_blips = "male";
+				char_chatbox = "default";
 				char_muted = false;
 				console.error("we're still missing some character data");
 			}
@@ -593,11 +590,28 @@ class Client extends EventEmitter {
 						frame_sfx: safe_tags(args[28])
 					};
 					chatmsg = Object.assign(extra_27, chatmsg);
-				}
-
-				if (chatmsg.showname && document.getElementById("showname").checked) {
-					chatmsg.nameplate = chatmsg.showname;
-				}
+				} else {
+					const extra_27 = {
+						looping_sfx: 0,
+						screenshake: 0,
+						frame_screenshake: "",
+						frame_realization: "",
+						frame_sfx: ""
+					};
+					chatmsg = Object.assign(extra_27, chatmsg);
+				}			
+			} else {
+				const extra_cccc = {
+					showname: "",
+					other_charid: 0,
+					other_name: "",
+					other_emote: "",
+					self_offset: 0,
+					other_offset: 0,
+					other_flip: 0,
+					noninterrupting_preanim: 0
+				};
+				chatmsg = Object.assign(extra_cccc, chatmsg);
 			}
 
 			// our own message appeared, reset the buttons
@@ -1122,6 +1136,14 @@ class Client extends EventEmitter {
 			document.getElementById("cccc").style.display = "";
 			document.getElementById("pairing").style.display = "";
 		}
+
+		if (args.includes("flipping")) {
+			document.getElementById("button_flip").style.display = "";
+		}
+
+		if (args.includes("looping_sfx")) {
+			document.getElementById("button_shake").style.display = "";
+		}
 	}
 
 	/**
@@ -1597,10 +1619,12 @@ async changeBackground(position) {
 		const nameBoxInner = document.getElementById("client_inner_name");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
+		const displayname = document.getElementById("showname").checked ? this.chatmsg.showname : this.chatmsg.nameplate;
+
 		//Clear out the last message
 		chatBoxInner.innerText = this.textnow;
-		nameBoxInner.innerText = this.chatmsg.nameplate;		
-
+		nameBoxInner.innerText = displayname;
+		
 		if (this.lastChar !== this.chatmsg.name) {
 			charSprite.style.opacity = 0;
 			charSprite.src = transparentPNG;
@@ -1609,7 +1633,7 @@ async changeBackground(position) {
 		}
 		this.lastChar = this.chatmsg.name;
 
-		appendICLog(this.chatmsg.content, this.chatmsg.nameplate);
+		appendICLog(this.chatmsg.content, displayname);
 
 		// start checking the files
 		try {
@@ -1696,13 +1720,10 @@ async changeBackground(position) {
 			charSprite.style.transform = "scaleX(1)";
 		}
 
-		if (extrafeatures.includes("cccc_ic_support")) {
-			// Flip the pair character
-			if (this.chatmsg.other_flip === 1) {
-				pairSprite.style.transform = "scaleX(-1)";
-			} else {
-				pairSprite.style.transform = "scaleX(1)";
-			}
+		if (this.chatmsg.other_flip === 1) {
+			pairSprite.style.transform = "scaleX(-1)";
+		} else {
+			pairSprite.style.transform = "scaleX(1)";
 		}
 
 		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
@@ -1771,11 +1792,12 @@ async changeBackground(position) {
 		// TODO: preanims sometimes play when they're not supposed to
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
 			// Effect stuff
-			if (this.chatmsg.flash === 2) {
+			if (this.chatmsg.screenshake === 1) {
 				// Shake screen
 				this.playSFX(AO_HOST + "sounds/general/sfx-stab.wav");
 				gamewindow.style.animation = "shake 0.2s 1";
-			} else if (this.chatmsg.flash === 1) {
+			}
+			if (this.chatmsg.flash === 1) {
 				// Flash screen
 				this.playSFX(AO_HOST + "sounds/general/sfx-realization.wav");
 				document.getElementById("client_fg").style.animation = "flash 0.4s 1";
@@ -1791,19 +1813,16 @@ async changeBackground(position) {
 				charSprite.style.opacity = 1;
 			}
 
-			if (extrafeatures.includes("cccc_ic_support")) {
-				if (this.chatmsg.other_name) {
-					const pairName = this.chatmsg.other_name.toLowerCase();
-					const pairEmote = this.chatmsg.other_emote.toLowerCase();
-					pairSprite.style.left = this.chatmsg.other_offset + "%";
-					charSprite.style.left = this.chatmsg.self_offset + "%";
-					pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
-					pairSprite.style.opacity = 1;
-				} else {
-					pairSprite.style.opacity = 0;
-					charSprite.style.left = 0;
-				}
-
+			if (this.chatmsg.other_name) {
+				const pairName = this.chatmsg.other_name.toLowerCase();
+				const pairEmote = this.chatmsg.other_emote.toLowerCase();
+				pairSprite.style.left = this.chatmsg.other_offset + "%";
+				charSprite.style.left = this.chatmsg.self_offset + "%";
+				pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
+				pairSprite.style.opacity = 1;
+			} else {
+				pairSprite.style.opacity = 0;
+				charSprite.style.left = 0;
 			}
 
 			this.chatmsg.startpreanim = false;
@@ -1988,11 +2007,15 @@ export function onEnter(event) {
 	if (event.keyCode === 13) {
 		const mychar = client.character;
 		const myemo = client.emote;
-		const myevi = client.evidence;
-		const myflip = ((client.flip) ? 1 : 0);
-		const mycolor = document.getElementById("textcolor").value;
+		const evi = client.evidence;
+		const flip = ((document.getElementById("button_flip").classList.contains("dark")) ? 1 : 0);
+		const flash = ((document.getElementById("button_flash").classList.contains("dark")) ? 1 : 0);
+		const screenshake = ((document.getElementById("button_shake").classList.contains("dark")) ? 1 : 0);
+		const noninterrupting_preanim = ((document.getElementById("check_nonint").checked) ? 1 : 0);
+		const looping_sfx = ((document.getElementById("check_loopsfx").checked) ? 1 : 0);
+		const color = document.getElementById("textcolor").value;
 		const showname = document.getElementById("ic_chat_name").value;
-		const mytext = document.getElementById("client_inputbox").value;
+		const text = document.getElementById("client_inputbox").value;
 		const pairchar = document.getElementById("pair_select").value;
 		const pairoffset = document.getElementById("pair_offset").value;
 		let sfxname = "0";
@@ -2008,9 +2031,9 @@ export function onEnter(event) {
 		}
 
 		client.sendIC("chat", preanim, mychar.name, myemo.emote,
-			mytext, mychar.side,
-			sfxname, myemo.zoom, sfxdelay, selectedShout, myevi, myflip,
-			selectedEffect, mycolor, showname, pairchar, pairoffset, 0);
+			text, mychar.side,
+			sfxname, myemo.zoom, sfxdelay, selectedShout, evi, flip,
+			flash, color, showname, pairchar, pairoffset, noninterrupting_preanim, looping_sfx, screenshake);
 	}
 }
 window.onEnter = onEnter;
@@ -2022,14 +2045,15 @@ window.onEnter = onEnter;
  */
 function resetICParams() {
 	document.getElementById("client_inputbox").value = "";
-	if (selectedEffect) {
-		document.getElementById("button_effect_" + selectedEffect).className = "client_button";
-		selectedEffect = 0;
-	}
+	document.getElementById("button_flash").className = "client_button";
+	document.getElementById("button_shake").className = "client_button";
+
+	document.getElementById("sendpreanim").checked = false;
+
 	if (selectedShout) {
 		document.getElementById("button_" + selectedShout).className = "client_button";
 		selectedShout = 0;
-	}
+	}	
 }
 
 /**
@@ -2722,45 +2746,14 @@ window.updateBackgroundPreview = updateBackgroundPreview;
  * If the same effect button is selected, then the effect is canceled.
  * @param {string} effect the new effect to be selected
  */
-export function toggleEffect(effect) {
-	if (effect === selectedEffect) {
-		document.getElementById("button_effect_" + effect).className = "client_button";
-		selectedEffect = 0;
+export function toggleEffect(button) {
+	if (button.classList.contains("dark")) {
+		button.className = "client_button";
 	} else {
-		document.getElementById("button_effect_" + effect).className = "client_button dark";
-		if (selectedEffect) {
-			document.getElementById("button_effect_" + selectedEffect).className = "client_button";
-		}
-		selectedEffect = effect;
+		button.className = "client_button dark";
 	}
 }
 window.toggleEffect = toggleEffect;
-
-/**
- * Toggle flip for in-character chat.
- */
-export function toggleFlip() {
-	if (client.flip) {
-		document.getElementById("button_flip").className = "client_button";
-	} else {
-		document.getElementById("button_flip").className = "client_button dark";
-	}
-	client.flip = !client.flip;
-}
-window.toggleFlip = toggleFlip;
-
-/**
- * Toggle presentable for presenting evidence in-character chat.
- */
-export function togglePresent() {
-	if (client.presentable) {
-		document.getElementById("button_present").className = "client_button";
-	} else {
-		document.getElementById("button_present").className = "client_button dark";
-	}
-	client.presentable = !client.presentable;
-}
-window.togglePresent = togglePresent;
 
 /**
  * Highlights and selects a menu.

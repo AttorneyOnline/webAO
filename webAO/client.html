@@ -127,9 +127,9 @@
 				<input type="checkbox" id="sendpreanim" name="sendpreanim" value="sendpreanim">
 				<br>
 				<br>
-				<button id="button_flip" alt="Flip" class="client_button" onclick="toggleFlip()">Flip</button>
-				<button id="button_effect_1" alt="Flash" class="client_button" onclick="toggleEffect(1)">Flash</button>
-				<button id="button_effect_2" alt="Shake" class="client_button" onclick="toggleEffect(2)">Shake</button>
+				<button id="button_flip"  alt="Flip"  class="client_button" onclick="toggleEffect(this)" style="display: none">Flip</button>
+				<button id="button_flash" alt="Flash" class="client_button" onclick="toggleEffect(this)">Flash</button>
+				<button id="button_shake" alt="Shake" class="client_button" onclick="toggleEffect(this)" style="display: none">Shake</button>
 			</div>
 			<br>
 			<br>
@@ -168,7 +168,13 @@
 					<input id="ic_chat_name" name="ic_chat_name" type="text">
 					<label for="showname">Show others:</label>
 					<input id="showname" name="showname" type="checkbox" onclick="showname_click()">
+					<label for="check_nonint">Noninterrupting Preanimation:</label>
+					<input type="checkbox" name="check_nonint" id="check_nonint">
 				</span>	
+				<span id="2.7" style="display: none">
+					<label for="check_nonint">Looping SFX:</label>
+					<input type="checkbox" name="check_loopsfx" id="check_loopsfx">
+				</span>
 			</div>			
 			</div>
 			<fieldset style="margin:10px;">
