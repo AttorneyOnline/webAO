@@ -572,7 +572,7 @@ class Client extends EventEmitter {
 			};
 
 			if (extrafeatures.includes("cccc_ic_support")) {
-				const extra_options = {
+				const extra_cccc = {
 					showname: safe_tags(args[16]),
 					other_charid: Number(args[17]),
 					other_name: safe_tags(args[18]),
@@ -582,7 +582,19 @@ class Client extends EventEmitter {
 					other_flip: Number(args[22]),
 					noninterrupting_preanim: Number(args[23])
 				};
-				chatmsg = Object.assign(extra_options, chatmsg);
+				chatmsg = Object.assign(extra_cccc, chatmsg);
+
+				if (extrafeatures.includes("looping_sfx")) {
+					const extra_27 = {
+						looping_sfx: Number(args[24]),
+						screenshake: Number(args[25]),
+						frame_screenshake: safe_tags(args[26]),
+						frame_realization: safe_tags(args[27]),
+						frame_sfx: safe_tags(args[28])
+					};
+					chatmsg = Object.assign(extra_27, chatmsg);
+				}
+
 				if (chatmsg.showname && document.getElementById("showname").checked) {
 					chatmsg.nameplate = chatmsg.showname;
 				}
