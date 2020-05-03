@@ -1898,7 +1898,6 @@ async changeBackground(position) {
 					chatBoxInner.innerText = this.textnow;
 
 					if (this.textnow === this.chatmsg.content) {
-						this.textTimer = 0;
 						this._animating = false;
 						charSprite.src = this.silentSprite;
 						charSprite.style.opacity = 1;
