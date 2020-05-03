@@ -1619,7 +1619,7 @@ async changeBackground(position) {
 		const nameBoxInner = document.getElementById("client_inner_name");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 
-		const displayname = document.getElementById("showname").checked ? this.chatmsg.showname : this.chatmsg.nameplate;
+		const displayname = (document.getElementById("showname").checked && this.chatmsg.showname !== "") ? this.chatmsg.showname : this.chatmsg.nameplate;
 
 		//Clear out the last message
 		chatBoxInner.innerText = this.textnow;
