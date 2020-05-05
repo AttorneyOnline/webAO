@@ -106,8 +106,6 @@ class Client extends EventEmitter {
 
 		// Preset some of the variables
 
-		this.presentable = false;
-
 		this.hp = [0, 0];
 
 		this.playerID = 1;
@@ -214,10 +212,10 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Gets the player's currently selected evidence if presentable.
+	 * Gets the current evidence ID unless the player doesn't want to present any evidence
 	 */
 	get evidence() {
-		return this.presentable ? this.selectedEvidence : 0;
+		return (document.getElementById("button_present").classList.contains("dark")) ? this.selectedEvidence : 0;
 	}
 
 	/**
