@@ -50,9 +50,5 @@ Temporary Items
 node_modules
 package-lock.json
 
-# Minified files in the wrong folder (this is for testing)
-*.b.js
-*.b.js.map
-
 # content folder
 webAO/base/
