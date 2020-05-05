@@ -32,8 +32,8 @@
 
 @font-face {
 	font-family: 'ace_attorneyregular';
-	src: url('ace-attorney.woff2') format('woff2'),
-		url('ace-attorney.woff') format('woff');
+	src: url('../ace-attorney.woff2') format('woff2'),
+		url('../ace-attorney.woff') format('woff');
 	font-weight: normal;
 	font-style: normal;
 }
