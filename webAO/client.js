@@ -832,14 +832,19 @@ class Client extends EventEmitter {
 		document.getElementById("areas").innerHTML = "";		
 	}
 
-	handleMusicInfo(trackindex,trackname) {
-		let flagAudio = false;
-
-		if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(trackname) || trackname.startsWith("=")) {
-			flagAudio = true;
+	isAudio(trackname) {
+		if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(trackname) || // regex for file extenstions
+			trackname.startsWith("=") ||
+			trackname.startsWith("-"))   // category markers
+		{
+			return true;
+		} else {
+			return false;
 		}
+	}
 
-		if (flagAudio) {
+	handleMusicInfo(trackindex,trackname) {
+		if (this.isAudio(trackname)) {
 			// After reached the audio put everything in the music list
 			const newentry = document.createElement("OPTION");
 			newentry.text = trackname;
