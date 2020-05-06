@@ -96,11 +96,10 @@
 }
 
 #client_inner_chat {
-	padding: 1.5% 4%;
-	margin: 1px;
-	line-height: 97%;
-	letter-spacing: 0.05em;
-	word-spacing: 0.3em;
+	margin: 0;
+	padding: 1% 5%;
+	line-height: 125%;
+	word-spacing: 0.2em;
 }
 
 #client_chatwaiting {
