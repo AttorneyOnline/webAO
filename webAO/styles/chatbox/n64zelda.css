@@ -1,0 +1,105 @@
+.text_white {
+	color: #fff;
+}
+
+.text_blue {
+    color: #505aff;
+}
+
+.text_green {
+	color: #46ff50;
+}
+
+.text_red {
+	color: #ff3c3c;
+}
+
+.text_orange {
+	color: #ff7800;
+}
+
+.text_yellow {
+	color: #ff0;
+}
+
+.text_pink {
+	color: #ff96b4;
+}
+
+.text_cyan {
+	color: #64b4ff;
+}
+
+@font-face {
+	font-family: 'ChiaroWeb';
+	src: url('https://github.com/ngarces/FE15-Text-Simulator/raw/master/FOT-ChiaroStd-B.otf') format('opentype');
+	font-weight: normal;
+	font-style: normal;
+}
+
+#client_chatcontainer {
+	display: block;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	height: 25%;
+	width: 100%;
+	filter: none;
+	font-family: "FOT-Chiaro Std", "ChiaroWeb", "Arial", sans-serif;
+}
+
+#client_name {
+	display: none;
+}
+
+#client_inner_name {
+	display: none;
+}
+
+#client_chat {
+	display: block;
+	position: absolute;
+	bottom: 2%;
+	left: 10%;
+	width: 80%;
+	height: 100%;
+	margin: auto;
+	border-radius: 0.5em;
+	background: rgba(0,0,0,0.7);
+	font-size: 1.3em;
+	word-break: keep-all;
+	overflow-wrap: break-word;
+    text-align: center;
+    line-height: 120%;	
+	scroll-behavior: smooth;
+}
+
+#client_inner_chat {
+	padding: 1% 5%;
+    margin: 0;
+    text-shadow: 0.1em 0.05em 0.1em #000;
+    overflow: hidden;
+}
+
+#client_chatwaiting {
+	display: block;
+	position: absolute;
+	transform: rotate(90deg);
+	left: 50%;
+	bottom: -5%;	
+    line-height: 0.5;
+    color: #0c5cd4;
+	animation: idling 0.5s linear infinite alternate;
+}
+
+@keyframes idling {
+	from {
+        color: #0c5cd4;
+        text-shadow: none;
+	}
+
+	to {
+        color: #3282ff;
+        text-shadow: 0 0 0.2em #3282ff;
+	}
+}
