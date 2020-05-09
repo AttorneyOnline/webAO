@@ -15,5 +15,6 @@ export default [
 	"chat999",
 	"halla",
 	"yttd",
-	"n64zelda"
+	"n64zelda",
+	"papermario"
 ];
