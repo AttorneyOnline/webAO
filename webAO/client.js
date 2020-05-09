@@ -1736,7 +1736,7 @@ async changeBackground(position) {
 			chatBoxInner.style.textAlign = "center";
 			this.chatmsg.content = this.chatmsg.content.substring(2, this.chatmsg.content.length);
 		} else {
-			chatBoxInner.style.textAlign = "initial";
+			chatBoxInner.style.textAlign = "inherit";
 		}
 
 		this.tick();
