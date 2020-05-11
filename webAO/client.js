@@ -761,7 +761,8 @@ class Client extends EventEmitter {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 				const chargs = args[i].split("&");
-				this.handleCharacterInfo(chargs, args[i - 1]);
+				const charid = args[i - 1];
+				setTimeout(() => this.handleCharacterInfo(chargs, charid), charid*10);
 			}
 		}
 		// Request the next pack
@@ -778,7 +779,8 @@ class Client extends EventEmitter {
 		for (let i = 1; i < args.length; i++) {
 			document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 			const chargs = args[i].split("&");
-			this.handleCharacterInfo(chargs, i - 1);
+			const charid = i - 1;
+			setTimeout(() => this.handleCharacterInfo(chargs, charid), charid*10);
 		}
 		// We're done with the characters, request the music
 		this.sendServer("RM#%");
