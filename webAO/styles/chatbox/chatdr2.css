@@ -57,8 +57,9 @@
 
 #client_inner_name {
 	padding: 0;
-    margin: 0;
-    writing-mode: sideways-lr;
+	margin: 0;
+	transform: rotate(180deg);
+    writing-mode: vertical-rl;    
     bottom: 25%;
     right: 0;
     position: absolute;
