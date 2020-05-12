@@ -2391,11 +2391,11 @@ window.chartable_filter = chartable_filter;
  * then spectator is chosen instead.
  */
 export function pickChar(ccharacter) {
-	if (ccharacter < 1000) {
-		client.sendCharacter(ccharacter);
-	} else {
+	if (ccharacter===-1) {
 		// Spectator
-		document.getElementById("client_charselect").style.display = "none";
+		document.getElementById("client_charselect").style.display = "none";		
+	} else {
+		client.sendCharacter(ccharacter);
 	}
 }
 window.pickChar = pickChar;
