@@ -147,11 +147,11 @@ function onMessage(e) {
 				+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[3]}${asset}">Watch</a>`
 				+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[3]}${asset}">Join</a></li>`;
 			server_description[i] = args[1];
-			if (lowMemory===false)
-				checkOnline(i, `${args[2]}:${args[3]}`);
+			if (!lowMemory)
+				setTimeout(() => checkOnline(i, `${args[2]}:${args[3]}`), 0);
 		}
-		if (lowMemory===false)
-			checkOnline(-1, "127.0.0.1:50001");
+		if (!lowMemory)
+			setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
 		masterserver.close();
 	}
 	else if (header === "servercheok") {
