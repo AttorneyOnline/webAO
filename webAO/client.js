@@ -2198,6 +2198,37 @@ export async function iniedit() {
 window.iniedit = iniedit;
 
 /**
+ * Triggered by the change aspect ratio checkbox
+ */
+export async function switchAspectRatio() {
+	const background = document.getElementById("client_background");
+	const offsetCheck = document.getElementById("client_hdviewport_offset");
+	if(document.getElementById("client_hdviewport").checked) {
+		background.style.paddingBottom = "56.25%";
+		offsetCheck.disabled = false;
+	} else {
+		background.style.paddingBottom = "75%";
+		offsetCheck.disabled = true;
+	}
+}
+window.switchAspectRatio = switchAspectRatio;
+
+/**
+ * Triggered by the change aspect ratio checkbox
+ */
+export async function switchChatOffset() {
+	const container = document.getElementById("client_chatcontainer");
+	if(document.getElementById("client_hdviewport_offset").checked) {
+		container.style.width = "80%";
+		container.style.left = "10%";
+	} else {
+		container.style.width = "100%";
+		container.style.left = 0;
+	}
+}
+window.switchChatOffset = switchChatOffset;
+
+/**
  * Triggered when a character icon is clicked in the character selection menu.
  * @param {MouseEvent} event
  */
