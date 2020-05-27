@@ -1607,7 +1607,7 @@ async changeBackground(position) {
 		// Reset CSS animation
 		fg.style.animation = "";
 		gamewindow.style.animation = "";
-		waitingBox.innerText = "";
+		waitingBox.style.opacity = 0;
 		
 		const eviBox = document.getElementById("client_evi");		
 
@@ -1887,7 +1887,7 @@ async changeBackground(position) {
 				if (this.textnow === this.chatmsg.content) {
 					charSprite.src = this.silentSprite;
 					charSprite.style.opacity = 1;
-					waitingBox.innerHTML = "&#9658;";
+					waitingBox.style.opacity = 1;
 					this._animating = false;
 					clearTimeout(this.updater);
 				}
@@ -1906,7 +1906,7 @@ async changeBackground(position) {
 						this._animating = false;
 						charSprite.src = this.silentSprite;
 						charSprite.style.opacity = 1;
-						waitingBox.innerHTML = "&#9658;";
+						waitingBox.style.opacity = 1;
 						clearTimeout(this.updater);
 					}
 				}
