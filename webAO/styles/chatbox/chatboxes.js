@@ -14,6 +14,8 @@ export default [
 	"p4",
 	"chat999",
 	"halla",
+	"homestuck",
+	"yakuza",
 	"yttd",
 	"n64zelda",
 	"papermario"
