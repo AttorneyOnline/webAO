@@ -20,6 +20,10 @@ if (window.requestIdleCallback) {
 		Fingerprint2.get(options, function (components) {
 			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
 
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+				lowMemory = true;
+			}
+
 			check_https();
 
 			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
@@ -27,9 +31,8 @@ if (window.requestIdleCallback) {
 			masterserver.onerror = (evt) => onError(evt);
 			masterserver.onmessage = (evt) => onMessage(evt);
 
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-				lowMemory = true;
-			}
+			// i don't need the ms to play alone
+			setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
 		});
 	});
 } else {
@@ -37,6 +40,10 @@ if (window.requestIdleCallback) {
 		Fingerprint2.get(options, function (components) {
 			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
 
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+				lowMemory = true;
+			}
+
 			check_https();
 
 			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
@@ -44,9 +51,8 @@ if (window.requestIdleCallback) {
 			masterserver.onerror = (evt) => onError(evt);
 			masterserver.onmessage = (evt) => onMessage(evt);
 
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-				lowMemory = true;
-			}
+			// i don't need the ms to play alone
+			setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
 		});
 	}, 500);
 }
@@ -150,8 +156,6 @@ function onMessage(e) {
 			if (!lowMemory)
 				setTimeout(() => checkOnline(i, `${args[2]}:${args[3]}`), 0);
 		}
-		if (!lowMemory)
-			setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
 		masterserver.close();
 	}
 	else if (header === "servercheok") {
