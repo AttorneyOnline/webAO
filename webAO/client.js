@@ -550,7 +550,7 @@ class Client extends EventEmitter {
 			let chatmsg = {
 				deskmod: safe_tags(args[1]).toLowerCase(),
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
-				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
+				nameplate: msg_nameplate,
 				chatbox: char_chatbox,
 				name: char_name,
 				sprite: safe_tags(args[4]).toLowerCase(),
