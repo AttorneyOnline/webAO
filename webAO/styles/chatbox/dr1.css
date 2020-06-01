@@ -68,7 +68,7 @@
 	content: "SPEAKING";
 	position: absolute;
 	letter-spacing: 0.075em;
-	left: 75%;
+	right: 0;
 	top: 0;
 	z-index: 2;
 	margin: 0;
@@ -100,9 +100,8 @@
 
 #client_inner_chat {
 	padding: 2% 4%;
-	padding-right: 10%;
+	padding-right: 15%;
 	margin: 0;
-	line-height: 97%;
 }
 
 #client_chatwaiting {
