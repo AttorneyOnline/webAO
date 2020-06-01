@@ -100,10 +100,19 @@
 
 #client_inner_chat {
 	padding: 2% 4%;
+	padding-right: 10%;
 	margin: 0;
 	line-height: 97%;
 }
 
 #client_chatwaiting {
-	display: none;
+	display: block;
+	position: absolute;
+    color: transparent;
+	right: 3%;
+	bottom: 30%;
+    width: 2em;
+    height: 2em;
+    background-image: url("chatwaiting_dr1.svg");
+    background-size: contain;
 }
