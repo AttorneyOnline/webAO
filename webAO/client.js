@@ -1767,7 +1767,7 @@ async changeBackground(position) {
 	 * 
 	 * 3 preanimdelay over
 	 * this animates the evidence popup and finally shows the character name and message box
-	 * it sets the text color , changes the background (again TODO) and sets the character speaking sprite
+	 * it sets the text color and the character speaking sprite
 	 * 
 	 * 4 textnow != content
 	 * this adds a character to the textbox and stops the animations if the entire message is present in the textbox
@@ -1861,7 +1861,6 @@ async changeBackground(position) {
 				if (this.chatmsg.preanimdelay === 0) {
 					shoutSprite.style.opacity = 0;
 					shoutSprite.style.animation = "";
-					this.changeBackground(this.chatmsg.side);
 				}
 
 				if (extrafeatures.includes("cccc_ic_support")) {
