@@ -1729,6 +1729,7 @@ async changeBackground(position) {
 			charSprite.style.transform = "scaleX(1)";
 		}
 
+		// flip the paired character
 		if (this.chatmsg.other_flip === 1) {
 			pairSprite.style.transform = "scaleX(-1)";
 		} else {
@@ -1753,18 +1754,10 @@ async changeBackground(position) {
 	 * 
 	 * OK, here's the documentation on how this works:
 	 * 
-	 * 1 flip
-	 * For whatever reason it starts off by checking if the character is flipped, every time this is called
-	 * This is probably a TODO to move this somewhere else
-	 * 
-	 * 2 flip
-	 * If the server supports it, the same is done for the paired character
-	 * Both of these should probably be moved to say()
-	 * 
-	 * 3 _animating
+	 * 1 _animating
 	 * If we're not done with this characters animation, i.e. his text isn't fully there, set a timeout for the next tick/step to happen
 	 * 
-	 * 5 startpreanim
+	 * 2 startpreanim
 	 * If the shout timer is over it starts with the preanim
 	 * The first thing it checks for is the shake effect (TODO on client this is handled by the @ symbol and not a flag )
 	 * Then is the flash/realization effect
@@ -1772,14 +1765,14 @@ async changeBackground(position) {
 	 * and the main characters preanim gif is loaded
 	 * If pairing is supported the paired character will just stand around with his idle sprite
 	 * 
-	 * 6 preanimdelay over
+	 * 3 preanimdelay over
 	 * this animates the evidence popup and finally shows the character name and message box
 	 * it sets the text color , changes the background (again TODO) and sets the character speaking sprite
 	 * 
-	 * 7 textnow != content
+	 * 4 textnow != content
 	 * this adds a character to the textbox and stops the animations if the entire message is present in the textbox
 	 * 
-	 * 8 sfx
+	 * 5 sfx
 	 * independent of the stuff above, this will play any sound effects specified by the emote the character sent.
 	 * happens after the shout delay + an sfx delay that comes with the message packet
 	 * 
