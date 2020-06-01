@@ -1789,7 +1789,8 @@ async changeBackground(position) {
 		const pairSprite = document.getElementById("client_pair_char");
 		const eviBox = document.getElementById("client_evi");
 		const shoutSprite = document.getElementById("client_shout");
-		const chatBoxInner = document.getElementById("client_inner_chat");		
+		const chatBoxInner = document.getElementById("client_inner_chat");
+		const chatBox = document.getElementById("client_chat");
 
 		// TODO: preanims sometimes play when they're not supposed to
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
@@ -1897,6 +1898,9 @@ async changeBackground(position) {
 					this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
 
 					chatBoxInner.innerText = this.textnow;
+
+					// scroll to bottom
+					chatBox.scrollTop = chatBox.scrollHeight;
 
 					if (this.textnow === this.chatmsg.content) {
 						this._animating = false;
