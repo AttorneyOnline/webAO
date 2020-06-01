@@ -1589,7 +1589,6 @@ async changeBackground(position) {
 
 	/**
 	 * Sets a new emote.
-	 * TODO: merge this and initUpdater
 	 * This sets up everything before the tick() loops starts
 	 * a lot of things can probably be moved here, like starting the shout animation if there is one
 	 * TODO: the preanim logic, on the other hand, should probably be moved to tick()
