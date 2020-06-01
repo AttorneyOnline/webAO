@@ -414,8 +414,10 @@ class Client extends EventEmitter {
 
 		document.getElementById("client_musicaudio").volume = getCookie("musicVolume") || 1;
 		changeMusicVolume();
-		document.getElementById("client_svolume").value = getCookie("sfxVolume") || 1;
+		document.getElementById("client_sfxaudio").volume = getCookie("sfxVolume") || 1;
 		changeSFXVolume();
+		document.getElementById("client_shoutaudio").volume = getCookie("shoutVolume") || 1;
+		changeShoutVolume();
 		document.getElementById("client_bvolume").value = getCookie("blipVolume") || 1;
 		changeBlipVolume();
 
@@ -1316,13 +1318,16 @@ class Viewport {
 			.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
 
-		this.sfxaudio = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
+		this.sfxaudio = document.getElementById("client_sfxaudio");
+		this.sfxaudio.src = `${AO_HOST}sounds/general/sfx-realization.wav`;
+
 		this.sfxplayed = 0;
 
-		this.shoutaudio = new Audio();
+		this.shoutaudio = document.getElementById("client_shoutaudio");
+		this.shoutaudio.src = `${AO_HOST}misc/default/objection.wav`;
 
 		this.music = document.getElementById("client_musicaudio");
-		this.music.play();
+		this.music.src = `${AO_HOST}sounds/music/trial (aa).mp3`;
 
 		this.updater = null;
 		this.testimonyUpdater = null;
@@ -2153,11 +2158,17 @@ window.changeMusicVolume = changeMusicVolume;
  * Triggered by the sound effect volume slider.
  */
 export function changeSFXVolume() {
-	viewport.sfxaudio.volume = document.getElementById("client_svolume").value;
-	viewport.shoutaudio.volume = document.getElementById("client_svolume").value;
-	setCookie("sfxVolume", document.getElementById("client_svolume").value);
+	setCookie("sfxVolume", document.getElementById("client_sfxaudio").volume);
 }
 window.changeSFXVolume = changeSFXVolume;
+
+/**
+ * Triggered by the shout volume slider.
+ */
+export function changeShoutVolume() {
+	setCookie("shoutVolume", document.getElementById("client_shoutaudio").volume);
+}
+window.changeShoutVolume = changeShoutVolume;
 
 /**
  * Triggered by the blip volume slider.
