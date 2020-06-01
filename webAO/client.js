@@ -1761,7 +1761,7 @@ async changeBackground(position) {
 	 * If the shout timer is over it starts with the preanim
 	 * The first thing it checks for is the shake effect (TODO on client this is handled by the @ symbol and not a flag )
 	 * Then is the flash/realization effect
-	 * After that, the shout image is set to a transparent placeholder gif (TODO just hide it with CSS)
+	 * After that, the shout image set to be transparent
 	 * and the main characters preanim gif is loaded
 	 * If pairing is supported the paired character will just stand around with his idle sprite
 	 * 
