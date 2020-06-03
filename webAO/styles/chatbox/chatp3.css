@@ -38,19 +38,21 @@ body {
 	display: block;
 	position: absolute;
 	bottom: 0;
-	left: 0;
+	left: 1%;
 	height: 30%;
-	width: 100%;
-    border-color: #d9e2f9;
+	width: 97%;
+	width: calc(98% - 0.3em);
+	border-color: #d9e2f9;
+	border-style: solid;
 	border-width: 0.15em;
-	border-radius: 50% / 10%;
+	border-radius: 75% / 25%;
 	background-color: #aaaeb4;}
 
 #client_name {
 	display: block;
 	position: absolute;
-	left: 1%;
-	top: 6%;
+	left: 3%;
+	top: 9%;
 	height: 15%;
 	color: #5c1d1b;
 	z-index: 1;
@@ -65,12 +67,12 @@ body {
 #client_chat {
 	display: block;
 	position: absolute;
-	bottom: 5%;
+	bottom: 6%;
 	left: 2%;
 	width: 96%;
-	height: 70%;
-	margin: auto;
-	font-size: 2em;
+	height: 68%;
+	margin: 0;
+	font-size: 1.5em;
 	word-break: keep-all;
 	overflow-wrap: break-word;
 	text-align: left;
@@ -79,7 +81,8 @@ body {
 }
 
 #client_inner_chat {
-	padding: 0;
+	padding-left: 3%;
+	padding-right: 8%;
 	margin: 0;
 	line-height: 97%;
 }
