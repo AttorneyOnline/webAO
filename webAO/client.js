@@ -667,7 +667,7 @@ class Client extends EventEmitter {
 			appendICLog(`The music was changed to ${track}`);
 		}
 
-		document.getElementById("client_trackstatus").innerText = track;
+		document.getElementById("client_trackstatustext").innerText = track;
 	}
 
 	/**
