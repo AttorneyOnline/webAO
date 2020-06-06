@@ -1667,6 +1667,18 @@ async changeBackground(position) {
 			this.silentSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif";
 		}
 
+		if (this.chatmsg.other_name) {
+			try {
+				const { url: pairUrl } = await this.oneSuccess([
+					this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png")),
+					this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif"))
+				]);
+				this.pairSilent = pairUrl ? pairUrl : transparentPNG;
+			} catch (error) {
+				this.pairSilent = AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif";
+			}
+		}
+
 		// gets which shout shall played
 		const shoutSprite = document.getElementById("client_shout");
 		const shout = this.shouts[this.chatmsg.objection];
@@ -1823,7 +1835,7 @@ async changeBackground(position) {
 				const pairEmote = this.chatmsg.other_emote.toLowerCase();
 				pairSprite.style.left = this.chatmsg.other_offset + "%";
 				charSprite.style.left = this.chatmsg.self_offset + "%";
-				pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
+				pairSprite.src = this.pairSilent;
 				pairSprite.style.opacity = 1;
 			} else {
 				pairSprite.style.opacity = 0;
@@ -1872,7 +1884,7 @@ async changeBackground(position) {
 						const pairEmote = this.chatmsg.other_emote.toLowerCase();
 						pairSprite.style.left = this.chatmsg.other_offset + "%";
 						charSprite.style.left = this.chatmsg.self_offset + "%";
-						pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
+						pairSprite.src = this.pairSilent;
 						pairSprite.style.opacity = 1;
 					} else {
 						pairSprite.style.opacity = 0;
