@@ -67,7 +67,6 @@
 
 <template id="client_wrapper">
 	<meta name="frame-title" lang="en" content="Game">
-	<div id="client_icwrapper">
 		<div id="client_background">
 			<div id="client_gamewindow">
 				<img id="client_court" alt="Courtroom backdrop" onerror="imgError(this);">
@@ -91,6 +90,10 @@
 				<div id="client_trackstatus" style="display: none;"><p id="client_trackstatustext">None</p></div>
 			</div>
 		</div>
+	</template>
+
+		<template id="iccontrols">
+			<meta name="frame-title" lang="en" content="Input">
 		<div id="client_iccontrols">
 			<input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)"
 				placeholder="Say something&hellip;">
@@ -232,7 +235,6 @@
 				</span>
 			</fieldset>
 		</div>
-	</div>
 </template>
 
 <template id="mainmenu">

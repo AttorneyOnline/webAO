@@ -20,7 +20,14 @@ const config = {
         type: "component",
         componentName: "template",
         title: "Game",
+        height: 30,        
         componentState: { id: "client_wrapper" }
+      },
+      {
+        type: "component",
+        title: "Input",
+        componentName: "template",
+        componentState: { id: "iccontrols" }
       }]
     },
     {
