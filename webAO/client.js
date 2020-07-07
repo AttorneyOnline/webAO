@@ -33,7 +33,7 @@ const serverIP = queryDict.ip;
 let mode = queryDict.mode;
 
 // Unless there is an asset URL specified, use the wasabi one
-const DEFAULT_HOST = location.hostname ? "https://s3.wasabisys.com/webao/base/" : "base/";
+const DEFAULT_HOST = location.hostname ? "https://webao-full.animatedchatroom.net/base/" : "base/";
 const AO_HOST = queryDict.asset || DEFAULT_HOST;
 const THEME = queryDict.theme || "default";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
