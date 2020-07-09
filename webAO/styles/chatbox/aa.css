@@ -93,7 +93,7 @@
 	bottom: 0;
 	left: 0;
 	width: 98%;
-	width: calc(100% - 0.27em);
+	width: calc(100% - 0.25em);
 	height: 78%;
 	margin: auto;
 	border-color: rgba(255, 255, 255, 0.5);
@@ -101,7 +101,7 @@
 	border-width: 0.15em;
 	border-radius: 0.3em;
 	background-color: rgba(0, 0, 16, 0.5);
-	font-size: 2em;
+	font-size: 1.7em;
 	word-break: keep-all;
 	overflow-wrap: break-word;
 	text-align: left;
