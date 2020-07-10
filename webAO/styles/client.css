@@ -345,6 +345,10 @@
 	overflow-y: hidden;
 }
 
+.emote_button.dark {
+	opacity: 0.5;
+}
+
 #client_emo {
 	position: relative;
 	top: 10px;
