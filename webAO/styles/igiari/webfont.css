@@ -1,0 +1,21 @@
+/* Webfont CSS setup for Igiari by Caveras */
+
+@font-face {
+	font-family:'Igiari';
+		src:url('Igiari.eot');
+		src:url('Igiari.eot?#iefix') format('embedded-opentype'),
+				url('Igiari.woff') format('woff'),
+				url('Igiari.ttf') format('truetype'),
+				url('Igiari.svg#Igiari') format('svg');
+	font-weight:normal;
+	font-style:normal;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+	@font-face {
+		font-family:'Igiari';
+		src: url('Igiari.svg') format('svg');
+		font-weight:normal;
+		font-style:normal;
+	}
+}
