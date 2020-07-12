@@ -1669,8 +1669,8 @@ async changeBackground(position) {
 		if (this.chatmsg.other_name) {
 			try {
 				const { url: pairUrl } = await this.oneSuccess([
-					this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png")),
-					this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif"))
+					this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/" + this.chatmsg.other_emote + ".png")),
+					this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/(a)" + this.chatmsg.other_emote + ".gif"))
 				]);
 				this.pairSilent = pairUrl ? pairUrl : transparentPNG;
 			} catch (error) {
