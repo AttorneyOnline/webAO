@@ -1674,7 +1674,7 @@ async changeBackground(position) {
 				]);
 				this.pairSilent = pairUrl ? pairUrl : transparentPNG;
 			} catch (error) {
-				this.pairSilent = AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif";
+				this.pairSilent = AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/(a)" + this.chatmsg.other_emote + ".gif";
 			}
 		}
 
