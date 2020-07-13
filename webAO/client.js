@@ -418,6 +418,8 @@ class Client extends EventEmitter {
 		changeSFXVolume();
 		document.getElementById("client_shoutaudio").volume = getCookie("shoutVolume") || 1;
 		changeShoutVolume();
+		document.getElementById("client_testimonyaudio").volume = getCookie("testimonyVolume") || 1;
+		changeTestimonyVolume();
 		document.getElementById("client_bvolume").value = getCookie("blipVolume") || 1;
 		changeBlipVolume();
 
@@ -2181,6 +2183,14 @@ export function changeShoutVolume() {
 	setCookie("shoutVolume", document.getElementById("client_shoutaudio").volume);
 }
 window.changeShoutVolume = changeShoutVolume;
+
+/**
+ * Triggered by the testimony volume slider.
+ */
+export function changeTestimonyVolume() {
+	setCookie("testimonyVolume", document.getElementById("client_testimonyaudio").volume);
+}
+window.changeTestimonyVolume = changeTestimonyVolume;
 
 /**
  * Triggered by the blip volume slider.
