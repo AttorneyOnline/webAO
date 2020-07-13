@@ -1329,6 +1329,9 @@ class Viewport {
 		this.shoutaudio = document.getElementById("client_shoutaudio");
 		this.shoutaudio.src = `${AO_HOST}misc/default/objection.wav`;
 
+		this.testimonyAudio = document.getElementById("client_testimonyaudio");
+		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-notguilty.wav`;
+
 		this.music = document.getElementById("client_musicaudio");
 		this.music.src = `${AO_HOST}sounds/music/trial (aa).mp3`;
 
@@ -1474,7 +1477,8 @@ async changeBackground(position) {
 			return;
 		}
 
-		(new Audio(client.resources[testimony].sfx)).play();
+		this.testimonyAudio.src = client.resources[testimony].sfx;
+		this.testimonyAudio.play();
 
 		const testimonyOverlay = document.getElementById("client_testimony");
 		testimonyOverlay.src = client.resources[testimony].src;
