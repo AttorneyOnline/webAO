@@ -85,6 +85,7 @@
 #client_inner_name {
 	text-justify: distribute;
 	letter-spacing: 0.075em;
+	line-height: 100%;
 	margin: 0;
 }
 
