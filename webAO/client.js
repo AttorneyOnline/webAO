@@ -418,6 +418,8 @@ class Client extends EventEmitter {
 		changeSFXVolume();
 		document.getElementById("client_shoutaudio").volume = getCookie("shoutVolume") || 1;
 		changeShoutVolume();
+		document.getElementById("client_testimonyaudio").volume = getCookie("testimonyVolume") || 1;
+		changeTestimonyVolume();
 		document.getElementById("client_bvolume").value = getCookie("blipVolume") || 1;
 		changeBlipVolume();
 
@@ -1327,6 +1329,9 @@ class Viewport {
 		this.shoutaudio = document.getElementById("client_shoutaudio");
 		this.shoutaudio.src = `${AO_HOST}misc/default/objection.wav`;
 
+		this.testimonyAudio = document.getElementById("client_testimonyaudio");
+		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-notguilty.wav`;
+
 		this.music = document.getElementById("client_musicaudio");
 		this.music.src = `${AO_HOST}sounds/music/trial (aa).mp3`;
 
@@ -1472,7 +1477,8 @@ async changeBackground(position) {
 			return;
 		}
 
-		(new Audio(client.resources[testimony].sfx)).play();
+		this.testimonyAudio.src = client.resources[testimony].sfx;
+		this.testimonyAudio.play();
 
 		const testimonyOverlay = document.getElementById("client_testimony");
 		testimonyOverlay.src = client.resources[testimony].src;
@@ -2181,6 +2187,14 @@ export function changeShoutVolume() {
 	setCookie("shoutVolume", document.getElementById("client_shoutaudio").volume);
 }
 window.changeShoutVolume = changeShoutVolume;
+
+/**
+ * Triggered by the testimony volume slider.
+ */
+export function changeTestimonyVolume() {
+	setCookie("testimonyVolume", document.getElementById("client_testimonyaudio").volume);
+}
+window.changeTestimonyVolume = changeTestimonyVolume;
 
 /**
  * Triggered by the blip volume slider.
