@@ -121,6 +121,8 @@ class Client extends EventEmitter {
 		this.areas = [];
 		this.musics = [];
 
+		this.callwords = [];
+
 		this.resources = {
 			"holdit": {
 				"src": AO_HOST + "misc/default/holdit_bubble.png",
@@ -2200,6 +2202,14 @@ export function reloadTheme() {
 	document.getElementById("client_theme").href = "styles/" + viewport.theme + ".css";
 }
 window.reloadTheme = reloadTheme;
+
+/**
+ * Triggered by a changed callword list
+ */
+export function changeCallwords() {
+	client.callwords = document.getElementById("client_callwords").value.split('\n');
+}
+window.changeCallwords = changeCallwords;
 
 /**
  * Triggered by the modcall sfx dropdown
