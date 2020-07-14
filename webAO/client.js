@@ -1647,6 +1647,8 @@ async changeBackground(position) {
 
 		appendICLog(this.chatmsg.content, displayname);
 
+		checkCallword(this.chatmsg.content);
+
 		// start checking the files
 		try {
 			const { url: speakUrl } = await this.oneSuccess([
@@ -2430,6 +2432,26 @@ function appendICLog(msg, name = "", time = new Date()) {
 
 	lastICMessageTime = new Date();
 }
+
+/**
+ * check if the message contains an entry on our callword list
+ * @param {String} message
+ */
+export function checkCallword(message) {
+	client.callwords.forEach(testCallword);
+
+	function testCallword(item)
+	{
+		if(item !== "" && message.includes(item))
+		{
+			viewport.sfxaudio.pause();
+			viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
+			viewport.sfxaudio.play();
+		}
+	}
+}
+
+
 
 /**
  * Triggered when the music search bar is changed
