@@ -2442,7 +2442,7 @@ export function checkCallword(message) {
 
 	function testCallword(item)
 	{
-		if(item !== "" && message.includes(item))
+		if(item !== "" && message.toLowerCase().includes(item.toLowerCase()))
 		{
 			viewport.sfxaudio.pause();
 			viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
