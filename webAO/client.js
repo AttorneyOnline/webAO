@@ -427,6 +427,8 @@ class Client extends EventEmitter {
 
 		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
 		document.getElementById("showname").checked = getCookie("showname");
+
+		document.getElementById("client_callwords").value = getCookie("callwords");
 	}
 
 	/**
@@ -2224,6 +2226,7 @@ window.reloadTheme = reloadTheme;
  */
 export function changeCallwords() {
 	client.callwords = document.getElementById("client_callwords").value.split('\n');
+	setCookie("callwords",client.callwords);
 }
 window.changeCallwords = changeCallwords;
 
