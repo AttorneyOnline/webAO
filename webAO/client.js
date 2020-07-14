@@ -121,6 +121,8 @@ class Client extends EventEmitter {
 		this.areas = [];
 		this.musics = [];
 
+		this.callwords = [];
+
 		this.resources = {
 			"holdit": {
 				"src": AO_HOST + "misc/default/holdit_bubble.png",
@@ -1651,6 +1653,8 @@ async changeBackground(position) {
 
 		appendICLog(this.chatmsg.content, displayname);
 
+		checkCallword(this.chatmsg.content);
+
 		// start checking the files
 		try {
 			const { url: speakUrl } = await this.oneSuccess([
@@ -2216,6 +2220,14 @@ export function reloadTheme() {
 window.reloadTheme = reloadTheme;
 
 /**
+ * Triggered by a changed callword list
+ */
+export function changeCallwords() {
+	client.callwords = document.getElementById("client_callwords").value.split('\n');
+}
+window.changeCallwords = changeCallwords;
+
+/**
  * Triggered by the modcall sfx dropdown
  */
 export function modcall_test() {
@@ -2434,6 +2446,26 @@ function appendICLog(msg, name = "", time = new Date()) {
 
 	lastICMessageTime = new Date();
 }
+
+/**
+ * check if the message contains an entry on our callword list
+ * @param {String} message
+ */
+export function checkCallword(message) {
+	client.callwords.forEach(testCallword);
+
+	function testCallword(item)
+	{
+		if(item !== "" && message.toLowerCase().includes(item.toLowerCase()))
+		{
+			viewport.sfxaudio.pause();
+			viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
+			viewport.sfxaudio.play();
+		}
+	}
+}
+
+
 
 /**
  * Triggered when the music search bar is changed
