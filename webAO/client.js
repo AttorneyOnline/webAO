@@ -92,12 +92,14 @@ let lastICMessageTime = new Date(0);
 class Client extends EventEmitter {
 	constructor(address) {
 		super();
-		this.serv = new WebSocket("ws://" + address);
-		// Assign the websocket events
-		this.serv.addEventListener("open", this.emit.bind(this, "open"));
-		this.serv.addEventListener("close", this.emit.bind(this, "close"));
-		this.serv.addEventListener("message", this.emit.bind(this, "message"));
-		this.serv.addEventListener("error", this.emit.bind(this, "error"));
+		if (mode !== "replay") {
+			this.serv = new WebSocket("ws://" + address);
+			// Assign the websocket events
+			this.serv.addEventListener("open", this.emit.bind(this, "open"));
+			this.serv.addEventListener("close", this.emit.bind(this, "close"));
+			this.serv.addEventListener("message", this.emit.bind(this, "message"));
+			this.serv.addEventListener("error", this.emit.bind(this, "error"));
+		}
 
 		this.on("open", this.onOpen.bind(this));
 		this.on("close", this.onClose.bind(this));
