@@ -1,10 +1,5 @@
 body {
-	font-family: "Ace Attorney", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi" , sans-serif;
-}
-
-img {
-	image-rendering: crisp-edges;
-	image-rendering: pixelated;
+	font-family: "FOTK-Yoon Mincho 740", serif;
 }
 
 .client_button {
@@ -14,22 +9,17 @@ img {
 	text-align: center;
 	font-weight: bold;
 	color: white;
-	background-color: #7b2900;
-	border-radius: 3px;
-	border-style: solid;
-	border-width: 1px;
-	border-color: #fff;
-	box-shadow: 1px 1px inset;
+	background-color: #2781b2;
+	border: 2px solid white;
 }
 
-.evi_icon {
-	width: 70px;
-	min-width: 70px;
-	height: 70px;
-	background-color: #7b7b7b;
-	outline: 2px ridge #fff;
-	outline-offset: -2px;
-	margin-right: 2px;
+.client_button:hover {
+    outline:  1px solid #ffc31d;
+    outline-offset: 7px;
+}
+
+.client_button:active {
+    background-color: #f2b91c;
 }
 
 #client_defense_hp {
@@ -68,4 +58,21 @@ img {
 	display: inline-block;
 	transition: 1s linear;
 	transition-property: width;
+}
+
+#client_menu {
+    background-image: url("trilogy_bg.png");
+    background-repeat: repeat;
+}
+
+#client_iccontrols {
+    background-image: url("trilogy_bg.png");
+    background-repeat: repeat;
+}
+
+.evi_icon {
+	background-color: #bebfbc;
+	border: 0.1em solid #f8f5f2;
+	outline: 0.2em solid #2988bc;
+	outline-offset: -0.2em;
 }

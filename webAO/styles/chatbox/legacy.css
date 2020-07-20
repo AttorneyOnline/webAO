@@ -1,0 +1,85 @@
+.text_white {
+	color: #fff;
+}
+
+.text_green {
+	color: #0f0;
+}
+
+.text_red {
+	color: #f00;
+}
+
+.text_orange {
+	color: #ffa500;
+}
+
+.text_blue {
+	color: #4596ff;
+}
+
+.text_yellow {
+	color: #ff0;
+}
+
+.text_pink {
+	color: #ffc0cb;
+}
+
+.text_cyan {
+	color: #0ff;
+}
+
+#client_chatcontainer {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	height: 40%;
+	width: 100%;
+}
+
+#client_name {
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 16%;
+	border: 1px solid rgba(255, 255, 255, 0.7);
+	border-radius: 3px;
+	background: rgba(73, 0, 254, 0.5);	
+	padding: 0px 6px;
+	z-index: 1;
+}
+
+#client_inner_name {
+	margin: 0;
+}
+
+#client_chat {
+	position: absolute;
+	display: block;
+	bottom: 0;
+	left: 0;
+	width: 98%;
+	width: calc(100% - 4px);	
+	height: 80%;
+	border: 2px solid rgba(255, 255, 255, 0.7);
+	border-radius: 4px;
+	background-color: rgba(0, 0, 0, 0.5);
+	margin: auto;		
+	font-size: 1em;
+	word-break: keep-all;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	text-align: left;
+	overflow: hidden;
+	scroll-behavior: smooth;
+}
+
+#client_inner_chat {
+	margin: 4px;
+}
+
+#client_chatwaiting {
+	display: none;
+}

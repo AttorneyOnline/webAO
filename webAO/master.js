@@ -1,43 +1,38 @@
 const MASTERSERVER_IP = "master.aceattorneyonline.com:27014";
-const version = 2.4;
+import { version } from '../package.json';
 
 import Fingerprint2 from 'fingerprintjs2';
+import { unescapeChat } from './encoding.js';
 
 let masterserver;
 
 let hdid;
 const options = { fonts: { extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"] }, excludes: { userAgent: true, enumerateDevices: true } };
 
-let oldLoading = false;
+let lowMemory = false;
 
 const server_description = [];
 server_description[-1] = "This is your computer on port 50001";
 const online_counter = [];
-
-/**
- * Unescapes a string to AO1 escape codes.
- * @param {string} estring the string to be unescaped
- */
-function unescapeChat(estring) {
-	return estring
-		.replace(/<num>/g, "#")
-		.replace(/<and>/g, "&")
-		.replace(/<percent>/g, "%")
-		.replace(/<dollar>/g, "$");
-}
 
 if (window.requestIdleCallback) {
 	requestIdleCallback(function () {
 		Fingerprint2.get(options, function (components) {
 			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
 
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+				lowMemory = true;
+			}
+
+			check_https();
+
 			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 			masterserver.onopen = (evt) => onOpen(evt);
+			masterserver.onerror = (evt) => onError(evt);
 			masterserver.onmessage = (evt) => onMessage(evt);
 
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-				oldLoading = true;
-			}
+			// i don't need the ms to play alone
+			setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
 		});
 	});
 } else {
@@ -45,15 +40,27 @@ if (window.requestIdleCallback) {
 		Fingerprint2.get(options, function (components) {
 			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
 
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+				lowMemory = true;
+			}
+
+			check_https();
+
 			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
 			masterserver.onopen = (evt) => onOpen(evt);
+			masterserver.onerror = (evt) => onError(evt);
 			masterserver.onmessage = (evt) => onMessage(evt);
 
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-				oldLoading = true;
-			}
+			// i don't need the ms to play alone
+			setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
 		});
 	}, 500);
+}
+
+export function check_https() {
+	if (document.location.protocol === "https:") {
+		document.getElementById("https_error").style.display = "";
+	}
 }
 
 export function setServ(ID) {
@@ -71,18 +78,21 @@ function onOpen(_e) {
 	console.log(`Your emulated HDID is ${hdid}`);
 	masterserver.send(`ID#webAO#webAO#%`);
 
-	if (oldLoading === true) {
-		masterserver.send("askforservers#%");
-	}
-	else {
-		masterserver.send("ALL#%");
-	}
+	masterserver.send("ALL#%");
 	masterserver.send("VC#%");
 }
 
-function checkOnline(serverID, coIP) {
+/**
+ * Triggered when an network error occurs.
+ * @param {ErrorEvent} e 
+ */
+function onError(evt) {
+	document.getElementById("ms_error").style.display = "block";
+	document.getElementById("ms_error_code").innerText = `A network error occurred: ${evt.reason} (${evt.code})`;
+}
 
-	var oserv = new WebSocket("ws://" + coIP);
+function checkOnline(serverID, coIP) {
+	let oserv = new WebSocket("ws://" + coIP);
 
 	// define what the callbacks do
 	function onCOOpen(_e) {
@@ -136,31 +146,21 @@ function onMessage(e) {
 			const serverEntry = servers[i];
 			const args = serverEntry.split("&");
 			const asset = args[4] ? `&asset=${args[4]}` : "";
+			const liclass = lowMemory ? "" : "unavailable"; // don't hide the entries if we're not checking them
 
 			document.getElementById("masterlist").innerHTML +=
-				`<li id="server${i}" class="unavailable" onmouseover="setServ(${i})"><p>${args[0]}</p>`
+				`<li id="server${i}" class="${liclass}" onmouseover="setServ(${i})"><p>${args[0]}</p>`
 				+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[3]}${asset}">Watch</a>`
 				+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[3]}${asset}">Join</a></li>`;
 			server_description[i] = args[1];
-			checkOnline(i, `${args[2]}:${args[3]}`);
+			if (!lowMemory)
+				setTimeout(() => checkOnline(i, `${args[2]}:${args[3]}`), 0);
 		}
-		checkOnline(-1, "127.0.0.1:50001");
 		masterserver.close();
-	}
-	else if (header === "SN") {
-		const args = msg.split("#");
-		const i = args[1];
-		document.getElementById("masterlist").innerHTML +=
-			`<li id="server${i}" class="unavailable" onmouseover="setServ(${i})"><p>${args[5]}</p>`
-			+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[4]}">Watch</a>`
-			+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[4]}">Join</a></li>`;
-		server_description[i] = args[6];
-		masterserver.send("SR#" + i + "#%");
-		checkOnline(i, `${args[2]}:${args[3]}`);
 	}
 	else if (header === "servercheok") {
 		const args = msg.split("#").slice(1);
-		document.getElementById("clientinfo").innerHTML = `Client version: ${args[0]}`;
+		document.getElementById("clientinfo").innerHTML = `Client version: ${version} expected: ${args[0]}`;
 	}
 	else if (header === "SV") {
 		const args = msg.split("#").slice(1);

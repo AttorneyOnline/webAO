@@ -1,0 +1,22 @@
+export default [
+	"aa",
+	"chatdd",
+	"dgs",
+	"chatplvsaa",
+	"trilogy",
+	"chatfuture",
+	"legacy",
+	"dr1",
+	"chatdr2",
+	"drv3",
+	"drae",
+	"chatp3",
+	"p4",
+	"chat999",
+	"halla",
+	"homestuck",
+	"yakuza",
+	"yttd",
+	"n64zelda",
+	"papermario"
+];

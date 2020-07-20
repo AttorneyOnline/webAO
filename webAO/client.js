@@ -6,14 +6,19 @@
 
 import Fingerprint2 from 'fingerprintjs2';
 
+import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
+
 // Load some defaults for the background and evidence dropdowns
 import character_arr from "./characters.js";
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
+import sfx_arr from "./sounds.js";
+
+import chatbox_arr from "./styles/chatbox/chatboxes.js";
 
 import { EventEmitter } from "events";
 
-const version = 2.4;
+import { version } from '../package.json';
 
 let client;
 let viewport;
@@ -28,7 +33,7 @@ const serverIP = queryDict.ip;
 let mode = queryDict.mode;
 
 // Unless there is an asset URL specified, use the wasabi one
-const DEFAULT_HOST = location.hostname ? "https://s3.wasabisys.com/webao/base/" : "base/";
+const DEFAULT_HOST = location.hostname ? "https://webao-full.animatedchatroom.net/base/" : "base/";
 const AO_HOST = queryDict.asset || DEFAULT_HOST;
 const THEME = queryDict.theme || "default";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
@@ -101,9 +106,6 @@ class Client extends EventEmitter {
 
 		// Preset some of the variables
 
-		this.flip = false;
-		this.presentable = false;
-
 		this.hp = [0, 0];
 
 		this.playerID = 1;
@@ -117,18 +119,21 @@ class Client extends EventEmitter {
 		this.emotes = [];
 		this.evidences = [];
 		this.areas = [];
+		this.musics = [];
+
+		this.callwords = [];
 
 		this.resources = {
 			"holdit": {
-				"src": AO_HOST + "themes/" + THEME + "/holdit.gif",
+				"src": AO_HOST + "misc/default/holdit_bubble.png",
 				"duration": 720
 			},
 			"objection": {
-				"src": AO_HOST + "themes/" + THEME + "/objection.gif",
+				"src": AO_HOST + "misc/default/objection_bubble.png",
 				"duration": 720
 			},
 			"takethat": {
-				"src": AO_HOST + "themes/" + THEME + "/takethat.gif",
+				"src": AO_HOST + "misc/default/takethat_bubble.png",
 				"duration": 840
 			},
 			"witnesstestimony": {
@@ -141,14 +146,16 @@ class Client extends EventEmitter {
 				"duration": 1600,
 				"sfx": AO_HOST + "sounds/general/sfx-testimony2.wav"
 			},
-			"notguilty": {
-				"src": AO_HOST + "themes/" + THEME + "/notguilty.gif",
-				"duration": 2440
-			},
 			"guilty": {
 				"src": AO_HOST + "themes/" + THEME + "/guilty.gif",
-				"duration": 2870
-			}
+				"duration": 2870,
+				"sfx": AO_HOST + "sounds/general/sfx-guilty.wav"
+			},
+			"notguilty": {
+				"src": AO_HOST + "themes/" + THEME + "/notguilty.gif",
+				"duration": 2440,
+				"sfx": AO_HOST + "sounds/general/sfx-notguilty.wav"
+			},
 		};
 
 		this.selectedEmote = -1;
@@ -156,8 +163,6 @@ class Client extends EventEmitter {
 
 		this.checkUpdater = null;
 
-		// Only used for RMC/'music' packets, not EM/SM/MC packets.
-		this.musicList = Object();
 		/**
 		 * Assign handlers for all commands
 		 * If you implement a new command, you need to add it here
@@ -209,10 +214,10 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Gets the player's currently selected evidence if presentable.
+	 * Gets the current evidence ID unless the player doesn't want to present any evidence
 	 */
 	get evidence() {
-		return this.presentable ? this.selectedEvidence : 0;
+		return (document.getElementById("button_present").classList.contains("dark")) ? this.selectedEvidence : 0;
 	}
 
 	/**
@@ -254,14 +259,25 @@ class Client extends EventEmitter {
 	 * @param {number} self_offset offset to paired character (optional)
 	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
-	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim) {
+	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim, looping_sfx, screenshake) {
 		let extra_cccc = ``;
+		let extra_27 = ``;
+
 		if (extrafeatures.includes("cccc_ic_support")) {
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
+
+			if (extrafeatures.includes("looping_sfx")) {
+				const frame_screenshake = "";
+				const frame_realization = "";
+				const frame_sfx = "";
+	
+				extra_27 = `${looping_sfx}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
+			}
 		}
+		
 		const serverMessage = `MS#${deskmod}#${preanim}#${name}#${emote}` +
 			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
-			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}%`;
+			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}%`;
 		
 		console.log(serverMessage);
 		
@@ -311,7 +327,11 @@ class Client extends EventEmitter {
 	 * @param {string} message to mod
 	 */
 	sendZZ(msg) {
-		this.sendServer(`ZZ#${msg}#%`);
+		if (extrafeatures.includes("modcall_reason")) {
+			this.sendServer(`ZZ#${msg}#%`);
+		} else {
+			this.sendServer(`ZZ#%`);
+		}
 	}
 
 	/**
@@ -389,15 +409,26 @@ class Client extends EventEmitter {
 		document.querySelector('#client_themeselect [value="' + cookietheme + '"]').selected = true;
 		reloadTheme();
 
+		var cookiechatbox = getCookie("chatbox") || "dynamic";
+
+		document.querySelector('#client_chatboxselect [value="' + cookiechatbox + '"]').selected = true;
+		setChatbox(cookiechatbox);
+
 		document.getElementById("client_musicaudio").volume = getCookie("musicVolume") || 1;
 		changeMusicVolume();
-		document.getElementById("client_svolume").value = getCookie("sfxVolume") || 1;
+		document.getElementById("client_sfxaudio").volume = getCookie("sfxVolume") || 1;
 		changeSFXVolume();
+		document.getElementById("client_shoutaudio").volume = getCookie("shoutVolume") || 1;
+		changeShoutVolume();
+		document.getElementById("client_testimonyaudio").volume = getCookie("testimonyVolume") || 1;
+		changeTestimonyVolume();
 		document.getElementById("client_bvolume").value = getCookie("blipVolume") || 1;
 		changeBlipVolume();
 
 		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
 		document.getElementById("showname").checked = getCookie("showname");
+
+		document.getElementById("client_callwords").value = getCookie("callwords");
 	}
 
 	/**
@@ -478,15 +509,10 @@ class Client extends EventEmitter {
 	 */
 	cleanup() {
 		clearInterval(this.checkUpdater);
-	}
 
-	/**
-	 * XXX: a nasty hack made by gameboyprinter.
-	 * @param {string} msg chat message to prepare for display 
-	 */
-	prepChat(msg) {
-		// TODO: make this less awful
-		return unescapeChat(decodeChat(msg));
+		// the connection got rekt, get rid of the old musiclist
+		this.resetMusiclist();
+		document.getElementById("client_chartable").innerHTML = "";
 	}
 
 	/**
@@ -498,27 +524,48 @@ class Client extends EventEmitter {
 		if (args[4] !== viewport.chatmsg.content) {
 			document.getElementById("client_inner_chat").innerHTML = "";
 
+			const char_id = Number(args[9]);
+			const char_name = safe_tags(args[3]);
+
 			let msg_nameplate = args[3];
 			let msg_blips = "male";
+			let char_chatbox = "default";
+			let char_muted = false;
+
 			try {
-				msg_nameplate = this.chars[args[9]].showname;
-				msg_blips = this.chars[args[9]].gender;
+				msg_nameplate = this.chars[char_id].showname;
+				msg_blips = this.chars[char_id].gender;
+				char_chatbox = this.chars[char_id].chat;
+				char_muted = this.chars[char_id].muted;				
+
+				if(this.chars[char_id].name !== char_name) {
+					console.info(this.chars[char_id].name + " is iniediting to " + char_name);
+					const chargs = (char_name + "&" + "iniediter").split("&");
+					this.handleCharacterInfo(chargs,char_id);
+				}
 			} catch (e) {
-				//we already set defaults
+				msg_nameplate = args[3];
+				msg_blips = "male";
+				char_chatbox = "default";
+				char_muted = false;
+				console.error("we're still missing some character data");
 			}
+
+			if (char_muted === false) {
 
 			let chatmsg = {
 				deskmod: safe_tags(args[1]).toLowerCase(),
 				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
-				nameplate: msg_nameplate,				// TODO: there's a new feature that let's people choose the name that's displayed
-				name: safe_tags(args[3]),
+				nameplate: msg_nameplate,
+				chatbox: char_chatbox,
+				name: char_name,
 				sprite: safe_tags(args[4]).toLowerCase(),
-				content: this.prepChat(args[5]), // Escape HTML tags
+				content: prepChat(args[5]), // Escape HTML tags
 				side: args[6].toLowerCase(),
 				sound: safe_tags(args[7]).toLowerCase(),
 				blips: safe_tags(msg_blips),
 				type: Number(args[8]),
-				charid: Number(args[9]),
+				charid: char_id,
 				snddelay: Number(args[10]),
 				objection: Number(args[11]),
 				evidence: safe_tags(args[12]),
@@ -528,7 +575,7 @@ class Client extends EventEmitter {
 			};
 
 			if (extrafeatures.includes("cccc_ic_support")) {
-				const extra_options = {
+				const extra_cccc = {
 					showname: safe_tags(args[16]),
 					other_charid: Number(args[17]),
 					other_name: safe_tags(args[18]),
@@ -538,18 +585,48 @@ class Client extends EventEmitter {
 					other_flip: Number(args[22]),
 					noninterrupting_preanim: Number(args[23])
 				};
-				chatmsg = Object.assign(extra_options, chatmsg);
-				if (chatmsg.showname && document.getElementById("showname").checked) {
-					chatmsg.nameplate = chatmsg.showname;
-				}
+				chatmsg = Object.assign(extra_cccc, chatmsg);
+
+				if (extrafeatures.includes("looping_sfx")) {
+					const extra_27 = {
+						looping_sfx: Number(args[24]),
+						screenshake: Number(args[25]),
+						frame_screenshake: safe_tags(args[26]),
+						frame_realization: safe_tags(args[27]),
+						frame_sfx: safe_tags(args[28])
+					};
+					chatmsg = Object.assign(extra_27, chatmsg);
+				} else {
+					const extra_27 = {
+						looping_sfx: 0,
+						screenshake: 0,
+						frame_screenshake: "",
+						frame_realization: "",
+						frame_sfx: ""
+					};
+					chatmsg = Object.assign(extra_27, chatmsg);
+				}			
+			} else {
+				const extra_cccc = {
+					showname: "",
+					other_charid: 0,
+					other_name: "",
+					other_emote: "",
+					self_offset: 0,
+					other_offset: 0,
+					other_flip: 0,
+					noninterrupting_preanim: 0
+				};
+				chatmsg = Object.assign(extra_cccc, chatmsg);
 			}
 
+			// our own message appeared, reset the buttons
 			if (chatmsg.charid === this.charID) {
 				resetICParams();
 			}
 
-			if (client.chars[chatmsg.charid].muted === false)
-				viewport.say(chatmsg); // no await
+			viewport.say(chatmsg); // no await
+			}
 		}
 	}
 
@@ -559,7 +636,7 @@ class Client extends EventEmitter {
 	 */
 	handleCT(args) {
 		const oocLog = document.getElementById("client_ooclog");
-		oocLog.innerHTML += `${decodeChat(unescapeChat(args[1]))}: ${decodeChat(unescapeChat(args[2]))}\r\n`;
+		oocLog.innerHTML += `${prepChat(args[1])}: ${prepChat(args[2])}\r\n`;
 		if (oocLog.scrollTop > oocLog.scrollHeight - 600) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
@@ -570,18 +647,33 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleMC(args) {
-		const track = args[1];
-		const charID = Number(args[2]);
+		const track = prepChat(args[1]);
+		let charID = Number(args[2]);
+   
 		const music = viewport.music;
+		let musicname;
 		music.pause();
-		music.src = MUSIC_HOST + track.toLowerCase();
+		if(track.startsWith("http")) {
+			music.src = track;
+		} else {
+			music.src = MUSIC_HOST + encodeURI(track.toLowerCase());
+		}
 		music.play();
+
+		try {
+			musicname = this.chars[charID].name;
+		} catch(e) {
+			charID = -1;
+		}
+
 		if (charID >= 0) {
-			const musicname = this.chars[charID].name;
+			musicname = this.chars[charID].name;
 			appendICLog(`${musicname} changed music to ${track}`);
 		} else {
 			appendICLog(`The music was changed to ${track}`);
 		}
+
+		document.getElementById("client_trackstatustext").innerText = track;
 	}
 
 	/**
@@ -620,6 +712,7 @@ class Client extends EventEmitter {
 			} catch (err) {
 				cini = {};
 				img.classList.add("noini");
+				console.warn("character " + chargs[0] + " is missing from webAO");
 				// If it does, give the user a visual indication that the character is unusable
 			}
 
@@ -633,7 +726,8 @@ class Client extends EventEmitter {
 				name: chargs[0],
 				showname: chargs[0],
 				side: "def",
-				gender: "male"
+				gender: "male",
+				chat: "aa"
 			};
 			cini.options = Object.assign(default_options, cini.options);
 
@@ -648,6 +742,8 @@ class Client extends EventEmitter {
 				showname: safe_tags(cini.options.showname),
 				desc: safe_tags(chargs[1]),
 				gender: safe_tags(cini.options.gender).toLowerCase(),
+				side: safe_tags(cini.options.side).toLowerCase(),
+				chat: safe_tags(cini.options.chat).toLowerCase(),
 				evidence: chargs[3],
 				icon: icon,
 				inifile: cini,
@@ -675,7 +771,8 @@ class Client extends EventEmitter {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 				const chargs = args[i].split("&");
-				this.handleCharacterInfo(chargs, args[i - 1]);
+				const charid = args[i - 1];
+				setTimeout(() => this.handleCharacterInfo(chargs, charid), charid*10);
 			}
 		}
 		// Request the next pack
@@ -692,7 +789,8 @@ class Client extends EventEmitter {
 		for (let i = 1; i < args.length; i++) {
 			document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
 			const chargs = args[i].split("&");
-			this.handleCharacterInfo(chargs, i - 1);
+			const charid = i - 1;
+			setTimeout(() => this.handleCharacterInfo(chargs, charid), charid*10);
 		}
 		// We're done with the characters, request the music
 		this.sendServer("RM#%");
@@ -721,8 +819,8 @@ class Client extends EventEmitter {
 		for (let i = 1; i < args.length - 1; i++) {
 			const arg = args[i].split("&");
 			this.evidences[i - 1] = {
-				name: decodeChat(unescapeChat(arg[0])),
-				desc: decodeChat(unescapeChat(arg[1])),
+				name: prepChat(arg[0]),
+				desc: prepChat(arg[1]),
 				filename: safe_tags(arg[2]),
 				icon: AO_HOST + "evidence/" + encodeURI(arg[2].toLowerCase())
 			};
@@ -740,9 +838,55 @@ class Client extends EventEmitter {
 	}
 
 	resetMusiclist() {
-		const hmusiclist = document.getElementById("client_musiclist");
-		hmusiclist.innerHTML = "";
+		this.musics = [];
 		this.areas = [];
+		document.getElementById("client_musiclist").innerHTML = "";
+		document.getElementById("areas").innerHTML = "";		
+	}
+
+	isAudio(trackname) {
+		if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(trackname) || // regex for file extenstions
+			trackname.startsWith("=") ||
+			trackname.startsWith("-"))   // category markers
+		{
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	handleMusicInfo(trackindex,trackname) {
+		if (this.isAudio(trackname)) {
+			// After reached the audio put everything in the music list
+			const newentry = document.createElement("OPTION");
+			newentry.text = trackname;
+			document.getElementById("client_musiclist").options.add(newentry);
+			this.musics.push(trackname);
+		} else {
+			const thisarea = {
+				name: trackname,
+				players: 0,
+				status: "IDLE",
+				cm: "",
+				locked: "FREE"
+			};
+
+			this.areas.push(thisarea);
+
+			// Create area button
+			let newarea = document.createElement("SPAN");
+			newarea.classList = "area-button area-default";
+			newarea.id = "area" + trackindex;
+			newarea.innerText = thisarea.name;
+			newarea.title = "Players: <br>" +
+				"Status: <br>" +
+				"CM: ";
+			newarea.onclick = function () {
+				area_click(this);
+			};
+
+			document.getElementById("areas").appendChild(newarea);
+		}
 	}
 
 	/**
@@ -755,16 +899,16 @@ class Client extends EventEmitter {
 		if(args[1] === "0") {
 			this.resetMusiclist();
 		}
-		this.sendServer("AM#" + ((args[1] / 10) + 1) + "#%");
-		const hmusiclist = document.getElementById("client_musiclist");
+
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-				const newentry = document.createElement("OPTION");
-				newentry.text = args[i];
-				hmusiclist.options.add(newentry);
+				this.handleMusicInfo(args[i-1],safe_tags(args[i]));
 			}
 		}
+
+		// get the next batch of tracks
+		this.sendServer("AM#" + ((args[1] / 10) + 1) + "#%");
 	}
 
 	/**
@@ -774,54 +918,11 @@ class Client extends EventEmitter {
 	handleSM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
 		this.resetMusiclist();
-		const hmusiclist = document.getElementById("client_musiclist");
-		let flagAudio = false;
 
 		for (let i = 1; i < args.length - 1; i++) {
 			// Check when found the song for the first time
 			document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-			if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(args[i]) && !flagAudio) {
-				flagAudio = true;
-			}
-
-			if (flagAudio) {
-				// After reached the audio put everything in the music list
-				const newentry = document.createElement("OPTION");
-				newentry.text = args[i];
-				hmusiclist.options.add(newentry);
-			} else {
-				this.areas[i] = {
-					name: safe_tags(args[i]),
-					players: 0,
-					status: "IDLE",
-					cm: "",
-					locked: "FREE"
-				};
-
-				// Create area button
-				let newarea = document.createElement("SPAN");
-				newarea.classList = "area-button area-default";
-				newarea.id = "area" + i;
-				newarea.innerText = this.areas[i].name;
-				newarea.title = "Players: <br>" +
-					"Status: <br>" +
-					"CM: ";
-				newarea.onclick = function () {
-					area_click(this);
-				};
-
-				document.getElementById("areas").appendChild(newarea);
-			}
-		}
-
-		// We need to check if the last area that we got was actually a category
-		// header for music. If it was, then move it over to the music list.
-		const area_box = document.getElementById("areas");
-		if (area_box.lastChild.textContent.startsWith("=")) {
-			const audio_title = document.createElement("OPTION");
-			audio_title.text = area_box.lastChild.textContent;
-			hmusiclist.insertBefore(audio_title, hmusiclist.firstChild);
-			area_box.removeChild(area_box.lastChild);
+			this.handleMusicInfo(i-1,safe_tags(args[i]));
 		}
 
 		// Music done, carry on
@@ -953,15 +1054,21 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Handles a call mod message.
+	 * Handles a modcall
 	 * @param {Array} args packet arguments
 	 */
 	handleZZ(args) {
 		const oocLog = document.getElementById("client_ooclog");
-		oocLog.innerHTML += `$Alert: ${decodeChat(unescapeChat(args[1]))}\r\n`;
+		oocLog.innerHTML += `$Alert: ${prepChat(args[1])}\r\n`;
 		if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
 			oocLog.scrollTop = oocLog.scrollHeight;
 		}
+		viewport.sfxaudio.pause();
+		const oldvolume = viewport.sfxaudio.volume;
+		viewport.sfxaudio.volume = 1;
+		viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
+		viewport.sfxaudio.play();
+		viewport.sfxaudio.volume = oldvolume;
 	}
 
 	/**
@@ -994,23 +1101,23 @@ class Client extends EventEmitter {
 	 */
 	handleARUP(args) {
 		args = args.slice(1);
-		for (let i = 1; i < args.length - 1; i++) {
+		for (let i = 0; i < args.length - 2; i++) {
 			if (this.areas[i]) { // the server sends us ARUP before we even get the area list
 				const thisarea = document.getElementById("area" + i);
 				switch (Number(args[0])) {
 					case 0: // playercount				
-						this.areas[i].players = Number(args[i]);
+						this.areas[i].players = Number(args[i+1]);
 						thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players})`;
 						break;
 					case 1: // status
-						this.areas[i].status = safe_tags(args[i]);
+						this.areas[i].status = safe_tags(args[i+1]);
 						thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();
 						break;
 					case 2:
-						this.areas[i].cm = safe_tags(args[i]);
+						this.areas[i].cm = safe_tags(args[i+1]);
 						break;
 					case 3:
-						this.areas[i].locked = safe_tags(args[i]);
+						this.areas[i].locked = safe_tags(args[i+1]);
 						break;
 				}
 
@@ -1043,6 +1150,14 @@ class Client extends EventEmitter {
 		if (args.includes("cccc_ic_support")) {
 			document.getElementById("cccc").style.display = "";
 			document.getElementById("pairing").style.display = "";
+		}
+
+		if (args.includes("flipping")) {
+			document.getElementById("button_flip").style.display = "";
+		}
+
+		if (args.includes("looping_sfx")) {
+			document.getElementById("button_shake").style.display = "";
 		}
 	}
 
@@ -1089,9 +1204,9 @@ class Client extends EventEmitter {
 			let img = document.getElementById(`demo_${i}`);
 
 			if (args[i + 1] === "-1")
-				img.style = "opacity: 0.25";
+				img.style.opacity = 0.25;
 			else if (args[i + 1] === "0")
-				img.style = "";			
+				img.style.opacity = 1;			
 		}
 	}
 
@@ -1149,11 +1264,13 @@ class Client extends EventEmitter {
 					zoom: Number(emoteinfo[3]) || 0,
 					sfx: esfx.toLowerCase(),
 					sfxdelay: esfxd,
-					button_off: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
-					button_on: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_on.png`
+					frame_screenshake: "",
+					frame_realization: "",
+					frame_sfx: "",
+					button: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`
 				};
 				emotesList.innerHTML +=
-					`<img src=${emotes[i].button_off}
+					`<img src=${emotes[i].button}
 					id="emo_${i}"
 					alt="${emotes[i].desc}"
 					class="emote_button"
@@ -1208,13 +1325,19 @@ class Viewport {
 			.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
 
-		this.sfxaudio = new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav");
+		this.sfxaudio = document.getElementById("client_sfxaudio");
+		this.sfxaudio.src = `${AO_HOST}sounds/general/sfx-realization.wav`;
+
 		this.sfxplayed = 0;
 
-		this.shoutaudio = new Audio();
+		this.shoutaudio = document.getElementById("client_shoutaudio");
+		this.shoutaudio.src = `${AO_HOST}misc/default/objection.wav`;
+
+		this.testimonyAudio = document.getElementById("client_testimonyaudio");
+		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-notguilty.wav`;
 
 		this.music = document.getElementById("client_musicaudio");
-		this.music.play();
+		this.music.src = `${AO_HOST}sounds/music/trial (aa).mp3`;
 
 		this.updater = null;
 		this.testimonyUpdater = null;
@@ -1254,6 +1377,18 @@ class Viewport {
 		return `${AO_HOST}background/${encodeURI(this.bgname.toLowerCase())}/`;
 	}
 
+
+	/**
+	 * Play any SFX
+	 * 
+	 * @param {string} sfxname
+	 */
+	async playSFX(sfxname) {
+		this.sfxaudio.pause();
+		this.sfxaudio.src = sfxname;
+		this.sfxaudio.play();
+	}
+
 	/**
  * Changes the viewport background based on a given position.
  * 
@@ -1262,6 +1397,9 @@ class Viewport {
  */
 async changeBackground(position) {
 	const bgfolder = viewport.bgFolder;
+
+	const bench = document.getElementById("client_bench");
+	const court = document.getElementById("client_court");
 
 	const positions = {
 		def: {
@@ -1308,17 +1446,20 @@ async changeBackground(position) {
 
 	const { bg, desk, speedLines } = positions[position];
 
+	bench.className = position + "_bench";
+	court.className = position + "_court";
+
 	if (viewport.chatmsg.type === 5) {
-		document.getElementById("client_court").src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
-		document.getElementById("client_bench").style.display = "none";
+		court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
+		bench.style.opacity = 0;
 	} else {
-		document.getElementById("client_court").src = bgfolder + bg;
+		court.src = bgfolder + bg;
 		if (desk) {
 			const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
-			document.getElementById("client_bench").src = bgfolder + deskFilename;
-			document.getElementById("client_bench").style.display = "block";
+			bench.src = bgfolder + deskFilename;
+			bench.style.opacity = 1;
 		} else {
-			document.getElementById("client_bench").style.display = "none";
+			bench.style.opacity = 0;
 		}
 	}
 	}
@@ -1340,11 +1481,12 @@ async changeBackground(position) {
 			return;
 		}
 
-		(new Audio(client.resources[testimony].sfx)).play();
+		this.testimonyAudio.src = client.resources[testimony].sfx;
+		this.testimonyAudio.play();
 
 		const testimonyOverlay = document.getElementById("client_testimony");
 		testimonyOverlay.src = client.resources[testimony].src;
-		testimonyOverlay.style.display = "";
+		testimonyOverlay.style.opacity = 1;
 
 		this.testimonyTimer = 0;
 		this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
@@ -1451,14 +1593,13 @@ async changeBackground(position) {
 	disposeTestimony() {
 		client.testimonyID = 0;
 		this.testimonyTimer = 0;
-		document.getElementById("client_testimony").style.display = "none";
+		document.getElementById("client_testimony").style.opacity = 0;
 		clearTimeout(this.testimonyUpdater);
 	}
 
 
 	/**
 	 * Sets a new emote.
-	 * TODO: merge this and initUpdater
 	 * This sets up everything before the tick() loops starts
 	 * a lot of things can probably be moved here, like starting the shout animation if there is one
 	 * TODO: the preanim logic, on the other hand, should probably be moved to tick()
@@ -1466,33 +1607,24 @@ async changeBackground(position) {
 	 */
 	async say(chatmsg) {
 		this.chatmsg = chatmsg;
-		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(chatmsg.blips.toLowerCase())}.wav`);
 		this.textnow = "";
 		this.sfxplayed = 0;
 		this.textTimer = 0;
 		this._animating = true;
 
-		const charSprite = document.getElementById("client_char");
-		const pairSprite = document.getElementById("client_pair_char");
-		const nameBox = document.getElementById("client_name");
-		const chatBox = document.getElementById("client_chat");
-		const chatContainerBox = document.getElementById("client_chatcontainer");
-		const waitingBox = document.getElementById("client_chatwaiting");
-		const eviBox = document.getElementById("client_evi");
-		const shoutSprite = document.getElementById("client_shout");
-		const chatBoxInner = document.getElementById("client_inner_chat");
-		const fg = document.getElementById("client_fg");
-		const gamewindow = document.getElementById("client_gamewindow");
-
-		let gifLength = 0;
-
 		// stop updater
 		clearTimeout(this.updater);
+
+		const fg = document.getElementById("client_fg");
+		const gamewindow = document.getElementById("client_gamewindow");
+		const waitingBox = document.getElementById("client_chatwaiting");
 
 		// Reset CSS animation
 		fg.style.animation = "";
 		gamewindow.style.animation = "";
-		waitingBox.innerText = "";
+		waitingBox.style.opacity = 0;
+		
+		const eviBox = document.getElementById("client_evi");		
 
 		if (this.lastEvi !== this.chatmsg.evidence) {
 			eviBox.style.opacity = "0";
@@ -1500,19 +1632,30 @@ async changeBackground(position) {
 		}
 		this.lastEvi = this.chatmsg.evidence;
 
+		const charSprite = document.getElementById("client_char");
+		const pairSprite = document.getElementById("client_pair_char");
+
+		const chatContainerBox = document.getElementById("client_chatcontainer");	
+		const nameBoxInner = document.getElementById("client_inner_name");
+		const chatBoxInner = document.getElementById("client_inner_chat");
+
+		const displayname = (document.getElementById("showname").checked && this.chatmsg.showname !== "") ? this.chatmsg.showname : this.chatmsg.nameplate;
+
 		//Clear out the last message
 		chatBoxInner.innerText = this.textnow;
-		nameBox.innerText = this.chatmsg.nameplate;		
-
+		nameBoxInner.innerText = displayname;
+		
 		if (this.lastChar !== this.chatmsg.name) {
-			charSprite.style.display = "none";
+			charSprite.style.opacity = 0;
 			charSprite.src = transparentPNG;
-			pairSprite.style.display = "none";	
+			pairSprite.style.opacity = 0;
 			pairSprite.src = transparentPNG;
 		}
 		this.lastChar = this.chatmsg.name;
 
-		appendICLog(chatmsg.content, chatmsg.nameplate);
+		appendICLog(this.chatmsg.content, displayname);
+
+		checkCallword(this.chatmsg.content);
 
 		// start checking the files
 		try {
@@ -1535,15 +1678,27 @@ async changeBackground(position) {
 			this.silentSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif";
 		}
 
+		if (this.chatmsg.other_name) {
+			try {
+				const { url: pairUrl } = await this.oneSuccess([
+					this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/" + this.chatmsg.other_emote + ".png")),
+					this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/(a)" + this.chatmsg.other_emote + ".gif"))
+				]);
+				this.pairSilent = pairUrl ? pairUrl : transparentPNG;
+			} catch (error) {
+				this.pairSilent = AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/(a)" + this.chatmsg.other_emote + ".gif";
+			}
+		}
+
 		// gets which shout shall played
+		const shoutSprite = document.getElementById("client_shout");
 		const shout = this.shouts[this.chatmsg.objection];
 		if (shout) {
 			// Hide message box
-			nameBox.style.display = "none";
-			chatBox.style.display = "none";
-			chatContainerBox.style.display = "none";
+			chatContainerBox.style.opacity = 0;
 			shoutSprite.src = client.resources[shout]["src"];
-			shoutSprite.style.display = "block";
+			shoutSprite.style.opacity = 1;
+			shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
 
 			let shoutUrl;
 
@@ -1559,36 +1714,38 @@ async changeBackground(position) {
 
 			this.shoutaudio.src = shoutUrl;
 			this.shoutaudio.play();
-			this.shoutTimer = 850;
+			this.shoutTimer = client.resources[shout]["duration"];
 		} else {
 			this.shoutTimer = 0;
 		}
 
 		this.chatmsg.startpreanim = true;
+		let gifLength = 0;
 		switch (this.chatmsg.type) {
 			// case 0:
 			// normal emote, no preanim
 			case 1:
 				// play preanim
 				// Hide message box
-				nameBox.style.display = "none";
-				chatBox.style.display = "none";
-				chatContainerBox.style.display = "none";
+				chatContainerBox.style.opacity = 0;
 				// If preanim existed then determine the length
-				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/${encodeURI(chatmsg.preanim)}.gif`);
+				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}.gif`);
 				this.chatmsg.startspeaking = false;
 				break;
 			// case 5:
 			// zoom
 			default:
 				// due to a retarded client bug, we need to strip the sfx from the MS, if the preanim isn't playing
-				chatmsg.sound = "";
+				this.chatmsg.sound = "";
 				this.chatmsg.startspeaking = true;
 				break;
 		}
 		this.chatmsg.preanimdelay = parseInt(gifLength);
 
 		this.changeBackground(chatmsg.side);
+
+		setChatbox(chatmsg.chatbox);
+		resizeChatbox();
 
 		// Flip the character
 		if (this.chatmsg.flip === 1) {
@@ -1597,13 +1754,21 @@ async changeBackground(position) {
 			charSprite.style.transform = "scaleX(1)";
 		}
 
-		if (extrafeatures.includes("cccc_ic_support")) {
-			// Flip the pair character
-			if (this.chatmsg.other_flip === 1) {
-				pairSprite.style.transform = "scaleX(-1)";
-			} else {
-				pairSprite.style.transform = "scaleX(1)";
-			}
+		// flip the paired character
+		if (this.chatmsg.other_flip === 1) {
+			pairSprite.style.transform = "scaleX(-1)";
+		} else {
+			pairSprite.style.transform = "scaleX(1)";
+		}
+
+		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
+
+		// process markup
+		if(this.chatmsg.content.startsWith("~~")) {
+			chatBoxInner.style.textAlign = "center";
+			this.chatmsg.content = this.chatmsg.content.substring(2, this.chatmsg.content.length);
+		} else {
+			chatBoxInner.style.textAlign = "inherit";
 		}
 
 		this.tick();
@@ -1614,94 +1779,78 @@ async changeBackground(position) {
 	 * 
 	 * OK, here's the documentation on how this works:
 	 * 
-	 * 1 flip
-	 * For whatever reason it starts off by checking if the character is flipped, every time this is called
-	 * This is probably a TODO to move this somewhere else
-	 * 
-	 * 2 flip
-	 * If the server supports it, the same is done for the paired character
-	 * Both of these should probably be moved to say()
-	 * 
-	 * 3 _animating
+	 * 1 _animating
 	 * If we're not done with this characters animation, i.e. his text isn't fully there, set a timeout for the next tick/step to happen
 	 * 
-	 * 5 startpreanim
+	 * 2 startpreanim
 	 * If the shout timer is over it starts with the preanim
 	 * The first thing it checks for is the shake effect (TODO on client this is handled by the @ symbol and not a flag )
 	 * Then is the flash/realization effect
-	 * After that, the shout image is set to a transparent placeholder gif (TODO just hide it with CSS)
+	 * After that, the shout image set to be transparent
 	 * and the main characters preanim gif is loaded
 	 * If pairing is supported the paired character will just stand around with his idle sprite
 	 * 
-	 * 6 preanimdelay over
+	 * 3 preanimdelay over
 	 * this animates the evidence popup and finally shows the character name and message box
-	 * it sets the text color , changes the background (again TODO) and sets the character speaking sprite
+	 * it sets the text color and the character speaking sprite
 	 * 
-	 * 7 textnow != content
+	 * 4 textnow != content
 	 * this adds a character to the textbox and stops the animations if the entire message is present in the textbox
 	 * 
-	 * 8 sfx
+	 * 5 sfx
 	 * independent of the stuff above, this will play any sound effects specified by the emote the character sent.
 	 * happens after the shout delay + an sfx delay that comes with the message packet
 	 * 
 	 * XXX: This relies on a global variable `this.chatmsg`!
 	 */
 	tick() {
-		const nameBox = document.getElementById("client_name");
-		const chatBox = document.getElementById("client_chat");
-		const chatContainerBox = document.getElementById("client_chatcontainer");
+		if (this._animating) {
+			this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
+		}
+
+		const gamewindow = document.getElementById("client_gamewindow");
 		const waitingBox = document.getElementById("client_chatwaiting");
 		const charSprite = document.getElementById("client_char");
 		const pairSprite = document.getElementById("client_pair_char");
 		const eviBox = document.getElementById("client_evi");
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
-
-		if (this._animating) {
-			this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
-		}
+		const chatBox = document.getElementById("client_chat");
 
 		// TODO: preanims sometimes play when they're not supposed to
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
 			// Effect stuff
-			if (this.chatmsg.flash === 2) {
+			if (this.chatmsg.screenshake === 1) {
 				// Shake screen
-				this.sfxaudio.pause();
-				this.sfxplayed = 1;
-				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-stab.wav";
-				this.sfxaudio.play();
-				document.getElementById("client_gamewindow").style.animation = "shake 0.2s 1";
-			} else if (this.chatmsg.flash === 1) {
+				this.playSFX(AO_HOST + "sounds/general/sfx-stab.wav");
+				gamewindow.style.animation = "shake 0.2s 1";
+			}
+			if (this.chatmsg.flash === 1) {
 				// Flash screen
-				this.sfxaudio.pause();
-				this.sfxplayed = 1;
-				this.sfxaudio.src = AO_HOST + "sounds/general/sfx-realization.wav";
-				this.sfxaudio.play();
+				this.playSFX(AO_HOST + "sounds/general/sfx-realization.wav");
 				document.getElementById("client_fg").style.animation = "flash 0.4s 1";
 			}
 
 			// Pre-animation stuff
 			if (this.chatmsg.preanimdelay > 0) {
-				shoutSprite.style.display = "none";
+				shoutSprite.style.opacity = 0;
+				shoutSprite.style.animation = "";
 				const charName = this.chatmsg.name.toLowerCase();
 				const preanim = this.chatmsg.preanim.toLowerCase();
 				charSprite.src = `${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`;
-				charSprite.style.display = "";
+				charSprite.style.opacity = 1;
 			}
 
-			if (extrafeatures.includes("cccc_ic_support")) {
-				if (this.chatmsg.other_name) {
-					const pairName = this.chatmsg.other_name.toLowerCase();
-					const pairEmote = this.chatmsg.other_emote.toLowerCase();
-					pairSprite.style.left = this.chatmsg.other_offset + "%";
-					charSprite.style.left = this.chatmsg.self_offset + "%";
-					pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
-					pairSprite.style.display = "";
-				} else {
-					pairSprite.style.display = "none";
-					charSprite.style.left = 0;
-				}
-
+			if (this.chatmsg.other_name) {
+				const pairName = this.chatmsg.other_name.toLowerCase();
+				const pairEmote = this.chatmsg.other_emote.toLowerCase();
+				pairSprite.style.left = this.chatmsg.other_offset + "%";
+				charSprite.style.left = this.chatmsg.self_offset + "%";
+				pairSprite.src = this.pairSilent;
+				pairSprite.style.opacity = 1;
+			} else {
+				pairSprite.style.opacity = 0;
+				charSprite.style.left = 0;
 			}
 
 			this.chatmsg.startpreanim = false;
@@ -1726,21 +1875,18 @@ async changeBackground(position) {
 					}
 				}
 
-				chatContainerBox.style.display = "block";
+				resizeChatbox();
 
-				nameBox.style.display = "block";
-				nameBox.style.fontSize = (nameBox.offsetHeight * 0.7) + "px";
+				const chatContainerBox = document.getElementById("client_chatcontainer");
+				chatContainerBox.style.opacity = 1;
 
 				chatBoxInner.className = "text_" + this.colors[this.chatmsg.color];
-
-				chatBox.style.display = "block";
-				chatBox.style.fontSize = (chatBox.offsetHeight * 0.25) + "px";
 
 				this.chatmsg.startspeaking = false;
 
 				if (this.chatmsg.preanimdelay === 0) {
-					shoutSprite.style.display = "none";
-					this.changeBackground(this.chatmsg.side);
+					shoutSprite.style.opacity = 0;
+					shoutSprite.style.animation = "";
 				}
 
 				if (extrafeatures.includes("cccc_ic_support")) {
@@ -1749,21 +1895,21 @@ async changeBackground(position) {
 						const pairEmote = this.chatmsg.other_emote.toLowerCase();
 						pairSprite.style.left = this.chatmsg.other_offset + "%";
 						charSprite.style.left = this.chatmsg.self_offset + "%";
-						pairSprite.src = `${AO_HOST}characters/${pairName}/(a)${pairEmote}.gif`;
-						pairSprite.style.display = "";
+						pairSprite.src = this.pairSilent;
+						pairSprite.style.opacity = 1;
 					} else {
-						pairSprite.style.display = "none";
+						pairSprite.style.opacity = 0;
 						charSprite.style.left = 0;
 					}
 				}
 
 				charSprite.src = this.speakingSprite;
-				charSprite.style.display = "";
+				charSprite.style.opacity = 1;
 
 				if (this.textnow === this.chatmsg.content) {
 					charSprite.src = this.silentSprite;
-					charSprite.style.display = "";
-					waitingBox.innerHTML = "&#9654;";
+					charSprite.style.opacity = 1;
+					waitingBox.style.opacity = 1;
 					this._animating = false;
 					clearTimeout(this.updater);
 				}
@@ -1778,12 +1924,14 @@ async changeBackground(position) {
 
 					chatBoxInner.innerText = this.textnow;
 
+					// scroll to bottom
+					chatBox.scrollTop = chatBox.scrollHeight;
+
 					if (this.textnow === this.chatmsg.content) {
-						this.textTimer = 0;
 						this._animating = false;
 						charSprite.src = this.silentSprite;
-						charSprite.style.display = "";
-						waitingBox.innerHTML = "&#9654;";
+						charSprite.style.opacity = 1;
+						waitingBox.style.opacity = 1;
 						clearTimeout(this.updater);
 					}
 				}
@@ -1791,11 +1939,9 @@ async changeBackground(position) {
 		}
 
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
-			this.sfxaudio.pause();
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1" && this.chatmsg.sound !== "" && this.chatmsg.sound !== undefined) {
-				this.sfxaudio.src = AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav";
-				this.sfxaudio.play();
+				this.playSFX(AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav");
 			}
 		}
 		this.textTimer = this.textTimer + UPDATE_INTERVAL;
@@ -1845,19 +1991,23 @@ class INI {
  * @param {String} cname The name of the cookie to return
  */
 function getCookie(cname) {
-	var name = cname + "=";
-	var decodedCookie = decodeURIComponent(document.cookie);
-	var ca = decodedCookie.split(';');
-	for (var i = 0; i < ca.length; i++) {
-		var c = ca[i];
-		while (c.charAt(0) === ' ') {
-			c = c.substring(1);
+	try {
+		const name = cname + "=";
+		const decodedCookie = decodeURIComponent(document.cookie);
+		const ca = decodedCookie.split(';');
+		for (var i = 0; i < ca.length; i++) {
+			var c = ca[i];
+			while (c.charAt(0) === ' ') {
+				c = c.substring(1);
+			}
+			if (c.indexOf(name) === 0) {
+				return c.substring(name.length, c.length);
+			}
 		}
-		if (c.indexOf(name) === 0) {
-			return c.substring(name.length, c.length);
-		}
+		return "";
+	} catch (error) {
+		return "";
 	}
-	return "";
 }
 
 /**
@@ -1890,11 +2040,15 @@ export function onEnter(event) {
 	if (event.keyCode === 13) {
 		const mychar = client.character;
 		const myemo = client.emote;
-		const myevi = client.evidence;
-		const myflip = ((client.flip) ? 1 : 0);
-		const mycolor = document.getElementById("textcolor").value;
+		const evi = client.evidence;
+		const flip = ((document.getElementById("button_flip").classList.contains("dark")) ? 1 : 0);
+		const flash = ((document.getElementById("button_flash").classList.contains("dark")) ? 1 : 0);
+		const screenshake = ((document.getElementById("button_shake").classList.contains("dark")) ? 1 : 0);
+		const noninterrupting_preanim = ((document.getElementById("check_nonint").checked) ? 1 : 0);
+		const looping_sfx = ((document.getElementById("check_loopsfx").checked) ? 1 : 0);
+		const color = document.getElementById("textcolor").value;
 		const showname = document.getElementById("ic_chat_name").value;
-		const mytext = document.getElementById("client_inputbox").value;
+		const text = document.getElementById("client_inputbox").value;
 		const pairchar = document.getElementById("pair_select").value;
 		const pairoffset = document.getElementById("pair_offset").value;
 		let sfxname = "0";
@@ -1910,9 +2064,9 @@ export function onEnter(event) {
 		}
 
 		client.sendIC("chat", preanim, mychar.name, myemo.emote,
-			mytext, mychar.side,
-			sfxname, myemo.zoom, sfxdelay, selectedShout, myevi, myflip,
-			selectedEffect, mycolor, showname, pairchar, pairoffset, 0);
+			text, mychar.side,
+			sfxname, myemo.zoom, sfxdelay, selectedShout, evi, flip,
+			flash, color, showname, pairchar, pairoffset, noninterrupting_preanim, looping_sfx, screenshake);
 	}
 }
 window.onEnter = onEnter;
@@ -1924,15 +2078,36 @@ window.onEnter = onEnter;
  */
 function resetICParams() {
 	document.getElementById("client_inputbox").value = "";
-	if (selectedEffect) {
-		document.getElementById("button_effect_" + selectedEffect).className = "client_button";
-		selectedEffect = 0;
-	}
+	document.getElementById("button_flash").className = "client_button";
+	document.getElementById("button_shake").className = "client_button";
+
+	document.getElementById("sendpreanim").checked = false;
+
 	if (selectedShout) {
 		document.getElementById("button_" + selectedShout).className = "client_button";
 		selectedShout = 0;
-	}
+	}	
 }
+
+/**
+ * Triggered when the music search bar is changed
+ * @param {MouseEvent} event
+ */
+export function musiclist_filter(_event) {
+	const musiclist_element = document.getElementById("client_musiclist");
+	const searchname = document.getElementById("client_musicsearch").value;
+
+	musiclist_element.innerHTML = "";
+
+	for (const trackname of client.musics){
+		if (trackname.toLowerCase().indexOf(searchname.toLowerCase()) !== -1) { 
+			const newentry = document.createElement("OPTION");
+			newentry.text = trackname;
+			musiclist_element.options.add(newentry);
+		}
+	}		
+}
+window.musiclist_filter = musiclist_filter;
 
 /**
  * Triggered when an item on the music list is clicked.
@@ -2007,11 +2182,25 @@ window.changeMusicVolume = changeMusicVolume;
  * Triggered by the sound effect volume slider.
  */
 export function changeSFXVolume() {
-	viewport.sfxaudio.volume = document.getElementById("client_svolume").value;
-	viewport.shoutaudio.volume = document.getElementById("client_svolume").value;
-	setCookie("sfxVolume", document.getElementById("client_svolume").value);
+	setCookie("sfxVolume", document.getElementById("client_sfxaudio").volume);
 }
 window.changeSFXVolume = changeSFXVolume;
+
+/**
+ * Triggered by the shout volume slider.
+ */
+export function changeShoutVolume() {
+	setCookie("shoutVolume", document.getElementById("client_shoutaudio").volume);
+}
+window.changeShoutVolume = changeShoutVolume;
+
+/**
+ * Triggered by the testimony volume slider.
+ */
+export function changeTestimonyVolume() {
+	setCookie("testimonyVolume", document.getElementById("client_testimonyaudio").volume);
+}
+window.changeTestimonyVolume = changeTestimonyVolume;
 
 /**
  * Triggered by the blip volume slider.
@@ -2033,6 +2222,23 @@ export function reloadTheme() {
 window.reloadTheme = reloadTheme;
 
 /**
+ * Triggered by a changed callword list
+ */
+export function changeCallwords() {
+	client.callwords = document.getElementById("client_callwords").value.split('\n');
+	setCookie("callwords",client.callwords);
+}
+window.changeCallwords = changeCallwords;
+
+/**
+ * Triggered by the modcall sfx dropdown
+ */
+export function modcall_test() {
+	client.handleZZ("test#test".split("#"));
+}
+window.modcall_test = modcall_test;
+
+/**
  * Triggered by the ini button.
  */
 export async function iniedit() {
@@ -2042,6 +2248,37 @@ export async function iniedit() {
 	client.handlePV(("PV#0#CID#" + inicharID).split("#"));
 }
 window.iniedit = iniedit;
+
+/**
+ * Triggered by the change aspect ratio checkbox
+ */
+export async function switchAspectRatio() {
+	const background = document.getElementById("client_background");
+	const offsetCheck = document.getElementById("client_hdviewport_offset");
+	if(document.getElementById("client_hdviewport").checked) {
+		background.style.paddingBottom = "56.25%";
+		offsetCheck.disabled = false;
+	} else {
+		background.style.paddingBottom = "75%";
+		offsetCheck.disabled = true;
+	}
+}
+window.switchAspectRatio = switchAspectRatio;
+
+/**
+ * Triggered by the change aspect ratio checkbox
+ */
+export async function switchChatOffset() {
+	const container = document.getElementById("client_chatcontainer");
+	if(document.getElementById("client_hdviewport_offset").checked) {
+		container.style.width = "80%";
+		container.style.left = "10%";
+	} else {
+		container.style.width = "100%";
+		container.style.left = 0;
+	}
+}
+window.switchChatOffset = switchChatOffset;
 
 /**
  * Triggered when a character icon is clicked in the character selection menu.
@@ -2166,7 +2403,9 @@ export function ReconnectButton() {
 	client = new Client(serverIP);
 	if (client) {
 		mode = "join"; // HACK: see client.onOpen
+
 		document.getElementById("client_error").style.display = "none";
+
 	}
 }
 window.ReconnectButton = ReconnectButton;
@@ -2179,15 +2418,20 @@ window.ReconnectButton = ReconnectButton;
 function appendICLog(msg, name = "", time = new Date()) {
 	const entry = document.createElement("p");
 	const nameField = document.createElement("span");
-	nameField.id = "iclog_name";
+	const textField = document.createElement("span");
+	nameField.className = "iclog_name";
 	nameField.appendChild(document.createTextNode(name));
+
+	textField.className = "iclog_text";
+	textField.appendChild(document.createTextNode(msg));
+
 	entry.appendChild(nameField);
-	entry.appendChild(document.createTextNode(msg));
+	entry.appendChild(textField);
 
 	// Only put a timestamp if the minute has changed.
 	if (lastICMessageTime.getMinutes() !== time.getMinutes()) {
 		const timeStamp = document.createElement("span");
-		timeStamp.id = "iclog_time";
+		timeStamp.className = "iclog_time";
 		timeStamp.innerText = time.toLocaleTimeString(undefined, {
 			hour: "numeric",
 			minute: "2-digit"
@@ -2207,16 +2451,54 @@ function appendICLog(msg, name = "", time = new Date()) {
 }
 
 /**
+ * check if the message contains an entry on our callword list
+ * @param {String} message
+ */
+export function checkCallword(message) {
+	client.callwords.forEach(testCallword);
+
+	function testCallword(item)
+	{
+		if(item !== "" && message.toLowerCase().includes(item.toLowerCase()))
+		{
+			viewport.sfxaudio.pause();
+			viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
+			viewport.sfxaudio.play();
+		}
+	}
+}
+
+
+
+/**
+ * Triggered when the music search bar is changed
+ * @param {MouseEvent} event
+ */
+export function chartable_filter(_event) {
+	const searchname = document.getElementById("client_charactersearch").value;
+
+	client.chars.forEach(function (character, charid) {
+		const demothing = document.getElementById(`demo_${charid}`);
+		if (character.name.toLowerCase().indexOf(searchname.toLowerCase()) === -1) { 
+			demothing.style.display = "none";
+		} else {
+			demothing.style.display = "inline-block";
+		}
+	});
+}
+window.chartable_filter = chartable_filter;
+
+/**
  * Requests to play as a character.
  * @param {number} ccharacter the character ID; if this is a large number,
  * then spectator is chosen instead.
  */
 export function pickChar(ccharacter) {
-	if (ccharacter < 1000) {
-		client.sendCharacter(ccharacter);
-	} else {
+	if (ccharacter===-1) {
 		// Spectator
-		document.getElementById("client_charselect").style.display = "none";
+		document.getElementById("client_charselect").style.display = "none";		
+	} else {
+		client.sendCharacter(ccharacter);
 	}
 }
 window.pickChar = pickChar;
@@ -2228,13 +2510,13 @@ window.pickChar = pickChar;
 export function pickEmotion(emo) {
 	try {
 		if (client.selectedEmote !== -1) {
-			document.getElementById("emo_" + client.selectedEmote).src = client.emote.button_off;
+			document.getElementById("emo_" + client.selectedEmote).classList="emote_button";
 		}
 	} catch (err) {
 		// do nothing
 	}
 	client.selectedEmote = emo;
-	document.getElementById("emo_" + emo).src = client.emote.button_on;
+	document.getElementById("emo_" + emo).classList="emote_button dark";
 }
 window.pickEmotion = pickEmotion;
 
@@ -2361,6 +2643,36 @@ export function getIndexFromSelect(select_box, value) {
 window.getIndexFromSelect = getIndexFromSelect;
 
 /**
+ * Set the style of the chatbox
+ */
+export function setChatbox(style) {
+	const chatbox_theme = document.getElementById("chatbox_theme");
+	const selected_theme = document.getElementById("client_chatboxselect").value;
+	setCookie("chatbox", selected_theme);
+	if(selected_theme === "dynamic") {
+		if (chatbox_arr.includes(style)) {
+			chatbox_theme.href = "styles/chatbox/" + style + ".css";
+		} else {
+			chatbox_theme.href = "styles/chatbox/aa.css";
+		}
+	} else {
+		chatbox_theme.href = "styles/chatbox/" + selected_theme + ".css";
+	}
+}
+window.setChatbox = setChatbox;
+
+/**
+ * Set the font size for the chatbox
+ */
+export function resizeChatbox() {
+	const chatContainerBox = document.getElementById("client_chatcontainer");
+	const gameHeight = document.getElementById("client_background").offsetHeight;
+                
+	chatContainerBox.style.fontSize = (gameHeight * 0.0521).toFixed(1) + "px";
+}
+window.resizeChatbox = resizeChatbox;
+
+/**
  * Update evidence icon.
  */
 export function updateEvidenceIcon() {
@@ -2442,7 +2754,10 @@ window.randomCharacterOOC = randomCharacterOOC;
  * Call mod.
  */
 export function callMod() {
-	let modcall = prompt("Please enter the reason for the modcall", "");
+	let modcall;
+	if (extrafeatures.includes("modcall_reason")) {
+	modcall = prompt("Please enter the reason for the modcall", "");
+	}
 	if (modcall == null || modcall === "") {
 		// cancel
 	} else {
@@ -2538,45 +2853,14 @@ window.updateBackgroundPreview = updateBackgroundPreview;
  * If the same effect button is selected, then the effect is canceled.
  * @param {string} effect the new effect to be selected
  */
-export function toggleEffect(effect) {
-	if (effect === selectedEffect) {
-		document.getElementById("button_effect_" + effect).className = "client_button";
-		selectedEffect = 0;
+export function toggleEffect(button) {
+	if (button.classList.contains("dark")) {
+		button.className = "client_button";
 	} else {
-		document.getElementById("button_effect_" + effect).className = "client_button dark";
-		if (selectedEffect) {
-			document.getElementById("button_effect_" + selectedEffect).className = "client_button";
-		}
-		selectedEffect = effect;
+		button.className = "client_button dark";
 	}
 }
 window.toggleEffect = toggleEffect;
-
-/**
- * Toggle flip for in-character chat.
- */
-export function toggleFlip() {
-	if (client.flip) {
-		document.getElementById("button_flip").className = "client_button";
-	} else {
-		document.getElementById("button_flip").className = "client_button dark";
-	}
-	client.flip = !client.flip;
-}
-window.toggleFlip = toggleFlip;
-
-/**
- * Toggle presentable for presenting evidence in-character chat.
- */
-export function togglePresent() {
-	if (client.presentable) {
-		document.getElementById("button_present").className = "client_button";
-	} else {
-		document.getElementById("button_present").className = "client_button dark";
-	}
-	client.presentable = !client.presentable;
-}
-window.togglePresent = togglePresent;
 
 /**
  * Highlights and selects a menu.
@@ -2611,89 +2895,3 @@ export function toggleShout(shout) {
 	}
 }
 window.toggleShout = toggleShout;
-
-/**
- * Escapes a string to be HTML-safe.
- * 
- * XXX: This is unnecessary if we use `createTextNode` instead!
- * @param {string} unsafe an unsanitized string
- */
-function safe_tags(unsafe) {
-	if (unsafe) {
-		return unsafe
-			.replace(/&/g, "&amp;")
-			.replace(/</g, "&lt;");
-		//.replace(/"/g, "&quot;")
-		//.replace(/'/g, "&#039;");
-	} else {
-		return "";
-	}
-}
-
-/**
- * Escapes a string to AO1 escape codes.
- * @param {string} estring the string to be escaped
- */
-function escapeChat(estring) {
-	return estring
-		.replace(/#/g, "<num>")
-		.replace(/&/g, "<and>")
-		.replace(/%/g, "<percent>")
-		.replace(/\$/g, "<dollar>");
-}
-
-/**
- * Unescapes a string to AO1 escape codes.
- * @param {string} estring the string to be unescaped
- */
-function unescapeChat(estring) {
-	return estring
-		.replace(/<num>/g, "#")
-		.replace(/<and>/g, "&")
-		.replace(/<percent>/g, "%")
-		.replace(/<dollar>/g, "$");
-}
-
-/**
- * Encode text on client side.
- * @param {string} estring the string to be encoded
- */
-function encodeChat(estring) {
-	const selectedEncoding = document.getElementById("client_encoding").value;
-	if (selectedEncoding === "unicode") {
-		// This approach works by escaping all special characters to Unicode escape sequences.
-		// Source: https://gist.github.com/mathiasbynens/1243213
-		return estring.replace(/[^\0-~]/g, function (ch) {
-			return "\\u" + ("000" + ch.charCodeAt().toString(16)).slice(-4);
-		});
-	} else if (selectedEncoding === "utf16") {
-		// Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
-		const buffer = new ArrayBuffer(estring.length * 2);
-		const result = new Uint16Array(buffer);
-		for (let i = 0, strLen = estring.length; i < strLen; i++) {
-			result[i] = estring.charCodeAt(i);
-		}
-		return String(result);
-	} else {
-		return estring;
-	}
-}
-
-/**
- * Decodes text on client side.
- * @param {string} estring the string to be decoded
- */
-function decodeChat(estring) {
-	const selectedDecoding = document.getElementById("client_decoding").value;
-	if (selectedDecoding === "unicode") {
-		// Source: https://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode
-		return estring.replace(/\\u([\d\w]{1,})/gi, function (match, group) {
-			return String.fromCharCode(parseInt(group, 16));
-		});
-	} else if (selectedDecoding === "utf16") {
-		// Source: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
-		return String.fromCharCode.apply(null, new Uint16Array(estring.split(",")));
-	} else {
-		return estring;
-	}
-}

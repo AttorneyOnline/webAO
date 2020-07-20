@@ -5,17 +5,32 @@
 	<title>Attorney Online session</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="An off-the-cuff courtroom drama simulator">
+    <meta name="author" content="stonedDiscord">
+
+    <meta property="og:title" content="Attorney Online">
+    <meta property="og:description" content="Attorney Online is an online version of the world-renowned courtroom drama simulator that allows you to create and play out cases in an off-the-cuff format.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://web.aceattorneyonline.com/">
+    <meta property="og:image" content="https://repository-images.githubusercontent.com/78860508/89fcba80-aafd-11e9-80db-c5b10c01aba9">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Attorney Online">
+    <meta property="twitter:description" content="Attorney Online is an online version of the world-renowned courtroom drama simulator that allows you to create and play out cases in an off-the-cuff format.">
+    <meta property="twitter:url" content="http://web.aceattorneyonline.com/">
+    <meta property="twitter:image" content="https://repository-images.githubusercontent.com/78860508/89fcba80-aafd-11e9-80db-c5b10c01aba9">
 
 	<meta http-equiv="Content-Security-Policy" content="script-src-elem 'self' 'unsafe-inline' https://ajax.googleapis.com;
 														script-src 'self' 'unsafe-inline' 'unsafe-eval' https://ajax.googleapis.com;
 														style-src-elem 'self' 'unsafe-inline' https://golden-layout.com;
 														style-src 'self' 'unsafe-inline' https://golden-layout.com;
-														img-src 'self' data: https://webao.animatedchatroom.net https://s3.wasabisys.com;
-														connect-src 'self' ws: https://webao.animatedchatroom.net https://s3.wasabisys.com;
-														media-src 'self' https://webao.animatedchatroom.net https://s3.wasabisys.com;">
+														img-src 'self' data: file: *;
+														connect-src 'self' ws: file: *;
+														media-src 'self' file: *;">
 
-	<link rel="stylesheet" type="text/css" href="styles/client.css?v=1.0.0" id="client_stylesheet">
-	<link rel="stylesheet" type="text/css" href="styles/default.css?v=1.0.0" id="client_theme">
+	<link rel="stylesheet" type="text/css" href="styles/client.css?v=1.0.2" id="client_stylesheet">
+	<link rel="stylesheet" type="text/css" href="styles/default.css?v=1.0.1" id="client_theme">
+	<link rel="stylesheet" type="text/css" href="styles/chatbox/aa.css?v=1.0.1" id="chatbox_theme">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
 	<link type="text/css" rel="stylesheet"
@@ -23,7 +38,7 @@
 	<script src="lib/jdataview.min.js"></script>
 	<script src="lib/gify.min.js"></script>
 	<script src="ui.b.js"></script>
-	<script src="client.b.js?v=1.0.1"></script>
+	<script src="client.b.js?v=1.0.2"></script>
 </head>
 
 <body>
@@ -35,9 +50,10 @@
 	</div>
 	<div id="client_charselect">
 		<p>Choose your character</p>
-		<button onclick="pickChar(1001)">Or spectate</button>
-		<br>
-		<br>
+		<button onclick="pickChar(-1)">Or spectate</button>
+		<br><br>
+		<input id="client_charactersearch" placeholder="Search" oninput="chartable_filter(event)"></input>
+		<br><br>
 		<div id="client_chartable"></div>
 	</div>
 	<div id="client_error" class="error" style="display: none">
@@ -55,20 +71,24 @@
 		<div id="client_background">
 			<div id="client_gamewindow">
 				<img id="client_court" alt="Courtroom backdrop" onerror="imgError(this);">
-				<img id="client_pair_char" alt="Paired character" style="display: none;" onerror="charError(this);">
+				<img id="client_pair_char" alt="Paired character" onerror="charError(this);">
 				<img id="client_char" alt="Character" onerror="charError(this);">
 				<img id="client_bench">
 				<img id="client_fg" alt="Various overlay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
 				<img id="client_evi" src="" alt="Character Evidence" onerror="imgError(this);">
+				<img id="client_testimony" alt="Testimony overlay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" onerror="imgError(this);">
 				<img id="client_shout" alt="Shout overlay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
-				<div id="client_chatcontainer">
-					<div id="client_name"></div>
+				<div id="client_chatcontainer" style="font-size: 12px; opacity: 0;">
+					<div id="client_chatdecoration"></div>
+					<div id="client_name">
+						<p id="client_inner_name"></p>
+					</div>
 					<div id="client_chat">
 						<p id="client_inner_chat"></p>
-						<div id="client_chatwaiting">&#9654;</div>
+						<div id="client_chatwaiting">&#9658;</div>
 					</div>
 				</div>
-				<img id="client_testimony" alt="Testimony overlay" style="display: none;" onerror="imgError(this);">
+				<div id="client_trackstatus" style="display: none;"><p id="client_trackstatustext">None</p></div>
 			</div>
 		</div>
 		<div id="client_iccontrols">
@@ -86,7 +106,8 @@
 			<div id="client_emo">
 			</div>
 			<br>
-			<div id="client_buttons">
+			<div id="character_options">
+				<div id="emote_options">
 				<button id="button_1" alt="Hold it!" class="client_button" onclick="toggleShout(1)">Hold it!</button>
 				<button id="button_2" alt="OBJECTION!" class="client_button"
 					onclick="toggleShout(2)">OBJECTION!</button>
@@ -108,9 +129,59 @@
 				<input type="checkbox" id="sendpreanim" name="sendpreanim" value="sendpreanim">
 				<br>
 				<br>
-				<button id="button_flip" alt="Flip" class="client_button" onclick="toggleFlip()">Flip</button>
-				<button id="button_effect_1" alt="Flash" class="client_button" onclick="toggleEffect(1)">Flash</button>
-				<button id="button_effect_2" alt="Shake" class="client_button" onclick="toggleEffect(2)">Shake</button>
+				<button id="button_flip"  alt="Flip"  class="client_button" onclick="toggleEffect(this)" style="display: none">Flip</button>
+				<button id="button_flash" alt="Flash" class="client_button" onclick="toggleEffect(this)">Flash</button>
+				<button id="button_shake" alt="Shake" class="client_button" onclick="toggleEffect(this)" style="display: none">Shake</button>
+			</div>
+			<br>
+			<br>
+			<div id="character_options">
+				<label for="role_select">Role:</label>
+				<select id="role_select" name="role_select" onchange="changeRoleOOC()">
+					<option value="def">Defense</option>
+					<option value="pro">Prosecution</option>
+					<option value="jud">Judge</option>
+					<option value="wit">Witness</option>
+					<option value="hld">Helper Defense</option>
+					<option value="hlp">Helper Prosecution</option>
+					<option value="jur">Jury</option>
+					<option value="sea">Seance</option>
+				</select>
+				<br>
+				<br>
+				<button id="char_change" alt="Change" class="client_button hover_button" onclick="changeCharacter()">Change
+					Character</button>
+				<button id="char_random" alt="Random" class="client_button hover_button"
+					onclick="randomCharacterOOC()">Random Character</button>
+				<br>
+				<br>
+				<span id="pairing" style="display: none">
+					<label for="pair_select">Pairing partner:</label>
+					<select name="pair_select" id="pair_select">
+						<option value="-1">None</option>
+					</select>
+					<br>
+					<label for="pair_offset">Pairing offset:</label>
+					<input type="range" name="pair_offset" id="pair_offset" min="-100" max="100" value="0">
+				</span>
+				<br>
+				<br>
+				<span id="cccc" style="display: none">
+					<label for="ic_chat_name">Custom Showname:</label>
+					<input id="ic_chat_name" name="ic_chat_name" type="text">
+					<br>
+					<label for="showname">Show others:</label>
+					<input id="showname" name="showname" type="checkbox" onclick="showname_click()">
+					<br>
+					<br>
+					<label for="check_nonint">Noninterrupting Preanimation:</label>
+					<input type="checkbox" name="check_nonint" id="check_nonint">
+				</span>	
+				<span id="2.7" style="display: none">
+					<label for="check_nonint">Looping SFX:</label>
+					<input type="checkbox" name="check_loopsfx" id="check_loopsfx">
+				</span>
+			</div>			
 			</div>
 			<fieldset style="margin:10px;">
 				<legend>Actions</legend>
@@ -151,15 +222,6 @@
 				<!-- No Commands -->
 				<span id="no_action">
 					No judge actions available for this role.
-				</span>
-				<br>
-				<span id="pairing" style="display: none">
-					<label for="pair_select">Pairing partner:</label>
-					<select name="pair_select" id="pair_select">
-						<option value="-1">None</option>
-					</select>
-					<label for="pair_offset">Pairing offset:</label>
-					<input type="range" name="pair_offset" id="pair_offset" min="-100" max="100" value="0">
 				</span>
 				<br>
 				<br>
@@ -218,7 +280,7 @@
 					<select id="bg_select" name="bg_select" onchange="updateBackgroundPreview()"
 						style="margin-top:10px"></select>
 					<br>
-					<input id="bg_filename" name="bg_filename" class="short" type="text" style="margin-top:10px">
+					<input id="bg_filename" name="bg_filename" type="text" style="margin-top:10px">
 					<br>
 					<br>
 					<button id="bg_change" alt="Change" class="client_button hover_button"
@@ -232,18 +294,19 @@
 			<meta name="frame-title" lang="en" content="Evidence">
 			<fieldset style="text-align: left; display: flex; flex-direction: column;">
 				<legend>Information</legend>
-				<div style="display: flex;">
+				<hr>
+				<div style="display: flex;">					
 					<img id="evi_preview" class="evi_icon" src="" alt="Evidence Icon" onerror="imgError(this);">
 					<div id="evi_options">
+						<input id="evi_name" name="evi_name" type="text" placeholder="Evidence name">
+						<br>
 						<label for="evi_filename">Icon:</label>
 						<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
-						<input id="evi_filename" name="evi_filename" class="short" type="text"
+						<input id="evi_filename" name="evi_filename" type="text"
 							placeholder="Custom filename">
-						<br>
-						<label for="evi_name">Name:</label>
-						<input id="evi_name" name="evi_name" class="short" type="text" placeholder="Evidence name">
 					</div>
 				</div>
+				<hr>
 				<div style="display: flex; padding-top: 5px;">
 					<textarea id="evi_desc" name="evi_desc" rows="2" cols="20"
 						placeholder="Evidence description"></textarea>
@@ -262,67 +325,89 @@
 			<br>
 			<div id="evidences"></div>
 			<br>
-			<button id="button_present" alt="Present" class="client_button" onclick="togglePresent()"
-				style="letter-spacing: 3px; width: 8em;"><i>Present</i></button>
+			<button id="button_present" alt="Present" class="client_button" onclick="toggleEffect(this)">Present</button>
 		</span>
 
 		<!-- Settings section -->
 		<span class="menu_content" id="content_3">
 			<meta name="frame-title" lang="en" content="Settings">
-			<label for="OOC_name">Server chat name:</label>
-			<input id="OOC_name" name="OOC_name" class="short" type="text">
-			<label for="role_select">Role:</label>
-			<select id="role_select" name="role_select" onchange="changeRoleOOC()">
-				<option value="def">Defense</option>
-				<option value="pro">Prosecution</option>
-				<option value="jud">Judge</option>
-				<option value="wit">Witness</option>
-				<option value="hld">Helper Defense</option>
-				<option value="hlp">Helper Prosecution</option>
-				<option value="jur">Jury</option>
-				<option value="sea">Seance</option>
-			</select>
-			<br>
-			<br>
-			<span id="cccc" style="display: none">
-				<label for="ic_chat_name">Custom Showname:</label>
-				<input id="ic_chat_name" name="ic_chat_name" class="short" type="text">
-				<label for="showname">Show others:</label>
-				<input id="showname" name="showname" type="checkbox" onclick="showname_click()">
-			</span>
-			<br>
-			<br>
+			<h2>Volume</h2>
 			<p>Music</p>
 			<audio id="client_musicaudio" onvolumechange="changeMusicVolume()" controls loop></audio>
 
 			<p>SFX</p>
-			<input id="client_svolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
-					onchange="changeSFXVolume()">
+			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" controls></audio>
+
+			<p>Shouts</p>
+			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" controls></audio>
+			
+			<p>Testimony/Guilty</p>
+			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" controls></audio>
 
 			<p>Blip</p>
 			<input id="client_bvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
 					onchange="changeBlipVolume()">
 			<br>
 			<br>
-			<button id="char_change" alt="Change" class="client_button hover_button" onclick="changeCharacter()">Change
-				Character</button>
-			<button id="char_random" alt="Random" class="client_button hover_button"
-				onclick="randomCharacterOOC()">Random Character</button>
-			<br>
-			<br>
-			<label for="client_themeselect">Theme:</label>
+			<label for="client_themeselect">Menu theme:</label>
 			<select id="client_themeselect" name="client_themeselect" onchange="reloadTheme()">
 				<option value="default" selected>Default</option>
 				<option value="classic">Classic</option>
 				<option value="soj">DD / SoJ</option>
-				<option value="cyber">Cyber (WIP)</option>
+				<option value="cyber">Cyber</option>
+				<option value="trilogy">Trilogy</option>
 			</select>
+			<br>
+			<br>
+			<label for="client_chatboxselect">Chatbox theme:</label>
+			<select id="client_chatboxselect" name="client_chatboxselect" onchange="setChatbox(this.value)">
+				<option value="dynamic" selected>Use characters</option>
+				<option value="aa">AA</option>
+				<option value="chatdd">DD / SoJ</option>
+				<option value="dgs">DGS</option>
+				<option value="chatplvsaa">PL vs AA</option>
+				<option value="trilogy">Trilogy</option>
+				<option value="chatfuture">Future theme</option>
+				<option value="legacy">old webAO</option>
+				<option value="chat999">999</option>
+				<option value="dr1">DR 1</option>
+				<option value="chatdr2">DR 2</option>
+				<option value="drv3">DR 3</option>
+				<option value="drae">DR: AE</option>
+				<option value="homestuck">Homestuck</option>
+				<option value="n64zelda">N64 Zelda</option>
+				<option value="papermario">Paper Mario</option>
+				<option value="chatp3">Persona 3</option>
+				<option value="p4">Persona 4</option>
+				<option value="halla">VA-11 HALL-A</option>
+				<option value="yakuza">Yakuza</option>
+				<option value="yttd">YTTD</option>
+			</select>
+			<!--
+			<br>
+			<br>
+			<button id="client_modcall" onclick="modcall_test()">Test modcall</button>
+			-->
 			<br>
 			<br>
 			<p>Ini editing (experimental)</p>
 			<label for="client_ininame">Iniedit Character:</label>
 			<select type="text" id="client_ininame" name="client_ininame"></select>
 			<button id="client_inichange" onclick="iniedit()">Change</button>
+			<br>
+			<br>
+			<p>16:9 viewport (experimental)</p>
+			<label for="client_hdviewport">Enable:</label>
+			<input type="checkbox" id="client_hdviewport" id="client_hdviewport" onclick="switchAspectRatio()">
+			<br>
+			<label for="client_hdviewport_offset">Offset chatbox:</label>
+			<input type="checkbox" id="client_hdviewport_offset" id="client_hdviewport_offset" onclick="switchChatOffset()">
+			<br>
+			<br>
+			<label for="client_callwords">Callwords:</label>
+			<br>
+			<textarea id="client_callwords" name="client_callwords" rows="4" cols="10"
+						placeholder="Put 1 callword per line here" onchange="changeCallwords()"></textarea>
 			<br>
 			<br>
 			<span style="color:red">&#8595; Only touch these settings if you know what you are doing. &#8595;</span>
@@ -345,15 +430,15 @@
 			<br>
 			<br>
 			<label for="bg_command">Change background command:</label>
-			<input id="bg_command" name="bg_command" class="short" type="text" value="bg $1">
+			<input id="bg_command" name="bg_command" type="text" value="bg $1">
 			<br>
 			<br>
 			<label for="role_command">Change role command:</label>
-			<input id="role_command" name="role_command" class="short" type="text" value="pos $1">
+			<input id="role_command" name="role_command" type="text" value="pos $1">
 			<br>
 			<br>
 			<label for="randomchar_command">Random character command:</label>
-			<input id="randomchar_command" name="randomchar_command" class="short" type="text" value="randomchar">
+			<input id="randomchar_command" name="randomchar_command" type="text" value="randomchar">
 			<br>
 			<br>
 			<span style="color:blue">Changing these settings will save them as a cookie.<br>
@@ -372,6 +457,7 @@
 				<a href="https://github.com/oldmud0">@oldmud0</a> and
 				<a href="https://github.com/qubrick">Qubrick</a>.</p>
 			<p>Special thanks to Aleks for reverse engineering the original Delphi client written by FanatSors.</p>
+			<p><a href="styles/igiari/readme.txt">Igiari font by Caveras</a></p>
 		</span>
 	</div>
 </template>
@@ -387,13 +473,16 @@
 	<meta name="frame-title" lang="en" content="Server">
 	<div style="height: 100%; display: flex; flex-direction: column;">
 		<textarea id="client_ooclog" style="flex: 1 auto" readonly></textarea>
-		<input id="client_oocinputbox" class="long" type="text" onkeypress="onOOCEnter(event)">
+		<span style="display: inline-block; white-space: nowrap;">
+			<input id="OOC_name" style="width: 15%;" name="OOC_name" type="text">
+			<input id="client_oocinputbox" style="width: 85%;" type="text" onkeypress="onOOCEnter(event)">
+		</span>
 	</div>
 </template>
 
 <template id="music">
 	<meta name="frame-title" lang="en" content="Music">
-	<input id="client_musicsearch" style="display:none"></input>
+	<input id="client_musicsearch" placeholder="Search" oninput="musiclist_filter(event)"></input>
 	<select id="client_musiclist" size="5" onchange="musiclist_click(event)">
 	</select>
 </template>

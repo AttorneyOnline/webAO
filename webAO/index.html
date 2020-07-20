@@ -1,11 +1,22 @@
 <html>
-
 <head>
     <title>Attorney Online ONLINE</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="An off-the-cuff courtroom drama simulator">
+    <meta name="author" content="stonedDiscord">
+
+    <meta property="og:title" content="Attorney Online">
+    <meta property="og:description" content="Attorney Online is an online version of the world-renowned courtroom drama simulator that allows you to create and play out cases in an off-the-cuff format.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://web.aceattorneyonline.com/">
+    <meta property="og:image" content="https://repository-images.githubusercontent.com/78860508/89fcba80-aafd-11e9-80db-c5b10c01aba9">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Attorney Online">
+    <meta property="twitter:description" content="Attorney Online is an online version of the world-renowned courtroom drama simulator that allows you to create and play out cases in an off-the-cuff format.">
+    <meta property="twitter:url" content="http://web.aceattorneyonline.com/">
+    <meta property="twitter:image" content="https://repository-images.githubusercontent.com/78860508/89fcba80-aafd-11e9-80db-c5b10c01aba9">
 
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self' 'unsafe-inline' 'unsafe-eval' *.aceattorneyonline.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws:;">
@@ -60,6 +71,20 @@
     </nav>
     <div id="serverlist_container">
         <h2>Server List</h2>
+        <div id="https_error" class="error" style="display: none;">
+            <p>https is not supported</p>
+            <p>Please <a href="http://web.aceattorneyonline.com/">click here</a> to be redirected to the http version</p>
+        </div>
+        <div id="ms_error" class="error" style="display: none;">
+            <p>Could not connect to the master server.</p>
+            <p>Please check your firewall.</p>
+            <p id="ms_error_code">A network error occurred</p>
+        </div>
+        <noscript>
+        <div id="js_error" class="error">
+            <p>webAO requires JavaScript to work</p>
+        </div>
+        </noscript>
         <ul class="serverlist" id="masterlist">
             <li id="server-2" class="unavailable" onmouseover="setServ(-2)">
                 <p>Objection Maker</p>

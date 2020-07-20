@@ -144,7 +144,9 @@
 	box-shadow: 0 0 0 1px #EFAD21;
 }
 
-#content {}
+.error {
+	color: orangered;
+}
 
 ul.navbar-nav.ml-auto {
 	display: inline-flex;

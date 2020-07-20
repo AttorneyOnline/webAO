@@ -1,0 +1,108 @@
+.text_white {
+	color: #fff;
+}
+
+.text_green {
+	color: #00c900;
+}
+
+.text_red {
+	color: #ff1700;
+}
+
+.text_orange {
+	color: #ffa500;
+}
+
+.text_blue {
+	color: #67b7ed;
+}
+
+.text_yellow {
+	color: #ff0;
+}
+
+.text_pink {
+	color: #ffc0cb;
+}
+
+.text_cyan {
+	color: #0ff;
+}
+
+#client_chatcontainer {
+	position: absolute;
+	bottom: 0;
+	height: 30%;
+	width: 100%;
+    font-family: "FOTK-Yoon Mincho 740", serif;
+}
+
+#client_name {
+    display: block;
+    background-color: #2989bd;
+    top: 0;
+    left: 10%;
+	padding: 0 10px;
+    height: 20%;
+    min-width: 15%;
+    border: 1px white;
+    border-style: solid none solid none;
+    position: absolute;
+    z-index: 1;
+}
+
+#client_inner_name {
+	margin: 0;
+}
+
+#client_chat {
+	font-size: 1em;
+	display: block;
+	width: 100%;
+	margin: auto;
+	height: 90%;
+	top: 10%;
+	position: absolute;
+	word-break: keep-all;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	text-align: left;
+	overflow: hidden;
+    scroll-behavior: smooth;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAL0lEQVQImWOQ98nYzGsVupnXKnSzvE8GCmaASWBTgF8S3VhkNgOySnRTiJdENxYAYC1Ff2vnYrkAAAAASUVORK5CYII=) repeat;
+    border: 1px white;
+    border-style: solid none solid none;
+}
+
+#client_inner_chat {
+	margin: 4px;
+	padding: 2% 5%;
+}
+
+#client_chatwaiting {
+    display: block;
+    color: transparent;
+	right: 0.6em;
+	bottom: 0.6em;
+    width: 1em;
+    height: 1em;
+    background-image: url("chatwaiting_triology.svg");
+    background-size: contain;
+	position: absolute;
+	animation: idling 0.5s ease infinite;
+}
+
+@keyframes idling {
+	0% {
+		right: 0.6em;
+	}
+
+	25% {
+		right: 0.7em;
+    }
+
+	100% {
+		right: 0.6em;
+	}
+}
