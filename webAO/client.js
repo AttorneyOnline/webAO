@@ -92,6 +92,7 @@ let lastICMessageTime = new Date(0);
 class Client extends EventEmitter {
 	constructor(address) {
 		super();
+		console.log("mode: " + mode);
 		if (mode !== "replay") {
 			this.serv = new WebSocket("ws://" + address);
 			// Assign the websocket events
@@ -99,6 +100,8 @@ class Client extends EventEmitter {
 			this.serv.addEventListener("close", this.emit.bind(this, "close"));
 			this.serv.addEventListener("message", this.emit.bind(this, "message"));
 			this.serv.addEventListener("error", this.emit.bind(this, "error"));
+		} else {
+			this.joinServer();
 		}
 
 		this.on("open", this.onOpen.bind(this));
@@ -197,6 +200,7 @@ class Client extends EventEmitter {
 		this.on("decryptor", this.handleDecryptor.bind(this));
 		this.on("PV", this.handlePV.bind(this));
 		this.on("CHECK", () => { });
+		this.on("CH", () => { });
 
 		this._lastTimeICReceived = new Date(0);
 	}
@@ -227,8 +231,22 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
 	sendServer(message) {
-		// console.log(message);
-		this.serv.send(message);
+		console.debug("C: " + message);
+		if (mode === "replay") {
+			this.sendSelf(message);
+		} else {
+			this.serv.send(message);
+		}
+	}
+
+	/**
+	 * Hook for sending messages to the client
+	 * @param {string} message the message to send
+	 */
+	sendSelf(message) {
+		document.getElementById("client_ooclog").innerHTML += message + "\r\n";
+		const message_event = new MessageEvent('websocket', { data: message });
+		this.onMessage(message_event);
 	}
 
 	/**
@@ -280,8 +298,6 @@ class Client extends EventEmitter {
 		const serverMessage = `MS#${deskmod}#${preanim}#${name}#${emote}` +
 			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
 			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}%`;
-		
-		console.log(serverMessage);
 		
 		this.sendServer(serverMessage);
 	}
@@ -484,7 +500,7 @@ class Client extends EventEmitter {
 	 */
 	onMessage(e) {
 		const msg = e.data;
-		console.debug(msg);
+		console.debug("S: " + msg);
 
 		const lines = msg.split("%");
 		const args = lines[0].split("#");
@@ -1082,6 +1098,8 @@ class Client extends EventEmitter {
 		this.serverSoftware = args[2].split("&")[0];
 		if (this.serverSoftware === "serverD")
 			this.serverVersion = args[2].split("&")[1];
+		else if (this.serverSoftware === "webAO")
+			this.sendSelf("PN#0#0#%");
 		else
 			this.serverVersion = args[3];
 
@@ -1283,6 +1301,14 @@ class Client extends EventEmitter {
 		}
 		pickEmotion(1);
 		}
+	}
+
+	/**
+	 * we are asking ourselves what characters there are
+	 * @param {Array} args packet arguments
+	 */
+	handleaskChaa(_args) {
+		this.onMessage("SC#Phoenix#PhoenixSOJ#Young Mia#Grossberg#%");
 	}
 }
 
