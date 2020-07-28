@@ -9,7 +9,6 @@ import Fingerprint2 from 'fingerprintjs2';
 import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
-import character_arr from "./characters.js";
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 import sfx_arr from "./sounds.js";
@@ -380,12 +379,6 @@ class Client extends EventEmitter {
 	loadResources() {
 		document.getElementById("client_version").innerText = "version " + version;
 
-		// Load iniedit character array to select
-		const iniedit_select = document.getElementById("client_ininame");
-		character_arr.forEach(inicharacter => {
-			iniedit_select.add(new Option(inicharacter));
-		});
-
 		// Load background array to select
 		const background_select = document.getElementById("bg_select");
 		background_select.add(new Option("Custom", 0));
@@ -720,6 +713,8 @@ class Client extends EventEmitter {
 			mute_select.add(new Option(safe_tags(chargs[0]), charid));
 			const pair_select = document.getElementById("pair_select");
 			pair_select.add(new Option(safe_tags(chargs[0]), charid));
+			const iniedit_select = document.getElementById("client_ininame");
+			iniedit_select.add(new Option(safe_tags(chargs[0])));
 
 			// sometimes ini files lack important settings
 			const default_options = {
