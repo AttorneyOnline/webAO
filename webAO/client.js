@@ -261,6 +261,7 @@ class Client extends EventEmitter {
 	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim, looping_sfx, screenshake) {
 		let extra_cccc = ``;
 		let extra_27 = ``;
+		let extra_28 = ``;
 
 		if (extrafeatures.includes("cccc_ic_support")) {
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
@@ -271,12 +272,18 @@ class Client extends EventEmitter {
 				const frame_sfx = "";
 	
 				extra_27 = `${looping_sfx}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
+				if (extrafeatures.includes("effects")) {
+					const additive = 0;
+					const effect = "";
+		
+					extra_28 = `${additive}#${effect}#`;
+				}
 			}
 		}
 		
 		const serverMessage = `MS#${deskmod}#${preanim}#${name}#${emote}` +
 			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
-			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}%`;
+			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
 		
 		console.log(serverMessage);
 		
