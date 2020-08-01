@@ -267,14 +267,14 @@ class Client extends EventEmitter {
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
 
 			if (extrafeatures.includes("looping_sfx")) {
-				const frame_screenshake = "";
-				const frame_realization = "";
-				const frame_sfx = "";
+				const frame_screenshake = "-";
+				const frame_realization = "-";
+				const frame_sfx = "-";
 	
 				extra_27 = `${looping_sfx}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
 				if (extrafeatures.includes("effects")) {
 					const additive = 0;
-					const effect = "";
+					const effect = "-";
 		
 					extra_28 = `${additive}#${effect}#`;
 				}
