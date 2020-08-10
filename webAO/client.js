@@ -1599,6 +1599,27 @@ async changeBackground(position) {
 		clearTimeout(this.testimonyUpdater);
 	}
 
+	/**
+	 * Sets all the img tags to the right sources
+	 * @param {*} chatmsg 
+	 */
+	setEmote(charactername, emotename, prefix, pair) {
+		const pairID = pair ? "pair" : "char";
+		const characterFolder = AO_HOST + "characters/";
+
+		const  gif_s = document.getElementById("client_" + pairID + "_gif");
+		const  png_s = document.getElementById("client_" + pairID + "_png");
+		const apng_s = document.getElementById("client_" + pairID +"_apng");
+
+		//hide the last sprite
+		gif_s.src = transparentPNG;
+		png_s.src = transparentPNG;
+		apng_s.src = transparentPNG;
+
+		gif_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.gif`;
+		png_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(emotename)}.png`;
+		apng_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.apng`;
+	}
 
 	/**
 	 * Sets a new emote.
@@ -1634,8 +1655,8 @@ async changeBackground(position) {
 		}
 		this.lastEvi = this.chatmsg.evidence;
 
-		const charSprite = document.getElementById("client_char");
-		const pairSprite = document.getElementById("client_pair_char");
+		const charLayers = document.getElementById("client_char");
+		const pairLayers = document.getElementById("client_pair_char");
 
 		const chatContainerBox = document.getElementById("client_chatcontainer");	
 		const nameBoxInner = document.getElementById("client_inner_name");
@@ -1648,10 +1669,8 @@ async changeBackground(position) {
 		nameBoxInner.innerText = displayname;
 		
 		if (this.lastChar !== this.chatmsg.name) {
-			charSprite.style.opacity = 0;
-			charSprite.src = transparentPNG;
-			pairSprite.style.opacity = 0;
-			pairSprite.src = transparentPNG;
+			charLayers.style.opacity = 0;
+			pairLayers.style.opacity = 0;
 		}
 		this.lastChar = this.chatmsg.name;
 
@@ -1751,16 +1770,16 @@ async changeBackground(position) {
 
 		// Flip the character
 		if (this.chatmsg.flip === 1) {
-			charSprite.style.transform = "scaleX(-1)";
+			charLayers.style.transform = "scaleX(-1)";
 		} else {
-			charSprite.style.transform = "scaleX(1)";
+			charLayers.style.transform = "scaleX(1)";
 		}
 
 		// flip the paired character
 		if (this.chatmsg.other_flip === 1) {
-			pairSprite.style.transform = "scaleX(-1)";
+			pairLayers.style.transform = "scaleX(-1)";
 		} else {
-			pairSprite.style.transform = "scaleX(1)";
+			pairLayers.style.transform = "scaleX(1)";
 		}
 
 		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
@@ -1812,12 +1831,18 @@ async changeBackground(position) {
 
 		const gamewindow = document.getElementById("client_gamewindow");
 		const waitingBox = document.getElementById("client_chatwaiting");
-		const charSprite = document.getElementById("client_char");
-		const pairSprite = document.getElementById("client_pair_char");
+		const charLayers = document.getElementById("client_char");
+		const pairLayers = document.getElementById("client_pair_char");
 		const eviBox = document.getElementById("client_evi");
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 		const chatBox = document.getElementById("client_chat");
+
+		const charName = this.chatmsg.name.toLowerCase();
+		const charEmote = this.chatmsg.sprite.toLowerCase();
+
+		const pairName = this.chatmsg.other_name.toLowerCase();
+		const pairEmote = this.chatmsg.other_emote.toLowerCase();
 
 		// TODO: preanims sometimes play when they're not supposed to
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
@@ -1836,23 +1861,19 @@ async changeBackground(position) {
 			// Pre-animation stuff
 			if (this.chatmsg.preanimdelay > 0) {
 				shoutSprite.style.opacity = 0;
-				shoutSprite.style.animation = "";
-				const charName = this.chatmsg.name.toLowerCase();
+				shoutSprite.style.animation = "";				
 				const preanim = this.chatmsg.preanim.toLowerCase();
-				charSprite.src = `${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`;
-				charSprite.style.opacity = 1;
+				this.setEmote(charName,preanim,"",false);
+				charLayers.style.opacity = 1;
 			}
 
 			if (this.chatmsg.other_name) {
-				const pairName = this.chatmsg.other_name.toLowerCase();
-				const pairEmote = this.chatmsg.other_emote.toLowerCase();
-				pairSprite.style.left = this.chatmsg.other_offset + "%";
-				charSprite.style.left = this.chatmsg.self_offset + "%";
-				pairSprite.src = this.pairSilent;
-				pairSprite.style.opacity = 1;
+				pairLayers.style.left = this.chatmsg.other_offset + "%";
+				charLayers.style.left = this.chatmsg.self_offset + "%";
+				pairLayers.style.opacity = 1;
 			} else {
-				pairSprite.style.opacity = 0;
-				charSprite.style.left = 0;
+				pairLayers.style.opacity = 0;
+				charLayers.style.left = 0;
 			}
 
 			this.chatmsg.startpreanim = false;
@@ -1893,24 +1914,22 @@ async changeBackground(position) {
 
 				if (extrafeatures.includes("cccc_ic_support")) {
 					if (this.chatmsg.other_name) {
-						const pairName = this.chatmsg.other_name.toLowerCase();
-						const pairEmote = this.chatmsg.other_emote.toLowerCase();
-						pairSprite.style.left = this.chatmsg.other_offset + "%";
-						charSprite.style.left = this.chatmsg.self_offset + "%";
-						pairSprite.src = this.pairSilent;
-						pairSprite.style.opacity = 1;
+						pairLayers.style.left = this.chatmsg.other_offset + "%";
+						charLayers.style.left = this.chatmsg.self_offset + "%";
+						this.setEmote(pairName,pairEmote,"(a)",true);
+						pairLayers.style.opacity = 1;
 					} else {
-						pairSprite.style.opacity = 0;
-						charSprite.style.left = 0;
+						pairLayers.style.opacity = 0;
+						charLayers.style.left = 0;
 					}
 				}
 
-				charSprite.src = this.speakingSprite;
-				charSprite.style.opacity = 1;
+				this.setEmote(charName,charEmote,"(b)",false);
+				charLayers.style.opacity = 1;
 
 				if (this.textnow === this.chatmsg.content) {
-					charSprite.src = this.silentSprite;
-					charSprite.style.opacity = 1;
+					this.setEmote(charName,charEmote,"(a)",false);
+					charLayers.style.opacity = 1;
 					waitingBox.style.opacity = 1;
 					this._animating = false;
 					clearTimeout(this.updater);
@@ -1931,8 +1950,8 @@ async changeBackground(position) {
 
 					if (this.textnow === this.chatmsg.content) {
 						this._animating = false;
-						charSprite.src = this.silentSprite;
-						charSprite.style.opacity = 1;
+						this.setEmote(charName,charEmote,"(a)",false);
+						charLayers.style.opacity = 1;
 						waitingBox.style.opacity = 1;
 						clearTimeout(this.updater);
 					}
