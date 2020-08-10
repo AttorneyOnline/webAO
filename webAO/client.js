@@ -1678,37 +1678,11 @@ async changeBackground(position) {
 
 		checkCallword(this.chatmsg.content);
 
-		// start checking the files
-		try {
-			const { url: speakUrl } = await this.oneSuccess([
-				this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png")),
-				this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif"))
-			]);
-			this.speakingSprite = speakUrl ? speakUrl : transparentPNG;
-		} catch (error) {
-			this.speakingSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif";
-		}
-
-		try {
-			const { url: silentUrl } = await this.oneSuccess([
-				this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png")),
-				this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif"))
-			]);
-			this.silentSprite = silentUrl ? silentUrl : transparentPNG;
-		} catch (error) {
-			this.silentSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif";
-		}
+		this.setEmote(this.chatmsg.name.toLowerCase(), this.chatmsg.sprite, "(b)", false);
+		this.setEmote(this.chatmsg.name.toLowerCase(), this.chatmsg.sprite, "(a)", false);
 
 		if (this.chatmsg.other_name) {
-			try {
-				const { url: pairUrl } = await this.oneSuccess([
-					this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/" + this.chatmsg.other_emote + ".png")),
-					this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/(a)" + this.chatmsg.other_emote + ".gif"))
-				]);
-				this.pairSilent = pairUrl ? pairUrl : transparentPNG;
-			} catch (error) {
-				this.pairSilent = AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/(a)" + this.chatmsg.other_emote + ".gif";
-			}
+			this.setEmote(this.chatmsg.other_name.toLowerCase(), this.chatmsg.other_emote, "(a)", false);
 		}
 
 		// gets which shout shall played
@@ -2318,7 +2292,7 @@ window.changeCharacter = changeCharacter;
  */
 export function charError(image) {
 	console.warn(image.src + " is missing from webAO");
-	//image.src = transparentPNG;
+	image.src = transparentPNG;
 	return true;
 }
 window.charError = charError;
