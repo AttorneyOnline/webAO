@@ -767,11 +767,10 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleCI(args) {
-		document.getElementById("client_loadingtext").innerHTML = "Loading Character " + args[1];
 		// Loop through the 10 characters that were sent
 		for (let i = 2; i <= args.length - 2; i++) {
 			if (i % 2 === 0) {
-				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
+				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${args[1]}/${this.char_list_length}`;
 				const chargs = args[i].split("&");
 				const charid = args[i - 1];
 				setTimeout(() => this.handleCharacterInfo(chargs, charid), charid*10);
@@ -904,7 +903,7 @@ class Client extends EventEmitter {
 
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
-				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
+				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${args[1]}/${this.music_list_length}`;
 				this.handleMusicInfo(args[i-1],safe_tags(args[i]));
 			}
 		}
