@@ -2053,6 +2053,8 @@ export function onEnter(event) {
 		const text = document.getElementById("client_inputbox").value;
 		const pairchar = document.getElementById("pair_select").value;
 		const pairoffset = document.getElementById("pair_offset").value;
+		const myrole = document.getElementById("role_select").value ? document.getElementById("role_select").value : mychar.side;
+
 		let sfxname = "0";
 		let sfxdelay = 0;
 		let preanim = "-";
@@ -2066,7 +2068,7 @@ export function onEnter(event) {
 		}
 
 		client.sendIC("chat", preanim, mychar.name, myemo.emote,
-			text, mychar.side,
+			text, myrole,
 			sfxname, myemo.zoom, sfxdelay, selectedShout, evi, flip,
 			flash, color, showname, pairchar, pairoffset, noninterrupting_preanim, looping_sfx, screenshake);
 	}
@@ -2736,11 +2738,11 @@ window.changeBackgroundOOC = changeBackgroundOOC;
  * Change role via OOC.
  */
 export function changeRoleOOC() {
-	const role_select = document.getElementById("role_select");
-	const role_command = document.getElementById("role_command").value;
+	const new_role = document.getElementById("role_select").value;
 
-	client.sendOOC("/" + role_command.replace("$1", role_select.value));
-	updateActionCommands(role_select.value);
+	client.sendOOC("/pos " + new_role);
+	client.sendServer("SP#" + new_role + "#%");
+	updateActionCommands(new_role);
 }
 window.changeRoleOOC = changeRoleOOC;
 
