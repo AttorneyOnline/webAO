@@ -1787,8 +1787,13 @@ async changeBackground(position) {
 		}
 
 		// apply effects
+		const effectinfo = this.chatmsg.effects.split('|');
 		fg.style.animation = "";
-		fg.src = transparentPNG;
+
+		if (effectinfo[0])
+			fg.src = `${AO_HOST}themes/default/effects/${encodeURI(effectinfo[0].toLowerCase())}.webp`;
+		else
+			fg.src = transparentPNG;		
 
 		this.tick();
 	}
