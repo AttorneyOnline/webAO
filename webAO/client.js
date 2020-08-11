@@ -1793,7 +1793,10 @@ async changeBackground(position) {
 		if (effectinfo[0])
 			fg.src = `${AO_HOST}themes/default/effects/${encodeURI(effectinfo[0].toLowerCase())}.webp`;
 		else
-			fg.src = transparentPNG;		
+			fg.src = transparentPNG;
+
+		if (this.chatmsg.sound === "0" || this.chatmsg.sound === "1" || this.chatmsg.sound === "" || this.chatmsg.sound === undefined)
+			this.chatmsg.sound = effectinfo[2];
 
 		this.tick();
 	}
