@@ -536,12 +536,12 @@ class Client extends EventEmitter {
 				msg_nameplate = this.chars[char_id].showname;
 				msg_blips = this.chars[char_id].gender;
 				char_chatbox = this.chars[char_id].chat;
-				char_muted = this.chars[char_id].muted;				
+				char_muted = this.chars[char_id].muted;
 
-				if(this.chars[char_id].name !== char_name) {
+				if (this.chars[char_id].name !== char_name) {
 					console.info(this.chars[char_id].name + " is iniediting to " + char_name);
 					const chargs = (char_name + "&" + "iniediter").split("&");
-					this.handleCharacterInfo(chargs,char_id);
+					this.handleCharacterInfo(chargs, char_id);
 				}
 			} catch (e) {
 				msg_nameplate = args[3];
@@ -553,79 +553,94 @@ class Client extends EventEmitter {
 
 			if (char_muted === false) {
 
-			let chatmsg = {
-				deskmod: safe_tags(args[1]).toLowerCase(),
-				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
-				nameplate: msg_nameplate,
-				chatbox: char_chatbox,
-				name: char_name,
-				sprite: safe_tags(args[4]).toLowerCase(),
-				content: prepChat(args[5]), // Escape HTML tags
-				side: args[6].toLowerCase(),
-				sound: safe_tags(args[7]).toLowerCase(),
-				blips: safe_tags(msg_blips),
-				type: Number(args[8]),
-				charid: char_id,
-				snddelay: Number(args[10]),
-				objection: Number(args[11]),
-				evidence: safe_tags(args[12]),
-				flip: Number(args[13]),
-				flash: Number(args[14]),
-				color: Number(args[15])
-			};
-
-			if (extrafeatures.includes("cccc_ic_support")) {
-				const extra_cccc = {
-					showname: safe_tags(args[16]),
-					other_charid: Number(args[17]),
-					other_name: safe_tags(args[18]),
-					other_emote: safe_tags(args[19]),
-					self_offset: Number(args[20]),
-					other_offset: Number(args[21]),
-					other_flip: Number(args[22]),
-					noninterrupting_preanim: Number(args[23])
+				let chatmsg = {
+					deskmod: safe_tags(args[1]).toLowerCase(),
+					preanim: safe_tags(args[2]).toLowerCase(), // get preanim
+					nameplate: msg_nameplate,
+					chatbox: char_chatbox,
+					name: char_name,
+					sprite: safe_tags(args[4]).toLowerCase(),
+					content: prepChat(args[5]), // Escape HTML tags
+					side: args[6].toLowerCase(),
+					sound: safe_tags(args[7]).toLowerCase(),
+					blips: safe_tags(msg_blips),
+					type: Number(args[8]),
+					charid: char_id,
+					snddelay: Number(args[10]),
+					objection: Number(args[11]),
+					evidence: safe_tags(args[12]),
+					flip: Number(args[13]),
+					flash: Number(args[14]),
+					color: Number(args[15])
 				};
-				chatmsg = Object.assign(extra_cccc, chatmsg);
 
-				if (extrafeatures.includes("looping_sfx")) {
-					const extra_27 = {
-						looping_sfx: Number(args[24]),
-						screenshake: Number(args[25]),
-						frame_screenshake: safe_tags(args[26]),
-						frame_realization: safe_tags(args[27]),
-						frame_sfx: safe_tags(args[28])
+				if (extrafeatures.includes("cccc_ic_support")) {
+					const extra_cccc = {
+						showname: safe_tags(args[16]),
+						other_charid: Number(args[17]),
+						other_name: safe_tags(args[18]),
+						other_emote: safe_tags(args[19]),
+						self_offset: Number(args[20]),
+						other_offset: Number(args[21]),
+						other_flip: Number(args[22]),
+						noninterrupting_preanim: Number(args[23])
 					};
-					chatmsg = Object.assign(extra_27, chatmsg);
+					chatmsg = Object.assign(extra_cccc, chatmsg);
+
+					if (extrafeatures.includes("looping_sfx")) {
+						const extra_27 = {
+							looping_sfx: Number(args[24]),
+							screenshake: Number(args[25]),
+							frame_screenshake: safe_tags(args[26]),
+							frame_realization: safe_tags(args[27]),
+							frame_sfx: safe_tags(args[28])
+						};
+						chatmsg = Object.assign(extra_27, chatmsg);
+
+						if (extrafeatures.includes("effects")) {
+							const extra_28 = {
+								additive: Number(args[29]),
+								effects: safe_tags(args[30])
+							};
+							chatmsg = Object.assign(extra_28, chatmsg);
+						} else {
+							const extra_28 = {
+								additive: 0,
+								effects: ""
+							};
+							chatmsg = Object.assign(extra_28, chatmsg);
+						}
+
+					} else {
+						const extra_27 = {
+							looping_sfx: 0,
+							screenshake: 0,
+							frame_screenshake: "",
+							frame_realization: "",
+							frame_sfx: ""
+						};
+						chatmsg = Object.assign(extra_27, chatmsg);
+					}
 				} else {
-					const extra_27 = {
-						looping_sfx: 0,
-						screenshake: 0,
-						frame_screenshake: "",
-						frame_realization: "",
-						frame_sfx: ""
+					const extra_cccc = {
+						showname: "",
+						other_charid: 0,
+						other_name: "",
+						other_emote: "",
+						self_offset: 0,
+						other_offset: 0,
+						other_flip: 0,
+						noninterrupting_preanim: 0
 					};
-					chatmsg = Object.assign(extra_27, chatmsg);
-				}			
-			} else {
-				const extra_cccc = {
-					showname: "",
-					other_charid: 0,
-					other_name: "",
-					other_emote: "",
-					self_offset: 0,
-					other_offset: 0,
-					other_flip: 0,
-					noninterrupting_preanim: 0
-				};
-				chatmsg = Object.assign(extra_cccc, chatmsg);
-			}
+					chatmsg = Object.assign(extra_cccc, chatmsg);
+				}
 
-			// our own message appeared, reset the buttons
-			if (chatmsg.charid === this.charID) {
-				resetICParams();
-			}
+				// our own message appeared, reset the buttons
+				if (chatmsg.charid === this.charID) {
+					resetICParams();
+				}
 
-			viewport.say(chatmsg); // no await
+				viewport.say(chatmsg); // no await
 			}
 		}
 	}
@@ -1621,7 +1636,6 @@ async changeBackground(position) {
 		const waitingBox = document.getElementById("client_chatwaiting");
 
 		// Reset CSS animation
-		fg.style.animation = "";
 		gamewindow.style.animation = "";
 		waitingBox.style.opacity = 0;
 		
@@ -1772,6 +1786,18 @@ async changeBackground(position) {
 			chatBoxInner.style.textAlign = "inherit";
 		}
 
+		// apply effects
+		const effectinfo = this.chatmsg.effects.split('|');
+		fg.style.animation = "";
+
+		if (effectinfo[0])
+			fg.src = `${AO_HOST}themes/default/effects/${encodeURI(effectinfo[0].toLowerCase())}.webp`;
+		else
+			fg.src = transparentPNG;
+
+		if (this.chatmsg.sound === "0" || this.chatmsg.sound === "1" || this.chatmsg.sound === "" || this.chatmsg.sound === undefined)
+			this.chatmsg.sound = effectinfo[2];
+
 		this.tick();
 	}
 
@@ -1817,6 +1843,7 @@ async changeBackground(position) {
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 		const chatBox = document.getElementById("client_chat");
+		const effectlayer = document.getElementById("client_fg");
 
 		// TODO: preanims sometimes play when they're not supposed to
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
@@ -1829,7 +1856,7 @@ async changeBackground(position) {
 			if (this.chatmsg.flash === 1) {
 				// Flash screen
 				this.playSFX(AO_HOST + "sounds/general/sfx-realization.wav");
-				document.getElementById("client_fg").style.animation = "flash 0.4s 1";
+				effectlayer.style.animation = "flash 0.4s 1";
 			}
 
 			// Pre-animation stuff
