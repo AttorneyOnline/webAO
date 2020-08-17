@@ -182,11 +182,27 @@
 	height: 100%;
 	width: 100%;
 	bottom: 0;
+}
+
+#client_pair_char>img {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	bottom: 0;
+	left: 0;
 	object-fit: cover;
 	object-position: 50% 0;
 }
 
 #client_char {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	bottom: 0;
+	left: 0;
+}
+
+#client_char>img {
 	position: absolute;
 	height: 100%;
 	width: 100%;
