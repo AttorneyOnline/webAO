@@ -620,6 +620,11 @@ class Client extends EventEmitter {
 							frame_sfx: ""
 						};
 						chatmsg = Object.assign(extra_27, chatmsg);
+						const extra_28 = {
+							additive: 0,
+							effects: ""
+						};
+						chatmsg = Object.assign(extra_28, chatmsg);
 					}
 				} else {
 					const extra_cccc = {
@@ -633,6 +638,19 @@ class Client extends EventEmitter {
 						noninterrupting_preanim: 0
 					};
 					chatmsg = Object.assign(extra_cccc, chatmsg);
+					const extra_27 = {
+						looping_sfx: 0,
+						screenshake: 0,
+						frame_screenshake: "",
+						frame_realization: "",
+						frame_sfx: ""
+					};
+					chatmsg = Object.assign(extra_27, chatmsg);
+					const extra_28 = {
+						additive: 0,
+						effects: ""
+					};
+					chatmsg = Object.assign(extra_28, chatmsg);
 				}
 
 				// our own message appeared, reset the buttons
@@ -1625,10 +1643,12 @@ async changeBackground(position) {
 		const  png_s = document.getElementById("client_" + pairID + "_png");
 		const apng_s = document.getElementById("client_" + pairID +"_apng");
 
-		//hide the last sprite
-		gif_s.src = transparentPNG;
-		png_s.src = transparentPNG;
-		apng_s.src = transparentPNG;
+		if (this.lastChar !== this.chatmsg.name) {
+			//hide the last sprite
+			gif_s.src = transparentPNG;
+			png_s.src = transparentPNG;
+			apng_s.src = transparentPNG;
+		}
 
 		gif_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.gif`;
 		png_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(emotename)}.png`;
@@ -1689,9 +1709,8 @@ async changeBackground(position) {
 
 		appendICLog(this.chatmsg.content, displayname);
 
-		checkCallword(this.chatmsg.content);
+		checkCallword(this.chatmsg.content);		
 
-		this.setEmote(this.chatmsg.name.toLowerCase(), this.chatmsg.sprite, "(b)", false);
 		this.setEmote(this.chatmsg.name.toLowerCase(), this.chatmsg.sprite, "(a)", false);
 
 		if (this.chatmsg.other_name) {
