@@ -1730,8 +1730,6 @@ async changeBackground(position) {
 			// case 5:
 			// zoom
 			default:
-				// due to a retarded client bug, we need to strip the sfx from the MS, if the preanim isn't playing
-				this.chatmsg.sound = "";
 				this.chatmsg.startspeaking = true;
 				break;
 		}
