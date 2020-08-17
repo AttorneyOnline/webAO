@@ -1336,7 +1336,7 @@ class Viewport {
 		this.shoutaudio.src = `${AO_HOST}misc/default/objection.wav`;
 
 		this.testimonyAudio = document.getElementById("client_testimonyaudio");
-		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-notguilty.wav`;
+		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.wav`;
 
 		this.music = document.getElementById("client_musicaudio");
 		this.music.src = `${AO_HOST}sounds/music/trial (aa).mp3`;
@@ -1861,6 +1861,9 @@ async changeBackground(position) {
 					eviBox.style.width = "auto";
 					eviBox.style.height = "36.5%";
 					eviBox.style.opacity = 1;
+
+					this.testimonyAudio.src = AO_HOST + "sounds/general/sfx-evidenceshoop.wav";
+					this.testimonyAudio.play();
 
 					if (this.chatmsg.side === "def") {
 						// Only def show evidence on right
