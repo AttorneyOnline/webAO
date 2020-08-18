@@ -84,22 +84,6 @@
     z-index: 3;
 }
 
-#client_chat::before {
-    content: "";
-    position: absolute;
-
-    background-image: linear-gradient(45deg, rgba(0,0,0,0.1) 25%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 75%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0.1)),
-                        linear-gradient(45deg, rgba(0,0,0,0.1) 25%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 75%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0.1));
-    background-size: 2em 2em;
-    background-position: 0 0, 1em 1em;
-    transform: rotate(-10deg);
-    width: 250%;
-    height: 400%;
-    top: -100%;
-    left: -100%;
-    z-index: 2;
-  }
-
 #client_inner_chat {
     position: absolute;
 	padding: 2% 4%;
