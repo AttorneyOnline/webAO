@@ -39,6 +39,13 @@
 	font-style:normal;
 }
 
+@font-face {
+	font-family:'Ace Name';
+		src: url('../Ace_Name_Regular.ttf');
+	font-weight:normal;
+	font-style:normal;
+}
+
 #client_chatcontainer {
 	display: block;
 	position: absolute;
@@ -47,7 +54,6 @@
 	height: 40%;
 	width: 100%;
 	filter: none;
-	font-family: "Igiari Cyrillic", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 #client_name {
@@ -67,6 +73,7 @@
 	border-width: 0.2em;
 	border-radius: 0.2em;	
 	z-index: 1;
+	font-family: "Ace Name", "Igiari Cyrillic", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 #client_inner_name {
@@ -96,6 +103,7 @@
 	text-align: left;
 	overflow: hidden;
 	scroll-behavior: smooth;
+	font-family: "Igiari Cyrillic", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 #client_inner_chat {
