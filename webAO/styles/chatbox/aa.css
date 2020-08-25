@@ -41,7 +41,7 @@
 
 @font-face {
 	font-family:'Ace Name';
-		src: url('../Ace_Name_Regular.ttf');
+		src: url('./ace-name.ttf');
 	font-weight:normal;
 	font-style:normal;
 }
