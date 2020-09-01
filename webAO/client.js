@@ -32,7 +32,7 @@ const serverIP = queryDict.ip;
 let mode = queryDict.mode;
 
 // Unless there is an asset URL specified, use the wasabi one
-const DEFAULT_HOST = location.hostname ? "https://cloudflare-ipfs.com/ipfs/QmZSdhjX8RUKBTER8hyVNHnK2ByLXusYc99FRS6RztDKUF/" : "base/";
+const DEFAULT_HOST = location.hostname ? "https://cloudflare-ipfs.com/ipfs/QmeWK7nB1xjS3zQRwqwGYrKcbiNUKYiWHYCryXzrJF336c/" : "base/";
 const AO_HOST = queryDict.asset || DEFAULT_HOST;
 const THEME = queryDict.theme || "default";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
