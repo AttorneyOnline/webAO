@@ -10,6 +10,7 @@ import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
 import character_arr from "./characters.js";
+import music_arr from "./music.js";
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 import sfx_arr from "./sounds.js";
@@ -402,7 +403,8 @@ class Client extends EventEmitter {
 
 		this.sendServer(`HI#${hdid}#%`);
 		this.sendServer(`ID#webAO#webAO#%`);
-		this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
+		if (mode !== "replay")
+			this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
 	}
 
 	/**
@@ -1383,7 +1385,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleRM(_args) {
-		this.sendSelf("SM#stop.mp3#%");
+		this.sendSelf("SM#" + music_arr.join("#") + "#%");
 	}
 
 	/**
@@ -1391,9 +1393,14 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleRD(_args) {
+		this.sendSelf("BN#gs4#%");
 		this.sendSelf("DONE#%");
-		document.getElementById("client_ooclog").innerHTML = "";
-		
+		const ooclog = document.getElementById("client_ooclog");
+		ooclog.innerHTML = "";
+		ooclog.readOnly = false;
+
+		document.getElementById("client_oocinput").style.display = "none";
+		document.getElementById("client_replaycontrols").style.display = "inline-block";
 	}
 }
 
