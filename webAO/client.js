@@ -606,7 +606,7 @@ class Client extends EventEmitter {
 						} else {
 							const extra_28 = {
 								additive: 0,
-								effects: ""
+								effects: "||"
 							};
 							chatmsg = Object.assign(extra_28, chatmsg);
 						}
