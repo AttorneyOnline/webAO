@@ -250,11 +250,20 @@ class Client extends EventEmitter {
 	 * Hook for sending messages to the client
 	 * @param {string} message the message to send
 	 */
-	sendSelf(message) {
-		document.getElementById("client_ooclog").value += message + "\r\n";
+	handleSelf(message) {
 		const message_event = new MessageEvent('websocket', { data: message });
 		setTimeout(() => this.onMessage(message_event), 1);
+	}	
+
+	/**
+	 * Hook for sending messages to the client
+	 * @param {string} message the message to send
+	 */
+	sendSelf(message) {
+		document.getElementById("client_ooclog").value += message + "\r\n";
+		this.handleSelf(message);
 	}
+
 
 	/**
 	 * Sends an out-of-character chat message.
@@ -540,6 +549,22 @@ class Client extends EventEmitter {
 		// the connection got rekt, get rid of the old musiclist
 		this.resetMusiclist();
 		document.getElementById("client_chartable").innerHTML = "";
+	}
+
+	/**
+	 * Parse the lines in the OOC and play them
+	 * @param {*} args packet arguments
+	 */
+	handleReplay() {
+		const ooclog = document.getElementById("client_ooclog");
+		const rtime = document.getElementById("client_replaytimer").value;
+
+		const clines = ooclog.value.split(/\r?\n/);
+		if (clines[0]) {
+			this.handleSelf(clines[0]);
+			ooclog.value = clines.slice(1).join("\r\n");
+			setTimeout(() => onReplayGo(""), rtime);
+		}
 	}
 
 	/**
@@ -2158,6 +2183,15 @@ export function onOOCEnter(event) {
 	}
 }
 window.onOOCEnter = onOOCEnter;
+
+/**
+ * Triggered when the user click replay GOOOOO
+ * @param {KeyboardEvent} event
+ */
+export function onReplayGo(_event) {
+	client.handleReplay();
+}
+window.onReplayGo = onReplayGo;
 
 /**
  * Triggered when the Return key is pressed on the in-character chat input box.
