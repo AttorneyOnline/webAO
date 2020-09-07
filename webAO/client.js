@@ -9,7 +9,6 @@ import Fingerprint2 from 'fingerprintjs2';
 import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
-import character_arr from "./characters.js";
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 import sfx_arr from "./sounds.js";
@@ -33,7 +32,7 @@ const serverIP = queryDict.ip;
 let mode = queryDict.mode;
 
 // Unless there is an asset URL specified, use the wasabi one
-const DEFAULT_HOST = location.hostname ? "https://webao-full.animatedchatroom.net/base/" : "base/";
+const DEFAULT_HOST = location.hostname ? "https://cloudflare-ipfs.com/ipfs/QmeWK7nB1xjS3zQRwqwGYrKcbiNUKYiWHYCryXzrJF336c/" : "base/";
 const AO_HOST = queryDict.asset || DEFAULT_HOST;
 const THEME = queryDict.theme || "default";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
@@ -282,22 +281,29 @@ class Client extends EventEmitter {
 	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim, looping_sfx, screenshake) {
 		let extra_cccc = ``;
 		let extra_27 = ``;
+		let extra_28 = ``;
 
 		if (extrafeatures.includes("cccc_ic_support")) {
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
 
 			if (extrafeatures.includes("looping_sfx")) {
-				const frame_screenshake = "";
-				const frame_realization = "";
-				const frame_sfx = "";
+				const frame_screenshake = "-";
+				const frame_realization = "-";
+				const frame_sfx = "-";
 	
 				extra_27 = `${looping_sfx}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
+				if (extrafeatures.includes("effects")) {
+					const additive = 0;
+					const effect = "-";
+		
+					extra_28 = `${additive}#${effect}#`;
+				}
 			}
 		}
 		
 		const serverMessage = `MS#${deskmod}#${preanim}#${name}#${emote}` +
 			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
-			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}%`;
+			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
 		
 		this.sendServer(serverMessage);
 	}
@@ -397,12 +403,6 @@ class Client extends EventEmitter {
 	 */
 	loadResources() {
 		document.getElementById("client_version").innerText = "version " + version;
-
-		// Load iniedit character array to select
-		const iniedit_select = document.getElementById("client_ininame");
-		character_arr.forEach(inicharacter => {
-			iniedit_select.add(new Option(inicharacter));
-		});
 
 		// Load background array to select
 		const background_select = document.getElementById("bg_select");
@@ -554,12 +554,12 @@ class Client extends EventEmitter {
 				msg_nameplate = this.chars[char_id].showname;
 				msg_blips = this.chars[char_id].gender;
 				char_chatbox = this.chars[char_id].chat;
-				char_muted = this.chars[char_id].muted;				
+				char_muted = this.chars[char_id].muted;
 
-				if(this.chars[char_id].name !== char_name) {
+				if (this.chars[char_id].name !== char_name) {
 					console.info(this.chars[char_id].name + " is iniediting to " + char_name);
 					const chargs = (char_name + "&" + "iniediter").split("&");
-					this.handleCharacterInfo(chargs,char_id);
+					this.handleCharacterInfo(chargs, char_id);
 				}
 			} catch (e) {
 				msg_nameplate = args[3];
@@ -571,50 +571,91 @@ class Client extends EventEmitter {
 
 			if (char_muted === false) {
 
-			let chatmsg = {
-				deskmod: safe_tags(args[1]).toLowerCase(),
-				preanim: safe_tags(args[2]).toLowerCase(), // get preanim
-				nameplate: msg_nameplate,
-				chatbox: char_chatbox,
-				name: char_name,
-				sprite: safe_tags(args[4]).toLowerCase(),
-				content: prepChat(args[5]), // Escape HTML tags
-				side: args[6].toLowerCase(),
-				sound: safe_tags(args[7]).toLowerCase(),
-				blips: safe_tags(msg_blips),
-				type: Number(args[8]),
-				charid: char_id,
-				snddelay: Number(args[10]),
-				objection: Number(args[11]),
-				evidence: safe_tags(args[12]),
-				flip: Number(args[13]),
-				flash: Number(args[14]),
-				color: Number(args[15])
-			};
-
-			if (extrafeatures.includes("cccc_ic_support")) {
-				const extra_cccc = {
-					showname: safe_tags(args[16]),
-					other_charid: Number(args[17]),
-					other_name: safe_tags(args[18]),
-					other_emote: safe_tags(args[19]),
-					self_offset: Number(args[20]),
-					other_offset: Number(args[21]),
-					other_flip: Number(args[22]),
-					noninterrupting_preanim: Number(args[23])
+				let chatmsg = {
+					deskmod: safe_tags(args[1]).toLowerCase(),
+					preanim: safe_tags(args[2]).toLowerCase(), // get preanim
+					nameplate: msg_nameplate,
+					chatbox: char_chatbox,
+					name: char_name,
+					sprite: safe_tags(args[4]).toLowerCase(),
+					content: prepChat(args[5]), // Escape HTML tags
+					side: args[6].toLowerCase(),
+					sound: safe_tags(args[7]).toLowerCase(),
+					blips: safe_tags(msg_blips),
+					type: Number(args[8]),
+					charid: char_id,
+					snddelay: Number(args[10]),
+					objection: Number(args[11]),
+					evidence: safe_tags(args[12]),
+					flip: Number(args[13]),
+					flash: Number(args[14]),
+					color: Number(args[15])
 				};
-				chatmsg = Object.assign(extra_cccc, chatmsg);
 
-				if (extrafeatures.includes("looping_sfx")) {
-					const extra_27 = {
-						looping_sfx: Number(args[24]),
-						screenshake: Number(args[25]),
-						frame_screenshake: safe_tags(args[26]),
-						frame_realization: safe_tags(args[27]),
-						frame_sfx: safe_tags(args[28])
+				if (extrafeatures.includes("cccc_ic_support")) {
+					const extra_cccc = {
+						showname: safe_tags(args[16]),
+						other_charid: Number(args[17]),
+						other_name: safe_tags(args[18]),
+						other_emote: safe_tags(args[19]),
+						self_offset: Number(args[20]),
+						other_offset: Number(args[21]),
+						other_flip: Number(args[22]),
+						noninterrupting_preanim: Number(args[23])
 					};
-					chatmsg = Object.assign(extra_27, chatmsg);
+					chatmsg = Object.assign(extra_cccc, chatmsg);
+
+					if (extrafeatures.includes("looping_sfx")) {
+						const extra_27 = {
+							looping_sfx: Number(args[24]),
+							screenshake: Number(args[25]),
+							frame_screenshake: safe_tags(args[26]),
+							frame_realization: safe_tags(args[27]),
+							frame_sfx: safe_tags(args[28])
+						};
+						chatmsg = Object.assign(extra_27, chatmsg);
+
+						if (extrafeatures.includes("effects")) {
+							const extra_28 = {
+								additive: Number(args[29]),
+								effects: safe_tags(args[30])
+							};
+							chatmsg = Object.assign(extra_28, chatmsg);
+						} else {
+							const extra_28 = {
+								additive: 0,
+								effects: ""
+							};
+							chatmsg = Object.assign(extra_28, chatmsg);
+						}
+
+					} else {
+						const extra_27 = {
+							looping_sfx: 0,
+							screenshake: 0,
+							frame_screenshake: "",
+							frame_realization: "",
+							frame_sfx: ""
+						};
+						chatmsg = Object.assign(extra_27, chatmsg);
+						const extra_28 = {
+							additive: 0,
+							effects: ""
+						};
+						chatmsg = Object.assign(extra_28, chatmsg);
+					}
 				} else {
+					const extra_cccc = {
+						showname: "",
+						other_charid: 0,
+						other_name: "",
+						other_emote: "",
+						self_offset: 0,
+						other_offset: 0,
+						other_flip: 0,
+						noninterrupting_preanim: 0
+					};
+					chatmsg = Object.assign(extra_cccc, chatmsg);
 					const extra_27 = {
 						looping_sfx: 0,
 						screenshake: 0,
@@ -623,27 +664,19 @@ class Client extends EventEmitter {
 						frame_sfx: ""
 					};
 					chatmsg = Object.assign(extra_27, chatmsg);
-				}			
-			} else {
-				const extra_cccc = {
-					showname: "",
-					other_charid: 0,
-					other_name: "",
-					other_emote: "",
-					self_offset: 0,
-					other_offset: 0,
-					other_flip: 0,
-					noninterrupting_preanim: 0
-				};
-				chatmsg = Object.assign(extra_cccc, chatmsg);
-			}
+					const extra_28 = {
+						additive: 0,
+						effects: ""
+					};
+					chatmsg = Object.assign(extra_28, chatmsg);
+				}
 
-			// our own message appeared, reset the buttons
-			if (chatmsg.charid === this.charID) {
-				resetICParams();
-			}
+				// our own message appeared, reset the buttons
+				if (chatmsg.charid === this.charID) {
+					resetICParams();
+				}
 
-			viewport.say(chatmsg); // no await
+				viewport.say(chatmsg); // no await
 			}
 		}
 	}
@@ -738,6 +771,8 @@ class Client extends EventEmitter {
 			mute_select.add(new Option(safe_tags(chargs[0]), charid));
 			const pair_select = document.getElementById("pair_select");
 			pair_select.add(new Option(safe_tags(chargs[0]), charid));
+			const iniedit_select = document.getElementById("client_ininame");
+			iniedit_select.add(new Option(safe_tags(chargs[0])));
 
 			// sometimes ini files lack important settings
 			const default_options = {
@@ -783,11 +818,10 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleCI(args) {
-		document.getElementById("client_loadingtext").innerHTML = "Loading Character " + args[1];
 		// Loop through the 10 characters that were sent
 		for (let i = 2; i <= args.length - 2; i++) {
 			if (i % 2 === 0) {
-				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${i}/${this.char_list_length}`;
+				document.getElementById("client_loadingtext").innerHTML = `Loading Character ${args[1]}/${this.char_list_length}`;
 				const chargs = args[i].split("&");
 				const charid = args[i - 1];
 				setTimeout(() => this.handleCharacterInfo(chargs, charid), charid*10);
@@ -920,7 +954,7 @@ class Client extends EventEmitter {
 
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
-				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
+				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${args[1]}/${this.music_list_length}`;
 				this.handleMusicInfo(args[i-1],safe_tags(args[i]));
 			}
 		}
@@ -1362,7 +1396,7 @@ class Viewport {
 		this.shoutaudio.src = `${AO_HOST}misc/default/objection.wav`;
 
 		this.testimonyAudio = document.getElementById("client_testimonyaudio");
-		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-notguilty.wav`;
+		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.wav`;
 
 		this.music = document.getElementById("client_musicaudio");
 		this.music.src = `${AO_HOST}sounds/music/trial (aa).mp3`;
@@ -1625,6 +1659,29 @@ async changeBackground(position) {
 		clearTimeout(this.testimonyUpdater);
 	}
 
+	/**
+	 * Sets all the img tags to the right sources
+	 * @param {*} chatmsg 
+	 */
+	setEmote(charactername, emotename, prefix, pair) {
+		const pairID = pair ? "pair" : "char";
+		const characterFolder = AO_HOST + "characters/";
+
+		const  gif_s = document.getElementById("client_" + pairID + "_gif");
+		const  png_s = document.getElementById("client_" + pairID + "_png");
+		const apng_s = document.getElementById("client_" + pairID +"_apng");
+
+		if (this.lastChar !== this.chatmsg.name) {
+			//hide the last sprite
+			gif_s.src = transparentPNG;
+			png_s.src = transparentPNG;
+			apng_s.src = transparentPNG;
+		}
+
+		gif_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.gif`;
+		png_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(emotename)}.png`;
+		apng_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.apng`;
+	}
 
 	/**
 	 * Sets a new emote.
@@ -1648,7 +1705,6 @@ async changeBackground(position) {
 		const waitingBox = document.getElementById("client_chatwaiting");
 
 		// Reset CSS animation
-		fg.style.animation = "";
 		gamewindow.style.animation = "";
 		waitingBox.style.opacity = 0;
 		
@@ -1660,8 +1716,8 @@ async changeBackground(position) {
 		}
 		this.lastEvi = this.chatmsg.evidence;
 
-		const charSprite = document.getElementById("client_char");
-		const pairSprite = document.getElementById("client_pair_char");
+		const charLayers = document.getElementById("client_char");
+		const pairLayers = document.getElementById("client_pair_char");
 
 		const chatContainerBox = document.getElementById("client_chatcontainer");	
 		const nameBoxInner = document.getElementById("client_inner_name");
@@ -1674,48 +1730,19 @@ async changeBackground(position) {
 		nameBoxInner.innerText = displayname;
 		
 		if (this.lastChar !== this.chatmsg.name) {
-			charSprite.style.opacity = 0;
-			charSprite.src = transparentPNG;
-			pairSprite.style.opacity = 0;
-			pairSprite.src = transparentPNG;
+			charLayers.style.opacity = 0;
+			pairLayers.style.opacity = 0;
 		}
 		this.lastChar = this.chatmsg.name;
 
 		appendICLog(this.chatmsg.content, displayname);
 
-		checkCallword(this.chatmsg.content);
+		checkCallword(this.chatmsg.content);		
 
-		// start checking the files
-		try {
-			const { url: speakUrl } = await this.oneSuccess([
-				this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png")),
-				this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif"))
-			]);
-			this.speakingSprite = speakUrl ? speakUrl : transparentPNG;
-		} catch (error) {
-			this.speakingSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(b)" + this.chatmsg.sprite + ".gif";
-		}
-
-		try {
-			const { url: silentUrl } = await this.oneSuccess([
-				this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/" + this.chatmsg.sprite + ".png")),
-				this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif"))
-			]);
-			this.silentSprite = silentUrl ? silentUrl : transparentPNG;
-		} catch (error) {
-			this.silentSprite = AO_HOST + "characters/" + encodeURI(this.chatmsg.name.toLowerCase()) + "/(a)" + this.chatmsg.sprite + ".gif";
-		}
+		this.setEmote(this.chatmsg.name.toLowerCase(), this.chatmsg.sprite, "(a)", false);
 
 		if (this.chatmsg.other_name) {
-			try {
-				const { url: pairUrl } = await this.oneSuccess([
-					this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/" + this.chatmsg.other_emote + ".png")),
-					this.rejectOnError(fetch(AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/(a)" + this.chatmsg.other_emote + ".gif"))
-				]);
-				this.pairSilent = pairUrl ? pairUrl : transparentPNG;
-			} catch (error) {
-				this.pairSilent = AO_HOST + "characters/" + encodeURI(this.chatmsg.other_name.toLowerCase()) + "/(a)" + this.chatmsg.other_emote + ".gif";
-			}
+			this.setEmote(this.chatmsg.other_name.toLowerCase(), this.chatmsg.other_emote, "(a)", false);
 		}
 
 		// gets which shout shall played
@@ -1763,8 +1790,6 @@ async changeBackground(position) {
 			// case 5:
 			// zoom
 			default:
-				// due to a retarded client bug, we need to strip the sfx from the MS, if the preanim isn't playing
-				this.chatmsg.sound = "";
 				this.chatmsg.startspeaking = true;
 				break;
 		}
@@ -1777,16 +1802,16 @@ async changeBackground(position) {
 
 		// Flip the character
 		if (this.chatmsg.flip === 1) {
-			charSprite.style.transform = "scaleX(-1)";
+			charLayers.style.transform = "scaleX(-1)";
 		} else {
-			charSprite.style.transform = "scaleX(1)";
+			charLayers.style.transform = "scaleX(1)";
 		}
 
 		// flip the paired character
 		if (this.chatmsg.other_flip === 1) {
-			pairSprite.style.transform = "scaleX(-1)";
+			pairLayers.style.transform = "scaleX(-1)";
 		} else {
-			pairSprite.style.transform = "scaleX(1)";
+			pairLayers.style.transform = "scaleX(1)";
 		}
 
 		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
@@ -1798,6 +1823,18 @@ async changeBackground(position) {
 		} else {
 			chatBoxInner.style.textAlign = "inherit";
 		}
+
+		// apply effects
+		const effectinfo = this.chatmsg.effects.split('|');
+		fg.style.animation = "";
+
+		if (effectinfo[0] && effectinfo[0] !== "-")
+			fg.src = `${AO_HOST}themes/default/effects/${encodeURI(effectinfo[0].toLowerCase())}.webp`;
+		else
+			fg.src = transparentPNG;
+
+		if (this.chatmsg.sound === "0" || this.chatmsg.sound === "1" || this.chatmsg.sound === "" || this.chatmsg.sound === undefined)
+			this.chatmsg.sound = effectinfo[2];
 
 		this.tick();
 	}
@@ -1838,12 +1875,19 @@ async changeBackground(position) {
 
 		const gamewindow = document.getElementById("client_gamewindow");
 		const waitingBox = document.getElementById("client_chatwaiting");
-		const charSprite = document.getElementById("client_char");
-		const pairSprite = document.getElementById("client_pair_char");
+		const charLayers = document.getElementById("client_char");
+		const pairLayers = document.getElementById("client_pair_char");
 		const eviBox = document.getElementById("client_evi");
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 		const chatBox = document.getElementById("client_chat");
+		const effectlayer = document.getElementById("client_fg");
+
+		const charName = this.chatmsg.name.toLowerCase();
+		const charEmote = this.chatmsg.sprite.toLowerCase();
+
+		const pairName = this.chatmsg.other_name.toLowerCase();
+		const pairEmote = this.chatmsg.other_emote.toLowerCase();
 
 		// TODO: preanims sometimes play when they're not supposed to
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
@@ -1856,29 +1900,25 @@ async changeBackground(position) {
 			if (this.chatmsg.flash === 1) {
 				// Flash screen
 				this.playSFX(AO_HOST + "sounds/general/sfx-realization.wav");
-				document.getElementById("client_fg").style.animation = "flash 0.4s 1";
+				effectlayer.style.animation = "flash 0.4s 1";
 			}
 
 			// Pre-animation stuff
 			if (this.chatmsg.preanimdelay > 0) {
 				shoutSprite.style.opacity = 0;
-				shoutSprite.style.animation = "";
-				const charName = this.chatmsg.name.toLowerCase();
+				shoutSprite.style.animation = "";				
 				const preanim = this.chatmsg.preanim.toLowerCase();
-				charSprite.src = `${AO_HOST}characters/${encodeURI(charName)}/${encodeURI(preanim)}.gif`;
-				charSprite.style.opacity = 1;
+				this.setEmote(charName,preanim,"",false);
+				charLayers.style.opacity = 1;
 			}
 
 			if (this.chatmsg.other_name) {
-				const pairName = this.chatmsg.other_name.toLowerCase();
-				const pairEmote = this.chatmsg.other_emote.toLowerCase();
-				pairSprite.style.left = this.chatmsg.other_offset + "%";
-				charSprite.style.left = this.chatmsg.self_offset + "%";
-				pairSprite.src = this.pairSilent;
-				pairSprite.style.opacity = 1;
+				pairLayers.style.left = this.chatmsg.other_offset + "%";
+				charLayers.style.left = this.chatmsg.self_offset + "%";
+				pairLayers.style.opacity = 1;
 			} else {
-				pairSprite.style.opacity = 0;
-				charSprite.style.left = 0;
+				pairLayers.style.opacity = 0;
+				charLayers.style.left = 0;
 			}
 
 			this.chatmsg.startpreanim = false;
@@ -1892,6 +1932,9 @@ async changeBackground(position) {
 					eviBox.style.width = "auto";
 					eviBox.style.height = "36.5%";
 					eviBox.style.opacity = 1;
+
+					this.testimonyAudio.src = AO_HOST + "sounds/general/sfx-evidenceshoop.wav";
+					this.testimonyAudio.play();
 
 					if (this.chatmsg.side === "def") {
 						// Only def show evidence on right
@@ -1919,24 +1962,22 @@ async changeBackground(position) {
 
 				if (extrafeatures.includes("cccc_ic_support")) {
 					if (this.chatmsg.other_name) {
-						const pairName = this.chatmsg.other_name.toLowerCase();
-						const pairEmote = this.chatmsg.other_emote.toLowerCase();
-						pairSprite.style.left = this.chatmsg.other_offset + "%";
-						charSprite.style.left = this.chatmsg.self_offset + "%";
-						pairSprite.src = this.pairSilent;
-						pairSprite.style.opacity = 1;
+						pairLayers.style.left = this.chatmsg.other_offset + "%";
+						charLayers.style.left = this.chatmsg.self_offset + "%";
+						this.setEmote(pairName,pairEmote,"(a)",true);
+						pairLayers.style.opacity = 1;
 					} else {
-						pairSprite.style.opacity = 0;
-						charSprite.style.left = 0;
+						pairLayers.style.opacity = 0;
+						charLayers.style.left = 0;
 					}
 				}
 
-				charSprite.src = this.speakingSprite;
-				charSprite.style.opacity = 1;
+				this.setEmote(charName,charEmote,"(b)",false);
+				charLayers.style.opacity = 1;
 
 				if (this.textnow === this.chatmsg.content) {
-					charSprite.src = this.silentSprite;
-					charSprite.style.opacity = 1;
+					this.setEmote(charName,charEmote,"(a)",false);
+					charLayers.style.opacity = 1;
 					waitingBox.style.opacity = 1;
 					this._animating = false;
 					clearTimeout(this.updater);
@@ -1957,8 +1998,8 @@ async changeBackground(position) {
 
 					if (this.textnow === this.chatmsg.content) {
 						this._animating = false;
-						charSprite.src = this.silentSprite;
-						charSprite.style.opacity = 1;
+						this.setEmote(charName,charEmote,"(a)",false);
+						charLayers.style.opacity = 1;
 						waitingBox.style.opacity = 1;
 						clearTimeout(this.updater);
 					}
@@ -2079,6 +2120,8 @@ export function onEnter(event) {
 		const text = document.getElementById("client_inputbox").value;
 		const pairchar = document.getElementById("pair_select").value;
 		const pairoffset = document.getElementById("pair_offset").value;
+		const myrole = document.getElementById("role_select").value ? document.getElementById("role_select").value : mychar.side;
+
 		let sfxname = "0";
 		let sfxdelay = 0;
 		let preanim = "-";
@@ -2092,7 +2135,7 @@ export function onEnter(event) {
 		}
 
 		client.sendIC("chat", preanim, mychar.name, myemo.emote,
-			text, mychar.side,
+			text, myrole,
 			sfxname, myemo.zoom, sfxdelay, selectedShout, evi, flip,
 			flash, color, showname, pairchar, pairoffset, noninterrupting_preanim, looping_sfx, screenshake);
 	}
@@ -2325,7 +2368,7 @@ window.changeCharacter = changeCharacter;
  */
 export function charError(image) {
 	console.warn(image.src + " is missing from webAO");
-	//image.src = transparentPNG;
+	image.src = transparentPNG;
 	return true;
 }
 window.charError = charError;
@@ -2762,11 +2805,11 @@ window.changeBackgroundOOC = changeBackgroundOOC;
  * Change role via OOC.
  */
 export function changeRoleOOC() {
-	const role_select = document.getElementById("role_select");
-	const role_command = document.getElementById("role_command").value;
+	const new_role = document.getElementById("role_select").value;
 
-	client.sendOOC("/" + role_command.replace("$1", role_select.value));
-	updateActionCommands(role_select.value);
+	client.sendOOC("/pos " + new_role);
+	client.sendServer("SP#" + new_role + "#%");
+	updateActionCommands(new_role);
 }
 window.changeRoleOOC = changeRoleOOC;
 

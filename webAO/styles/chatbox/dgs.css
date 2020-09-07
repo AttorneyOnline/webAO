@@ -38,6 +38,14 @@
 	src: local('Cabin Condensed'), local('CabinCondensed-Regular'), url(https://fonts.gstatic.com/s/cabincondensed/v13/nwpMtK6mNhBK2err_hqkYhHRqmwqZ-LY.woff2) format('woff2');
 }
 
+@font-face {
+	font-family: 'Bitter';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: local('Bitter Regular'), local('Bitter-Regular'), url(https://fonts.gstatic.com/s/bitter/v15/rax8HiqOu8IVPmn7cYxpPDk.woff2) format('woff2');
+  }
+
 #client_chatcontainer {
 	display: block;
 	position: absolute;
@@ -62,7 +70,7 @@
 	top: 0;
 	border-radius: 3px;
 	position: absolute;
-	font-family: "Times New Roman", serif;
+	font-family: "Bitter", "Times New Roman", serif;
 }
 
 #client_inner_name {

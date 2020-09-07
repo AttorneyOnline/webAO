@@ -31,11 +31,10 @@
 }
 
 @font-face {
-	font-family: 'ace_attorneyregular';
-	src: url('../ace-attorney.woff2') format('woff2'),
-		url('../ace-attorney.woff') format('woff');
-	font-weight: normal;
-	font-style: normal;
+	font-family:'Igiari Cyrillic';
+		src: url('../igiari/igiari-cyrillic.ttf');
+	font-weight:normal;
+	font-style:normal;
 }
 
 #client_chatcontainer {
@@ -46,7 +45,7 @@
 	height: 40%;
 	width: 100%;
 	filter: none;
-	font-family: "Ace Attorney", "ace_attorneyregular", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
+	font-family: "Igiari Cyrillic", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 #client_name {

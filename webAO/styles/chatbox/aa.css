@@ -33,23 +33,17 @@
 /* Webfont CSS setup for Igiari by Caveras */
 
 @font-face {
-	font-family:'Igiari';
-		src:url('../igiari/Igiari.eot');
-		src:url('../igiari/Igiari.eot?#iefix') format('embedded-opentype'),
-				url('../igiari/Igiari.woff') format('woff'),
-				url('../igiari/Igiari.ttf') format('truetype'),
-				url('../igiari/Igiari.svg#Igiari') format('svg');
+	font-family:'Igiari Cyrillic';
+		src: url('../igiari/igiari-cyrillic.ttf');
 	font-weight:normal;
 	font-style:normal;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-	@font-face {
-		font-family:'Igiari';
-		src: url('../igiari/Igiari.svg') format('svg');
-		font-weight:normal;
-		font-style:normal;
-	}
+@font-face {
+	font-family:'Ace Name';
+		src: url('./ace-name.ttf');
+	font-weight:normal;
+	font-style:normal;
 }
 
 #client_chatcontainer {
@@ -60,7 +54,6 @@
 	height: 40%;
 	width: 100%;
 	filter: none;
-	font-family: "Igiari", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 #client_name {
@@ -70,23 +63,26 @@
 	top: 1%;
 	height: 13%;
 	min-width: 3.25em;	
-	font-size: 1.1em;
-	background: rgba(56, 56, 163, 0.5);
+	font-size: 0.8em;
+	background: rgba(60, 85, 255, 0.4);
 	box-shadow: 0.075em 0.075em rgba(0, 56, 163, 0.5) inset;
 	margin: 0;
-	padding: 0 2%;
+	padding-top: 0.4%;
+	padding-left: 1.955%;
+	padding-right: 1.955%;
 	border-color: rgba(255, 255, 255, 0.5);
 	border-style: ridge groove groove ridge;
 	border-width: 0.2em;
-	border-radius: 0.2em;	
+	border-radius: 0.3em;	
 	z-index: 1;
+	font-family: "Ace Name", "Igiari Cyrillic", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 #client_inner_name {
 	text-justify: distribute;
-	letter-spacing: 0.075em;
 	line-height: 100%;
 	margin: 0;
+	margin-top: 2.75%;
 }
 
 #client_chat {
@@ -98,17 +94,18 @@
 	width: calc(100% - 0.25em);
 	height: 78%;
 	margin: auto;
-	border-color: rgba(255, 255, 255, 0.5);
+	border-color: rgba(255, 255, 255, 0.6);
 	border-style: ridge groove groove ridge;
 	border-width: 0.15em;
-	border-radius: 0.2em;
-	background-color: rgba(0, 0, 16, 0.5);
+	border-radius: 0.15em;
+	background-color: rgba(0, 0, 16, 0.55);
 	font-size: 1.6em;
 	word-break: keep-all;
 	overflow-wrap: break-word;
 	text-align: left;
 	overflow: hidden;
 	scroll-behavior: smooth;
+	font-family: "Igiari Cyrillic", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 #client_inner_chat {

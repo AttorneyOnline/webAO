@@ -28,7 +28,9 @@
 														connect-src 'self' ws: file: *;
 														media-src 'self' file: *;">
 
-	<link rel="stylesheet" type="text/css" href="styles/client.css?v=1.0.2" id="client_stylesheet">
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/images/logo-new.png"/>
+	<link rel="stylesheet" type="text/css" href="styles/client.css?v=1.0.3" id="client_stylesheet">
 	<link rel="stylesheet" type="text/css" href="styles/default.css?v=1.0.1" id="client_theme">
 	<link rel="stylesheet" type="text/css" href="styles/chatbox/aa.css?v=1.0.1" id="chatbox_theme">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -71,8 +73,16 @@
 		<div id="client_background">
 			<div id="client_gamewindow">
 				<img id="client_court" alt="Courtroom backdrop" onerror="imgError(this);">
-				<img id="client_pair_char" alt="Paired character" onerror="charError(this);">
-				<img id="client_char" alt="Character" onerror="charError(this);">
+				<div id="client_pair_char" alt="Paired character">
+					<img id="client_pair_gif" onerror="charError(this);">
+					<img id="client_pair_png" onerror="charError(this);">
+					<img id="client_pair_apng" onerror="charError(this);">
+				</div>
+				<div id="client_char" alt="Character">
+					<img id="client_char_gif" onerror="charError(this);">
+					<img id="client_char_png" onerror="charError(this);">
+					<img id="client_char_apng" onerror="charError(this);">
+				</div>
 				<img id="client_bench">
 				<img id="client_fg" alt="Various overlay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
 				<img id="client_evi" src="" alt="Character Evidence" onerror="imgError(this);">
@@ -138,6 +148,7 @@
 			<div id="character_options">
 				<label for="role_select">Role:</label>
 				<select id="role_select" name="role_select" onchange="changeRoleOOC()">
+					<option value="">Default</option>
 					<option value="def">Defense</option>
 					<option value="pro">Prosecution</option>
 					<option value="jud">Judge</option>
@@ -433,10 +444,6 @@
 			<input id="bg_command" name="bg_command" type="text" value="bg $1">
 			<br>
 			<br>
-			<label for="role_command">Change role command:</label>
-			<input id="role_command" name="role_command" type="text" value="pos $1">
-			<br>
-			<br>
 			<label for="randomchar_command">Random character command:</label>
 			<input id="randomchar_command" name="randomchar_command" type="text" value="randomchar">
 			<br>
@@ -456,7 +463,8 @@
 				<a href="https://github.com/stonedDiscord">@stonedDiscord</a> and fixed up by
 				<a href="https://github.com/oldmud0">@oldmud0</a> and
 				<a href="https://github.com/qubrick">Qubrick</a>.</p>
-			<p>Special thanks to Aleks for reverse engineering the original Delphi client written by FanatSors.</p>
+			<p><a href="https://github.com/AttorneyOnline/webAO">Follow development on our GitHub</a></p>
+			<p>Special thanks to Aleks for the first webAO PoC.</p>
 			<p><a href="styles/igiari/readme.txt">Igiari font by Caveras</a></p>
 		</span>
 	</div>
