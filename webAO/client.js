@@ -9,6 +9,7 @@ import Fingerprint2 from 'fingerprintjs2';
 import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
+import character_arr from "./characters.js";
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 import sfx_arr from "./sounds.js";
@@ -191,10 +192,16 @@ class Client extends EventEmitter {
 		this.on("HP", this.handleHP.bind(this));
 		this.on("RT", this.handleRT.bind(this));
 		this.on("ZZ", this.handleZZ.bind(this));
+		this.on("HI", this.handleHI.bind(this));
 		this.on("ID", this.handleID.bind(this));
 		this.on("PN", this.handlePN.bind(this));
 		this.on("SI", this.handleSI.bind(this));
 		this.on("ARUP", this.handleARUP.bind(this));
+		this.on("askchaa", this.handleaskchaa.bind(this));
+		this.on("CC", this.handleCC.bind(this));
+		this.on("RC", this.handleRC.bind(this));
+		this.on("RM", this.handleRM.bind(this));
+		this.on("RD", this.handleRD.bind(this));
 		this.on("CharsCheck", this.handleCharsCheck.bind(this));
 		this.on("decryptor", this.handleDecryptor.bind(this));
 		this.on("PV", this.handlePV.bind(this));
@@ -245,7 +252,7 @@ class Client extends EventEmitter {
 	sendSelf(message) {
 		document.getElementById("client_ooclog").innerHTML += message + "\r\n";
 		const message_event = new MessageEvent('websocket', { data: message });
-		this.onMessage(message_event);
+		setTimeout(() => this.onMessage(message_event), 1);
 	}
 
 	/**
@@ -1124,6 +1131,15 @@ class Client extends EventEmitter {
 	}
 
 	/**
+	 * Handle the player
+	 * @param {Array} args packet arguments
+	 */
+	handleHI(args) {
+		this.sendSelf("ID#1#webAO#" + version + "#%");
+		this.sendSelf("FL#fastloading#yellowtext#ccc_ic_support#flipping#looping_sfx#%");
+	}
+
+	/**
 	 * Identifies the server and issues a playerID
 	 * @param {Array} args packet arguments
 	 */
@@ -1132,9 +1148,10 @@ class Client extends EventEmitter {
 		this.serverSoftware = args[2].split("&")[0];
 		if (this.serverSoftware === "serverD")
 			this.serverVersion = args[2].split("&")[1];
-		else if (this.serverSoftware === "webAO")
-			this.sendSelf("PN#0#0#%");
-		else
+		else if (this.serverSoftware === "webAO") {
+			oldLoading = false;
+			this.sendSelf("PN#0#1#%");
+		} else
 			this.serverVersion = args[3];
 
 		if (this.serverSoftware === "serverD" && this.serverVersion === "1377.152")
@@ -1147,6 +1164,22 @@ class Client extends EventEmitter {
 	 */
 	handlePN(_args) {
 		this.sendServer("askchaa#%");
+	}
+
+	/**
+	 * What? you want a character??
+	 * @param {Array} args packet arguments
+	 */
+	handleCC(args) {
+		this.sendSelf("PV#1#CID#" + args[2] + "#%");
+	}
+
+	/**
+	 * What? you want a character list from me??
+	 * @param {Array} args packet arguments
+	 */
+	handleaskchaa(_args) {
+		this.sendSelf("SI#" + character_arr.length + "#0#0#%");
 	}
 
 	/**
@@ -1341,8 +1374,26 @@ class Client extends EventEmitter {
 	 * we are asking ourselves what characters there are
 	 * @param {Array} args packet arguments
 	 */
-	handleaskChaa(_args) {
-		this.onMessage("SC#Phoenix#PhoenixSOJ#Young Mia#Grossberg#%");
+	handleRC(_args) {
+		this.sendSelf("SC#" + character_arr.join("#") + "#%");
+	}
+
+	/**
+	 * we are asking ourselves what characters there are
+	 * @param {Array} args packet arguments
+	 */
+	handleRM(_args) {
+		this.sendSelf("SM#stop.mp3#%");
+	}
+
+	/**
+	 * we are asking ourselves what characters there are
+	 * @param {Array} args packet arguments
+	 */
+	handleRD(_args) {
+		this.sendSelf("DONE#%");
+		document.getElementById("client_ooclog").innerHTML = "";
+		
 	}
 }
 
@@ -2797,7 +2848,11 @@ export function changeBackgroundOOC() {
 	} else {
 		filename = selectedBG.value;
 	}
-	client.sendOOC("/" + changeBGCommand.replace("$1", filename));
+
+	if (mode==="join")
+		client.sendOOC("/" + changeBGCommand.replace("$1", filename));
+	else if (mode==="replay")
+		client.sendSelf("BN#" + filename + "#%");
 }
 window.changeBackgroundOOC = changeBackgroundOOC;
 
