@@ -9,6 +9,8 @@ import Fingerprint2 from 'fingerprintjs2';
 import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
+import character_arr from "./characters.js";
+import music_arr from "./music.js";
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 import sfx_arr from "./sounds.js";
@@ -91,12 +93,17 @@ let lastICMessageTime = new Date(0);
 class Client extends EventEmitter {
 	constructor(address) {
 		super();
-		this.serv = new WebSocket("ws://" + address);
-		// Assign the websocket events
-		this.serv.addEventListener("open", this.emit.bind(this, "open"));
-		this.serv.addEventListener("close", this.emit.bind(this, "close"));
-		this.serv.addEventListener("message", this.emit.bind(this, "message"));
-		this.serv.addEventListener("error", this.emit.bind(this, "error"));
+		console.log("mode: " + mode);
+		if (mode !== "replay") {
+			this.serv = new WebSocket("ws://" + address);
+			// Assign the websocket events
+			this.serv.addEventListener("open", this.emit.bind(this, "open"));
+			this.serv.addEventListener("close", this.emit.bind(this, "close"));
+			this.serv.addEventListener("message", this.emit.bind(this, "message"));
+			this.serv.addEventListener("error", this.emit.bind(this, "error"));
+		} else {
+			this.joinServer();
+		}
 
 		this.on("open", this.onOpen.bind(this));
 		this.on("close", this.onClose.bind(this));
@@ -186,14 +193,21 @@ class Client extends EventEmitter {
 		this.on("HP", this.handleHP.bind(this));
 		this.on("RT", this.handleRT.bind(this));
 		this.on("ZZ", this.handleZZ.bind(this));
+		this.on("HI", this.handleHI.bind(this));
 		this.on("ID", this.handleID.bind(this));
 		this.on("PN", this.handlePN.bind(this));
 		this.on("SI", this.handleSI.bind(this));
 		this.on("ARUP", this.handleARUP.bind(this));
+		this.on("askchaa", this.handleaskchaa.bind(this));
+		this.on("CC", this.handleCC.bind(this));
+		this.on("RC", this.handleRC.bind(this));
+		this.on("RM", this.handleRM.bind(this));
+		this.on("RD", this.handleRD.bind(this));
 		this.on("CharsCheck", this.handleCharsCheck.bind(this));
 		this.on("decryptor", this.handleDecryptor.bind(this));
 		this.on("PV", this.handlePV.bind(this));
 		this.on("CHECK", () => { });
+		this.on("CH", () => { });
 
 		this._lastTimeICReceived = new Date(0);
 	}
@@ -224,9 +238,32 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
 	sendServer(message) {
-		// console.log(message);
-		this.serv.send(message);
+		console.debug("C: " + message);
+		if (mode === "replay") {
+			this.sendSelf(message);
+		} else {
+			this.serv.send(message);
+		}
 	}
+
+	/**
+	 * Hook for sending messages to the client
+	 * @param {string} message the message to send
+	 */
+	handleSelf(message) {
+		const message_event = new MessageEvent('websocket', { data: message });
+		setTimeout(() => this.onMessage(message_event), 1);
+	}	
+
+	/**
+	 * Hook for sending messages to the client
+	 * @param {string} message the message to send
+	 */
+	sendSelf(message) {
+		document.getElementById("client_ooclog").value += message + "\r\n";
+		this.handleSelf(message);
+	}
+
 
 	/**
 	 * Sends an out-of-character chat message.
@@ -284,8 +321,6 @@ class Client extends EventEmitter {
 		const serverMessage = `MS#${deskmod}#${preanim}#${name}#${emote}` +
 			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
 			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
-		
-		console.log(serverMessage);
 		
 		this.sendServer(serverMessage);
 	}
@@ -377,7 +412,8 @@ class Client extends EventEmitter {
 
 		this.sendServer(`HI#${hdid}#%`);
 		this.sendServer(`ID#webAO#webAO#%`);
-		this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
+		if (mode !== "replay")
+			this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
 	}
 
 	/**
@@ -482,7 +518,7 @@ class Client extends EventEmitter {
 	 */
 	onMessage(e) {
 		const msg = e.data;
-		console.debug(msg);
+		console.debug("S: " + msg);
 
 		const lines = msg.split("%");
 		const args = lines[0].split("#");
@@ -513,6 +549,22 @@ class Client extends EventEmitter {
 		// the connection got rekt, get rid of the old musiclist
 		this.resetMusiclist();
 		document.getElementById("client_chartable").innerHTML = "";
+	}
+
+	/**
+	 * Parse the lines in the OOC and play them
+	 * @param {*} args packet arguments
+	 */
+	handleReplay() {
+		const ooclog = document.getElementById("client_ooclog");
+		const rtime = document.getElementById("client_replaytimer").value;
+
+		const clines = ooclog.value.split(/\r?\n/);
+		if (clines[0]) {
+			this.handleSelf(clines[0]);
+			ooclog.value = clines.slice(1).join("\r\n");
+			setTimeout(() => onReplayGo(""), rtime);
+		}
 	}
 
 	/**
@@ -1106,6 +1158,15 @@ class Client extends EventEmitter {
 	}
 
 	/**
+	 * Handle the player
+	 * @param {Array} args packet arguments
+	 */
+	handleHI(args) {
+		this.sendSelf("ID#1#webAO#" + version + "#%");
+		this.sendSelf("FL#fastloading#yellowtext#ccc_ic_support#flipping#looping_sfx#%");
+	}
+
+	/**
 	 * Identifies the server and issues a playerID
 	 * @param {Array} args packet arguments
 	 */
@@ -1114,7 +1175,10 @@ class Client extends EventEmitter {
 		this.serverSoftware = args[2].split("&")[0];
 		if (this.serverSoftware === "serverD")
 			this.serverVersion = args[2].split("&")[1];
-		else
+		else if (this.serverSoftware === "webAO") {
+			oldLoading = false;
+			this.sendSelf("PN#0#1#%");
+		} else
 			this.serverVersion = args[3];
 
 		if (this.serverSoftware === "serverD" && this.serverVersion === "1377.152")
@@ -1127,6 +1191,22 @@ class Client extends EventEmitter {
 	 */
 	handlePN(_args) {
 		this.sendServer("askchaa#%");
+	}
+
+	/**
+	 * What? you want a character??
+	 * @param {Array} args packet arguments
+	 */
+	handleCC(args) {
+		this.sendSelf("PV#1#CID#" + args[2] + "#%");
+	}
+
+	/**
+	 * What? you want a character list from me??
+	 * @param {Array} args packet arguments
+	 */
+	handleaskchaa(_args) {
+		this.sendSelf("SI#" + character_arr.length + "#0#0#%");
 	}
 
 	/**
@@ -1315,6 +1395,37 @@ class Client extends EventEmitter {
 		}
 		pickEmotion(1);
 		}
+	}
+
+	/**
+	 * we are asking ourselves what characters there are
+	 * @param {Array} args packet arguments
+	 */
+	handleRC(_args) {
+		this.sendSelf("SC#" + character_arr.join("#") + "#%");
+	}
+
+	/**
+	 * we are asking ourselves what characters there are
+	 * @param {Array} args packet arguments
+	 */
+	handleRM(_args) {
+		this.sendSelf("SM#" + music_arr.join("#") + "#%");
+	}
+
+	/**
+	 * we are asking ourselves what characters there are
+	 * @param {Array} args packet arguments
+	 */
+	handleRD(_args) {
+		this.sendSelf("BN#gs4#%");
+		this.sendSelf("DONE#%");
+		const ooclog = document.getElementById("client_ooclog");
+		ooclog.value = "";
+		ooclog.readOnly = false;
+
+		document.getElementById("client_oocinput").style.display = "none";
+		document.getElementById("client_replaycontrols").style.display = "inline-block";
 	}
 }
 
@@ -2074,6 +2185,15 @@ export function onOOCEnter(event) {
 window.onOOCEnter = onOOCEnter;
 
 /**
+ * Triggered when the user click replay GOOOOO
+ * @param {KeyboardEvent} event
+ */
+export function onReplayGo(_event) {
+	client.handleReplay();
+}
+window.onReplayGo = onReplayGo;
+
+/**
  * Triggered when the Return key is pressed on the in-character chat input box.
  * @param {KeyboardEvent} event
  */
@@ -2769,7 +2889,11 @@ export function changeBackgroundOOC() {
 	} else {
 		filename = selectedBG.value;
 	}
-	client.sendOOC("/" + changeBGCommand.replace("$1", filename));
+
+	if (mode==="join")
+		client.sendOOC("/" + changeBGCommand.replace("$1", filename));
+	else if (mode==="replay")
+		client.sendSelf("BN#" + filename + "#%");
 }
 window.changeBackgroundOOC = changeBackgroundOOC;
 
