@@ -251,7 +251,7 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
 	sendSelf(message) {
-		document.getElementById("client_ooclog").innerHTML += message + "\r\n";
+		document.getElementById("client_ooclog").value += message + "\r\n";
 		const message_event = new MessageEvent('websocket', { data: message });
 		setTimeout(() => this.onMessage(message_event), 1);
 	}
@@ -1396,7 +1396,7 @@ class Client extends EventEmitter {
 		this.sendSelf("BN#gs4#%");
 		this.sendSelf("DONE#%");
 		const ooclog = document.getElementById("client_ooclog");
-		ooclog.innerHTML = "";
+		ooclog.value = "";
 		ooclog.readOnly = false;
 
 		document.getElementById("client_oocinput").style.display = "none";
