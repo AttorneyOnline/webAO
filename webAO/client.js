@@ -295,7 +295,7 @@ class Client extends EventEmitter {
 	 * @param {number} self_offset offset to paired character (optional)
 	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
-	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim, looping_sfx, screenshake) {
+	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim, looping_sfx, screenshake, frame_screenshake, frame_realization, frame_sfx, additive, effect) {
 		let extra_cccc = ``;
 		let extra_27 = ``;
 		let extra_28 = ``;
@@ -304,15 +304,8 @@ class Client extends EventEmitter {
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
 
 			if (extrafeatures.includes("looping_sfx")) {
-				const frame_screenshake = "-";
-				const frame_realization = "-";
-				const frame_sfx = "-";
-	
 				extra_27 = `${looping_sfx}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
 				if (extrafeatures.includes("effects")) {
-					const additive = 0;
-					const effect = "-";
-		
 					extra_28 = `${additive}#${effect}#`;
 				}
 			}
@@ -2213,6 +2206,8 @@ export function onEnter(event) {
 		const pairchar = document.getElementById("pair_select").value;
 		const pairoffset = document.getElementById("pair_offset").value;
 		const myrole = document.getElementById("role_select").value ? document.getElementById("role_select").value : mychar.side;
+		const additive = ((document.getElementById("check_additive").checked) ? 1 : 0);
+		const effect = document.getElementById("effect_select").value;
 
 		let sfxname = "0";
 		let sfxdelay = 0;
@@ -2229,7 +2224,7 @@ export function onEnter(event) {
 		client.sendIC("chat", preanim, mychar.name, myemo.emote,
 			text, myrole,
 			sfxname, myemo.zoom, sfxdelay, selectedShout, evi, flip,
-			flash, color, showname, pairchar, pairoffset, noninterrupting_preanim, looping_sfx, screenshake);
+			flash, color, showname, pairchar, pairoffset, noninterrupting_preanim, looping_sfx, screenshake, "-", "-", "-", additive, effect);
 	}
 }
 window.onEnter = onEnter;
