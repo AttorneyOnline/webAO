@@ -1526,8 +1526,9 @@ class Viewport {
 	 * 
 	 * @param {string} sfxname
 	 */
-	async playSFX(sfxname) {
+	async playSFX(sfxname, looping) {
 		this.sfxaudio.pause();
+		this.sfxaudio.loop = looping;
 		this.sfxaudio.src = sfxname;
 		this.sfxaudio.play();
 	}
@@ -1975,12 +1976,12 @@ async changeBackground(position) {
 			// Effect stuff
 			if (this.chatmsg.screenshake === 1) {
 				// Shake screen
-				this.playSFX(AO_HOST + "sounds/general/sfx-stab.wav");
+				this.playSFX(AO_HOST + "sounds/general/sfx-stab.wav", false);
 				gamewindow.style.animation = "shake 0.2s 1";
 			}
 			if (this.chatmsg.flash === 1) {
 				// Flash screen
-				this.playSFX(AO_HOST + "sounds/general/sfx-realization.wav");
+				this.playSFX(AO_HOST + "sounds/general/sfx-realization.wav", false);
 				effectlayer.style.animation = "flash 0.4s 1";
 			}
 
@@ -2091,7 +2092,7 @@ async changeBackground(position) {
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1" && this.chatmsg.sound !== "" && this.chatmsg.sound !== undefined) {
-				this.playSFX(AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav");
+				this.playSFX(AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav", this.chatmsg.looping_sfx);
 			}
 		}
 		this.textTimer = this.textTimer + UPDATE_INTERVAL;
