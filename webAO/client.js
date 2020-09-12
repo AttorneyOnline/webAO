@@ -1265,6 +1265,11 @@ class Client extends EventEmitter {
 
 		if (args.includes("looping_sfx")) {
 			document.getElementById("button_shake").style.display = "";
+			document.getElementById("2.7").style.display = "";
+		}
+
+		if (args.includes("effects")) {
+			document.getElementById("2.8").style.display = "";
 		}
 	}
 
