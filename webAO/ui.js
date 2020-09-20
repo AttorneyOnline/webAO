@@ -20,7 +20,8 @@ const config = {
         type: "component",
         componentName: "template",
         title: "Game",
-        height: 30,        
+        height: 30,
+        id: "thegame",   
         componentState: { id: "client_wrapper" }
       },
       {
@@ -80,3 +81,8 @@ golden.registerComponent("template", function (container, componentState) {
 });
 
 golden.init();
+
+golden.on( 'stateChanged', function(_stack){
+  const gamewindow = golden.root.getItemsById("thegame")[0].container;
+  //gamewindow.setSize(gamewindow.width,gamewindow.width * 0.75);
+});
