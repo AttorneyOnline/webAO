@@ -141,16 +141,17 @@ function onMessage(e) {
 		for (let i = 0; i < servers.length - 1; i++) {
 			const serverEntry = servers[i];
 			const args = serverEntry.split("&");
+			const ipport = args[2] + ":" + args[3];
 			const asset = args[4] ? `&asset=${args[4]}` : "";
 			const liclass = lowMemory ? "" : "unavailable"; // don't hide the entries if we're not checking them
 
 			document.getElementById("masterlist").innerHTML +=
 				`<li id="server${i}" class="${liclass}" onmouseover="setServ(${i})"><p>${args[0]}</p>`
-				+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[3]}${asset}">Watch</a>`
-				+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[3]}${asset}">Join</a></li>`;
+				+ `<a class="button" href="client.html?mode=watch&ip=${ipport}${asset}">Watch</a>`
+				+ `<a class="button" href="client.html?mode=join&ip=${ipport}${asset}">Join</a></li>`;
 			server_description[i] = args[1];
 			if (!lowMemory)
-				setTimeout(() => checkOnline(i, `${args[2]}:${args[3]}`), 0);
+				setTimeout(() => checkOnline(i, ipport), 0);
 		}
 		masterserver.close();
 	}
