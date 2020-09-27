@@ -116,10 +116,6 @@ function checkOnline(serverID, coIP) {
 		}
 	}
 
-	function onCOError(_e) {
-		console.warn(coIP + " threw an error.");
-	}
-
 	// assign the callbacks
 	oserv.onopen = function (evt) {
 		onCOOpen(evt);
@@ -129,8 +125,8 @@ function checkOnline(serverID, coIP) {
 		onCOMessage(evt);
 	};
 
-	oserv.onerror = function (evt) {
-		onCOError(evt);
+	oserv.onerror = function (_evt) {
+		console.warn(coIP + " threw an error.");
 	};
 
 }
@@ -138,7 +134,7 @@ function checkOnline(serverID, coIP) {
 function onMessage(e) {
 	const msg = e.data;
 	const header = msg.split("#", 2)[0];
-	console.log(header);
+	console.debug(msg);
 
 	if (header === "ALL") {
 		const servers = msg.split("#").slice(1);
