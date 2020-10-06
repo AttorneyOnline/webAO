@@ -20,6 +20,7 @@ import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import { EventEmitter } from "events";
 
 import { version } from '../package.json';
+import { features } from 'process';
 
 let client;
 let viewport;
@@ -407,7 +408,7 @@ class Client extends EventEmitter {
 		this.sendServer(`ID#webAO#webAO#%`);
 		if (mode !== "replay")
 			this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
-	}
+		}
 
 	/**
 	 * Load game resources and stored settings.
@@ -1162,7 +1163,7 @@ class Client extends EventEmitter {
 	 */
 	handleHI(args) {
 		this.sendSelf("ID#1#webAO#" + version + "#%");
-		this.sendSelf("FL#fastloading#yellowtext#ccc_ic_support#flipping#looping_sfx#%");
+		this.sendSelf("FL#fastloading#yellowtext#cccc_ic_support#flipping#looping_sfx#effects#%");
 	}
 
 	/**
