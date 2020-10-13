@@ -15,6 +15,7 @@ export default [
 	"chat999",
 	"halla",
 	"homestuck",
+	"key",
 	"yakuza",
 	"yttd",
 	"n64zelda",
