@@ -11,9 +11,9 @@ const options = { fonts: { extendedJsFonts: true, userDefinedFonts: ["Ace Attorn
 
 let lowMemory = false;
 
-const server_description = [];
-server_description[-1] = "This is your computer on port 50001";
-const online_counter = [];
+let servers = [];
+servers[-2] = { name: "Singleplayer", description: "Build cases, try out new things", ip: "127.0.0.1", port: 50001, assets: "", online: "" };
+servers[-1] = { name: "Localhost", description: "This is your computer on port 50001", ip: "127.0.0.1", port: 50001, assets: "", online: "Online: ?/?" };
 
 if (window.requestIdleCallback) {
 	requestIdleCallback(function () {
@@ -64,9 +64,11 @@ export function check_https() {
 }
 
 export function setServ(ID) {
-	console.log(server_description[ID]);
-	if (server_description[ID] !== undefined) {
-		document.getElementById("serverdescription_content").innerHTML = "<b>" + online_counter[ID] + "</b><br>" + server_description[ID];
+	if (!lowMemory)
+		checkOnline(ID, servers[ID].ip + ":" + servers[ID].port);
+
+	if (servers[ID].description !== undefined) {
+		document.getElementById("serverdescription_content").innerHTML = "<b>" + servers[ID].online + "</b><br>" + servers[ID].description;
 	}
 	else {
 		document.getElementById("serverdescription_content").innerHTML = "";
@@ -106,12 +108,12 @@ function checkOnline(serverID, coIP) {
 		const coheader = comsg.split("#", 2)[0];
 		const coarguments = comsg.split("#").slice(1);
 		if (coheader === "PN") {
-			online_counter[serverID] = `Online: ${coarguments[0]}/${coarguments[1]}`;
+			servers[serverID].online = `Online: ${coarguments[0]}/${coarguments[1]}`;
 			oserv.close();
 		}
 		else if (coheader === "BD") {
-			online_counter[serverID] = "Banned";
-			server_description[serverID] = coarguments[0];
+			servers[serverID].online = "Banned";
+			servers[serverID].description = coarguments[0];
 			oserv.close();
 		}
 	}
@@ -137,21 +139,21 @@ function onMessage(e) {
 	console.debug(msg);
 
 	if (header === "ALL") {
-		const servers = msg.split("#").slice(1);
-		for (let i = 0; i < servers.length - 1; i++) {
-			const serverEntry = servers[i];
+		const allservers = msg.split("#").slice(1);
+		for (let i = 0; i < allservers.length - 1; i++) {
+			const serverEntry = allservers[i];
 			const args = serverEntry.split("&");
+
+			let thisserver = { name: args[0], description: args[1], ip: args[2], port: args[3], assets: args[4], online: "Online: ?/?" };
+			servers[i] = thisserver;
+
 			const ipport = args[2] + ":" + args[3];
 			const asset = args[4] ? `&asset=${args[4]}` : "";
-			const liclass = lowMemory ? "" : "unavailable"; // don't hide the entries if we're not checking them
 
 			document.getElementById("masterlist").innerHTML +=
-				`<li id="server${i}" class="${liclass}" onmouseover="setServ(${i})"><p>${args[0]}</p>`
+				`<li id="server${i}" onmouseover="setServ(${i})"><p>${servers[i].name}</p>`
 				+ `<a class="button" href="client.html?mode=watch&ip=${ipport}${asset}">Watch</a>`
-				+ `<a class="button" href="client.html?mode=join&ip=${ipport}${asset}">Join</a></li>`;
-			server_description[i] = args[1];
-			if (!lowMemory)
-				setTimeout(() => checkOnline(i, ipport), 0);
+				+ `<a class="button" href="client.html?mode=join&ip=${ipport}${asset}">Join</a></li>`;			
 		}
 		masterserver.close();
 	}
