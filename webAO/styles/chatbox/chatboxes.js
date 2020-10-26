@@ -6,6 +6,7 @@ export default [
 	"trilogy",
 	"chatfuture",
 	"legacy",
+	"ddlc",
 	"dr1",
 	"chatdr2",
 	"drv3",

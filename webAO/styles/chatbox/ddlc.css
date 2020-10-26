@@ -1,0 +1,129 @@
+.text_white {
+    color: #fff;
+    -webkit-text-stroke: 0.04em #523643;
+}
+
+.text_blue {
+    color: #6bc6f7;
+    -webkit-text-stroke: 0.04em #523643;
+}
+
+.text_green {
+    color: #00f700;
+    -webkit-text-stroke: 0.04em #523643;
+}
+
+.text_red {
+    color: #f00;
+    -webkit-text-stroke: 0.04em #523643;
+}
+
+.text_orange {
+    color: #f77339;
+    -webkit-text-stroke: 0.04em #523643;
+}
+
+.text_yellow {
+    color: #ff0;
+    -webkit-text-stroke: 0.04em #523643;
+}
+
+.text_pink {
+    color: #ffc0cb;
+    -webkit-text-stroke: 0.04em #523643;
+}
+
+.text_cyan {
+    color: #0ff;
+    -webkit-text-stroke: 0.04em #523643;
+}
+
+#client_chatcontainer {
+	display: block;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	height: 35%;
+	width: 100%;
+	filter: none;
+}
+
+#client_name {
+	display: block;
+	position: absolute;
+	left: 5%;
+	top: 0;
+	height: 25%;
+	min-width: 5em;	
+	font-size: 1em;
+	background: #f6e4ea;
+	margin: 0;
+	border-radius: 0.25em;	
+    z-index: 0;
+    font-family: "Riffic", "RifficFree", sans-serif;
+    font-weight: bold;
+}
+
+#client_inner_name {
+	text-justify: distribute;
+	line-height: 100%;
+    margin: 0;
+    color: white;
+    -webkit-text-stroke: 0.05em #bb5599;
+    -webkit-text-fill-color: white;
+}
+
+#client_chat {
+	display: block;
+	position: absolute;
+	bottom: 2%;
+	left: 0;
+	width: 98%;
+	width: calc(100% - 0.25em);
+	height: 75%;
+	margin: auto;
+	border: solid #ffdfee 0.15em;
+	border-radius: 0.25em;
+    background-color: #fea7d1;
+    background-image: radial-gradient(#fa95c2 25%, transparent 25%),
+     radial-gradient(#fa95c2 25%, transparent 25%);
+    background-position: 0 0, 24px 24px;
+    background-size: 48px 48px;
+    font-family: "Aller", "OpenSans", sans-serif;
+    font-size: 1em;
+    font-weight: 600;
+	word-break: keep-all;
+	overflow-wrap: break-word;
+	text-align: left;
+	overflow: hidden;
+	scroll-behavior: smooth;
+}
+
+#client_inner_chat {
+	padding: 2% 5%;
+	margin: 1px;
+	line-height: 100%;
+}
+
+#client_chatwaiting {
+	display: block;
+	position: absolute;
+	right: 2%;
+	bottom: 15%;
+	line-height: 0.5;
+	animation: idling 0.4s linear infinite;
+}
+
+@keyframes idling {
+	0% {
+		right: 0;
+	}
+
+	50% {
+		right: 2%;
+	}
+
+	100% {
+		right: 0;
+	}
+}
