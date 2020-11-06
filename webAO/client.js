@@ -143,6 +143,10 @@ class Client extends EventEmitter {
 				"src": AO_HOST + "misc/default/takethat_bubble.png",
 				"duration": 840
 			},
+			"custom": {
+				"src": AO_HOST + "characters//custom.gif",
+				"duration": 840
+			},
 			"witnesstestimony": {
 				"src": AO_HOST + "themes/" + THEME + "/witnesstestimony.gif",
 				"duration": 1560,
