@@ -1841,7 +1841,7 @@ async changeBackground(position) {
 		if (shout) {
 			// Hide message box
 			chatContainerBox.style.opacity = 0;
-			if (shout === 4) {
+			if (this.chatmsg.objection === 4) {
 				shoutSprite.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/custom.gif`;
 			} else {
 				shoutSprite.src = client.resources[shout]["src"];
