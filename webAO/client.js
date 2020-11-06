@@ -1453,7 +1453,8 @@ class Viewport {
 			undefined,
 			"holdit",
 			"objection",
-			"takethat"
+			"takethat",
+			"custom"
 		];
 
 		this.colors = [
@@ -1840,9 +1841,14 @@ async changeBackground(position) {
 		if (shout) {
 			// Hide message box
 			chatContainerBox.style.opacity = 0;
-			shoutSprite.src = client.resources[shout]["src"];
+			if (shout === 4) {
+				shoutSprite.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/custom.gif`;
+			} else {
+				shoutSprite.src = client.resources[shout]["src"];
+				shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
+			}
 			shoutSprite.style.opacity = 1;
-			shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
+			
 
 			let shoutUrl;
 
