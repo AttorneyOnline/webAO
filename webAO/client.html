@@ -371,7 +371,7 @@
 			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" controls></audio>
 
 			<p>Shouts</p>
-			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" controls></audio>
+			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" onerror="shoutMissing(this)" controls></audio>
 			
 			<p>Testimony/Guilty</p>
 			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" controls></audio>

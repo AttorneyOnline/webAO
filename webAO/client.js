@@ -1916,19 +1916,7 @@ async changeBackground(position) {
 			shoutSprite.style.opacity = 1;
 			
 
-			let shoutUrl;
-
-			try {
-			const { url: soundUrl } = await this.oneSuccess([
-				this.rejectOnError(fetch(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`)),
-				this.rejectOnError(fetch(`${AO_HOST}misc/default/objection.wav`))
-			]);
-			shoutUrl = soundUrl;
-			} catch (error) {
-				shoutUrl = AO_HOST + `${AO_HOST}misc/default/objection.wav`;
-			}
-
-			this.shoutaudio.src = shoutUrl;
+			this.shoutaudio.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
 			this.shoutaudio.play();
 			this.shoutTimer = client.resources[shout]["duration"];
 		} else {
@@ -2437,6 +2425,15 @@ export function changeShoutVolume() {
 	setCookie("shoutVolume", document.getElementById("client_shoutaudio").volume);
 }
 window.changeShoutVolume = changeShoutVolume;
+
+/**
+ * Triggered when the shout could not be found
+ */
+export function shoutMissing(self) {
+	self.src = AO_HOST + `${AO_HOST}misc/default/objection.opus`;
+	self.play();
+}
+window.shoutMissing = shoutMissing;
 
 /**
  * Triggered by the testimony volume slider.
