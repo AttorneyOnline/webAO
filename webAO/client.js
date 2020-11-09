@@ -931,7 +931,7 @@ class Client extends EventEmitter {
 	}
 
 	isAudio(trackname) {
-		if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(trackname) || // regex for file extenstions
+		if (trackname.includes(".") || // regex for file extenstions
 			trackname.startsWith("=") ||
 			trackname.startsWith("-"))   // category markers
 		{
