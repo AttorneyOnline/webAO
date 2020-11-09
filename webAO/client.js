@@ -184,6 +184,8 @@ class Client extends EventEmitter {
 		this.on("FL", this.handleFL.bind(this));
 		this.on("LE", this.handleLE.bind(this));
 		this.on("EM", this.handleEM.bind(this));
+		this.on("FM", this.handleFM.bind(this));
+		this.on("FA", this.handleFA.bind(this));
 		this.on("SM", this.handleSM.bind(this));
 		this.on("MM", this.handleMM.bind(this));
 		this.on("BD", this.handleBD.bind(this));
@@ -924,10 +926,13 @@ class Client extends EventEmitter {
 	}
 
 	resetMusiclist() {
-		this.musics = [];
+		this.musics = [];		
+		document.getElementById("client_musiclist").innerHTML = "";			
+	}
+
+	resetArealist() {
 		this.areas = [];
-		document.getElementById("client_musiclist").innerHTML = "";
-		document.getElementById("areas").innerHTML = "";		
+		document.getElementById("areas").innerHTML = "";
 	}
 
 	isAudio(trackname) {
@@ -941,13 +946,16 @@ class Client extends EventEmitter {
 		}
 	}
 
+	addTrack(trackname) {
+		const newentry = document.createElement("OPTION");
+		newentry.text = trackname;
+		document.getElementById("client_musiclist").options.add(newentry);
+		this.musics.push(trackname);
+	}
+
 	handleMusicInfo(trackindex,trackname) {
 		if (this.isAudio(trackname)) {
-			// After reached the audio put everything in the music list
-			const newentry = document.createElement("OPTION");
-			newentry.text = trackname;
-			document.getElementById("client_musiclist").options.add(newentry);
-			this.musics.push(trackname);
+			this.addTrack(trackname);
 		} else {
 			this.createArea(trackindex,trackname);
 		}
@@ -989,6 +997,7 @@ class Client extends EventEmitter {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music";
 		if(args[1] === "0") {
 			this.resetMusiclist();
+			this.resetArealist();
 		}
 
 		for (let i = 2; i < args.length - 1; i++) {
@@ -1009,6 +1018,7 @@ class Client extends EventEmitter {
 	handleSM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
 		this.resetMusiclist();
+		this.resetArealist();
 
 		for (let i = 1; i < args.length - 1; i++) {
 			// Check when found the song for the first time
@@ -1018,6 +1028,31 @@ class Client extends EventEmitter {
 
 		// Music done, carry on
 		this.sendServer("RD#%");
+	}
+
+	/**
+	 * Handles updated music list
+	 * @param {Array} args packet arguments
+	 */
+	handleFM(args) {
+		this.resetMusiclist();
+
+		for (let i = 1; i < args.length - 1; i++) {
+			// Check when found the song for the first time
+			this.addTrack(safe_tags(args[i]));
+		}
+	}
+
+	/**
+	 * Handles updated area list
+	 * @param {Array} args packet arguments
+	 */
+	handleFA(args) {
+		this.resetArealist();
+
+		for (let i = 1; i < args.length - 1; i++) {
+			this.createArea(i-1,safe_tags(args[i]));
+		}
 	}
 
 	/**
