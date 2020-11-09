@@ -25,13 +25,14 @@
     "@babel/preset-env": "^7.11.5",
     "babel-loader": "^8.0.6",
     "eslint": "^6.8.0",
-    "golden-layout": "^1.5.9",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12"
   },
   "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^3.0.1",
     "core-js": "^3.6.4",
     "fingerprintjs2": "^2.1.2",
+    "golden-layout": "^1.5.9",
     "regenerator-runtime": "^0.13.7"
   }
 }
