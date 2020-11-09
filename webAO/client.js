@@ -446,7 +446,7 @@ class Client extends EventEmitter {
 		document.querySelector('#client_chatboxselect [value="' + cookiechatbox + '"]').selected = true;
 		setChatbox(cookiechatbox);
 
-		document.getElementById("client_musicaudio").volume = getCookie("musicVolume") || 1;
+		document.getElementById("client_mvolume").value = getCookie("musicVolume") || 1;
 		changeMusicVolume();
 		document.getElementById("client_sfxaudio").volume = getCookie("sfxVolume") || 1;
 		changeSFXVolume();
@@ -736,8 +736,11 @@ class Client extends EventEmitter {
 	handleMC(args) {
 		const track = prepChat(args[1]);
 		let charID = Number(args[2]);
+		const showname = args[3] || "";
+		const looping = Boolean(args[4]);
+		const channel = Number(args[5]) || 0;
    
-		const music = viewport.music;
+		const music = viewport.music[channel];
 		let musicname;
 		music.pause();
 		if(track.startsWith("http")) {
@@ -745,6 +748,7 @@ class Client extends EventEmitter {
 		} else {
 			music.src = MUSIC_HOST + encodeURI(track.toLowerCase());
 		}
+		music.loop = looping;
 		music.play();
 
 		try {
@@ -1528,8 +1532,9 @@ class Viewport {
 		this.testimonyAudio = document.getElementById("client_testimonyaudio");
 		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.wav`;
 
-		this.music = document.getElementById("client_musicaudio");
-		this.music.src = `${AO_HOST}sounds/music/trial (aa).mp3`;
+		this.music = new Array(3);
+		this.music.fill(new Audio(`${AO_HOST}sounds/music/trial (aa).mp3`))
+			.forEach(channel => channel.volume = 0.5);
 
 		this.updater = null;
 		this.testimonyUpdater = null;
@@ -1555,11 +1560,19 @@ class Viewport {
 	}
 
 	/**
-	 * Sets the volume of the blip sound.
+	 * Sets the volume of the blip sounds.
 	 * @param {number} volume
 	 */
 	set blipVolume(volume) {
 		this.blipChannels.forEach(channel => channel.volume = volume);
+	}
+
+	/**
+	 * Sets the volume of the music.
+	 * @param {number} volume
+	 */
+	set musicVolume(volume) {
+		this.music.forEach(channel => channel.volume = volume);
 	}
 
 	/**
@@ -2387,7 +2400,8 @@ window.area_click = area_click;
  * Triggered by the music volume slider.
  */
 export function changeMusicVolume() {
-	setCookie("musicVolume", document.getElementById("client_musicaudio").volume);
+	viewport.musicVolume = document.getElementById("client_mvolume").value;
+	setCookie("musicVolume", document.getElementById("client_mvolume").value);
 }
 window.changeMusicVolume = changeMusicVolume;
 
