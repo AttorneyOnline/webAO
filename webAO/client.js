@@ -144,7 +144,7 @@ class Client extends EventEmitter {
 				"duration": 840
 			},
 			"custom": {
-				"src": AO_HOST + "characters//custom.gif",
+				"src": "",
 				"duration": 840
 			},
 			"witnesstestimony": {
