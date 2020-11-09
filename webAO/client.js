@@ -734,9 +734,9 @@ class Client extends EventEmitter {
 	handleMC(args) {
 		const track = prepChat(args[1]);
 		let charID = Number(args[2]);
-		const showname = args[3] ? args[3] : "";
-		const looping = args[4] ? Boolean(args[4]) : false;
-		const channel = args[5] ? Number(args[5]) : 0;
+		const showname = args[3] || "";
+		const looping = Boolean(args[4]);
+		const channel = Number(args[5]) || 0;
    
 		const music = viewport.music[channel];
 		let musicname;
