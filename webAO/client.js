@@ -1925,7 +1925,7 @@ async changeBackground(position) {
 			]);
 			shoutUrl = soundUrl;
 			} catch (error) {
-				shoutUrl = AO_HOST + `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
+				shoutUrl = AO_HOST + `${AO_HOST}misc/default/objection.wav`;
 			}
 
 			this.shoutaudio.src = shoutUrl;
