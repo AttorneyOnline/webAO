@@ -949,30 +949,35 @@ class Client extends EventEmitter {
 			document.getElementById("client_musiclist").options.add(newentry);
 			this.musics.push(trackname);
 		} else {
-			const thisarea = {
-				name: trackname,
-				players: 0,
-				status: "IDLE",
-				cm: "",
-				locked: "FREE"
-			};
-
-			this.areas.push(thisarea);
-
-			// Create area button
-			let newarea = document.createElement("SPAN");
-			newarea.classList = "area-button area-default";
-			newarea.id = "area" + trackindex;
-			newarea.innerText = thisarea.name;
-			newarea.title = "Players: <br>" +
-				"Status: <br>" +
-				"CM: ";
-			newarea.onclick = function () {
-				area_click(this);
-			};
-
-			document.getElementById("areas").appendChild(newarea);
+			this.createArea(trackindex,trackname);
 		}
+	}
+
+	createArea(id,name) {
+		const thisarea = {
+			name: name,
+			players: 0,
+			status: "IDLE",
+			cm: "",
+			locked: "FREE"
+		};
+
+		this.areas.push(thisarea);
+
+		// Create area button
+		let newarea = document.createElement("SPAN");
+		newarea.classList = "area-button area-default";
+		newarea.id = "area" + id;
+		newarea.innerText = thisarea.name;
+		newarea.title = `Players: ${thisarea.players}\n` +
+						`Status: ${thisarea.status}\n` +
+						`CM: ${thisarea.cm}\n` +
+						`Area lock: ${thisarea.locked}`;
+		newarea.onclick = function () {
+			area_click(this);
+		};
+
+		document.getElementById("areas").appendChild(newarea);
 	}
 
 	/**
@@ -1234,7 +1239,7 @@ class Client extends EventEmitter {
 				}
 
 				thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();
-				
+
 				thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players}) [${this.areas[i].status}]`;
 
 				thisarea.title = `Players: ${this.areas[i].players}\n` +
