@@ -1221,11 +1221,9 @@ class Client extends EventEmitter {
 				switch (Number(args[0])) {
 					case 0: // playercount				
 						this.areas[i].players = Number(args[i+1]);
-						thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players})`;
 						break;
 					case 1: // status
 						this.areas[i].status = safe_tags(args[i+1]);
-						thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();
 						break;
 					case 2:
 						this.areas[i].cm = safe_tags(args[i+1]);
@@ -1234,6 +1232,10 @@ class Client extends EventEmitter {
 						this.areas[i].locked = safe_tags(args[i+1]);
 						break;
 				}
+
+				thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();
+				
+				thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players}) [${this.areas[i].status}]`;
 
 				thisarea.title = `Players: ${this.areas[i].players}\n` +
 					`Status: ${this.areas[i].status}\n` +
