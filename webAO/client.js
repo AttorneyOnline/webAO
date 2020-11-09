@@ -846,6 +846,7 @@ class Client extends EventEmitter {
 				inifile: cini,
 				muted: false
 			};
+
 		} else {
 			console.warn("missing charid " + charid);
 			let img = document.getElementById(`demo_${charid}`);
@@ -1444,6 +1445,12 @@ class Client extends EventEmitter {
 					alt="${emotes[i].desc}"
 					class="emote_button"
 					onclick="pickEmotion(${i})">`;
+
+				if(await fileExists(AO_HOST + "characters/" + encodeURI(me.name.toLowerCase()) + "/custom.gif"))
+					document.getElementById("button_4").style.display = "";
+				else
+					document.getElementById("button_4").style.display = "none";
+
 			} catch (e) {
 				console.error("missing emote " + i);
 			}
