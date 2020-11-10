@@ -2430,8 +2430,10 @@ window.changeShoutVolume = changeShoutVolume;
  * Triggered when the shout could not be found
  */
 export function shoutMissing(self) {
-	self.src = AO_HOST + `${AO_HOST}misc/default/objection.opus`;
-	self.play();
+	if (self.src !== `${AO_HOST}misc/default/objection.opus`) {
+		self.src = `${AO_HOST}misc/default/objection.opus`;
+		self.play();
+	}		
 }
 window.shoutMissing = shoutMissing;
 
