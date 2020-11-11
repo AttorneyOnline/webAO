@@ -2914,7 +2914,7 @@ window.setChatbox = setChatbox;
  */
 export function resizeChatbox() {
 	const chatContainerBox = document.getElementById("client_chatcontainer");
-	const gameHeight = document.getElementById("client_gamwindow").offsetHeight;
+	const gameHeight = document.getElementById("client_gamewindow").offsetHeight;
                 
 	chatContainerBox.style.fontSize = (gameHeight * 0.0521).toFixed(1) + "px";
 }
@@ -2927,9 +2927,12 @@ export function resizeGame() {
 	const gameWindowBox = document.getElementById("client_gamewindow");
 	const gameHeight = document.getElementById("client_background").offsetHeight;
 	
-	const neightbourheight = ((gameHeight / 192).trunc() * 192);
-	gameWindowBox.style.height = neightbourheight + "px";
-	gameWindowBox.style.width = neightbourheight * (4/3) + "px";
+	const multiple = Math.trunc(gameHeight / 192);
+	if(multiple !== 0) {
+		const neightbourheight = (multiple * 192);
+		gameWindowBox.style.height = neightbourheight + "px";
+		gameWindowBox.style.width = neightbourheight * (4/3) + "px";
+	}
 }
 window.resizeGame = resizeGame;
 
