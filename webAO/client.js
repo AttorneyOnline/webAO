@@ -2508,6 +2508,11 @@ export async function switchAspectRatio() {
 }
 window.switchAspectRatio = switchAspectRatio;
 
+export async function switchResizeMode() {
+
+}
+window.switchResizeMode = switchResizeMode;
+
 /**
  * Triggered by the change aspect ratio checkbox
  */
@@ -2909,11 +2914,24 @@ window.setChatbox = setChatbox;
  */
 export function resizeChatbox() {
 	const chatContainerBox = document.getElementById("client_chatcontainer");
-	const gameHeight = document.getElementById("client_background").offsetHeight;
+	const gameHeight = document.getElementById("client_gamwindow").offsetHeight;
                 
 	chatContainerBox.style.fontSize = (gameHeight * 0.0521).toFixed(1) + "px";
 }
 window.resizeChatbox = resizeChatbox;
+
+/**
+ * Set the width of the game window
+ */
+export function resizeGame() {
+	const gameWindowBox = document.getElementById("client_gamewindow");
+	const gameHeight = document.getElementById("client_background").offsetHeight;
+	
+	const neightbourheight = ((gameHeight / 192).trunc() * 192);
+	gameWindowBox.style.height = neightbourheight + "px";
+	gameWindowBox.style.width = neightbourheight * (4/3) + "px";
+}
+window.resizeGame = resizeGame;
 
 /**
  * Update evidence icon.
