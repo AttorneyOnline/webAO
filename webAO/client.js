@@ -2925,13 +2925,17 @@ window.resizeChatbox = resizeChatbox;
  */
 export function resizeGame() {
 	const gameWindowBox = document.getElementById("client_gamewindow");
-	const gameHeight = document.getElementById("client_background").offsetHeight;
+	const backgroundBox = document.getElementById("client_background");
+	const gameHeight = backgroundBox.offsetHeight;
 	
 	const multiple = Math.trunc(gameHeight / 192);
-	if(multiple !== 0) {
+	if(multiple >= 1) {
 		const neightbourheight = (multiple * 192);
 		gameWindowBox.style.height = neightbourheight + "px";
 		gameWindowBox.style.width = neightbourheight * (4/3) + "px";
+	} else {
+		gameWindowBox.style.height = backgroundBox.offsetHeight + "px";
+		gameWindowBox.style.width = backgroundBox.offsetWidth + "px";
 	}
 }
 window.resizeGame = resizeGame;
