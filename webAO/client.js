@@ -463,6 +463,7 @@ class Client extends EventEmitter {
 
 		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
 		document.getElementById("showname").checked = getCookie("showname");
+		showname_click();
 
 		document.getElementById("client_callwords").value = getCookie("callwords");
 	}
@@ -1891,7 +1892,7 @@ async changeBackground(position) {
 		}
 		this.lastChar = this.chatmsg.name;
 
-		appendICLog(this.chatmsg.content, displayname);
+		appendICLog(this.chatmsg.content, this.chatmsg.showname, this.chatmsg.nameplate);
 
 		checkCallword(this.chatmsg.content);		
 
@@ -2383,6 +2384,13 @@ window.mutelist_click = mutelist_click;
 export function showname_click(_event) {
 	setCookie("showname", document.getElementById("showname").checked);
 	setCookie("ic_chat_name", document.getElementById("ic_chat_name").value);
+
+	const css_s = document.getElementById("nameplate_setting");
+
+	if (document.getElementById("showname").checked)
+		css_s.href = "styles/shownames.css";
+	else
+		css_s.href = "styles/nameplates.css";
 }
 window.showname_click = showname_click;
 
@@ -2658,17 +2666,25 @@ window.ReconnectButton = ReconnectButton;
  * @param {string} msg the string to be added
  * @param {string} name the name of the sender
  */
-function appendICLog(msg, name = "", time = new Date()) {
+function appendICLog(msg, showname = "", nameplate = "", time = new Date()) {
 	const entry = document.createElement("p");
-	const nameField = document.createElement("span");
-	const textField = document.createElement("span");
-	nameField.className = "iclog_name";
-	nameField.appendChild(document.createTextNode(name));
+	const shownameField = document.createElement("span");
+	const nameplateField = document.createElement("span");
+	const textField = document.createElement("span");	
+	nameplateField.classList = "iclog_name iclog_nameplate";
+	nameplateField.appendChild(document.createTextNode(nameplate));
+
+	shownameField.classList = "iclog_name iclog_showname";
+	if (showname === "" || !showname)
+		shownameField.appendChild(document.createTextNode(nameplate));
+	else
+		shownameField.appendChild(document.createTextNode(showname));
 
 	textField.className = "iclog_text";
 	textField.appendChild(document.createTextNode(msg));
 
-	entry.appendChild(nameField);
+	entry.appendChild(shownameField);
+	entry.appendChild(nameplateField);
 	entry.appendChild(textField);
 
 	// Only put a timestamp if the minute has changed.
