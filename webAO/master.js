@@ -11,6 +11,8 @@ const options = { fonts: { extendedJsFonts: true, userDefinedFonts: ["Ace Attorn
 
 let lowMemory = false;
 
+let selectedServer = -1;
+
 let servers = [];
 servers[-2] = { name: "Singleplayer", description: "Build cases, try out new things", ip: "127.0.0.1", port: 50001, assets: "", online: "" };
 servers[-1] = { name: "Localhost", description: "This is your computer on port 50001", ip: "127.0.0.1", port: 50001, assets: "", online: "Online: ?/?" };
@@ -64,6 +66,8 @@ export function check_https() {
 }
 
 export function setServ(ID) {
+	selectedServer = ID;
+
 	if (!lowMemory && document.getElementById(`server${ID}`).className === "")
 		checkOnline(ID, servers[ID].ip + ":" + servers[ID].port);
 
@@ -124,6 +128,8 @@ function checkOnline(serverID, coIP) {
 			servers[serverID].description = coarguments[0];
 			oserv.close();
 		}
+		if (serverID === selectedServer)
+			document.getElementById("serverdescription_content").innerHTML = "<b>" + servers[serverID].online + "</b><br>" + servers[serverID].description;
 	}
 
 	// assign the callbacks
