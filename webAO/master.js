@@ -64,7 +64,7 @@ export function check_https() {
 }
 
 export function setServ(ID) {
-	if (!lowMemory)
+	if (!lowMemory && document.getElementById(`server${ID}`).className === "")
 		checkOnline(ID, servers[ID].ip + ":" + servers[ID].port);
 
 	if (servers[ID].description !== undefined) {
@@ -94,7 +94,15 @@ function onError(evt) {
 }
 
 function checkOnline(serverID, coIP) {
-	let oserv = new WebSocket("ws://" + coIP);
+	let oserv;
+	if (serverID !== -2) {
+		try {
+			oserv = new WebSocket("ws://" + coIP);
+		} catch (SecurityError) {
+			document.getElementById(`server${serverID}`).className = "unavailable";
+		}
+		
+	}
 
 	// define what the callbacks do
 	function onCOOpen(_e) {
@@ -129,6 +137,7 @@ function checkOnline(serverID, coIP) {
 
 	oserv.onerror = function (_evt) {
 		console.warn(coIP + " threw an error.");
+		document.getElementById(`server${serverID}`).className = "unavailable";
 	};
 
 }
