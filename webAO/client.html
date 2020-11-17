@@ -430,12 +430,16 @@
 			<button id="client_inichange" onclick="iniedit()">Change</button>
 			<br>
 			<br>
+			<p>Snap to multiple of original resolution (experimental)</p>
+			<label for="client_snap">Enable:</label>
+			<input id="client_snap" type="checkbox" onclick="resizeGame()">
+			<br>
 			<p>16:9 viewport (experimental)</p>
 			<label for="client_hdviewport">Enable:</label>
-			<input type="checkbox" id="client_hdviewport" id="client_hdviewport" onclick="switchAspectRatio()">
+			<input id="client_hdviewport" type="checkbox" onclick="switchAspectRatio()">
 			<br>
 			<label for="client_hdviewport_offset">Offset chatbox:</label>
-			<input type="checkbox" id="client_hdviewport_offset" id="client_hdviewport_offset" onclick="switchChatOffset()">
+			<input id="client_hdviewport_offset" type="checkbox" onclick="switchChatOffset()">
 			<br>
 			<br>
 			<label for="client_callwords">Callwords:</label>

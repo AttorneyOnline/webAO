@@ -2929,7 +2929,7 @@ export function resizeGame() {
 	const gameHeight = backgroundBox.offsetHeight;
 	
 	const multiple = Math.trunc(gameHeight / 192);
-	if(multiple >= 1) {
+	if(multiple >= 1 && document.getElementById("client_snap").checked) {
 		const neightbourheight = (multiple * 192);
 		gameWindowBox.style.height = neightbourheight + "px";
 		gameWindowBox.style.width = neightbourheight * (4/3) + "px";
