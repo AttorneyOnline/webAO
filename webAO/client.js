@@ -2933,9 +2933,15 @@ export function resizeGame() {
 		const neightbourheight = (multiple * 192);
 		gameWindowBox.style.height = neightbourheight + "px";
 		gameWindowBox.style.width = neightbourheight * (4/3) + "px";
+
+		gameWindowBox.style.top = Math.trunc((backgroundBox.offsetHeight - neightbourheight)/2) + "px";
+		gameWindowBox.style.left = Math.trunc((backgroundBox.offsetWidth - (neightbourheight * (4/3)))/2) + "px";
 	} else {
 		gameWindowBox.style.height = backgroundBox.offsetHeight + "px";
 		gameWindowBox.style.width = backgroundBox.offsetWidth + "px";
+
+		gameWindowBox.style.top = 0;
+		gameWindowBox.style.left = 0;
 	}
 }
 window.resizeGame = resizeGame;
