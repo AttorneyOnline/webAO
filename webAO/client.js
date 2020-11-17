@@ -2468,7 +2468,7 @@ window.changeBlipVolume = changeBlipVolume;
 export function reloadTheme() {
 	viewport.theme = document.getElementById("client_themeselect").value;
 	setCookie("theme", viewport.theme);
-	document.getElementById("client_theme").href = "styles/" + viewport.theme + ".css";
+	document.getElementById("client_theme").href = "styles/theme/" + viewport.theme + ".css";
 }
 window.reloadTheme = reloadTheme;
 
