@@ -105,6 +105,7 @@ function checkOnline(serverID, coIP) {
 			oserv = new WebSocket("ws://" + coIP);
 		} catch (SecurityError) {
 			document.getElementById(`server${serverID}`).className = "unavailable";
+			return;
 		}
 		
 	}
