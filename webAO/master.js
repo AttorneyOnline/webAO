@@ -3,6 +3,7 @@ import { version } from '../package.json';
 
 import Fingerprint2 from 'fingerprintjs2';
 import { unescapeChat } from './encoding.js';
+import { safe_tags } from './encoding.js';
 
 let masterserver;
 
@@ -120,12 +121,12 @@ function checkOnline(serverID, coIP) {
 		const coheader = comsg.split("#", 2)[0];
 		const coarguments = comsg.split("#").slice(1);
 		if (coheader === "PN") {
-			servers[serverID].online = `Online: ${coarguments[0]}/${coarguments[1]}`;
+			servers[serverID].online = `Online: ${Number(coarguments[0])}/${Number(coarguments[1])}`;
 			oserv.close();
 		}
 		else if (coheader === "BD") {
 			servers[serverID].online = "Banned";
-			servers[serverID].description = coarguments[0];
+			servers[serverID].description = safe_tags(coarguments[0]);
 			oserv.close();
 		}
 		if (serverID === selectedServer)
@@ -159,7 +160,7 @@ function onMessage(e) {
 			const serverEntry = allservers[i];
 			const args = serverEntry.split("&");
 
-			let thisserver = { name: args[0], description: args[1], ip: args[2], port: args[3], assets: args[4], online: "Online: ?/?" };
+			let thisserver = { name: safe_tags(args[0]), description: safe_tags(args[1]), ip: args[2], port: Number(args[3]), assets: args[4], online: "Online: ?/?" };
 			servers[i] = thisserver;
 
 			const ipport = args[2] + ":" + args[3];
