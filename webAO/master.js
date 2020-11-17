@@ -73,7 +73,7 @@ export function setServ(ID) {
 		checkOnline(ID, servers[ID].ip + ":" + servers[ID].port);
 
 	if (servers[ID].description !== undefined) {
-		document.getElementById("serverdescription_content").innerHTML = "<b>" + servers[ID].online + "</b><br>" + servers[ID].description;
+		document.getElementById("serverdescription_content").innerHTML = "<b>" + servers[ID].online + "</b><br>" + safe_tags(servers[ID].description);
 	}
 	else {
 		document.getElementById("serverdescription_content").innerHTML = "";
@@ -126,11 +126,11 @@ function checkOnline(serverID, coIP) {
 		}
 		else if (coheader === "BD") {
 			servers[serverID].online = "Banned";
-			servers[serverID].description = safe_tags(coarguments[0]);
+			servers[serverID].description = coarguments[0];
 			oserv.close();
 		}
 		if (serverID === selectedServer)
-			document.getElementById("serverdescription_content").innerHTML = "<b>" + servers[serverID].online + "</b><br>" + servers[serverID].description;
+			document.getElementById("serverdescription_content").innerHTML = "<b>" + servers[serverID].online + "</b><br>" + safe_tags(servers[serverID].description);
 	}
 
 	// assign the callbacks
@@ -160,14 +160,14 @@ function onMessage(e) {
 			const serverEntry = allservers[i];
 			const args = serverEntry.split("&");
 
-			let thisserver = { name: safe_tags(args[0]), description: safe_tags(args[1]), ip: args[2], port: Number(args[3]), assets: args[4], online: "Online: ?/?" };
+			let thisserver = { name: args[0], description: args[1], ip: args[2], port: Number(args[3]), assets: args[4], online: "Online: ?/?" };
 			servers[i] = thisserver;
 
 			const ipport = args[2] + ":" + args[3];
 			const asset = args[4] ? `&asset=${args[4]}` : "";
 
 			document.getElementById("masterlist").innerHTML +=
-				`<li id="server${i}" onmouseover="setServ(${i})"><p>${servers[i].name}</p>`
+				`<li id="server${i}" onmouseover="setServ(${i})"><p>${safe_tags(servers[i].name)}</p>`
 				+ `<a class="button" href="client.html?mode=watch&ip=${ipport}${asset}">Watch</a>`
 				+ `<a class="button" href="client.html?mode=join&ip=${ipport}${asset}">Join</a></li>`;			
 		}

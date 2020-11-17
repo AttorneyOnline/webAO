@@ -31,8 +31,8 @@ export function unescapeChat(estring) {
 export function safe_tags(unsafe) {
 	if (unsafe) {
 		return unsafe
-			.replace(/>/g, "&rt;")
-			.replace(/</g, "&lt;");
+			.replace(/>/g, '&gt;')
+			.replace(/</g, '&lt;');
 	} else {
 		return "";
 	}
