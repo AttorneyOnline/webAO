@@ -96,6 +96,7 @@ function onOpen(_e) {
 function onError(evt) {
 	document.getElementById("ms_error").style.display = "block";
 	document.getElementById("ms_error_code").innerText = `A network error occurred: ${evt.reason} (${evt.code})`;
+	return;
 }
 
 function checkOnline(serverID, coIP) {
@@ -124,11 +125,13 @@ function checkOnline(serverID, coIP) {
 		if (coheader === "PN") {
 			servers[serverID].online = `Online: ${Number(coarguments[0])}/${Number(coarguments[1])}`;
 			oserv.close();
+			return;
 		}
 		else if (coheader === "BD") {
 			servers[serverID].online = "Banned";
 			servers[serverID].description = coarguments[0];
 			oserv.close();
+			return;
 		}
 		if (serverID === selectedServer)
 			document.getElementById("serverdescription_content").innerHTML = "<b>" + servers[serverID].online + "</b><br>" + safe_tags(servers[serverID].description);
@@ -146,6 +149,7 @@ function checkOnline(serverID, coIP) {
 	oserv.onerror = function (_evt) {
 		console.warn(coIP + " threw an error.");
 		document.getElementById(`server${serverID}`).className = "unavailable";
+		return;
 	};
 
 }
@@ -173,6 +177,7 @@ function onMessage(e) {
 				+ `<a class="button" href="client.html?mode=join&ip=${ipport}${asset}">Join</a></li>`;			
 		}
 		masterserver.close();
+		return;
 	}
 	else if (header === "servercheok") {
 		const args = msg.split("#").slice(1);
