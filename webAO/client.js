@@ -5,6 +5,7 @@
 */
 
 import Fingerprint2 from 'fingerprintjs2';
+import IPFS from 'ipfs';
 
 import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
