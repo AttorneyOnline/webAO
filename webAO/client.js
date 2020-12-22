@@ -796,6 +796,7 @@ class Client extends EventEmitter {
 	async handleCharacterInfo(chargs, charid) {
 		if (chargs[0]) {
 			let cini = {};
+			let cswap = {};
 			let icon = AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char_icon.png";
 			let img = document.getElementById(`demo_${charid}`);
 			img.alt = chargs[0];
@@ -812,12 +813,18 @@ class Client extends EventEmitter {
 				// If it does, give the user a visual indication that the character is unusable
 			}
 
+			// Load iniswaps if there are any
+			try {
+				const cswapdata = await request(AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/iniswaps.ini");
+				cswap = cswapdata.split("\n");
+			} catch (err) {
+				cswap = {};
+			}
+
 			const mute_select = document.getElementById("mute_select");
 			mute_select.add(new Option(safe_tags(chargs[0]), charid));
 			const pair_select = document.getElementById("pair_select");
 			pair_select.add(new Option(safe_tags(chargs[0]), charid));
-			const iniedit_select = document.getElementById("client_ininame");
-			iniedit_select.add(new Option(safe_tags(chargs[0])));
 
 			// sometimes ini files lack important settings
 			const default_options = {
@@ -845,6 +852,7 @@ class Client extends EventEmitter {
 				evidence: chargs[3],
 				icon: icon,
 				inifile: cini,
+				swaps: cswap,
 				muted: false
 			};
 
@@ -1447,16 +1455,29 @@ class Client extends EventEmitter {
 					class="emote_button"
 					onclick="pickEmotion(${i})">`;
 
-				if(await fileExists(AO_HOST + "characters/" + encodeURI(me.name.toLowerCase()) + "/custom.gif"))
-					document.getElementById("button_4").style.display = "";
-				else
-					document.getElementById("button_4").style.display = "none";
-
 			} catch (e) {
 				console.error("missing emote " + i);
 			}
 		}
 		pickEmotion(1);
+		}
+
+		if(await fileExists(AO_HOST + "characters/" + encodeURI(me.name.toLowerCase()) + "/custom.gif"))
+			document.getElementById("button_4").style.display = "";
+		else
+			document.getElementById("button_4").style.display = "none";
+
+		const iniedit_select = document.getElementById("client_ininame");
+
+		function addIniswap(value) {
+			iniedit_select.add(new Option(safe_tags(value)));
+		}
+
+		// most iniswaps don't list their original char
+		if (me.swaps.length > 0) {
+			iniedit_select.innerHTML = "";
+			addIniswap(me.name);
+			me.swaps.forEach(addIniswap);
 		}
 	}
 
