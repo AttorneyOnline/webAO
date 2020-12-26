@@ -36,9 +36,11 @@ const serverIP = queryDict.ip;
 let mode = queryDict.mode;
 
 initIPFS();
+
 // Unless there is an asset URL specified, use the wasabi one
-const DEFAULT_HOST = location.hostname ? "https://dweb.link/ipfs/QmeWK7nB1xjS3zQRwqwGYrKcbiNUKYiWHYCryXzrJF336c/" : "base/";
-const AO_HOST = queryDict.asset || DEFAULT_HOST;
+//const DEFAULT_HOST = location.hostname ? "https://dweb.link/ipfs/QmeWK7nB1xjS3zQRwqwGYrKcbiNUKYiWHYCryXzrJF336c/" : "base/";
+//const AO_HOST = queryDict.asset || DEFAULT_HOST;
+const AO_HOST = "/ipfs/QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL/";
 const THEME = queryDict.theme || "default";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
 
@@ -104,6 +106,31 @@ async function initIPFS() {
 	for await (const file of ipfs.ls(cid)) {
 		console.log(file.path);
 	}
+
+	//await getFile("QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL/characters/winston/char_icon.png");
+}
+
+async function getIPFSimage(cid) {
+	console.log(cid);
+    const chunks = [];
+    for await (const chunk of window.ipfs.cat(cid)) {
+      chunks.push(chunk);
+    }
+
+    const final_file = Buffer.concat(chunks);
+	var image_b64 = 'data:image;base64,' + final_file.toString('base64');
+	return(image_b64);
+}
+
+async function getIPFStext(cid) {
+	console.log(cid);
+    const chunks = [];
+    for await (const chunk of window.ipfs.cat(cid)) {
+      chunks.push(chunk);
+    }
+
+    const final_file = Buffer.concat(chunks);
+	return(final_file.toString());
 }
 
 class Client extends EventEmitter {
@@ -814,11 +841,13 @@ class Client extends EventEmitter {
 			let icon = AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char_icon.png";
 			let img = document.getElementById(`demo_${charid}`);
 			img.alt = chargs[0];
-			img.src = icon;	// seems like a good time to load the icon
+			getIPFSimage(icon).then((value) => {
+				img.src = value;
+			});
 
 			// If the ini doesn't exist on the server this will throw an error
 			try {
-				const cinidata = await request(AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char.ini");
+				const cinidata = await getIPFStext(AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char.ini");
 				cini = INI.parse(cinidata);
 			} catch (err) {
 				cini = {};
@@ -1545,24 +1574,24 @@ class Viewport {
 		// Allocate multiple blip audio channels to make blips less jittery
 
 		this.blipChannels = new Array(6);
-		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav"))
-			.forEach(channel => channel.volume = 0.5);
+		//this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav"))
+		//	.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
 
 		this.sfxaudio = document.getElementById("client_sfxaudio");
-		this.sfxaudio.src = `${AO_HOST}sounds/general/sfx-realization.wav`;
+		//this.sfxaudio.src = `${AO_HOST}sounds/general/sfx-realization.wav`;
 
 		this.sfxplayed = 0;
 
 		this.shoutaudio = document.getElementById("client_shoutaudio");
-		this.shoutaudio.src = `${AO_HOST}misc/default/objection.wav`;
+		//this.shoutaudio.src = `${AO_HOST}misc/default/objection.wav`;
 
 		this.testimonyAudio = document.getElementById("client_testimonyaudio");
-		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.wav`;
+		//this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.wav`;
 
 		this.music = new Array(3);
-		this.music.fill(new Audio(`${AO_HOST}sounds/music/trial (aa).mp3`))
-			.forEach(channel => channel.volume = 0.5);
+		//this.music.fill(new Audio(`${AO_HOST}sounds/music/trial (aa).mp3`))
+		//	.forEach(channel => channel.volume = 0.5);
 
 		this.updater = null;
 		this.testimonyUpdater = null;
