@@ -35,6 +35,7 @@ location.search.substr(1).split("&").forEach(function (item) {
 const serverIP = queryDict.ip;
 let mode = queryDict.mode;
 
+initIPFS();
 // Unless there is an asset URL specified, use the wasabi one
 const DEFAULT_HOST = location.hostname ? "https://dweb.link/ipfs/QmeWK7nB1xjS3zQRwqwGYrKcbiNUKYiWHYCryXzrJF336c/" : "base/";
 const AO_HOST = queryDict.asset || DEFAULT_HOST;
@@ -91,6 +92,19 @@ if (window.requestIdleCallback) {
 
 
 let lastICMessageTime = new Date(0);
+
+async function initIPFS() {
+    const ipfs = await IPFS.create();
+    window.ipfs = ipfs;
+    const status = ipfs.isOnline() ? 'online' : 'offline';
+	console.log(`Node status: ${status}`);
+	
+	const cid = 'QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL';
+
+	for await (const file of ipfs.ls(cid)) {
+		console.log(file.path);
+	}
+}
 
 class Client extends EventEmitter {
 	constructor(address) {

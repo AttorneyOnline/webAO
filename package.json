@@ -33,7 +33,7 @@
     "core-js": "^3.6.4",
     "fingerprintjs2": "^2.1.2",
     "golden-layout": "^1.5.9",
-    "ipfs": "^0.52.2",
+    "ipfs": "^0.52.3",
     "regenerator-runtime": "^0.13.7"
   }
 }
