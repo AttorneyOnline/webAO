@@ -116,10 +116,6 @@ function checkOnline(serverID, coIP) {
 		}
 	}
 
-	function onCOError(_e) {
-		console.warn(coIP + " threw an error.");
-	}
-
 	// assign the callbacks
 	oserv.onopen = function (evt) {
 		onCOOpen(evt);
@@ -129,8 +125,8 @@ function checkOnline(serverID, coIP) {
 		onCOMessage(evt);
 	};
 
-	oserv.onerror = function (evt) {
-		onCOError(evt);
+	oserv.onerror = function (_evt) {
+		console.warn(coIP + " threw an error.");
 	};
 
 }
@@ -138,23 +134,24 @@ function checkOnline(serverID, coIP) {
 function onMessage(e) {
 	const msg = e.data;
 	const header = msg.split("#", 2)[0];
-	console.log(header);
+	console.debug(msg);
 
 	if (header === "ALL") {
 		const servers = msg.split("#").slice(1);
 		for (let i = 0; i < servers.length - 1; i++) {
 			const serverEntry = servers[i];
 			const args = serverEntry.split("&");
+			const ipport = args[2] + ":" + args[3];
 			const asset = args[4] ? `&asset=${args[4]}` : "";
 			const liclass = lowMemory ? "" : "unavailable"; // don't hide the entries if we're not checking them
 
 			document.getElementById("masterlist").innerHTML +=
 				`<li id="server${i}" class="${liclass}" onmouseover="setServ(${i})"><p>${args[0]}</p>`
-				+ `<a class="button" href="client.html?mode=watch&ip=${args[2]}:${args[3]}${asset}">Watch</a>`
-				+ `<a class="button" href="client.html?mode=join&ip=${args[2]}:${args[3]}${asset}">Join</a></li>`;
+				+ `<a class="button" href="client.html?mode=watch&ip=${ipport}${asset}">Watch</a>`
+				+ `<a class="button" href="client.html?mode=join&ip=${ipport}${asset}">Join</a></li>`;
 			server_description[i] = args[1];
 			if (!lowMemory)
-				setTimeout(() => checkOnline(i, `${args[2]}:${args[3]}`), 0);
+				setTimeout(() => checkOnline(i, ipport), 0);
 		}
 		masterserver.close();
 	}

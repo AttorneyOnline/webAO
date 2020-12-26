@@ -30,9 +30,10 @@
 
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="/images/logo-new.png"/>
-	<link rel="stylesheet" type="text/css" href="styles/client.css?v=1.0.2" id="client_stylesheet">
+	<link rel="stylesheet" type="text/css" href="styles/client.css?v=1.0.3" id="client_stylesheet">
 	<link rel="stylesheet" type="text/css" href="styles/default.css?v=1.0.1" id="client_theme">
 	<link rel="stylesheet" type="text/css" href="styles/chatbox/aa.css?v=1.0.1" id="chatbox_theme">
+	<link rel="stylesheet" type="text/css" href="styles/nameplates.css" id="nameplate_setting">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
 	<link type="text/css" rel="stylesheet"
@@ -123,6 +124,8 @@
 					onclick="toggleShout(2)">OBJECTION!</button>
 				<button id="button_3" alt="Take That!" class="client_button" onclick="toggleShout(3)">Take
 					That!</button>
+				<button id="button_4" alt="Custom" class="client_button" onclick="toggleShout(4)" style="display: none">
+					Custom</button>
 				<br>
 				<br>
 				<label for="textcolor">Text Color:</label>
@@ -187,11 +190,29 @@
 					<br>
 					<label for="check_nonint">Noninterrupting Preanimation:</label>
 					<input type="checkbox" name="check_nonint" id="check_nonint">
-				</span>	
+				</span>		
+				<br>
+				<br>
 				<span id="2.7" style="display: none">
-					<label for="check_nonint">Looping SFX:</label>
+					<label for="check_loopsfx">Looping SFX:</label>
 					<input type="checkbox" name="check_loopsfx" id="check_loopsfx">
 				</span>
+				<br>
+				<br>
+				<span id="2.8" style="display: none">
+					<label for="check_additive">Additive:</label>
+					<input type="checkbox" name="check_additive" id="check_additive">
+					<br>
+					<br>
+					<label for="effect_select">Effect:</label>
+					<select id="effect_select" name="effect_select">
+						<option value="-">None</option>
+						<option value="realization">Realization</option>
+						<option value="hearts">Hearts</option>
+						<option value="reaction">Reaction</option>
+						<option value="impact">Impact</option>
+					</select>
+				</span>	
 			</div>			
 			</div>
 			<fieldset style="margin:10px;">
@@ -344,13 +365,14 @@
 			<meta name="frame-title" lang="en" content="Settings">
 			<h2>Volume</h2>
 			<p>Music</p>
-			<audio id="client_musicaudio" onvolumechange="changeMusicVolume()" controls loop></audio>
+			<input id="client_mvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
+					onchange="changeMusicVolume()">
 
 			<p>SFX</p>
 			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" controls></audio>
 
 			<p>Shouts</p>
-			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" controls></audio>
+			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" onerror="shoutMissing(this)" controls></audio>
 			
 			<p>Testimony/Guilty</p>
 			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" controls></audio>
@@ -385,7 +407,9 @@
 				<option value="chatdr2">DR 2</option>
 				<option value="drv3">DR 3</option>
 				<option value="drae">DR: AE</option>
+				<option value="ddlc">DDLC</option>
 				<option value="homestuck">Homestuck</option>
+				<option value="key">Key</option>
 				<option value="n64zelda">N64 Zelda</option>
 				<option value="papermario">Paper Mario</option>
 				<option value="chatp3">Persona 3</option>
@@ -481,9 +505,13 @@
 	<meta name="frame-title" lang="en" content="Server">
 	<div style="height: 100%; display: flex; flex-direction: column;">
 		<textarea id="client_ooclog" style="flex: 1 auto" readonly></textarea>
-		<span style="display: inline-block; white-space: nowrap;">
+		<span id="client_oocinput" style="display: inline-block; white-space: nowrap;">
 			<input id="OOC_name" style="width: 15%;" name="OOC_name" type="text">
 			<input id="client_oocinputbox" style="width: 85%;" type="text" onkeypress="onOOCEnter(event)">
+		</span>
+		<span id="client_replaycontrols" style="display: none; white-space: nowrap;">
+			<input id="client_replaygo" style="width: 25%;" type="button" onclick="onReplayGo(event)" value="GO">
+			<input id="client_replaytimer" style="width: 25%;" type="number" value="2000">
 		</span>
 	</div>
 </template>

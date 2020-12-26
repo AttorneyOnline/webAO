@@ -18,6 +18,7 @@ const config = {
       width: 40,
       content: [{
         type: "component",
+        isClosable: false,
         componentName: "template",
         title: "Game",
         componentState: { id: "client_wrapper" }
@@ -32,12 +33,14 @@ const config = {
           type: "stack",
           content: [{
             type: "component",
+            isClosable: false,
             title: "Main",
             componentName: "template",
             componentState: { id: "mainmenu" }
           },
           {
             type: "component",
+            isClosable: false,
             title: "Log",
             componentName: "template",
             componentState: { id: "log" }

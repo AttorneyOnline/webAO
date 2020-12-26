@@ -9,6 +9,8 @@ import Fingerprint2 from 'fingerprintjs2';
 import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
+import character_arr from "./characters.js";
+import music_arr from "./music.js";
 import background_arr from "./backgrounds.js";
 import evidence_arr from "./evidence.js";
 import sfx_arr from "./sounds.js";
@@ -18,6 +20,7 @@ import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import { EventEmitter } from "events";
 
 import { version } from '../package.json';
+import { features } from 'process';
 
 let client;
 let viewport;
@@ -32,7 +35,7 @@ const serverIP = queryDict.ip;
 let mode = queryDict.mode;
 
 // Unless there is an asset URL specified, use the wasabi one
-const DEFAULT_HOST = location.hostname ? "https://cloudflare-ipfs.com/ipfs/QmZSdhjX8RUKBTER8hyVNHnK2ByLXusYc99FRS6RztDKUF/" : "base/";
+const DEFAULT_HOST = location.hostname ? "https://bafybeicndnzjokdlnf4ooigvkav7clnvkll3pbigifw5td6inhbrindue4.ipfs.dweb.link/" : "base/";
 const AO_HOST = queryDict.asset || DEFAULT_HOST;
 const THEME = queryDict.theme || "default";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
@@ -91,12 +94,17 @@ let lastICMessageTime = new Date(0);
 class Client extends EventEmitter {
 	constructor(address) {
 		super();
-		this.serv = new WebSocket("ws://" + address);
-		// Assign the websocket events
-		this.serv.addEventListener("open", this.emit.bind(this, "open"));
-		this.serv.addEventListener("close", this.emit.bind(this, "close"));
-		this.serv.addEventListener("message", this.emit.bind(this, "message"));
-		this.serv.addEventListener("error", this.emit.bind(this, "error"));
+		console.log("mode: " + mode);
+		if (mode !== "replay") {
+			this.serv = new WebSocket("ws://" + address);
+			// Assign the websocket events
+			this.serv.addEventListener("open", this.emit.bind(this, "open"));
+			this.serv.addEventListener("close", this.emit.bind(this, "close"));
+			this.serv.addEventListener("message", this.emit.bind(this, "message"));
+			this.serv.addEventListener("error", this.emit.bind(this, "error"));
+		} else {
+			this.joinServer();
+		}
 
 		this.on("open", this.onOpen.bind(this));
 		this.on("close", this.onClose.bind(this));
@@ -135,25 +143,29 @@ class Client extends EventEmitter {
 				"src": AO_HOST + "misc/default/takethat_bubble.png",
 				"duration": 840
 			},
+			"custom": {
+				"src": "",
+				"duration": 840
+			},
 			"witnesstestimony": {
 				"src": AO_HOST + "themes/" + THEME + "/witnesstestimony.gif",
 				"duration": 1560,
-				"sfx": AO_HOST + "sounds/general/sfx-testimony.wav"
+				"sfx": AO_HOST + "sounds/general/sfx-testimony.opus"
 			},
 			"crossexamination": {
 				"src": AO_HOST + "themes/" + THEME + "/crossexamination.gif",
 				"duration": 1600,
-				"sfx": AO_HOST + "sounds/general/sfx-testimony2.wav"
+				"sfx": AO_HOST + "sounds/general/sfx-testimony2.opus"
 			},
 			"guilty": {
 				"src": AO_HOST + "themes/" + THEME + "/guilty.gif",
 				"duration": 2870,
-				"sfx": AO_HOST + "sounds/general/sfx-guilty.wav"
+				"sfx": AO_HOST + "sounds/general/sfx-guilty.opus"
 			},
 			"notguilty": {
 				"src": AO_HOST + "themes/" + THEME + "/notguilty.gif",
 				"duration": 2440,
-				"sfx": AO_HOST + "sounds/general/sfx-notguilty.wav"
+				"sfx": AO_HOST + "sounds/general/sfx-notguilty.opus"
 			},
 		};
 
@@ -176,6 +188,8 @@ class Client extends EventEmitter {
 		this.on("FL", this.handleFL.bind(this));
 		this.on("LE", this.handleLE.bind(this));
 		this.on("EM", this.handleEM.bind(this));
+		this.on("FM", this.handleFM.bind(this));
+		this.on("FA", this.handleFA.bind(this));
 		this.on("SM", this.handleSM.bind(this));
 		this.on("MM", this.handleMM.bind(this));
 		this.on("BD", this.handleBD.bind(this));
@@ -186,14 +200,21 @@ class Client extends EventEmitter {
 		this.on("HP", this.handleHP.bind(this));
 		this.on("RT", this.handleRT.bind(this));
 		this.on("ZZ", this.handleZZ.bind(this));
+		this.on("HI", this.handleHI.bind(this));
 		this.on("ID", this.handleID.bind(this));
 		this.on("PN", this.handlePN.bind(this));
 		this.on("SI", this.handleSI.bind(this));
 		this.on("ARUP", this.handleARUP.bind(this));
+		this.on("askchaa", this.handleaskchaa.bind(this));
+		this.on("CC", this.handleCC.bind(this));
+		this.on("RC", this.handleRC.bind(this));
+		this.on("RM", this.handleRM.bind(this));
+		this.on("RD", this.handleRD.bind(this));
 		this.on("CharsCheck", this.handleCharsCheck.bind(this));
 		this.on("decryptor", this.handleDecryptor.bind(this));
 		this.on("PV", this.handlePV.bind(this));
 		this.on("CHECK", () => { });
+		this.on("CH", () => { });
 
 		this._lastTimeICReceived = new Date(0);
 	}
@@ -224,9 +245,32 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
 	sendServer(message) {
-		// console.log(message);
-		this.serv.send(message);
+		console.debug("C: " + message);
+		if (mode === "replay") {
+			this.sendSelf(message);
+		} else {
+			this.serv.send(message);
+		}
 	}
+
+	/**
+	 * Hook for sending messages to the client
+	 * @param {string} message the message to send
+	 */
+	handleSelf(message) {
+		const message_event = new MessageEvent('websocket', { data: message });
+		setTimeout(() => this.onMessage(message_event), 1);
+	}	
+
+	/**
+	 * Hook for sending messages to the client
+	 * @param {string} message the message to send
+	 */
+	sendSelf(message) {
+		document.getElementById("client_ooclog").value += message + "\r\n";
+		this.handleSelf(message);
+	}
+
 
 	/**
 	 * Sends an out-of-character chat message.
@@ -258,7 +302,7 @@ class Client extends EventEmitter {
 	 * @param {number} self_offset offset to paired character (optional)
 	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
-	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim, looping_sfx, screenshake) {
+	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim, looping_sfx, screenshake, frame_screenshake, frame_realization, frame_sfx, additive, effect) {
 		let extra_cccc = ``;
 		let extra_27 = ``;
 		let extra_28 = ``;
@@ -267,15 +311,8 @@ class Client extends EventEmitter {
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
 
 			if (extrafeatures.includes("looping_sfx")) {
-				const frame_screenshake = "-";
-				const frame_realization = "-";
-				const frame_sfx = "-";
-	
 				extra_27 = `${looping_sfx}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
 				if (extrafeatures.includes("effects")) {
-					const additive = 0;
-					const effect = "-";
-		
 					extra_28 = `${additive}#${effect}#`;
 				}
 			}
@@ -284,8 +321,6 @@ class Client extends EventEmitter {
 		const serverMessage = `MS#${deskmod}#${preanim}#${name}#${emote}` +
 			`#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}` +
 			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
-		
-		console.log(serverMessage);
 		
 		this.sendServer(serverMessage);
 	}
@@ -377,8 +412,9 @@ class Client extends EventEmitter {
 
 		this.sendServer(`HI#${hdid}#%`);
 		this.sendServer(`ID#webAO#webAO#%`);
-		this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
-	}
+		if (mode !== "replay")
+			this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
+		}
 
 	/**
 	 * Load game resources and stored settings.
@@ -414,7 +450,7 @@ class Client extends EventEmitter {
 		document.querySelector('#client_chatboxselect [value="' + cookiechatbox + '"]').selected = true;
 		setChatbox(cookiechatbox);
 
-		document.getElementById("client_musicaudio").volume = getCookie("musicVolume") || 1;
+		document.getElementById("client_mvolume").value = getCookie("musicVolume") || 1;
 		changeMusicVolume();
 		document.getElementById("client_sfxaudio").volume = getCookie("sfxVolume") || 1;
 		changeSFXVolume();
@@ -427,6 +463,7 @@ class Client extends EventEmitter {
 
 		document.getElementById("ic_chat_name").value = getCookie("ic_chat_name");
 		document.getElementById("showname").checked = getCookie("showname");
+		showname_click();
 
 		document.getElementById("client_callwords").value = getCookie("callwords");
 	}
@@ -482,14 +519,20 @@ class Client extends EventEmitter {
 	 */
 	onMessage(e) {
 		const msg = e.data;
-		console.debug(msg);
+		console.debug("S: " + msg);
 
 		const lines = msg.split("%");
-		const args = lines[0].split("#");
-		const header = args[0];
 
-		if (!this.emit(header, args)) {
-			console.warn(`Invalid packet header ${header}`);
+		for (const msg of lines) {
+			if(msg === "")
+				break;
+			
+			const args = msg.split("#");
+			const header = args[0];
+	
+			if (!this.emit(header, args)) {
+				console.warn(`Invalid packet header ${header}`);
+			}
 		}
 	}
 
@@ -513,6 +556,22 @@ class Client extends EventEmitter {
 		// the connection got rekt, get rid of the old musiclist
 		this.resetMusiclist();
 		document.getElementById("client_chartable").innerHTML = "";
+	}
+
+	/**
+	 * Parse the lines in the OOC and play them
+	 * @param {*} args packet arguments
+	 */
+	handleReplay() {
+		const ooclog = document.getElementById("client_ooclog");
+		const rtime = document.getElementById("client_replaytimer").value;
+
+		const clines = ooclog.value.split(/\r?\n/);
+		if (clines[0]) {
+			this.handleSelf(clines[0]);
+			ooclog.value = clines.slice(1).join("\r\n");
+			setTimeout(() => onReplayGo(""), rtime);
+		}
 	}
 
 	/**
@@ -606,7 +665,7 @@ class Client extends EventEmitter {
 						} else {
 							const extra_28 = {
 								additive: 0,
-								effects: ""
+								effects: "||"
 							};
 							chatmsg = Object.assign(extra_28, chatmsg);
 						}
@@ -620,6 +679,11 @@ class Client extends EventEmitter {
 							frame_sfx: ""
 						};
 						chatmsg = Object.assign(extra_27, chatmsg);
+						const extra_28 = {
+							additive: 0,
+							effects: ""
+						};
+						chatmsg = Object.assign(extra_28, chatmsg);
 					}
 				} else {
 					const extra_cccc = {
@@ -633,6 +697,19 @@ class Client extends EventEmitter {
 						noninterrupting_preanim: 0
 					};
 					chatmsg = Object.assign(extra_cccc, chatmsg);
+					const extra_27 = {
+						looping_sfx: 0,
+						screenshake: 0,
+						frame_screenshake: "",
+						frame_realization: "",
+						frame_sfx: ""
+					};
+					chatmsg = Object.assign(extra_27, chatmsg);
+					const extra_28 = {
+						additive: 0,
+						effects: ""
+					};
+					chatmsg = Object.assign(extra_28, chatmsg);
 				}
 
 				// our own message appeared, reset the buttons
@@ -664,8 +741,11 @@ class Client extends EventEmitter {
 	handleMC(args) {
 		const track = prepChat(args[1]);
 		let charID = Number(args[2]);
+		const showname = args[3] || "";
+		const looping = Boolean(args[4]);
+		const channel = Number(args[5]) || 0;
    
-		const music = viewport.music;
+		const music = viewport.music[channel];
 		let musicname;
 		music.pause();
 		if(track.startsWith("http")) {
@@ -673,6 +753,7 @@ class Client extends EventEmitter {
 		} else {
 			music.src = MUSIC_HOST + encodeURI(track.toLowerCase());
 		}
+		music.loop = looping;
 		music.play();
 
 		try {
@@ -715,6 +796,7 @@ class Client extends EventEmitter {
 	async handleCharacterInfo(chargs, charid) {
 		if (chargs[0]) {
 			let cini = {};
+			let cswap = {};
 			let icon = AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char_icon.png";
 			let img = document.getElementById(`demo_${charid}`);
 			img.alt = chargs[0];
@@ -731,12 +813,18 @@ class Client extends EventEmitter {
 				// If it does, give the user a visual indication that the character is unusable
 			}
 
+			// Load iniswaps if there are any
+			try {
+				const cswapdata = await request(AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/iniswaps.ini");
+				cswap = cswapdata.split("\n");
+			} catch (err) {
+				cswap = {};
+			}
+
 			const mute_select = document.getElementById("mute_select");
 			mute_select.add(new Option(safe_tags(chargs[0]), charid));
 			const pair_select = document.getElementById("pair_select");
 			pair_select.add(new Option(safe_tags(chargs[0]), charid));
-			const iniedit_select = document.getElementById("client_ininame");
-			iniedit_select.add(new Option(safe_tags(chargs[0])));
 
 			// sometimes ini files lack important settings
 			const default_options = {
@@ -764,8 +852,10 @@ class Client extends EventEmitter {
 				evidence: chargs[3],
 				icon: icon,
 				inifile: cini,
+				swaps: cswap,
 				muted: false
 			};
+
 		} else {
 			console.warn("missing charid " + charid);
 			let img = document.getElementById(`demo_${charid}`);
@@ -854,14 +944,17 @@ class Client extends EventEmitter {
 	}
 
 	resetMusiclist() {
-		this.musics = [];
+		this.musics = [];		
+		document.getElementById("client_musiclist").innerHTML = "";			
+	}
+
+	resetArealist() {
 		this.areas = [];
-		document.getElementById("client_musiclist").innerHTML = "";
-		document.getElementById("areas").innerHTML = "";		
+		document.getElementById("areas").innerHTML = "";
 	}
 
 	isAudio(trackname) {
-		if (/\.(?:wav|mp3|mp4|ogg|opus)$/i.test(trackname) || // regex for file extenstions
+		if (trackname.includes(".") || // regex for file extenstions
 			trackname.startsWith("=") ||
 			trackname.startsWith("-"))   // category markers
 		{
@@ -871,38 +964,46 @@ class Client extends EventEmitter {
 		}
 	}
 
+	addTrack(trackname) {
+		const newentry = document.createElement("OPTION");
+		newentry.text = trackname;
+		document.getElementById("client_musiclist").options.add(newentry);
+		this.musics.push(trackname);
+	}
+
 	handleMusicInfo(trackindex,trackname) {
 		if (this.isAudio(trackname)) {
-			// After reached the audio put everything in the music list
-			const newentry = document.createElement("OPTION");
-			newentry.text = trackname;
-			document.getElementById("client_musiclist").options.add(newentry);
-			this.musics.push(trackname);
+			this.addTrack(trackname);
 		} else {
-			const thisarea = {
-				name: trackname,
-				players: 0,
-				status: "IDLE",
-				cm: "",
-				locked: "FREE"
-			};
-
-			this.areas.push(thisarea);
-
-			// Create area button
-			let newarea = document.createElement("SPAN");
-			newarea.classList = "area-button area-default";
-			newarea.id = "area" + trackindex;
-			newarea.innerText = thisarea.name;
-			newarea.title = "Players: <br>" +
-				"Status: <br>" +
-				"CM: ";
-			newarea.onclick = function () {
-				area_click(this);
-			};
-
-			document.getElementById("areas").appendChild(newarea);
+			this.createArea(trackindex,trackname);
 		}
+	}
+
+	createArea(id,name) {
+		const thisarea = {
+			name: name,
+			players: 0,
+			status: "IDLE",
+			cm: "",
+			locked: "FREE"
+		};
+
+		this.areas.push(thisarea);
+
+		// Create area button
+		let newarea = document.createElement("SPAN");
+		newarea.classList = "area-button area-default";
+		newarea.id = "area" + id;
+		newarea.innerText = thisarea.name;
+		newarea.title = `Players: ${thisarea.players}\n` +
+						`Status: ${thisarea.status}\n` +
+						`CM: ${thisarea.cm}\n` +
+						`Area lock: ${thisarea.locked}`;
+		newarea.onclick = function () {
+			area_click(this);
+		};
+
+		document.getElementById("areas").appendChild(newarea);
 	}
 
 	/**
@@ -914,6 +1015,7 @@ class Client extends EventEmitter {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music";
 		if(args[1] === "0") {
 			this.resetMusiclist();
+			this.resetArealist();
 		}
 
 		for (let i = 2; i < args.length - 1; i++) {
@@ -934,6 +1036,7 @@ class Client extends EventEmitter {
 	handleSM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
 		this.resetMusiclist();
+		this.resetArealist();
 
 		for (let i = 1; i < args.length - 1; i++) {
 			// Check when found the song for the first time
@@ -943,6 +1046,31 @@ class Client extends EventEmitter {
 
 		// Music done, carry on
 		this.sendServer("RD#%");
+	}
+
+	/**
+	 * Handles updated music list
+	 * @param {Array} args packet arguments
+	 */
+	handleFM(args) {
+		this.resetMusiclist();
+
+		for (let i = 1; i < args.length - 1; i++) {
+			// Check when found the song for the first time
+			this.addTrack(safe_tags(args[i]));
+		}
+	}
+
+	/**
+	 * Handles updated area list
+	 * @param {Array} args packet arguments
+	 */
+	handleFA(args) {
+		this.resetArealist();
+
+		for (let i = 1; i < args.length - 1; i++) {
+			this.createArea(i-1,safe_tags(args[i]));
+		}
 	}
 
 	/**
@@ -1082,9 +1210,18 @@ class Client extends EventEmitter {
 		viewport.sfxaudio.pause();
 		const oldvolume = viewport.sfxaudio.volume;
 		viewport.sfxaudio.volume = 1;
-		viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
+		viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.opus";
 		viewport.sfxaudio.play();
 		viewport.sfxaudio.volume = oldvolume;
+	}
+
+	/**
+	 * Handle the player
+	 * @param {Array} args packet arguments
+	 */
+	handleHI(args) {
+		this.sendSelf("ID#1#webAO#" + version + "#%");
+		this.sendSelf("FL#fastloading#yellowtext#cccc_ic_support#flipping#looping_sfx#effects#%");
 	}
 
 	/**
@@ -1096,7 +1233,10 @@ class Client extends EventEmitter {
 		this.serverSoftware = args[2].split("&")[0];
 		if (this.serverSoftware === "serverD")
 			this.serverVersion = args[2].split("&")[1];
-		else
+		else if (this.serverSoftware === "webAO") {
+			oldLoading = false;
+			this.sendSelf("PN#0#1#%");
+		} else
 			this.serverVersion = args[3];
 
 		if (this.serverSoftware === "serverD" && this.serverVersion === "1377.152")
@@ -1112,6 +1252,22 @@ class Client extends EventEmitter {
 	}
 
 	/**
+	 * What? you want a character??
+	 * @param {Array} args packet arguments
+	 */
+	handleCC(args) {
+		this.sendSelf("PV#1#CID#" + args[2] + "#%");
+	}
+
+	/**
+	 * What? you want a character list from me??
+	 * @param {Array} args packet arguments
+	 */
+	handleaskchaa(_args) {
+		this.sendSelf("SI#" + character_arr.length + "#0#0#%");
+	}
+
+	/**
 	 * Handle the change of players in an area.
 	 * @param {Array} args packet arguments
 	 */
@@ -1123,11 +1279,9 @@ class Client extends EventEmitter {
 				switch (Number(args[0])) {
 					case 0: // playercount				
 						this.areas[i].players = Number(args[i+1]);
-						thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players})`;
 						break;
 					case 1: // status
 						this.areas[i].status = safe_tags(args[i+1]);
-						thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();
 						break;
 					case 2:
 						this.areas[i].cm = safe_tags(args[i+1]);
@@ -1136,6 +1290,10 @@ class Client extends EventEmitter {
 						this.areas[i].locked = safe_tags(args[i+1]);
 						break;
 				}
+
+				thisarea.classList = "area-button area-" + this.areas[i].status.toLowerCase();
+
+				thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players}) [${this.areas[i].status}]`;
 
 				thisarea.title = `Players: ${this.areas[i].players}\n` +
 					`Status: ${this.areas[i].status}\n` +
@@ -1174,6 +1332,11 @@ class Client extends EventEmitter {
 
 		if (args.includes("looping_sfx")) {
 			document.getElementById("button_shake").style.display = "";
+			document.getElementById("2.7").style.display = "";
+		}
+
+		if (args.includes("effects")) {
+			document.getElementById("2.8").style.display = "";
 		}
 	}
 
@@ -1291,12 +1454,62 @@ class Client extends EventEmitter {
 					alt="${emotes[i].desc}"
 					class="emote_button"
 					onclick="pickEmotion(${i})">`;
+
 			} catch (e) {
 				console.error("missing emote " + i);
 			}
 		}
 		pickEmotion(1);
 		}
+
+		if(await fileExists(AO_HOST + "characters/" + encodeURI(me.name.toLowerCase()) + "/custom.gif"))
+			document.getElementById("button_4").style.display = "";
+		else
+			document.getElementById("button_4").style.display = "none";
+
+		const iniedit_select = document.getElementById("client_ininame");
+
+		function addIniswap(value) {
+			iniedit_select.add(new Option(safe_tags(value)));
+		}
+
+		// most iniswaps don't list their original char
+		if (me.swaps.length > 0) {
+			iniedit_select.innerHTML = "";
+			addIniswap(me.name);
+			me.swaps.forEach(addIniswap);
+		}
+	}
+
+	/**
+	 * we are asking ourselves what characters there are
+	 * @param {Array} args packet arguments
+	 */
+	handleRC(_args) {
+		this.sendSelf("SC#" + character_arr.join("#") + "#%");
+	}
+
+	/**
+	 * we are asking ourselves what characters there are
+	 * @param {Array} args packet arguments
+	 */
+	handleRM(_args) {
+		this.sendSelf("SM#" + music_arr.join("#") + "#%");
+	}
+
+	/**
+	 * we are asking ourselves what characters there are
+	 * @param {Array} args packet arguments
+	 */
+	handleRD(_args) {
+		this.sendSelf("BN#gs4#%");
+		this.sendSelf("DONE#%");
+		const ooclog = document.getElementById("client_ooclog");
+		ooclog.value = "";
+		ooclog.readOnly = false;
+
+		document.getElementById("client_oocinput").style.display = "none";
+		document.getElementById("client_replaycontrols").style.display = "inline-block";
 	}
 }
 
@@ -1319,7 +1532,8 @@ class Viewport {
 			undefined,
 			"holdit",
 			"objection",
-			"takethat"
+			"takethat",
+			"custom"
 		];
 
 		this.colors = [
@@ -1337,23 +1551,24 @@ class Viewport {
 		// Allocate multiple blip audio channels to make blips less jittery
 
 		this.blipChannels = new Array(6);
-		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav"))
+		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"))
 			.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
 
 		this.sfxaudio = document.getElementById("client_sfxaudio");
-		this.sfxaudio.src = `${AO_HOST}sounds/general/sfx-realization.wav`;
+		this.sfxaudio.src = `${AO_HOST}sounds/general/sfx-realization.opus`;
 
 		this.sfxplayed = 0;
 
 		this.shoutaudio = document.getElementById("client_shoutaudio");
-		this.shoutaudio.src = `${AO_HOST}misc/default/objection.wav`;
+		this.shoutaudio.src = `${AO_HOST}misc/default/objection.opus`;
 
 		this.testimonyAudio = document.getElementById("client_testimonyaudio");
-		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.wav`;
+		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.opus`;
 
-		this.music = document.getElementById("client_musicaudio");
-		this.music.src = `${AO_HOST}sounds/music/trial (aa).mp3`;
+		this.music = new Array(3);
+		this.music.fill(new Audio(`${AO_HOST}sounds/music/trial (aa).opus`))
+			.forEach(channel => channel.volume = 0.5);
 
 		this.updater = null;
 		this.testimonyUpdater = null;
@@ -1379,11 +1594,19 @@ class Viewport {
 	}
 
 	/**
-	 * Sets the volume of the blip sound.
+	 * Sets the volume of the blip sounds.
 	 * @param {number} volume
 	 */
 	set blipVolume(volume) {
 		this.blipChannels.forEach(channel => channel.volume = volume);
+	}
+
+	/**
+	 * Sets the volume of the music.
+	 * @param {number} volume
+	 */
+	set musicVolume(volume) {
+		this.music.forEach(channel => channel.volume = volume);
 	}
 
 	/**
@@ -1399,8 +1622,9 @@ class Viewport {
 	 * 
 	 * @param {string} sfxname
 	 */
-	async playSFX(sfxname) {
+	async playSFX(sfxname, looping) {
 		this.sfxaudio.pause();
+		this.sfxaudio.loop = looping;
 		this.sfxaudio.src = sfxname;
 		this.sfxaudio.play();
 	}
@@ -1625,10 +1849,12 @@ async changeBackground(position) {
 		const  png_s = document.getElementById("client_" + pairID + "_png");
 		const apng_s = document.getElementById("client_" + pairID +"_apng");
 
-		//hide the last sprite
-		gif_s.src = transparentPNG;
-		png_s.src = transparentPNG;
-		apng_s.src = transparentPNG;
+		if (this.lastChar !== this.chatmsg.name) {
+			//hide the last sprite
+			gif_s.src = transparentPNG;
+			png_s.src = transparentPNG;
+			apng_s.src = transparentPNG;
+		}
 
 		gif_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.gif`;
 		png_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(emotename)}.png`;
@@ -1687,11 +1913,10 @@ async changeBackground(position) {
 		}
 		this.lastChar = this.chatmsg.name;
 
-		appendICLog(this.chatmsg.content, displayname);
+		appendICLog(this.chatmsg.content, this.chatmsg.showname, this.chatmsg.nameplate);
 
-		checkCallword(this.chatmsg.content);
+		checkCallword(this.chatmsg.content);		
 
-		this.setEmote(this.chatmsg.name.toLowerCase(), this.chatmsg.sprite, "(b)", false);
 		this.setEmote(this.chatmsg.name.toLowerCase(), this.chatmsg.sprite, "(a)", false);
 
 		if (this.chatmsg.other_name) {
@@ -1704,23 +1929,16 @@ async changeBackground(position) {
 		if (shout) {
 			// Hide message box
 			chatContainerBox.style.opacity = 0;
-			shoutSprite.src = client.resources[shout]["src"];
-			shoutSprite.style.opacity = 1;
-			shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
-
-			let shoutUrl;
-
-			try {
-			const { url: soundUrl } = await this.oneSuccess([
-				this.rejectOnError(fetch(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`)),
-				this.rejectOnError(fetch(`${AO_HOST}misc/default/objection.wav`))
-			]);
-			shoutUrl = soundUrl;
-			} catch (error) {
-				shoutUrl = AO_HOST + `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
+			if (this.chatmsg.objection === 4) {
+				shoutSprite.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/custom.gif`;
+			} else {
+				shoutSprite.src = client.resources[shout]["src"];
+				shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
 			}
+			shoutSprite.style.opacity = 1;
+			
 
-			this.shoutaudio.src = shoutUrl;
+			this.shoutaudio.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.opus`;
 			this.shoutaudio.play();
 			this.shoutTimer = client.resources[shout]["duration"];
 		} else {
@@ -1767,7 +1985,7 @@ async changeBackground(position) {
 			pairLayers.style.transform = "scaleX(1)";
 		}
 
-		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
+		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`);
 
 		// process markup
 		if(this.chatmsg.content.startsWith("~~")) {
@@ -1781,7 +1999,7 @@ async changeBackground(position) {
 		const effectinfo = this.chatmsg.effects.split('|');
 		fg.style.animation = "";
 
-		if (effectinfo[0])
+		if (effectinfo[0] && effectinfo[0] !== "-")
 			fg.src = `${AO_HOST}themes/default/effects/${encodeURI(effectinfo[0].toLowerCase())}.webp`;
 		else
 			fg.src = transparentPNG;
@@ -1847,12 +2065,12 @@ async changeBackground(position) {
 			// Effect stuff
 			if (this.chatmsg.screenshake === 1) {
 				// Shake screen
-				this.playSFX(AO_HOST + "sounds/general/sfx-stab.wav");
+				this.playSFX(AO_HOST + "sounds/general/sfx-stab.opus", false);
 				gamewindow.style.animation = "shake 0.2s 1";
 			}
 			if (this.chatmsg.flash === 1) {
 				// Flash screen
-				this.playSFX(AO_HOST + "sounds/general/sfx-realization.wav");
+				this.playSFX(AO_HOST + "sounds/general/sfx-realization.opus", false);
 				effectlayer.style.animation = "flash 0.4s 1";
 			}
 
@@ -1886,7 +2104,7 @@ async changeBackground(position) {
 					eviBox.style.height = "36.5%";
 					eviBox.style.opacity = 1;
 
-					this.testimonyAudio.src = AO_HOST + "sounds/general/sfx-evidenceshoop.wav";
+					this.testimonyAudio.src = AO_HOST + "sounds/general/sfx-evidenceshoop.opus";
 					this.testimonyAudio.play();
 
 					if (this.chatmsg.side === "def") {
@@ -1963,7 +2181,7 @@ async changeBackground(position) {
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1" && this.chatmsg.sound !== "" && this.chatmsg.sound !== undefined) {
-				this.playSFX(AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav");
+				this.playSFX(AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".opus", this.chatmsg.looping_sfx);
 			}
 		}
 		this.textTimer = this.textTimer + UPDATE_INTERVAL;
@@ -2055,6 +2273,15 @@ export function onOOCEnter(event) {
 window.onOOCEnter = onOOCEnter;
 
 /**
+ * Triggered when the user click replay GOOOOO
+ * @param {KeyboardEvent} event
+ */
+export function onReplayGo(_event) {
+	client.handleReplay();
+}
+window.onReplayGo = onReplayGo;
+
+/**
  * Triggered when the Return key is pressed on the in-character chat input box.
  * @param {KeyboardEvent} event
  */
@@ -2074,6 +2301,8 @@ export function onEnter(event) {
 		const pairchar = document.getElementById("pair_select").value;
 		const pairoffset = document.getElementById("pair_offset").value;
 		const myrole = document.getElementById("role_select").value ? document.getElementById("role_select").value : mychar.side;
+		const additive = ((document.getElementById("check_additive").checked) ? 1 : 0);
+		const effect = document.getElementById("effect_select").value;
 
 		let sfxname = "0";
 		let sfxdelay = 0;
@@ -2090,7 +2319,7 @@ export function onEnter(event) {
 		client.sendIC("chat", preanim, mychar.name, myemo.emote,
 			text, myrole,
 			sfxname, myemo.zoom, sfxdelay, selectedShout, evi, flip,
-			flash, color, showname, pairchar, pairoffset, noninterrupting_preanim, looping_sfx, screenshake);
+			flash, color, showname, pairchar, pairoffset, noninterrupting_preanim, looping_sfx, screenshake, "-", "-", "-", additive, effect);
 	}
 }
 window.onEnter = onEnter;
@@ -2176,6 +2405,13 @@ window.mutelist_click = mutelist_click;
 export function showname_click(_event) {
 	setCookie("showname", document.getElementById("showname").checked);
 	setCookie("ic_chat_name", document.getElementById("ic_chat_name").value);
+
+	const css_s = document.getElementById("nameplate_setting");
+
+	if (document.getElementById("showname").checked)
+		css_s.href = "styles/shownames.css";
+	else
+		css_s.href = "styles/nameplates.css";
 }
 window.showname_click = showname_click;
 
@@ -2198,7 +2434,8 @@ window.area_click = area_click;
  * Triggered by the music volume slider.
  */
 export function changeMusicVolume() {
-	setCookie("musicVolume", document.getElementById("client_musicaudio").volume);
+	viewport.musicVolume = document.getElementById("client_mvolume").value;
+	setCookie("musicVolume", document.getElementById("client_mvolume").value);
 }
 window.changeMusicVolume = changeMusicVolume;
 
@@ -2217,6 +2454,17 @@ export function changeShoutVolume() {
 	setCookie("shoutVolume", document.getElementById("client_shoutaudio").volume);
 }
 window.changeShoutVolume = changeShoutVolume;
+
+/**
+ * Triggered when the shout could not be found
+ */
+export function shoutMissing(self) {
+	if (self.src !== `${AO_HOST}misc/default/objection.opus`) {
+		self.src = `${AO_HOST}misc/default/objection.opus`;
+		self.play();
+	}		
+}
+window.shoutMissing = shoutMissing;
 
 /**
  * Triggered by the testimony volume slider.
@@ -2439,17 +2687,25 @@ window.ReconnectButton = ReconnectButton;
  * @param {string} msg the string to be added
  * @param {string} name the name of the sender
  */
-function appendICLog(msg, name = "", time = new Date()) {
+function appendICLog(msg, showname = "", nameplate = "", time = new Date()) {
 	const entry = document.createElement("p");
-	const nameField = document.createElement("span");
-	const textField = document.createElement("span");
-	nameField.className = "iclog_name";
-	nameField.appendChild(document.createTextNode(name));
+	const shownameField = document.createElement("span");
+	const nameplateField = document.createElement("span");
+	const textField = document.createElement("span");	
+	nameplateField.classList = "iclog_name iclog_nameplate";
+	nameplateField.appendChild(document.createTextNode(nameplate));
+
+	shownameField.classList = "iclog_name iclog_showname";
+	if (showname === "" || !showname)
+		shownameField.appendChild(document.createTextNode(nameplate));
+	else
+		shownameField.appendChild(document.createTextNode(showname));
 
 	textField.className = "iclog_text";
 	textField.appendChild(document.createTextNode(msg));
 
-	entry.appendChild(nameField);
+	entry.appendChild(shownameField);
+	entry.appendChild(nameplateField);
 	entry.appendChild(textField);
 
 	// Only put a timestamp if the minute has changed.
@@ -2486,7 +2742,7 @@ export function checkCallword(message) {
 		if(item !== "" && message.toLowerCase().includes(item.toLowerCase()))
 		{
 			viewport.sfxaudio.pause();
-			viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
+			viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.opus";
 			viewport.sfxaudio.play();
 		}
 	}
@@ -2750,7 +3006,11 @@ export function changeBackgroundOOC() {
 	} else {
 		filename = selectedBG.value;
 	}
-	client.sendOOC("/" + changeBGCommand.replace("$1", filename));
+
+	if (mode==="join")
+		client.sendOOC("/" + changeBGCommand.replace("$1", filename));
+	else if (mode==="replay")
+		client.sendSelf("BN#" + filename + "#%");
 }
 window.changeBackgroundOOC = changeBackgroundOOC;
 
