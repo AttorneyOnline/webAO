@@ -40,7 +40,7 @@ initIPFS();
 // Unless there is an asset URL specified, use the wasabi one
 //const DEFAULT_HOST = location.hostname ? "https://dweb.link/ipfs/QmeWK7nB1xjS3zQRwqwGYrKcbiNUKYiWHYCryXzrJF336c/" : "base/";
 //const AO_HOST = queryDict.asset || DEFAULT_HOST;
-const AO_HOST = "/ipfs/QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL/";
+const AO_HOST = "QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL/";
 const THEME = queryDict.theme || "default";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
 
@@ -100,37 +100,45 @@ async function initIPFS() {
     window.ipfs = ipfs;
     const status = ipfs.isOnline() ? 'online' : 'offline';
 	console.log(`Node status: ${status}`);
+}
+
+async function getIPFSdata(cid) {
+	const chunks = [];
 	
-	const cid = 'QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL';
-
-	for await (const file of ipfs.ls(cid)) {
-		console.log(file.path);
-	}
-
-	//await getFile("QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL/characters/winston/char_icon.png");
+	try {
+		for await (const chunk of window.ipfs.cat(cid)) {
+			chunks.push(chunk);
+		}
+	
+		return Buffer.concat(chunks);
+	} catch (error) {
+		return null;
+	}    
 }
 
 async function getIPFSimage(cid) {
-	console.log(cid);
-    const chunks = [];
-    for await (const chunk of window.ipfs.cat(cid)) {
-      chunks.push(chunk);
-    }
-
-    const final_file = Buffer.concat(chunks);
+    const final_file = await getIPFSdata(cid);
 	var image_b64 = 'data:image;base64,' + final_file.toString('base64');
 	return(image_b64);
 }
 
-async function getIPFStext(cid) {
-	console.log(cid);
-    const chunks = [];
-    for await (const chunk of window.ipfs.cat(cid)) {
-      chunks.push(chunk);
-    }
+async function getIPFSsound(cid) {
+    const final_file = await getIPFSdata(cid);
+	var audio_b64 = 'data:audio;base64,' + final_file.toString('base64');
+	return(audio_b64);
+}
 
-    const final_file = Buffer.concat(chunks);
+async function getIPFStext(cid) {
+    const final_file = await getIPFSdata(cid);
 	return(final_file.toString());
+}
+
+async function listIPFSfiles(cid) {
+	let filelist = [];
+	for await (const file of window.ipfs.ls(cid)) {
+		filelist.push(file.path);
+	}
+	return filelist;
 }
 
 class Client extends EventEmitter {
@@ -793,7 +801,9 @@ class Client extends EventEmitter {
 		if(track.startsWith("http")) {
 			music.src = track;
 		} else {
-			music.src = MUSIC_HOST + encodeURI(track.toLowerCase());
+			getIPFSsound(`${AO_HOST}sounds/music/${track.toLowerCase()}`).then((value) => {
+				music.src = value;
+			});
 		}
 		music.loop = looping;
 		music.play();
@@ -1595,24 +1605,36 @@ class Viewport {
 		// Allocate multiple blip audio channels to make blips less jittery
 
 		this.blipChannels = new Array(6);
-		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"))
-			.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
+		this.blipChannels.fill(new Audio())
+			.forEach(channel => channel.volume = 0.5);
+
+		getIPFSsound(`${AO_HOST}sounds/general/sfx-blipmale.opus`).then((value) => {
+			this.blipChannels.forEach(channel => channel.src = value);
+		});		
 
 		this.sfxaudio = document.getElementById("client_sfxaudio");
-		this.sfxaudio.src = `${AO_HOST}sounds/general/sfx-realization.opus`;
-
 		this.sfxplayed = 0;
+		getIPFSsound(`${AO_HOST}sounds/general/sfx-realization.opus`).then((value) => {
+			this.sfxaudio.src = value;
+		});
 
 		this.shoutaudio = document.getElementById("client_shoutaudio");
-		this.shoutaudio.src = `${AO_HOST}misc/default/objection.opus`;
+		getIPFSsound(`${AO_HOST}misc/default/objection.opus`).then((value) => {
+			this.shoutaudio.src = value;
+		});
 
 		this.testimonyAudio = document.getElementById("client_testimonyaudio");
-		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.opus`;
+		getIPFSsound(`${AO_HOST}sounds/general/sfx-guilty.opus`).then((value) => {
+			this.testimonyAudio.src = value;
+		});
 
 		this.music = new Array(3);
-		this.music.fill(new Audio(`${AO_HOST}sounds/music/trial (aa).opus`))
+		this.music.fill(new Audio())
 			.forEach(channel => channel.volume = 0.5);
+		getIPFSsound(`${AO_HOST}sounds/music/trial (aa).opus`).then((value) => {
+			this.music.forEach(channel => channel.src = value);
+		});
 
 		this.updater = null;
 		this.testimonyUpdater = null;
@@ -1884,24 +1906,24 @@ async changeBackground(position) {
 	 * Sets all the img tags to the right sources
 	 * @param {*} chatmsg 
 	 */
-	setEmote(charactername, emotename, prefix, pair) {
+	async setEmote(charactername, emotename, prefix, pair) {
 		const pairID = pair ? "pair" : "char";
-		const characterFolder = AO_HOST + "characters/";
+		const characterFolder = AO_HOST + "characters/" + encodeURI(charactername) + "/";
 
-		const  gif_s = document.getElementById("client_" + pairID + "_gif");
-		const  png_s = document.getElementById("client_" + pairID + "_png");
-		const apng_s = document.getElementById("client_" + pairID +"_apng");
+		const charsprite = document.getElementById("client_" + pairID);
+
+		const files = await listIPFSfiles(characterFolder);
+		console.log(files);
 
 		if (this.lastChar !== this.chatmsg.name) {
 			//hide the last sprite
-			gif_s.src = transparentPNG;
-			png_s.src = transparentPNG;
-			apng_s.src = transparentPNG;
+			charsprite.src = transparentPNG;
 		}
 
-		gif_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.gif`;
-		png_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(emotename)}.png`;
-		apng_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.apng`;
+		if (files.includes(characterFolder + `${encodeURI(prefix)}${encodeURI(emotename)}.apng`)) {
+			charsprite.src = await getIPFSimage(characterFolder + `${encodeURI(prefix)}${encodeURI(emotename)}.apng`);
+		}
+		//charsprite.src = await getIPFSimage("QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL/characters/judge/(a)warning.apng");
 	}
 
 	/**
@@ -2028,7 +2050,9 @@ async changeBackground(position) {
 			pairLayers.style.transform = "scaleX(1)";
 		}
 
-		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`);
+		getIPFSsound(`${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`).then((value) => {
+			this.blipChannels.forEach(channel => channel.src = value);
+		});	
 
 		// process markup
 		if(this.chatmsg.content.startsWith("~~")) {
