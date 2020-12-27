@@ -192,22 +192,22 @@ class Client extends EventEmitter {
 			"witnesstestimony": {
 				"src": AO_HOST + "themes/" + THEME + "/witnesstestimony.gif",
 				"duration": 1560,
-				"sfx": AO_HOST + "sounds/general/sfx-testimony.wav"
+				"sfx": AO_HOST + "sounds/general/sfx-testimony.opus"
 			},
 			"crossexamination": {
 				"src": AO_HOST + "themes/" + THEME + "/crossexamination.gif",
 				"duration": 1600,
-				"sfx": AO_HOST + "sounds/general/sfx-testimony2.wav"
+				"sfx": AO_HOST + "sounds/general/sfx-testimony2.opus"
 			},
 			"guilty": {
 				"src": AO_HOST + "themes/" + THEME + "/guilty.gif",
 				"duration": 2870,
-				"sfx": AO_HOST + "sounds/general/sfx-guilty.wav"
+				"sfx": AO_HOST + "sounds/general/sfx-guilty.opus"
 			},
 			"notguilty": {
 				"src": AO_HOST + "themes/" + THEME + "/notguilty.gif",
 				"duration": 2440,
-				"sfx": AO_HOST + "sounds/general/sfx-notguilty.wav"
+				"sfx": AO_HOST + "sounds/general/sfx-notguilty.opus"
 			},
 		};
 
@@ -838,6 +838,7 @@ class Client extends EventEmitter {
 	async handleCharacterInfo(chargs, charid) {
 		if (chargs[0]) {
 			let cini = {};
+			let cswap = {};
 			let icon = AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char_icon.png";
 			let img = document.getElementById(`demo_${charid}`);
 			img.alt = chargs[0];
@@ -856,12 +857,18 @@ class Client extends EventEmitter {
 				// If it does, give the user a visual indication that the character is unusable
 			}
 
+			// Load iniswaps if there are any
+			try {
+				const cswapdata = await request(AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/iniswaps.ini");
+				cswap = cswapdata.split("\n");
+			} catch (err) {
+				cswap = {};
+			}
+
 			const mute_select = document.getElementById("mute_select");
 			mute_select.add(new Option(safe_tags(chargs[0]), charid));
 			const pair_select = document.getElementById("pair_select");
 			pair_select.add(new Option(safe_tags(chargs[0]), charid));
-			const iniedit_select = document.getElementById("client_ininame");
-			iniedit_select.add(new Option(safe_tags(chargs[0])));
 
 			// sometimes ini files lack important settings
 			const default_options = {
@@ -889,6 +896,7 @@ class Client extends EventEmitter {
 				evidence: chargs[3],
 				icon: icon,
 				inifile: cini,
+				swaps: cswap,
 				muted: false
 			};
 
@@ -1246,7 +1254,7 @@ class Client extends EventEmitter {
 		viewport.sfxaudio.pause();
 		const oldvolume = viewport.sfxaudio.volume;
 		viewport.sfxaudio.volume = 1;
-		viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
+		viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.opus";
 		viewport.sfxaudio.play();
 		viewport.sfxaudio.volume = oldvolume;
 	}
@@ -1491,16 +1499,29 @@ class Client extends EventEmitter {
 					class="emote_button"
 					onclick="pickEmotion(${i})">`;
 
-				if(await fileExists(AO_HOST + "characters/" + encodeURI(me.name.toLowerCase()) + "/custom.gif"))
-					document.getElementById("button_4").style.display = "";
-				else
-					document.getElementById("button_4").style.display = "none";
-
 			} catch (e) {
 				console.error("missing emote " + i);
 			}
 		}
 		pickEmotion(1);
+		}
+
+		if(await fileExists(AO_HOST + "characters/" + encodeURI(me.name.toLowerCase()) + "/custom.gif"))
+			document.getElementById("button_4").style.display = "";
+		else
+			document.getElementById("button_4").style.display = "none";
+
+		const iniedit_select = document.getElementById("client_ininame");
+
+		function addIniswap(value) {
+			iniedit_select.add(new Option(safe_tags(value)));
+		}
+
+		// most iniswaps don't list their original char
+		if (me.swaps.length > 0) {
+			iniedit_select.innerHTML = "";
+			addIniswap(me.name);
+			me.swaps.forEach(addIniswap);
 		}
 	}
 
@@ -1574,24 +1595,24 @@ class Viewport {
 		// Allocate multiple blip audio channels to make blips less jittery
 
 		this.blipChannels = new Array(6);
-		//this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.wav"))
-		//	.forEach(channel => channel.volume = 0.5);
+		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"))
+			.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
 
 		this.sfxaudio = document.getElementById("client_sfxaudio");
-		//this.sfxaudio.src = `${AO_HOST}sounds/general/sfx-realization.wav`;
+		this.sfxaudio.src = `${AO_HOST}sounds/general/sfx-realization.opus`;
 
 		this.sfxplayed = 0;
 
 		this.shoutaudio = document.getElementById("client_shoutaudio");
-		//this.shoutaudio.src = `${AO_HOST}misc/default/objection.wav`;
+		this.shoutaudio.src = `${AO_HOST}misc/default/objection.opus`;
 
 		this.testimonyAudio = document.getElementById("client_testimonyaudio");
-		//this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.wav`;
+		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.opus`;
 
 		this.music = new Array(3);
-		//this.music.fill(new Audio(`${AO_HOST}sounds/music/trial (aa).mp3`))
-		//	.forEach(channel => channel.volume = 0.5);
+		this.music.fill(new Audio(`${AO_HOST}sounds/music/trial (aa).opus`))
+			.forEach(channel => channel.volume = 0.5);
 
 		this.updater = null;
 		this.testimonyUpdater = null;
@@ -1960,7 +1981,7 @@ async changeBackground(position) {
 			shoutSprite.style.opacity = 1;
 			
 
-			this.shoutaudio.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.wav`;
+			this.shoutaudio.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.opus`;
 			this.shoutaudio.play();
 			this.shoutTimer = client.resources[shout]["duration"];
 		} else {
@@ -2007,7 +2028,7 @@ async changeBackground(position) {
 			pairLayers.style.transform = "scaleX(1)";
 		}
 
-		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.wav`);
+		this.blipChannels.forEach(channel => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`);
 
 		// process markup
 		if(this.chatmsg.content.startsWith("~~")) {
@@ -2087,12 +2108,12 @@ async changeBackground(position) {
 			// Effect stuff
 			if (this.chatmsg.screenshake === 1) {
 				// Shake screen
-				this.playSFX(AO_HOST + "sounds/general/sfx-stab.wav", false);
+				this.playSFX(AO_HOST + "sounds/general/sfx-stab.opus", false);
 				gamewindow.style.animation = "shake 0.2s 1";
 			}
 			if (this.chatmsg.flash === 1) {
 				// Flash screen
-				this.playSFX(AO_HOST + "sounds/general/sfx-realization.wav", false);
+				this.playSFX(AO_HOST + "sounds/general/sfx-realization.opus", false);
 				effectlayer.style.animation = "flash 0.4s 1";
 			}
 
@@ -2126,7 +2147,7 @@ async changeBackground(position) {
 					eviBox.style.height = "36.5%";
 					eviBox.style.opacity = 1;
 
-					this.testimonyAudio.src = AO_HOST + "sounds/general/sfx-evidenceshoop.wav";
+					this.testimonyAudio.src = AO_HOST + "sounds/general/sfx-evidenceshoop.opus";
 					this.testimonyAudio.play();
 
 					if (this.chatmsg.side === "def") {
@@ -2203,7 +2224,7 @@ async changeBackground(position) {
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1" && this.chatmsg.sound !== "" && this.chatmsg.sound !== undefined) {
-				this.playSFX(AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".wav", this.chatmsg.looping_sfx);
+				this.playSFX(AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".opus", this.chatmsg.looping_sfx);
 			}
 		}
 		this.textTimer = this.textTimer + UPDATE_INTERVAL;
@@ -2764,7 +2785,7 @@ export function checkCallword(message) {
 		if(item !== "" && message.toLowerCase().includes(item.toLowerCase()))
 		{
 			viewport.sfxaudio.pause();
-			viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.wav";
+			viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.opus";
 			viewport.sfxaudio.play();
 		}
 	}
