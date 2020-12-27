@@ -25,8 +25,8 @@
 														style-src-elem 'self' 'unsafe-inline' https://golden-layout.com;
 														style-src 'self' 'unsafe-inline' https://golden-layout.com;
 														img-src 'self' data: file: *;
-														connect-src 'self' ws: file: *;
-														media-src 'self' file: *;">
+														connect-src 'self' data: ws: file: *;
+														media-src 'self' data: file: *;">
 
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="/images/logo-new.png"/>
@@ -74,16 +74,8 @@
 		<div id="client_background">
 			<div id="client_gamewindow">
 				<img id="client_court" alt="Courtroom backdrop" onerror="imgError(this);">
-				<div id="client_pair_char" alt="Paired character">
-					<img id="client_pair_gif" onerror="charError(this);">
-					<img id="client_pair_png" onerror="charError(this);">
-					<img id="client_pair_apng" onerror="charError(this);">
-				</div>
-				<div id="client_char" alt="Character">
-					<img id="client_char_gif" onerror="charError(this);">
-					<img id="client_char_png" onerror="charError(this);">
-					<img id="client_char_apng" onerror="charError(this);">
-				</div>
+				<img id="client_pair_char" alt="Paired character">
+				<img id="client_char" alt="Character">
 				<img id="client_bench">
 				<img id="client_fg" alt="Various overlay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
 				<img id="client_evi" src="" alt="Character Evidence" onerror="imgError(this);">
