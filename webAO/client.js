@@ -870,7 +870,7 @@ class Client extends EventEmitter {
 
 			// Load iniswaps if there are any
 			try {
-				const cswapdata = await request(AO_HOST + "characters/" + chargs[0].toLowerCase() + "/iniswaps.ini");
+				const cswapdata = await getIPFStext(AO_HOST + "characters/" + chargs[0].toLowerCase() + "/iniswaps.ini");
 				cswap = cswapdata.split("\n");
 			} catch (err) {
 				cswap = {};
@@ -1501,7 +1501,7 @@ class Client extends EventEmitter {
 					frame_screenshake: "",
 					frame_realization: "",
 					frame_sfx: "",
-					button: await getIPFSimage(AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`)
+					button: await getIPFSimage(AO_HOST + `characters/${me.name.toLowerCase()}/emotions/button${i}_off.png`)
 				};
 				emotesList.innerHTML +=
 					`<img src=${emotes[i].button}
@@ -1517,7 +1517,7 @@ class Client extends EventEmitter {
 		pickEmotion(1);
 		}
 
-		if(await fileExists(AO_HOST + "characters/" + encodeURI(me.name.toLowerCase()) + "/custom.gif"))
+		if(await fileExists(AO_HOST + "characters/" + me.name.toLowerCase() + "/custom.gif"))
 			document.getElementById("button_4").style.display = "";
 		else
 			document.getElementById("button_4").style.display = "none";
