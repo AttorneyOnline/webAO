@@ -112,7 +112,8 @@ async function getIPFSdata(cid) {
 	
 		return Buffer.concat(chunks);
 	} catch (error) {
-		return null;
+		console.warn("could not find "+cid+" on IPFS, "+error);
+		return "";
 	}    
 }
 
@@ -849,7 +850,7 @@ class Client extends EventEmitter {
 		if (chargs[0]) {
 			let cini = {};
 			let cswap = {};
-			let icon = AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char_icon.png";
+			let icon = AO_HOST + "characters/" + chargs[0].toLowerCase() + "/char_icon.png";
 			let img = document.getElementById(`demo_${charid}`);
 			img.alt = chargs[0];
 			getIPFSimage(icon).then((value) => {
@@ -858,7 +859,7 @@ class Client extends EventEmitter {
 
 			// If the ini doesn't exist on the server this will throw an error
 			try {
-				const cinidata = await getIPFStext(AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/char.ini");
+				const cinidata = await getIPFStext(AO_HOST + "characters/" + chargs[0].toLowerCase() + "/char.ini");
 				cini = INI.parse(cinidata);
 			} catch (err) {
 				cini = {};
@@ -869,7 +870,7 @@ class Client extends EventEmitter {
 
 			// Load iniswaps if there are any
 			try {
-				const cswapdata = await request(AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/iniswaps.ini");
+				const cswapdata = await request(AO_HOST + "characters/" + chargs[0].toLowerCase() + "/iniswaps.ini");
 				cswap = cswapdata.split("\n");
 			} catch (err) {
 				cswap = {};
@@ -1200,7 +1201,7 @@ class Client extends EventEmitter {
 		if (bg_index === 0) {
 			document.getElementById("bg_filename").value = viewport.bgname;
 		}
-		document.getElementById("bg_preview").src = await getIPFSimage(AO_HOST + "background/" + encodeURI(args[1].toLowerCase()) + "/defenseempty.png");
+		document.getElementById("bg_preview").src = await getIPFSimage(AO_HOST + "background/" + args[1].toLowerCase() + "/defenseempty.png");
 		if (this.charID === -1) {
 			viewport.changeBackground("jud");
 		} else {
@@ -2526,10 +2527,7 @@ window.changeShoutVolume = changeShoutVolume;
  * Triggered when the shout could not be found
  */
 export function shoutMissing(self) {
-	if (self.src !== `${AO_HOST}misc/default/objection.opus`) {
-		self.src = `${AO_HOST}misc/default/objection.opus`;
-		self.play();
-	}		
+
 }
 window.shoutMissing = shoutMissing;
 
