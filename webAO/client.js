@@ -1174,7 +1174,7 @@ class Client extends EventEmitter {
 	 * Handles a background change.
 	 * @param {Array} args packet arguments
 	 */
-	handleBN(args) {
+	async handleBN(args) {
 		viewport.bgname = safe_tags(args[1]);
 		const bg_index = getIndexFromSelect("bg_select", viewport.bgname);
 		document.getElementById("bg_select").selectedIndex = bg_index;
@@ -1182,7 +1182,7 @@ class Client extends EventEmitter {
 		if (bg_index === 0) {
 			document.getElementById("bg_filename").value = viewport.bgname;
 		}
-		document.getElementById("bg_preview").src = AO_HOST + "background/" + encodeURI(args[1].toLowerCase()) + "/defenseempty.png";
+		document.getElementById("bg_preview").src = await getIPFSimage(AO_HOST + "background/" + encodeURI(args[1].toLowerCase()) + "/defenseempty.png");
 		if (this.charID === -1) {
 			viewport.changeBackground("jud");
 		} else {
@@ -1482,7 +1482,7 @@ class Client extends EventEmitter {
 					frame_screenshake: "",
 					frame_realization: "",
 					frame_sfx: "",
-					button: AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`
+					button: await getIPFSimage(AO_HOST + `characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`)
 				};
 				emotesList.innerHTML +=
 					`<img src=${emotes[i].button}
@@ -1713,13 +1713,12 @@ async changeBackground(position) {
 	court.className = position + "_court";
 
 	if (viewport.chatmsg.type === 5) {
-		court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
+		court.src = await getIPFSimage(`${AO_HOST}themes/default/${encodeURI(speedLines)}`);
 		bench.style.opacity = 0;
 	} else {
-		court.src = bgfolder + bg;
+		court.src = await getIPFSimage(bgfolder + bg);
 		if (desk) {
-			const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
-			bench.src = bgfolder + deskFilename;
+			bench.src = await getIPFSimage(bgfolder + desk.ao2);
 			bench.style.opacity = 1;
 		} else {
 			bench.style.opacity = 0;
@@ -2023,7 +2022,7 @@ async changeBackground(position) {
 		fg.style.animation = "";
 
 		if (effectinfo[0] && effectinfo[0] !== "-")
-			fg.src = `${AO_HOST}themes/default/effects/${encodeURI(effectinfo[0].toLowerCase())}.webp`;
+			fg.src = await getIPFSimage(`${AO_HOST}themes/default/effects/${encodeURI(effectinfo[0].toLowerCase())}.webp`);
 		else
 			fg.src = transparentPNG;
 
@@ -2905,7 +2904,7 @@ window.deleteEvidence = deleteEvidence;
 /**
  * Cancel evidence selection.
  */
-export function cancelEvidence() {
+export async function cancelEvidence() {
 	//Clear evidence data
 	if (client.selectedEvidence > 0) {
 		document.getElementById("evi_" + client.selectedEvidence).className = "evi_icon";
@@ -2918,7 +2917,7 @@ export function cancelEvidence() {
 	document.getElementById("evi_filename").value = "";
 	document.getElementById("evi_name").value = "";
 	document.getElementById("evi_desc").value = "";
-	document.getElementById("evi_preview").src = AO_HOST + "misc/empty.png"; //Clear icon
+	document.getElementById("evi_preview").src = await getIPFSimage(AO_HOST + "misc/empty.png"); //Clear icon
 
 	// Update button
 	document.getElementById("evi_add").className = "client_button hover_button";
@@ -2978,17 +2977,17 @@ window.resizeChatbox = resizeChatbox;
 /**
  * Update evidence icon.
  */
-export function updateEvidenceIcon() {
+export async function updateEvidenceIcon() {
 	const evidence_select = document.getElementById("evi_select");
 	const evidence_filename = document.getElementById("evi_filename");
 	const evidence_iconbox = document.getElementById("evi_preview");
 
 	if (evidence_select.selectedIndex === 0) {
 		evidence_filename.style.display = "initial";
-		evidence_iconbox.src = AO_HOST + "evidence/" + encodeURI(evidence_filename.value.toLowerCase());
+		evidence_iconbox.src = await getIPFSimage(AO_HOST + "evidence/" + encodeURI(evidence_filename.value.toLowerCase()));
 	} else {
 		evidence_filename.style.display = "none";
-		evidence_iconbox.src = AO_HOST + "evidence/" + encodeURI(evidence_select.value.toLowerCase());
+		evidence_iconbox.src = await getIPFSimage(AO_HOST + "evidence/" + encodeURI(evidence_select.value.toLowerCase()));
 	}
 }
 window.updateEvidenceIcon = updateEvidenceIcon;
@@ -3140,17 +3139,17 @@ window.redHPP = redHPP;
 /**
  * Update background preview.
  */
-export function updateBackgroundPreview() {
+export async function updateBackgroundPreview() {
 	const background_select = document.getElementById("bg_select");
 	const background_filename = document.getElementById("bg_filename");
 	const background_preview = document.getElementById("bg_preview");
 
 	if (background_select.selectedIndex === 0) {
 		background_filename.style.display = "initial";
-		background_preview.src = AO_HOST + "background/" + encodeURI(background_filename.value.toLowerCase()) + "/defenseempty.png";
+		background_preview.src = await getIPFSimage(AO_HOST + "background/" + encodeURI(background_filename.value.toLowerCase()) + "/defenseempty.png");
 	} else {
 		background_filename.style.display = "none";
-		background_preview.src = AO_HOST + "background/" + encodeURI(background_select.value.toLowerCase()) + "/defenseempty.png";
+		background_preview.src = await getIPFSimage(AO_HOST + "background/" + encodeURI(background_select.value.toLowerCase()) + "/defenseempty.png");
 	}
 }
 window.updateBackgroundPreview = updateBackgroundPreview;
