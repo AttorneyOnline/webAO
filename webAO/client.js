@@ -117,21 +117,27 @@ async function getIPFSdata(cid) {
 	}    
 }
 
-async function getIPFSimage(cid) {
-    const final_file = await getIPFSdata(cid);
-	var image_b64 = 'data:image;base64,' + final_file.toString('base64');
-	return(image_b64);
+async function getImage(cid) {
+	if (window.ipfs) {
+		const final_file = await getIPFSdata(cid);
+		var image_b64 = 'data:image;base64,' + final_file.toString('base64');
+		return(image_b64);
+	}    
 }
 
-async function getIPFSsound(cid) {
+async function getSound(cid) {
+	if (window.ipfs) {
     const final_file = await getIPFSdata(cid);
 	var audio_b64 = 'data:audio;base64,' + final_file.toString('base64');
 	return(audio_b64);
 }
+}
 
-async function getIPFStext(cid) {
+async function getText(cid) {
+	if (window.ipfs) {
     const final_file = await getIPFSdata(cid);
 	return(final_file.toString());
+	}
 }
 
 async function listIPFSfiles(cid) {
@@ -802,7 +808,7 @@ class Client extends EventEmitter {
 		if(track.startsWith("http")) {
 			music.src = track;
 		} else {
-			getIPFSsound(`${AO_HOST}sounds/music/${track.toLowerCase()}`).then((value) => {
+			getSound(`${AO_HOST}sounds/music/${track.toLowerCase()}`).then((value) => {
 				music.src = value;
 			});
 		}
@@ -853,13 +859,13 @@ class Client extends EventEmitter {
 			let icon = AO_HOST + "characters/" + chargs[0].toLowerCase() + "/char_icon.png";
 			let img = document.getElementById(`demo_${charid}`);
 			img.alt = chargs[0];
-			getIPFSimage(icon).then((value) => {
+			getImage(icon).then((value) => {
 				img.src = value;
 			});
 
 			// If the ini doesn't exist on the server this will throw an error
 			try {
-				const cinidata = await getIPFStext(AO_HOST + "characters/" + chargs[0].toLowerCase() + "/char.ini");
+				const cinidata = await getText(AO_HOST + "characters/" + chargs[0].toLowerCase() + "/char.ini");
 				cini = INI.parse(cinidata);
 			} catch (err) {
 				cini = {};
@@ -870,7 +876,7 @@ class Client extends EventEmitter {
 
 			// Load iniswaps if there are any
 			try {
-				const cswapdata = await getIPFStext(AO_HOST + "characters/" + chargs[0].toLowerCase() + "/iniswaps.ini");
+				const cswapdata = await getText(AO_HOST + "characters/" + chargs[0].toLowerCase() + "/iniswaps.ini");
 				cswap = cswapdata.split("\n");
 			} catch (err) {
 				cswap = {};
@@ -1201,7 +1207,7 @@ class Client extends EventEmitter {
 		if (bg_index === 0) {
 			document.getElementById("bg_filename").value = viewport.bgname;
 		}
-		document.getElementById("bg_preview").src = await getIPFSimage(AO_HOST + "background/" + args[1].toLowerCase() + "/defenseempty.png");
+		document.getElementById("bg_preview").src = await getImage(AO_HOST + "background/" + args[1].toLowerCase() + "/defenseempty.png");
 		if (this.charID === -1) {
 			viewport.changeBackground("jud");
 		} else {
@@ -1501,7 +1507,7 @@ class Client extends EventEmitter {
 					frame_screenshake: "",
 					frame_realization: "",
 					frame_sfx: "",
-					button: await getIPFSimage(AO_HOST + `characters/${me.name.toLowerCase()}/emotions/button${i}_off.png`)
+					button: await getImage(AO_HOST + `characters/${me.name.toLowerCase()}/emotions/button${i}_off.png`)
 				};
 				emotesList.innerHTML +=
 					`<img src=${emotes[i].button}
@@ -1610,30 +1616,30 @@ class Viewport {
 		this.blipChannels.fill(new Audio())
 			.forEach(channel => channel.volume = 0.5);
 
-		getIPFSsound(`${AO_HOST}sounds/general/sfx-blipmale.opus`).then((value) => {
+		getSound(`${AO_HOST}sounds/general/sfx-blipmale.opus`).then((value) => {
 			this.blipChannels.forEach(channel => channel.src = value);
 		});		
 
 		this.sfxaudio = document.getElementById("client_sfxaudio");
 		this.sfxplayed = 0;
-		getIPFSsound(`${AO_HOST}sounds/general/sfx-realization.opus`).then((value) => {
+		getSound(`${AO_HOST}sounds/general/sfx-realization.opus`).then((value) => {
 			this.sfxaudio.src = value;
 		});
 
 		this.shoutaudio = document.getElementById("client_shoutaudio");
-		getIPFSsound(`${AO_HOST}misc/default/objection.opus`).then((value) => {
+		getSound(`${AO_HOST}misc/default/objection.opus`).then((value) => {
 			this.shoutaudio.src = value;
 		});
 
 		this.testimonyAudio = document.getElementById("client_testimonyaudio");
-		getIPFSsound(`${AO_HOST}sounds/general/sfx-guilty.opus`).then((value) => {
+		getSound(`${AO_HOST}sounds/general/sfx-guilty.opus`).then((value) => {
 			this.testimonyAudio.src = value;
 		});
 
 		this.music = new Array(3);
 		this.music.fill(new Audio())
 			.forEach(channel => channel.volume = 0.5);
-		getIPFSsound(`${AO_HOST}sounds/music/trial (aa).opus`).then((value) => {
+		getSound(`${AO_HOST}sounds/music/trial (aa).opus`).then((value) => {
 			this.music.forEach(channel => channel.src = value);
 		});
 
@@ -1757,12 +1763,12 @@ async changeBackground(position) {
 	court.className = position + "_court";
 
 	if (viewport.chatmsg.type === 5) {
-		court.src = await getIPFSimage(`${AO_HOST}themes/default/${encodeURI(speedLines)}`);
+		court.src = await getImage(`${AO_HOST}themes/default/${encodeURI(speedLines)}`);
 		bench.style.opacity = 0;
 	} else {
-		court.src = await getIPFSimage(bgfolder + bg);
+		court.src = await getImage(bgfolder + bg);
 		if (desk) {
-			bench.src = await getIPFSimage(bgfolder + desk.ao2);
+			bench.src = await getImage(bgfolder + desk.ao2);
 			bench.style.opacity = 1;
 		} else {
 			bench.style.opacity = 0;
@@ -1922,9 +1928,9 @@ async changeBackground(position) {
 		}
 
 		if (files.includes(characterFolder + `${encodeURI(prefix)}${encodeURI(emotename)}.apng`)) {
-			charsprite.src = await getIPFSimage(characterFolder + `${encodeURI(prefix)}${encodeURI(emotename)}.apng`);
+			charsprite.src = await getImage(characterFolder + `${encodeURI(prefix)}${encodeURI(emotename)}.apng`);
 		}
-		//charsprite.src = await getIPFSimage("QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL/characters/judge/(a)warning.apng");
+		//charsprite.src = await getImage("QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL/characters/judge/(a)warning.apng");
 	}
 
 	/**
@@ -2051,7 +2057,7 @@ async changeBackground(position) {
 			pairLayers.style.transform = "scaleX(1)";
 		}
 
-		getIPFSsound(`${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`).then((value) => {
+		getSound(`${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`).then((value) => {
 			this.blipChannels.forEach(channel => channel.src = value);
 		});	
 
@@ -2068,7 +2074,7 @@ async changeBackground(position) {
 		fg.style.animation = "";
 
 		if (effectinfo[0] && effectinfo[0] !== "-")
-			fg.src = await getIPFSimage(`${AO_HOST}themes/default/effects/${encodeURI(effectinfo[0].toLowerCase())}.webp`);
+			fg.src = await getImage(`${AO_HOST}themes/default/effects/${encodeURI(effectinfo[0].toLowerCase())}.webp`);
 		else
 			fg.src = transparentPNG;
 
@@ -2960,7 +2966,7 @@ export async function cancelEvidence() {
 	document.getElementById("evi_filename").value = "";
 	document.getElementById("evi_name").value = "";
 	document.getElementById("evi_desc").value = "";
-	document.getElementById("evi_preview").src = await getIPFSimage(AO_HOST + "misc/empty.png"); //Clear icon
+	document.getElementById("evi_preview").src = await getImage(AO_HOST + "misc/empty.png"); //Clear icon
 
 	// Update button
 	document.getElementById("evi_add").className = "client_button hover_button";
@@ -3027,10 +3033,10 @@ export async function updateEvidenceIcon() {
 
 	if (evidence_select.selectedIndex === 0) {
 		evidence_filename.style.display = "initial";
-		evidence_iconbox.src = await getIPFSimage(AO_HOST + "evidence/" + encodeURI(evidence_filename.value.toLowerCase()));
+		evidence_iconbox.src = await getImage(AO_HOST + "evidence/" + encodeURI(evidence_filename.value.toLowerCase()));
 	} else {
 		evidence_filename.style.display = "none";
-		evidence_iconbox.src = await getIPFSimage(AO_HOST + "evidence/" + encodeURI(evidence_select.value.toLowerCase()));
+		evidence_iconbox.src = await getImage(AO_HOST + "evidence/" + encodeURI(evidence_select.value.toLowerCase()));
 	}
 }
 window.updateEvidenceIcon = updateEvidenceIcon;
@@ -3189,10 +3195,10 @@ export async function updateBackgroundPreview() {
 
 	if (background_select.selectedIndex === 0) {
 		background_filename.style.display = "initial";
-		background_preview.src = await getIPFSimage(AO_HOST + "background/" + encodeURI(background_filename.value.toLowerCase()) + "/defenseempty.png");
+		background_preview.src = await getImage(AO_HOST + "background/" + encodeURI(background_filename.value.toLowerCase()) + "/defenseempty.png");
 	} else {
 		background_filename.style.display = "none";
-		background_preview.src = await getIPFSimage(AO_HOST + "background/" + encodeURI(background_select.value.toLowerCase()) + "/defenseempty.png");
+		background_preview.src = await getImage(AO_HOST + "background/" + encodeURI(background_select.value.toLowerCase()) + "/defenseempty.png");
 	}
 }
 window.updateBackgroundPreview = updateBackgroundPreview;
