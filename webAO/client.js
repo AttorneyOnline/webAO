@@ -37,10 +37,11 @@ let mode = queryDict.mode;
 
 initIPFS();
 
-// Unless there is an asset URL specified, use the wasabi one
-//const DEFAULT_HOST = location.hostname ? "https://dweb.link/ipfs/QmeWK7nB1xjS3zQRwqwGYrKcbiNUKYiWHYCryXzrJF336c/" : "base/";
+// Unless there is an asset URL specified, use IPFS
+const IPFS_HOST = "QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL";
+//const DEFAULT_HOST = location.hostname ? "https://dweb.link/ipfs/" + IPFS_HOST + "/" : "base/";
 //const AO_HOST = queryDict.asset || DEFAULT_HOST;
-const AO_HOST = "QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL/";
+const AO_HOST = IPFS_HOST + "/";
 const THEME = queryDict.theme || "default";
 const MUSIC_HOST = AO_HOST + "sounds/music/";
 
