@@ -161,7 +161,9 @@ class Client extends EventEmitter {
 			this.serv.addEventListener("message", this.emit.bind(this, "message"));
 			this.serv.addEventListener("error", this.emit.bind(this, "error"));
 		} else {
-			this.joinServer();
+			setTimeout(function(){
+				client.joinServer();
+			},500);
 		}
 
 		this.on("open", this.onOpen.bind(this));
@@ -470,6 +472,7 @@ class Client extends EventEmitter {
 
 		this.sendServer(`HI#${hdid}#%`);
 		this.sendServer(`ID#webAO#webAO#%`);
+				
 		if (mode !== "replay")
 			this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
 		}
@@ -554,7 +557,9 @@ class Client extends EventEmitter {
 	 * Triggered when a connection is established to the server.
 	 */
 	onOpen(_e) {
-		client.joinServer();
+		setTimeout(function(){
+			client.joinServer();
+		},500);
 	}
 
 	/**
@@ -1525,6 +1530,8 @@ class Client extends EventEmitter {
 		}
 
 		if(await fileExists(AO_HOST + "characters/" + me.name.toLowerCase() + "/custom.gif"))
+			document.getElementById("button_4").style.display = "";
+		else if(await fileExists(AO_HOST + "characters/" + me.name.toLowerCase() + "/custom.apng"))
 			document.getElementById("button_4").style.display = "";
 		else
 			document.getElementById("button_4").style.display = "none";
@@ -2730,12 +2737,18 @@ async function request(url) {
  * @param {string} url the URI to be checked
  */
 async function fileExists(url) {
+	if(window.ipfs) {
+		const folderName = url.substring(0, url.lastIndexOf("/"));
+		const folderFiles = listIPFSfiles(folderName);
+		return (await folderFiles).includes(url);
+	} else {
 	try {
 		await request(url);
 		return true;
 	} catch (err) {
 		if (err.code >= 400) return false;
 		else throw err;
+	}
 	}
 }
 
