@@ -30,6 +30,10 @@
 	color: #6be4fb;
 }
 
+.text_grey {
+	color: #bbb;
+}
+
 #client_chatcontainer {
 	position: absolute;
 	width: 100%;

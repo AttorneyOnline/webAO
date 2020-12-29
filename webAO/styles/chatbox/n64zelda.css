@@ -30,6 +30,10 @@
 	color: #64b4ff;
 }
 
+.text_grey {
+	color: #bbb;
+}
+
 @font-face {
 	font-family: 'ChiaroWeb';
 	src: url('https://github.com/ngarces/FE15-Text-Simulator/raw/master/FOT-ChiaroStd-B.otf') format('opentype');

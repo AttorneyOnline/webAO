@@ -34,6 +34,10 @@
 	color: rgb(179,014,014);
 }
 
+.text_grey {
+	color: #bbb;
+}
+
 #client_chatcontainer {
 	display: block;
 	position: absolute;

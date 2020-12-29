@@ -30,6 +30,10 @@
 	color: #0ff;
 }
 
+.text_grey {
+	color: #bbb;
+}
+
 @font-face {
 	font-family:'Igiari Cyrillic';
 		src: url('../igiari/igiari-cyrillic.ttf');
