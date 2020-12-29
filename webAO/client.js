@@ -1543,9 +1543,9 @@ class Viewport {
 			"orange",
 			"blue",
 			"yellow",
-			"rainbow",
 			"pink",
-			"cyan"
+			"cyan",
+			"grey"
 		];
 
 		// Allocate multiple blip audio channels to make blips less jittery
