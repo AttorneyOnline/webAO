@@ -323,6 +323,9 @@ class Client extends EventEmitter {
 			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
 		
 		this.sendServer(serverMessage);
+		if (mode === "replay") {
+			document.getElementById("client_ooclog").value += "wait#" + document.getElementById("client_replaytimer").value + "#%\r\n";
+		}
 	}
 
 	/**
