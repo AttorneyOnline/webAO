@@ -567,12 +567,20 @@ class Client extends EventEmitter {
 	 */
 	handleReplay() {
 		const ooclog = document.getElementById("client_ooclog");
-		const rtime = document.getElementById("client_replaytimer").value;
+		const rawLog = false;
+		let rtime = document.getElementById("client_replaytimer").value;
 
 		const clines = ooclog.value.split(/\r?\n/);
 		if (clines[0]) {
-			this.handleSelf(clines[0]);
+			const currentLine = String(clines[0]);
+			this.handleSelf(currentLine);
 			ooclog.value = clines.slice(1).join("\r\n");
+			if (currentLine.substr(0,4)==="wait" && rawLog === false) {
+				rtime = currentLine.split("#")[1];
+			} else if (currentLine.substr(0,2)!=="MS"){
+				rtime = 0;
+			}
+
 			setTimeout(() => onReplayGo(""), rtime);
 		}
 	}
