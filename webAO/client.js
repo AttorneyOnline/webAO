@@ -2459,17 +2459,6 @@ export function changeShoutVolume() {
 window.changeShoutVolume = changeShoutVolume;
 
 /**
- * Triggered when the shout could not be found
- */
-export function shoutMissing(self) {
-	if (self.src !== `${AO_HOST}misc/default/objection.opus`) {
-		self.src = `${AO_HOST}misc/default/objection.opus`;
-		self.play();
-	}		
-}
-window.shoutMissing = shoutMissing;
-
-/**
  * Triggered by the testimony volume slider.
  */
 export function changeTestimonyVolume() {
