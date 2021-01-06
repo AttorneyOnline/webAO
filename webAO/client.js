@@ -1318,7 +1318,7 @@ class Client extends EventEmitter {
 			let colorselect = document.getElementById("textcolor");
 
 			colorselect.options[colorselect.options.length] = new Option("Yellow", 5);
-			colorselect.options[colorselect.options.length] = new Option("Rainbow", 6);
+			colorselect.options[colorselect.options.length] = new Option("Grey", 6);
 			colorselect.options[colorselect.options.length] = new Option("Pink", 7);
 			colorselect.options[colorselect.options.length] = new Option("Cyan", 8);
 		}
