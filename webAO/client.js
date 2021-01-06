@@ -128,7 +128,7 @@ async function getImage(filename) {
 async function getSound(filename) {
 	if (window.ipfs) {
     const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
-	var audio_b64 = 'data:audio;base64,' + final_file.toString('base64');
+	var audio_b64 = 'data:audio/ogg;base64,' + final_file.toString('base64');
 	return(audio_b64);
 	} else {
 		return "https://dweb.link/ipfs/" + IPFS_HOST + '/';
@@ -145,11 +145,16 @@ async function getText(filename) {
 }
 
 async function listIPFSfiles(folder) {
-	let filelist = [];
-	for await (const file of window.ipfs.ls(IPFS_HOST + '/' + folder)) {
-		filelist.push(file.path);
+	try {
+		let filelist = [];
+		console.log(IPFS_HOST + '/' + folder);
+		for await (const file of window.ipfs.ls(IPFS_HOST + '/' + folder)) {
+			filelist.push(file.path);
+		}
+		return filelist;
+	} catch (error) {
+		return [];
 	}
-	return filelist;
 }
 
 class Client extends EventEmitter {
@@ -2741,8 +2746,7 @@ async function request(url) {
 async function fileExists(url) {
 	if(window.ipfs) {
 		const folderName = url.substring(0, url.lastIndexOf("/"));
-		const folderFiles = listIPFSfiles(folderName);
-		return (await folderFiles).includes(url);
+		return (await listIPFSfiles(folderName)).includes(IPFS_HOST + '/' + url);
 	} else {
 	try {
 		await request(url);
