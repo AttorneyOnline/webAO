@@ -995,14 +995,14 @@ class Client extends EventEmitter {
 				name: prepChat(arg[0]),
 				desc: prepChat(arg[1]),
 				filename: safe_tags(arg[2]),
-				icon: AO_HOST + "evidence/" + encodeURI(arg[2].toLowerCase())
+				icon: AO_HOST + "evidence/" + arg[2].toLowerCase()
 			};
 		}
 
 		const evidence_box = document.getElementById("evidences");
 		evidence_box.innerHTML = "";
 		for (let i = 1; i <= this.evidences.length; i++) {
-			evidence_box.innerHTML += `<img src="${this.evidences[i - 1].icon}" 
+			evidence_box.innerHTML += `<img src="${getImage(this.evidences[i - 1].icon)}" 
 				id="evi_${i}" 
 				alt="${this.evidences[i - 1].name}"
 				class="evi_icon"
@@ -1277,7 +1277,7 @@ class Client extends EventEmitter {
 		viewport.sfxaudio.pause();
 		const oldvolume = viewport.sfxaudio.volume;
 		viewport.sfxaudio.volume = 1;
-		viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.opus";
+		viewport.sfxaudio.src = getSound(AO_HOST + "sounds/general/sfx-gallery.opus");
 		viewport.sfxaudio.play();
 		viewport.sfxaudio.volume = oldvolume;
 	}
@@ -1706,7 +1706,7 @@ class Viewport {
 	async playSFX(sfxname, looping) {
 		this.sfxaudio.pause();
 		this.sfxaudio.loop = looping;
-		this.sfxaudio.src = sfxname;
+		this.sfxaudio.src = getSound(sfxname);
 		this.sfxaudio.play();
 	}
 
@@ -1801,11 +1801,11 @@ async changeBackground(position) {
 			return;
 		}
 
-		this.testimonyAudio.src = client.resources[testimony].sfx;
+		this.testimonyAudio.src = getSound(client.resources[testimony].sfx);
 		this.testimonyAudio.play();
 
 		const testimonyOverlay = document.getElementById("client_testimony");
-		testimonyOverlay.src = client.resources[testimony].src;
+		testimonyOverlay.src = getImage(client.resources[testimony].src);
 		testimonyOverlay.style.opacity = 1;
 
 		this.testimonyTimer = 0;
@@ -2010,15 +2010,15 @@ async changeBackground(position) {
 			// Hide message box
 			chatContainerBox.style.opacity = 0;
 			if (this.chatmsg.objection === 4) {
-				shoutSprite.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/custom.gif`;
+				shoutSprite.src = getImage(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/custom.gif`);
 			} else {
-				shoutSprite.src = client.resources[shout]["src"];
+				shoutSprite.src = getImage(client.resources[shout]["src"]);
 				shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
 			}
 			shoutSprite.style.opacity = 1;
 			
 
-			this.shoutaudio.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.opus`;
+			this.shoutaudio.src = getSound(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.opus`);
 			this.shoutaudio.play();
 			this.shoutTimer = client.resources[shout]["duration"];
 		} else {
@@ -2180,13 +2180,13 @@ async changeBackground(position) {
 			if (this.chatmsg.startspeaking) {
 				if (this.chatmsg.evidence > 0) {
 					// Prepare evidence
-					eviBox.src = safe_tags(client.evidences[this.chatmsg.evidence - 1].icon);
+					eviBox.src = getImage(client.evidences[this.chatmsg.evidence - 1].icon);
 
 					eviBox.style.width = "auto";
 					eviBox.style.height = "36.5%";
 					eviBox.style.opacity = 1;
 
-					this.testimonyAudio.src = AO_HOST + "sounds/general/sfx-evidenceshoop.opus";
+					this.testimonyAudio.src = getSound(AO_HOST + "sounds/general/sfx-evidenceshoop.opus");
 					this.testimonyAudio.play();
 
 					if (this.chatmsg.side === "def") {
@@ -2827,7 +2827,7 @@ export function checkCallword(message) {
 		if(item !== "" && message.toLowerCase().includes(item.toLowerCase()))
 		{
 			viewport.sfxaudio.pause();
-			viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.opus";
+			viewport.sfxaudio.src = getSound(AO_HOST + "sounds/general/sfx-gallery.opus");
 			viewport.sfxaudio.play();
 		}
 	}
