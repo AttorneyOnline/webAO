@@ -39,11 +39,8 @@ initIPFS();
 
 // Unless there is an asset URL specified, use IPFS
 const IPFS_HOST = "QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL";
-//const DEFAULT_HOST = location.hostname ? "https://dweb.link/ipfs/" + IPFS_HOST + "/" : "base/";
-//const AO_HOST = queryDict.asset || DEFAULT_HOST;
-const AO_HOST = IPFS_HOST + "/";
+
 const THEME = queryDict.theme || "default";
-const MUSIC_HOST = AO_HOST + "sounds/music/";
 
 const UPDATE_INTERVAL = 60;
 
@@ -118,26 +115,32 @@ async function getIPFSdata(cid) {
 	}    
 }
 
-async function getImage(cid) {
+async function getImage(filename) {
 	if (window.ipfs) {
-		const final_file = await getIPFSdata(cid);
+		const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
 		var image_b64 = 'data:image;base64,' + final_file.toString('base64');
 		return(image_b64);
-	}    
+	} else {
+		return "https://dweb.link/ipfs/" + IPFS_HOST + '/';
+	}
 }
 
-async function getSound(cid) {
+async function getSound(filename) {
 	if (window.ipfs) {
-    const final_file = await getIPFSdata(cid);
+    const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
 	var audio_b64 = 'data:audio;base64,' + final_file.toString('base64');
 	return(audio_b64);
-}
+	} else {
+		return "https://dweb.link/ipfs/" + IPFS_HOST + '/';
+	}
 }
 
-async function getText(cid) {
+async function getText(filename) {
 	if (window.ipfs) {
-    const final_file = await getIPFSdata(cid);
+    const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
 	return(final_file.toString());
+	} else {
+		return "https://dweb.link/ipfs/" + IPFS_HOST + '/';
 	}
 }
 
@@ -192,15 +195,15 @@ class Client extends EventEmitter {
 
 		this.resources = {
 			"holdit": {
-				"src": AO_HOST + "misc/default/holdit_bubble.png",
+				"src": "misc/default/holdit_bubble.png",
 				"duration": 720
 			},
 			"objection": {
-				"src": AO_HOST + "misc/default/objection_bubble.png",
+				"src": "misc/default/objection_bubble.png",
 				"duration": 720
 			},
 			"takethat": {
-				"src": AO_HOST + "misc/default/takethat_bubble.png",
+				"src": "misc/default/takethat_bubble.png",
 				"duration": 840
 			},
 			"custom": {
@@ -208,24 +211,24 @@ class Client extends EventEmitter {
 				"duration": 840
 			},
 			"witnesstestimony": {
-				"src": AO_HOST + "themes/" + THEME + "/witnesstestimony.gif",
+				"src": "themes/" + THEME + "/witnesstestimony.gif",
 				"duration": 1560,
-				"sfx": AO_HOST + "sounds/general/sfx-testimony.opus"
+				"sfx": "sounds/general/sfx-testimony.opus"
 			},
 			"crossexamination": {
-				"src": AO_HOST + "themes/" + THEME + "/crossexamination.gif",
+				"src": "themes/" + THEME + "/crossexamination.gif",
 				"duration": 1600,
-				"sfx": AO_HOST + "sounds/general/sfx-testimony2.opus"
+				"sfx": "sounds/general/sfx-testimony2.opus"
 			},
 			"guilty": {
-				"src": AO_HOST + "themes/" + THEME + "/guilty.gif",
+				"src": "themes/" + THEME + "/guilty.gif",
 				"duration": 2870,
-				"sfx": AO_HOST + "sounds/general/sfx-guilty.opus"
+				"sfx": "sounds/general/sfx-guilty.opus"
 			},
 			"notguilty": {
-				"src": AO_HOST + "themes/" + THEME + "/notguilty.gif",
+				"src": "themes/" + THEME + "/notguilty.gif",
 				"duration": 2440,
-				"sfx": AO_HOST + "sounds/general/sfx-notguilty.opus"
+				"sfx": "sounds/general/sfx-notguilty.opus"
 			},
 		};
 
@@ -814,7 +817,7 @@ class Client extends EventEmitter {
 		if(track.startsWith("http")) {
 			music.src = track;
 		} else {
-			getSound(`${AO_HOST}sounds/music/${track.toLowerCase()}`).then((value) => {
+			getSound(`sounds/music/${track.toLowerCase()}`).then((value) => {
 				music.src = value;
 			});
 		}
@@ -862,7 +865,7 @@ class Client extends EventEmitter {
 		if (chargs[0]) {
 			let cini = {};
 			let cswap = {};
-			let icon = AO_HOST + "characters/" + chargs[0].toLowerCase() + "/char_icon.png";
+			let icon = "characters/" + chargs[0].toLowerCase() + "/char_icon.png";
 			let img = document.getElementById(`demo_${charid}`);
 			img.alt = chargs[0];
 			getImage(icon).then((value) => {
@@ -871,7 +874,7 @@ class Client extends EventEmitter {
 
 			// If the ini doesn't exist on the server this will throw an error
 			try {
-				const cinidata = await getText(AO_HOST + "characters/" + chargs[0].toLowerCase() + "/char.ini");
+				const cinidata = await getText("characters/" + chargs[0].toLowerCase() + "/char.ini");
 				cini = INI.parse(cinidata);
 			} catch (err) {
 				cini = {};
@@ -882,7 +885,7 @@ class Client extends EventEmitter {
 
 			// Load iniswaps if there are any
 			try {
-				const cswapdata = await getText(AO_HOST + "characters/" + chargs[0].toLowerCase() + "/iniswaps.ini");
+				const cswapdata = await getText("characters/" + chargs[0].toLowerCase() + "/iniswaps.ini");
 				cswap = cswapdata.split("\n");
 			} catch (err) {
 				cswap = {};
@@ -995,7 +998,7 @@ class Client extends EventEmitter {
 				name: prepChat(arg[0]),
 				desc: prepChat(arg[1]),
 				filename: safe_tags(arg[2]),
-				icon: AO_HOST + "evidence/" + arg[2].toLowerCase()
+				icon: "evidence/" + arg[2].toLowerCase()
 			};
 		}
 
@@ -1213,7 +1216,7 @@ class Client extends EventEmitter {
 		if (bg_index === 0) {
 			document.getElementById("bg_filename").value = viewport.bgname;
 		}
-		document.getElementById("bg_preview").src = await getImage(AO_HOST + "background/" + args[1].toLowerCase() + "/defenseempty.png");
+		document.getElementById("bg_preview").src = await getImage("background/" + args[1].toLowerCase() + "/defenseempty.png");
 		if (this.charID === -1) {
 			viewport.changeBackground("jud");
 		} else {
@@ -1277,7 +1280,7 @@ class Client extends EventEmitter {
 		viewport.sfxaudio.pause();
 		const oldvolume = viewport.sfxaudio.volume;
 		viewport.sfxaudio.volume = 1;
-		viewport.sfxaudio.src = getSound(AO_HOST + "sounds/general/sfx-gallery.opus");
+		viewport.sfxaudio.src = getSound("sounds/general/sfx-gallery.opus");
 		viewport.sfxaudio.play();
 		viewport.sfxaudio.volume = oldvolume;
 	}
@@ -1513,7 +1516,7 @@ class Client extends EventEmitter {
 					frame_screenshake: "",
 					frame_realization: "",
 					frame_sfx: "",
-					button: await getImage(AO_HOST + `characters/${me.name.toLowerCase()}/emotions/button${i}_off.png`)
+					button: await getImage(`characters/${me.name.toLowerCase()}/emotions/button${i}_off.png`)
 				};
 				emotesList.innerHTML +=
 					`<img src=${emotes[i].button}
@@ -1529,9 +1532,9 @@ class Client extends EventEmitter {
 		pickEmotion(1);
 		}
 
-		if(await fileExists(AO_HOST + "characters/" + me.name.toLowerCase() + "/custom.gif"))
+		if(await fileExists("characters/" + me.name.toLowerCase() + "/custom.gif"))
 			document.getElementById("button_4").style.display = "";
-		else if(await fileExists(AO_HOST + "characters/" + me.name.toLowerCase() + "/custom.apng"))
+		else if(await fileExists("characters/" + me.name.toLowerCase() + "/custom.apng"))
 			document.getElementById("button_4").style.display = "";
 		else
 			document.getElementById("button_4").style.display = "none";
@@ -1624,30 +1627,30 @@ class Viewport {
 		this.blipChannels.fill(new Audio())
 			.forEach(channel => channel.volume = 0.5);
 
-		getSound(`${AO_HOST}sounds/general/sfx-blipmale.opus`).then((value) => {
+		getSound(`sounds/general/sfx-blipmale.opus`).then((value) => {
 			this.blipChannels.forEach(channel => channel.src = value);
 		});		
 
 		this.sfxaudio = document.getElementById("client_sfxaudio");
 		this.sfxplayed = 0;
-		getSound(`${AO_HOST}sounds/general/sfx-realization.opus`).then((value) => {
+		getSound(`sounds/general/sfx-realization.opus`).then((value) => {
 			this.sfxaudio.src = value;
 		});
 
 		this.shoutaudio = document.getElementById("client_shoutaudio");
-		getSound(`${AO_HOST}misc/default/objection.opus`).then((value) => {
+		getSound(`misc/default/objection.opus`).then((value) => {
 			this.shoutaudio.src = value;
 		});
 
 		this.testimonyAudio = document.getElementById("client_testimonyaudio");
-		getSound(`${AO_HOST}sounds/general/sfx-guilty.opus`).then((value) => {
+		getSound(`sounds/general/sfx-guilty.opus`).then((value) => {
 			this.testimonyAudio.src = value;
 		});
 
 		this.music = new Array(3);
 		this.music.fill(new Audio())
 			.forEach(channel => channel.volume = 0.5);
-		getSound(`${AO_HOST}sounds/music/trial (aa).opus`).then((value) => {
+		getSound(`sounds/music/trial (aa).opus`).then((value) => {
 			this.music.forEach(channel => channel.src = value);
 		});
 
@@ -1694,7 +1697,7 @@ class Viewport {
 	 * Returns the path which the background is located in.
 	 */
 	get bgFolder() {
-		return `${AO_HOST}background/${encodeURI(this.bgname.toLowerCase())}/`;
+		return `background/${encodeURI(this.bgname.toLowerCase())}/`;
 	}
 
 
@@ -1771,7 +1774,7 @@ async changeBackground(position) {
 	court.className = position + "_court";
 
 	if (viewport.chatmsg.type === 5) {
-		court.src = await getImage(`${AO_HOST}themes/default/${encodeURI(speedLines)}`);
+		court.src = await getImage(`themes/default/${encodeURI(speedLines)}`);
 		bench.style.opacity = 0;
 	} else {
 		court.src = await getImage(bgfolder + bg);
@@ -1923,7 +1926,7 @@ async changeBackground(position) {
 	 */
 	async setEmote(charactername, emotename, prefix, pair) {
 		const pairID = pair ? "pair" : "char";
-		const characterFolder = AO_HOST + "characters/" + encodeURI(charactername) + "/";
+		const characterFolder = "characters/" + encodeURI(charactername) + "/";
 
 		const charsprite = document.getElementById("client_" + pairID);
 
@@ -2010,7 +2013,7 @@ async changeBackground(position) {
 			// Hide message box
 			chatContainerBox.style.opacity = 0;
 			if (this.chatmsg.objection === 4) {
-				shoutSprite.src = getImage(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/custom.gif`);
+				shoutSprite.src = getImage(`characters/${encodeURI(this.chatmsg.name.toLowerCase())}/custom.gif`);
 			} else {
 				shoutSprite.src = getImage(client.resources[shout]["src"]);
 				shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
@@ -2018,7 +2021,7 @@ async changeBackground(position) {
 			shoutSprite.style.opacity = 1;
 			
 
-			this.shoutaudio.src = getSound(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.opus`);
+			this.shoutaudio.src = getSound(`characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.opus`);
 			this.shoutaudio.play();
 			this.shoutTimer = client.resources[shout]["duration"];
 		} else {
@@ -2035,7 +2038,7 @@ async changeBackground(position) {
 				// Hide message box
 				chatContainerBox.style.opacity = 0;
 				// If preanim existed then determine the length
-				gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}.gif`);
+				gifLength = await this.getAnimLength(`characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}.gif`);
 				this.chatmsg.startspeaking = false;
 				break;
 			// case 5:
@@ -2065,7 +2068,7 @@ async changeBackground(position) {
 			pairLayers.style.transform = "scaleX(1)";
 		}
 
-		getSound(`${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`).then((value) => {
+		getSound(`sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`).then((value) => {
 			this.blipChannels.forEach(channel => channel.src = value);
 		});	
 
@@ -2082,7 +2085,7 @@ async changeBackground(position) {
 		fg.style.animation = "";
 
 		if (effectinfo[0] && effectinfo[0] !== "-")
-			fg.src = await getImage(`${AO_HOST}themes/default/effects/${encodeURI(effectinfo[0].toLowerCase())}.webp`);
+			fg.src = await getImage(`themes/default/effects/${encodeURI(effectinfo[0].toLowerCase())}.webp`);
 		else
 			fg.src = transparentPNG;
 
@@ -2147,12 +2150,12 @@ async changeBackground(position) {
 			// Effect stuff
 			if (this.chatmsg.screenshake === 1) {
 				// Shake screen
-				this.playSFX(AO_HOST + "sounds/general/sfx-stab.opus", false);
+				this.playSFX("sounds/general/sfx-stab.opus", false);
 				gamewindow.style.animation = "shake 0.2s 1";
 			}
 			if (this.chatmsg.flash === 1) {
 				// Flash screen
-				this.playSFX(AO_HOST + "sounds/general/sfx-realization.opus", false);
+				this.playSFX("sounds/general/sfx-realization.opus", false);
 				effectlayer.style.animation = "flash 0.4s 1";
 			}
 
@@ -2186,7 +2189,7 @@ async changeBackground(position) {
 					eviBox.style.height = "36.5%";
 					eviBox.style.opacity = 1;
 
-					this.testimonyAudio.src = getSound(AO_HOST + "sounds/general/sfx-evidenceshoop.opus");
+					this.testimonyAudio.src = getSound("sounds/general/sfx-evidenceshoop.opus");
 					this.testimonyAudio.play();
 
 					if (this.chatmsg.side === "def") {
@@ -2263,7 +2266,7 @@ async changeBackground(position) {
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1" && this.chatmsg.sound !== "" && this.chatmsg.sound !== undefined) {
-				this.playSFX(AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".opus", this.chatmsg.looping_sfx);
+				this.playSFX("sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".opus", this.chatmsg.looping_sfx);
 			}
 		}
 		this.textTimer = this.textTimer + UPDATE_INTERVAL;
@@ -2827,7 +2830,7 @@ export function checkCallword(message) {
 		if(item !== "" && message.toLowerCase().includes(item.toLowerCase()))
 		{
 			viewport.sfxaudio.pause();
-			viewport.sfxaudio.src = getSound(AO_HOST + "sounds/general/sfx-gallery.opus");
+			viewport.sfxaudio.src = getSound("sounds/general/sfx-gallery.opus");
 			viewport.sfxaudio.play();
 		}
 	}
@@ -2980,7 +2983,7 @@ export async function cancelEvidence() {
 	document.getElementById("evi_filename").value = "";
 	document.getElementById("evi_name").value = "";
 	document.getElementById("evi_desc").value = "";
-	document.getElementById("evi_preview").src = await getImage(AO_HOST + "misc/empty.png"); //Clear icon
+	document.getElementById("evi_preview").src = await getImage("misc/empty.png"); //Clear icon
 
 	// Update button
 	document.getElementById("evi_add").className = "client_button hover_button";
@@ -3047,10 +3050,10 @@ export async function updateEvidenceIcon() {
 
 	if (evidence_select.selectedIndex === 0) {
 		evidence_filename.style.display = "initial";
-		evidence_iconbox.src = await getImage(AO_HOST + "evidence/" + encodeURI(evidence_filename.value.toLowerCase()));
+		evidence_iconbox.src = await getImage("evidence/" + encodeURI(evidence_filename.value.toLowerCase()));
 	} else {
 		evidence_filename.style.display = "none";
-		evidence_iconbox.src = await getImage(AO_HOST + "evidence/" + encodeURI(evidence_select.value.toLowerCase()));
+		evidence_iconbox.src = await getImage("evidence/" + encodeURI(evidence_select.value.toLowerCase()));
 	}
 }
 window.updateEvidenceIcon = updateEvidenceIcon;
@@ -3209,10 +3212,10 @@ export async function updateBackgroundPreview() {
 
 	if (background_select.selectedIndex === 0) {
 		background_filename.style.display = "initial";
-		background_preview.src = await getImage(AO_HOST + "background/" + encodeURI(background_filename.value.toLowerCase()) + "/defenseempty.png");
+		background_preview.src = await getImage("background/" + encodeURI(background_filename.value.toLowerCase()) + "/defenseempty.png");
 	} else {
 		background_filename.style.display = "none";
-		background_preview.src = await getImage(AO_HOST + "background/" + encodeURI(background_select.value.toLowerCase()) + "/defenseempty.png");
+		background_preview.src = await getImage("background/" + encodeURI(background_select.value.toLowerCase()) + "/defenseempty.png");
 	}
 }
 window.updateBackgroundPreview = updateBackgroundPreview;
