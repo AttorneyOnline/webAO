@@ -144,9 +144,9 @@ async function getText(filename) {
 	}
 }
 
-async function listIPFSfiles(cid) {
+async function listIPFSfiles(folder) {
 	let filelist = [];
-	for await (const file of window.ipfs.ls(cid)) {
+	for await (const file of window.ipfs.ls(IPFS_HOST + '/' + folder)) {
 		filelist.push(file.path);
 	}
 	return filelist;
@@ -1931,14 +1931,13 @@ async changeBackground(position) {
 		const charsprite = document.getElementById("client_" + pairID);
 
 		const files = await listIPFSfiles(characterFolder);
-		console.log(files);
 
 		if (this.lastChar !== this.chatmsg.name) {
 			//hide the last sprite
 			charsprite.src = transparentPNG;
 		}
 
-		if (files.includes(characterFolder + `${encodeURI(prefix)}${encodeURI(emotename)}.apng`)) {
+		if (files.includes(`${IPFS_HOST}/${characterFolder}${encodeURI(prefix)}${encodeURI(emotename)}.apng`)) {
 			charsprite.src = await getImage(characterFolder + `${encodeURI(prefix)}${encodeURI(emotename)}.apng`);
 		}
 		//charsprite.src = await getImage("QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL/characters/judge/(a)warning.apng");
