@@ -824,14 +824,6 @@ class Client extends EventEmitter {
 				// If it does, give the user a visual indication that the character is unusable
 			}
 
-			// Load iniswaps if there are any
-			try {
-				const cswapdata = await request(AO_HOST + "characters/" + encodeURI(chargs[0].toLowerCase()) + "/iniswaps.ini");
-				cswap = cswapdata.split("\n");
-			} catch (err) {
-				cswap = {};
-			}
-
 			const mute_select = document.getElementById("mute_select");
 			mute_select.add(new Option(safe_tags(chargs[0]), charid));
 			const pair_select = document.getElementById("pair_select");
@@ -863,7 +855,6 @@ class Client extends EventEmitter {
 				evidence: chargs[3],
 				icon: icon,
 				inifile: cini,
-				swaps: cswap,
 				muted: false
 			};
 
@@ -1484,11 +1475,20 @@ class Client extends EventEmitter {
 			iniedit_select.add(new Option(safe_tags(value)));
 		}
 
+		// Load iniswaps if there are any
+		let cswap;
+		try {
+			const cswapdata = await request(AO_HOST + "characters/" + encodeURI(me.name.toLowerCase()) + "/iniswaps.ini");
+			cswap = cswapdata.split("\n");
+		} catch (err) {
+			cswap = {};
+		}
+
 		// most iniswaps don't list their original char
-		if (me.swaps.length > 0) {
+		if (cswap.length > 0) {
 			iniedit_select.innerHTML = "";
 			addIniswap(me.name);
-			me.swaps.forEach(addIniswap);
+			cswap.forEach(addIniswap);
 		}
 	}
 
