@@ -211,7 +211,6 @@ class Client extends EventEmitter {
 		this.on("RM", this.handleRM.bind(this));
 		this.on("RD", this.handleRD.bind(this));
 		this.on("CharsCheck", this.handleCharsCheck.bind(this));
-		this.on("decryptor", this.handleDecryptor.bind(this));
 		this.on("PV", this.handlePV.bind(this));
 		this.on("CHECK", () => { });
 		this.on("CH", () => { });
@@ -1389,14 +1388,6 @@ class Client extends EventEmitter {
 			else if (args[i + 1] === "0")
 				img.style.opacity = 1;			
 		}
-	}
-
-	/**
-	 * Decryptor for the command headers
-	 * @param {Array} args packet arguments
-	 */
-	handleDecryptor(_args) {
-		// unused since AO2
 	}
 
 	/**
