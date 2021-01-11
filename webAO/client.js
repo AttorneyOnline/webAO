@@ -859,6 +859,9 @@ class Client extends EventEmitter {
 				muted: false
 			};
 
+			const iniedit_select = document.getElementById("client_ininame");
+			iniedit_select.add(new Option(safe_tags(chargs[0])));
+
 		} else {
 			console.warn("missing charid " + charid);
 			let img = document.getElementById(`demo_${charid}`);
