@@ -369,13 +369,22 @@
 					onchange="changeMusicVolume()">
 
 			<p>SFX</p>
-			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" controls></audio>
+			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" controls>
+				<source id="client_sfxaudio_opus" type="audio/ogg">
+				<source id="client_sfxaudio_wav"  type="audio/wav">
+			</audio>
 
 			<p>Shouts</p>
-			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" controls></audio>
+			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" controls>
+				<source id="client_shoutaudio_opus" type="audio/ogg">
+				<source id="client_shoutaudio_wav"  type="audio/wav">
+			</audio>
 			
 			<p>Testimony/Guilty</p>
-			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" controls></audio>
+			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" controls>
+				<source id="client_testimonyaudio_opus" type="audio/ogg">
+				<source id="client_testimonyaudio_wav"  type="audio/wav">
+			</audio>
 
 			<p>Blip</p>
 			<input id="client_bvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"

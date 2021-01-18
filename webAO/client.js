@@ -1216,8 +1216,7 @@ class Client extends EventEmitter {
 		viewport.sfxaudio.pause();
 		const oldvolume = viewport.sfxaudio.volume;
 		viewport.sfxaudio.volume = 1;
-		viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.opus";
-		viewport.sfxaudio.play();
+		viewport.playSFX("sfx-gallery",false);
 		viewport.sfxaudio.volume = oldvolume;
 	}
 
@@ -1563,15 +1562,18 @@ class Viewport {
 		this.currentBlipChannel = 0;
 
 		this.sfxaudio = document.getElementById("client_sfxaudio");
-		this.sfxaudio.src = `${AO_HOST}sounds/general/sfx-realization.opus`;
+		this.sfxaudio.firstElementChild.src = `${AO_HOST}sounds/general/sfx-realization.opus`;
+		this.sfxaudio.lastElementChild.src  = `${AO_HOST}sounds/general/sfx-realization.wav`;
 
 		this.sfxplayed = 0;
 
 		this.shoutaudio = document.getElementById("client_shoutaudio");
-		this.shoutaudio.src = `${AO_HOST}misc/default/objection.opus`;
+		this.shoutaudio.firstElementChild.src = `${AO_HOST}misc/default/objection.opus`;
+		this.shoutaudio.lastElementChild.src  = `${AO_HOST}misc/default/objection.wav`;
 
-		this.testimonyAudio = document.getElementById("client_testimonyaudio");
-		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.opus`;
+		this.testimonyaudio = document.getElementById("client_testimonyaudio");
+		this.testimonyaudio.firstElementChild.src = `${AO_HOST}sounds/general/sfx-guilty.opus`;
+		this.testimonyaudio.lastElementChild.src  = `${AO_HOST}sounds/general/sfx-guilty.wav`;
 
 		this.music = new Array(3);
 		this.music.fill(new Audio(`${AO_HOST}sounds/music/trial (aa).opus`))
@@ -1632,7 +1634,8 @@ class Viewport {
 	async playSFX(sfxname, looping) {
 		this.sfxaudio.pause();
 		this.sfxaudio.loop = looping;
-		this.sfxaudio.src = sfxname;
+		this.sfxaudio.firstElementChild.src = `${AO_HOST}sounds/general/${sfxname}.opus`;
+		this.sfxaudio.lastElementChild.src  = `${AO_HOST}sounds/general/${sfxname}.wav`;
 		this.sfxaudio.play();
 	}
 
@@ -2072,12 +2075,12 @@ async changeBackground(position) {
 			// Effect stuff
 			if (this.chatmsg.screenshake === 1) {
 				// Shake screen
-				this.playSFX(AO_HOST + "sounds/general/sfx-stab.opus", false);
+				this.playSFX("sfx-stab", false);
 				gamewindow.style.animation = "shake 0.2s 1";
 			}
 			if (this.chatmsg.flash === 1) {
 				// Flash screen
-				this.playSFX(AO_HOST + "sounds/general/sfx-realization.opus", false);
+				this.playSFX("sfx-realization", false);
 				effectlayer.style.animation = "flash 0.4s 1";
 			}
 
@@ -2188,7 +2191,7 @@ async changeBackground(position) {
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1" && this.chatmsg.sound !== "" && this.chatmsg.sound !== undefined) {
-				this.playSFX(AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".opus", this.chatmsg.looping_sfx);
+				this.playSFX(encodeURI(this.chatmsg.sound.toLowerCase()), this.chatmsg.looping_sfx);
 			}
 		}
 		this.textTimer = this.textTimer + UPDATE_INTERVAL;
@@ -2737,9 +2740,7 @@ export function checkCallword(message) {
 	{
 		if(item !== "" && message.toLowerCase().includes(item.toLowerCase()))
 		{
-			viewport.sfxaudio.pause();
-			viewport.sfxaudio.src = AO_HOST + "sounds/general/sfx-gallery.opus";
-			viewport.sfxaudio.play();
+			viewport.playSFX("sfx-gallery",false);
 		}
 	}
 }
