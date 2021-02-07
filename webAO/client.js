@@ -121,7 +121,7 @@ async function getImage(filename) {
 		var image_b64 = 'data:image;base64,' + final_file.toString('base64');
 		return(image_b64);
 	} else {
-		return "https://dweb.link/ipfs/" + IPFS_HOST + '/';
+		return "https://dweb.link/ipfs/" + IPFS_HOST + '/' + filename;
 	}
 }
 
@@ -131,7 +131,7 @@ async function getSound(filename) {
 	var audio_b64 = 'data:audio/ogg;base64,' + final_file.toString('base64');
 	return(audio_b64);
 	} else {
-		return "https://dweb.link/ipfs/" + IPFS_HOST + '/';
+		return "https://dweb.link/ipfs/" + IPFS_HOST + '/' + filename;
 	}
 }
 
@@ -140,7 +140,7 @@ async function getText(filename) {
     const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
 	return(final_file.toString());
 	} else {
-		return "https://dweb.link/ipfs/" + IPFS_HOST + '/';
+		return "https://dweb.link/ipfs/" + IPFS_HOST + '/' + filename;
 	}
 }
 
