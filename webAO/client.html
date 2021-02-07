@@ -506,9 +506,9 @@
 	<meta name="frame-title" lang="en" content="Server">
 	<div style="height: 100%; display: flex; flex-direction: column;">
 		<textarea id="client_ooclog" style="flex: 1 auto" readonly></textarea>
-		<span id="client_oocinput" style="display: inline-block; white-space: nowrap;">
-			<input id="OOC_name" style="width: 15%;" name="OOC_name" type="text">
-			<input id="client_oocinputbox" style="width: 85%;" type="text" onkeypress="onOOCEnter(event)">
+		<span id="client_oocinput">
+			<input id="OOC_name" name="OOC_name" type="text">
+			<input id="client_oocinputbox" type="text" onkeypress="onOOCEnter(event)">
 		</span>
 		<span id="client_replaycontrols" style="display: none; white-space: nowrap;">
 			<input id="client_replaygo" style="width: 25%;" type="button" onclick="onReplayGo(event)" value="GO">
