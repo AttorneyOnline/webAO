@@ -121,6 +121,10 @@
 	height: 100%;
 }
 
+#client_iccontrols {
+	overflow-y:auto;
+}
+
 @keyframes shake {
 
 	0%,
