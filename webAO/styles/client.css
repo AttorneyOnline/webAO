@@ -115,8 +115,9 @@
 }
 
 #client_icwrapper {
-	overflow-x: hidden;
-	overflow-y: auto;
+	overflow: hidden;
+	display:flex;
+	flex-flow: column nowrap;
 	height: 100%;
 }
 
