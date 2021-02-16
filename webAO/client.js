@@ -1985,6 +1985,10 @@ async changeBackground(position) {
 			charLayers.style.transform = "scaleX(1)";
 		}
 
+		// Shift by the horizontal offset
+		pairLayers.style.left = this.chatmsg.other_offset + "%";
+		charLayers.style.left = this.chatmsg.self_offset + "%";
+
 		// flip the paired character
 		if (this.chatmsg.other_flip === 1) {
 			pairLayers.style.transform = "scaleX(-1)";
@@ -2091,12 +2095,9 @@ async changeBackground(position) {
 			}
 
 			if (this.chatmsg.other_name) {
-				pairLayers.style.left = this.chatmsg.other_offset + "%";
-				charLayers.style.left = this.chatmsg.self_offset + "%";
 				pairLayers.style.opacity = 1;
 			} else {
 				pairLayers.style.opacity = 0;
-				charLayers.style.left = 0;
 			}
 
 			this.chatmsg.startpreanim = false;
@@ -2138,16 +2139,11 @@ async changeBackground(position) {
 					shoutSprite.style.animation = "";
 				}
 
-				if (extrafeatures.includes("cccc_ic_support")) {
-					if (this.chatmsg.other_name) {
-						pairLayers.style.left = this.chatmsg.other_offset + "%";
-						charLayers.style.left = this.chatmsg.self_offset + "%";
-						this.setEmote(pairName,pairEmote,"(a)",true);
-						pairLayers.style.opacity = 1;
-					} else {
-						pairLayers.style.opacity = 0;
-						charLayers.style.left = 0;
-					}
+				if (this.chatmsg.other_name) {
+					this.setEmote(pairName,pairEmote,"(a)",true);
+					pairLayers.style.opacity = 1;
+				} else {
+					pairLayers.style.opacity = 0;
 				}
 
 				this.setEmote(charName,charEmote,"(b)",false);
