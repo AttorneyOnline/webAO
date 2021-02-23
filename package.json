@@ -32,8 +32,7 @@
     "@fingerprintjs/fingerprintjs": "^3.0.5",
     "core-js": "^3.8.2",
     "golden-layout": "^1.5.9",
-    "ipfs": "^0.54.2",
-    "regenerator-runtime": "^0.13.7",
-    "stream-browserify": "^2.0.2"
+    "ipfs-core": "^0.5.2",
+    "regenerator-runtime": "^0.13.7"
   }
 }

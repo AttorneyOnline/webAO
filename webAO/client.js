@@ -4,7 +4,7 @@
  * credits to aleks for original idea and source
 */
 
-import IPFS from 'ipfs';
+import IPFS from 'ipfs-core';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
