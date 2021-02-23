@@ -20,8 +20,7 @@ import chatbox_arr from "./styles/chatbox/chatboxes.js";
 
 import { EventEmitter } from "events";
 
-import { version } from '../package.json';
-import { features } from 'process';
+import version from '../package.json';
 
 let client;
 let viewport;
