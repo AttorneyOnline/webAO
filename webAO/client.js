@@ -141,7 +141,6 @@ async function getText(filename) {
 async function listIPFSfiles(folder) {
 	try {
 		let filelist = [];
-		console.log(IPFS_HOST + '/' + folder);
 		for await (const file of window.ipfs.ls(IPFS_HOST + '/' + folder)) {
 			filelist.push(file.path);
 		}
@@ -1945,10 +1944,13 @@ async changeBackground(position) {
 
 		if (files.includes(`${IPFS_HOST}/${characterFolder}${encodeURI(prefix)}${encodeURI(emotename)}.apng`)) {
 			charsprite.src = await getImage(characterFolder + `${encodeURI(prefix)}${encodeURI(emotename)}.apng`);
+		} else if (files.includes(`${IPFS_HOST}/${characterFolder}${encodeURI(emotename)}.png`)) {
+			charsprite.src = await getImage(characterFolder + `${encodeURI(emotename)}.png`);
+		} else if (files.includes(`${IPFS_HOST}/${characterFolder}${encodeURI(prefix)}${encodeURI(emotename)}.gif`)) {
+			charsprite.src = await getImage(characterFolder + `${encodeURI(prefix)}${encodeURI(emotename)}.gif`);
 		}
-		//charsprite.src = await getImage("QmTXeNpkFTWTcwF1mpZqVHR9fLPLQuVi9JoYBH5nL2w9sL/characters/judge/(a)warning.apng");
-	}
 
+	}
 	/**
 	 * Sets a new emote.
 	 * This sets up everything before the tick() loops starts
