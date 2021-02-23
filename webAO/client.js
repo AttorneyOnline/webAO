@@ -94,32 +94,32 @@ if (window.requestIdleCallback) {
 let lastICMessageTime = new Date(0);
 
 async function initIPFS() {
-    const ipfs = await IPFS.create();
-    window.ipfs = ipfs;
-    const status = ipfs.isOnline() ? 'online' : 'offline';
+	const ipfs = await IPFS.create();
+	window.ipfs = ipfs;
+	const status = ipfs.isOnline() ? 'online' : 'offline';
 	console.log(`Node status: ${status}`);
 }
 
 async function getIPFSdata(cid) {
 	const chunks = [];
-	
+
 	try {
 		for await (const chunk of window.ipfs.cat(cid)) {
 			chunks.push(chunk);
 		}
-	
+
 		return Buffer.concat(chunks);
 	} catch (error) {
-		console.warn("could not find "+cid+" on IPFS, "+error);
+		console.warn("could not find " + cid + " on IPFS, " + error);
 		return "";
-	}    
+	}
 }
 
 async function getImage(filename) {
 	if (window.ipfs) {
 		const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
 		var image_b64 = 'data:image;base64,' + final_file.toString('base64');
-		return(image_b64);
+		return (image_b64);
 	} else {
 		return "https://dweb.link/ipfs/" + IPFS_HOST + '/' + filename;
 	}
@@ -127,9 +127,9 @@ async function getImage(filename) {
 
 async function getSound(filename) {
 	if (window.ipfs) {
-    const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
-	var audio_b64 = 'data:audio/ogg;base64,' + final_file.toString('base64');
-	return(audio_b64);
+		const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
+		var audio_b64 = 'data:audio/ogg;base64,' + final_file.toString('base64');
+		return (audio_b64);
 	} else {
 		return "https://dweb.link/ipfs/" + IPFS_HOST + '/' + filename;
 	}
@@ -137,8 +137,8 @@ async function getSound(filename) {
 
 async function getText(filename) {
 	if (window.ipfs) {
-    const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
-	return(final_file.toString());
+		const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
+		return (final_file.toString());
 	} else {
 		return "https://dweb.link/ipfs/" + IPFS_HOST + '/' + filename;
 	}
