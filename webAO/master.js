@@ -1,8 +1,9 @@
 const MASTERSERVER_IP = "master.aceattorneyonline.com:27014";
 import { version } from '../package.json';
 
-import Fingerprint2 from 'fingerprintjs2';
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { unescapeChat } from './encoding.js';
+import { safe_tags } from './encoding.js';
 
 let masterserver;
 
@@ -11,51 +12,32 @@ const options = { fonts: { extendedJsFonts: true, userDefinedFonts: ["Ace Attorn
 
 let lowMemory = false;
 
-const server_description = [];
-server_description[-1] = "This is your computer on port 50001";
-const online_counter = [];
+let selectedServer = -1;
 
-if (window.requestIdleCallback) {
-	requestIdleCallback(function () {
-		Fingerprint2.get(options, function (components) {
-			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
+let servers = [];
+servers[-2] = { name: "Singleplayer", description: "Build cases, try out new things", ip: "127.0.0.1", port: 50001, assets: "", online: "" };
+servers[-1] = { name: "Localhost", description: "This is your computer on port 50001", ip: "127.0.0.1", port: 50001, assets: "", online: "Online: ?/?" };
 
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-				lowMemory = true;
-			}
+FingerprintJS.load().then(fp => {
+	fp.get().then(result => {
+		// Handle the result
+		hdid = result.visitorId;
 
-			check_https();
+		if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+			lowMemory = true;
+		}
 
-			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
-			masterserver.onopen = (evt) => onOpen(evt);
-			masterserver.onerror = (evt) => onError(evt);
-			masterserver.onmessage = (evt) => onMessage(evt);
+		check_https();
 
-			// i don't need the ms to play alone
-			setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
-		});
-	});
-} else {
-	setTimeout(function () {
-		Fingerprint2.get(options, function (components) {
-			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
+		masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
+		masterserver.onopen = (evt) => onOpen(evt);
+		masterserver.onerror = (evt) => onError(evt);
+		masterserver.onmessage = (evt) => onMessage(evt);
 
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-				lowMemory = true;
-			}
-
-			check_https();
-
-			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
-			masterserver.onopen = (evt) => onOpen(evt);
-			masterserver.onerror = (evt) => onError(evt);
-			masterserver.onmessage = (evt) => onMessage(evt);
-
-			// i don't need the ms to play alone
-			setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
-		});
-	}, 500);
-}
+		// i don't need the ms to play alone
+		setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
+	})
+})
 
 export function check_https() {
 	if (document.location.protocol === "https:") {
@@ -64,9 +46,13 @@ export function check_https() {
 }
 
 export function setServ(ID) {
-	console.log(server_description[ID]);
-	if (server_description[ID] !== undefined) {
-		document.getElementById("serverdescription_content").innerHTML = "<b>" + online_counter[ID] + "</b><br>" + server_description[ID];
+	selectedServer = ID;
+
+	if (!lowMemory && document.getElementById(`server${ID}`).className === "")
+		checkOnline(ID, servers[ID].ip + ":" + servers[ID].port);
+
+	if (servers[ID].description !== undefined) {
+		document.getElementById("serverdescription_content").innerHTML = "<b>" + servers[ID].online + "</b><br>" + safe_tags(servers[ID].description);
 	}
 	else {
 		document.getElementById("serverdescription_content").innerHTML = "";
@@ -89,10 +75,20 @@ function onOpen(_e) {
 function onError(evt) {
 	document.getElementById("ms_error").style.display = "block";
 	document.getElementById("ms_error_code").innerText = `A network error occurred: ${evt.reason} (${evt.code})`;
+	return;
 }
 
 function checkOnline(serverID, coIP) {
-	let oserv = new WebSocket("ws://" + coIP);
+	let oserv;
+	if (serverID !== -2) {
+		try {
+			oserv = new WebSocket("ws://" + coIP);
+		} catch (SecurityError) {
+			document.getElementById(`server${serverID}`).className = "unavailable";
+			return;
+		}
+		
+	}
 
 	// define what the callbacks do
 	function onCOOpen(_e) {
@@ -106,14 +102,18 @@ function checkOnline(serverID, coIP) {
 		const coheader = comsg.split("#", 2)[0];
 		const coarguments = comsg.split("#").slice(1);
 		if (coheader === "PN") {
-			online_counter[serverID] = `Online: ${coarguments[0]}/${coarguments[1]}`;
+			servers[serverID].online = `Online: ${Number(coarguments[0])}/${Number(coarguments[1])}`;
 			oserv.close();
+			return;
 		}
 		else if (coheader === "BD") {
-			online_counter[serverID] = "Banned";
-			server_description[serverID] = coarguments[0];
+			servers[serverID].online = "Banned";
+			servers[serverID].description = coarguments[0];
 			oserv.close();
+			return;
 		}
+		if (serverID === selectedServer)
+			document.getElementById("serverdescription_content").innerHTML = "<b>" + servers[serverID].online + "</b><br>" + safe_tags(servers[serverID].description);
 	}
 
 	// assign the callbacks
@@ -127,6 +127,8 @@ function checkOnline(serverID, coIP) {
 
 	oserv.onerror = function (_evt) {
 		console.warn(coIP + " threw an error.");
+		document.getElementById(`server${serverID}`).className = "unavailable";
+		return;
 	};
 
 }
@@ -137,23 +139,24 @@ function onMessage(e) {
 	console.debug(msg);
 
 	if (header === "ALL") {
-		const servers = msg.split("#").slice(1);
-		for (let i = 0; i < servers.length - 1; i++) {
-			const serverEntry = servers[i];
+		const allservers = msg.split("#").slice(1);
+		for (let i = 0; i < allservers.length - 1; i++) {
+			const serverEntry = allservers[i];
 			const args = serverEntry.split("&");
+
+			let thisserver = { name: args[0], description: args[1], ip: args[2], port: Number(args[3]), assets: args[4], online: "Online: ?/?" };
+			servers[i] = thisserver;
+
 			const ipport = args[2] + ":" + args[3];
 			const asset = args[4] ? `&asset=${args[4]}` : "";
-			const liclass = lowMemory ? "" : "unavailable"; // don't hide the entries if we're not checking them
 
 			document.getElementById("masterlist").innerHTML +=
-				`<li id="server${i}" class="${liclass}" onmouseover="setServ(${i})"><p>${args[0]}</p>`
+				`<li id="server${i}" onmouseover="setServ(${i})"><p>${safe_tags(servers[i].name)}</p>`
 				+ `<a class="button" href="client.html?mode=watch&ip=${ipport}${asset}">Watch</a>`
-				+ `<a class="button" href="client.html?mode=join&ip=${ipport}${asset}">Join</a></li>`;
-			server_description[i] = args[1];
-			if (!lowMemory)
-				setTimeout(() => checkOnline(i, ipport), 0);
+				+ `<a class="button" href="client.html?mode=join&ip=${ipport}${asset}">Join</a></li>`;			
 		}
 		masterserver.close();
+		return;
 	}
 	else if (header === "servercheok") {
 		const args = msg.split("#").slice(1);

@@ -38,6 +38,11 @@
     -webkit-text-stroke: 0.04em #523643;
 }
 
+.text_grey {
+	color: #bbb;
+	-webkit-text-stroke: 0.04em #523643;
+}
+
 #client_chatcontainer {
 	display: block;
 	position: absolute;

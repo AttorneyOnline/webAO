@@ -4,8 +4,8 @@
  * credits to aleks for original idea and source
 */
 
-import Fingerprint2 from 'fingerprintjs2';
 import IPFS from 'ipfs';
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
@@ -62,34 +62,20 @@ let extrafeatures = [];
 let hdid;
 const options = { fonts: { extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"] }, excludes: { userAgent: true, enumerateDevices: true } };
 
-if (window.requestIdleCallback) {
-	requestIdleCallback(function () {
-		Fingerprint2.get(options, function (components) {
-			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
-			client = new Client(serverIP);
-			viewport = new Viewport();
+FingerprintJS.load().then(fp => {
+	fp.get().then(result => {
+		// Handle the result
+		hdid = result.visitorId;
 
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-				oldLoading = true;
-			}
-			client.loadResources();
-		});
-	});
-} else {
-	setTimeout(function () {
-		Fingerprint2.get(options, function (components) {
-			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
-			client = new Client(serverIP);
-			viewport = new Viewport();
+		client = new Client(serverIP);
+		viewport = new Viewport();
 
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-				oldLoading = true;
-			}
-			client.loadResources();
-		});
-	}, 500);
-}
-
+		if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+			oldLoading = true;
+		}
+		client.loadResources();
+	})
+})
 
 let lastICMessageTime = new Date(0);
 
@@ -288,7 +274,6 @@ class Client extends EventEmitter {
 		this.on("RM", this.handleRM.bind(this));
 		this.on("RD", this.handleRD.bind(this));
 		this.on("CharsCheck", this.handleCharsCheck.bind(this));
-		this.on("decryptor", this.handleDecryptor.bind(this));
 		this.on("PV", this.handlePV.bind(this));
 		this.on("CHECK", () => { });
 		this.on("CH", () => { });
@@ -400,6 +385,9 @@ class Client extends EventEmitter {
 			`#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
 		
 		this.sendServer(serverMessage);
+		if (mode === "replay") {
+			document.getElementById("client_ooclog").value += "wait#" + document.getElementById("client_replaytimer").value + "#%\r\n";
+		}
 	}
 
 	/**
@@ -644,12 +632,20 @@ class Client extends EventEmitter {
 	 */
 	handleReplay() {
 		const ooclog = document.getElementById("client_ooclog");
-		const rtime = document.getElementById("client_replaytimer").value;
+		const rawLog = false;
+		let rtime = document.getElementById("client_replaytimer").value;
 
 		const clines = ooclog.value.split(/\r?\n/);
 		if (clines[0]) {
-			this.handleSelf(clines[0]);
+			const currentLine = String(clines[0]);
+			this.handleSelf(currentLine);
 			ooclog.value = clines.slice(1).join("\r\n");
+			if (currentLine.substr(0,4)==="wait" && rawLog === false) {
+				rtime = currentLine.split("#")[1];
+			} else if (currentLine.substr(0,2)!=="MS"){
+				rtime = 0;
+			}
+
 			setTimeout(() => onReplayGo(""), rtime);
 		}
 	}
@@ -807,10 +803,12 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleCT(args) {
+		if (mode !== "replay") {
 		const oocLog = document.getElementById("client_ooclog");
 		oocLog.innerHTML += `${prepChat(args[1])}: ${prepChat(args[2])}\r\n`;
 		if (oocLog.scrollTop > oocLog.scrollHeight - 600) {
 			oocLog.scrollTop = oocLog.scrollHeight;
+		}
 		}
 	}
 
@@ -897,14 +895,6 @@ class Client extends EventEmitter {
 				// If it does, give the user a visual indication that the character is unusable
 			}
 
-			// Load iniswaps if there are any
-			try {
-				const cswapdata = await getText("characters/" + chargs[0].toLowerCase() + "/iniswaps.ini");
-				cswap = cswapdata.split("\n");
-			} catch (err) {
-				cswap = {};
-			}
-
 			const mute_select = document.getElementById("mute_select");
 			mute_select.add(new Option(safe_tags(chargs[0]), charid));
 			const pair_select = document.getElementById("pair_select");
@@ -936,9 +926,11 @@ class Client extends EventEmitter {
 				evidence: chargs[3],
 				icon: icon,
 				inifile: cini,
-				swaps: cswap,
 				muted: false
 			};
+
+			const iniedit_select = document.getElementById("client_ininame");
+			iniedit_select.add(new Option(safe_tags(chargs[0])));
 
 		} else {
 			console.warn("missing charid " + charid);
@@ -1400,7 +1392,7 @@ class Client extends EventEmitter {
 			let colorselect = document.getElementById("textcolor");
 
 			colorselect.options[colorselect.options.length] = new Option("Yellow", 5);
-			colorselect.options[colorselect.options.length] = new Option("Rainbow", 6);
+			colorselect.options[colorselect.options.length] = new Option("Grey", 6);
 			colorselect.options[colorselect.options.length] = new Option("Pink", 7);
 			colorselect.options[colorselect.options.length] = new Option("Cyan", 8);
 		}
@@ -1471,14 +1463,6 @@ class Client extends EventEmitter {
 			else if (args[i + 1] === "0")
 				img.style.opacity = 1;			
 		}
-	}
-
-	/**
-	 * Decryptor for the command headers
-	 * @param {Array} args packet arguments
-	 */
-	handleDecryptor(_args) {
-		// unused since AO2
 	}
 
 	/**
@@ -1559,11 +1543,20 @@ class Client extends EventEmitter {
 			iniedit_select.add(new Option(safe_tags(value)));
 		}
 
+		// Load iniswaps if there are any
+		let cswap;
+		try {
+			const cswapdata = await getText("characters/" + chargs[0].toLowerCase() + "/iniswaps.ini");
+			cswap = cswapdata.split("\n");
+		} catch (err) {
+			cswap = {};
+		}
+
 		// most iniswaps don't list their original char
-		if (me.swaps.length > 0) {
+		if (cswap.length > 0) {
 			iniedit_select.innerHTML = "";
 			addIniswap(me.name);
-			me.swaps.forEach(addIniswap);
+			cswap.forEach(addIniswap);
 		}
 	}
 
@@ -1629,9 +1622,9 @@ class Viewport {
 			"orange",
 			"blue",
 			"yellow",
-			"rainbow",
 			"pink",
-			"cyan"
+			"cyan",
+			"grey"
 		];
 
 		// Allocate multiple blip audio channels to make blips less jittery
@@ -2074,6 +2067,10 @@ async changeBackground(position) {
 			charLayers.style.transform = "scaleX(1)";
 		}
 
+		// Shift by the horizontal offset
+		pairLayers.style.left = this.chatmsg.other_offset + "%";
+		charLayers.style.left = this.chatmsg.self_offset + "%";
+
 		// flip the paired character
 		if (this.chatmsg.other_flip === 1) {
 			pairLayers.style.transform = "scaleX(-1)";
@@ -2182,12 +2179,9 @@ async changeBackground(position) {
 			}
 
 			if (this.chatmsg.other_name) {
-				pairLayers.style.left = this.chatmsg.other_offset + "%";
-				charLayers.style.left = this.chatmsg.self_offset + "%";
 				pairLayers.style.opacity = 1;
 			} else {
 				pairLayers.style.opacity = 0;
-				charLayers.style.left = 0;
 			}
 
 			this.chatmsg.startpreanim = false;
@@ -2229,16 +2223,11 @@ async changeBackground(position) {
 					shoutSprite.style.animation = "";
 				}
 
-				if (extrafeatures.includes("cccc_ic_support")) {
-					if (this.chatmsg.other_name) {
-						pairLayers.style.left = this.chatmsg.other_offset + "%";
-						charLayers.style.left = this.chatmsg.self_offset + "%";
-						this.setEmote(pairName,pairEmote,"(a)",true);
-						pairLayers.style.opacity = 1;
-					} else {
-						pairLayers.style.opacity = 0;
-						charLayers.style.left = 0;
-					}
+				if (this.chatmsg.other_name) {
+					this.setEmote(pairName,pairEmote,"(a)",true);
+					pairLayers.style.opacity = 1;
+				} else {
+					pairLayers.style.opacity = 0;
 				}
 
 				this.setEmote(charName,charEmote,"(b)",false);

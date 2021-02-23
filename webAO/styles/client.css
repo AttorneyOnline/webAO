@@ -120,6 +120,11 @@
 	height: 100%;
 }
 
+#client_iccontrols {
+	overflow-y:auto;
+}
+
+
 @keyframes shake {
 
 	0%,
@@ -442,6 +447,20 @@
 	resize: none;
 	flex: 1 1 auto;
 	border: none;
+}
+
+#client_oocinput {
+	display:flex;
+	flex-flow: row nowrap;
+	whitespace: nowrap;	
+}
+
+#client_oocinputbox {
+	flex-grow:1;
+}
+
+#OOC_name {
+	width:15%;	
 }
 
 #client_musicsearch {

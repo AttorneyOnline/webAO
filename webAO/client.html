@@ -94,18 +94,18 @@
 				<div id="client_trackstatus" style="display: none;"><p id="client_trackstatustext">None</p></div>
 			</div>
 		</div>
+		<input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)"
+			placeholder="Say something&hellip;" autocomplete="off">
+		<div id="client_bars">
+			<span id="client_defense_hp" class="health-box">
+				<div class="health-bar"></div>
+			</span>
+			<span id="client_prosecutor_hp" class="health-box">
+				<div class="health-bar"></div>
+			</span>
+		</div>
 		<div id="client_iccontrols">
-			<input id="client_inputbox" class="long" type="text" onkeypress="onEnter(event)"
-				placeholder="Say something&hellip;">
 			<meta name="frame-title" lang="en" content="miscellaneous">
-			<div id="client_bars">
-				<span id="client_defense_hp" class="health-box">
-					<div class="health-bar"></div>
-				</span>
-				<span id="client_prosecutor_hp" class="health-box">
-					<div class="health-bar"></div>
-				</span>
-			</div>
 			<div id="client_emo">
 			</div>
 			<br>
@@ -395,6 +395,7 @@
 				<option value="chatfuture">Future theme</option>
 				<option value="legacy">old webAO</option>
 				<option value="chat999">999</option>
+				<option value="acww">Animal Crossing</option>
 				<option value="dr1">DR 1</option>
 				<option value="chatdr2">DR 2</option>
 				<option value="drv3">DR 3</option>
@@ -497,9 +498,9 @@
 	<meta name="frame-title" lang="en" content="Server">
 	<div style="height: 100%; display: flex; flex-direction: column;">
 		<textarea id="client_ooclog" style="flex: 1 auto" readonly></textarea>
-		<span id="client_oocinput" style="display: inline-block; white-space: nowrap;">
-			<input id="OOC_name" style="width: 15%;" name="OOC_name" type="text">
-			<input id="client_oocinputbox" style="width: 85%;" type="text" onkeypress="onOOCEnter(event)">
+		<span id="client_oocinput">
+			<input id="OOC_name" name="OOC_name" type="text">
+			<input id="client_oocinputbox" type="text" onkeypress="onOOCEnter(event)">
 		</span>
 		<span id="client_replaycontrols" style="display: none; white-space: nowrap;">
 			<input id="client_replaygo" style="width: 25%;" type="button" onclick="onReplayGo(event)" value="GO">

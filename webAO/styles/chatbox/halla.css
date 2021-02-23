@@ -30,6 +30,10 @@
 	color: #50d3ce;
 }
 
+.text_grey {
+	color: #bbb;
+}
+
 @font-face {
 	font-family: 'Inconsolata';
 	font-style: normal;

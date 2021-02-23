@@ -137,7 +137,6 @@
 .serverlist .unavailable {
 	background-color: #ff6b6B;
 	border-color: #ad2121;
-	display: none;
 }
 
 .serverlist .button:hover {

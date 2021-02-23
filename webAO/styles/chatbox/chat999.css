@@ -30,6 +30,10 @@
 	color: #0ff;
 }
 
+.text_grey {
+	color: #bbb;
+}
+
 #client_chatcontainer {
 	display: block;
 	position: absolute;

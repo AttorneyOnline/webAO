@@ -30,6 +30,10 @@
 	color: #0ff;
 }
 
+.text_grey {
+	color: #bbb;
+}
+
 #client_chatcontainer {
 	position: absolute;
 	width: 100%;
@@ -41,10 +45,6 @@
 
 #client_name {
 	display: none
-}
-
-#client_inner_name {
-
 }
 
 #client_chat {

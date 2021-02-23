@@ -30,6 +30,10 @@
 	color: #0ff;
 }
 
+.text_grey {
+	color: #bbb;
+}
+
 @font-face {
 	font-family: 'Cabin Condensed';
 	font-style: normal;
