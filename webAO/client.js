@@ -1827,7 +1827,8 @@ async changeBackground(position) {
 	 */
 	async getAnimLength(filename) {
 		try {
-			const file = await requestBuffer(filename);
+			const file = await getIPFSdata(IPFS_HOST + '/' + filename);
+
 			return this.calculateGifLength(file);
 		} catch (err) {
 			return 0;
