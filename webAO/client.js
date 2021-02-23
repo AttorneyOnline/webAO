@@ -116,7 +116,10 @@ async function getIPFSdata(cid) {
 }
 
 async function getImage(filename) {
-	if (window.ipfs) {
+	if (queryDict.asset) {
+		return queryDict.asset + filename
+	}
+	else if (window.ipfs) {
 		const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
 		var image_b64 = 'data:image;base64,' + final_file.toString('base64');
 		return (image_b64);
@@ -126,7 +129,10 @@ async function getImage(filename) {
 }
 
 async function getSound(filename) {
-	if (window.ipfs) {
+	if (queryDict.asset) {
+		return queryDict.asset + filename
+	}
+	else if (window.ipfs) {
 		const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
 		var audio_b64 = 'data:audio/ogg;base64,' + final_file.toString('base64');
 		return (audio_b64);
@@ -136,7 +142,10 @@ async function getSound(filename) {
 }
 
 async function getText(filename) {
-	if (window.ipfs) {
+	if (queryDict.asset) {
+		return queryDict.asset + filename
+	}
+	else if (window.ipfs) {
 		const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
 		return (final_file.toString());
 	} else {
