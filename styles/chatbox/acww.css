@@ -1,0 +1,102 @@
+.text_white {
+	color: #000;
+}
+
+#client_chatcontainer {
+	display: block;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	height: 42%;
+	width: 100%;
+    filter: none;
+}
+
+#client_name {
+	display: block;
+	position: absolute;
+	left: 11%;
+	top: 0;
+	height: 12%;
+	min-width: 11%;	
+	font-size: 0.8em;
+    background: #d8f8a0;
+    color: #004000;
+	margin: 0;
+	padding-top: 0.4%;
+	padding-left: 1.955%;
+	padding-right: 1.955%;
+	border-color: #b0f818;
+	border-style: solid;
+	border-width: 0.3em 0.6em;
+    border-radius: 10%/50%;	
+    box-shadow: 0 0.3em #70c020;
+    line-height: 100%;
+	z-index: 1;
+	font-family: sans-serif;
+}
+
+#client_inner_name {
+	text-justify: distribute;
+	line-height: 100%;
+	margin: 0;
+	margin-top: 2.75%;
+}
+
+#client_chat {
+	display: block;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 87%;
+	margin: auto;
+	/*border-color: darkgray;
+	border-style: solid;
+	border-width: 0.15em;
+	border-radius: 0.15em;
+    background-color: white;*/
+    background-image: url("acww.svg");
+    background-size: cover;
+    background-repeat: no-repeat;
+	word-break: keep-all;
+	overflow-wrap: break-word;
+	text-align: left;
+	overflow: hidden;
+	scroll-behavior: smooth;
+	font-family: sans-serif;
+}
+
+#client_inner_chat {
+	padding: 5% 12%;
+	margin: 0;
+	line-height: 100%;
+}
+
+#client_chatwaiting {
+	display: block;
+	position: absolute;
+	color: transparent;
+	text-shadow: none;
+	right: 12%;
+	bottom: 15%;
+    width: 1.4em;
+    height: 1.5em;
+    background-image: url("chatwaiting_acww.svg");
+	background-size: contain;
+	animation: idling 0.4s linear infinite;
+}
+
+@keyframes idling {
+	0% {
+		bottom: 12%;
+	}
+
+	50% {
+		bottom: 15%;
+	}
+
+	100% {
+		bottom: 12%;
+	}
+}

@@ -1,0 +1,99 @@
+.text_white {
+	color: #fff;
+}
+
+.text_blue {
+	color: #93bbe6;
+}
+
+.text_green {
+	color: #6ab057;
+}
+
+.text_red {
+	color: #e1522a;
+}
+
+.text_orange {
+	color: #cf714c;
+}
+
+.text_yellow {
+	color: #fef9ad;
+}
+
+.text_pink {
+	color: #ffc0cb;
+}
+
+.text_cyan {
+	color: #0ff;
+}
+
+.text_grey {
+	color: #bbb;
+}
+
+@font-face {
+	font-family: 'Cabin Condensed';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: local('Cabin Condensed'), local('CabinCondensed-Regular'), url(https://fonts.gstatic.com/s/cabincondensed/v13/nwpMtK6mNhBK2err_hqkYhHRqmwqZ-LY.woff2) format('woff2');
+}
+
+#client_chatcontainer {
+	font-family: 'Cabin Condensed', sans-serif;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	height: 35%;
+	width: 100%;
+}
+
+#client_name {
+    display: block;
+    left: 1%;
+    top: 0;
+    height: 20%;
+    min-width: 15%;
+	padding: 0px 6px;	
+    border: 2px ridge #b1822d;
+    border-radius: 0.4em;
+    background: #783500;
+	position: absolute;
+	z-index: 1;
+}
+
+#client_inner_name {
+	margin: 1px;
+}
+
+#client_chat {
+	font-size: 1em;
+	display: block;
+    width: 99%;
+    width: calc(100% - 4px);
+	margin: auto;
+    height: 80%;
+    border: 2px ridge #d9a63b;
+    border-radius: 0.5em;
+	background-color: rgba(148,96,0,0.6);
+	bottom: 0;
+	position: absolute;
+	word-break: keep-all;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	text-align: left;
+	overflow: hidden;
+	scroll-behavior: smooth;
+}
+
+#client_inner_chat {
+	margin: 6px;
+	padding: 6px 20px;
+}
+
+#client_chatwaiting {
+	display: none;
+}

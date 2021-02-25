@@ -1,0 +1,136 @@
+.text_white {
+	color: rgb(255,255,255);
+}
+
+.text_blue {
+	color: rgb(000,043,152);
+}
+
+.text_green {
+	color: rgb(080,255,080);
+}
+
+.text_red {
+	color: rgb(179,014,014);
+}
+
+.text_orange {
+	color: rgb(255,116,088);
+}
+
+.text_yellow {
+	color: rgb(255,255,200);
+}
+
+.text_pink {
+	color: rgb(255,200,200);
+}
+
+.text_cyan {
+	color: rgb(100,100,255);
+}
+
+.text_cyan {
+	color: rgb(179,014,014);
+}
+
+.text_grey {
+	color: #bbb;
+}
+
+#client_chatcontainer {
+	display: block;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	height: 33%;
+	width: 100%;
+    filter: none;
+    font-family: "Verdana";
+}
+
+#client_chatdecoration {
+    display: block;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+	height: 80%;
+    background: rgba(000,000,080,0.5);    
+    background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(000,000,80,0.5) 5%,rgba(000,000,080,0.5) 95%, rgba(0,0,0,0) 100%);
+}
+
+#client_name {
+	display: block;
+	position: absolute;
+	left: 2%;
+	top: 0;
+	height: 15%;
+    min-width: 4em;
+    font-size: 0.9em;
+	background: rgba(000,043,152,0.5);
+	margin: 0;
+	padding: 0.5% 3%;
+	border-color: #ca9d86;
+	border-style: ridge;
+	border-width: 0.1em;
+	border-radius: 0.15em;
+	z-index: 1;
+}
+
+#client_inner_name {
+	text-justify: distribute;
+    margin: 0;
+    line-height: 100%;
+    text-shadow: 2px 2px black;
+}
+
+#client_chat {
+	display: block;
+	position: absolute;
+	bottom: 4%;
+	left: 3%;
+	width: 94%;
+	height: 70%;
+	margin: auto;
+	border-color: #ca9d86;
+	border-style: ridge;
+	border-width: 0.1em;
+	border-radius: 0.15em;
+	font-size: 1.6em;
+	word-break: keep-all;
+	overflow-wrap: break-word;
+	text-align: left;
+	overflow: hidden;
+    scroll-behavior: smooth;
+    font-size: 75%;
+}
+
+#client_inner_chat {
+    font-size: 1em;
+	margin: 1px;
+    line-height: 100%;
+    text-shadow: 2px 2px black;
+    padding: 1% 8%;
+}
+
+#client_chatwaiting {
+	display: block;
+	position: absolute;
+	right: 2%;
+	bottom: 15%;
+    line-height: 0.5;
+    color: #dba398;
+    animation: idling 0.4s linear infinite alternate;
+    transform: rotate(90deg);
+}
+
+@keyframes idling {
+	0% {
+		transform: rotate(90deg) scaleY(0);
+	}
+
+	100% {
+		transform: rotate(90deg) scaleY(1);
+	}
+}
