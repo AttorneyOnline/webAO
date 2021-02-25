@@ -635,8 +635,8 @@ class Client extends EventEmitter {
 						other_charid: Number(args[17]),
 						other_name: safe_tags(args[18]),
 						other_emote: safe_tags(args[19]),
-						self_offset: Number(args[20]),
-						other_offset: Number(args[21]),
+						self_offset: args[20].split('&'),
+						other_offset: args[21].split('&'),
 						other_flip: Number(args[22]),
 						noninterrupting_preanim: Number(args[23])
 					};
@@ -655,13 +655,13 @@ class Client extends EventEmitter {
 						if (extrafeatures.includes("effects")) {
 							const extra_28 = {
 								additive: Number(args[29]),
-								effects: safe_tags(args[30])
+								effects: args[30].split('|')
 							};
 							chatmsg = Object.assign(extra_28, chatmsg);
 						} else {
 							const extra_28 = {
 								additive: 0,
-								effects: "||"
+								effects: ['','','']
 							};
 							chatmsg = Object.assign(extra_28, chatmsg);
 						}
@@ -677,7 +677,7 @@ class Client extends EventEmitter {
 						chatmsg = Object.assign(extra_27, chatmsg);
 						const extra_28 = {
 							additive: 0,
-							effects: ""
+							effects: ['','','']
 						};
 						chatmsg = Object.assign(extra_28, chatmsg);
 					}
@@ -687,8 +687,8 @@ class Client extends EventEmitter {
 						other_charid: 0,
 						other_name: "",
 						other_emote: "",
-						self_offset: 0,
-						other_offset: 0,
+						self_offset: [0,0],
+						other_offset: [0,0],
 						other_flip: 0,
 						noninterrupting_preanim: 0
 					};
@@ -703,7 +703,7 @@ class Client extends EventEmitter {
 					chatmsg = Object.assign(extra_27, chatmsg);
 					const extra_28 = {
 						additive: 0,
-						effects: ""
+						effects: ['','','']
 					};
 					chatmsg = Object.assign(extra_28, chatmsg);
 				}
@@ -1972,8 +1972,12 @@ async changeBackground(position) {
 		}
 
 		// Shift by the horizontal offset
-		pairLayers.style.left = this.chatmsg.other_offset + "%";
-		charLayers.style.left = this.chatmsg.self_offset + "%";
+		pairLayers.style.left = Number(this.chatmsg.other_offset[0]) + "%";
+		charLayers.style.left = Number(this.chatmsg.self_offset[0]) + "%";
+
+		// New vertical offsets
+		pairLayers.style.top = Number(this.chatmsg.other_offset[1]) + "%";
+		charLayers.style.top = Number(this.chatmsg.self_offset[1]) + "%";
 
 		// flip the paired character
 		if (this.chatmsg.other_flip === 1) {
@@ -1993,16 +1997,15 @@ async changeBackground(position) {
 		}
 
 		// apply effects
-		const effectinfo = this.chatmsg.effects.split('|');
 		fg.style.animation = "";
 
-		if (effectinfo[0] && effectinfo[0] !== "-")
-			fg.src = `${AO_HOST}themes/default/effects/${encodeURI(effectinfo[0].toLowerCase())}.webp`;
+		if (this.chatmsg.effects[0] && this.chatmsg.effects[0] !== "-")
+			fg.src = `${AO_HOST}themes/default/effects/${encodeURI(this.chatmsg.effects[0].toLowerCase())}.webp`;
 		else
 			fg.src = transparentPNG;
 
 		if (this.chatmsg.sound === "0" || this.chatmsg.sound === "1" || this.chatmsg.sound === "" || this.chatmsg.sound === undefined)
-			this.chatmsg.sound = effectinfo[2];
+			this.chatmsg.sound = this.chatmsg.effects[2];
 
 		this.tick();
 	}
