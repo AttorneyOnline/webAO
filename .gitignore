@@ -50,5 +50,6 @@ Temporary Items
 node_modules
 package-lock.json
 
-# content folder
-webAO/base/
+# webpack shit
+*.b.js
+*.b.js.map
