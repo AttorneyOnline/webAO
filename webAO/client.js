@@ -287,12 +287,15 @@ class Client extends EventEmitter {
 	 * @param {number} self_offset offset to paired character (optional)
 	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
-	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip, realization, text_color, showname, other_charid, self_offset, noninterrupting_preanim, looping_sfx, screenshake, frame_screenshake, frame_realization, frame_sfx, additive, effect) {
+	sendIC(deskmod, preanim, name, emote, message, side, sfx_name, emote_modifier, sfx_delay, objection_modifier, evidence, flip,
+			realization, text_color, showname, other_charid, self_hoffset, self_yoffset, noninterrupting_preanim, looping_sfx, screenshake,
+			frame_screenshake, frame_realization, frame_sfx, additive, effect) {
 		let extra_cccc = ``;
 		let extra_27 = ``;
 		let extra_28 = ``;
 
 		if (extrafeatures.includes("cccc_ic_support")) {
+			const self_offset = extrafeatures.includes("y_offset") ? self_hoffset : self_hoffset+'&'+self_yoffset;
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
 
 			if (extrafeatures.includes("looping_sfx")) {
@@ -1330,6 +1333,10 @@ class Client extends EventEmitter {
 		if (args.includes("effects")) {
 			document.getElementById("2.8").style.display = "";
 		}
+
+		if (args.includes("y_offset")) {
+			document.getElementById("y_offset").style.display = "";
+		}
 	}
 
 	/**
@@ -2292,6 +2299,7 @@ export function onEnter(event) {
 		const text = document.getElementById("client_inputbox").value;
 		const pairchar = document.getElementById("pair_select").value;
 		const pairoffset = document.getElementById("pair_offset").value;
+		const pairyoffset = document.getElementById("pair_y_offset").value;
 		const myrole = document.getElementById("role_select").value ? document.getElementById("role_select").value : mychar.side;
 		const additive = ((document.getElementById("check_additive").checked) ? 1 : 0);
 		const effect = document.getElementById("effect_select").value;
@@ -2311,7 +2319,7 @@ export function onEnter(event) {
 		client.sendIC("chat", preanim, mychar.name, myemo.emote,
 			text, myrole,
 			sfxname, myemo.zoom, sfxdelay, selectedShout, evi, flip,
-			flash, color, showname, pairchar, pairoffset, noninterrupting_preanim, looping_sfx, screenshake, "-", "-", "-", additive, effect);
+			flash, color, showname, pairchar, pairoffset, pairyoffset, noninterrupting_preanim, looping_sfx, screenshake, "-", "-", "-", additive, effect);
 	}
 }
 window.onEnter = onEnter;
