@@ -174,14 +174,10 @@
 					<select name="pair_select" id="pair_select">
 						<option value="-1">None</option>
 					</select>
-					<br>
-					<label for="pair_offset">Horizontal offset:</label>
-					<input type="range" name="pair_offset" id="pair_offset" min="-100" max="100" value="0">
-					<span id="y_offset" style="display: none"></span>
-						<label for="pair_y_offset">Vertical offset:</label>
-						<input type="range" name="pair_y_offset" id="pair_y_offset" min="-100" max="100" value="0">
-					</span>
-				<br>
+					<table style="border: none;margin-left: auto;margin-right: auto;">
+						<tr                                    ><td><p>Horizontal offset:</p></td><td><input type="range" name="pair_offset"   id="pair_offset"   min="-100" max="100" value="0"></td></tr>
+						<tr id="y_offset" style="display: none"><td><p  >Vertical offset:</p></td><td><input type="range" name="pair_y_offset" id="pair_y_offset" min="-100" max="100" value="0"></td></tr>
+					</table>
 				<br>
 				<span id="cccc" style="display: none">
 					<label for="ic_chat_name">Custom Showname:</label>
