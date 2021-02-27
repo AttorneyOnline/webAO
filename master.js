@@ -1,7 +1,7 @@
 const MASTERSERVER_IP = "master.aceattorneyonline.com:27014";
 import { version } from '../package.json';
 
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import Fingerprint2 from 'fingerprintjs2';
 import { unescapeChat } from './encoding.js';
 import { safe_tags } from './encoding.js';
 
@@ -18,26 +18,47 @@ let servers = [];
 servers[-2] = { name: "Singleplayer", description: "Build cases, try out new things", ip: "127.0.0.1", port: 50001, assets: "", online: "" };
 servers[-1] = { name: "Localhost", description: "This is your computer on port 50001", ip: "127.0.0.1", port: 50001, assets: "", online: "Online: ?/?" };
 
-FingerprintJS.load().then(fp => {
-	fp.get().then(result => {
-		// Handle the result
-		hdid = result.visitorId;
+if (window.requestIdleCallback) {
+	requestIdleCallback(function () {
+		Fingerprint2.get(options, function (components) {
+			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
 
-		if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-			lowMemory = true;
-		}
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+				lowMemory = true;
+			}
 
-		check_https();
+			check_https();
 
-		masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
-		masterserver.onopen = (evt) => onOpen(evt);
-		masterserver.onerror = (evt) => onError(evt);
-		masterserver.onmessage = (evt) => onMessage(evt);
+			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
+			masterserver.onopen = (evt) => onOpen(evt);
+			masterserver.onerror = (evt) => onError(evt);
+			masterserver.onmessage = (evt) => onMessage(evt);
 
-		// i don't need the ms to play alone
-		setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
-	})
-})
+			// i don't need the ms to play alone
+			setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
+		});
+	});
+} else {
+	setTimeout(function () {
+		Fingerprint2.get(options, function (components) {
+			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
+
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+				lowMemory = true;
+			}
+
+			check_https();
+
+			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
+			masterserver.onopen = (evt) => onOpen(evt);
+			masterserver.onerror = (evt) => onError(evt);
+			masterserver.onmessage = (evt) => onMessage(evt);
+
+			// i don't need the ms to play alone
+			setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
+		});
+	}, 500);
+}
 
 export function check_https() {
 	if (document.location.protocol === "https:") {
