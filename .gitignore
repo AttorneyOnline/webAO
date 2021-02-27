@@ -52,4 +52,4 @@ package-lock.json
 
 # webpack shit
 *.b.js
-*.b.js.map
+*.b.js.*
