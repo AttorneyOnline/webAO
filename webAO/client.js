@@ -4,7 +4,7 @@
  * credits to aleks for original idea and source
 */
 
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import Fingerprint2 from 'fingerprintjs2';
 
 import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
@@ -60,20 +60,34 @@ let extrafeatures = [];
 let hdid;
 const options = { fonts: { extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"] }, excludes: { userAgent: true, enumerateDevices: true } };
 
-FingerprintJS.load().then(fp => {
-	fp.get().then(result => {
-		// Handle the result
-		hdid = result.visitorId;
+if (window.requestIdleCallback) {
+	requestIdleCallback(function () {
+		Fingerprint2.get(options, function (components) {
+			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
+			client = new Client(serverIP);
+			viewport = new Viewport();
 
-		client = new Client(serverIP);
-		viewport = new Viewport();
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+				oldLoading = true;
+			}
+			client.loadResources();
+		});
+	});
+} else {
+	setTimeout(function () {
+		Fingerprint2.get(options, function (components) {
+			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
+			client = new Client(serverIP);
+			viewport = new Viewport();
 
-		if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-			oldLoading = true;
-		}
-		client.loadResources();
-	})
-})
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+				oldLoading = true;
+			}
+			client.loadResources();
+		});
+	}, 500);
+}
+
 
 let lastICMessageTime = new Date(0);
 
