@@ -34,5 +34,11 @@
     "fingerprintjs2": "^2.1.2",
     "golden-layout": "^1.5.9",
     "regenerator-runtime": "^0.13.7"
-  }
+  },
+  "browserslist": [
+    "defaults",
+    "Safari > 3",
+    "Opera > 8",
+    "Android > 3"
+  ]
 }

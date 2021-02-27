@@ -24,7 +24,12 @@ module.exports = {
                   [
                     '@babel/preset-env', {
                       useBuiltIns: 'usage',
-                      targets: 'defaults',
+                      targets: [
+                        "defaults",
+                        "Safari > 3",
+                        "Opera > 8",
+                        "Android > 3"
+                      ],
                       corejs: 3
                     }
                   ]
