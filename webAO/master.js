@@ -10,8 +10,6 @@ let masterserver;
 let hdid;
 const options = { fonts: { extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"] }, excludes: { userAgent: true, enumerateDevices: true } };
 
-let lowMemory = false;
-
 let selectedServer = -1;
 
 let servers = [];
@@ -22,10 +20,6 @@ if (window.requestIdleCallback) {
 	requestIdleCallback(function () {
 		Fingerprint2.get(options, function (components) {
 			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
-
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-				lowMemory = true;
-			}
 
 			check_https();
 
@@ -42,10 +36,6 @@ if (window.requestIdleCallback) {
 	setTimeout(function () {
 		Fingerprint2.get(options, function (components) {
 			hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
-
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
-				lowMemory = true;
-			}
 
 			check_https();
 
