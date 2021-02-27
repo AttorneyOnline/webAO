@@ -67,7 +67,7 @@ if (window.requestIdleCallback) {
 			client = new Client(serverIP);
 			viewport = new Viewport();
 
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Nintendo|Opera Mini/i.test(navigator.userAgent)) {
 				oldLoading = true;
 			}
 			client.loadResources();
@@ -80,7 +80,7 @@ if (window.requestIdleCallback) {
 			client = new Client(serverIP);
 			viewport = new Viewport();
 
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Opera Mini/i.test(navigator.userAgent)) {
+			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Nintendo|Opera Mini/i.test(navigator.userAgent)) {
 				oldLoading = true;
 			}
 			client.loadResources();
