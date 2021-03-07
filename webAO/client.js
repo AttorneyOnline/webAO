@@ -2356,6 +2356,12 @@ function resetICParams() {
 	}	
 }
 
+export function resetOffset(_event) {
+	document.getElementById("pair_offset").value = 0;
+	document.getElementById("pair_y_offset").value = 0;
+}
+window.resetOffset = resetOffset;
+
 /**
  * Triggered when the music search bar is changed
  * @param {MouseEvent} event
