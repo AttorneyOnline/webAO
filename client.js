@@ -309,7 +309,7 @@ class Client extends EventEmitter {
 		let extra_28 = ``;
 
 		if (extrafeatures.includes("cccc_ic_support")) {
-			const self_offset = extrafeatures.includes("y_offset") ? self_hoffset : self_hoffset+'&'+self_yoffset;
+			const self_offset = extrafeatures.includes("y_offset") ? self_hoffset+'&'+self_yoffset : self_hoffset;
 			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
 
 			if (extrafeatures.includes("looping_sfx")) {
