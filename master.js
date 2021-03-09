@@ -59,7 +59,7 @@ export function check_https() {
 export function setServ(ID) {
 	selectedServer = ID;
 
-	if (!lowMemory && document.getElementById(`server${ID}`).className === "")
+	if (document.getElementById(`server${ID}`).className === "")
 		checkOnline(ID, servers[ID].ip + ":" + servers[ID].port);
 
 	if (servers[ID].description !== undefined) {
