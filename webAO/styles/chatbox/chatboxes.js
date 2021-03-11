@@ -14,6 +14,7 @@ export default [
 	"drae",
 	"chatp3",
 	"p4",
+	"p5",
 	"chat999",
 	"halla",
 	"homestuck",
