@@ -1862,17 +1862,20 @@ async changeBackground(position) {
 		const  gif_s = document.getElementById("client_" + pairID + "_gif");
 		const  png_s = document.getElementById("client_" + pairID + "_png");
 		const apng_s = document.getElementById("client_" + pairID +"_apng");
+		const webp_s = document.getElementById("client_" + pairID +"_webp");
 
 		if (this.lastChar !== this.chatmsg.name) {
 			//hide the last sprite
 			gif_s.src = transparentPNG;
 			png_s.src = transparentPNG;
 			apng_s.src = transparentPNG;
+			webp_s.src = transparentPNG;
 		}
 
 		gif_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.gif`;
 		png_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(emotename)}.png`;
 		apng_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.apng`;
+		webp_s.src = characterFolder + `${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.webp`;
 	}
 
 	/**
