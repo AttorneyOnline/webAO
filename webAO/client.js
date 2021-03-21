@@ -116,11 +116,11 @@ async function getImage(filename) {
 async function getSound(filename) {
 	if (queryDict.asset) {
 		return queryDict.asset + filename
-	}
-	else if (window.ipfs) {
-		const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
-		var audio_b64 = 'data:audio/ogg;base64,' + final_file.toString('base64');
-		return (audio_b64);
+//	}
+//	else if (window.ipfs) {
+//		const final_file = await getIPFSdata(IPFS_HOST + '/' + filename);
+//		var audio_b64 = 'data:audio/ogg;base64,' + final_file.toString('base64');
+//		return (audio_b64);
 	} else {
 		return "https://dweb.link/ipfs/" + IPFS_HOST + '/' + filename;
 	}
