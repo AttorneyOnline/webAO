@@ -510,7 +510,7 @@ class Client extends EventEmitter {
 	 */
 	onClose(e) {
 		console.error(`The connection was closed: ${e.reason} (${e.code})`);
-		if (this.char_list_length == 0) {
+		if (extrafeatures.length == 0) {
 			document.getElementById("client_errortext").textContent = "Could not connect to the server";
 		}
 			document.getElementById("client_error").style.display = "flex";
