@@ -130,6 +130,8 @@ class Client extends EventEmitter {
 
 		this.callwords = [];
 
+		this.banned = false;
+
 		this.resources = {
 			"holdit": {
 				"src": AO_HOST + "misc/default/holdit_bubble.png",
@@ -510,14 +512,13 @@ class Client extends EventEmitter {
 	 */
 	onClose(e) {
 		console.error(`The connection was closed: ${e.reason} (${e.code})`);
-		if (extrafeatures.length == 0) {
+		if (extrafeatures.length == 0 && this.banned === false) {
 			document.getElementById("client_errortext").textContent = "Could not connect to the server";
 		}
 			document.getElementById("client_error").style.display = "flex";
 			document.getElementById("client_loading").style.display = "none";
 			document.getElementById("error_id").textContent = e.code;
-			this.cleanup();
-		
+			this.cleanup();		
 	}
 
 	/**
@@ -1119,6 +1120,7 @@ class Client extends EventEmitter {
 	 */
 	handleKB(args) {
 		this.handleBans("Banned", safe_tags(args[1]));
+		this.banned = true;
 	}
 
 	/**
@@ -1128,6 +1130,7 @@ class Client extends EventEmitter {
 	 */
 	handleBD(args) {
 		this.handleBans("Banned", safe_tags(args[1]));
+		this.banned = true;
 	}
 
 	/**
