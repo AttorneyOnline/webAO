@@ -307,12 +307,18 @@ class Client extends EventEmitter {
 			realization, text_color, showname, other_charid, self_hoffset, self_yoffset, noninterrupting_preanim, looping_sfx, screenshake,
 			frame_screenshake, frame_realization, frame_sfx, additive, effect) {
 		let extra_cccc = ``;
+		let other_emote = ``;
+		let other_offset = ``;
 		let extra_27 = ``;
 		let extra_28 = ``;
 
 		if (extrafeatures.includes("cccc_ic_support")) {
-			const self_offset = extrafeatures.includes("y_offset") ? self_hoffset+'&'+self_yoffset : self_hoffset;
-			extra_cccc = `${showname}#${other_charid}#${self_offset}#${noninterrupting_preanim}#`;
+			const self_offset = extrafeatures.includes("y_offset") ? self_hoffset+'&'+self_yoffset : self_hoffset;			
+			if (mode === "replay") {
+				other_emote = `##`;
+		    	other_offset = `#0#0`;
+			}
+			extra_cccc = `${showname}#${other_charid}${other_emote}#${self_offset}${other_offset}#${noninterrupting_preanim}#`;		
 
 			if (extrafeatures.includes("looping_sfx")) {
 				extra_27 = `${looping_sfx}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
