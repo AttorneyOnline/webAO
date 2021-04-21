@@ -1709,7 +1709,19 @@ async changeBackground(position) {
 		}
 	};
 
-	const { bg, desk, speedLines } = positions[position];
+	let bg;
+	let desk;
+	let speedLines;
+
+	if ( "def,pro,hld,hlp,wit,jud,jur,sea".includes(position)) {
+		bg = positions[position].bg;
+		desk = positions[position].desk;
+		speedLines = positions[position].speedLines;
+	} else {
+		bg = position + ".png";
+		desk = { ao2: position + "_overlay.png", ao1: "_overlay.png" };
+		speedLines = "defense_speedlines.gif";
+	}
 
 	bench.className = position + "_bench";
 	court.className = position + "_court";
