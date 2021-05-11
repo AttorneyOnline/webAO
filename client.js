@@ -36,9 +36,8 @@ let mode = queryDict.mode;
 
 // Unless there is an asset URL specified, use the wasabi one
 const DEFAULT_HOST = "http://attorneyoffline.de/base/";
-const AO_HOST = queryDict.asset || DEFAULT_HOST;
+let AO_HOST = queryDict.asset || DEFAULT_HOST;
 const THEME = queryDict.theme || "default";
-const MUSIC_HOST = AO_HOST + "sounds/music/";
 
 const UPDATE_INTERVAL = 60;
 
@@ -214,6 +213,7 @@ class Client extends EventEmitter {
 		this.on("RD", this.handleRD.bind(this));
 		this.on("CharsCheck", this.handleCharsCheck.bind(this));
 		this.on("PV", this.handlePV.bind(this));
+		this.on("ASS", this.handleASS.bind(this));
 		this.on("CHECK", () => { });
 		this.on("CH", () => { });
 
@@ -775,7 +775,7 @@ class Client extends EventEmitter {
 		if(track.startsWith("http")) {
 			music.src = track;
 		} else {
-			music.src = MUSIC_HOST + encodeURI(track.toLowerCase());
+			music.src = AO_HOST + "/sounds/music/" + encodeURI(track.toLowerCase());
 		}
 		music.loop = looping;
 		music.play();
@@ -1504,6 +1504,14 @@ class Client extends EventEmitter {
 			addIniswap(me.name);
 			cswap.forEach(addIniswap);
 		}
+	}
+
+	/**
+	 * new asset url!!
+	 * @param {Array} args packet arguments
+	 */
+	 handleASS(args) {
+		AO_HOST = args[1];
 	}
 
 	/**
