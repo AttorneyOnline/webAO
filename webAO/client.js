@@ -775,7 +775,7 @@ class Client extends EventEmitter {
 		if(track.startsWith("http")) {
 			music.src = track;
 		} else {
-			music.src = AO_HOST + "/sounds/music/" + encodeURI(track.toLowerCase());
+			music.src = AO_HOST + "sounds/music/" + encodeURI(track.toLowerCase());
 		}
 		music.loop = looping;
 		music.play();
