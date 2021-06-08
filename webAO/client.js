@@ -2742,8 +2742,7 @@ async function fileExists(url) {
 		await request(url);
 		return true;
 	} catch (err) {
-		if (err.code >= 400) return false;
-		else throw err;
+		return false;
 	}
 }
 
