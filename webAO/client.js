@@ -406,16 +406,6 @@ class Client extends EventEmitter {
 	}
 
 	/**
-	 * Requests to leave the room and free the character slot.
-	 * 
-	 * Note: This packet is undocumented. It is not implemented by
-	 * either the AO2 client or tsuserver.
-	 */
-	sendLeaveRoom() {
-		this.sendServer("FC#%");
-	}
-
-	/**
 	 * Begins the handshake process by sending an identifier
 	 * to the server.
 	 */
@@ -2637,7 +2627,6 @@ window.switchChatOffset = switchChatOffset;
  * @param {MouseEvent} event
  */
 export function changeCharacter(_event) {
-	client.sendLeaveRoom();
 	document.getElementById("client_charselect").style.display = "block";
 	document.getElementById("client_emo").innerHTML = "";
 }
