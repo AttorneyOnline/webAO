@@ -983,7 +983,7 @@ class Client extends EventEmitter {
 	async fetchCharacterList() {
 		try {
 			const chardata = await request(AO_HOST + "characters.json");
-			char_array = JSON.parse(chardata);
+			const char_array = JSON.parse(chardata);
 			// the try catch will fail before here when there is no file
 
 			const char_select = document.getElementById("client_ininame");
