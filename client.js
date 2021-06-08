@@ -9,11 +9,10 @@ import Fingerprint2 from 'fingerprintjs2';
 import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
-import character_arr from "./characters.js";
-import music_arr from "./music.js";
-import background_arr from "./backgrounds.js";
-import evidence_arr from "./evidence.js";
-import sfx_arr from "./sounds.js";
+import vanilla_character_arr from "./characters.js";
+import vanilla_music_arr from "./music.js";
+import vanilla_background_arr from "./backgrounds.js";
+import vanilla_evidence_arr from "./evidence.js";
 
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 
@@ -428,14 +427,14 @@ class Client extends EventEmitter {
 		// Load background array to select
 		const background_select = document.getElementById("bg_select");
 		background_select.add(new Option("Custom", 0));
-		background_arr.forEach(background => {
+		vanilla_background_arr.forEach(background => {
 			background_select.add(new Option(background));
 		});
 
 		// Load evidence array to select
 		const evidence_select = document.getElementById("evi_select");
 		evidence_select.add(new Option("Custom", 0));
-		evidence_arr.forEach(evidence => {
+		vanilla_evidence_arr.forEach(evidence => {
 			evidence_select.add(new Option(evidence));
 		});
 
@@ -558,7 +557,7 @@ class Client extends EventEmitter {
 		clearInterval(this.checkUpdater);
 
 		// the connection got rekt, get rid of the old musiclist
-		this.resetMusiclist();
+		this.resetMusicList();
 		document.getElementById("client_chartable").innerHTML = "";
 	}
 
@@ -951,14 +950,51 @@ class Client extends EventEmitter {
 		}
 	}
 
-	resetMusiclist() {
+	resetMusicList() {
 		this.musics = [];		
-		document.getElementById("client_musiclist").innerHTML = "";			
+		document.getElementById("client_musiclist").innerHTML = "";	
 	}
 
-	resetArealist() {
+	resetAreaList() {
 		this.areas = [];
 		document.getElementById("areas").innerHTML = "";
+
+		this.fetchBackgroundList();
+	}
+
+	async fetchBackgroundList() {
+		try {
+			const bgdata = await request(AO_HOST + "backgrounds.json");
+			const bg_array = JSON.parse(bgdata);
+			// the try catch will fail before here when there is no file
+
+			const bg_select = document.getElementById("bg_select");
+			bg_select.innerHTML = "";
+
+			bg_select.add(new Option("Custom", 0));
+			bg_array.forEach(background => {
+				bg_select.add(new Option(background));
+			});
+		} catch (err) {
+			console.warn("there was no backgrounds.json file");
+		}		
+	}
+
+	async fetchCharacterList() {
+		try {
+			const chardata = await request(AO_HOST + "characters.json");
+			char_array = JSON.parse(chardata);
+			// the try catch will fail before here when there is no file
+
+			const char_select = document.getElementById("client_ininame");
+			char_select.innerHTML = "";
+
+			char_array.forEach(character => {
+				char_select.add(new Option(character));
+			});
+		} catch (err) {
+			console.warn("there was no characters.json file");
+		}		
 	}
 
 	isAudio(trackname) {
@@ -1022,8 +1058,8 @@ class Client extends EventEmitter {
 	handleEM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music";
 		if(args[1] === "0") {
-			this.resetMusiclist();
-			this.resetArealist();
+			this.resetMusicList();
+			this.resetAreaList();
 		}
 
 		for (let i = 2; i < args.length - 1; i++) {
@@ -1043,8 +1079,8 @@ class Client extends EventEmitter {
 	 */
 	handleSM(args) {
 		document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
-		this.resetMusiclist();
-		this.resetArealist();
+		this.resetMusicList();
+		this.resetAreaList();
 
 		for (let i = 1; i < args.length - 1; i++) {
 			// Check when found the song for the first time
@@ -1061,7 +1097,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleFM(args) {
-		this.resetMusiclist();
+		this.resetMusicList();
 
 		for (let i = 1; i < args.length - 1; i++) {
 			// Check when found the song for the first time
@@ -1074,7 +1110,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleFA(args) {
-		this.resetArealist();
+		this.resetAreaList();
 
 		for (let i = 1; i < args.length - 1; i++) {
 			this.createArea(i-1,safe_tags(args[i]));
@@ -1274,7 +1310,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleaskchaa(_args) {
-		this.sendSelf("SI#" + character_arr.length + "#0#0#%");
+		this.sendSelf("SI#" + vanilla_character_arr.length + "#0#0#%");
 	}
 
 	/**
@@ -1475,25 +1511,26 @@ class Client extends EventEmitter {
 
 		const iniedit_select = document.getElementById("client_ininame");
 
-		function addIniswap(value) {
-			iniedit_select.add(new Option(safe_tags(value)));
-		}
-
 		// Load iniswaps if there are any
-		let cswap;
 		try {
 			const cswapdata = await request(AO_HOST + "characters/" + encodeURI(me.name.toLowerCase()) + "/iniswaps.ini");
-			cswap = cswapdata.split("\n");
-		} catch (err) {
-			cswap = {};
-		}
+			const cswap = cswapdata.split("\n");
 
-		// most iniswaps don't list their original char
-		if (cswap.length > 0) {
-			iniedit_select.innerHTML = "";
-			addIniswap(me.name);
-			cswap.forEach(addIniswap);
-		}
+			// most iniswaps don't list their original char
+			if (cswap.length > 0) {
+				iniedit_select.innerHTML = "";
+
+				function addIniswap(value) {
+					iniedit_select.add(new Option(safe_tags(value)));
+				}
+
+				addIniswap(me.name);
+				cswap.forEach(addIniswap);
+			}
+		} catch (err) {
+			console.info("character doesn't have iniswaps");
+			this.fetchCharacterList();
+		}		
 	}
 
 	/**
@@ -1509,7 +1546,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleRC(_args) {
-		this.sendSelf("SC#" + character_arr.join("#") + "#%");
+		this.sendSelf("SC#" + vanilla_character_arr.join("#") + "#%");
 	}
 
 	/**
@@ -1517,7 +1554,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
 	handleRM(_args) {
-		this.sendSelf("SM#" + music_arr.join("#") + "#%");
+		this.sendSelf("SM#" + vanilla_music_arr.join("#") + "#%");
 	}
 
 	/**
@@ -2694,8 +2731,7 @@ async function fileExists(url) {
 		await request(url);
 		return true;
 	} catch (err) {
-		if (err.code >= 400) return false;
-		else throw err;
+		return false;
 	}
 }
 
