@@ -997,6 +997,25 @@ class Client extends EventEmitter {
 		}		
 	}
 
+	async fetchEvidenceList() {
+		try {
+			const evidata = await request(AO_HOST + "evidence.json");
+			const evi_array = JSON.parse(evidata);
+			// the try catch will fail before here when there is no file
+
+			const evi_select = document.getElementById("evi_select");
+			evi_select.innerHTML = "";
+
+			evi_array.forEach(evi => {
+				evi_select.add(new Option(evi));
+			});
+			evidence_select.add(new Option("Custom", 0));
+			
+		} catch (err) {
+			console.warn("there was no evidence.json file");
+		}		
+	}
+
 	isAudio(trackname) {
 		if (trackname.includes(".") || // regex for file extenstions
 			trackname.startsWith("=") ||
