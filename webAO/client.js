@@ -960,6 +960,7 @@ class Client extends EventEmitter {
 		document.getElementById("areas").innerHTML = "";
 
 		this.fetchBackgroundList();
+		this.fetchEvidenceList();
 	}
 
 	async fetchBackgroundList() {
@@ -1010,7 +1011,7 @@ class Client extends EventEmitter {
 				evi_select.add(new Option(evi));
 			});
 			evidence_select.add(new Option("Custom", 0));
-			
+
 		} catch (err) {
 			console.warn("there was no evidence.json file");
 		}		
