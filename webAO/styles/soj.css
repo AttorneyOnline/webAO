@@ -36,6 +36,19 @@ body {
 	outline-offset: -1px;
 }
 
+.objection_button {
+	margin: 1px;
+	padding: 2px 15px;
+	cursor: pointer;
+	text-align: center;
+	font-weight: bold;
+	color: #fff;
+	background: linear-gradient(to bottom, #6b3c10, #422008);
+	border: 1px solid #211408;
+	outline: 1px solid #846129;
+	outline-offset: -1px;
+}
+
 #client_log {
 	position: relative;
 	height: 100%;

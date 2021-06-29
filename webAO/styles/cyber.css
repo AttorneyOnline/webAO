@@ -93,6 +93,17 @@ img {
 	border: green solid 1px;
 }
 
+.objection_button {
+	min-width: 6em;
+	margin: 1px;
+	padding: 6px 2px;
+	cursor: pointer;
+	text-align: center;
+	color: black;
+	background-color: green;
+	border: greenyellow solid 1px;
+}
+
 #client_log {
 	color: white;
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAFElEQVQImWNgYGDYjAVTV/A/w2YAfxQSe53wkNkAAAAASUVORK5CYII=) repeat;
