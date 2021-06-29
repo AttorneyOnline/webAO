@@ -102,6 +102,19 @@ hr {
 }
 
 .client_button {
+	min-width: 2.5em;
+	margin: 1px;
+	padding: 6px 2px;
+	cursor: pointer;
+	text-align: center;
+	color: #000;
+	background-color: #c0c0c0;
+	text-shadow: 0 0 1px #000;
+	border: #909090 solid 1px;
+	border-radius: 4px;
+}
+
+.objection_button {
 	min-width: 6em;
 	margin: 1px;
 	padding: 6px 2px;
@@ -112,6 +125,10 @@ hr {
 	background-color: #7b2900;
 	text-shadow: 0 0 4px #000;
 	border: #000 solid 1px;
+}
+
+#button_2 {
+	text-transform: capitalize;
 }
 
 #client_log {
@@ -174,4 +191,23 @@ hr {
 	display: inline-block;
 	transition: 1s linear;
 	transition-property: width;
+}
+
+#client_ooclog {
+    background-color: #8b8b8b;
+	color: #000;
+}
+
+#client_inputbox {
+    background-color: #6d6d6d;
+    color: #000;
+}
+
+#client_iccontrols {
+	background-color: #595959;
+}
+
+#client_oocinput {
+	background-color: #575757;
+	color: #000;
 }

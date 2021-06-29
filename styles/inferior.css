@@ -1,5 +1,5 @@
 body {
-	font-family: sans-serif;
+	font-family: "Arial", sans-serif;
 }
 
 img {
@@ -7,33 +7,33 @@ img {
 	image-rendering: pixelated;
 }
 
+input[type=text] {
+    background-color: #575757;
+    color: #fff;  
+}
+
+::placeholder {
+    color: #ababab;
+    opacity: 1;
+}
+
+select {
+    background-color: #a9a9a9;
+    color: #000;
+}
+
 .client_button {
 	margin: 1px;
 	padding: 2px 15px;
-	cursor: pointer;
+	cursor: default;
 	text-align: center;
 	font-weight: bold;
 	color: white;
-	background-color: #7b2900;
+	background-color: #7c2900;
 	border-radius: 3px;
 	border-style: solid;
 	border-width: 1px;
-	border-color: #fff;
-	box-shadow: 1px 1px inset;
-}
-
-.objection_button {
-	margin: 1px;
-	padding: 7px 15px;
-	cursor: pointer;
-	text-align: center;
-	font-weight: bold;
-	color: white;
-	background-color: #7b2900;
-	border-radius: 3px;
-	border-style: solid;
-	border-width: 1px;
-	border-color: #fff;
+	border-color: #9a5a34 #4a3d36 #6e2200 #4a3d36;
 	box-shadow: 1px 1px inset;
 }
 
@@ -47,29 +47,46 @@ img {
 	margin-right: 2px;
 }
 
+#client_inputbox {
+    background-color: #808080;
+    color: #fff;
+}
+
+#client_iccontrols {
+    background: #303030;
+}
+
+#client_log {
+	color: #fff;
+	background-color: #000;
+}
+
 #client_defense_hp {
 	text-align: left;
+	border-color: #486eca;
 }
 
 #client_defense_hp>.health-bar {
-	background-color: #169de0;
+	background-color: #333c8e;	
 }
 
 #client_prosecutor_hp {
 	text-align: right;
+	border-color: #ca4848;
 }
 
 #client_prosecutor_hp>.health-bar {
-	background-color: #e01f5f;
+	background-color: #8e0000;
+	
 }
 
 .health-box {
-	background-color: #555;
+	background-color: #000;
 	height: 20px;
 	width: 50%;
 	margin: 0 auto;
-	border: solid 2px #aaa;
-	border-radius: 5px;
+	border-style: solid none;
+	border-width: 0.1em;
 	box-sizing: border-box;
 	display: block;
 }
@@ -77,10 +94,14 @@ img {
 .health-bar {
 	width: 100%;
 	height: 100%;
-	border-radius: 3px;
 	bottom: 0;
 	position: relative;
 	display: inline-block;
 	transition: 1s linear;
 	transition-property: width;
+}
+
+#client_ooclog {
+    background-color: #8b8b8b;
+	color: #000;
 }
