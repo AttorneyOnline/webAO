@@ -121,9 +121,12 @@
 	overflow-x: hidden;
 	overflow-y: auto;
 	height: 100%;
+	background: inherit;
 }
 
 #client_iccontrols {
+	position: relative;
+	background: inherit;
 	overflow-y:auto;
 }
 
@@ -353,6 +356,7 @@
 
 #client_bars {
 	position: relative;
+	background: inherit;
 	text-align: center;
 	display: flex;
 	display: -webkit-flex;
