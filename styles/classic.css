@@ -5,7 +5,7 @@ body {
 /* Webfont CSS setup for Igiari by Caveras */
 @font-face {
 	font-family:'Igiari Cyrillic';
-		src: url('../igiari/igiari-cyrillic.ttf');
+		src: url('./igiari/igiari-cyrillic.ttf');
 	font-weight:normal;
 	font-style:normal;
 }
@@ -184,7 +184,7 @@ hr {
 	width: 100%;
 	height: 60%;
 	height: calc(100% - 4px);
-	bottom: 0;
+	bottom: 1px;
 	border-width: 2px;
 	border-style: groove none ridge none;
 	position: relative;
