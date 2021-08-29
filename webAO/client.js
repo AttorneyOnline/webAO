@@ -193,6 +193,7 @@ class Client extends EventEmitter {
 		this.on("SM", this.handleSM.bind(this));
 		this.on("MM", this.handleMM.bind(this));
 		this.on("BD", this.handleBD.bind(this));
+		this.on("BB", this.handleBB.bind(this));
 		this.on("KB", this.handleKB.bind(this));
 		this.on("KK", this.handleKK.bind(this));
 		this.on("DONE", this.handleDONE.bind(this));
@@ -1174,6 +1175,15 @@ class Client extends EventEmitter {
 		this.handleBans("Banned", safe_tags(args[1]));
 		this.banned = true;
 	}
+
+	/**
+	 * Handles the warning packet
+	 * on client this spawns a message box you can't close for 2 seconds
+	 * @param {Array} args ban reason
+	 */
+		 handleBB(args) {
+			alert(safe_tags(args[1]));
+		}
 
 	/**
 	 * Handles the banned packet
