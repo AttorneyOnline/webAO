@@ -1643,7 +1643,7 @@ class Viewport {
 
 		this.blipChannels = new Array(6);
 		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"))
-			.forEach(channel => channel.volume = 0.5);
+		this.blipChannels.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
 
 		this.sfxaudio = document.getElementById("client_sfxaudio");
@@ -1657,9 +1657,11 @@ class Viewport {
 		this.testimonyAudio = document.getElementById("client_testimonyaudio");
 		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.opus`;
 
-		this.music = new Array(3);
-		this.music.fill(new Audio(`${AO_HOST}sounds/music/trial (aa).opus`))
-			.forEach(channel => channel.volume = 0.5);
+		this.music = new Array( new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
+								new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
+								new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
+								new Audio(`${AO_HOST}sounds/music/trial (aa).opus`));
+		this.music.forEach(channel => channel.volume = 0.5);
 
 		this.updater = null;
 		this.testimonyUpdater = null;
