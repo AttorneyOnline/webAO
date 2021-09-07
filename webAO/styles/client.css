@@ -186,6 +186,20 @@
 	top: 0;
 	left: 0;
 	object-fit: cover;
+	transition: 0.5s ease-in-out;
+	transition-property: object-position;
+}
+
+.def_court {
+	object-position: left;
+}
+
+.wit_court {
+	object-position: center;
+}
+
+.pro_court {
+	object-position: right;
 }
 
 #client_pair_char {
