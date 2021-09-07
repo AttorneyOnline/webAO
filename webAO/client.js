@@ -1641,8 +1641,12 @@ class Viewport {
 
 		// Allocate multiple blip audio channels to make blips less jittery
 
-		this.blipChannels = new Array(6);
-		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"))
+		this.blipChannels = new Array(  new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
+										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
+										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
+										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
+										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
+										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"));
 		this.blipChannels.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
 
