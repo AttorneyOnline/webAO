@@ -758,6 +758,7 @@ class Client extends EventEmitter {
 		const showname = args[3] || "";
 		const looping = Boolean(args[4]);
 		const channel = Number(args[5]) || 0;
+		const fading = Number(args[6]) || 0; // unused in web
    
 		const music = viewport.music[channel];
 		let musicname;
