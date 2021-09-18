@@ -179,6 +179,14 @@
 	width: 100%;
 }
 
+#client_court_static {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 0;
+}
+
 #client_court {
 	position: absolute;
 	height: 100%;
@@ -201,6 +209,13 @@
 	bottom: 0;
 }
 
+#client_court_classic {
+	position: absolute;
+	height: 100%;
+	top: 0;
+	left: 0;
+}
+
 .def_court {
 	object-position: left;
 }
@@ -213,13 +228,20 @@
 	object-position: right;
 }
 
-#client_charview {
+#client_fullview {
 	position: absolute;
 	height: 100%;
 	width: 100%;
 	bottom: 0;
 	transition: 0.5s ease-in-out;
 	transition-property: left;
+}
+
+#client_classicview {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	bottom: 0;
 }
 
 .client_char {
@@ -239,12 +261,8 @@
 	object-position: 50% 0;
 }
 
-.def_bench, .hld_bench, .jur_bench, .sea_bench {
+#client_bench_classic {
 	left: 0;
-}
-
-.pro_bench, .hlp_bench, .wit_bench, .jud_bench {
-	right: 0;
 }
 
 #client_def_bench, #client_def_char, #client_def_pair_char, #client_court_def {
