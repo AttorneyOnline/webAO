@@ -758,7 +758,7 @@ class Client extends EventEmitter {
 		const showname = args[3] || "";
 		const looping = Boolean(args[4]);
 		const channel = Number(args[5]) || 0;
-		const fading = Number(args[6]) || 0; // unused in web
+		// const fading = Number(args[6]) || 0; // unused in web
    
 		const music = viewport.music[channel];
 		let musicname;
@@ -1648,6 +1648,7 @@ class Viewport {
 										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
 										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"));
 		this.blipChannels.forEach(channel => channel.volume = 0.5);
+		this.blipChannels.forEach(channel => channel.onerror = opusCheck(channel));
 		this.currentBlipChannel = 0;
 
 		this.sfxaudio = document.getElementById("client_sfxaudio");
@@ -1666,6 +1667,7 @@ class Viewport {
 								new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
 								new Audio(`${AO_HOST}sounds/music/trial (aa).opus`));
 		this.music.forEach(channel => channel.volume = 0.5);
+		this.music.forEach(channel => channel.onerror = opusCheck(channel));
 
 		this.updater = null;
 		this.testimonyUpdater = null;
@@ -2690,6 +2692,23 @@ export function imgError(image) {
 	return true;
 }
 window.imgError = imgError;
+
+/**
+ * Triggered when there was an error loading a sound
+ * @param {HTMLImageElement} image the element containing the missing sound
+ */
+ export function opusCheck(channel) {
+	console.info(channel)
+	console.info("failed to load sound "+channel.src)
+	let oldsrc = ""
+	oldsrc = channel.src
+	if(!oldsrc.endsWith(".opus")) {
+		newsrc = oldsrc.replace(".mp3",".opus")
+		newsrc = newsrc.replace(".wav",".opus")
+		channel.src = newsrc; //unload so the old sprite doesn't persist
+	}
+}
+window.opusCheck = opusCheck;
 
 /**
  * Make a GET request for a specific URI.
