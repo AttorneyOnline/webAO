@@ -1229,6 +1229,8 @@ class Client extends EventEmitter {
 		document.getElementById("client_wit_bench").src = bgfolder + "stand.png"
 		document.getElementById("client_pro_bench").src = bgfolder + "prosecutiondesk.png"
 
+		document.getElementById("client_court").src = bgfolder + "full.png"
+
 		document.getElementById("client_court_def").src = bgfolder + "defenseempty.png"
 		document.getElementById("client_court_deft").src = bgfolder + "transition_def.png"
 		document.getElementById("client_court_wit").src = bgfolder + "witnessempty.png"
@@ -1740,9 +1742,9 @@ class Viewport {
 async changeBackground(position) {
 	const bgfolder = viewport.bgFolder;
 
-	const view = document.getElementById("client_charview");
-	const bench = document.getElementById("client_"+position+"_bench");
-	const court = document.getElementById("client_court");
+	const view = document.getElementById("client_fullview");
+	const bench = document.getElementById("client_bench_classic");
+	const court = document.getElementById("client_court_classic");
 
 	const positions = {
 		def: {
@@ -1791,7 +1793,6 @@ async changeBackground(position) {
 	let desk;
 	let speedLines;
 
-
 	if ( "def,pro,hld,hlp,wit,jud,jur,sea".includes(position)) {
 		bg = positions[position].bg;
 		desk = positions[position].desk;
@@ -1802,14 +1803,11 @@ async changeBackground(position) {
 		speedLines = "defense_speedlines.gif";
 	}
 
-	court.className = position + "_court";
-
 	if (viewport.chatmsg.type === 5) {
 		court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
 		bench.style.opacity = 0;
 	} else {
-		court.src = bgfolder + "full.png";
-		view.src = bgfolder + "full.png";
+		court.src = bgfolder + bg;
 		if (desk) {
 			const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
 			bench.src = bgfolder + deskFilename;
@@ -1819,19 +1817,27 @@ async changeBackground(position) {
 		}
 	}
 
-	switch(position) {
-		case "def":
-			view.style.left = "0";
-			break;
-		case "wit":
-			view.style.left = "-200%";
-			break;
-		case "pro":
-			view.style.left = "-400%";
-			break;
+	if ( "def,pro,wit".includes(position)) {
+		bench.style.display = "none";
+		view.style.display = "";
+		document.getElementById("client_classicview").style.display = "none";
+		switch(position) {
+			case "def":
+				view.style.left = "0";
+				break;
+			case "wit":
+				view.style.left = "-200%";
+				break;
+			case "pro":
+				view.style.left = "-400%";
+				break;
+		}
+	} else {
+		bench.style.display = "";
+		view.style.display = "none";	
+		document.getElementById("client_classicview").style.display = "";
 	}
-
-	}
+}
 
 	/**
 	 * Intialize testimony updater 
@@ -1973,11 +1979,12 @@ async changeBackground(position) {
 	setEmote(charactername, emotename, prefix, pair, side) {
 		const pairID = pair ? "pair" : "char";
 		const characterFolder = AO_HOST + "characters/";
+		const position = "def,pro,wit".includes(side) ? side+"_" : ""
 
-		const  gif_s = document.getElementById("client_" + side + "_" + pairID + "_gif");
-		const  png_s = document.getElementById("client_" + side + "_" + pairID + "_png");
-		const apng_s = document.getElementById("client_" + side + "_" + pairID +"_apng");
-		const webp_s = document.getElementById("client_" + side + "_" + pairID +"_webp");
+		const  gif_s = document.getElementById("client_" + position + pairID + "_gif");
+		const  png_s = document.getElementById("client_" + position + pairID + "_png");
+		const apng_s = document.getElementById("client_" + position + pairID +"_apng");
+		const webp_s = document.getElementById("client_" + position + pairID +"_webp");
 
 		if (this.lastChar !== this.chatmsg.name) {
 			//hide the last sprite
@@ -2006,6 +2013,8 @@ async changeBackground(position) {
 		this.sfxplayed = 0;
 		this.textTimer = 0;
 		this._animating = true;
+		let charLayers = document.getElementById("client_char");
+		let pairLayers = document.getElementById("client_pair_char");
 
 		// stop updater
 		clearTimeout(this.updater);
@@ -2026,8 +2035,10 @@ async changeBackground(position) {
 		}
 		this.lastEvi = this.chatmsg.evidence;
 
-		const charLayers = document.getElementById("client_"+this.chatmsg.side+"_char");
-		const pairLayers = document.getElementById("client_"+this.chatmsg.side+"_pair_char");
+		if ( "def,pro,wit".includes(this.chatmsg.side)) {
+			charLayers = document.getElementById("client_"+this.chatmsg.side+"_char");
+			pairLayers = document.getElementById("client_"+this.chatmsg.side+"_pair_char");
+		}
 
 		const chatContainerBox = document.getElementById("client_chatcontainer");	
 		const nameBoxInner = document.getElementById("client_inner_name");
@@ -2185,13 +2196,18 @@ async changeBackground(position) {
 
 		const gamewindow = document.getElementById("client_gamewindow");
 		const waitingBox = document.getElementById("client_chatwaiting");
-		const charLayers = document.getElementById("client_"+this.chatmsg.side+"_char");
-		const pairLayers = document.getElementById("client_"+this.chatmsg.side+"_pair_char");
 		const eviBox = document.getElementById("client_evi");
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
 		const chatBox = document.getElementById("client_chat");
 		const effectlayer = document.getElementById("client_fg");
+		let charLayers = document.getElementById("client_char");
+		let pairLayers = document.getElementById("client_pair_char");
+
+		if ( "def,pro,wit".includes(this.chatmsg.side)) {
+			charLayers = document.getElementById("client_"+this.chatmsg.side+"_char");
+			pairLayers = document.getElementById("client_"+this.chatmsg.side+"_pair_char");
+		}
 
 		const charName = this.chatmsg.name.toLowerCase();
 		const charEmote = this.chatmsg.sprite.toLowerCase();
