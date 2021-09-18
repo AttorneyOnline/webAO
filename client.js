@@ -758,7 +758,6 @@ class Client extends EventEmitter {
 		const showname = args[3] || "";
 		const looping = Boolean(args[4]);
 		const channel = Number(args[5]) || 0;
-		// const fading = Number(args[6]) || 0; // unused in web
    
 		const music = viewport.music[channel];
 		let musicname;
@@ -1217,6 +1216,7 @@ class Client extends EventEmitter {
 	 */
 	handleBN(args) {
 		viewport.bgname = safe_tags(args[1]);
+		const bgfolder = viewport.bgFolder;
 		const bg_index = getIndexFromSelect("bg_select", viewport.bgname);
 		document.getElementById("bg_select").selectedIndex = bg_index;
 		updateBackgroundPreview();
@@ -1224,6 +1224,17 @@ class Client extends EventEmitter {
 			document.getElementById("bg_filename").value = viewport.bgname;
 		}
 		document.getElementById("bg_preview").src = AO_HOST + "background/" + encodeURI(args[1].toLowerCase()) + "/defenseempty.png";
+		
+		document.getElementById("client_def_bench").src = bgfolder + "defensedesk.png"
+		document.getElementById("client_wit_bench").src = bgfolder + "stand.png"
+		document.getElementById("client_pro_bench").src = bgfolder + "prosecutiondesk.png"
+
+		document.getElementById("client_court_def").src = bgfolder + "defenseempty.png"
+		document.getElementById("client_court_deft").src = bgfolder + "transition_def.png"
+		document.getElementById("client_court_wit").src = bgfolder + "witnessempty.png"
+		document.getElementById("client_court_prot").src = bgfolder + "transition_pro.png"
+		document.getElementById("client_court_pro").src = bgfolder + "prosecutorempty.png"
+		
 		if (this.charID === -1) {
 			viewport.changeBackground("jud");
 		} else {
@@ -1641,14 +1652,9 @@ class Viewport {
 
 		// Allocate multiple blip audio channels to make blips less jittery
 
-		this.blipChannels = new Array(  new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
-										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
-										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
-										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
-										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
-										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"));
-		this.blipChannels.forEach(channel => channel.volume = 0.5);
-		this.blipChannels.forEach(channel => channel.onerror = opusCheck(channel));
+		this.blipChannels = new Array(6);
+		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"))
+			.forEach(channel => channel.volume = 0.5);
 		this.currentBlipChannel = 0;
 
 		this.sfxaudio = document.getElementById("client_sfxaudio");
@@ -1662,12 +1668,9 @@ class Viewport {
 		this.testimonyAudio = document.getElementById("client_testimonyaudio");
 		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.opus`;
 
-		this.music = new Array( new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
-								new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
-								new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
-								new Audio(`${AO_HOST}sounds/music/trial (aa).opus`));
-		this.music.forEach(channel => channel.volume = 0.5);
-		this.music.forEach(channel => channel.onerror = opusCheck(channel));
+		this.music = new Array(3);
+		this.music.fill(new Audio(`${AO_HOST}sounds/music/trial (aa).opus`))
+			.forEach(channel => channel.volume = 0.5);
 
 		this.updater = null;
 		this.testimonyUpdater = null;
@@ -1737,7 +1740,8 @@ class Viewport {
 async changeBackground(position) {
 	const bgfolder = viewport.bgFolder;
 
-	const bench = document.getElementById("client_bench");
+	const view = document.getElementById("client_charview");
+	const bench = document.getElementById("client_"+position+"_bench");
 	const court = document.getElementById("client_court");
 
 	const positions = {
@@ -1747,7 +1751,7 @@ async changeBackground(position) {
 			speedLines: "defense_speedlines.gif"
 		},
 		pro: {
-			bg: "prosecutorempty.png",
+			bg: "prosecutionempty.png",
 			desk: { ao2: "prosecutiondesk.png", ao1: "bancoacusacion.png" },
 			speedLines: "prosecution_speedlines.gif"
 		},
@@ -1787,6 +1791,7 @@ async changeBackground(position) {
 	let desk;
 	let speedLines;
 
+
 	if ( "def,pro,hld,hlp,wit,jud,jur,sea".includes(position)) {
 		bg = positions[position].bg;
 		desk = positions[position].desk;
@@ -1797,14 +1802,14 @@ async changeBackground(position) {
 		speedLines = "defense_speedlines.gif";
 	}
 
-	bench.className = position + "_bench";
 	court.className = position + "_court";
 
 	if (viewport.chatmsg.type === 5) {
 		court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
 		bench.style.opacity = 0;
 	} else {
-		court.src = bgfolder + bg;
+		court.src = bgfolder + "full.png";
+		view.src = bgfolder + "full.png";
 		if (desk) {
 			const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
 			bench.src = bgfolder + deskFilename;
@@ -1813,6 +1818,19 @@ async changeBackground(position) {
 			bench.style.opacity = 0;
 		}
 	}
+
+	switch(position) {
+		case "def":
+			view.style.left = "0";
+			break;
+		case "wit":
+			view.style.left = "-200%";
+			break;
+		case "pro":
+			view.style.left = "-400%";
+			break;
+	}
+
 	}
 
 	/**
@@ -1952,14 +1970,14 @@ async changeBackground(position) {
 	 * Sets all the img tags to the right sources
 	 * @param {*} chatmsg 
 	 */
-	setEmote(charactername, emotename, prefix, pair) {
+	setEmote(charactername, emotename, prefix, pair, side) {
 		const pairID = pair ? "pair" : "char";
 		const characterFolder = AO_HOST + "characters/";
 
-		const  gif_s = document.getElementById("client_" + pairID + "_gif");
-		const  png_s = document.getElementById("client_" + pairID + "_png");
-		const apng_s = document.getElementById("client_" + pairID +"_apng");
-		const webp_s = document.getElementById("client_" + pairID +"_webp");
+		const  gif_s = document.getElementById("client_" + side + "_" + pairID + "_gif");
+		const  png_s = document.getElementById("client_" + side + "_" + pairID + "_png");
+		const apng_s = document.getElementById("client_" + side + "_" + pairID +"_apng");
+		const webp_s = document.getElementById("client_" + side + "_" + pairID +"_webp");
 
 		if (this.lastChar !== this.chatmsg.name) {
 			//hide the last sprite
@@ -2008,8 +2026,8 @@ async changeBackground(position) {
 		}
 		this.lastEvi = this.chatmsg.evidence;
 
-		const charLayers = document.getElementById("client_char");
-		const pairLayers = document.getElementById("client_pair_char");
+		const charLayers = document.getElementById("client_"+this.chatmsg.side+"_char");
+		const pairLayers = document.getElementById("client_"+this.chatmsg.side+"_pair_char");
 
 		const chatContainerBox = document.getElementById("client_chatcontainer");	
 		const nameBoxInner = document.getElementById("client_inner_name");
@@ -2031,10 +2049,10 @@ async changeBackground(position) {
 
 		checkCallword(this.chatmsg.content);		
 
-		this.setEmote(this.chatmsg.name.toLowerCase(), this.chatmsg.sprite, "(a)", false);
+		this.setEmote(this.chatmsg.name.toLowerCase(), this.chatmsg.sprite, "(a)", false, this.chatmsg.side);
 
 		if (this.chatmsg.other_name) {
-			this.setEmote(this.chatmsg.other_name.toLowerCase(), this.chatmsg.other_emote, "(a)", false);
+			this.setEmote(this.chatmsg.other_name.toLowerCase(), this.chatmsg.other_emote, "(a)", false, this.chatmsg.side);
 		}
 
 		// gets which shout shall played
@@ -2093,8 +2111,8 @@ async changeBackground(position) {
 		}
 
 		// Shift by the horizontal offset
-		pairLayers.style.left = Number(this.chatmsg.other_offset[0]) + "%";
-		charLayers.style.left = Number(this.chatmsg.self_offset[0]) + "%";
+		//pairLayers.style.left = Number(this.chatmsg.other_offset[0]) + "%";
+		//charLayers.style.left = Number(this.chatmsg.self_offset[0]) + "%";
 
 		// New vertical offsets
 		pairLayers.style.top = Number(this.chatmsg.other_offset[1]) + "%";
@@ -2167,8 +2185,8 @@ async changeBackground(position) {
 
 		const gamewindow = document.getElementById("client_gamewindow");
 		const waitingBox = document.getElementById("client_chatwaiting");
-		const charLayers = document.getElementById("client_char");
-		const pairLayers = document.getElementById("client_pair_char");
+		const charLayers = document.getElementById("client_"+this.chatmsg.side+"_char");
+		const pairLayers = document.getElementById("client_"+this.chatmsg.side+"_pair_char");
 		const eviBox = document.getElementById("client_evi");
 		const shoutSprite = document.getElementById("client_shout");
 		const chatBoxInner = document.getElementById("client_inner_chat");
@@ -2200,7 +2218,7 @@ async changeBackground(position) {
 				shoutSprite.style.opacity = 0;
 				shoutSprite.style.animation = "";				
 				const preanim = this.chatmsg.preanim.toLowerCase();
-				this.setEmote(charName,preanim,"",false);
+				this.setEmote(charName,preanim,"",false,this.chatmsg.side);
 				charLayers.style.opacity = 1;
 			}
 
@@ -2250,17 +2268,17 @@ async changeBackground(position) {
 				}
 
 				if (this.chatmsg.other_name) {
-					this.setEmote(pairName,pairEmote,"(a)",true);
+					this.setEmote(pairName,pairEmote,"(a)",true,this.chatmsg.side);
 					pairLayers.style.opacity = 1;
 				} else {
 					pairLayers.style.opacity = 0;
 				}
 
-				this.setEmote(charName,charEmote,"(b)",false);
+				this.setEmote(charName,charEmote,"(b)",false,this.chatmsg.side);
 				charLayers.style.opacity = 1;
 
 				if (this.textnow === this.chatmsg.content) {
-					this.setEmote(charName,charEmote,"(a)",false);
+					this.setEmote(charName,charEmote,"(a)",false,this.chatmsg.side);
 					charLayers.style.opacity = 1;
 					waitingBox.style.opacity = 1;
 					this._animating = false;
@@ -2282,7 +2300,7 @@ async changeBackground(position) {
 
 					if (this.textnow === this.chatmsg.content) {
 						this._animating = false;
-						this.setEmote(charName,charEmote,"(a)",false);
+						this.setEmote(charName,charEmote,"(a)",false,this.chatmsg.side);
 						charLayers.style.opacity = 1;
 						waitingBox.style.opacity = 1;
 						clearTimeout(this.updater);
@@ -2692,23 +2710,6 @@ export function imgError(image) {
 	return true;
 }
 window.imgError = imgError;
-
-/**
- * Triggered when there was an error loading a sound
- * @param {HTMLImageElement} image the element containing the missing sound
- */
- export function opusCheck(channel) {
-	console.info(channel)
-	console.info("failed to load sound "+channel.src)
-	let oldsrc = ""
-	oldsrc = channel.src
-	if(!oldsrc.endsWith(".opus")) {
-		newsrc = oldsrc.replace(".mp3",".opus")
-		newsrc = newsrc.replace(".wav",".opus")
-		channel.src = newsrc; //unload so the old sprite doesn't persist
-	}
-}
-window.opusCheck = opusCheck;
 
 /**
  * Make a GET request for a specific URI.
