@@ -2420,19 +2420,22 @@ export function onEnter(event) {
 
 		let sfxname = "0";
 		let sfxdelay = 0;
-		let preanim = "-";
+		let emote_mod = myemo.zoom;
 		if (document.getElementById("sendsfx").checked) {
 			sfxname = myemo.sfx;
 			sfxdelay = myemo.sfxdelay;
 		}
 
+		// not to overwrite a 5 from the ini or anything else
 		if (document.getElementById("sendpreanim").checked) {
-			preanim = myemo.preanim;
-		}
+			if (emote_mod === 0)
+				emote_mod = 1;
+		} else if (emote_mod === 1)
+			emote_mod = 0;		
 
-		client.sendIC("chat", preanim, mychar.name, myemo.emote,
+		client.sendIC("chat", myemo.preanim, mychar.name, myemo.emote,
 			text, myrole,
-			sfxname, myemo.zoom, sfxdelay, selectedShout, evi, flip,
+			sfxname, emote_mod, sfxdelay, selectedShout, evi, flip,
 			flash, color, showname, pairchar, pairoffset, pairyoffset, noninterrupting_preanim, looping_sfx, screenshake, "-", "-", "-", additive, effect);
 	}
 }
