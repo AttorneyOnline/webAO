@@ -73,71 +73,20 @@
 	<div id="client_icwrapper">
 		<div id="client_background">
 			<div id="client_gamewindow">
-				<div id="client_fullview">
-					<div id="client_stitch_court">
-						<img id="client_court_def" alt="Courtroom backdrop" onerror="imgError(this);">
-						<img id="client_court_deft" alt="Courtroom backdrop" onerror="imgError(this);">
-						<img id="client_court_wit" alt="Courtroom backdrop" onerror="imgError(this);">
-						<img id="client_court_prot" alt="Courtroom backdrop" onerror="imgError(this);">
-						<img id="client_court_pro" alt="Courtroom backdrop" onerror="imgError(this);">
-					</div>
-					<img id="client_court" alt="Courtroom backdrop" onerror="imgError(this);">
-					<div id="client_def_pair_char" class="client_char" alt="Paired character">
-						<img id="client_def_pair_gif" onerror="charError(this);">
-						<img id="client_def_pair_png" onerror="charError(this);">
-						<img id="client_def_pair_apng" onerror="charError(this);">
-						<img id="client_def_pair_webp" onerror="charError(this);">
-					</div>
-					<div id="client_def_char" class="client_char" alt="Character">
-						<img id="client_def_char_gif" onerror="charError(this);">
-						<img id="client_def_char_png" onerror="charError(this);">
-						<img id="client_def_char_apng" onerror="charError(this);">
-						<img id="client_def_char_webp" onerror="charError(this);">
-					</div>
-					<div id="client_wit_pair_char" class="client_char" alt="Paired character">
-						<img id="client_wit_pair_gif" onerror="charError(this);">
-						<img id="client_wit_pair_png" onerror="charError(this);">
-						<img id="client_wit_pair_apng" onerror="charError(this);">
-						<img id="client_wit_pair_webp" onerror="charError(this);">
-					</div>
-					<div id="client_wit_char" class="client_char" alt="Character">
-						<img id="client_wit_char_gif" onerror="charError(this);">
-						<img id="client_wit_char_png" onerror="charError(this);">
-						<img id="client_wit_char_apng" onerror="charError(this);">
-						<img id="client_wit_char_webp" onerror="charError(this);">
-					</div>
-					<div id="client_pro_pair_char" class="client_char" alt="Paired character">
-						<img id="client_pro_pair_gif" onerror="charError(this);">
-						<img id="client_pro_pair_png" onerror="charError(this);">
-						<img id="client_pro_pair_apng" onerror="charError(this);">
-						<img id="client_pro_pair_webp" onerror="charError(this);">
-					</div>
-					<div id="client_pro_char" class="client_char" alt="Character">
-						<img id="client_pro_char_gif" onerror="charError(this);">
-						<img id="client_pro_char_png" onerror="charError(this);">
-						<img id="client_pro_char_apng" onerror="charError(this);">
-						<img id="client_pro_char_webp" onerror="charError(this);">
-					</div>
-					<img id="client_def_bench" class="client_bench">
-					<img id="client_wit_bench" class="client_bench">
-					<img id="client_pro_bench" class="client_bench">
-				</div>
-				<div id="client_classicview">
-				<img id="client_court_classic" alt="Courtroom backdrop" onerror="imgError(this);">
-				<div id="client_pair_char" class="client_char" alt="Paired character">
+				<img id="client_court" alt="Courtroom backdrop" onerror="imgError(this);">
+				<div id="client_pair_char" alt="Paired character">
 					<img id="client_pair_gif" onerror="charError(this);">
 					<img id="client_pair_png" onerror="charError(this);">
 					<img id="client_pair_apng" onerror="charError(this);">
 					<img id="client_pair_webp" onerror="charError(this);">
 				</div>
-				<div id="client_char" class="client_char" alt="Character">
+				<div id="client_char" alt="Character">
 					<img id="client_char_gif" onerror="charError(this);">
 					<img id="client_char_png" onerror="charError(this);">
 					<img id="client_char_apng" onerror="charError(this);">
 					<img id="client_char_webp" onerror="charError(this);">
 				</div>
-				<img id="client_bench_classic" class="client_bench">	
-				</div>
+				<img id="client_bench">
 				<img id="client_fg" alt="Various overlay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
 				<img id="client_evi" src="" alt="Character Evidence" onerror="imgError(this);">
 				<img id="client_testimony" alt="Testimony overlay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" onerror="imgError(this);">
@@ -424,13 +373,13 @@
 					onchange="changeMusicVolume()">
 
 			<p>SFX</p>
-			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" controls></audio>
+			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" onerror="opusCheck()" controls></audio>
 
 			<p>Shouts</p>
-			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" controls></audio>
+			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" onerror="opusCheck()" controls></audio>
 			
 			<p>Testimony/Guilty</p>
-			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" controls></audio>
+			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" onerror="opusCheck()" controls></audio>
 
 			<p>Blip</p>
 			<input id="client_bvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
