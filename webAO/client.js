@@ -758,6 +758,7 @@ class Client extends EventEmitter {
 		const showname = args[3] || "";
 		const looping = Boolean(args[4]);
 		const channel = Number(args[5]) || 0;
+		// const fading = Number(args[6]) || 0; // unused in web
    
 		const music = viewport.music[channel];
 		let musicname;
@@ -1654,9 +1655,14 @@ class Viewport {
 
 		// Allocate multiple blip audio channels to make blips less jittery
 
-		this.blipChannels = new Array(6);
-		this.blipChannels.fill(new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"))
-			.forEach(channel => channel.volume = 0.5);
+		this.blipChannels = new Array(  new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
+										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
+										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
+										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
+										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"),
+										new Audio(AO_HOST + "sounds/general/sfx-blipmale.opus"));
+		this.blipChannels.forEach(channel => channel.volume = 0.5);
+		this.blipChannels.forEach(channel => channel.onerror = opusCheck(channel));
 		this.currentBlipChannel = 0;
 
 		this.sfxaudio = document.getElementById("client_sfxaudio");
@@ -1670,9 +1676,12 @@ class Viewport {
 		this.testimonyAudio = document.getElementById("client_testimonyaudio");
 		this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.opus`;
 
-		this.music = new Array(3);
-		this.music.fill(new Audio(`${AO_HOST}sounds/music/trial (aa).opus`))
-			.forEach(channel => channel.volume = 0.5);
+		this.music = new Array( new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
+								new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
+								new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
+								new Audio(`${AO_HOST}sounds/music/trial (aa).opus`));
+		this.music.forEach(channel => channel.volume = 0.5);
+		this.music.forEach(channel => channel.onerror = opusCheck(channel));
 
 		this.updater = null;
 		this.testimonyUpdater = null;
@@ -2454,19 +2463,22 @@ export function onEnter(event) {
 
 		let sfxname = "0";
 		let sfxdelay = 0;
-		let preanim = "-";
+		let emote_mod = myemo.zoom;
 		if (document.getElementById("sendsfx").checked) {
 			sfxname = myemo.sfx;
 			sfxdelay = myemo.sfxdelay;
 		}
 
+		// not to overwrite a 5 from the ini or anything else
 		if (document.getElementById("sendpreanim").checked) {
-			preanim = myemo.preanim;
-		}
+			if (emote_mod === 0)
+				emote_mod = 1;
+		} else if (emote_mod === 1)
+			emote_mod = 0;		
 
-		client.sendIC("chat", preanim, mychar.name, myemo.emote,
+		client.sendIC("chat", myemo.preanim, mychar.name, myemo.emote,
 			text, myrole,
-			sfxname, myemo.zoom, sfxdelay, selectedShout, evi, flip,
+			sfxname, emote_mod, sfxdelay, selectedShout, evi, flip,
 			flash, color, showname, pairchar, pairoffset, pairyoffset, noninterrupting_preanim, looping_sfx, screenshake, "-", "-", "-", additive, effect);
 	}
 }
@@ -2726,6 +2738,23 @@ export function imgError(image) {
 	return true;
 }
 window.imgError = imgError;
+
+/**
+ * Triggered when there was an error loading a sound
+ * @param {HTMLImageElement} image the element containing the missing sound
+ */
+ export function opusCheck(channel) {
+	console.info(channel)
+	console.info("failed to load sound "+channel.src)
+	let oldsrc = ""
+	oldsrc = channel.src
+	if(!oldsrc.endsWith(".opus")) {
+		newsrc = oldsrc.replace(".mp3",".opus")
+		newsrc = newsrc.replace(".wav",".opus")
+		channel.src = newsrc; //unload so the old sprite doesn't persist
+	}
+}
+window.opusCheck = opusCheck;
 
 /**
  * Make a GET request for a specific URI.
