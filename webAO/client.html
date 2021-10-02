@@ -488,9 +488,14 @@
 			<button id="client_inichange" onclick="iniedit()">Change</button>
 			<br>
 			<br>
+			<p>Pan-tilit (experimental)</p>
+			<label for="client_pantilt">Enable:</label>
+			<input type="checkbox" id="client_pantilt" name="client_pantilt" onclick="switchPanTilt()">
+			<br>
+			<br>
 			<p>16:9 viewport (experimental)</p>
 			<label for="client_hdviewport">Enable:</label>
-			<input type="checkbox" id="client_hdviewport" id="client_hdviewport" onclick="switchAspectRatio()">
+			<input type="checkbox" id="client_hdviewport" name="client_hdviewport" onclick="switchAspectRatio()">
 			<br>
 			<label for="client_hdviewport_offset">Offset chatbox:</label>
 			<input type="checkbox" id="client_hdviewport_offset" id="client_hdviewport_offset" onclick="switchChatOffset()">
