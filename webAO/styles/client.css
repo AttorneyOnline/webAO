@@ -233,7 +233,7 @@
 	height: 100%;
 	width: 100%;
 	bottom: 0;
-	transition: 0.5s ease-in-out;
+	transition: none;
 	transition-property: left;
 }
 

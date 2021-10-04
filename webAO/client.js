@@ -2677,6 +2677,19 @@ export async function iniedit() {
 window.iniedit = iniedit;
 
 /**
+ * Triggered by the pantilt checkbox
+ */
+ export async function switchPanTilt() {
+	const background = document.getElementById("client_fullview");
+	if(document.getElementById("client_pantilt").checked) {
+		background.style.transition = "0.5s ease-in-out";		
+	} else {
+		background.style.transition = "none"
+	}
+}
+window.switchPanTilt = switchPanTilt;
+
+/**
  * Triggered by the change aspect ratio checkbox
  */
 export async function switchAspectRatio() {
