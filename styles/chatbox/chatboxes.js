@@ -21,6 +21,7 @@ export default [
 	"key",
 	"yakuza",
 	"yttd",
+	"whentheycry",
 	"n64zelda",
 	"papermario"
 ];
