@@ -313,7 +313,7 @@ class Client extends EventEmitter {
 		let extra_28 = ``;
 
 		if (extrafeatures.includes("cccc_ic_support")) {
-			const self_offset = extrafeatures.includes("y_offset") ? self_hoffset+'&'+self_yoffset : self_hoffset;			
+			const self_offset = extrafeatures.includes("y_offset") ? self_hoffset+'<and>'+self_yoffset : self_hoffset;	// HACK: this should be an & but client fucked it up and all the servers adopted it
 			if (mode === "replay") {
 				other_emote = `##`;
 		    	other_offset = `#0#0`;
