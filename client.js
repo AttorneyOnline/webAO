@@ -2131,8 +2131,20 @@ async changeBackground(position) {
 		}
 
 		// Shift by the horizontal offset
-		//pairLayers.style.left = Number(this.chatmsg.other_offset[0]) + "%";
-		//charLayers.style.left = Number(this.chatmsg.self_offset[0]) + "%";
+		switch(this.chatmsg.side) {
+			case "wit":
+				pairLayers.style.left = (200+Number(this.chatmsg.other_offset[0])) + "%";
+				charLayers.style.left = (200+Number(this.chatmsg.self_offset[0])) + "%";
+				break;
+			case "pro":
+				pairLayers.style.left = (400+Number(this.chatmsg.other_offset[0])) + "%";
+				charLayers.style.left = (400+Number(this.chatmsg.self_offset[0])) + "%";
+				break;
+			default:
+				pairLayers.style.left = Number(this.chatmsg.other_offset[0]) + "%";
+				charLayers.style.left = Number(this.chatmsg.self_offset[0]) + "%";
+				break;
+		}
 
 		// New vertical offsets
 		pairLayers.style.top = Number(this.chatmsg.other_offset[1]) + "%";
