@@ -651,8 +651,8 @@ class Client extends EventEmitter {
 						other_charid: Number(args[17]),
 						other_name: safe_tags(args[18]),
 						other_emote: safe_tags(args[19]),
-						self_offset: args[20].split('&'),
-						other_offset: args[21].split('&'),
+						self_offset: args[20].split('<and>'), // HACK: here as well, client is fucked and uses this instead of &
+						other_offset: args[21].split('<and>'),
 						other_flip: Number(args[22]),
 						noninterrupting_preanim: Number(args[23])
 					};
