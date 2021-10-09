@@ -2336,7 +2336,7 @@ async changeBackground(position) {
 
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
 			this.sfxplayed = 1;
-			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1" && this.chatmsg.sound !== "" && this.chatmsg.sound !== undefined) {
+			if (this.chatmsg.sound !== "0" && this.chatmsg.sound !== "1" && this.chatmsg.sound !== "" && this.chatmsg.sound !== undefined && (this.chatmsg.type == 1 || this.chatmsg.type == 2 || this.chatmsg.type == 6)) {
 				this.playSFX(AO_HOST + "sounds/general/" + encodeURI(this.chatmsg.sound.toLowerCase()) + ".opus", this.chatmsg.looping_sfx);
 			}
 		}
