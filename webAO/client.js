@@ -839,7 +839,8 @@ class Client extends EventEmitter {
 				showname: chargs[0],
 				side: "def",
 				gender: "male",
-				chat: "aa"
+				chat: "",
+				category: ""
 			};
 			cini.options = Object.assign(default_options, cini.options);
 
@@ -855,7 +856,7 @@ class Client extends EventEmitter {
 				desc: safe_tags(chargs[1]),
 				gender: safe_tags(cini.options.gender).toLowerCase(),
 				side: safe_tags(cini.options.side).toLowerCase(),
-				chat: safe_tags(cini.options.chat).toLowerCase(),
+				chat: (cini.options.chat==="") ? safe_tags(cini.options.chat).toLowerCase() : safe_tags(cini.options.category).toLowerCase(),
 				evidence: chargs[3],
 				icon: icon,
 				inifile: cini,
