@@ -2691,8 +2691,13 @@ window.iniedit = iniedit;
 /**
  * Triggered by the pantilt checkbox
  */
- export async function switchPanTilt() {
+ export async function switchPanTilt(addcheck) {
 	const background = document.getElementById("client_fullview");
+	if (addcheck === 1) {
+		document.getElementById("client_pantilt").checked = true;
+	} else if (addcheck === 2) {
+		document.getElementById("client_pantilt").checked = false;
+	}
 	if(document.getElementById("client_pantilt").checked) {
 		background.style.transition = "0.5s ease-in-out";		
 	} else {
