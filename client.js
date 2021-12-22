@@ -1944,57 +1944,6 @@ async changeBackground(position) {
 	}
 
 	/**
-	 * Adds up the chunk delays to find out how long a WEBP is
-	 * @param {data} webpFile the WEBP data
-	 */
-		 calculateWebpLength(webpFile) {
-			let d = new Uint8Array(webpFile);
-			// https://developers.google.com/speed/webp/docs/riff_container#animation
-			let duration = 0;
-			for (var i = 0; i < d.length; i++) {
-				// Find ANMF header (41 4E 4D 46)
-				if (d[i] === 0x41
-					&& d[i + 1] === 0x4E
-					&& d[i + 2] === 0x4D
-					&& d[i + 3] === 0x46) {
-					// Swap 5th and 6th bytes to get the delay per frame
-					let delay = (d[i + 21] << 8) | (d[i + 20] & 0xFF);
-	
-					// Should be aware browsers have a minimum frame delay 
-					// e.g. 6ms for IE, 2ms modern browsers (50fps)
-					duration += delay < 2 ? 10 : delay;
-				}
-			}
-			console.debug(duration);
-			return duration * 10;
-		}
-
-		/**
-	 * Adds up the chunk delays to find out how long a APNG is
-	 * @param {data} apngFile the APNG data
-	 */
-		 calculateApngLength(apngFile) {
-			let d = new Uint8Array(apngFile);
-			// https://wiki.mozilla.org/APNG_Specification#.60fcTL.60:_The_Frame_Control_Chunk
-			let duration = 0;
-			for (var i = 0; i < d.length; i++) {
-				// Find fcTL header (66 63 54 4C)
-				if (d[i] === 0x66
-					&& d[i + 1] === 0x63
-					&& d[i + 2] === 0x54
-					&& d[i + 3] === 0x4C) {
-					// numerator and denominator
-					let delay = ((d[i + 21] / d[i + 23]) * 1000)
-	
-					// minimum is 100ms
-					duration += delay < 100 ? 100 : delay;
-				}
-			}
-			console.debug(duration);
-			return duration * 10;
-		}
-
-	/**
 	 * Updates the testimony overaly
 	 */
 	updateTestimony() {
@@ -3043,6 +2992,9 @@ export function pickEmotion(emo) {
 	}
 	client.selectedEmote = emo;
 	document.getElementById("emo_" + emo).classList="emote_button dark";
+
+	document.getElementById("sendsfx").checked = (client.emote.sfx.length > 1) ? true : false;
+
 }
 window.pickEmotion = pickEmotion;
 
