@@ -2992,6 +2992,9 @@ export function pickEmotion(emo) {
 	}
 	client.selectedEmote = emo;
 	document.getElementById("emo_" + emo).classList="emote_button dark";
+
+	document.getElementById("sendsfx").checked = (client.emote.sfx.length > 1) ? true : false;
+
 }
 window.pickEmotion = pickEmotion;
 
