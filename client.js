@@ -2995,6 +2995,8 @@ export function pickEmotion(emo) {
 
 	document.getElementById("sendsfx").checked = (client.emote.sfx.length > 1) ? true : false;
 
+	document.getElementById("sendpreanim").checked = (client.emote.zoom == 1) ? true : false;
+
 }
 window.pickEmotion = pickEmotion;
 
