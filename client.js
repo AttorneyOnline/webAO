@@ -199,6 +199,7 @@ class Client extends EventEmitter {
 		this.on("BN", this.handleBN.bind(this));
 		this.on("HP", this.handleHP.bind(this));
 		this.on("RT", this.handleRT.bind(this));
+        this.on("TI", this.handleTI.bind(this));
 		this.on("ZZ", this.handleZZ.bind(this));
 		this.on("HI", this.handleHI.bind(this));
 		this.on("ID", this.handleID.bind(this));
@@ -1315,6 +1316,26 @@ class Client extends EventEmitter {
 				console.warn("Invalid testimony");
 		}
 		viewport.initTestimonyUpdater();
+	}
+
+	/**
+	 * Handles a timer update
+	 * @param {Array} args packet arguments
+	 */
+	handleTI(args) {
+		const timerid = Number(args[1]);
+		const type = Number(args[2]);
+        const timer_value = Number(args[3]);
+        switch (type) {
+            case 0:
+                //
+            case 1:
+                document.getElementById("client_timer"+timerid).innerText = timer_value;
+            case 2:
+                document.getElementById("client_timer"+timerid).style.display = "";
+            case 3:
+                document.getElementById("client_timer"+timerid).style.display = "none";
+        }
 	}
 
 	/**
