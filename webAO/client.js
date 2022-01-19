@@ -1020,9 +1020,11 @@ class Client extends EventEmitter {
 	}
 
 	isAudio(trackname) {
-		if (trackname.includes(".") || // regex for file extenstions
-			trackname.startsWith("=") ||
-			trackname.startsWith("-"))   // category markers
+		if (trackname.endsWith(".wav") ||
+            trackname.endsWith(".mp3") ||
+            trackname.endsWith(".mp4") ||
+            trackname.endsWith(".ogg") ||
+            trackname.endsWith(".opus"))  // NOT category markers
 		{
 			return true;
 		} else {
@@ -1035,14 +1037,6 @@ class Client extends EventEmitter {
 		newentry.text = trackname;
 		document.getElementById("client_musiclist").options.add(newentry);
 		this.musics.push(trackname);
-	}
-
-	handleMusicInfo(trackindex,trackname) {
-		if (this.isAudio(trackname)) {
-			this.addTrack(trackname);
-		} else {
-			this.createArea(trackindex,trackname);
-		}
 	}
 
 	createArea(id,name) {
@@ -1072,6 +1066,19 @@ class Client extends EventEmitter {
 		document.getElementById("areas").appendChild(newarea);
 	}
 
+
+	/**
+	 * Area list fuckery
+	 */
+	fix_last_area() {
+        if (this.areas.length > 0) {
+            let malplaced = this.areas.pop().name;
+            const areas = document.getElementById("areas");
+            areas.removeChild(areas.lastChild);
+            this.addTrack(malplaced);
+        }
+    }
+
 	/**
 	 * Handles incoming music information, containing multiple entries
 	 * per packet.
@@ -1087,7 +1094,13 @@ class Client extends EventEmitter {
 		for (let i = 2; i < args.length - 1; i++) {
 			if (i % 2 === 0) {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${args[1]}/${this.music_list_length}`;
-				this.handleMusicInfo(args[i-1],safe_tags(args[i]));
+                const trackname = safe_tags(args[i]);
+                const trackindex = args[i-1];
+                if (this.isAudio(trackname)) {
+                    this.addTrack(trackname);
+                } else {
+                    this.createArea(trackindex,trackname);
+                }
 			}
 		}
 
@@ -1104,10 +1117,22 @@ class Client extends EventEmitter {
 		this.resetMusicList();
 		this.resetAreaList();
 
+        let musics_time = false;
+
 		for (let i = 1; i < args.length - 1; i++) {
 			// Check when found the song for the first time
+            const trackname = safe_tags(args[i]);
+            const trackindex = i-1;
 			document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-			this.handleMusicInfo(i-1,safe_tags(args[i]));
+            if (musics_time) {
+                this.addTrack(trackname);
+            } else if (this.isAudio(trackname)) {
+                musics_time = true;
+                this.fix_last_area();
+                this.addTrack(trackname);
+            } else {
+                this.createArea(trackindex,trackname);
+            }
 		}
 
 		// Music done, carry on
