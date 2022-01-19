@@ -604,7 +604,7 @@ class Client extends EventEmitter {
 
 			try {
 				msg_nameplate = this.chars[char_id].showname;
-				msg_blips = this.chars[char_id].gender;
+				msg_blips = this.chars[char_id].blips;
 				char_chatbox = this.chars[char_id].chat;
 				char_muted = this.chars[char_id].muted;
 
@@ -837,7 +837,7 @@ class Client extends EventEmitter {
 				name: chargs[0],
 				showname: chargs[0],
 				side: "def",
-				gender: "male",
+				blips: "male",
 				chat: "",
 				category: ""
 			};
@@ -853,6 +853,7 @@ class Client extends EventEmitter {
 				name: safe_tags(chargs[0]),
 				showname: safe_tags(cini.options.showname),
 				desc: safe_tags(chargs[1]),
+				blips: safe_tags(cini.options.blips).toLowerCase(),
 				gender: safe_tags(cini.options.gender).toLowerCase(),
 				side: safe_tags(cini.options.side).toLowerCase(),
 				chat: (cini.options.chat==="") ? safe_tags(cini.options.chat).toLowerCase() : safe_tags(cini.options.category).toLowerCase(),
@@ -861,6 +862,9 @@ class Client extends EventEmitter {
 				inifile: cini,
 				muted: false
 			};
+
+            if(this.chars[charid].blips === "")
+                this.chars[charid].blips = this.chars[charid].gender;
 
 			const iniedit_select = document.getElementById("client_ininame");
 			iniedit_select.add(new Option(safe_tags(chargs[0])));
