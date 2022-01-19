@@ -23,13 +23,10 @@ if (window.requestIdleCallback) {
 
 			check_https();
 
-			fetch("https://servers.aceattorneyonline.com/servers")
-				.then(response => response.json())
-				.then(data => processServerlist(data));
-
-			fetch("https://servers.aceattorneyonline.com/version")
-				.then(response => response.text())
-				.then(response => processVersion(response));
+			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
+			masterserver.onopen = (evt) => onOpen(evt);
+			masterserver.onerror = (evt) => onError(evt);
+			masterserver.onmessage = (evt) => onMessage(evt);
 
 			// i don't need the ms to play alone
 			setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
@@ -42,13 +39,10 @@ if (window.requestIdleCallback) {
 
 			check_https();
 
-			fetch("https://servers.aceattorneyonline.com/servers")
-				.then(response => response.json())
-				.then(data => processServerlist(data));
-
-			fetch("https://servers.aceattorneyonline.com/version")
-				.then(response => response.text())
-				.then(response => processVersion(response));
+			masterserver = new WebSocket("ws://" + MASTERSERVER_IP);
+			masterserver.onopen = (evt) => onOpen(evt);
+			masterserver.onerror = (evt) => onError(evt);
+			masterserver.onmessage = (evt) => onMessage(evt);
 
 			// i don't need the ms to play alone
 			setTimeout(() => checkOnline(-1, "127.0.0.1:50001"), 0);
@@ -66,7 +60,7 @@ export function setServ(ID) {
 	selectedServer = ID;
 
 	if (document.getElementById(`server${ID}`).className === "")
-		checkOnline(ID, servers[ID].ip + ":" + servers[ID].ws_port);
+		checkOnline(ID, servers[ID].ip + ":" + servers[ID].port);
 
 	if (servers[ID].description !== undefined) {
 		document.getElementById("serverdescription_content").innerHTML = "<b>" + servers[ID].online + "</b><br>" + safe_tags(servers[ID].description);
@@ -76,6 +70,24 @@ export function setServ(ID) {
 	}
 }
 window.setServ = setServ;
+
+function onOpen(_e) {
+	console.log(`Your emulated HDID is ${hdid}`);
+	masterserver.send(`ID#webAO#webAO#%`);
+
+	masterserver.send("ALL#%");
+	masterserver.send("VC#%");
+}
+
+/**
+ * Triggered when an network error occurs.
+ * @param {ErrorEvent} e 
+ */
+function onError(evt) {
+	document.getElementById("ms_error").style.display = "block";
+	document.getElementById("ms_error_code").innerText = `A network error occurred: ${evt.reason} (${evt.code})`;
+	return;
+}
 
 function checkOnline(serverID, coIP) {
 	let oserv;
@@ -132,27 +144,45 @@ function checkOnline(serverID, coIP) {
 
 }
 
-function processServerlist(thelist) {
-	for (let i = 0; i < thelist.length - 1; i++) {
-		const serverEntry = thelist[i];
-		console.debug(serverEntry)
+function onMessage(e) {
+	const msg = e.data;
+	const header = msg.split("#", 2)[0];
+	console.debug(msg);
 
-		servers[i] = serverEntry;
+	if (header === "ALL") {
+		const allservers = msg.split("#").slice(1);
+		for (let i = 0; i < allservers.length - 1; i++) {
+			const serverEntry = allservers[i];
+			const args = serverEntry.split("&");
 
-		const ipport = serverEntry.ip + ":" + serverEntry.ws_port;
+			let thisserver = { name: args[0], description: args[1], ip: args[2], port: Number(args[3]), assets: args[4], online: "Online: ?/?" };
+			servers[i] = thisserver;
 
-		if (serverEntry.ws_port) {
+			const ipport = args[2] + ":" + args[3];
+			const asset = args[4] ? `&asset=${args[4]}` : "";
+
 			document.getElementById("masterlist").innerHTML +=
-				`<li id="server${i}" onmouseover="setServ(${i})"><p>${safe_tags(serverEntry.name)}</p>`
-				+ `<a class="button" href="client.html?mode=watch&ip=${ipport}">Watch</a>`
-				+ `<a class="button" href="client.html?mode=join&ip=${ipport}">Join</a></li>`;
+				`<li id="server${i}" onmouseover="setServ(${i})"><p>${safe_tags(servers[i].name)}</p>`
+				+ `<a class="button" href="client.html?mode=watch&ip=${ipport}${asset}">Watch</a>`
+				+ `<a class="button" href="client.html?mode=join&ip=${ipport}${asset}">Join</a></li>`;			
+		}
+		masterserver.close();
+		return;
+	}
+	else if (header === "servercheok") {
+		const args = msg.split("#").slice(1);
+		document.getElementById("clientinfo").innerHTML = `Client version: ${version} expected: ${args[0]}`;
+	}
+	else if (header === "SV") {
+		const args = msg.split("#").slice(1);
+		document.getElementById("serverinfo").innerHTML = `Master server version: ${args[0]}`;
+	}
+	else if (header === "CT") {
+		const args = msg.split("#").slice(1);
+		const msChat = document.getElementById("masterchat");
+		msChat.innerHTML += `${unescapeChat(args[0])}: ${unescapeChat(args[1])}\r\n`;
+		if (msChat.scrollTop > msChat.scrollHeight - 600) {
+			msChat.scrollTop = msChat.scrollHeight;
 		}
 	}
-	return;
-}
-
-function processVersion(data) {
-	console.debug(data);
-	document.getElementById("clientinfo").innerHTML = `Client version: ${version}`;
-	document.getElementById("serverinfo").innerHTML = `Master server version: ${data}`;
 }
