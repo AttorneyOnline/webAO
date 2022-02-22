@@ -2078,6 +2078,9 @@ async changeBackground(position) {
 		// stop updater
 		clearTimeout(this.updater);
 
+		// stop last sfx from looping any longer
+		this.sfxaudio.loop = false;
+
 		const fg = document.getElementById("client_fg");
 		const gamewindow = document.getElementById("client_gamewindow");
 		const waitingBox = document.getElementById("client_chatwaiting");
