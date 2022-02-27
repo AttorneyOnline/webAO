@@ -21,19 +21,19 @@
   },
   "homepage": "https://github.com/AttorneyOnline/webAO#readme",
   "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "babel-loader": "^8.2.2",
-    "eslint": "^7.32.0",
-    "webpack": "^5.58.1",
-    "webpack-cli": "^4.9.0"
+    "@babel/core": "^7.17.5",
+    "@babel/preset-env": "^7.16.11",
+    "babel-loader": "^8.2.3",
+    "eslint": "^8.10.0",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2"
   },
   "dependencies": {
-    "@fingerprintjs/fingerprintjs": "^3.0.5",
-    "core-js": "^3.8.2",
+    "@fingerprintjs/fingerprintjs": "^3.3.3",
+    "core-js": "^3.21.1",
     "fingerprintjs2": "^2.1.2",
-    "golden-layout": "^1.5.9",
-    "regenerator-runtime": "^0.13.7"
+    "golden-layout": "^2.4.0",
+    "regenerator-runtime": "^0.13.9"
   },
   "browserslist": [
     "defaults",
