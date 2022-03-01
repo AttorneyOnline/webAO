@@ -57,6 +57,12 @@ let extrafeatures = [];
 let hdid;
 const options = { fonts: { extendedJsFonts: true, userDefinedFonts: ["Ace Attorney", "8bitoperator", "DINEngschrift"] }, excludes: { userAgent: true, enumerateDevices: true } };
 
+function isLowMemory() {
+	if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Nintendo|Opera Mini/i.test(navigator.userAgent)) {
+				oldLoading = true;
+			}
+}
+
 if (window.requestIdleCallback) {
 	requestIdleCallback(function () {
 		Fingerprint2.get(options, function (components) {
@@ -64,9 +70,7 @@ if (window.requestIdleCallback) {
 			client = new Client(serverIP);
 			viewport = new Viewport();
 
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Nintendo|Opera Mini/i.test(navigator.userAgent)) {
-				oldLoading = true;
-			}
+			isLowMemory();
 			client.loadResources();
 		});
 	});
@@ -77,9 +81,7 @@ if (window.requestIdleCallback) {
 			client = new Client(serverIP);
 			viewport = new Viewport();
 
-			if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Nintendo|Opera Mini/i.test(navigator.userAgent)) {
-				oldLoading = true;
-			}
+			isLowMemory();
 			client.loadResources();
 		});
 	}, 500);
@@ -124,6 +126,8 @@ class Client extends EventEmitter {
 		this.evidences = [];
 		this.areas = [];
 		this.musics = [];
+		
+		this.musics_time = false;
 
 		this.callwords = [];
 
@@ -1094,6 +1098,7 @@ class Client extends EventEmitter {
 		if(args[1] === "0") {
 			this.resetMusicList();
 			this.resetAreaList();
+			this.musics_time = false;
 		}
 
 		for (let i = 2; i < args.length - 1; i++) {
@@ -1101,11 +1106,15 @@ class Client extends EventEmitter {
 				document.getElementById("client_loadingtext").innerHTML = `Loading Music ${args[1]}/${this.music_list_length}`;
                 const trackname = safe_tags(args[i]);
                 const trackindex = args[i-1];
-                if (this.isAudio(trackname)) {
-                    this.addTrack(trackname);
-                } else {
-                    this.createArea(trackindex,trackname);
-                }
+                if (this.musics_time) {
+                	this.addTrack(trackname);
+            	} else if (this.isAudio(trackname)) {
+                	this.musics_time = true;
+                	this.fix_last_area();
+                	this.addTrack(trackname);
+            	} else {
+                	this.createArea(trackindex,trackname);
+            	}
 			}
 		}
 
@@ -1122,17 +1131,17 @@ class Client extends EventEmitter {
 		this.resetMusicList();
 		this.resetAreaList();
 
-        let musics_time = false;
+        this.musics_time = false;
 
 		for (let i = 1; i < args.length - 1; i++) {
 			// Check when found the song for the first time
             const trackname = safe_tags(args[i]);
             const trackindex = i-1;
 			document.getElementById("client_loadingtext").innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-            if (musics_time) {
+            if (this.musics_time) {
                 this.addTrack(trackname);
             } else if (this.isAudio(trackname)) {
-                musics_time = true;
+                this.musics_time = true;
                 this.fix_last_area();
                 this.addTrack(trackname);
             } else {
