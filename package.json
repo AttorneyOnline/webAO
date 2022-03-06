@@ -10,8 +10,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.config.js",
     "start": "webpack-dev-server --config webpack.config.js",
-    "lint": "eslint .  --ext .js",
-    "lint:fix": "eslint --fix .  --ext .js"
+    "lint": "eslint ./webAO  --ext .js",
+    "lint:fix": "eslint --fix ./webAO  --ext .js"
   },
   "repository": {
     "type": "git",
