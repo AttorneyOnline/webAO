@@ -1,7 +1,8 @@
 import Fingerprint2 from 'fingerprintjs2';
-const version = process.env.npm_package_version
 
 import { unescapeChat, safe_tags } from './encoding.js';
+
+const version = process.env.npm_package_version;
 
 const MASTERSERVER_IP = 'master.aceattorneyonline.com:27014';
 
