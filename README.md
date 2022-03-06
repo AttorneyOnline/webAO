@@ -12,7 +12,16 @@ Desktop-only features:
  - Non-interrupting preanimations
 
 In short, webAO is in disrepair. Again.
- 
+
 Link to the client in this repo: http://web.aceattorneyonline.com/
 
-Guide to installing it locally: https://docs.google.com/document/d/1X4OjG0tfoTZayqY9MM6fqzL_aGMKFAECg7NSQRYafAU/edit
+# Project Setup
+- Install [Node JS](https://nodejs.org/en/)
+
+# Running Locally
+`npm install`
+
+`npm run start`
+
+
+
