@@ -9,10 +9,10 @@ import Fingerprint2 from 'fingerprintjs2';
 import { escapeChat, encodeChat, prepChat, safe_tags } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
-import vanilla_character_arr from "./characters.js";
-import vanilla_music_arr from "./music.js";
-import vanilla_background_arr from "./backgrounds.js";
-import vanilla_evidence_arr from "./evidence.js";
+import vanilla_character_arr from "./constants/characters.js";
+import vanilla_music_arr from "./constants/music.js";
+import vanilla_background_arr from "./constants/backgrounds.js";
+import vanilla_evidence_arr from "./constants/evidence.js";
 
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 
