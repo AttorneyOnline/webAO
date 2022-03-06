@@ -1265,17 +1265,17 @@ class Client extends EventEmitter {
 		}
 		document.getElementById("bg_preview").src = AO_HOST + "background/" + encodeURI(args[1].toLowerCase()) + "/defenseempty.png";
 		
-		document.getElementById("client_def_bench").src = bgfolder + "defensedesk.png"
-		document.getElementById("client_wit_bench").src = bgfolder + "stand.png"
-		document.getElementById("client_pro_bench").src = bgfolder + "prosecutiondesk.png"
+		document.getElementById("client_def_bench").src = bgfolder + "defensedesk.png";
+		document.getElementById("client_wit_bench").src = bgfolder + "stand.png";
+		document.getElementById("client_pro_bench").src = bgfolder + "prosecutiondesk.png";
 
-		document.getElementById("client_court").src = bgfolder + "full.png"
+		document.getElementById("client_court").src = bgfolder + "full.png";
 
-		document.getElementById("client_court_def").src = bgfolder + "defenseempty.png"
-		document.getElementById("client_court_deft").src = bgfolder + "transition_def.png"
-		document.getElementById("client_court_wit").src = bgfolder + "witnessempty.png"
-		document.getElementById("client_court_prot").src = bgfolder + "transition_pro.png"
-		document.getElementById("client_court_pro").src = bgfolder + "prosecutorempty.png"
+		document.getElementById("client_court_def").src = bgfolder + "defenseempty.png";
+		document.getElementById("client_court_deft").src = bgfolder + "transition_def.png";
+		document.getElementById("client_court_wit").src = bgfolder + "witnessempty.png";
+		document.getElementById("client_court_prot").src = bgfolder + "transition_pro.png";
+		document.getElementById("client_court_pro").src = bgfolder + "prosecutorempty.png";
 		
 		if (this.charID === -1) {
 			viewport.changeBackground("jud");
@@ -2047,7 +2047,7 @@ async changeBackground(position) {
 	setEmote(charactername, emotename, prefix, pair, side) {
 		const pairID = pair ? "pair" : "char";
 		const characterFolder = AO_HOST + "characters/";
-		const position = "def,pro,wit".includes(side) ? side+"_" : ""
+		const position = "def,pro,wit".includes(side) ? side+"_" : "";
 
 		const  gif_s = document.getElementById("client_" + position + pairID + "_gif");
 		const  png_s = document.getElementById("client_" + position + pairID + "_png");
@@ -2763,7 +2763,7 @@ window.iniedit = iniedit;
 	if(document.getElementById("client_pantilt").checked) {
 		background.style.transition = "0.5s ease-in-out";		
 	} else {
-		background.style.transition = "none"
+		background.style.transition = "none";
 	}
 }
 window.switchPanTilt = switchPanTilt;
@@ -2836,13 +2836,13 @@ window.imgError = imgError;
  * @param {HTMLImageElement} image the element containing the missing sound
  */
  export function opusCheck(channel) {
-	console.info(channel)
-	console.info("failed to load sound "+channel.src)
-	let oldsrc = ""
-	oldsrc = channel.src
+	console.info(channel);
+	console.info("failed to load sound "+channel.src);
+	let oldsrc = "";
+	oldsrc = channel.src;
 	if(!oldsrc.endsWith(".opus")) {
-		newsrc = oldsrc.replace(".mp3",".opus")
-		newsrc = newsrc.replace(".wav",".opus")
+		newsrc = oldsrc.replace(".mp3",".opus");
+		newsrc = newsrc.replace(".wav",".opus");
 		channel.src = newsrc; //unload so the old sprite doesn't persist
 	}
 }
