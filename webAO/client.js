@@ -18,7 +18,7 @@ import chatbox_arr from "./styles/chatbox/chatboxes.js";
 
 import { EventEmitter } from "events";
 
-import { version } from '../package.json';
+const version = process.env.npm_package_version
 
 let client;
 let viewport;
