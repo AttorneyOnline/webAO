@@ -19,7 +19,7 @@ import vanilla_evidence_arr from './evidence.js';
 
 import chatbox_arr from './styles/chatbox/chatboxes.js';
 
-import { version } from '../package.json';
+const version = process.env.npm_package_version
 
 let client;
 let viewport;

@@ -1,6 +1,11 @@
 /* eslint-env node */
 
 const path = require('path');
+const dotenv = require('dotenv')
+const webpack = require('webpack')
+
+// this will update the process.env with environment variables in .env file
+dotenv.config();
 
 module.exports = {
   entry: {
@@ -39,7 +44,16 @@ module.exports = {
       },
     ],
   },
-
+  performance: {
+    hints: false,
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000
+  }, 
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(process.env)
+    })
+  ],
   devtool: 'source-map',
   mode: 'production',
 };

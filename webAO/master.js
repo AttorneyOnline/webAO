@@ -1,5 +1,5 @@
 import Fingerprint2 from 'fingerprintjs2';
-import { version } from '../package.json';
+const version = process.env.npm_package_version
 
 import { unescapeChat, safe_tags } from './encoding.js';
 
