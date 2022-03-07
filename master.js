@@ -1,4 +1,4 @@
-import Fingerprint2 from 'fingerprintjs2';
+import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
 import { unescapeChat, safe_tags } from './encoding.js';
 
@@ -21,10 +21,11 @@ servers[-1] = {
   name: 'Localhost', description: 'This is your computer on port 50001', ip: '127.0.0.1', port: 50001, assets: '', online: 'Online: ?/?',
 };
 
-if (window.requestIdleCallback) {
-  requestIdleCallback(() => {
-    Fingerprint2.get(options, (components) => {
-      hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
+const fpPromise = FingerprintJS.load()
+fpPromise
+   .then(fp => fp.get())
+   .then(result => {
+      hdid = result.visitorId;
 
       check_https();
 
@@ -35,25 +36,7 @@ if (window.requestIdleCallback) {
 
       // i don't need the ms to play alone
       setTimeout(() => checkOnline(-1, '127.0.0.1:50001'), 0);
-    });
-  });
-} else {
-  setTimeout(() => {
-    Fingerprint2.get(options, (components) => {
-      hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
-
-      check_https();
-
-      masterserver = new WebSocket(`ws://${MASTERSERVER_IP}`);
-      masterserver.onopen = (evt) => onOpen(evt);
-      masterserver.onerror = (evt) => onError(evt);
-      masterserver.onmessage = (evt) => onMessage(evt);
-
-      // i don't need the ms to play alone
-      setTimeout(() => checkOnline(-1, '127.0.0.1:50001'), 0);
-    });
-  }, 500);
-}
+});
 
 export function check_https() {
   if (document.location.protocol === 'https:') {
