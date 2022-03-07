@@ -1,24 +1,19 @@
-name: Node CI
+name: Deploy CI
 
 on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout
       uses: actions/checkout@v1
     - name: Setup Node
       uses: actions/setup-node@v1
-    - name: npm install, build, and test
-      run: |
-        git submodule init
-        git submodule update
-        npm install
-        npm ci
-        npm run build
+    - name: Install Dependencies
+      run: npm install
+    - name: Build Project 
+      run: npm build
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@4.0.0
       with:
