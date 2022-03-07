@@ -1889,7 +1889,7 @@ class Viewport {
     }
 
     if ('def,pro,wit'.includes(position)) {
-      bench.style.display = 'none';
+      document.getElementById('client_'+position+'_classic').style.display = 'none';
       view.style.display = '';
       document.getElementById('client_classicview').style.display = 'none';
       switch (position) {
