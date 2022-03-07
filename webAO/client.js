@@ -90,6 +90,46 @@ if (window.requestIdleCallback) {
 
 let lastICMessageTime = new Date(0);
 
+const onMessage = (e) => {
+    const msg = e.data;
+    const lines = msg.split('%');
+
+    for (const msg of lines) {
+      if (msg === '') { break; }
+
+      const args = msg.split('#');
+      const header = args[0];
+      const messageHandler = {
+        'MS': client.handleMS
+      }
+
+      if (Object.keys(messageHandler).includes(header)) {
+        messageHandler[header](args)
+      } else if (!client.emit(header, args)) {
+        console.warn(`Invalid packet header ${header}`);
+      }
+    }
+}
+
+const onClose = (e) => {
+    console.error(`The connection was closed: ${e.reason} (${e.code})`);
+    if (extrafeatures.length == 0 && client.banned === false) {
+      document.getElementById('client_errortext').textContent = 'Could not connect to the server';
+    }
+    document.getElementById('client_error').style.display = 'flex';
+    document.getElementById('client_loading').style.display = 'none';
+    document.getElementById('error_id').textContent = e.code;
+    client.cleanup();
+  }
+const onOpen = (_e) => {
+  client.joinServer();
+}
+const onError = (e) => {
+  console.error(`A network error occurred: ${e.reason} (${e.code})`);
+  document.getElementById('client_error').style.display = 'flex';
+  document.getElementById('error_id').textContent = e.code;
+  client.cleanup();
+}
 class Client extends EventEmitter {
   constructor(address) {
     super();
@@ -105,10 +145,10 @@ class Client extends EventEmitter {
       this.joinServer();
     }
 
-    this.on('open', this.onOpen.bind(this));
-    this.on('close', this.onClose.bind(this));
-    this.on('message', this.onMessage.bind(this));
-    this.on('error', this.onError.bind(this));
+    this.on('open', onOpen);
+    this.on('close', onClose);
+    this.on('message', onMessage);
+    this.on('error', onError);
 
     // Preset some of the variables
 
@@ -181,7 +221,6 @@ class Client extends EventEmitter {
 		 * Assign handlers for all commands
 		 * If you implement a new command, you need to add it here
 		 */
-    this.on('MS', this.handleMS.bind(this));
     this.on('CT', this.handleCT.bind(this));
     this.on('MC', this.handleMC.bind(this));
     this.on('RMC', this.handleRMC.bind(this));
@@ -264,7 +303,7 @@ class Client extends EventEmitter {
 	 */
   handleSelf(message) {
     const message_event = new MessageEvent('websocket', { data: message });
-    setTimeout(() => this.onMessage(message_event), 1);
+    setTimeout(() => onMessage(message_event), 1);
   }
 
   /**
@@ -522,61 +561,6 @@ class Client extends EventEmitter {
   }
 
   /**
-	 * Triggered when a connection is established to the server.
-	 */
-  onOpen(_e) {
-    client.joinServer();
-  }
-
-  /**
-	 * Triggered when the connection to the server closes.
-	 * @param {CloseEvent} e
-	 */
-  onClose(e) {
-    console.error(`The connection was closed: ${e.reason} (${e.code})`);
-    if (extrafeatures.length == 0 && this.banned === false) {
-      document.getElementById('client_errortext').textContent = 'Could not connect to the server';
-    }
-    document.getElementById('client_error').style.display = 'flex';
-    document.getElementById('client_loading').style.display = 'none';
-    document.getElementById('error_id').textContent = e.code;
-    this.cleanup();
-  }
-
-  /**
-	 * Triggered when a packet is received from the server.
-	 * @param {MessageEvent} e
-	 */
-  onMessage(e) {
-    const msg = e.data;
-    console.debug(`S: ${msg}`);
-
-    const lines = msg.split('%');
-
-    for (const msg of lines) {
-      if (msg === '') { break; }
-
-      const args = msg.split('#');
-      const header = args[0];
-
-      if (!this.emit(header, args)) {
-        console.warn(`Invalid packet header ${header}`);
-      }
-    }
-  }
-
-  /**
-	 * Triggered when an network error occurs.
-	 * @param {ErrorEvent} e
-	 */
-  onError(e) {
-    console.error(`A network error occurred: ${e.reason} (${e.code})`);
-    document.getElementById('client_error').style.display = 'flex';
-    document.getElementById('error_id').textContent = e.code;
-    this.cleanup();
-  }
-
-  /**
 	 * Stop sending keepalives to the server.
 	 */
   cleanup() {
@@ -629,15 +613,15 @@ class Client extends EventEmitter {
       let char_muted = false;
 
       try {
-        msg_nameplate = this.chars[char_id].showname;
-        msg_blips = this.chars[char_id].blips;
-        char_chatbox = this.chars[char_id].chat;
-        char_muted = this.chars[char_id].muted;
+        msg_nameplate = client.chars[char_id].showname;
+        msg_blips = client.chars[char_id].blips;
+        char_chatbox = client.chars[char_id].chat;
+        char_muted = client.chars[char_id].muted;
 
-        if (this.chars[char_id].name !== char_name) {
-          console.info(`${this.chars[char_id].name} is iniediting to ${char_name}`);
+        if (client.chars[char_id].name !== char_name) {
+          console.info(`${client.chars[char_id].name} is iniediting to ${char_name}`);
           const chargs = (`${char_name}&` + 'iniediter').split('&');
-          this.handleCharacterInfo(chargs, char_id);
+          client.handleCharacterInfo(chargs, char_id);
         }
       } catch (e) {
         msg_nameplate = args[3];
@@ -748,7 +732,7 @@ class Client extends EventEmitter {
         }
 
         // our own message appeared, reset the buttons
-        if (chatmsg.charid === this.charID) {
+        if (chatmsg.charid === client.charID) {
           resetICParams();
         }
 
