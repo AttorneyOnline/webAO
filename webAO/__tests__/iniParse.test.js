@@ -1,4 +1,4 @@
-import iniParse from './iniParse';
+import iniParse from '../iniParse';
 
 const iniExample = `
 [Options]
