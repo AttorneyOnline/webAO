@@ -2,6 +2,8 @@
 Thumbs.db
 ehthumbs.db
 
+coverage/
+
 # Folder config file
 Desktop.ini
 
