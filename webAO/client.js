@@ -4,7 +4,7 @@
  * credits to aleks for original idea and source
 */
 
-import Fingerprint2 from 'fingerprintjs2';
+import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
 import { EventEmitter } from 'events';
 import {
@@ -65,29 +65,17 @@ function isLowMemory() {
   }
 }
 
-if (window.requestIdleCallback) {
-  requestIdleCallback(() => {
-    Fingerprint2.get(options, (components) => {
-      hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
+const fpPromise = FingerprintJS.load()
+fpPromise
+   .then(fp => fp.get())
+   .then(result => {
+      hdid = result.visitorId;
       client = new Client(serverIP);
       viewport = new Viewport();
 
       isLowMemory();
       client.loadResources();
-    });
-  });
-} else {
-  setTimeout(() => {
-    Fingerprint2.get(options, (components) => {
-      hdid = Fingerprint2.x64hash128(components.reduce((a, b) => `${a.value || a}, ${b.value}`), 31);
-      client = new Client(serverIP);
-      viewport = new Viewport();
-
-      isLowMemory();
-      client.loadResources();
-    });
-  }, 500);
-}
+});
 
 let lastICMessageTime = new Date(0);
 
