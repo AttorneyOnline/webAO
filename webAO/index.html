@@ -26,6 +26,7 @@
         content="default-src 'self' 'unsafe-inline' 'unsafe-eval' *.aceattorneyonline.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws:;">
 
     <meta name="viewport" content="width=700, initial-scale=1">
+    <meta name="theme-color" content="#2c3d51">
 
     <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Oswald%7CRoboto+Condensed" rel="stylesheet">
@@ -35,6 +36,18 @@
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" href="images/favicon.ico">
     <script src="master.b.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+        navigator.serviceWorker.register('../sw.js').then( () => {
+            console.log('Service Worker Registered')
+   })
+ })
+}
+    </script>
+
+    
 </head>
 
 <body>
