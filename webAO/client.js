@@ -91,45 +91,45 @@ if (window.requestIdleCallback) {
 let lastICMessageTime = new Date(0);
 
 const onMessage = (e) => {
-    const msg = e.data;
-    const lines = msg.split('%');
+  const msg = e.data;
+  const lines = msg.split('%');
 
-    for (const msg of lines) {
-      if (msg === '') { break; }
+  for (const msg of lines) {
+    if (msg === '') { break; }
 
-      const args = msg.split('#');
-      const header = args[0];
-      const messageHandler = {
-        'MS': client.handleMS
-      }
+    const args = msg.split('#');
+    const header = args[0];
+    const messageHandler = {
+      MS: client.handleMS,
+    };
 
-      if (Object.keys(messageHandler).includes(header)) {
-        messageHandler[header](args)
-      } else if (!client.emit(header, args)) {
-        console.warn(`Invalid packet header ${header}`);
-      }
+    if (Object.keys(messageHandler).includes(header)) {
+      messageHandler[header](args);
+    } else if (!client.emit(header, args)) {
+      console.warn(`Invalid packet header ${header}`);
     }
-}
+  }
+};
 
 const onClose = (e) => {
-    console.error(`The connection was closed: ${e.reason} (${e.code})`);
-    if (extrafeatures.length == 0 && client.banned === false) {
-      document.getElementById('client_errortext').textContent = 'Could not connect to the server';
-    }
-    document.getElementById('client_error').style.display = 'flex';
-    document.getElementById('client_loading').style.display = 'none';
-    document.getElementById('error_id').textContent = e.code;
-    client.cleanup();
+  console.error(`The connection was closed: ${e.reason} (${e.code})`);
+  if (extrafeatures.length == 0 && client.banned === false) {
+    document.getElementById('client_errortext').textContent = 'Could not connect to the server';
   }
+  document.getElementById('client_error').style.display = 'flex';
+  document.getElementById('client_loading').style.display = 'none';
+  document.getElementById('error_id').textContent = e.code;
+  client.cleanup();
+};
 const onOpen = (_e) => {
   client.joinServer();
-}
+};
 const onError = (e) => {
   console.error(`A network error occurred: ${e.reason} (${e.code})`);
   document.getElementById('client_error').style.display = 'flex';
   document.getElementById('error_id').textContent = e.code;
   client.cleanup();
-}
+};
 class Client extends EventEmitter {
   constructor(address) {
     super();
