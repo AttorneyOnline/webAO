@@ -2720,9 +2720,11 @@ window.iniedit = iniedit;
 export async function switchPanTilt(addcheck) {
   const background = document.getElementById('client_fullview');
   if (addcheck === 1) {
-    document.getElementById('client_pantilt').checked = true;
+    document.getElementById('client_pantilt').checked = true;    
+    document.getElementById('client_court').style.display = '';
   } else if (addcheck === 2) {
     document.getElementById('client_pantilt').checked = false;
+    document.getElementById('client_court').style.display = 'none';
   }
   if (document.getElementById('client_pantilt').checked) {
     background.style.transition = '0.5s ease-in-out';
