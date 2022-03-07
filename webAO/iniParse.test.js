@@ -11,18 +11,18 @@ number = 9
 `
 describe('iniParse', () => {
     test('should not lowercase value if key is showname', () => {
-        const ini = iniParse(`
+        const parsedIni = iniParse(`
         [test]
         showname = MATT
         `)
-        expect(ini.test.showname).toBe('MATT')
+        expect(parsedIni.test.showname).toBe('MATT')
     })
     test('should lowercase value if key is not showname', () => {
-        const ini = iniParse(`
+        const parsedIni = iniParse(`
         [test]
         party = TIME
         `)
-        expect(ini.test.party).toBe('time')
+        expect(parsedIni.test.party).toBe('time')
     })
     test('should parse sections', () => {
         const parsedIni = iniParse(iniExample)
@@ -31,6 +31,18 @@ describe('iniParse', () => {
     test('should parse parameters', () => {
         const parsedIni = iniParse(iniExample)
         expect(Object.keys(parsedIni.options).length).toBe(2);
+    })
+    test('should remove empty lines', () => {
+        const parsedIni = iniParse(`
+        [test]
+        
+        
+        1 = 1
+        2 = 2
+
+
+        `)
+        expect(Object.keys(parsedIni.test).length).toBe(2)
     })
 })
 
