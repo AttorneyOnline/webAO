@@ -18,6 +18,7 @@ import vanilla_background_arr from './backgrounds.js';
 import vanilla_evidence_arr from './evidence.js';
 
 import chatbox_arr from './styles/chatbox/chatboxes.js';
+import iniParse from './iniParse';
 
 const version = process.env.npm_package_version;
 
@@ -843,7 +844,7 @@ class Client extends EventEmitter {
       // If the ini doesn't exist on the server this will throw an error
       try {
         const cinidata = await request(`${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char.ini`);
-        cini = INI.parse(cinidata);
+        cini = iniParse(cinidata);
       } catch (err) {
         cini = {};
         img.classList.add('noini');
@@ -2407,42 +2408,6 @@ class Viewport {
       }
     }
     this.textTimer += UPDATE_INTERVAL;
-  }
-}
-
-class INI {
-  static parse(data) {
-    const regex = {
-      section: /^\s*\[\s*([^\]]*)\s*\]\s*$/,
-      param: /^\s*([\w.\-_]+)\s*=\s*(.*?)\s*$/,
-      comment: /^\s*;.*$/,
-    };
-    const value = {};
-    const lines = data.split(/\r\n|\r|\n/);
-    let section;
-    lines.forEach((line) => {
-      if (regex.comment.test(line)) {
-
-      } else if (line.length === 0) {
-
-      } else if (regex.param.test(line)) {
-        const match = line.match(regex.param);
-        if (section) {
-          if (match[1].toLowerCase() === 'showname') {	// don't lowercase the showname
-            value[section].showname = match[2];
-          } else {
-            value[section][match[1].toLowerCase()] = match[2].toLowerCase();
-          }
-          // } else { // we don't care about attributes without a section
-          //	value[match[1]] = match[2];
-        }
-      } else if (regex.section.test(line)) {
-        const match = line.match(regex.section);
-        value[match[1].toLowerCase()] = {};				// lowercase everything else
-        section = match[1].toLowerCase();
-      }
-    });
-    return value;
   }
 }
 
