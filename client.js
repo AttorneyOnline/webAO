@@ -1816,7 +1816,7 @@ class Viewport {
         speedLines: 'defense_speedlines.gif',
       },
       pro: {
-        bg: 'prosecutionempty.png',
+        bg: 'prosecutorempty.png',
         desk: { ao2: 'prosecutiondesk.png', ao1: 'bancoacusacion.png' },
         speedLines: 'prosecution_speedlines.gif',
       },
