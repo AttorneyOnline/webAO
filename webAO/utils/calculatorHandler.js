@@ -1,7 +1,7 @@
-import calculateGifLength from "./calculateGifLength";
-import calculateWebpLength from "./calculateWebpLength";
+import calculateGifLength from './calculateGifLength';
+import calculateWebpLength from './calculateWebpLength';
 
 export default {
-    '.gif': calculateGifLength,
-    '.webp': calculateWebpLength
-}
+  '.gif': calculateGifLength,
+  '.webp': calculateWebpLength,
+};

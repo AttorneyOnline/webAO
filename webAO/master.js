@@ -1,4 +1,4 @@
-import FingerprintJS from '@fingerprintjs/fingerprintjs'
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 import { unescapeChat, safeTags } from './encoding.js';
 
@@ -21,22 +21,22 @@ servers[-1] = {
   name: 'Localhost', description: 'This is your computer on port 50001', ip: '127.0.0.1', port: 50001, assets: '', online: 'Online: ?/?',
 };
 
-const fpPromise = FingerprintJS.load()
+const fpPromise = FingerprintJS.load();
 fpPromise
-   .then(fp => fp.get())
-   .then(result => {
-      hdid = result.visitorId;
+  .then((fp) => fp.get())
+  .then((result) => {
+    hdid = result.visitorId;
 
-      check_https();
+    check_https();
 
-      masterserver = new WebSocket(`ws://${MASTERSERVER_IP}`);
-      masterserver.onopen = (evt) => onOpen(evt);
-      masterserver.onerror = (evt) => onError(evt);
-      masterserver.onmessage = (evt) => onMessage(evt);
+    masterserver = new WebSocket(`ws://${MASTERSERVER_IP}`);
+    masterserver.onopen = (evt) => onOpen(evt);
+    masterserver.onerror = (evt) => onError(evt);
+    masterserver.onmessage = (evt) => onMessage(evt);
 
-      // i don't need the ms to play alone
-      setTimeout(() => checkOnline(-1, '127.0.0.1:50001'), 0);
-});
+    // i don't need the ms to play alone
+    setTimeout(() => checkOnline(-1, '127.0.0.1:50001'), 0);
+  });
 
 export function check_https() {
   if (document.location.protocol === 'https:') {

@@ -4,7 +4,7 @@
  * credits to aleks for original idea and source
 */
 
-import FingerprintJS from '@fingerprintjs/fingerprintjs'
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 import { EventEmitter } from 'events';
 import {
@@ -12,10 +12,10 @@ import {
 } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
-import vanilla_character_arr from "./constants/characters.js";
-import vanilla_music_arr from "./constants/music.js";
-import vanilla_background_arr from "./constants/backgrounds.js";
-import vanilla_evidence_arr from "./constants/evidence.js";
+import vanilla_character_arr from './constants/characters.js';
+import vanilla_music_arr from './constants/music.js';
+import vanilla_background_arr from './constants/backgrounds.js';
+import vanilla_evidence_arr from './constants/evidence.js';
 
 import chatbox_arr from './styles/chatbox/chatboxes.js';
 import iniParse from './iniParse';
@@ -60,24 +60,22 @@ let extrafeatures = [];
 
 let hdid;
 
-
 function isLowMemory() {
   if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Nintendo|Opera Mini/i.test(navigator.userAgent)) {
     oldLoading = true;
   }
 }
-const fpPromise = FingerprintJS.load()
+const fpPromise = FingerprintJS.load();
 fpPromise
-   .then(fp => fp.get())
-   .then(result => {
+  .then((fp) => fp.get())
+  .then((result) => {
+    hdid = result.visitorId;
+    client = new Client(serverIP);
+    viewport = new Viewport();
 
-      hdid = result.visitorId;
-      client = new Client(serverIP);
-      viewport = new Viewport();
-
-      isLowMemory();
-      client.loadResources();
-});
+    isLowMemory();
+    client.loadResources();
+  });
 
 let lastICMessageTime = new Date(0);
 
@@ -1033,8 +1031,8 @@ class Client extends EventEmitter {
   }
 
   isAudio(trackname) {
-    const audioEndings = ['.wav', '.mp3', '.ogg', '.opus']
-    return audioEndings.filter(ending => trackname.endsWith(ending)).length === 1
+    const audioEndings = ['.wav', '.mp3', '.ogg', '.opus'];
+    return audioEndings.filter((ending) => trackname.endsWith(ending)).length === 1;
   }
 
   addTrack(trackname) {
@@ -1871,7 +1869,7 @@ class Viewport {
     }
 
     if ('def,pro,wit'.includes(position)) {
-      document.getElementById('client_'+position+'_bench').style.display = 'none';
+      document.getElementById(`client_${position}_bench`).style.display = 'none';
       view.style.display = '';
       document.getElementById('client_classicview').style.display = 'none';
       switch (position) {
@@ -1925,19 +1923,19 @@ class Viewport {
 	 * silently fail and return 0 instead.
 	 * @param {string} filename the animation file name
 	 */
-  
+
   async getAnimLength(url) {
-    const extensions = ['.gif','.webp']
+    const extensions = ['.gif', '.webp'];
     for (const extension of extensions) {
-      const urlWithExtension = url+extension
-      const exists = await fileExists(urlWithExtension)
+      const urlWithExtension = url + extension;
+      const exists = await fileExists(urlWithExtension);
       if (exists) {
-        const fileBuffer = await requestBuffer(urlWithExtension)
-        const length = calculatorHandler[extension](fileBuffer)
-        return length
+        const fileBuffer = await requestBuffer(urlWithExtension);
+        const length = calculatorHandler[extension](fileBuffer);
+        return length;
       }
-    };
-    return 0
+    }
+    return 0;
   }
 
   oneSuccess(promises) {
@@ -2042,26 +2040,26 @@ class Viewport {
     const apng_s = document.getElementById(`client_${position}${pairID}_apng`);
     const webp_s = document.getElementById(`client_${position}${pairID}_webp`);
     const extensionsMap = {
-      '.gif': gif_s, 
-      '.png': png_s, 
-      '.apng': apng_s, 
-      '.webp': webp_s
-    }
+      '.gif': gif_s,
+      '.png': png_s,
+      '.apng': apng_s,
+      '.webp': webp_s,
+    };
 
     for (const [extension, htmlElement] of Object.entries(extensionsMap)) {
       // Hides all sprites before creating a new sprite
       if (this.lastChar !== this.chatmsg.name) {
-        htmlElement.src = transparentPNG
+        htmlElement.src = transparentPNG;
       }
       let url;
       if (extension === '.png') {
-        url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(emotename)}${extension}`
+        url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(emotename)}${extension}`;
       } else {
-        url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}${extension}`
+        url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}${extension}`;
       }
-      const exists = fileExistsSync(url)
+      const exists = fileExistsSync(url);
       if (exists) {
-        htmlElement.src = url
+        htmlElement.src = url;
         return;
       }
     }
@@ -2280,7 +2278,7 @@ class Viewport {
     const effectlayer = document.getElementById('client_fg');
     let charLayers = document.getElementById('client_char');
     let pairLayers = document.getElementById('client_pair_char');
-    
+
     if ('def,pro,wit'.includes(this.chatmsg.side)) {
       charLayers = document.getElementById(`client_${this.chatmsg.side}_char`);
       pairLayers = document.getElementById(`client_${this.chatmsg.side}_pair_char`);
@@ -2410,7 +2408,6 @@ class Viewport {
     this.textTimer += UPDATE_INTERVAL;
   }
 }
-
 
 /**
  * Triggered when the Return key is pressed on the out-of-character chat input box.
@@ -2697,7 +2694,7 @@ window.iniedit = iniedit;
 export async function switchPanTilt(addcheck) {
   const background = document.getElementById('client_fullview');
   if (addcheck === 1) {
-    document.getElementById('client_pantilt').checked = true;    
+    document.getElementById('client_pantilt').checked = true;
     document.getElementById('client_court').style.display = '';
   } else if (addcheck === 2) {
     document.getElementById('client_pantilt').checked = false;
@@ -2824,8 +2821,6 @@ async function requestBuffer(url) {
   });
 }
 
-
-
 /**
  * Checks if a file exists at the specified URI.
  * @param {string} url the URI to be checked
@@ -2840,15 +2835,14 @@ async function fileExists(url) {
 }
 const fileExistsSync = (url) => {
   try {
-    var http = new XMLHttpRequest();
+    const http = new XMLHttpRequest();
     http.open('HEAD', url, false);
     http.send();
-    return http.status!=404;
+    return http.status != 404;
   } catch (e) {
-    return false
+    return false;
   }
-}
-
+};
 
 /**
  * Triggered when the reconnect button is pushed.
