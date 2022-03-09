@@ -8,7 +8,7 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
 import { EventEmitter } from 'events';
 import {
-  escapeChat, encodeChat, prepChat, safe_tags,
+  escapeChat, encodeChat, prepChat, safeTags,
 } from './encoding.js';
 
 // Load some defaults for the background and evidence dropdowns
@@ -19,6 +19,10 @@ import vanilla_evidence_arr from "./constants/evidence.js";
 
 import chatbox_arr from './styles/chatbox/chatboxes.js';
 import iniParse from './iniParse';
+import calculatorHandler from './utils/calculatorHandler.js';
+import getCookie from './utils/getCookie.js';
+import setCookie from './utils/setCookie.js';
+import request from './services/request.js';
 
 const version = process.env.npm_package_version;
 
@@ -31,8 +35,7 @@ location.search.substr(1).split('&').forEach((item) => {
   queryDict[item.split('=')[0]] = item.split('=')[1];
 });
 
-const serverIP = queryDict.ip;
-let { mode } = queryDict;
+let { ip: serverIP, mode } = queryDict;
 
 // Unless there is an asset URL specified, use the wasabi one
 const DEFAULT_HOST = 'http://attorneyoffline.de/base/';
@@ -50,25 +53,24 @@ const transparentPNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCA
 let oldLoading = false;
 
 // presettings
-const selectedEffect = 0;
 let selectedMenu = 1;
 let selectedShout = 0;
 
 let extrafeatures = [];
 
 let hdid;
-const options = { fonts: { extendedJsFonts: true, userDefinedFonts: ['Ace Attorney', '8bitoperator', 'DINEngschrift'] }, excludes: { userAgent: true, enumerateDevices: true } };
+
 
 function isLowMemory() {
   if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Nintendo|Opera Mini/i.test(navigator.userAgent)) {
     oldLoading = true;
   }
 }
-
 const fpPromise = FingerprintJS.load()
 fpPromise
    .then(fp => fp.get())
    .then(result => {
+
       hdid = result.visitorId;
       client = new Client(serverIP);
       viewport = new Viewport();
@@ -82,7 +84,6 @@ let lastICMessageTime = new Date(0);
 class Client extends EventEmitter {
   constructor(address) {
     super();
-    console.log(`mode: ${mode}`);
     if (mode !== 'replay') {
       this.serv = new WebSocket(`ws://${address}`);
       // Assign the websocket events
@@ -610,7 +611,7 @@ class Client extends EventEmitter {
       document.getElementById('client_inner_chat').innerHTML = '';
 
       const char_id = Number(args[9]);
-      const char_name = safe_tags(args[3]);
+      const char_name = safeTags(args[3]);
 
       let msg_nameplate = args[3];
       let msg_blips = 'male';
@@ -638,21 +639,21 @@ class Client extends EventEmitter {
 
       if (char_muted === false) {
         let chatmsg = {
-          deskmod: safe_tags(args[1]).toLowerCase(),
-          preanim: safe_tags(args[2]).toLowerCase(), // get preanim
+          deskmod: safeTags(args[1]).toLowerCase(),
+          preanim: safeTags(args[2]).toLowerCase(), // get preanim
           nameplate: msg_nameplate,
           chatbox: char_chatbox,
           name: char_name,
-          sprite: safe_tags(args[4]).toLowerCase(),
+          sprite: safeTags(args[4]).toLowerCase(),
           content: prepChat(args[5]), // Escape HTML tags
           side: args[6].toLowerCase(),
-          sound: safe_tags(args[7]).toLowerCase(),
-          blips: safe_tags(msg_blips),
+          sound: safeTags(args[7]).toLowerCase(),
+          blips: safeTags(msg_blips),
           type: Number(args[8]),
           charid: char_id,
           snddelay: Number(args[10]),
           objection: Number(args[11]),
-          evidence: safe_tags(args[12]),
+          evidence: safeTags(args[12]),
           flip: Number(args[13]),
           flash: Number(args[14]),
           color: Number(args[15]),
@@ -660,10 +661,10 @@ class Client extends EventEmitter {
 
         if (extrafeatures.includes('cccc_ic_support')) {
           const extra_cccc = {
-            showname: safe_tags(args[16]),
+            showname: safeTags(args[16]),
             other_charid: Number(args[17]),
-            other_name: safe_tags(args[18]),
-            other_emote: safe_tags(args[19]),
+            other_name: safeTags(args[18]),
+            other_emote: safeTags(args[19]),
             self_offset: args[20].split('<and>'), // HACK: here as well, client is fucked and uses this instead of &
             other_offset: args[21].split('<and>'),
             other_flip: Number(args[22]),
@@ -675,9 +676,9 @@ class Client extends EventEmitter {
             const extra_27 = {
               looping_sfx: Number(args[24]),
               screenshake: Number(args[25]),
-              frame_screenshake: safe_tags(args[26]),
-              frame_realization: safe_tags(args[27]),
-              frame_sfx: safe_tags(args[28]),
+              frame_screenshake: safeTags(args[26]),
+              frame_realization: safeTags(args[27]),
+              frame_sfx: safeTags(args[28]),
             };
             chatmsg = Object.assign(extra_27, chatmsg);
 
@@ -841,9 +842,9 @@ class Client extends EventEmitter {
       }
 
       const mute_select = document.getElementById('mute_select');
-      mute_select.add(new Option(safe_tags(chargs[0]), charid));
+      mute_select.add(new Option(safeTags(chargs[0]), charid));
       const pair_select = document.getElementById('pair_select');
-      pair_select.add(new Option(safe_tags(chargs[0]), charid));
+      pair_select.add(new Option(safeTags(chargs[0]), charid));
 
       // sometimes ini files lack important settings
       const default_options = {
@@ -863,13 +864,13 @@ class Client extends EventEmitter {
       cini.emotions = Object.assign(default_emotions, cini.emotions);
 
       this.chars[charid] = {
-        name: safe_tags(chargs[0]),
-        showname: safe_tags(cini.options.showname),
-        desc: safe_tags(chargs[1]),
-        blips: safe_tags(cini.options.blips).toLowerCase(),
-        gender: safe_tags(cini.options.gender).toLowerCase(),
-        side: safe_tags(cini.options.side).toLowerCase(),
-        chat: (cini.options.chat === '') ? safe_tags(cini.options.chat).toLowerCase() : safe_tags(cini.options.category).toLowerCase(),
+        name: safeTags(chargs[0]),
+        showname: safeTags(cini.options.showname),
+        desc: safeTags(chargs[1]),
+        blips: safeTags(cini.options.blips).toLowerCase(),
+        gender: safeTags(cini.options.gender).toLowerCase(),
+        side: safeTags(cini.options.side).toLowerCase(),
+        chat: (cini.options.chat === '') ? safeTags(cini.options.chat).toLowerCase() : safeTags(cini.options.category).toLowerCase(),
         evidence: chargs[3],
         icon,
         inifile: cini,
@@ -879,7 +880,7 @@ class Client extends EventEmitter {
       if (this.chars[charid].blips === '') { this.chars[charid].blips = this.chars[charid].gender; }
 
       const iniedit_select = document.getElementById('client_ininame');
-      iniedit_select.add(new Option(safe_tags(chargs[0])));
+      iniedit_select.add(new Option(safeTags(chargs[0])));
     } else {
       console.warn(`missing charid ${charid}`);
       const img = document.getElementById(`demo_${charid}`);
@@ -949,7 +950,7 @@ class Client extends EventEmitter {
       this.evidences[i - 1] = {
         name: prepChat(arg[0]),
         desc: prepChat(arg[1]),
-        filename: safe_tags(arg[2]),
+        filename: safeTags(arg[2]),
         icon: `${AO_HOST}evidence/${encodeURI(arg[2].toLowerCase())}`,
       };
     }
@@ -1032,15 +1033,8 @@ class Client extends EventEmitter {
   }
 
   isAudio(trackname) {
-    if (trackname.endsWith('.wav')
-            || trackname.endsWith('.mp3')
-            || trackname.endsWith('.mp4')
-            || trackname.endsWith('.ogg')
-            || trackname.endsWith('.opus')) // NOT category markers
-    {
-      return true;
-    }
-    return false;
+    const audioEndings = ['.wav', '.mp3', '.ogg', '.opus']
+    return audioEndings.filter(ending => trackname.endsWith(ending)).length === 1
   }
 
   addTrack(trackname) {
@@ -1105,7 +1099,7 @@ class Client extends EventEmitter {
     for (let i = 2; i < args.length - 1; i++) {
       if (i % 2 === 0) {
         document.getElementById('client_loadingtext').innerHTML = `Loading Music ${args[1]}/${this.music_list_length}`;
-        const trackname = safe_tags(args[i]);
+        const trackname = safeTags(args[i]);
         const trackindex = args[i - 1];
         if (this.musics_time) {
                 	this.addTrack(trackname);
@@ -1136,7 +1130,7 @@ class Client extends EventEmitter {
 
     for (let i = 1; i < args.length - 1; i++) {
       // Check when found the song for the first time
-      const trackname = safe_tags(args[i]);
+      const trackname = safeTags(args[i]);
       const trackindex = i - 1;
       document.getElementById('client_loadingtext').innerHTML = `Loading Music ${i}/${this.music_list_length}`;
       if (this.musics_time) {
@@ -1163,7 +1157,7 @@ class Client extends EventEmitter {
 
     for (let i = 1; i < args.length - 1; i++) {
       // Check when found the song for the first time
-      this.addTrack(safe_tags(args[i]));
+      this.addTrack(safeTags(args[i]));
     }
   }
 
@@ -1175,7 +1169,7 @@ class Client extends EventEmitter {
     this.resetAreaList();
 
     for (let i = 1; i < args.length - 1; i++) {
-      this.createArea(i - 1, safe_tags(args[i]));
+      this.createArea(i - 1, safeTags(args[i]));
     }
   }
 
@@ -1204,7 +1198,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args kick reason
 	 */
   handleKK(args) {
-    this.handleBans('Kicked', safe_tags(args[1]));
+    this.handleBans('Kicked', safeTags(args[1]));
   }
 
   /**
@@ -1213,7 +1207,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args ban reason
 	 */
   handleKB(args) {
-    this.handleBans('Banned', safe_tags(args[1]));
+    this.handleBans('Banned', safeTags(args[1]));
     this.banned = true;
   }
 
@@ -1223,7 +1217,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args ban reason
 	 */
 		 handleBB(args) {
-    alert(safe_tags(args[1]));
+    alert(safeTags(args[1]));
   }
 
   /**
@@ -1232,7 +1226,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args ban reason
 	 */
   handleBD(args) {
-    this.handleBans('Banned', safe_tags(args[1]));
+    this.handleBans('Banned', safeTags(args[1]));
     this.banned = true;
   }
 
@@ -1256,7 +1250,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
   handleBN(args) {
-    viewport.bgname = safe_tags(args[1]);
+    viewport.bgname = safeTags(args[1]);
     const bgfolder = viewport.bgFolder;
     const bg_index = getIndexFromSelect('bg_select', viewport.bgname);
     document.getElementById('bg_select').selectedIndex = bg_index;
@@ -1427,13 +1421,13 @@ class Client extends EventEmitter {
             this.areas[i].players = Number(args[i + 1]);
             break;
           case 1: // status
-            this.areas[i].status = safe_tags(args[i + 1]);
+            this.areas[i].status = safeTags(args[i + 1]);
             break;
           case 2:
-            this.areas[i].cm = safe_tags(args[i + 1]);
+            this.areas[i].cm = safeTags(args[i + 1]);
             break;
           case 3:
-            this.areas[i].locked = safe_tags(args[i + 1]);
+            this.areas[i].locked = safeTags(args[i + 1]);
             break;
         }
 
@@ -1613,7 +1607,7 @@ class Client extends EventEmitter {
         iniedit_select.innerHTML = '';
 
         function addIniswap(value) {
-          iniedit_select.add(new Option(safe_tags(value)));
+          iniedit_select.add(new Option(safeTags(value)));
         }
 
         addIniswap(me.name);
@@ -1931,13 +1925,19 @@ class Viewport {
 	 * silently fail and return 0 instead.
 	 * @param {string} filename the animation file name
 	 */
-  async getAnimLength(filename) {
-    try {
-      const file = await requestBuffer(filename);
-      return this.calculateGifLength(file);
-    } catch (err) {
-      return 0;
-    }
+  
+  async getAnimLength(url) {
+    const extensions = ['.gif','.webp']
+    for (const extension of extensions) {
+      const urlWithExtension = url+extension
+      const exists = await fileExists(urlWithExtension)
+      if (exists) {
+        const fileBuffer = await requestBuffer(urlWithExtension)
+        const length = calculatorHandler[extension](fileBuffer)
+        return length
+      }
+    };
+    return 0
   }
 
   oneSuccess(promises) {
@@ -2041,19 +2041,30 @@ class Viewport {
     const png_s = document.getElementById(`client_${position}${pairID}_png`);
     const apng_s = document.getElementById(`client_${position}${pairID}_apng`);
     const webp_s = document.getElementById(`client_${position}${pairID}_webp`);
-
-    if (this.lastChar !== this.chatmsg.name) {
-      // hide the last sprite
-      gif_s.src = transparentPNG;
-      png_s.src = transparentPNG;
-      apng_s.src = transparentPNG;
-      webp_s.src = transparentPNG;
+    const extensionsMap = {
+      '.gif': gif_s, 
+      '.png': png_s, 
+      '.apng': apng_s, 
+      '.webp': webp_s
     }
 
-    gif_s.src = `${characterFolder}${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.gif`;
-    png_s.src = `${characterFolder}${encodeURI(charactername)}/${encodeURI(emotename)}.png`;
-    apng_s.src = `${characterFolder}${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.apng`;
-    webp_s.src = `${characterFolder}${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}.webp`;
+    for (const [extension, htmlElement] of Object.entries(extensionsMap)) {
+      // Hides all sprites before creating a new sprite
+      if (this.lastChar !== this.chatmsg.name) {
+        htmlElement.src = transparentPNG
+      }
+      let url;
+      if (extension === '.png') {
+        url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(emotename)}${extension}`
+      } else {
+        url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}${extension}`
+      }
+      const exists = fileExistsSync(url)
+      if (exists) {
+        htmlElement.src = url
+        return;
+      }
+    }
   }
 
   /**
@@ -2156,7 +2167,7 @@ class Viewport {
         // Hide message box
         chatContainerBox.style.opacity = 0;
         // If preanim existed then determine the length
-        gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}.gif`);
+        gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}`);
         this.chatmsg.startspeaking = false;
         break;
         // case 5:
@@ -2269,7 +2280,7 @@ class Viewport {
     const effectlayer = document.getElementById('client_fg');
     let charLayers = document.getElementById('client_char');
     let pairLayers = document.getElementById('client_pair_char');
-
+    
     if ('def,pro,wit'.includes(this.chatmsg.side)) {
       charLayers = document.getElementById(`client_${this.chatmsg.side}_char`);
       pairLayers = document.getElementById(`client_${this.chatmsg.side}_pair_char`);
@@ -2314,9 +2325,10 @@ class Viewport {
       this.chatmsg.startspeaking = true;
     } else if (this.textTimer >= this.shoutTimer + this.chatmsg.preanimdelay && !this.chatmsg.startpreanim) {
       if (this.chatmsg.startspeaking) {
+        // Evidence Bullshit
         if (this.chatmsg.evidence > 0) {
           // Prepare evidence
-          eviBox.src = safe_tags(client.evidences[this.chatmsg.evidence - 1].icon);
+          eviBox.src = safeTags(client.evidences[this.chatmsg.evidence - 1].icon);
 
           eviBox.style.width = 'auto';
           eviBox.style.height = '36.5%';
@@ -2399,41 +2411,6 @@ class Viewport {
   }
 }
 
-/**
- * read a cookie from storage
- * got this from w3schools
- * https://www.w3schools.com/js/js_cookies.asp
- * @param {String} cname The name of the cookie to return
- */
-function getCookie(cname) {
-  try {
-    const name = `${cname}=`;
-    const decodedCookie = decodeURIComponent(document.cookie);
-    const ca = decodedCookie.split(';');
-    for (let i = 0; i < ca.length; i++) {
-      let c = ca[i];
-      while (c.charAt(0) === ' ') {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) === 0) {
-        return c.substring(name.length, c.length);
-      }
-    }
-    return '';
-  } catch (error) {
-    return '';
-  }
-}
-
-/**
- * set a cookie
- * the version from w3schools expects these to expire
- * @param {String} cname The name of the cookie to return
- * @param {String} value The value of that cookie option
- */
-function setCookie(cname, value) {
-  document.cookie = `${cname}=${value}`;
-}
 
 /**
  * Triggered when the Return key is pressed on the out-of-character chat input box.
@@ -2802,7 +2779,6 @@ window.imgError = imgError;
  * @param {HTMLImageElement} image the element containing the missing sound
  */
 export function opusCheck(channel) {
-  console.info(channel);
   console.info(`failed to load sound ${channel.src}`);
   let oldsrc = '';
   oldsrc = channel.src;
@@ -2848,39 +2824,7 @@ async function requestBuffer(url) {
   });
 }
 
-/**
- * Make a GET request for a specific URI.
- * @param {string} url the URI to be requested
- * @returns response data
- * @throws {Error} if status code is not 2xx, or a network error occurs
- */
-async function request(url) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = 'text';
-    xhr.addEventListener('error', () => {
-      const err = new Error(`Request for ${url} failed: ${xhr.statusText}`);
-      err.code = xhr.status;
-      reject(err);
-    });
-    xhr.addEventListener('abort', () => {
-      const err = new Error(`Request for ${url} was aborted!`);
-      err.code = xhr.status;
-      reject(err);
-    });
-    xhr.addEventListener('load', () => {
-      if (xhr.status < 200 || xhr.status >= 300) {
-        const err = new Error(`Request for ${url} failed with status code ${xhr.status}`);
-        err.code = xhr.status;
-        reject(err);
-      } else {
-        resolve(xhr.response);
-      }
-    });
-    xhr.open('GET', url, true);
-    xhr.send();
-  });
-}
+
 
 /**
  * Checks if a file exists at the specified URI.
@@ -2894,6 +2838,17 @@ async function fileExists(url) {
     return false;
   }
 }
+const fileExistsSync = (url) => {
+  try {
+    var http = new XMLHttpRequest();
+    http.open('HEAD', url, false);
+    http.send();
+    return http.status!=404;
+  } catch (e) {
+    return false
+  }
+}
+
 
 /**
  * Triggered when the reconnect button is pushed.
