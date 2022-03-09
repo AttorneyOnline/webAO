@@ -2239,7 +2239,7 @@ class Viewport {
     // apply effects
     fg.style.animation = '';
 
-    if (this.chatmsg.effects[0] && this.chatmsg.effects[0] !== '-') { fg.src = `${AO_HOST}themes/default/effects/${encodeURI(this.chatmsg.effects[0].toLowerCase())}.webp`; } else { fg.src = transparentPNG; }
+    if (this.chatmsg.effects[0] && this.chatmsg.effects[0] !== '-' && this.chatmsg.effects[0] !== 'none' ) { fg.src = `${AO_HOST}themes/default/effects/${encodeURI(this.chatmsg.effects[0].toLowerCase())}.webp`; } else { fg.src = transparentPNG; }
 
     if (this.chatmsg.sound === '0' || this.chatmsg.sound === '1' || this.chatmsg.sound === '' || this.chatmsg.sound === undefined) { this.chatmsg.sound = this.chatmsg.effects[2]; }
 
