@@ -1,6 +1,6 @@
-import FingerprintJS from '@fingerprintjs/fingerprintjs'
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
-import { unescapeChat, safe_tags } from './encoding.js';
+import { unescapeChat, safeTags } from './encoding.js';
 
 const version = process.env.npm_package_version;
 
@@ -21,22 +21,22 @@ servers[-1] = {
   name: 'Localhost', description: 'This is your computer on port 50001', ip: '127.0.0.1', port: 50001, assets: '', online: 'Online: ?/?',
 };
 
-const fpPromise = FingerprintJS.load()
+const fpPromise = FingerprintJS.load();
 fpPromise
-   .then(fp => fp.get())
-   .then(result => {
-      hdid = result.visitorId;
+  .then((fp) => fp.get())
+  .then((result) => {
+    hdid = result.visitorId;
 
-      check_https();
+    check_https();
 
-      masterserver = new WebSocket(`ws://${MASTERSERVER_IP}`);
-      masterserver.onopen = (evt) => onOpen(evt);
-      masterserver.onerror = (evt) => onError(evt);
-      masterserver.onmessage = (evt) => onMessage(evt);
+    masterserver = new WebSocket(`ws://${MASTERSERVER_IP}`);
+    masterserver.onopen = (evt) => onOpen(evt);
+    masterserver.onerror = (evt) => onError(evt);
+    masterserver.onmessage = (evt) => onMessage(evt);
 
-      // i don't need the ms to play alone
-      setTimeout(() => checkOnline(-1, '127.0.0.1:50001'), 0);
-});
+    // i don't need the ms to play alone
+    setTimeout(() => checkOnline(-1, '127.0.0.1:50001'), 0);
+  });
 
 export function check_https() {
   if (document.location.protocol === 'https:') {
@@ -50,7 +50,7 @@ export function setServ(ID) {
   if (document.getElementById(`server${ID}`).className === '') { checkOnline(ID, `${servers[ID].ip}:${servers[ID].port}`); }
 
   if (servers[ID].description !== undefined) {
-    document.getElementById('serverdescription_content').innerHTML = `<b>${servers[ID].online}</b><br>${safe_tags(servers[ID].description)}`;
+    document.getElementById('serverdescription_content').innerHTML = `<b>${servers[ID].online}</b><br>${safeTags(servers[ID].description)}`;
   } else {
     document.getElementById('serverdescription_content').innerHTML = '';
   }
@@ -107,7 +107,7 @@ function checkOnline(serverID, coIP) {
       oserv.close();
       return;
     }
-    if (serverID === selectedServer) { document.getElementById('serverdescription_content').innerHTML = `<b>${servers[serverID].online}</b><br>${safe_tags(servers[serverID].description)}`; }
+    if (serverID === selectedServer) { document.getElementById('serverdescription_content').innerHTML = `<b>${servers[serverID].online}</b><br>${safeTags(servers[serverID].description)}`; }
   }
 
   // assign the callbacks
@@ -145,7 +145,7 @@ function onMessage(e) {
       const asset = args[4] ? `&asset=${args[4]}` : '';
 
       document.getElementById('masterlist').innerHTML
-				+= `<li id="server${i}" onmouseover="setServ(${i})"><p>${safe_tags(servers[i].name)}</p>`
+				+= `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(servers[i].name)}</p>`
 				+ `<a class="button" href="client.html?mode=watch&ip=${ipport}${asset}">Watch</a>`
 				+ `<a class="button" href="client.html?mode=join&ip=${ipport}${asset}">Join</a></li>`;
     }

@@ -28,7 +28,7 @@ export function unescapeChat(estring) {
  * XXX: This is unnecessary if we use `createTextNode` instead!
  * @param {string} unsafe an unsanitized string
  */
-export function safe_tags(unsafe) {
+export function safeTags(unsafe) {
   if (unsafe) {
     return unsafe
       .replace(/>/g, '&gt;')
