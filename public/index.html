@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Attorney Online ONLINE</title>
+    <title><%= htmlWebpackPlugin.options.title %></title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="An off-the-cuff courtroom drama simulator">
@@ -30,24 +30,21 @@
 
     <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Oswald%7CRoboto+Condensed" rel="stylesheet">
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="/images/logo-new.png"/>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="logo-new.png"/>
     <link rel="stylesheet" type="text/css" href="styles/master.css">
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="icon" href="images/favicon.ico">
-    <script src="master.b.js"></script>
-    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="favicon.ico">
+    <link rel="manifest" href="manifest.json">    
     <script>
+        // Check that service workers are supported
         if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-        navigator.serviceWorker.register('../sw.js').then( () => {
-            console.log('Service Worker Registered')
-   })
- })
-}
-    </script>
-
-    
+          // Use the window load event to keep the page load performant
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('service-worker.js');
+          });
+        }
+        </script>
+        
 </head>
 
 <body>

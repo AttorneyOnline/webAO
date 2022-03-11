@@ -19,28 +19,29 @@ import vanilla_evidence_arr from './constants/evidence.js';
 
 import chatbox_arr from './styles/chatbox/chatboxes.js';
 import iniParse from './iniParse';
-import calculatorHandler from './utils/calculatorHandler.js';
 import getCookie from './utils/getCookie.js';
 import setCookie from './utils/setCookie.js';
 import request from './services/request.js';
+import { changeShoutVolume } from './dom/changeShoutVolume.js';
+import { changeSFXVolume } from './dom/changeSFXVolume.js';
+import setEmote from './client/setEmote.js';
+import fileExists from './utils/fileExists.js';
+import queryParser from './utils/queryParser.js';
+import getAnimLength from './utils/getAnimLength.js';
+import getResources from './utils/getResources.js';
 
 const version = process.env.npm_package_version;
 
 let client;
 let viewport;
-
 // Get the arguments from the URL bar
-const queryDict = {};
-location.search.substr(1).split('&').forEach((item) => {
-  queryDict[item.split('=')[0]] = item.split('=')[1];
-});
-
-let { ip: serverIP, mode } = queryDict;
-
+let {
+  ip: serverIP, mode, asset, theme,
+} = queryParser();
 // Unless there is an asset URL specified, use the wasabi one
 const DEFAULT_HOST = 'http://attorneyoffline.de/base/';
-let AO_HOST = queryDict.asset || DEFAULT_HOST;
-const THEME = queryDict.theme || 'default';
+let AO_HOST = asset || DEFAULT_HOST;
+const THEME = theme || 'default';
 
 const UPDATE_INTERVAL = 60;
 
@@ -121,44 +122,7 @@ class Client extends EventEmitter {
 
     this.banned = false;
 
-    this.resources = {
-      holdit: {
-        src: `${AO_HOST}misc/default/holdit_bubble.png`,
-        duration: 720,
-      },
-      objection: {
-        src: `${AO_HOST}misc/default/objection_bubble.png`,
-        duration: 720,
-      },
-      takethat: {
-        src: `${AO_HOST}misc/default/takethat_bubble.png`,
-        duration: 840,
-      },
-      custom: {
-        src: '',
-        duration: 840,
-      },
-      witnesstestimony: {
-        src: `${AO_HOST}themes/${THEME}/witnesstestimony.gif`,
-        duration: 1560,
-        sfx: `${AO_HOST}sounds/general/sfx-testimony.opus`,
-      },
-      crossexamination: {
-        src: `${AO_HOST}themes/${THEME}/crossexamination.gif`,
-        duration: 1600,
-        sfx: `${AO_HOST}sounds/general/sfx-testimony2.opus`,
-      },
-      guilty: {
-        src: `${AO_HOST}themes/${THEME}/guilty.gif`,
-        duration: 2870,
-        sfx: `${AO_HOST}sounds/general/sfx-guilty.opus`,
-      },
-      notguilty: {
-        src: `${AO_HOST}themes/${THEME}/notguilty.gif`,
-        duration: 2440,
-        sfx: `${AO_HOST}sounds/general/sfx-notguilty.opus`,
-      },
-    };
+    this.resources = getResources(AO_HOST, THEME);
 
     this.selectedEmote = -1;
     this.selectedEvidence = 0;
@@ -220,15 +184,15 @@ class Client extends EventEmitter {
   }
 
   /**
-	 * Gets the player's currently selected emote.
-	 */
+     * Gets the player's currently selected emote.
+     */
   get emote() {
     return this.emotes[this.selectedEmote];
   }
 
   /**
-	 * Gets the current evidence ID unless the player doesn't want to present any evidence
-	 */
+     * Gets the current evidence ID unless the player doesn't want to present any evidence
+     */
   get evidence() {
     return (document.getElementById('button_present').classList.contains('dark')) ? this.selectedEvidence : 0;
   }
@@ -238,12 +202,7 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
   sendServer(message) {
-    console.debug(`C: ${message}`);
-    if (mode === 'replay') {
-      this.sendSelf(message);
-    } else {
-      this.serv.send(message);
-    }
+    mode === 'replay' ? this.sendSelf(message) : this.serv.send(message);
   }
 
   /**
@@ -270,7 +229,9 @@ class Client extends EventEmitter {
 	 */
   sendOOC(message) {
     setCookie('OOC_name', document.getElementById('OOC_name').value);
-    this.sendServer(`CT#${escapeChat(encodeChat(document.getElementById('OOC_name').value))}#${escapeChat(encodeChat(message))}#%`);
+    const oocName = `${escapeChat(encodeChat(document.getElementById('OOC_name').value))}`;
+    const oocMessage = `${escapeChat(encodeChat(message))}`;
+    this.sendServer(`CT#${oocName}#${oocMessage}#%`);
   }
 
   /**
@@ -427,8 +388,6 @@ class Client extends EventEmitter {
 	 * to the server.
 	 */
   joinServer() {
-    console.log(`Your emulated HDID is ${hdid}`);
-
     this.sendServer(`HI#${hdid}#%`);
     this.sendServer('ID#webAO#webAO#%');
     if (mode !== 'replay') { this.checkUpdater = setInterval(() => this.sendCheck(), 5000); }
@@ -1537,7 +1496,7 @@ class Client extends EventEmitter {
     this.charID = Number(args[3]);
     document.getElementById('client_charselect').style.display = 'none';
 
-    const me = this.character;
+    const me = this.chars[this.charID];
     this.selectedEmote = -1;
     const { emotes } = this;
     const emotesList = document.getElementById('client_emo');
@@ -1742,22 +1701,6 @@ class Viewport {
   }
 
   /**
-	 * Returns whether or not the viewport is busy
-	 * performing a task (animating).
-	 */
-  get isAnimating() {
-    return this._animating;
-  }
-
-  /**
-	 * Sets the volume of the blip sounds.
-	 * @param {number} volume
-	 */
-  set blipVolume(volume) {
-    this.blipChannels.forEach((channel) => channel.volume = volume);
-  }
-
-  /**
 	 * Sets the volume of the music.
 	 * @param {number} volume
 	 */
@@ -1794,21 +1737,21 @@ class Viewport {
     const bgfolder = viewport.bgFolder;
 
     const view = document.getElementById('client_fullview');
-    
+
     let bench;
     if ('def,pro,wit'.includes(position)) {
-    	bench = document.getElementById('client_'+position+'_bench');
+    	bench = document.getElementById(`client_${position}_bench`);
     } else {
     	bench = document.getElementById('client_bench_classic');
     }
-    
+
     let court;
     if ('def,pro,wit'.includes(position)) {
-    	court = document.getElementById('client_court_'+position);
+    	court = document.getElementById(`client_court_${position}`);
     } else {
     	court = document.getElementById('client_court_classic');
     }
-    
+
     const positions = {
       def: {
         bg: 'defenseempty.png',
@@ -1867,7 +1810,7 @@ class Viewport {
     }
 
     if (viewport.chatmsg.type === 5) {
-      console.warn("this is a zoom");
+      console.warn('this is a zoom');
       court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
       bench.style.opacity = 0;
     } else {
@@ -1930,76 +1873,6 @@ class Viewport {
   }
 
   /**
-	 * Gets animation length. If the animation cannot be found, it will
-	 * silently fail and return 0 instead.
-	 * @param {string} filename the animation file name
-	 */
-
-  async getAnimLength(url) {
-    const extensions = ['.gif', '.webp'];
-    for (const extension of extensions) {
-      const urlWithExtension = url + extension;
-      const exists = await fileExists(urlWithExtension);
-      if (exists) {
-        const fileBuffer = await requestBuffer(urlWithExtension);
-        const length = calculatorHandler[extension](fileBuffer);
-        return length;
-      }
-    }
-    return 0;
-  }
-
-  oneSuccess(promises) {
-    return Promise.all(promises.map((p) =>
-    // If a request fails, count that as a resolution so it will keep
-    // waiting for other possible successes. If a request succeeds,
-    // treat it as a rejection so Promise.all immediately bails out.
-		 p.then(
-        (val) => Promise.reject(val),
-        (err) => Promise.resolve(err),
-      ))).then(
-      // If '.all' resolved, we've just got an array of errors.
-      (errors) => Promise.reject(errors),
-      // If '.all' rejected, we've got the result we wanted.
-      (val) => Promise.resolve(val),
-    );
-  }
-
-  rejectOnError(f) {
-    return new Promise((resolve, reject) => f.then((res) => {
-      if (res.ok) resolve(f);
-      else reject(f);
-    }));
-  }
-
-  /**
-	 * Adds up the frame delays to find out how long a GIF is
-	 * I totally didn't steal this
-	 * @param {data} gifFile the GIF data
-	 */
-  calculateGifLength(gifFile) {
-    const d = new Uint8Array(gifFile);
-    // Thanks to http://justinsomnia.org/2006/10/gif-animation-duration-calculation/
-    // And http://www.w3.org/Graphics/GIF/spec-gif89a.txt
-    let duration = 0;
-    for (let i = 0; i < d.length; i++) {
-      // Find a Graphic Control Extension hex(21F904__ ____ __00)
-      if (d[i] === 0x21
-				&& d[i + 1] === 0xF9
-				&& d[i + 2] === 0x04
-				&& d[i + 7] === 0x00) {
-        // Swap 5th and 6th bytes to get the delay per frame
-        const delay = (d[i + 5] << 8) | (d[i + 4] & 0xFF);
-
-        // Should be aware browsers have a minimum frame delay
-        // e.g. 6ms for IE, 2ms modern browsers (50fps)
-        duration += delay < 2 ? 10 : delay;
-      }
-    }
-    return duration * 10;
-  }
-
-  /**
 	 * Updates the testimony overaly
 	 */
   updateTestimony() {
@@ -2035,45 +1908,6 @@ class Viewport {
     this.testimonyTimer = 0;
     document.getElementById('client_testimony').style.opacity = 0;
     clearTimeout(this.testimonyUpdater);
-  }
-
-  /**
-	 * Sets all the img tags to the right sources
-	 * @param {*} chatmsg
-	 */
-  setEmote(charactername, emotename, prefix, pair, side) {
-    const pairID = pair ? 'pair' : 'char';
-    const characterFolder = `${AO_HOST}characters/`;
-    const position = 'def,pro,wit'.includes(side) ? `${side}_` : '';
-
-    const gif_s = document.getElementById(`client_${position}${pairID}_gif`);
-    const png_s = document.getElementById(`client_${position}${pairID}_png`);
-    const apng_s = document.getElementById(`client_${position}${pairID}_apng`);
-    const webp_s = document.getElementById(`client_${position}${pairID}_webp`);
-    const extensionsMap = {
-      '.gif': gif_s,
-      '.png': png_s,
-      '.apng': apng_s,
-      '.webp': webp_s,
-    };
-
-    for (const [extension, htmlElement] of Object.entries(extensionsMap)) {
-      // Hides all sprites before creating a new sprite
-      if (this.lastChar !== this.chatmsg.name) {
-        htmlElement.src = transparentPNG;
-      }
-      let url;
-      if (extension === '.png') {
-        url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(emotename)}${extension}`;
-      } else {
-        url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}${extension}`;
-      }
-      const exists = fileExistsSync(url);
-      if (exists) {
-        htmlElement.src = url;
-        return;
-      }
-    }
   }
 
   /**
@@ -2114,7 +1948,8 @@ class Viewport {
     }
     this.lastEvi = this.chatmsg.evidence;
 
-    if ('def,pro,wit'.includes(this.chatmsg.side)) {
+    const validSides = ['def', 'pro', 'wit'];
+    if (validSides.includes(this.chatmsg.side)) {
       charLayers = document.getElementById(`client_${this.chatmsg.side}_char`);
       pairLayers = document.getElementById(`client_${this.chatmsg.side}_pair_char`);
     }
@@ -2139,10 +1974,10 @@ class Viewport {
 
     checkCallword(this.chatmsg.content);
 
-    this.setEmote(this.chatmsg.name.toLowerCase(), this.chatmsg.sprite, '(a)', false, this.chatmsg.side);
+    setEmote(AO_HOST, this, this.chatmsg.name.toLowerCase(), this.chatmsg.sprite, '(a)', false, this.chatmsg.side);
 
     if (this.chatmsg.other_name) {
-      this.setEmote(this.chatmsg.other_name.toLowerCase(), this.chatmsg.other_emote, '(a)', false, this.chatmsg.side);
+      setEmote(AO_HOST, this, this.chatmsg.other_name.toLowerCase(), this.chatmsg.other_emote, '(a)', false, this.chatmsg.side);
     }
 
     // gets which shout shall played
@@ -2168,23 +2003,15 @@ class Viewport {
 
     this.chatmsg.startpreanim = true;
     let gifLength = 0;
-    switch (this.chatmsg.type) {
-      // case 0:
-      // normal emote, no preanim
-      case 1:
-        // play preanim
-        // Hide message box
-        chatContainerBox.style.opacity = 0;
-        // If preanim existed then determine the length
-        gifLength = await this.getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}`);
-        this.chatmsg.startspeaking = false;
-        break;
-        // case 5:
-        // zoom
-      default:
-        this.chatmsg.startspeaking = true;
-        break;
+
+    if (this.chatmsg.type === 1) {
+      chatContainerBox.style.opacity = 0;
+      gifLength = await getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}`);
+      this.chatmsg.startspeaking = false;
+    } else {
+      this.chatmsg.startspeaking = true;
     }
+
     this.chatmsg.preanimdelay = parseInt(gifLength);
 
     this.changeBackground(chatmsg.side);
@@ -2193,11 +2020,7 @@ class Viewport {
     resizeChatbox();
 
     // Flip the character
-    if (this.chatmsg.flip === 1) {
-      charLayers.style.transform = 'scaleX(-1)';
-    } else {
-      charLayers.style.transform = 'scaleX(1)';
-    }
+    charLayers.style.transform = this.chatmsg.flip === 1 ? 'scaleX(-1)' : 'scaleX(1)';
 
     // Shift by the horizontal offset
     switch (this.chatmsg.side) {
@@ -2220,11 +2043,7 @@ class Viewport {
     charLayers.style.top = `${Number(this.chatmsg.self_offset[1])}%`;
 
     // flip the paired character
-    if (this.chatmsg.other_flip === 1) {
-      pairLayers.style.transform = 'scaleX(-1)';
-    } else {
-      pairLayers.style.transform = 'scaleX(1)';
-    }
+    pairLayers.style.transform = this.chatmsg.other_flip === 1 ? 'scaleX(-1)' : 'scaleX(1)';
 
     this.blipChannels.forEach((channel) => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`);
 
@@ -2238,10 +2057,18 @@ class Viewport {
 
     // apply effects
     fg.style.animation = '';
+    const badEffects = ['-', 'none'];
+    if (this.chatmsg.effects[0] && !badEffects.includes(this.chatmsg.effects[i].toLowerCase())) {
+      const baseEffectUrl = `${AO_HOST}themes/default/effects/`;
+      fg.src = `${baseEffectUrl}${encodeURI(this.chatmsg.effects[0].toLowerCase())}.webp`;
+    } else {
+      fg.src = transparentPNG;
+    }
 
-    if (this.chatmsg.effects[0] && this.chatmsg.effects[0] !== '-' && this.chatmsg.effects[0].toLowerCase() !== 'none' ) { fg.src = `${AO_HOST}themes/default/effects/${encodeURI(this.chatmsg.effects[0].toLowerCase())}.webp`; } else { fg.src = transparentPNG; }
-
-    if (this.chatmsg.sound === '0' || this.chatmsg.sound === '1' || this.chatmsg.sound === '' || this.chatmsg.sound === undefined) { this.chatmsg.sound = this.chatmsg.effects[2]; }
+    const soundChecks = ['0', '1', '', undefined];
+    if (soundChecks.some((check) => this.chatmsg.sound === check)) {
+      this.chatmsg.sound = this.chatmsg.effects[2];
+    }
 
     this.tick();
   }
@@ -2320,7 +2147,7 @@ class Viewport {
         shoutSprite.style.opacity = 0;
         shoutSprite.style.animation = '';
         const preanim = this.chatmsg.preanim.toLowerCase();
-        this.setEmote(charName, preanim, '', false, this.chatmsg.side);
+        setEmote(AO_HOST, this, charName, preanim, '', false, this.chatmsg.side);
         charLayers.style.opacity = 1;
       }
 
@@ -2371,17 +2198,17 @@ class Viewport {
         }
 
         if (this.chatmsg.other_name) {
-          this.setEmote(pairName, pairEmote, '(a)', true, this.chatmsg.side);
+          setEmote(AO_HOST, this, pairName, pairEmote, '(a)', true, this.chatmsg.side);
           pairLayers.style.opacity = 1;
         } else {
           pairLayers.style.opacity = 0;
         }
 
-        this.setEmote(charName, charEmote, '(b)', false, this.chatmsg.side);
+        setEmote(AO_HOST, this, charName, charEmote, '(b)', false, this.chatmsg.side);
         charLayers.style.opacity = 1;
 
         if (this.textnow === this.chatmsg.content) {
-          this.setEmote(charName, charEmote, '(a)', false, this.chatmsg.side);
+          setEmote(AO_HOST, this, charName, charEmote, '(a)', false, this.chatmsg.side);
           charLayers.style.opacity = 1;
           waitingBox.style.opacity = 1;
           this._animating = false;
@@ -2402,7 +2229,7 @@ class Viewport {
 
         if (this.textnow === this.chatmsg.content) {
           this._animating = false;
-          this.setEmote(charName, charEmote, '(a)', false, this.chatmsg.side);
+          setEmote(AO_HOST, this, charName, charEmote, '(a)', false, this.chatmsg.side);
           charLayers.style.opacity = 1;
           waitingBox.style.opacity = 1;
           clearTimeout(this.updater);
@@ -2629,22 +2456,6 @@ export function changeMusicVolume() {
 window.changeMusicVolume = changeMusicVolume;
 
 /**
- * Triggered by the sound effect volume slider.
- */
-export function changeSFXVolume() {
-  setCookie('sfxVolume', document.getElementById('client_sfxaudio').volume);
-}
-window.changeSFXVolume = changeSFXVolume;
-
-/**
- * Triggered by the shout volume slider.
- */
-export function changeShoutVolume() {
-  setCookie('shoutVolume', document.getElementById('client_shoutaudio').volume);
-}
-window.changeShoutVolume = changeShoutVolume;
-
-/**
  * Triggered by the testimony volume slider.
  */
 export function changeTestimonyVolume() {
@@ -2831,29 +2642,6 @@ async function requestBuffer(url) {
     xhr.send();
   });
 }
-
-/**
- * Checks if a file exists at the specified URI.
- * @param {string} url the URI to be checked
- */
-async function fileExists(url) {
-  try {
-    await request(url);
-    return true;
-  } catch (err) {
-    return false;
-  }
-}
-const fileExistsSync = (url) => {
-  try {
-    const http = new XMLHttpRequest();
-    http.open('HEAD', url, false);
-    http.send();
-    return http.status != 404;
-  } catch (e) {
-    return false;
-  }
-};
 
 /**
  * Triggered when the reconnect button is pushed.
@@ -3314,20 +3102,6 @@ export function updateBackgroundPreview() {
   }
 }
 window.updateBackgroundPreview = updateBackgroundPreview;
-
-/**
- * Highlights and selects an effect for in-character chat.
- * If the same effect button is selected, then the effect is canceled.
- * @param {string} effect the new effect to be selected
- */
-export function toggleEffect(button) {
-  if (button.classList.contains('dark')) {
-    button.className = 'client_button';
-  } else {
-    button.className = 'client_button dark';
-  }
-}
-window.toggleEffect = toggleEffect;
 
 /**
  * Highlights and selects a menu.

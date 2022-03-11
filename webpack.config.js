@@ -3,6 +3,10 @@
 const path = require('path');
 const dotenv = require('dotenv');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const WorkboxPlugin = require('workbox-webpack-plugin');
+const glob = require('glob');
 
 // this will update the process.env with environment variables in .env file
 dotenv.config();
@@ -12,6 +16,10 @@ module.exports = {
     ui: './webAO/ui.js',
     client: './webAO/client.js',
     master: './webAO/master.js',
+    dom: glob.sync('./webAO/dom/*.js'),
+  },
+  node: {
+    global: true,
   },
   devtool: 'source-map',
   devServer: {
@@ -50,8 +58,9 @@ module.exports = {
     ],
   },
   output: {
-    path: path.resolve(__dirname, 'webAO'),
-    filename: '[name].b.js',
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].[contenthash].bundle.js',
+    clean: true,
   },
   performance: {
     hints: false,
@@ -59,9 +68,33 @@ module.exports = {
     maxAssetSize: 512000,
   },
   plugins: [
+    new CopyPlugin({
+      patterns: [
+        { from: path.resolve(__dirname, 'webAO', 'styles'), to: 'styles' },
+        { from: path.resolve(__dirname, 'static') },
+        { from: path.resolve(__dirname, 'webAO', 'golden'), to: 'golden' },
+        { from: path.resolve(__dirname, 'webAO', 'lib'), to: 'lib' },
+        { from: path.resolve(__dirname, 'webAO', 'sounds'), to: 'sounds' },
+      ],
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: 'public/index.html',
+      chunks: ['master', 'sw'],
+      title: 'Attorney Online',
+    }),
+
+    new HtmlWebpackPlugin({
+      title: 'Attorney Online',
+      filename: 'client.html',
+      chunks: ['client', 'ui', 'dom'],
+      template: 'public/client.html',
+    }),
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(process.env),
     }),
+    new WorkboxPlugin.GenerateSW(),
+
   ],
 
 };

@@ -58,7 +58,6 @@ export function setServ(ID) {
 window.setServ = setServ;
 
 function onOpen(_e) {
-  console.log(`Your emulated HDID is ${hdid}`);
   masterserver.send('ID#webAO#webAO#%');
 
   masterserver.send('ALL#%');
@@ -120,7 +119,6 @@ function checkOnline(serverID, coIP) {
   };
 
   oserv.onerror = function (_evt) {
-    console.warn(`${coIP} threw an error.`);
     document.getElementById(`server${serverID}`).className = 'unavailable';
   };
 }
