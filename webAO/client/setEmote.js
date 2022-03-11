@@ -16,10 +16,10 @@ const setEmote = (AO_HOST, client, charactername, emotename, prefix, pair, side)
   const apng_s = document.getElementById(`client_${position}${pairID}_apng`);
   const webp_s = document.getElementById(`client_${position}${pairID}_webp`);
   const extensionsMap = {
-    '.apng': apng_s,
-    '.webp': webp_s,
     '.gif': gif_s,
-    '.png': png_s,    
+    '.png': png_s,  
+    '.apng': apng_s,
+    '.webp': webp_s,  
   };
 
   for (const [extension, htmlElement] of Object.entries(extensionsMap)) {
