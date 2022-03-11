@@ -74,7 +74,6 @@ module.exports = {
         { from: path.resolve(__dirname, 'static') },
         { from: path.resolve(__dirname, 'webAO', 'golden'), to: 'golden' },
         { from: path.resolve(__dirname, 'webAO', 'lib'), to: 'lib' },
-        { from: path.resolve(__dirname, 'webAO', 'sounds'), to: 'sounds' },
       ],
     }),
     new HtmlWebpackPlugin({
