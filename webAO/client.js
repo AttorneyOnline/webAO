@@ -781,24 +781,7 @@ class Client extends EventEmitter {
     if (chargs[0]) {
       let cini = {};
       const cswap = {};
-
-      const getCharIcon = async () => {
-        const extensions = [
-          '.png',
-          '.webp',
-        ];
-        const charIconBaseUrl = `${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char_icon`;
-        for (let i = 0; i < extensions.length; i++) {
-          const fileUrl = charIconBaseUrl + extensions[i];
-          const exists = await fileExists(fileUrl);
-          if (exists) {
-            return fileUrl;
-          }
-        }
-      };
-
-      const charIconUrlResponse = await getCharIcon();
-      const icon = charIconUrlResponse || transparentPNG;
+      const icon = `${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char_icon.png`;
 
       const img = document.getElementById(`demo_${charid}`);
       img.alt = chargs[0];
