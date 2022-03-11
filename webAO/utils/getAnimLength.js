@@ -1,5 +1,6 @@
 import calculatorHandler from './calculatorHandler';
 import fileExists from './fileExists.js';
+import requestBuffer from '../services/request.js';
 /**
 	 * Gets animation length. If the animation cannot be found, it will
 	 * silently fail and return 0 instead.
