@@ -5,8 +5,8 @@
 */
 
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
-
 import { EventEmitter } from 'events';
+import fileExistsSync from './utils/fileExistsSync';
 import {
   escapeChat, encodeChat, prepChat, safeTags,
 } from './encoding.js';
@@ -782,7 +782,25 @@ class Client extends EventEmitter {
     if (chargs[0]) {
       let cini = {};
       const cswap = {};
-      const icon = `${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char_icon.png`;
+
+      const getCharIcon = async () => {
+        const extensions = [
+          '.png',
+          '.webp',
+        ];
+        const charIconBaseUrl = `${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char_icon`;
+        for (let i = 0; i < extensions.length; i++) {
+          const fileUrl = charIconBaseUrl + extensions[i];
+          const exists = await fileExists(fileUrl);
+          if (exists) {
+            return fileUrl;
+          }
+        }
+      };
+
+      const charIconUrlResponse = await getCharIcon();
+      const icon = charIconUrlResponse || transparentPNG;
+
       const img = document.getElementById(`demo_${charid}`);
       img.alt = chargs[0];
       img.src = icon;	// seems like a good time to load the icon
@@ -1525,6 +1543,29 @@ class Client extends EventEmitter {
             esfxd = 0;
           }
           // Make sure the asset server is case insensitive, or that everything on it is lowercase
+          const extensions = [
+            '.png',
+            '.webp',
+            '.gif',
+            '.apng',
+          ];
+          const getButtonUrl = async () => {
+            const extensions = [
+              '.png',
+              '.webp',
+            ];
+            const base = `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off`;
+            for (let i = 0; i < extensions.length; i++) {
+              const fileUrl = base + extensions[i];
+              const exists = await fileExists(fileUrl);
+              if (exists) {
+                return fileUrl;
+              }
+            }
+          };
+          const buttonResponse = await getButtonUrl();
+          const buttonUrl = buttonResponse || transparentPNG;
+
           emotes[i] = {
             desc: emoteinfo[0].toLowerCase(),
             preanim: emoteinfo[1].toLowerCase(),
@@ -1535,7 +1576,7 @@ class Client extends EventEmitter {
             frame_screenshake: '',
             frame_realization: '',
             frame_sfx: '',
-            button: `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
+            button: buttonUrl,
           };
           emotesList.innerHTML
 					+= `<img src=${emotes[i].button}
