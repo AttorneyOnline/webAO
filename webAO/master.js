@@ -92,7 +92,7 @@ function parseMasterlist(msg) {
  */
 function onError(evt) {
   document.getElementById('ms_error').style.display = 'block';
-  document.getElementById('ms_error_code').innerText = `A network error occurred: ${evt.reason} (${evt.code})`;
+  console.error(`A network error occurred: ${evt.reason} (${evt.code})`);
   parseMasterlist(localStorage.getItem('masterlist'));
 }
 
