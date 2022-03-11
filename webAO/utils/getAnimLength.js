@@ -1,6 +1,6 @@
 import calculatorHandler from './calculatorHandler';
 import fileExists from './fileExists.js';
-import requestBuffer from '../services/request.js';
+import {requestBuffer} from '../services/request.js';
 /**
 	 * Gets animation length. If the animation cannot be found, it will
 	 * silently fail and return 0 instead.
@@ -8,7 +8,7 @@ import requestBuffer from '../services/request.js';
 	 */
 
 const getAnimLength = async (url) => {
-  const extensions = ['.gif', '.webp'];
+  const extensions = ['.gif', '.webp', '.apng'];
   for (const extension of extensions) {
     const urlWithExtension = url + extension;
     const exists = await fileExists(urlWithExtension);

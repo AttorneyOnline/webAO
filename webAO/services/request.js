@@ -38,7 +38,7 @@ export async function requestBuffer(url) {
  * @returns response data
  * @throws {Error} if status code is not 2xx, or a network error occurs
  */
-const request = async (url) => new Promise((resolve, reject) => {
+export const request = async (url) => new Promise((resolve, reject) => {
   const xhr = new XMLHttpRequest();
   xhr.responseType = 'text';
   xhr.addEventListener('error', () => {

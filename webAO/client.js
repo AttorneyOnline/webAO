@@ -21,7 +21,7 @@ import chatbox_arr from './styles/chatbox/chatboxes.js';
 import iniParse from './iniParse';
 import getCookie from './utils/getCookie.js';
 import setCookie from './utils/setCookie.js';
-import request from './services/request.js';
+import {request} from './services/request.js';
 import { changeShoutVolume, changeSFXVolume } from './dom/changeVolume.js';
 import setEmote from './client/setEmote.js';
 import fileExists from './utils/fileExists.js';
@@ -2051,7 +2051,7 @@ class Viewport {
     } else {
       this.chatmsg.startspeaking = true;
     }
-
+    console.log(gifLength);
     this.chatmsg.preanimdelay = parseInt(gifLength);
 
     this.changeBackground(chatmsg.side);
