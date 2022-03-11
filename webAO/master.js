@@ -1,8 +1,7 @@
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 import { unescapeChat, safeTags } from './encoding.js';
-import getCookie from './utils/getCookie.js';
-import setCookie from './utils/setCookie.js';
+const myStorage = window.localStorage;
 
 const version = process.env.npm_package_version;
 
@@ -94,7 +93,7 @@ function parseMasterlist(msg) {
 function onError(evt) {
   document.getElementById('ms_error').style.display = 'block';
   document.getElementById('ms_error_code').innerText = `A network error occurred: ${evt.reason} (${evt.code})`;
-  parseMasterlist(getCookie('masterlist'));
+  parseMasterlist(localStorage.getItem('masterlist'));
 }
 
 function checkOnline(serverID, coIP) {
@@ -153,7 +152,7 @@ function onMessage(e) {
   console.debug(msg);
 
   if (header === 'ALL') {
-    setCookie('masterlist', msg);
+  	localStorage.setItem('masterlist', msg);
     parseMasterlist(msg);
     masterserver.close();
   } else if (header === 'servercheok') {
