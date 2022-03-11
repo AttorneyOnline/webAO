@@ -2097,8 +2097,8 @@ class Viewport {
 
     // apply effects
     fg.style.animation = '';
-    const badEffects = ['-', 'none'];
-    if (this.chatmsg.effects[0] && !badEffects.includes(this.chatmsg.effects[i].toLowerCase())) {
+    const badEffects = ['', '-', 'none'];
+    if (this.chatmsg.effects[0] && !badEffects.includes(this.chatmsg.effects[0].toLowerCase())) {
       const baseEffectUrl = `${AO_HOST}themes/default/effects/`;
       fg.src = `${baseEffectUrl}${encodeURI(this.chatmsg.effects[0].toLowerCase())}.webp`;
     } else {
