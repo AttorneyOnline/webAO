@@ -1,6 +1,8 @@
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 import { unescapeChat, safeTags } from './encoding.js';
+import getCookie from './utils/getCookie.js';
+import setCookie from './utils/setCookie.js';
 
 const version = process.env.npm_package_version;
 
@@ -64,6 +66,27 @@ function onOpen(_e) {
   masterserver.send('VC#%');
 }
 
+function parseMasterlist(msg) {
+	const allservers = msg.split('#').slice(1);
+	for (let i = 0; i < allservers.length - 1; i++) {
+      const serverEntry = allservers[i];
+      const args = serverEntry.split('&');
+
+      const thisserver = {
+        name: args[0], description: args[1], ip: args[2], port: Number(args[3]), assets: args[4], online: 'Online: ?/?',
+      };
+      servers[i] = thisserver;
+
+      const ipport = `${args[2]}:${args[3]}`;
+      const asset = args[4] ? `&asset=${args[4]}` : '';
+
+      document.getElementById('masterlist').innerHTML
+				+= `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(servers[i].name)}</p>`
+				+ `<a class="button" href="client.html?mode=watch&ip=${ipport}${asset}">Watch</a>`
+				+ `<a class="button" href="client.html?mode=join&ip=${ipport}${asset}">Join</a></li>`;
+    }
+}
+
 /**
  * Triggered when an network error occurs.
  * @param {ErrorEvent} e
@@ -71,6 +94,7 @@ function onOpen(_e) {
 function onError(evt) {
   document.getElementById('ms_error').style.display = 'block';
   document.getElementById('ms_error_code').innerText = `A network error occurred: ${evt.reason} (${evt.code})`;
+  parseMasterlist(getCookie('masterlist'));
 }
 
 function checkOnline(serverID, coIP) {
@@ -129,24 +153,8 @@ function onMessage(e) {
   console.debug(msg);
 
   if (header === 'ALL') {
-    const allservers = msg.split('#').slice(1);
-    for (let i = 0; i < allservers.length - 1; i++) {
-      const serverEntry = allservers[i];
-      const args = serverEntry.split('&');
-
-      const thisserver = {
-        name: args[0], description: args[1], ip: args[2], port: Number(args[3]), assets: args[4], online: 'Online: ?/?',
-      };
-      servers[i] = thisserver;
-
-      const ipport = `${args[2]}:${args[3]}`;
-      const asset = args[4] ? `&asset=${args[4]}` : '';
-
-      document.getElementById('masterlist').innerHTML
-				+= `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(servers[i].name)}</p>`
-				+ `<a class="button" href="client.html?mode=watch&ip=${ipport}${asset}">Watch</a>`
-				+ `<a class="button" href="client.html?mode=join&ip=${ipport}${asset}">Join</a></li>`;
-    }
+    setCookie('masterlist', msg);
+    parseMasterlist(msg);
     masterserver.close();
   } else if (header === 'servercheok') {
     const args = msg.split('#').slice(1);
