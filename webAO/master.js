@@ -28,10 +28,11 @@ fpPromise
     hdid = result.visitorId;
 
 			check_https();
-
+			
 			fetch("https://servers.aceattorneyonline.com/servers")
-				.then(response => response.json())
-				.then(data => processServerlist(data));
+    			.then(cachedServerlist)
+    			.then(response => loadServerlist(response))
+    			.catch(cachedServerlist);
 
 			fetch("https://servers.aceattorneyonline.com/version")
 				.then(response => response.text())
@@ -111,10 +112,22 @@ function checkOnline(serverID, coIP) {
 	};
 }
 
+function loadServerlist(thelist) {
+	localStorage.setItem('masterlist', thelist);
+	processServerlist(thelist)
+}
+
+function cachedServerlist(response) {
+	if (!response.ok) {
+		document.getElementById('ms_error').style.display = 'block';
+		return localStorage.getItem('masterlist');
+	}
+	return response.json();
+}
+
 function processServerlist(thelist) {
 	for (let i = 0; i < thelist.length - 1; i++) {
 		const serverEntry = thelist[i];
-		console.debug(serverEntry)
 
 		servers[i] = serverEntry;
 
