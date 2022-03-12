@@ -2027,14 +2027,13 @@ class Viewport {
     this.chatmsg.startpreanim = true;
     let gifLength = 0;
 
-    if (this.chatmsg.type === 1) {
+    if (this.chatmsg.type === 1 && this.chatmsg.preanim !== '-') {
       chatContainerBox.style.opacity = 0;
       gifLength = await getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}`);
       this.chatmsg.startspeaking = false;
     } else {
       this.chatmsg.startspeaking = true;
     }
-    console.log(gifLength);
     this.chatmsg.preanimdelay = parseInt(gifLength);
 
     this.changeBackground(chatmsg.side);
