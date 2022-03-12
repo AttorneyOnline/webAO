@@ -113,14 +113,15 @@ function checkOnline(serverID, coIP) {
 }
 
 function loadServerlist(thelist) {
-	localStorage.setItem('masterlist', thelist);
+	localStorage.setItem('masterlist', JSON.stringify(thelist));
 	processServerlist(thelist)
 }
 
 function cachedServerlist(response) {
 	if (!response.ok) {
 		document.getElementById('ms_error').style.display = 'block';
-		return localStorage.getItem('masterlist');
+		processServerlist(JSON.parse(localStorage.getItem('masterlist')));
+		return;
 	}
 	return response.json();
 }
