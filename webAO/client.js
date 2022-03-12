@@ -1525,29 +1525,7 @@ class Client extends EventEmitter {
             esfxd = 0;
           }
           // Make sure the asset server is case insensitive, or that everything on it is lowercase
-          const extensions = [
-            '.png',
-            '.webp',
-            '.gif',
-            '.apng',
-          ];
-          const getButtonUrl = async () => {
-            const extensions = [
-              '.png',
-              '.webp',
-            ];
-            const base = `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off`;
-            for (let i = 0; i < extensions.length; i++) {
-              const fileUrl = base + extensions[i];
-              const exists = await fileExists(fileUrl);
-              if (exists) {
-                return fileUrl;
-              }
-            }
-          };
-          const buttonResponse = await getButtonUrl();
-          const buttonUrl = buttonResponse || transparentPNG;
-
+          
           emotes[i] = {
             desc: emoteinfo[0].toLowerCase(),
             preanim: emoteinfo[1].toLowerCase(),
@@ -1558,7 +1536,7 @@ class Client extends EventEmitter {
             frame_screenshake: '',
             frame_realization: '',
             frame_sfx: '',
-            button: buttonUrl,
+			button: `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
           };
           emotesList.innerHTML
 					+= `<img src=${emotes[i].button}
