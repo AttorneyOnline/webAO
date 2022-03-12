@@ -983,7 +983,7 @@ class Client extends EventEmitter {
       evi_array.forEach((evi) => {
         evi_select.add(new Option(evi));
       });
-      evidence_select.add(new Option('Custom', 0));
+      evi_select.add(new Option('Custom', 0));
     } catch (err) {
       console.warn('there was no evidence.json file');
     }
