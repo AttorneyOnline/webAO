@@ -21,7 +21,7 @@ import chatbox_arr from './styles/chatbox/chatboxes.js';
 import iniParse from './iniParse';
 import getCookie from './utils/getCookie.js';
 import setCookie from './utils/setCookie.js';
-import {request} from './services/request.js';
+import { request } from './services/request.js';
 import { changeShoutVolume, changeSFXVolume } from './dom/changeVolume.js';
 import setEmote from './client/setEmote.js';
 import fileExists from './utils/fileExists.js';
@@ -790,10 +790,10 @@ class Client extends EventEmitter {
           const fileUrl = charIconBaseUrl + extensions[i];
           const exists = await fileExists(fileUrl);
           if (exists) {
-            return fileUrl
+            return fileUrl;
           }
         }
-        return transparentPNG
+        return transparentPNG;
       };
 
       const charIconUrlResponse = await getCharIcon();
@@ -801,7 +801,7 @@ class Client extends EventEmitter {
       const img = document.getElementById(`demo_${charid}`);
       img.alt = chargs[0];
       img.src = icon;	// seems like a good time to load the icon
-      
+
       // If the ini doesn't exist on the server this will throw an error
       try {
         const cinidata = await request(`${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char.ini`);
@@ -874,7 +874,7 @@ class Client extends EventEmitter {
         document.getElementById('client_loadingtext').innerHTML = `Loading Character ${args[1]}/${this.char_list_length}`;
         const chargs = args[i].split('&');
         const charid = args[i - 1];
-        setTimeout(() => this.handleCharacterInfo(chargs, charid), 500)
+        setTimeout(() => this.handleCharacterInfo(chargs, charid), 500);
       }
     }
     // Request the next pack
@@ -892,8 +892,8 @@ class Client extends EventEmitter {
       document.getElementById('client_loadingtext').innerHTML = `Loading Character ${i}/${this.char_list_length}`;
       const chargs = args[i].split('&');
       const charid = i - 1;
-      
-      this.handleCharacterInfo(chargs, charid)
+
+      this.handleCharacterInfo(chargs, charid);
     }
     // We're done with the characters, request the music
     this.sendServer('RM#%');
@@ -1542,7 +1542,7 @@ class Client extends EventEmitter {
             esfxd = 0;
           }
           // Make sure the asset server is case insensitive, or that everything on it is lowercase
-          
+
           emotes[i] = {
             desc: emoteinfo[0].toLowerCase(),
             preanim: emoteinfo[1].toLowerCase(),
@@ -1553,7 +1553,7 @@ class Client extends EventEmitter {
             frame_screenshake: '',
             frame_realization: '',
             frame_sfx: '',
-			button: `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
+            button: `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
           };
           emotesList.innerHTML
 					+= `<img src=${emotes[i].button}
