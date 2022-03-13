@@ -778,7 +778,6 @@ class Client extends EventEmitter {
 	 * @param {Number} charid character ID
 	 */
   async handleCharacterInfo(chargs, charid) {
-
     if (chargs[0]) {
       let cini = {};
       const img = document.getElementById(`demo_${charid}`);
@@ -787,7 +786,7 @@ class Client extends EventEmitter {
           '.png',
           '.webp',
         ];
-        img.alt = chargs[0]
+        img.alt = chargs[0];
         const charIconBaseUrl = `${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char_icon`;
         for (let i = 0; i < extensions.length; i++) {
           const fileUrl = charIconBaseUrl + extensions[i];
@@ -795,7 +794,7 @@ class Client extends EventEmitter {
           if (exists) {
             img.alt = chargs[0];
             img.src = fileUrl;
-            return
+            return;
           }
         }
       };
@@ -886,7 +885,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
   async handleSC(args) {
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
     // Add this so people can see characters loading on the screen.
     document.getElementById('client_loading').style.display = 'none';
@@ -897,7 +896,7 @@ class Client extends EventEmitter {
       document.getElementById('client_loadingtext').innerHTML = `Loading Character ${i}/${this.char_list_length}`;
       const chargs = args[i].split('&');
       const charid = i - 1;
-      await sleep(.1) // TODO: Too many network calls without this. net::ERR_INSUFFICIENT_RESOURCES 
+      await sleep(0.1); // TODO: Too many network calls without this. net::ERR_INSUFFICIENT_RESOURCES
       this.handleCharacterInfo(chargs, charid);
     }
     // We're done with the characters, request the music
