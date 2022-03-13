@@ -12,7 +12,6 @@ const calculateApngLength = (apngFile) => {
 					&& d[i + 1] === 0x63
 					&& d[i + 2] === 0x54
 					&& d[i + 3] === 0x4C) {
-					console.log("found apng header");
 					// numerator and denominator
 					let delay = ((d[i + 21] / d[i + 23]) * 1000)
 

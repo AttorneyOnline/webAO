@@ -780,13 +780,28 @@ class Client extends EventEmitter {
   async handleCharacterInfo(chargs, charid) {
     if (chargs[0]) {
       let cini = {};
-      const cswap = {};
-      const icon = `${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char_icon.png`;
+      const getCharIcon = async () => {
+        const extensions = [
+          '.png',
+          '.webp',
+        ];
+        const charIconBaseUrl = `${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char_icon`;
+        for (let i = 0; i < extensions.length; i++) {
+          const fileUrl = charIconBaseUrl + extensions[i];
+          const exists = await fileExists(fileUrl);
+          if (exists) {
+            return fileUrl
+          }
+        }
+        return transparentPNG
+      };
 
+      const charIconUrlResponse = await getCharIcon();
+      const icon = charIconUrlResponse || transparentPNG;
       const img = document.getElementById(`demo_${charid}`);
       img.alt = chargs[0];
       img.src = icon;	// seems like a good time to load the icon
-
+      
       // If the ini doesn't exist on the server this will throw an error
       try {
         const cinidata = await request(`${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char.ini`);
@@ -853,12 +868,13 @@ class Client extends EventEmitter {
 	 */
   handleCI(args) {
     // Loop through the 10 characters that were sent
+
     for (let i = 2; i <= args.length - 2; i++) {
       if (i % 2 === 0) {
         document.getElementById('client_loadingtext').innerHTML = `Loading Character ${args[1]}/${this.char_list_length}`;
         const chargs = args[i].split('&');
         const charid = args[i - 1];
-        setTimeout(() => this.handleCharacterInfo(chargs, charid), charid * 10);
+        setTimeout(() => this.handleCharacterInfo(chargs, charid), 500)
       }
     }
     // Request the next pack
@@ -870,13 +886,14 @@ class Client extends EventEmitter {
 	 * in one packet.
 	 * @param {Array} args packet arguments
 	 */
-  handleSC(args) {
+  async handleSC(args) {
     document.getElementById('client_loadingtext').innerHTML = 'Loading Characters';
     for (let i = 1; i < args.length; i++) {
       document.getElementById('client_loadingtext').innerHTML = `Loading Character ${i}/${this.char_list_length}`;
       const chargs = args[i].split('&');
       const charid = i - 1;
-      setTimeout(() => this.handleCharacterInfo(chargs, charid), charid * 10);
+      
+      this.handleCharacterInfo(chargs, charid)
     }
     // We're done with the characters, request the music
     this.sendServer('RM#%');
