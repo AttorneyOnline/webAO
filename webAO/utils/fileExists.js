@@ -6,7 +6,7 @@ const fileExists = async (url) => new Promise((resolve, reject) => {
       if (xhr.status === 200) {
         resolve(true);
       } else {
-        reject(false);
+        resolve(false);
       }
     }
   };

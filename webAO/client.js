@@ -778,29 +778,28 @@ class Client extends EventEmitter {
 	 * @param {Number} charid character ID
 	 */
   async handleCharacterInfo(chargs, charid) {
+
     if (chargs[0]) {
       let cini = {};
+      const img = document.getElementById(`demo_${charid}`);
       const getCharIcon = async () => {
         const extensions = [
           '.png',
           '.webp',
         ];
+        img.alt = chargs[0]
         const charIconBaseUrl = `${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char_icon`;
         for (let i = 0; i < extensions.length; i++) {
           const fileUrl = charIconBaseUrl + extensions[i];
           const exists = await fileExists(fileUrl);
           if (exists) {
-            return fileUrl;
+            img.alt = chargs[0];
+            img.src = fileUrl;
+            return
           }
         }
-        return transparentPNG;
       };
-
-      const charIconUrlResponse = await getCharIcon();
-      const icon = charIconUrlResponse || transparentPNG;
-      const img = document.getElementById(`demo_${charid}`);
-      img.alt = chargs[0];
-      img.src = icon;	// seems like a good time to load the icon
+      await getCharIcon();
 
       // If the ini doesn't exist on the server this will throw an error
       try {
@@ -844,7 +843,7 @@ class Client extends EventEmitter {
         side: safeTags(cini.options.side).toLowerCase(),
         chat: (cini.options.chat === '') ? safeTags(cini.options.chat).toLowerCase() : safeTags(cini.options.category).toLowerCase(),
         evidence: chargs[3],
-        icon,
+        icon: img.src,
         inifile: cini,
         muted: false,
       };
@@ -887,12 +886,18 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
   async handleSC(args) {
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    // Add this so people can see characters loading on the screen.
+    document.getElementById('client_loading').style.display = 'none';
+    document.getElementById('client_charselect').style.display = 'block';
+
     document.getElementById('client_loadingtext').innerHTML = 'Loading Characters';
     for (let i = 1; i < args.length; i++) {
       document.getElementById('client_loadingtext').innerHTML = `Loading Character ${i}/${this.char_list_length}`;
       const chargs = args[i].split('&');
       const charid = i - 1;
-
+      await sleep(.1) // TODO: Too many network calls without this. net::ERR_INSUFFICIENT_RESOURCES 
       this.handleCharacterInfo(chargs, charid);
     }
     // We're done with the characters, request the music
