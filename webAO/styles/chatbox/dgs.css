@@ -74,7 +74,7 @@
 	top: 0;
 	border-radius: 3px;
 	position: absolute;
-	font-family: "Bitter", "Times New Roman", serif;
+	font-family: "FOT-スキップ Std B", "Bitter", "Times New Roman", sans-serif;
 }
 
 #client_inner_name {
@@ -100,7 +100,7 @@
 	text-align: left;
 	overflow: hidden;
 	scroll-behavior: smooth;
-	font-family: 'Cabin Condensed', sans-serif;
+	font-family: "FOTToplar", "Cabin Condensed", sans-serif;
 }
 
 #client_inner_chat {
