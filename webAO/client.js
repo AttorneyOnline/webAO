@@ -21,7 +21,7 @@ import chatbox_arr from './styles/chatbox/chatboxes.js';
 import iniParse from './iniParse';
 import getCookie from './utils/getCookie.js';
 import setCookie from './utils/setCookie.js';
-import {request} from './services/request.js';
+import { request } from './services/request.js';
 import { changeShoutVolume, changeSFXVolume } from './dom/changeVolume.js';
 import setEmote from './client/setEmote.js';
 import fileExists from './utils/fileExists.js';
@@ -780,12 +780,25 @@ class Client extends EventEmitter {
   async handleCharacterInfo(chargs, charid) {
     if (chargs[0]) {
       let cini = {};
-      const cswap = {};
-      const icon = `${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char_icon.png`;
-
       const img = document.getElementById(`demo_${charid}`);
-      img.alt = chargs[0];
-      img.src = icon;	// seems like a good time to load the icon
+      const getCharIcon = async () => {
+        const extensions = [
+          '.png',
+          '.webp',
+        ];
+        img.alt = chargs[0];
+        const charIconBaseUrl = `${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char_icon`;
+        for (let i = 0; i < extensions.length; i++) {
+          const fileUrl = charIconBaseUrl + extensions[i];
+          const exists = await fileExists(fileUrl);
+          if (exists) {
+            img.alt = chargs[0];
+            img.src = fileUrl;
+            return;
+          }
+        }
+      };
+      await getCharIcon();
 
       // If the ini doesn't exist on the server this will throw an error
       try {
@@ -829,7 +842,7 @@ class Client extends EventEmitter {
         side: safeTags(cini.options.side).toLowerCase(),
         chat: (cini.options.chat === '') ? safeTags(cini.options.chat).toLowerCase() : safeTags(cini.options.category).toLowerCase(),
         evidence: chargs[3],
-        icon,
+        icon: img.src,
         inifile: cini,
         muted: false,
       };
@@ -853,12 +866,13 @@ class Client extends EventEmitter {
 	 */
   handleCI(args) {
     // Loop through the 10 characters that were sent
+
     for (let i = 2; i <= args.length - 2; i++) {
       if (i % 2 === 0) {
         document.getElementById('client_loadingtext').innerHTML = `Loading Character ${args[1]}/${this.char_list_length}`;
         const chargs = args[i].split('&');
         const charid = args[i - 1];
-        setTimeout(() => this.handleCharacterInfo(chargs, charid), charid * 10);
+        setTimeout(() => this.handleCharacterInfo(chargs, charid), 500);
       }
     }
     // Request the next pack
@@ -870,13 +884,20 @@ class Client extends EventEmitter {
 	 * in one packet.
 	 * @param {Array} args packet arguments
 	 */
-  handleSC(args) {
+  async handleSC(args) {
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    // Add this so people can see characters loading on the screen.
+    document.getElementById('client_loading').style.display = 'none';
+    document.getElementById('client_charselect').style.display = 'block';
+
     document.getElementById('client_loadingtext').innerHTML = 'Loading Characters';
     for (let i = 1; i < args.length; i++) {
       document.getElementById('client_loadingtext').innerHTML = `Loading Character ${i}/${this.char_list_length}`;
       const chargs = args[i].split('&');
       const charid = i - 1;
-      setTimeout(() => this.handleCharacterInfo(chargs, charid), charid * 10);
+      await sleep(0.1); // TODO: Too many network calls without this. net::ERR_INSUFFICIENT_RESOURCES
+      this.handleCharacterInfo(chargs, charid);
     }
     // We're done with the characters, request the music
     this.sendServer('RM#%');
@@ -1525,7 +1546,7 @@ class Client extends EventEmitter {
             esfxd = 0;
           }
           // Make sure the asset server is case insensitive, or that everything on it is lowercase
-          
+
           emotes[i] = {
             desc: emoteinfo[0].toLowerCase(),
             preanim: emoteinfo[1].toLowerCase(),
@@ -1536,7 +1557,7 @@ class Client extends EventEmitter {
             frame_screenshake: '',
             frame_realization: '',
             frame_sfx: '',
-			button: `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
+            button: `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/emotions/button${i}_off.png`,
           };
           emotesList.innerHTML
 					+= `<img src=${emotes[i].button}
