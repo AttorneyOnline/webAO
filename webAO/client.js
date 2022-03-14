@@ -285,7 +285,8 @@ window.changeTestimonyVolume = changeTestimonyVolume;
  * Triggered by the blip volume slider.
  */
 export function changeBlipVolume() {
-	viewport.blipVolume = document.getElementById('client_bvolume').value;
+	const blipVolume = document.getElementById('client_bvolume').value;
+  viewport.blipChannels.forEach((channel) => channel.volume = blipVolume);
 	setCookie('blipVolume', document.getElementById('client_bvolume').value);
 }
 window.changeBlipVolume = changeBlipVolume;
@@ -2709,6 +2710,7 @@ window.musiclist_click = musicListClick;
  * Triggered when a character in the mute list is clicked
  * @param {MouseEvent} event
  */
+
 export function muteListClick() {
 	const mutelist = document.getElementById('mute_select');
 	const selectedCharacter = mutelist.options[mutelist.selectedIndex];
