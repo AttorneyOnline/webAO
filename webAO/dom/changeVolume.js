@@ -5,7 +5,7 @@ import setCookie from '../utils/setCookie';
  */
 
 export function changeSFXVolume() {
-  setCookie('sfxVolume', document.getElementById('client_sfxaudio').volume);
+	setCookie('sfxVolume', document.getElementById('client_sfxaudio').volume);
 }
 window.changeSFXVolume = changeSFXVolume;
 
@@ -14,6 +14,6 @@ window.changeSFXVolume = changeSFXVolume;
  */
 
 export function changeShoutVolume() {
-  setCookie('shoutVolume', document.getElementById('client_shoutaudio').volume);
+	setCookie('shoutVolume', document.getElementById('client_shoutaudio').volume);
 }
 window.changeShoutVolume = changeShoutVolume;

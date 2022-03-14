@@ -72,7 +72,13 @@ golden.registerComponent('template', (container, componentState) => {
   const template = document.querySelector(`#${componentState.id}`);
   container.getElement().html(template.content);
   // TODO: support multiple locales
-  // container.setTitle(document.querySelector(`#${componentState.id} meta[name='frame-title']`).getAttribute("content"));
+  /*
+  container.setTitle(
+    document.querySelector(
+      `#${componentState.id} meta[name='frame-title']`
+      ).getAttribute("content")
+    );
+  */
 });
 
 golden.init();

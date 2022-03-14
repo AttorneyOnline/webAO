@@ -1,6 +1,7 @@
+/* eslint no-restricted-syntax: 'off' */
 import calculatorHandler from './calculatorHandler';
-import fileExists from './fileExists.js';
-import { requestBuffer } from '../services/request.js';
+import fileExists from './fileExists';
+import { requestBuffer } from '../services/request';
 /**
 	 * Gets animation length. If the animation cannot be found, it will
 	 * silently fail and return 0 instead.
@@ -8,16 +9,16 @@ import { requestBuffer } from '../services/request.js';
 	 */
 
 const getAnimLength = async (url) => {
-  const extensions = ['.gif', '.webp', '.apng'];
-  for (const extension of extensions) {
-    const urlWithExtension = url + extension;
-    const exists = await fileExists(urlWithExtension);
-    if (exists) {
-      const fileBuffer = await requestBuffer(urlWithExtension);
-      const length = calculatorHandler[extension](fileBuffer);
-      return length;
-    }
-  }
-  return 0;
+	const extensions = ['.gif', '.webp', '.apng'];
+	for (const extension of extensions) {
+		const urlWithExtension = url + extension;
+		const exists = await fileExists(urlWithExtension);
+		if (exists) {
+			const fileBuffer = await requestBuffer(urlWithExtension);
+			const length = calculatorHandler[extension](fileBuffer);
+			return length;
+		}
+	}
+	return 0;
 };
 export default getAnimLength;
