@@ -1,8 +1,8 @@
 /* eslint no-restricted-syntax: 'off', class-methods-use-this: 'off',
 max-len: 'warn', max-classes-per-file: 'warn', no-unused-expressions: 'warn',
 prefer-destructuring: 'warn', no-param-reassign: 'warn',
-no-use-before-define: 'warn', no-return-assign: 'warn',
-no-promise-executor-return: 'warn', no-inner-declarations: 'warn' */
+no-return-assign: 'warn', no-promise-executor-return: 'warn',
+no-inner-declarations: 'warn' */
 
 /* TODO: All of these eslint parameters exist and need to be
 		Either removed or moved to eslint config file. There are
@@ -78,6 +78,116 @@ function isLowMemory() {
 }
 
 let lastICMessageTime = new Date(0);
+/**
+ * Triggered when the user click replay GOOOOO
+ * @param {KeyboardEvent} event
+ */
+export function onReplayGo() {
+	client.handleReplay();
+}
+window.onReplayGo = onReplayGo;
+/**
+ * Update background preview.
+ */
+export function updateBackgroundPreview() {
+	const backgroundSelect = document.getElementById('bg_select');
+	const backgroundFilename = document.getElementById('bg_filename');
+	const backgroundPreview = document.getElementById('bg_preview');
+
+	if (backgroundSelect.selectedIndex === 0) {
+		backgroundFilename.style.display = 'initial';
+		backgroundPreview.src = `${AO_HOST}background/${encodeURI(backgroundFilename.value.toLowerCase())}/defenseempty.png`;
+	} else {
+		backgroundFilename.style.display = 'none';
+		backgroundPreview.src = `${AO_HOST}background/${encodeURI(backgroundSelect.value.toLowerCase())}/defenseempty.png`;
+	}
+}
+window.updateBackgroundPreview = updateBackgroundPreview;
+/**
+ * Triggered when there was an error loading a sound
+ * @param {HTMLImageElement} image the element containing the missing sound
+ */
+export function opusCheck(channel) {
+	let oldsrc = '';
+	oldsrc = channel.src;
+	if (!oldsrc.endsWith('.opus')) {
+		let newsrc = oldsrc.replace('.mp3', '.opus');
+		newsrc = newsrc.replace('.wav', '.opus');
+		channel.src = newsrc; // unload so the old sprite doesn't persist
+	}
+}
+window.opusCheck = opusCheck;
+/**
+ * check if the message contains an entry on our callword list
+ * @param {String} message
+ */
+export function checkCallword(message) {
+	function testCallword(item) {
+		if (item !== '' && message.toLowerCase().includes(item.toLowerCase())) {
+			viewport.sfxaudio.pause();
+			viewport.sfxaudio.src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
+			viewport.sfxaudio.play();
+		}
+	}
+	client.callwords.forEach(testCallword);
+}
+/**
+ * Find index of anything in select box.
+ * @param {string} selectBox the select element name
+ * @param {string} value the value that need to be compared
+ */
+export function getIndexFromSelect(selectBox, value) {
+	// Find if icon alraedy existed in select box
+	const selectElement = document.getElementById(selectBox);
+	for (let i = 1; i < selectElement.length; ++i) {
+		if (selectElement.options[i].value === value) {
+			return i;
+		}
+	}
+	return 0;
+}
+window.getIndexFromSelect = getIndexFromSelect;
+/**
+ * Set the font size for the chatbox
+ */
+export function resizeChatbox() {
+	const chatContainerBox = document.getElementById('client_chatcontainer');
+	const gameHeight = document.getElementById('client_background').offsetHeight;
+
+	chatContainerBox.style.fontSize = `${(gameHeight * 0.0521).toFixed(1)}px`;
+}
+window.resizeChatbox = resizeChatbox;
+/**
+ * Triggered when an item on the area list is clicked.
+ * @param {MouseEvent} event
+ */
+export function areaClick(el) {
+	const area = client.areas[el.id.substr(4)].name;
+	client.sendMusicChange(area);
+
+	const areaHr = document.createElement('div');
+	areaHr.className = 'hrtext';
+	areaHr.textContent = `switched to ${el.textContent}`;
+	document.getElementById('client_log').appendChild(areaHr);
+}
+window.area_click = areaClick;
+/**
+ * Resets the IC parameters for the player to enter a new chat message.
+ * This should only be called when the player's previous chat message
+ * was successfully sent/presented.
+ */
+function resetICParams() {
+	document.getElementById('client_inputbox').value = '';
+	document.getElementById('button_flash').className = 'client_button';
+	document.getElementById('button_shake').className = 'client_button';
+
+	document.getElementById('sendpreanim').checked = false;
+
+	if (selectedShout) {
+		document.getElementById(`button_${selectedShout}`).className = 'client_button';
+		selectedShout = 0;
+	}
+}
 
 /**
  * Update evidence icon.
@@ -96,6 +206,31 @@ export function updateEvidenceIcon() {
 	}
 }
 window.updateEvidenceIcon = updateEvidenceIcon;
+/**
+ * Cancel evidence selection.
+ */
+export function cancelEvidence() {
+	// Clear evidence data
+	if (client.selectedEvidence > 0) {
+		document.getElementById(`evi_${client.selectedEvidence}`).className = 'evi_icon';
+	}
+	client.selectedEvidence = 0;
+
+	// Clear evidence on information window
+	document.getElementById('evi_select').selectedIndex = 0;
+	updateEvidenceIcon(); // Update icon widget
+	document.getElementById('evi_filename').value = '';
+	document.getElementById('evi_name').value = '';
+	document.getElementById('evi_desc').value = '';
+	document.getElementById('evi_preview').src = `${AO_HOST}misc/empty.png`; // Clear icon
+
+	// Update button
+	document.getElementById('evi_add').className = 'client_button hover_button';
+	document.getElementById('evi_edit').className = 'client_button hover_button inactive';
+	document.getElementById('evi_cancel').className = 'client_button hover_button inactive';
+	document.getElementById('evi_del').className = 'client_button hover_button inactive';
+}
+window.cancelEvidence = cancelEvidence;
 
 /**
  * Triggered by the theme selector.
@@ -161,6 +296,27 @@ export function changeCallwords() {
 window.changeCallwords = changeCallwords;
 
 /**
+ * Highlights and selects an emotion for in-character chat.
+ * @param {string} emo the new emotion to be selected
+ */
+export function pickEmotion(emo) {
+	try {
+		if (client.selectedEmote !== -1) {
+			document.getElementById(`emo_${client.selectedEmote}`).classList = 'emote_button';
+		}
+	} catch (err) {
+		// do nothing
+	}
+	client.selectedEmote = emo;
+	document.getElementById(`emo_${emo}`).classList = 'emote_button dark';
+
+	document.getElementById('sendsfx').checked = (client.emote.sfx.length > 1);
+
+	document.getElementById('sendpreanim').checked = (client.emote.zoom === 1);
+}
+window.pickEmotion = pickEmotion;
+
+/**
  * Triggered when the showname checkboc is clicked
  * @param {MouseEvent} event
  */
@@ -173,7 +329,71 @@ export function shownameClick() {
 	if (document.getElementById('showname').checked) { cssSelector.href = 'styles/shownames.css'; } else { cssSelector.href = 'styles/nameplates.css'; }
 }
 window.shownameClick = shownameClick;
+/**
+ * Appends a message to the in-character chat log.
+ * @param {string} msg the string to be added
+ * @param {string} name the name of the sender
+ */
+function appendICLog(msg, showname = '', nameplate = '', time = new Date()) {
+	const entry = document.createElement('p');
+	const shownameField = document.createElement('span');
+	const nameplateField = document.createElement('span');
+	const textField = document.createElement('span');
+	nameplateField.classList = 'iclog_name iclog_nameplate';
+	nameplateField.appendChild(document.createTextNode(nameplate));
 
+	shownameField.classList = 'iclog_name iclog_showname';
+	if (showname === '' || !showname) { shownameField.appendChild(document.createTextNode(nameplate)); } else { shownameField.appendChild(document.createTextNode(showname)); }
+
+	textField.className = 'iclog_text';
+	textField.appendChild(document.createTextNode(msg));
+
+	entry.appendChild(shownameField);
+	entry.appendChild(nameplateField);
+	entry.appendChild(textField);
+
+	// Only put a timestamp if the minute has changed.
+	if (lastICMessageTime.getMinutes() !== time.getMinutes()) {
+		const timeStamp = document.createElement('span');
+		timeStamp.className = 'iclog_time';
+		timeStamp.innerText = time.toLocaleTimeString(undefined, {
+			hour: 'numeric',
+			minute: '2-digit',
+		});
+		entry.appendChild(timeStamp);
+	}
+
+	const clientLog = document.getElementById('client_log');
+	clientLog.appendChild(entry);
+
+	/* This is a little buggy - some troubleshooting might be desirable */
+	if (clientLog.scrollTop > clientLog.scrollHeight - 800) {
+		clientLog.scrollTop = clientLog.scrollHeight;
+	}
+
+	lastICMessageTime = new Date();
+}
+/**
+ * Update evidence icon.
+ */
+export function updateActionCommands(side) {
+	if (side === 'jud') {
+		document.getElementById('judge_action').style.display = 'inline-table';
+		document.getElementById('no_action').style.display = 'none';
+	} else {
+		document.getElementById('judge_action').style.display = 'none';
+		document.getElementById('no_action').style.display = 'inline-table';
+	}
+
+	// Update role selector
+	for (let i = 0, roleSelect = document.getElementById('role_select').options; i < roleSelect.length; i++) {
+		if (side === roleSelect[i].value) {
+			roleSelect.selectedIndex = i;
+			return;
+		}
+	}
+}
+window.updateActionCommands = updateActionCommands;
 class Client extends EventEmitter {
 	constructor(address) {
 		super();
@@ -2370,15 +2590,6 @@ export function onOOCEnter(event) {
 window.onOOCEnter = onOOCEnter;
 
 /**
- * Triggered when the user click replay GOOOOO
- * @param {KeyboardEvent} event
- */
-export function onReplayGo() {
-	client.handleReplay();
-}
-window.onReplayGo = onReplayGo;
-
-/**
  * Triggered when the Return key is pressed on the in-character chat input box.
  * @param {KeyboardEvent} event
  */
@@ -2447,24 +2658,6 @@ export function onEnter(event) {
 }
 window.onEnter = onEnter;
 
-/**
- * Resets the IC parameters for the player to enter a new chat message.
- * This should only be called when the player's previous chat message
- * was successfully sent/presented.
- */
-function resetICParams() {
-	document.getElementById('client_inputbox').value = '';
-	document.getElementById('button_flash').className = 'client_button';
-	document.getElementById('button_shake').className = 'client_button';
-
-	document.getElementById('sendpreanim').checked = false;
-
-	if (selectedShout) {
-		document.getElementById(`button_${selectedShout}`).className = 'client_button';
-		selectedShout = 0;
-	}
-}
-
 export function resetOffset() {
 	document.getElementById('pair_offset').value = 0;
 	document.getElementById('pair_y_offset').value = 0;
@@ -2525,21 +2718,6 @@ export function muteListClick() {
 	}
 }
 window.mutelist_click = muteListClick;
-
-/**
- * Triggered when an item on the area list is clicked.
- * @param {MouseEvent} event
- */
-export function areaClick(el) {
-	const area = client.areas[el.id.substr(4)].name;
-	client.sendMusicChange(area);
-
-	const areaHr = document.createElement('div');
-	areaHr.className = 'hrtext';
-	areaHr.textContent = `switched to ${el.textContent}`;
-	document.getElementById('client_log').appendChild(areaHr);
-}
-window.area_click = areaClick;
 
 /**
  * Triggered by the modcall sfx dropdown
@@ -2643,21 +2821,6 @@ export function imgError(image) {
 window.imgError = imgError;
 
 /**
- * Triggered when there was an error loading a sound
- * @param {HTMLImageElement} image the element containing the missing sound
- */
-export function opusCheck(channel) {
-	let oldsrc = '';
-	oldsrc = channel.src;
-	if (!oldsrc.endsWith('.opus')) {
-		let newsrc = oldsrc.replace('.mp3', '.opus');
-		newsrc = newsrc.replace('.wav', '.opus');
-		channel.src = newsrc; // unload so the old sprite doesn't persist
-	}
-}
-window.opusCheck = opusCheck;
-
-/**
  * Triggered when the reconnect button is pushed.
  */
 export function ReconnectButton() {
@@ -2670,67 +2833,6 @@ export function ReconnectButton() {
 	}
 }
 window.ReconnectButton = ReconnectButton;
-
-/**
- * Appends a message to the in-character chat log.
- * @param {string} msg the string to be added
- * @param {string} name the name of the sender
- */
-function appendICLog(msg, showname = '', nameplate = '', time = new Date()) {
-	const entry = document.createElement('p');
-	const shownameField = document.createElement('span');
-	const nameplateField = document.createElement('span');
-	const textField = document.createElement('span');
-	nameplateField.classList = 'iclog_name iclog_nameplate';
-	nameplateField.appendChild(document.createTextNode(nameplate));
-
-	shownameField.classList = 'iclog_name iclog_showname';
-	if (showname === '' || !showname) { shownameField.appendChild(document.createTextNode(nameplate)); } else { shownameField.appendChild(document.createTextNode(showname)); }
-
-	textField.className = 'iclog_text';
-	textField.appendChild(document.createTextNode(msg));
-
-	entry.appendChild(shownameField);
-	entry.appendChild(nameplateField);
-	entry.appendChild(textField);
-
-	// Only put a timestamp if the minute has changed.
-	if (lastICMessageTime.getMinutes() !== time.getMinutes()) {
-		const timeStamp = document.createElement('span');
-		timeStamp.className = 'iclog_time';
-		timeStamp.innerText = time.toLocaleTimeString(undefined, {
-			hour: 'numeric',
-			minute: '2-digit',
-		});
-		entry.appendChild(timeStamp);
-	}
-
-	const clientLog = document.getElementById('client_log');
-	clientLog.appendChild(entry);
-
-	/* This is a little buggy - some troubleshooting might be desirable */
-	if (clientLog.scrollTop > clientLog.scrollHeight - 800) {
-		clientLog.scrollTop = clientLog.scrollHeight;
-	}
-
-	lastICMessageTime = new Date();
-}
-
-/**
- * check if the message contains an entry on our callword list
- * @param {String} message
- */
-export function checkCallword(message) {
-	client.callwords.forEach(testCallword);
-
-	function testCallword(item) {
-		if (item !== '' && message.toLowerCase().includes(item.toLowerCase())) {
-			viewport.sfxaudio.pause();
-			viewport.sfxaudio.src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
-			viewport.sfxaudio.play();
-		}
-	}
-}
 
 /**
  * Triggered when the music search bar is changed
@@ -2766,27 +2868,6 @@ export function pickChar(ccharacter) {
 window.pickChar = pickChar;
 
 /**
- * Highlights and selects an emotion for in-character chat.
- * @param {string} emo the new emotion to be selected
- */
-export function pickEmotion(emo) {
-	try {
-		if (client.selectedEmote !== -1) {
-			document.getElementById(`emo_${client.selectedEmote}`).classList = 'emote_button';
-		}
-	} catch (err) {
-		// do nothing
-	}
-	client.selectedEmote = emo;
-	document.getElementById(`emo_${emo}`).classList = 'emote_button dark';
-
-	document.getElementById('sendsfx').checked = (client.emote.sfx.length > 1);
-
-	document.getElementById('sendpreanim').checked = (client.emote.zoom === 1);
-}
-window.pickEmotion = pickEmotion;
-
-/**
  * Edit selected evidence.
  */
 export function editEvidence() {
@@ -2813,56 +2894,6 @@ export function deleteEvidence() {
 	cancelEvidence();
 }
 window.deleteEvidence = deleteEvidence;
-
-/**
- * Find index of anything in select box.
- * @param {string} selectBox the select element name
- * @param {string} value the value that need to be compared
- */
-export function getIndexFromSelect(selectBox, value) {
-	// Find if icon alraedy existed in select box
-	const selectElement = document.getElementById(selectBox);
-	for (let i = 1; i < selectElement.length; ++i) {
-		if (selectElement.options[i].value === value) {
-			return i;
-		}
-	}
-	return 0;
-}
-window.getIndexFromSelect = getIndexFromSelect;
-
-/**
- * Set the font size for the chatbox
- */
-export function resizeChatbox() {
-	const chatContainerBox = document.getElementById('client_chatcontainer');
-	const gameHeight = document.getElementById('client_background').offsetHeight;
-
-	chatContainerBox.style.fontSize = `${(gameHeight * 0.0521).toFixed(1)}px`;
-}
-window.resizeChatbox = resizeChatbox;
-
-/**
- * Update evidence icon.
- */
-export function updateActionCommands(side) {
-	if (side === 'jud') {
-		document.getElementById('judge_action').style.display = 'inline-table';
-		document.getElementById('no_action').style.display = 'none';
-	} else {
-		document.getElementById('judge_action').style.display = 'none';
-		document.getElementById('no_action').style.display = 'inline-table';
-	}
-
-	// Update role selector
-	for (let i = 0, roleSelect = document.getElementById('role_select').options; i < roleSelect.length; i++) {
-		if (side === roleSelect[i].value) {
-			roleSelect.selectedIndex = i;
-			return;
-		}
-	}
-}
-window.updateActionCommands = updateActionCommands;
 
 /**
  * Change background via OOC.
@@ -2984,24 +3015,6 @@ export function redHPP() {
 window.redHPP = redHPP;
 
 /**
- * Update background preview.
- */
-export function updateBackgroundPreview() {
-	const backgroundSelect = document.getElementById('bg_select');
-	const backgroundFilename = document.getElementById('bg_filename');
-	const backgroundPreview = document.getElementById('bg_preview');
-
-	if (backgroundSelect.selectedIndex === 0) {
-		backgroundFilename.style.display = 'initial';
-		backgroundPreview.src = `${AO_HOST}background/${encodeURI(backgroundFilename.value.toLowerCase())}/defenseempty.png`;
-	} else {
-		backgroundFilename.style.display = 'none';
-		backgroundPreview.src = `${AO_HOST}background/${encodeURI(backgroundSelect.value.toLowerCase())}/defenseempty.png`;
-	}
-}
-window.updateBackgroundPreview = updateBackgroundPreview;
-
-/**
  * Highlights and selects a menu.
  * @param {string} menu the menu to be selected
  */
@@ -3046,31 +3059,6 @@ fpPromise
 		isLowMemory();
 		client.loadResources();
 	});
-/**
- * Cancel evidence selection.
- */
-export function cancelEvidence() {
-	// Clear evidence data
-	if (client.selectedEvidence > 0) {
-		document.getElementById(`evi_${client.selectedEvidence}`).className = 'evi_icon';
-	}
-	client.selectedEvidence = 0;
-
-	// Clear evidence on information window
-	document.getElementById('evi_select').selectedIndex = 0;
-	updateEvidenceIcon(); // Update icon widget
-	document.getElementById('evi_filename').value = '';
-	document.getElementById('evi_name').value = '';
-	document.getElementById('evi_desc').value = '';
-	document.getElementById('evi_preview').src = `${AO_HOST}misc/empty.png`; // Clear icon
-
-	// Update button
-	document.getElementById('evi_add').className = 'client_button hover_button';
-	document.getElementById('evi_edit').className = 'client_button hover_button inactive';
-	document.getElementById('evi_cancel').className = 'client_button hover_button inactive';
-	document.getElementById('evi_del').className = 'client_button hover_button inactive';
-}
-window.cancelEvidence = cancelEvidence;
 
 /**
  * Add evidence.
