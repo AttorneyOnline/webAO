@@ -2488,7 +2488,8 @@ window.changeTestimonyVolume = changeTestimonyVolume;
  * Triggered by the blip volume slider.
  */
 export function changeBlipVolume() {
-  viewport.blipVolume = document.getElementById('client_bvolume').value;
+  const blipVolume = document.getElementById('client_bvolume').value;
+  viewport.blipChannels.forEach((channel) => channel.volume = blipVolume);
   setCookie('blipVolume', document.getElementById('client_bvolume').value);
 }
 window.changeBlipVolume = changeBlipVolume;
