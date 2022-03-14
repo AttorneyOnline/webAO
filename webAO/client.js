@@ -77,7 +77,24 @@ function isLowMemory() {
 	}
 }
 
+/**
+ * Triggered when an item on the area list is clicked.
+ * @param {MouseEvent} event
+ */
+export function areaClick(el) {
+	console.log(client.areas);
+	console.log(el);
+	const area = client.areas[el.id.substr(4)].name;
+	client.sendMusicChange(area);
+
+	const areaHr = document.createElement('div');
+	areaHr.className = 'hrtext';
+	areaHr.textContent = `switched to ${el.textContent}`;
+	document.getElementById('client_log').appendChild(areaHr);
+}
+window.area_click = areaClick;
 let lastICMessageTime = new Date(0);
+
 /**
  * Triggered when the user click replay GOOOOO
  * @param {KeyboardEvent} event
@@ -157,20 +174,7 @@ export function resizeChatbox() {
 	chatContainerBox.style.fontSize = `${(gameHeight * 0.0521).toFixed(1)}px`;
 }
 window.resizeChatbox = resizeChatbox;
-/**
- * Triggered when an item on the area list is clicked.
- * @param {MouseEvent} event
- */
-export function areaClick(el) {
-	const area = client.areas[el.id.substr(4)].name;
-	client.sendMusicChange(area);
 
-	const areaHr = document.createElement('div');
-	areaHr.className = 'hrtext';
-	areaHr.textContent = `switched to ${el.textContent}`;
-	document.getElementById('client_log').appendChild(areaHr);
-}
-window.area_click = areaClick;
 /**
  * Resets the IC parameters for the player to enter a new chat message.
  * This should only be called when the player's previous chat message
@@ -394,6 +398,7 @@ export function updateActionCommands(side) {
 	}
 }
 window.updateActionCommands = updateActionCommands;
+
 class Client extends EventEmitter {
 	constructor(address) {
 		super();
@@ -1348,7 +1353,7 @@ class Client extends EventEmitter {
 						+ `Status: ${thisarea.status}\n`
 						+ `CM: ${thisarea.cm}\n`
 						+ `Area lock: ${thisarea.locked}`;
-		newarea.onclick = () => {
+		newarea.onclick = function () {
 			areaClick(this);
 		};
 
@@ -1946,7 +1951,6 @@ class Client extends EventEmitter {
 		document.getElementById('client_replaycontrols').style.display = 'inline-block';
 	}
 }
-
 class Viewport {
 	constructor() {
 		this.textnow = '';
@@ -2307,8 +2311,8 @@ class Viewport {
 
 		setEmote(AO_HOST, this, this.chatmsg.name.toLowerCase(), this.chatmsg.sprite, '(a)', false, this.chatmsg.side);
 
-		if (this.chatmsg.other_name) {
-			setEmote(AO_HOST, this, this.chatmsg.other_name.toLowerCase(), this.chatmsg.other_emote, '(a)', false, this.chatmsg.side);
+		if (this.chatmsg.otherName) {
+			setEmote(AO_HOST, this, this.chatmsg.otherName.toLowerCase(), this.chatmsg.otherEmote, '(a)', false, this.chatmsg.side);
 		}
 
 		// gets which shout shall played
@@ -2355,25 +2359,25 @@ class Viewport {
 		// Shift by the horizontal offset
 		switch (this.chatmsg.side) {
 		case 'wit':
-			pairLayers.style.left = `${200 + Number(this.chatmsg.other_offset[0])}%`;
-			charLayers.style.left = `${200 + Number(this.chatmsg.self_offset[0])}%`;
+			pairLayers.style.left = `${200 + Number(this.chatmsg.otherOffset[0])}%`;
+			charLayers.style.left = `${200 + Number(this.chatmsg.selfOffset[0])}%`;
 			break;
 		case 'pro':
-			pairLayers.style.left = `${400 + Number(this.chatmsg.other_offset[0])}%`;
-			charLayers.style.left = `${400 + Number(this.chatmsg.self_offset[0])}%`;
+			pairLayers.style.left = `${400 + Number(this.chatmsg.otherOffset[0])}%`;
+			charLayers.style.left = `${400 + Number(this.chatmsg.selfOffset[0])}%`;
 			break;
 		default:
-			pairLayers.style.left = `${Number(this.chatmsg.other_offset[0])}%`;
-			charLayers.style.left = `${Number(this.chatmsg.self_offset[0])}%`;
+			pairLayers.style.left = `${Number(this.chatmsg.otherOffset[0])}%`;
+			charLayers.style.left = `${Number(this.chatmsg.selfOffset[0])}%`;
 			break;
 		}
 
 		// New vertical offsets
-		pairLayers.style.top = `${Number(this.chatmsg.other_offset[1])}%`;
-		charLayers.style.top = `${Number(this.chatmsg.self_offset[1])}%`;
+		pairLayers.style.top = `${Number(this.chatmsg.otherOffset[1])}%`;
+		charLayers.style.top = `${Number(this.chatmsg.selfOffset[1])}%`;
 
 		// flip the paired character
-		pairLayers.style.transform = this.chatmsg.other_flip === 1 ? 'scaleX(-1)' : 'scaleX(1)';
+		pairLayers.style.transform = this.chatmsg.otherFlip === 1 ? 'scaleX(-1)' : 'scaleX(1)';
 
 		this.blipChannels.forEach((channel) => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`);
 
@@ -2455,8 +2459,8 @@ class Viewport {
 		const charName = this.chatmsg.name.toLowerCase();
 		const charEmote = this.chatmsg.sprite.toLowerCase();
 
-		const pairName = this.chatmsg.other_name.toLowerCase();
-		const pairEmote = this.chatmsg.other_emote.toLowerCase();
+		const pairName = this.chatmsg.otherName.toLowerCase();
+		const pairEmote = this.chatmsg.otherEmote.toLowerCase();
 
 		// TODO: preanims sometimes play when they're not supposed to
 		if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
@@ -2481,7 +2485,7 @@ class Viewport {
 				charLayers.style.opacity = 1;
 			}
 
-			if (this.chatmsg.other_name) {
+			if (this.chatmsg.otherName) {
 				pairLayers.style.opacity = 1;
 			} else {
 				pairLayers.style.opacity = 0;
@@ -2527,7 +2531,7 @@ class Viewport {
 					shoutSprite.style.animation = '';
 				}
 
-				if (this.chatmsg.other_name) {
+				if (this.chatmsg.otherName) {
 					setEmote(AO_HOST, this, pairName, pairEmote, '(a)', true, this.chatmsg.side);
 					pairLayers.style.opacity = 1;
 				} else {
@@ -2570,7 +2574,7 @@ class Viewport {
 		if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
 			this.sfxplayed = 1;
 			if (this.chatmsg.sound !== '0' && this.chatmsg.sound !== '1' && this.chatmsg.sound !== '' && this.chatmsg.sound !== undefined && (this.chatmsg.type === 1 || this.chatmsg.type === 2 || this.chatmsg.type === 6)) {
-				this.playSFX(`${AO_HOST}sounds/general/${encodeURI(this.chatmsg.sound.toLowerCase())}.opus`, this.chatmsg.looping_sfx);
+				this.playSFX(`${AO_HOST}sounds/general/${encodeURI(this.chatmsg.sound.toLowerCase())}.opus`, this.chatmsg.loopingSfx);
 			}
 		}
 		this.textTimer += UPDATE_INTERVAL;
@@ -3048,18 +3052,6 @@ export function toggleShout(shout) {
 }
 window.toggleShout = toggleShout;
 
-const fpPromise = FingerprintJS.load();
-fpPromise
-	.then((fp) => fp.get())
-	.then((result) => {
-		hdid = result.visitorId;
-		client = new Client(serverIP);
-		viewport = new Viewport();
-
-		isLowMemory();
-		client.loadResources();
-	});
-
 /**
  * Add evidence.
  */
@@ -3112,3 +3104,14 @@ export function pickEvidence(evidenceID) {
 	}
 }
 window.pickEvidence = pickEvidence;
+const fpPromise = FingerprintJS.load();
+fpPromise
+	.then((fp) => fp.get())
+	.then((result) => {
+		hdid = result.visitorId;
+		client = new Client(serverIP);
+		viewport = new Viewport();
+
+		isLowMemory();
+		client.loadResources();
+	});
