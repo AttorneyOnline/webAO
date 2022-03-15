@@ -1218,8 +1218,6 @@ class Client extends EventEmitter {
     document.getElementById('client_loading').style.display = 'none';
     if (mode === 'watch') {		// Spectators don't need to pick a character
       document.getElementById('client_charselect').style.display = 'none';
-    } else {
-      document.getElementById('client_charselect').style.display = 'block';
     }
   }
 
