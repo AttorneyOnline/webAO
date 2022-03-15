@@ -10,22 +10,19 @@ const setEmote = (AO_HOST, client, charactername, emotename, prefix, pair, side)
   const characterFolder = `${AO_HOST}characters/`;
   const acceptedPositions = ['def', 'pro', 'wit'];
   const position = acceptedPositions.includes(side) ? `${side}_` : '';
+  const emoteSelector = document.getElementById(`client_${position}${pairID}_img`)
+  const extensionsMap = [
+    '.gif',
+    '.png',
+    '.apng',
+    '.webp'
+  ];
+  const transparentPNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
-  const gif_s = document.getElementById(`client_${position}${pairID}_gif`);
-  const png_s = document.getElementById(`client_${position}${pairID}_png`);
-  const apng_s = document.getElementById(`client_${position}${pairID}_apng`);
-  const webp_s = document.getElementById(`client_${position}${pairID}_webp`);
-  const extensionsMap = {
-    '.gif': gif_s,
-    '.png': png_s,
-    '.apng': apng_s,
-    '.webp': webp_s,
-  };
-
-  for (const [extension, htmlElement] of Object.entries(extensionsMap)) {
+  for (const extension of extensionsMap) {
     // Hides all sprites before creating a new sprite
     if (client.lastChar !== client.chatmsg.name) {
-      htmlElement.src = transparentPNG;
+      emoteSelector.src = transparentPNG;
     }
     let url;
     if (extension === '.png') {
@@ -35,8 +32,8 @@ const setEmote = (AO_HOST, client, charactername, emotename, prefix, pair, side)
     }
     const exists = fileExistsSync(url);
     if (exists) {
-      htmlElement.src = url;
-      return;
+      emoteSelector.src = url;
+      break;
     }
   }
 };
