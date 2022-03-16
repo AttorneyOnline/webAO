@@ -912,13 +912,24 @@ class Client extends EventEmitter {
 	 * Handles incoming evidence information, containing only one evidence
 	 * item per packet.
 	 *
-	 * Mostly unimplemented in webAO.
+	 * EI#id#name&description&type&image&##%    
+	 *
 	 * @param {Array} args packet arguments
 	 */
   handleEI(args) {
     document.getElementById('client_loadingtext').innerHTML = `Loading Evidence ${args[1]}/${this.evidence_list_length}`;
-    document.getElementById('client_loadingbar').value = this.char_list_length + args[1];
-    this.sendServer('RM#%');
+    const evidenceID = args[1];
+    document.getElementById('client_loadingbar').value = this.char_list_length + evidenceID;
+    
+    const arg = args[2].split('&');
+      this.evidences[evidenceID] = {
+        name: prepChat(arg[0]),
+        desc: prepChat(arg[1]),
+        filename: safeTags(arg[3]),
+        icon: `${AO_HOST}evidence/${encodeURI(arg[3].toLowerCase())}`,
+      };
+    
+    this.sendServer('AE'+(evidenceID+1)+'#%');
   }
 
   /**
