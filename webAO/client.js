@@ -6,7 +6,6 @@
 
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { EventEmitter } from 'events';
-import fileExistsSync from './utils/fileExistsSync';
 import {
   escapeChat, encodeChat, prepChat, safeTags,
 } from './encoding.js';
