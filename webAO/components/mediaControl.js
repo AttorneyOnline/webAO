@@ -2,15 +2,14 @@
 const entryId = 'mediaControlEntry'
 const entrySelector = document.getElementById(entryId)
 const audioOutputSelect = document.createElement('select')
+
 const handleChange = async (event) => {
     const audioElements = document.getElementsByTagName('audio')
     const sinkId = event.target.value
     for (let i =0; i < audioElements.length; i++) {
-        await element.setSinkId(sinkId)
+        console.log(audioElements[i])
+        await audioElements[i].setSinkId(sinkId)
     }
-    audioElements.forEach(element => {
-        element.setSinkId()
-    });
     console.log(event.target.value)
 }
 audioOutputSelect.onchange = handleChange
@@ -34,14 +33,16 @@ const gotDevices = (deviceInfos) => {
   } 
 }
 
-const handleError = async () => {
-
-}
-
 const createMediaControl = () => {
     navigator.mediaDevices.enumerateDevices()
     .then(gotDevices)
     .catch(err => console.error(err));
 }
 
-createMediaControl()
+
+// You must ask for these permissions to use this feature.
+navigator.mediaDevices.getUserMedia({audio: true})
+.then(accept => createMediaControl())
+.catch(reject => {
+// Don't create media control.
+})
