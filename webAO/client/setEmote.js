@@ -1,3 +1,4 @@
+import transparentPng from '../constants/transparentPng';
 import fileExistsSync from '../utils/fileExistsSync';
 
 /**
@@ -17,12 +18,11 @@ const setEmote = (AO_HOST, client, charactername, emotename, prefix, pair, side)
     '.apng',
     '.webp'
   ];
-  const transparentPNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
   for (const extension of extensionsMap) {
     // Hides all sprites before creating a new sprite
     if (client.lastChar !== client.chatmsg.name) {
-      emoteSelector.src = transparentPNG;
+      emoteSelector.src = transparentPng;
     }
     let url;
     if (extension === '.png') {
