@@ -1,4 +1,3 @@
-
 const entryId = 'mediaControlEntry'
 const selectId = 'mediaControl'
 const entrySelector = document.getElementById(entryId)
@@ -9,21 +8,17 @@ const audioElements = document.getElementsByTagName('audio')
 const handleChange = async (event) => {
     const sinkId = event.target.value
     for (let i =0; i < audioElements.length; i++) {
-        console.log(audioElements[i])
         await audioElements[i].setSinkId(sinkId)
     }
-    console.log(event.target.value)
 }
 audioOutputSelect.onchange = handleChange
 
 const gotDevices = (deviceInfos) => {  
-    console.log('Enumerating', deviceInfos)
     let hasAudioOutput = false
     for (var i = 0; i !== deviceInfos.length; ++i) {
         var option = document.createElement("option");
         var deviceInfo = deviceInfos[i];
         option.value = deviceInfo.deviceId;
-        console.log(deviceInfo)
         if (deviceInfo.kind === 'audiooutput') {
             hasAudioOutput = true
             option.text = deviceInfo.label || `Speaker ${audioOutputSelect.length + 1}`
