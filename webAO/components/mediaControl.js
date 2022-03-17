@@ -1,10 +1,12 @@
 
 const entryId = 'mediaControlEntry'
+const selectId = 'mediaControl'
 const entrySelector = document.getElementById(entryId)
 const audioOutputSelect = document.createElement('select')
+audioOutputSelect.setAttribute('id', selectId)
+const audioElements = document.getElementsByTagName('audio')
 
 const handleChange = async (event) => {
-    const audioElements = document.getElementsByTagName('audio')
     const sinkId = event.target.value
     for (let i =0; i < audioElements.length; i++) {
         console.log(audioElements[i])
@@ -29,10 +31,17 @@ const gotDevices = (deviceInfos) => {
       }
   }
   if (hasAudioOutput) {
+    const label = createLabel()
+    entrySelector.append(label)
     entrySelector.append(audioOutputSelect)
   } 
 }
-
+const createLabel = () => {
+    const label = document.createElement('Label')
+    label.setAttribute("for", selectId)
+    label.innerHTML = "Audio Device: "
+    return label
+}
 const createMediaControl = () => {
     navigator.mediaDevices.enumerateDevices()
     .then(gotDevices)
