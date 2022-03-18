@@ -798,7 +798,7 @@ class Client extends EventEmitter {
           }
         }
       };
-      await getCharIcon();
+      getCharIcon();
 
       // If the ini doesn't exist on the server this will throw an error
       try {
