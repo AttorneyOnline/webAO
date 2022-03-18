@@ -28,6 +28,7 @@ import fileExists from './utils/fileExists.js';
 import queryParser from './utils/queryParser.js';
 import getAnimLength from './utils/getAnimLength.js';
 import getResources from './utils/getResources.js';
+import transparentPng from './constants/transparentPng';
 
 const version = process.env.npm_package_version;
 
@@ -44,7 +45,6 @@ const THEME = theme || 'default';
 
 const UPDATE_INTERVAL = 60;
 
-const transparentPNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 /**
  * Toggles AO1-style loading using paginated music packets for mobile platforms.
  * The old loading uses more smaller packets instead of a single big one,
@@ -2083,7 +2083,8 @@ class Viewport {
       const baseEffectUrl = `${AO_HOST}themes/default/effects/`;
       fg.src = `${baseEffectUrl}${encodeURI(this.chatmsg.effects[0].toLowerCase())}.webp`;
     } else {
-      fg.src = transparentPNG;
+      
+      fg.src = transparentPng;
     }
 
     const soundChecks = ['0', '1', '', undefined];
@@ -2599,7 +2600,7 @@ window.changeCharacter = changeCharacter;
  */
 export function charError(image) {
   console.warn(`${image.src} is missing from webAO`);
-  image.src = transparentPNG;
+  image.src = transparentPng;
   return true;
 }
 window.charError = charError;
