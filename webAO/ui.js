@@ -1,7 +1,6 @@
 /* eslint indent: ["error", 2] */
 
-// import GoldenLayout from "./golden/js/goldenlayout.js";
-import GoldenLayout from 'golden-layout';
+import { GoldenLayout } from "golden-layout";
 
 const config = {
   settings: {
@@ -67,12 +66,12 @@ const config = {
   }],
 };
 
-const golden = new GoldenLayout(config);
-golden.registerComponent('template', (container, componentState) => {
+const golden = new GoldenLayout();
+golden.registerComponentFactoryFunction('template', (container, componentState) => {
   const template = document.querySelector(`#${componentState.id}`);
-  container.getElement().html(template.content);
+  container.element.innerHTML = template.innerHTML;
   // TODO: support multiple locales
   // container.setTitle(document.querySelector(`#${componentState.id} meta[name='frame-title']`).getAttribute("content"));
 });
+golden.loadLayout(config)
 
-golden.init();
