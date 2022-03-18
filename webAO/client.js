@@ -3125,3 +3125,4 @@ export function toggleShout(shout) {
   }
 }
 window.toggleShout = toggleShout;
+export default Client
