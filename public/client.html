@@ -21,8 +21,8 @@
     <meta property="twitter:image" content="https://repository-images.githubusercontent.com/78860508/89fcba80-aafd-11e9-80db-c5b10c01aba9">
 
 	<meta http-equiv="Content-Security-Policy" content="script-src-elem 'self' 'unsafe-inline' https://ajax.googleapis.com;
+	style-src-elem 'self' 'unsafe-inline' https://golden-layout.com;
 														script-src 'self' 'unsafe-inline' 'unsafe-eval' https://ajax.googleapis.com;
-														style-src-elem 'self' 'unsafe-inline' https://golden-layout.com;
 														style-src 'self' 'unsafe-inline' https://golden-layout.com;
 														img-src 'self' data: file: *;
 														connect-src 'self' ws: file: *;
@@ -34,14 +34,13 @@
 	<link rel="stylesheet" type="text/css" href="styles/default.css?v=1.0.1" id="client_theme">
 	<link rel="stylesheet" type="text/css" href="styles/chatbox/aa.css?v=1.0.1" id="chatbox_theme">
 	<link rel="stylesheet" type="text/css" href="styles/nameplates.css" id="nameplate_setting">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
 	<link type="text/css" rel="stylesheet"
 		href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css" />
+
+
+
 	<script src="lib/jdataview.min.js"></script>
-	<script src="lib/gify.min.js"></script>
-	<script src="ui.b.js"></script>
-	<script src="client.b.js?v=1.0.2"></script>
 </head>
 
 <body>
@@ -86,40 +85,22 @@
 						<img id="client_court_pro" onerror="imgError(this);">
 					</div>
 					<div id="client_def_pair_char" class="client_char" alt="Paired character">
-						<img id="client_def_pair_gif" onerror="charError(this);">
-						<img id="client_def_pair_png" onerror="charError(this);">
-						<img id="client_def_pair_apng" onerror="charError(this);">
-						<img id="client_def_pair_webp" onerror="charError(this);">
+						<img id="client_def_pair_img" onerror="charError(this);">
 					</div>
 					<div id="client_def_char" class="client_char" alt="Character">
-						<img id="client_def_char_gif" onerror="charError(this);">
-						<img id="client_def_char_png" onerror="charError(this);">
-						<img id="client_def_char_apng" onerror="charError(this);">
-						<img id="client_def_char_webp" onerror="charError(this);">
+						<img id="client_def_char_img" onerror="charError(this);">
 					</div>
 					<div id="client_wit_pair_char" class="client_char" alt="Paired character">
-						<img id="client_wit_pair_gif" onerror="charError(this);">
-						<img id="client_wit_pair_png" onerror="charError(this);">
-						<img id="client_wit_pair_apng" onerror="charError(this);">
-						<img id="client_wit_pair_webp" onerror="charError(this);">
+						<img id="client_wit_pair_img" onerror="charError(this);">
 					</div>
 					<div id="client_wit_char" class="client_char" alt="Character">
-						<img id="client_wit_char_gif" onerror="charError(this);">
-						<img id="client_wit_char_png" onerror="charError(this);">
-						<img id="client_wit_char_apng" onerror="charError(this);">
-						<img id="client_wit_char_webp" onerror="charError(this);">
+						<img id="client_wit_char_img" onerror="charError(this);">
 					</div>
 					<div id="client_pro_pair_char" class="client_char" alt="Paired character">
-						<img id="client_pro_pair_gif" onerror="charError(this);">
-						<img id="client_pro_pair_png" onerror="charError(this);">
-						<img id="client_pro_pair_apng" onerror="charError(this);">
-						<img id="client_pro_pair_webp" onerror="charError(this);">
+						<img id="client_pro_pair_img" onerror="charError(this);">
 					</div>
 					<div id="client_pro_char" class="client_char" alt="Character">
-						<img id="client_pro_char_gif" onerror="charError(this);">
-						<img id="client_pro_char_png" onerror="charError(this);">
-						<img id="client_pro_char_apng" onerror="charError(this);">
-						<img id="client_pro_char_webp" onerror="charError(this);">
+						<img id="client_pro_char_img" onerror="charError(this);">
 					</div>
 					<img id="client_def_bench" class="client_bench">
 					<img id="client_wit_bench" class="client_bench">
@@ -128,16 +109,10 @@
 				<div id="client_classicview">
 				<img id="client_court_classic" onerror="imgError(this);">
 				<div id="client_pair_char" class="client_char" alt="Paired character">
-					<img id="client_pair_gif" onerror="charError(this);">
-					<img id="client_pair_png" onerror="charError(this);">
-					<img id="client_pair_apng" onerror="charError(this);">
-					<img id="client_pair_webp" onerror="charError(this);">
+					<img id="client_pair_img" onerror="charError(this);">
 				</div>
 				<div id="client_char" class="client_char" alt="Character">
-					<img id="client_char_gif" onerror="charError(this);">
-					<img id="client_char_png" onerror="charError(this);">
-					<img id="client_char_apng" onerror="charError(this);">
-					<img id="client_char_webp" onerror="charError(this);">
+					<img id="client_char_img" onerror="charError(this);">
 				</div>
 				<img id="client_bench_classic" class="client_bench">	
 				</div>
