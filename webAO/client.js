@@ -1235,6 +1235,9 @@ class Client extends EventEmitter {
 	 */
   handleDONE(_args) {
     document.getElementById('client_loading').style.display = 'none';
+    if (mode === 'watch') {		// Spectators don't need to pick a character
+      document.getElementById('client_waiting').style.display = 'none';
+    }
   }
 
   /**
@@ -2655,9 +2658,8 @@ window.opusCheck = opusCheck;
 export function ReconnectButton() {
   client.cleanup();
   client = new Client(serverIP);
+  
   if (client) {
-    mode = 'join'; // HACK: see client.onOpen
-
     document.getElementById('client_error').style.display = 'none';
   }
 }
@@ -2750,6 +2752,7 @@ window.chartable_filter = chartable_filter;
 export function pickChar(ccharacter) {
   if (ccharacter === -1) {
     // Spectator
+    document.getElementById('client_waiting').style.display = 'none';
     document.getElementById('client_charselect').style.display = 'none';
   } else {
     client.sendCharacter(ccharacter);
