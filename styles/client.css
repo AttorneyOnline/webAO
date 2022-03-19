@@ -80,6 +80,7 @@
 	text-align: center;
 	align-items: center;
 	font-size: large;
+	overflow-y: scroll;
 	z-index: 100;
 	background: #555;
 }
@@ -116,7 +117,6 @@
 
 #client_charselect {
 	display: block;
-	overflow-y: scroll;
 	text-align: center;
 	margin: 0 auto;
 	background: #444;
