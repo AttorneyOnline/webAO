@@ -2609,6 +2609,7 @@ window.switchChatOffset = switchChatOffset;
  * @param {MouseEvent} event
  */
 export function changeCharacter(_event) {
+  document.getElementById('client_waiting').style.display = 'block';
   document.getElementById('client_charselect').style.display = 'block';
   document.getElementById('client_emo').innerHTML = '';
 }
