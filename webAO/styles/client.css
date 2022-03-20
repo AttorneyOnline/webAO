@@ -169,14 +169,16 @@
 
 #client_background {
 	position: relative;
-	padding-bottom: 75%;
 	background-color: transparent;
 	top: 0;
 	left: 0;
 }
 
 #client_gamewindow {
+	position: inherit;
 	width: 100%;
+	padding-bottom: 75%;
+
 }
 
 #client_court_static {
