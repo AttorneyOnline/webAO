@@ -117,7 +117,7 @@ function checkOnline(serverID: number, coIP: string) {
   };
 }
 
-function loadServerlist(thelist: string) {
+function loadServerlist(thelist: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[]) {
   localStorage.setItem('masterlist', JSON.stringify(thelist));
   processServerlist(thelist);
 }
@@ -131,9 +131,9 @@ function cachedServerlist(response: Response) {
   return response.json();
 }
 
-function processServerlist(thelist: Array<object>) {
+function processServerlist(thelist: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[]) {
   for (let i = 0; i < thelist.length - 1; i++) {
-    const serverEntry = thelist[i];
+    const serverEntry: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string } = thelist[i];
 
     servers[i] = serverEntry;
 
