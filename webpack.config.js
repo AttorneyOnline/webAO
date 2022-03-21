@@ -15,13 +15,16 @@ module.exports = {
   entry: {
     ui: './webAO/ui.js',
     client: './webAO/client.js',
-    master: './webAO/master.js',
+    master: './webAO/master.ts',
     dom: glob.sync('./webAO/dom/*.js'),
   },
   node: {
     global: true,
   },
   devtool: 'source-map',
+  resolve: {
+    extensions: ["", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"],
+  },
   devServer: {
     static: {
       directory: path.join(__dirname, 'webAO'),
@@ -55,6 +58,9 @@ module.exports = {
           },
         },
       },
+      { test: /\.tsx?$/, loader: "ts-loader" },
+      // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+      { test: /\.js$/, loader: "source-map-loader" },
     ],
   },
   output: {

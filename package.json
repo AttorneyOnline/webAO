@@ -47,7 +47,9 @@
     "@fingerprintjs/fingerprintjs": "^3.3.3",
     "core-js": "^3.21.1",
     "golden-layout": "^2.5.0",
-    "regenerator-runtime": "^0.13.9"
+    "regenerator-runtime": "^0.13.9",
+    "source-map-loader": "^3.0.1",
+    "ts-loader": "^9.2.8"
   },
   "browserslist": [
     "defaults",

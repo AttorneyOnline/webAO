@@ -2,6 +2,12 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 import { unescapeChat, safeTags } from './encoding.js';
 
+declare global {
+  interface Window {
+    setServ: (ID: any) => void;
+  }
+}
+
 const myStorage = window.localStorage;
 
 const version = process.env.npm_package_version;
