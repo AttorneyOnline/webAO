@@ -2092,7 +2092,7 @@ class Viewport {
     if (soundChecks.some((check) => this.chatmsg.sound === check)) {
       this.chatmsg.sound = this.chatmsg.effects[2];
     }
-    this.chatmsg.parsed = attorneyMarkdown.applyMarkdown(chatmsg.content)
+    this.chatmsg.parsed = attorneyMarkdown.applyMarkdown(chatmsg.content, this.colors[this.chatmsg.color])
     this.tick();
   }
 
@@ -2244,7 +2244,6 @@ class Viewport {
           this.currentBlipChannel %= this.blipChannels.length;
         }
         this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
-
         chatBoxInner.appendChild(this.chatmsg.parsed[this.textnow.length - 1]);
 
         // scroll to bottom
