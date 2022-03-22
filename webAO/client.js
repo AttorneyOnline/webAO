@@ -2244,7 +2244,10 @@ class Viewport {
           this.currentBlipChannel %= this.blipChannels.length;
         }
         this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
-        chatBoxInner.appendChild(this.chatmsg.parsed[this.textnow.length - 1]);
+        const characterElement = this.chatmsg.parsed[this.textnow.length - 1]
+        if (characterElement) {
+          chatBoxInner.appendChild(this.chatmsg.parsed[this.textnow.length - 1]);
+        }
 
         // scroll to bottom
         chatBox.scrollTop = chatBox.scrollHeight;
