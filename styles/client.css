@@ -68,20 +68,32 @@
 	animation: error_blink 3s ease-in-out infinite;
 }
 
-#client_loading {
+#client_waiting {
 	display: block;
 	flex-direction: column;
 	position: fixed;
-  	top: 30vh;
-  	left: 30vw;
-	width: 40vw;
+  	top: 5vh;
+  	left: 10vw;
+	width: 80vw;
+	max-height: 90vh;
+	justify-content: center;
+	text-align: center;
+	align-items: center;
+	font-size: large;
+	overflow-y: scroll;
+	z-index: 100;
+	background: #555;
+}
+
+#client_loading {
+	display: block;
+	flex-direction: column;
 	justify-content: center;
 	text-align: center;
 	align-items: center;
 	background: black;
 	color: lightgreen;
 	font-size: large;
-	z-index: 100;
 }
 
 #client_loadingtext {
@@ -104,17 +116,10 @@
 }
 
 #client_charselect {
-	display: none;
-	position: fixed;
-  	top: 5vh;
-  	left: 10vw;
-	width: 80vw;
-	max-height: 90vh;
-	overflow-y: scroll;
+	display: block;
 	text-align: center;
 	margin: 0 auto;
 	background: #444;
-	z-index: 50;
 }
 
 #client_icwrapper {
