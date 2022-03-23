@@ -32,7 +32,7 @@ const aomlParser = (text: string) => {
     return parsed
 }
 
-const mlConfig = (AO_HOST) => {
+const mlConfig = (AO_HOST: string) => {
     const defaultUrl = `${AO_HOST}themes/default/chat_config.ini`
     let aomlParsed: Promise<{[key: string]: Aoml}> = request(defaultUrl).then((data) => aomlParser(data));
 
