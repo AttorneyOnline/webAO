@@ -1689,12 +1689,8 @@ class Viewport {
     this.testimonyAudio = document.getElementById('client_testimonyaudio');
     this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.opus`;
 
-    this.music = new Array(
-      new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
-      new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
-      new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
-      new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
-    );
+    const audioChannels = document.getElementsByClassName('audioChannel')
+    this.music = [...audioChannels];
     this.music.forEach((channel) => channel.volume = 0.5);
     this.music.forEach((channel) => channel.onerror = opusCheck(channel));
 
@@ -2612,6 +2608,10 @@ window.imgError = imgError;
  * @param {HTMLImageElement} image the element containing the missing sound
  */
 export function opusCheck(channel) {
+  const audio = channel.src
+  if (audio === '') {
+    return
+  }
   console.info(`failed to load sound ${channel.src}`);
   let oldsrc = '';
   oldsrc = channel.src;
