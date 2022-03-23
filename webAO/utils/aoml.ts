@@ -32,46 +32,34 @@ const aomlParser = (text: string) => {
     return parsed
 }
 
-
-
-
 const mlConfig = (AO_HOST) => {
     const defaultUrl = `${AO_HOST}themes/default/chat_config.ini`
-    let aomlParsed: {[key: string]: Aoml} = {}
+    let aomlParsed: Promise<{[key: string]: Aoml}> = request(defaultUrl).then((data) => aomlParser(data));
 
-    request(defaultUrl).then((data) => {
-            aomlParsed = aomlParser(data)
-        }
-    );
+    
 
-    const createIdentifiers = () => {
+    const createIdentifiers = async () => {
         const identifiers = new Map<string, Aoml>()
-        for (const [ruleName, value] of Object.entries(aomlParsed)) {
-            if (identifiers.has(value.start)) {
-                throw new Error()
-            } 
-            else if (value.start && value.end) {
+        for (const [ruleName, value] of Object.entries(await aomlParsed)) {
+            if (value.start && value.end) {
                 identifiers.set(value.start, value)
                 identifiers.set(value.end, value)
-            }
-
-            
+            }   
         }
         return identifiers
     }
-    const createStartIdentifiers = () => {
+    const createStartIdentifiers = async () => {
         const startingIdentifiers = new Set<string>()
-        for (const [ruleName, value] of Object.entries(aomlParsed)) {
+        for (const [ruleName, value] of Object.entries(await aomlParsed)) {
             if (value?.start && value?.end) {
                 startingIdentifiers.add(value.start)
             }   
         }
         return startingIdentifiers
     }
-
-    const applyMarkdown = (text: string, defaultColor: string) => {
-        const identifiers = createIdentifiers()
-        const startIdentifiers = createStartIdentifiers()
+    const applyMarkdown = async (text: string, defaultColor: string) => {
+        const identifiers = await createIdentifiers()
+        const startIdentifiers = await createStartIdentifiers()
         const closingStack = []
         const colorStack = []
         // each value in output will be an html element
@@ -81,7 +69,8 @@ const mlConfig = (AO_HOST) => {
             let currentIdentifier = identifiers.get(letter)
             const currentClosingLetter = closingStack[closingStack.length-1]
             const keepChar = Number(currentIdentifier?.remove) === 0
-            console.log(startIdentifiers)
+            console.log(currentClosingLetter, letter, keepChar)
+
             if (startIdentifiers.has(letter)) {
                 const color = identifiers.get(letter).color.split(',')
                 const r = color[0]
@@ -95,15 +84,11 @@ const mlConfig = (AO_HOST) => {
                     currentSelector.innerHTML = letter
                 }
             } else if (currentClosingLetter === letter) {
-                if (colorStack.length === 0) {
-                    currentSelector.className = `test_${defaultColor}`
-                } else {
-                    const r = colorStack[colorStack.length-1][0]
-                    const g = colorStack[colorStack.length-1][1]
-                    const b = colorStack[colorStack.length-1][2]
-                    const currentColor = `color: rgb(${r},${g},${b});`
-                    currentSelector.setAttribute('style', currentColor)
-                }
+                const r = colorStack[colorStack.length-1][0]
+                const g = colorStack[colorStack.length-1][1]
+                const b = colorStack[colorStack.length-1][2]
+                const currentColor = `color: rgb(${r},${g},${b});`
+                currentSelector.setAttribute('style', currentColor)
                 closingStack.pop()
                 colorStack.pop()
                 if (keepChar) {

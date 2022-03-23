@@ -2092,7 +2092,7 @@ class Viewport {
     if (soundChecks.some((check) => this.chatmsg.sound === check)) {
       this.chatmsg.sound = this.chatmsg.effects[2];
     }
-    this.chatmsg.parsed = attorneyMarkdown.applyMarkdown(chatmsg.content, this.colors[this.chatmsg.color])
+    this.chatmsg.parsed = await attorneyMarkdown.applyMarkdown(chatmsg.content, this.colors[this.chatmsg.color])
     this.tick();
   }
 
