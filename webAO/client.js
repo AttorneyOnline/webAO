@@ -9,7 +9,7 @@ import { EventEmitter } from 'events';
 import fileExistsSync from './utils/fileExistsSync';
 import {
   escapeChat, encodeChat, prepChat, safeTags,
-} from './encoding.js';
+} from './encoding';
 import mlConfig from './utils/aoml';
 // Load some defaults for the background and evidence dropdowns
 import vanilla_character_arr from './constants/characters.js';
@@ -2957,7 +2957,7 @@ window.updateActionCommands = updateActionCommands;
  */
 export function changeBackgroundOOC() {
   const selectedBG = document.getElementById('bg_select');
-  const changeBGCommand = document.getElementById('bg_command').value;
+  const changeBGCommand = "bg $1";
   const bgFilename = document.getElementById('bg_filename');
 
   let filename = '';
@@ -2987,7 +2987,7 @@ window.changeRoleOOC = changeRoleOOC;
  * Random character via OOC.
  */
 export function randomCharacterOOC() {
-  client.sendOOC(`/${document.getElementById('randomchar_command').value}`);
+  client.sendOOC(`/randomchar`);
 }
 window.randomCharacterOOC = randomCharacterOOC;
 

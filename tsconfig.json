@@ -3,6 +3,8 @@
     "outDir": "./dist",
     "allowJs": true,
     "target": "es5",
+    //"strict": true,
+    "strictNullChecks": false, //document.getElementBy
     "downlevelIteration": true
   },
   "include": ["./webAO/*"]
