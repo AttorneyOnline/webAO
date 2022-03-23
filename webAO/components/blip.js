@@ -13,5 +13,5 @@ const createBlip = (amountOfBlips) => {
         document.body.appendChild(audio)
     }
 }
-createBlip(3)
+createBlip(6)
 export default createBlip
