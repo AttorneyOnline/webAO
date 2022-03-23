@@ -2,7 +2,7 @@
  * Escapes a string to AO1 escape codes.
  * @param {string} estring the string to be escaped
  */
-export function escapeChat(estring: string) {
+export function escapeChat(estring: string): string {
   return estring
     .replace(/#/g, '<num>')
     .replace(/&/g, '<and>')
@@ -14,7 +14,7 @@ export function escapeChat(estring: string) {
  * Unescapes a string to AO1 escape codes.
  * @param {string} estring the string to be unescaped
  */
-export function unescapeChat(estring: string) {
+export function unescapeChat(estring: string): string {
   return estring
     .replace(/<num>/g, '#')
     .replace(/<and>/g, '&')
@@ -28,7 +28,7 @@ export function unescapeChat(estring: string) {
  * XXX: This is unnecessary if we use `createTextNode` instead!
  * @param {string} unsafe an unsanitized string
  */
-export function safeTags(unsafe: string) {
+export function safeTags(unsafe: string): string {
   if (unsafe) {
     return unsafe
       .replace(/>/g, '&gt;')
@@ -41,7 +41,7 @@ export function safeTags(unsafe: string) {
  * Encode text on client side.
  * @param {string} estring the string to be encoded
  */
-export function encodeChat(estring: string) {
+export function encodeChat(estring: string): string {
   return estring;
 }
 
@@ -49,7 +49,7 @@ export function encodeChat(estring: string) {
  * Decodes text on client side.
  * @param {string} estring the string to be decoded
  */
-export function decodeChat(estring: string) {
+export function decodeChat(estring: string): string {
     // Source: https://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode
     return estring.replace(/\\u([\d\w]{1,})/gi, (match, group) => String.fromCharCode(parseInt(group, 16)));
 }
@@ -58,7 +58,7 @@ export function decodeChat(estring: string) {
  * XXX: a nasty hack made by gameboyprinter.
  * @param {string} msg chat message to prepare for display
  */
-export function prepChat(msg: string) {
+export function prepChat(msg: string): string {
   // TODO: make this less awful
   return unescapeChat(decodeChat(msg));
 }
