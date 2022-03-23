@@ -798,7 +798,7 @@ class Client extends EventEmitter {
           }
         }
       };
-      await getCharIcon();
+      getCharIcon();
 
       // If the ini doesn't exist on the server this will throw an error
       try {
@@ -1218,8 +1218,6 @@ class Client extends EventEmitter {
     document.getElementById('client_loading').style.display = 'none';
     if (mode === 'watch') {		// Spectators don't need to pick a character
       document.getElementById('client_charselect').style.display = 'none';
-    } else {
-      document.getElementById('client_charselect').style.display = 'block';
     }
   }
 
@@ -1674,15 +1672,8 @@ class Viewport {
     ];
 
     // Allocate multiple blip audio channels to make blips less jittery
-
-    this.blipChannels = new Array(
-      new Audio(`${AO_HOST}sounds/general/sfx-blipmale.opus`),
-      new Audio(`${AO_HOST}sounds/general/sfx-blipmale.opus`),
-      new Audio(`${AO_HOST}sounds/general/sfx-blipmale.opus`),
-      new Audio(`${AO_HOST}sounds/general/sfx-blipmale.opus`),
-      new Audio(`${AO_HOST}sounds/general/sfx-blipmale.opus`),
-      new Audio(`${AO_HOST}sounds/general/sfx-blipmale.opus`),
-    );
+    const blipSelectors = document.getElementsByClassName('blipSound')
+    this.blipChannels = [...blipSelectors];
     this.blipChannels.forEach((channel) => channel.volume = 0.5);
     this.blipChannels.forEach((channel) => channel.onerror = opusCheck(channel));
     this.currentBlipChannel = 0;
@@ -3125,3 +3116,4 @@ export function toggleShout(shout) {
   }
 }
 window.toggleShout = toggleShout;
+export default Client
