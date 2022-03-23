@@ -17,6 +17,7 @@ module.exports = {
     client: './webAO/client.js',
     master: './webAO/master.ts',
     dom: glob.sync('./webAO/dom/*.js'),
+    components: glob.sync('./webAO/components/*.js'),
   },
   node: {
     global: true,
@@ -92,7 +93,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Attorney Online',
       filename: 'client.html',
-      chunks: ['client', 'ui', 'dom'],
+      chunks: ['client', 'ui', 'dom', 'components'],
       template: 'public/client.html',
     }),
     new webpack.DefinePlugin({
