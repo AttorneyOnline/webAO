@@ -17,13 +17,14 @@ module.exports = {
     client: './webAO/client.js',
     master: './webAO/master.ts',
     dom: glob.sync('./webAO/dom/*.js'),
+    components: glob.sync('./webAO/components/*.js'),
   },
   node: {
     global: true,
   },
   devtool: 'source-map',
   resolve: {
-    extensions: ["", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"],
+    extensions: ['.js', '.jsx', '.tsx', '.ts', '.json'],
   },
   devServer: {
     static: {
@@ -58,7 +59,7 @@ module.exports = {
           },
         },
       },
-      { test: /\.tsx?$/, loader: "ts-loader" },
+      { test: /\.ts?$/, loader: "ts-loader" },
       // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
       { test: /\.js$/, loader: "source-map-loader" },
     ],
@@ -92,13 +93,13 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Attorney Online',
       filename: 'client.html',
-      chunks: ['client', 'ui', 'dom'],
+      chunks: ['client', 'ui', 'dom', 'components'],
       template: 'public/client.html',
     }),
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(process.env),
     }),
-    new WorkboxPlugin.GenerateSW(),
+    // new WorkboxPlugin.GenerateSW(),
 
   ],
 
