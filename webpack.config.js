@@ -24,7 +24,7 @@ module.exports = {
   },
   devtool: 'source-map',
   resolve: {
-    extensions: ["", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"],
+    extensions: ['.js', '.jsx', '.tsx', '.ts', '.json'],
   },
   devServer: {
     static: {
@@ -59,7 +59,7 @@ module.exports = {
           },
         },
       },
-      { test: /\.tsx?$/, loader: "ts-loader" },
+      { test: /\.ts?$/, loader: "ts-loader" },
       // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
       { test: /\.js$/, loader: "source-map-loader" },
     ],
@@ -99,7 +99,7 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(process.env),
     }),
-    new WorkboxPlugin.GenerateSW(),
+    // new WorkboxPlugin.GenerateSW(),
 
   ],
 
