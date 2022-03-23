@@ -99,7 +99,7 @@ mockRequest.mockReturnValue(Promise.resolve(networkRequest))
       const config = mlConfig('localhost')
       
       const actual = await config.applyMarkdown(`~NO[]~!`, `white`)
-      const expected = `]`
+      const expected = ``
       expect(actual[4].innerHTML).toBe(expected)
     })
     it('Should remove a closing letter if remove = 1', async () => {

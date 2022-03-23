@@ -69,7 +69,6 @@ const mlConfig = (AO_HOST) => {
             let currentIdentifier = identifiers.get(letter)
             const currentClosingLetter = closingStack[closingStack.length-1]
             const keepChar = Number(currentIdentifier?.remove) === 0
-            console.log(currentClosingLetter, letter, keepChar)
 
             if (startIdentifiers.has(letter)) {
                 const color = identifiers.get(letter).color.split(',')

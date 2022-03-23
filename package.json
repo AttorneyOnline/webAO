@@ -7,7 +7,7 @@
     "babel": "babel ui.js -o ui.b.js",
     "webpack": "webpack",
     "deploy": "cross-env NODE_ENV=production webpack -p",
-    "test": "jest aoml.test.ts",
+    "test": "jest",
     "test:coverage": "jest --coverage",
     "build": "webpack --config webpack.config.js",
     "start": "webpack serve --config webpack.config.js",
