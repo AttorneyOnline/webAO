@@ -1,6 +1,6 @@
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
-import { unescapeChat, safeTags } from './encoding.js';
+import { unescapeChat, safeTags } from './encoding';
 
 declare global {
   interface Window {
