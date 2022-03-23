@@ -67,10 +67,10 @@ export function setServ(ID: number) {
 window.setServ = setServ;
 
 function checkOnline(serverID: number, coIP: string) {
-  let oserv;
+  let serverConnection: WebSocket;
   if (serverID !== -2) {
     try {
-      oserv = new WebSocket(`ws://${coIP}`);
+      serverConnection = new WebSocket(`ws://${coIP}`);
     } catch (SecurityError) {
       document.getElementById(`server${serverID}`).className = 'unavailable';
       return;
@@ -78,24 +78,24 @@ function checkOnline(serverID: number, coIP: string) {
   }
 
   // define what the callbacks do
-  function onCOOpen(_e) {
+  function onCOOpen() {
     document.getElementById(`server${serverID}`).className = 'available';
-    oserv.send(`HI#${hdid}#%`);
-    oserv.send('ID#webAO#webAO#%');
+    serverConnection.send(`HI#${hdid}#%`);
+    serverConnection.send('ID#webAO#webAO#%');
   }
 
-  function onCOMessage(e) {
+  function onCOMessage(e: MessageEvent) {
     const comsg = e.data;
     const coheader = comsg.split('#', 2)[0];
     const coarguments = comsg.split('#').slice(1);
     if (coheader === 'PN') {
       servers[serverID].online = `Online: ${Number(coarguments[0])}/${Number(coarguments[1])}`;
-      oserv.close();
+      serverConnection.close();
       return;
     } if (coheader === 'BD') {
       servers[serverID].online = 'Banned';
       servers[serverID].description = coarguments[0];
-      oserv.close();
+      serverConnection.close();
       return;
     }
     if (serverID === selectedServer) {
@@ -104,15 +104,15 @@ function checkOnline(serverID: number, coIP: string) {
   }
 
   // assign the callbacks
-  oserv.onopen = function (evt) {
-    onCOOpen(evt);
+  serverConnection.onopen = function () {
+    onCOOpen();
   };
 
-  oserv.onmessage = function (evt) {
+  serverConnection.onmessage = function (evt: MessageEvent) {
     onCOMessage(evt);
   };
 
-  oserv.onerror = function (_evt) {
+  serverConnection.onerror = function (_evt: Event) {
     document.getElementById(`server${serverID}`).className = 'unavailable';
   };
 }
