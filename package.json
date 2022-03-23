@@ -28,6 +28,8 @@
     "@babel/core": "^7.17.5",
     "@babel/plugin-transform-modules-commonjs": "^7.16.8",
     "@babel/preset-env": "^7.16.11",
+    "@babel/preset-typescript": "^7.16.7",
+    "@types/jest": "^27.4.1",
     "babel-loader": "^8.2.3",
     "copy-webpack-plugin": "^10.2.4",
     "dotenv": "^16.0.0",
@@ -47,7 +49,10 @@
     "@fingerprintjs/fingerprintjs": "^3.3.3",
     "core-js": "^3.21.1",
     "golden-layout": "^2.5.0",
-    "regenerator-runtime": "^0.13.9"
+    "regenerator-runtime": "^0.13.9",
+    "source-map-loader": "^3.0.1",
+    "ts-loader": "^9.2.8",
+    "typescript": "^4.6.2"
   },
   "browserslist": [
     "defaults",

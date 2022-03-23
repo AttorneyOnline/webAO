@@ -10,7 +10,7 @@ import fileExistsSync from './utils/fileExistsSync';
 import {
   escapeChat, encodeChat, prepChat, safeTags,
 } from './encoding.js';
-
+import mlConfig from './utils/aoml';
 // Load some defaults for the background and evidence dropdowns
 import vanilla_character_arr from './constants/characters.js';
 import vanilla_music_arr from './constants/music.js';
@@ -42,6 +42,8 @@ let {
 const DEFAULT_HOST = 'http://attorneyoffline.de/base/';
 let AO_HOST = asset || DEFAULT_HOST;
 const THEME = theme || 'default';
+
+const attorneyMarkdown = mlConfig(AO_HOST)
 
 const UPDATE_INTERVAL = 60;
 
@@ -1694,15 +1696,8 @@ class Viewport {
     ];
 
     // Allocate multiple blip audio channels to make blips less jittery
-
-    this.blipChannels = new Array(
-      new Audio(`${AO_HOST}sounds/general/sfx-blipmale.opus`),
-      new Audio(`${AO_HOST}sounds/general/sfx-blipmale.opus`),
-      new Audio(`${AO_HOST}sounds/general/sfx-blipmale.opus`),
-      new Audio(`${AO_HOST}sounds/general/sfx-blipmale.opus`),
-      new Audio(`${AO_HOST}sounds/general/sfx-blipmale.opus`),
-      new Audio(`${AO_HOST}sounds/general/sfx-blipmale.opus`),
-    );
+    const blipSelectors = document.getElementsByClassName('blipSound')
+    this.blipChannels = [...blipSelectors];
     this.blipChannels.forEach((channel) => channel.volume = 0.5);
     this.blipChannels.forEach((channel) => channel.onerror = opusCheck(channel));
     this.currentBlipChannel = 0;
@@ -1718,12 +1713,8 @@ class Viewport {
     this.testimonyAudio = document.getElementById('client_testimonyaudio');
     this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.opus`;
 
-    this.music = new Array(
-      new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
-      new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
-      new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
-      new Audio(`${AO_HOST}sounds/music/trial (aa).opus`),
-    );
+    const audioChannels = document.getElementsByClassName('audioChannel')
+    this.music = [...audioChannels];
     this.music.forEach((channel) => channel.volume = 0.5);
     this.music.forEach((channel) => channel.onerror = opusCheck(channel));
 
@@ -1960,6 +1951,7 @@ class Viewport {
 	 * @param {object} chatmsg the new chat message
 	 */
   async say(chatmsg) {
+
     this.chatmsg = chatmsg;
     this.textnow = '';
     this.sfxplayed = 0;
@@ -2111,7 +2103,7 @@ class Viewport {
     if (soundChecks.some((check) => this.chatmsg.sound === check)) {
       this.chatmsg.sound = this.chatmsg.effects[2];
     }
-
+    this.chatmsg.parsed = await attorneyMarkdown.applyMarkdown(chatmsg.content, this.colors[this.chatmsg.color])
     this.tick();
   }
 
@@ -2263,8 +2255,10 @@ class Viewport {
           this.currentBlipChannel %= this.blipChannels.length;
         }
         this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
-
-        chatBoxInner.innerText = this.textnow;
+        const characterElement = this.chatmsg.parsed[this.textnow.length - 1]
+        if (characterElement) {
+          chatBoxInner.appendChild(this.chatmsg.parsed[this.textnow.length - 1]);
+        }
 
         // scroll to bottom
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -2346,6 +2340,7 @@ export function onEnter(event) {
     if (document.getElementById('sendpreanim').checked) {
       if (emote_mod === 0) { emote_mod = 1; }
     } else if (emote_mod === 1) { emote_mod = 0; }
+
 
     client.sendIC(
       'chat',
@@ -2642,6 +2637,10 @@ window.imgError = imgError;
  * @param {HTMLImageElement} image the element containing the missing sound
  */
 export function opusCheck(channel) {
+  const audio = channel.src
+  if (audio === '') {
+    return
+  }
   console.info(`failed to load sound ${channel.src}`);
   let oldsrc = '';
   oldsrc = channel.src;

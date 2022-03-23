@@ -2,24 +2,28 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 import { unescapeChat, safeTags } from './encoding.js';
 
+declare global {
+  interface Window {
+    setServ: (ID: any) => void;
+  }
+}
+
 const myStorage = window.localStorage;
 
 const version = process.env.npm_package_version;
 
 const MASTERSERVER_IP = 'master.aceattorneyonline.com:27014';
 
-let masterserver;
+let hdid: string;
 
-let hdid;
+let selectedServer: number = -1;
 
-let selectedServer = -1;
-
-const servers = [];
+let servers: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[] = [];
 servers[-2] = {
-  name: 'Singleplayer', description: 'Build cases, try out new things', ip: '127.0.0.1', port: 50001, assets: '', online: '',
+  name: 'Singleplayer', description: 'Build cases, try out new things', ip: '127.0.0.1', port: 50001, ws_port: 50001, assets: '', online: '',
 };
 servers[-1] = {
-  name: 'Localhost', description: 'This is your computer on port 50001', ip: '127.0.0.1', port: 50001, assets: '', online: 'Online: ?/?',
+  name: 'Localhost', description: 'This is your computer on port 50001', ip: '127.0.0.1', port: 50001, ws_port: 50001, assets: '', online: 'Online: ?/?',
 };
 
 const fpPromise = FingerprintJS.load();
@@ -49,7 +53,7 @@ export function check_https() {
   }
 }
 
-export function setServ(ID) {
+export function setServ(ID: number) {
   selectedServer = ID;
 
   if (document.getElementById(`server${ID}`).className === '') { checkOnline(ID, `${servers[ID].ip}:${servers[ID].ws_port}`); }
@@ -62,7 +66,7 @@ export function setServ(ID) {
 }
 window.setServ = setServ;
 
-function checkOnline(serverID, coIP) {
+function checkOnline(serverID: number, coIP: string) {
   let oserv;
   if (serverID !== -2) {
     try {
@@ -113,12 +117,12 @@ function checkOnline(serverID, coIP) {
   };
 }
 
-function loadServerlist(thelist) {
+function loadServerlist(thelist: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[]) {
   localStorage.setItem('masterlist', JSON.stringify(thelist));
   processServerlist(thelist);
 }
 
-function cachedServerlist(response) {
+function cachedServerlist(response: Response) {
   if (!response.ok) {
     document.getElementById('ms_error').style.display = 'block';
     processServerlist(JSON.parse(localStorage.getItem('masterlist')));
@@ -127,9 +131,9 @@ function cachedServerlist(response) {
   return response.json();
 }
 
-function processServerlist(thelist) {
+function processServerlist(thelist: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[]) {
   for (let i = 0; i < thelist.length - 1; i++) {
-    const serverEntry = thelist[i];
+    const serverEntry: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string } = thelist[i];
 
     servers[i] = serverEntry;
 
@@ -144,7 +148,7 @@ function processServerlist(thelist) {
   }
 }
 
-function processVersion(data) {
+function processVersion(data: string) {
   console.debug(data);
   document.getElementById('clientinfo').innerHTML = `Client version: ${version}`;
   document.getElementById('serverinfo').innerHTML = `Master server version: ${data}`;
