@@ -6,7 +6,7 @@ const urlExtensionsToTry = [
     '.webp',
     '.apng'
 ]
-const tryUrls = async (url) => {
+const tryUrls = async (url: string) => {
     for (let i = 0; i < urlExtensionsToTry.length; i++) {
         const extension = urlExtensionsToTry[i]
         const fullFileUrl = url + extension
