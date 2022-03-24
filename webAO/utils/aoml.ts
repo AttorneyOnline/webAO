@@ -1,7 +1,7 @@
 import request from "../services/request"
 
 interface Aoml {
-    [key: string]: any | number,
+    [key: string]: string | number,
     name: string;
     start: string;
     end: string;
