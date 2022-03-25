@@ -29,7 +29,7 @@ import queryParser from './utils/queryParser.js';
 import getAnimLength from './utils/getAnimLength.js';
 import getResources from './utils/getResources.js';
 import transparentPng from './constants/transparentPng';
-
+import downloadFile from './services/downloadFile'
 const version = process.env.npm_package_version;
 
 let client;
@@ -559,13 +559,51 @@ class Client extends EventEmitter {
     }
   }
 
+  saveChatlogHandle = async () => {
+    const clientLog = document.getElementById('client_log')
+    const icMessageLogs = clientLog.getElementsByTagName('p')
+    const messages = []
+
+    for (let i = 0; i < icMessageLogs.length; i++) {
+      const SHOWNAME_POSITION = 0
+      const TEXT_POSITION = 2
+      const showname = icMessageLogs[i].children[SHOWNAME_POSITION].innerHTML
+      const text = icMessageLogs[i].children[TEXT_POSITION].innerHTML
+      const message = `${showname}: ${text}`
+      messages.push(message)
+    }
+    const d = new Date();
+    let ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(d);
+    let mo = new Intl.DateTimeFormat('en', { month: 'short' }).format(d);
+    let da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(d);
+
+    const filename = `chatlog-${da}-${mo}-${ye}`.toLowerCase()
+    downloadFile(messages.join('\n'), filename)
+
+    // Reset Chatbox to Empty
+    document.getElementById('client_inputbox').value = '';
+  }
+  
   /**
 	 * Handles an in-character chat message.
 	 * @param {*} args packet arguments
 	 */
   handleMS(args) {
+    const msMessage = args[5]
+    const commands = {
+      '/save_chatlog': this.saveChatlogHandle
+    }
+    const commandsMap = new Map(Object.entries(commands))
+
+    if (msMessage && commandsMap.has(msMessage.toLowerCase())) {
+      try {
+        commandsMap.get(msMessage.toLowerCase())()
+      } catch (e) {
+        // Command Not Recognized
+      }
+    }
     // TODO: this if-statement might be a bug.
-    if (args[4] !== viewport.chatmsg.content) {
+    else if (args[4] !== viewport.chatmsg.content) {
       document.getElementById('client_inner_chat').innerHTML = '';
 
       const char_id = Number(args[9]);
@@ -699,8 +737,7 @@ class Client extends EventEmitter {
         if (chatmsg.charid === this.charID) {
           resetICParams();
         }
-
-        viewport.say(chatmsg); // no await
+          viewport.say(chatmsg); // no await
       }
     }
   }
