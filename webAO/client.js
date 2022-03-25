@@ -232,7 +232,21 @@ class Client extends EventEmitter {
     setCookie('OOC_name', document.getElementById('OOC_name').value);
     const oocName = `${escapeChat(encodeChat(document.getElementById('OOC_name').value))}`;
     const oocMessage = `${escapeChat(encodeChat(message))}`;
-    this.sendServer(`CT#${oocName}#${oocMessage}#%`);
+
+    const commands = {
+      '/save_chatlog': this.saveChatlogHandle
+    }
+    const commandsMap = new Map(Object.entries(commands))
+
+    if (oocMessage && commandsMap.has(oocMessage.toLowerCase())) {
+      try {
+        commandsMap.get(oocMessage.toLowerCase())()
+      } catch (e) {
+        // Command Not Recognized
+      }
+    } else {
+      this.sendServer(`CT#${oocName}#${oocMessage}#%`);
+    }
   }
 
   /**
@@ -589,21 +603,9 @@ class Client extends EventEmitter {
 	 * @param {*} args packet arguments
 	 */
   handleMS(args) {
-    const msMessage = args[5]
-    const commands = {
-      '/save_chatlog': this.saveChatlogHandle
-    }
-    const commandsMap = new Map(Object.entries(commands))
 
-    if (msMessage && commandsMap.has(msMessage.toLowerCase())) {
-      try {
-        commandsMap.get(msMessage.toLowerCase())()
-      } catch (e) {
-        // Command Not Recognized
-      }
-    }
     // TODO: this if-statement might be a bug.
-    else if (args[4] !== viewport.chatmsg.content) {
+    if (args[4] !== viewport.chatmsg.content) {
       document.getElementById('client_inner_chat').innerHTML = '';
 
       const char_id = Number(args[9]);
@@ -754,6 +756,7 @@ class Client extends EventEmitter {
         oocLog.scrollTop = oocLog.scrollHeight;
       }
     }
+
   }
 
   /**
