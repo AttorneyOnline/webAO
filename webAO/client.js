@@ -6,7 +6,7 @@
 
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { EventEmitter } from 'events';
-import fileExistsSync from './utils/fileExistsSync';
+import tryUrls from './utils/tryUrls'
 import {
   escapeChat, encodeChat, prepChat, safeTags,
 } from './encoding';
@@ -1222,11 +1222,12 @@ class Client extends EventEmitter {
       document.getElementById('client_charselect').style.display = 'none';
     }
   }
-
+  
   /**
 	 * Handles a background change.
 	 * @param {Array} args packet arguments
 	 */
+  
   handleBN(args) {
     viewport.bgname = safeTags(args[1]);
     const bgfolder = viewport.bgFolder;
@@ -1236,19 +1237,17 @@ class Client extends EventEmitter {
     if (bg_index === 0) {
       document.getElementById('bg_filename').value = viewport.bgname;
     }
-    document.getElementById('bg_preview').src = `${AO_HOST}background/${encodeURI(args[1].toLowerCase())}/defenseempty.png`;
-
-    document.getElementById('client_def_bench').src = `${bgfolder}defensedesk.png`;
-    document.getElementById('client_wit_bench').src = `${bgfolder}stand.png`;
-    document.getElementById('client_pro_bench').src = `${bgfolder}prosecutiondesk.png`;
-
-    document.getElementById('client_court').src = `${bgfolder}full.png`;
-
-    document.getElementById('client_court_def').src = `${bgfolder}defenseempty.png`;
-    document.getElementById('client_court_deft').src = `${bgfolder}transition_def.png`;
-    document.getElementById('client_court_wit').src = `${bgfolder}witnessempty.png`;
-    document.getElementById('client_court_prot').src = `${bgfolder}transition_pro.png`;
-    document.getElementById('client_court_pro').src = `${bgfolder}prosecutorempty.png`;
+    
+    tryUrls(`${AO_HOST}background/${encodeURI(args[1].toLowerCase())}/defenseempty`).then(resp => {document.getElementById('bg_preview').src = resp});
+    tryUrls(`${bgfolder}defensedesk`).then((resp) => document.getElementById('client_def_bench').src = resp);
+    tryUrls(`${bgfolder}stand`).then(resp => {document.getElementById('client_wit_bench').src = resp});
+    tryUrls(`${bgfolder}prosecutiondesk`).then(resp => {document.getElementById('client_pro_bench').src = resp});
+    tryUrls(`${bgfolder}full`).then(resp => {document.getElementById('client_court').src = resp});
+    tryUrls(`${bgfolder}defenseempty`).then(resp => {document.getElementById('client_court_def').src = resp});
+    tryUrls(`${bgfolder}transition_def`).then(resp => {document.getElementById('client_court_deft').src = resp});
+    tryUrls(`${bgfolder}witnessempty`).then(resp => {document.getElementById('client_court_wit').src = resp});
+    tryUrls(`${bgfolder}transition_pro`).then(resp => {document.getElementById('client_court_prot').src = resp});
+    tryUrls(`${bgfolder}prosecutorempty`).then(resp => {document.getElementById('client_court_pro').src = resp});
 
     if (this.charID === -1) {
       viewport.changeBackground('jud');
@@ -1765,42 +1764,42 @@ class Viewport {
 
     const positions = {
       def: {
-        bg: 'defenseempty.png',
+        bg: 'defenseempty',
         desk: { ao2: 'defensedesk.png', ao1: 'bancodefensa.png' },
         speedLines: 'defense_speedlines.gif',
       },
       pro: {
-        bg: 'prosecutorempty.png',
+        bg: 'prosecutorempty',
         desk: { ao2: 'prosecutiondesk.png', ao1: 'bancoacusacion.png' },
         speedLines: 'prosecution_speedlines.gif',
       },
       hld: {
-        bg: 'helperstand.png',
+        bg: 'helperstand',
         desk: null,
         speedLines: 'defense_speedlines.gif',
       },
       hlp: {
-        bg: 'prohelperstand.png',
+        bg: 'prohelperstand',
         desk: null,
         speedLines: 'prosecution_speedlines.gif',
       },
       wit: {
-        bg: 'witnessempty.png',
+        bg: 'witnessempty',
         desk: { ao2: 'stand.png', ao1: 'estrado.png' },
         speedLines: 'prosecution_speedlines.gif',
       },
       jud: {
-        bg: 'judgestand.png',
+        bg: 'judgestand',
         desk: { ao2: 'judgedesk.png', ao1: 'judgedesk.gif' },
         speedLines: 'prosecution_speedlines.gif',
       },
       jur: {
-        bg: 'jurystand.png',
+        bg: 'jurystand',
         desk: { ao2: 'jurydesk.png', ao1: 'estrado.png' },
         speedLines: 'defense_speedlines.gif',
       },
       sea: {
-        bg: 'seancestand.png',
+        bg: 'seancestand',
         desk: { ao2: 'seancedesk.png', ao1: 'estrado.png' },
         speedLines: 'prosecution_speedlines.gif',
       },
@@ -1815,7 +1814,7 @@ class Viewport {
       desk = positions[position].desk;
       speedLines = positions[position].speedLines;
     } else {
-      bg = `${position}.png`;
+      bg = `${position}`;
       desk = { ao2: `${position}_overlay.png`, ao1: '_overlay.png' };
       speedLines = 'defense_speedlines.gif';
     }
@@ -1825,7 +1824,9 @@ class Viewport {
       court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
       bench.style.opacity = 0;
     } else {
-      court.src = bgfolder + bg;
+      // Set src here
+      
+      court.src = await tryUrls(bgfolder + bg)
       if (desk) {
         const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
         bench.src = bgfolder + deskFilename;

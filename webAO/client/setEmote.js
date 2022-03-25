@@ -1,12 +1,12 @@
 import transparentPng from '../constants/transparentPng';
-import fileExistsSync from '../utils/fileExistsSync';
+import fileExists from '../utils/fileExists';
 
 /**
 	 * Sets all the img tags to the right sources
 	 * @param {*} chatmsg
 	 */
 
-const setEmote = (AO_HOST, client, charactername, emotename, prefix, pair, side) => {
+const setEmote = async (AO_HOST, client, charactername, emotename, prefix, pair, side) => {
   const pairID = pair ? 'pair' : 'char';
   const characterFolder = `${AO_HOST}characters/`;
   const acceptedPositions = ['def', 'pro', 'wit'];
@@ -30,7 +30,7 @@ const setEmote = (AO_HOST, client, charactername, emotename, prefix, pair, side)
     } else {
       url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(prefix)}${encodeURI(emotename)}${extension}`;
     }
-    const exists = fileExistsSync(url);
+    const exists = await fileExists(url);
     if (exists) {
       emoteSelector.src = url;
       break;
