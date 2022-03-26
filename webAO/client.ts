@@ -32,8 +32,8 @@ import transparentPng from './constants/transparentPng';
 import downloadFile from './services/downloadFile'
 const version = process.env.npm_package_version;
 
-let client;
-let viewport;
+let client: Client;
+let viewport: Viewport;
 // Get the arguments from the URL bar
 let {
   ip: serverIP, mode, asset, theme,
@@ -58,9 +58,9 @@ let oldLoading = false;
 let selectedMenu = 1;
 let selectedShout = 0;
 
-let extrafeatures = [];
+let extrafeatures: string[] = [];
 
-let hdid;
+let hdid: string;
 
 declare global {
   interface Window {
@@ -93,7 +93,7 @@ declare global {
     pickChar: (ccharacter: any) => void;
     chartable_filter: (_event: any) => void;
     ReconnectButton: (_event: any) => void;
-    opusCheck: (channel: any) => void;
+    opusCheck: (channel: HTMLAudioElement) => OnErrorEventHandlerNonNull;
     imgError: (image: any) => void;
     charError: (image: any) => void;
     changeCharacter: (_event: any) => void;
@@ -160,7 +160,7 @@ class Client extends EventEmitter {
   checkUpdater: any;
   _lastTimeICReceived: any;
 
-  constructor(address) {
+  constructor(address: string) {
     super();
     if (mode !== 'replay') {
       this.serv = new WebSocket(`ws://${address}`);
@@ -280,7 +280,7 @@ class Client extends EventEmitter {
 	 * Hook for sending messages to the server
 	 * @param {string} message the message to send
 	 */
-  sendServer(message) {
+  sendServer(message: string) {
     mode === 'replay' ? this.sendSelf(message) : this.serv.send(message);
   }
 
@@ -288,7 +288,7 @@ class Client extends EventEmitter {
 	 * Hook for sending messages to the client
 	 * @param {string} message the message to send
 	 */
-  handleSelf(message) {
+  handleSelf(message: string) {
     const message_event = new MessageEvent('websocket', { data: message });
     setTimeout(() => this.onMessage(message_event), 1);
   }
@@ -297,7 +297,7 @@ class Client extends EventEmitter {
 	 * Hook for sending messages to the client
 	 * @param {string} message the message to send
 	 */
-  sendSelf(message) {
+  sendSelf(message: string) {
     (<HTMLInputElement>document.getElementById('client_ooclog')).value += `${message}\r\n`;
     this.handleSelf(message);
   }
@@ -306,7 +306,7 @@ class Client extends EventEmitter {
 	 * Sends an out-of-character chat message.
 	 * @param {string} message the message to send
 	 */
-  sendOOC(message) {
+  sendOOC(message: string) {
     setCookie('OOC_name', (<HTMLInputElement>document.getElementById('OOC_name')).value);
     const oocName = `${escapeChat(encodeChat((<HTMLInputElement>document.getElementById('OOC_name')).value))}`;
     const oocMessage = `${escapeChat(encodeChat(message))}`;
@@ -336,12 +336,12 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to be sent
 	 * @param {string} side the name of the side in the background
 	 * @param {string} sfx_name the name of the sound effect
-	 * @param {string} emote_modifier whether or not to zoom
+	 * @param {number} emote_modifier whether or not to zoom
 	 * @param {number} sfx_delay the delay (in milliseconds) to play the sound effect
-	 * @param {string} objection_modifier the number of the shout to play
+	 * @param {number} objection_modifier the number of the shout to play
 	 * @param {string} evidence the filename of evidence to show
-	 * @param {number} flip change to 1 to reverse sprite for position changes
-	 * @param {number} realization screen flash effect
+	 * @param {boolean} flip change to 1 to reverse sprite for position changes
+	 * @param {boolean} realization screen flash effect
 	 * @param {number} text_color text color
 	 * @param {string} showname custom name to be displayed (optional)
 	 * @param {number} other_charid paired character (optional)
@@ -349,32 +349,32 @@ class Client extends EventEmitter {
 	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
   sendIC(
-    deskmod,
-    preanim,
-    name,
-    emote,
-    message,
-    side,
-    sfx_name,
-    emote_modifier,
-    sfx_delay,
-    objection_modifier,
-    evidence,
-    flip,
-    realization,
-    text_color,
-    showname,
-    other_charid,
-    self_hoffset,
-    self_yoffset,
-    noninterrupting_preanim,
-    looping_sfx,
-    screenshake,
-    frame_screenshake,
-    frame_realization,
-    frame_sfx,
-    additive,
-    effect,
+    deskmod: string,
+    preanim: string,
+    name: string,
+    emote: string,
+    message: string,
+    side: string,
+    sfx_name: string,
+    emote_modifier: number,
+    sfx_delay: number,
+    objection_modifier: number,
+    evidence: number,
+    flip: boolean,
+    realization: boolean,
+    text_color: number,
+    showname: string,
+    other_charid: string,
+    self_hoffset: number,
+    self_yoffset: number,
+    noninterrupting_preanim: boolean,
+    looping_sfx: boolean,
+    screenshake: boolean,
+    frame_screenshake: string,
+    frame_realization: string,
+    frame_sfx: string,
+    additive: boolean,
+    effect: string,
   ) {
     let extra_cccc = '';
     let other_emote = '';
@@ -388,19 +388,19 @@ class Client extends EventEmitter {
         other_emote = '##';
 		    	other_offset = '#0#0';
       }
-      extra_cccc = `${showname}#${other_charid}${other_emote}#${self_offset}${other_offset}#${noninterrupting_preanim}#`;
+      extra_cccc = `${showname}#${other_charid}${other_emote}#${self_offset}${other_offset}#${Number(noninterrupting_preanim)}#`;
 
       if (extrafeatures.includes('looping_sfx')) {
-        extra_27 = `${looping_sfx}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
+        extra_27 = `${Number(looping_sfx)}#${Number(screenshake)}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
         if (extrafeatures.includes('effects')) {
-          extra_28 = `${additive}#${effect}#`;
+          extra_28 = `${Number(additive)}#${effect}#`;
         }
       }
     }
 
     const serverMessage = `MS#${deskmod}#${preanim}#${name}#${emote}`
 			+ `#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}`
-			+ `#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
+			+ `#${this.charID}#${sfx_delay}#${Number(objection_modifier)}#${Number(evidence)}#${Number(flip)}#${Number(realization)}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
 
     this.sendServer(serverMessage);
     if (mode === 'replay') {
@@ -414,7 +414,7 @@ class Client extends EventEmitter {
 	 * @param {string} evidence description
 	 * @param {string} evidence image filename
 	 */
-  sendPE(name, desc, img) {
+  sendPE(name: string, desc: string, img: string) {
     this.sendServer(`PE#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
   }
 
@@ -425,7 +425,7 @@ class Client extends EventEmitter {
 	 * @param {string} evidence description
 	 * @param {string} evidence image filename
 	 */
-  sendEE(id, name, desc, img) {
+  sendEE(id: number, name: string, desc: string, img: string) {
     this.sendServer(`EE#${id}#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
   }
 
@@ -433,7 +433,7 @@ class Client extends EventEmitter {
 	 * Sends delete evidence command.
 	 * @param {number} evidence id
 	 */
-  sendDE(id) {
+  sendDE(id: number) {
     this.sendServer(`DE#${id}#%`);
   }
 
@@ -442,7 +442,7 @@ class Client extends EventEmitter {
 	 * @param {number} side the position
 	 * @param {number} hp the health point
 	 */
-  sendHP(side, hp) {
+  sendHP(side: number, hp: number) {
     this.sendServer(`HP#${side}#${hp}#%`);
   }
 
@@ -450,7 +450,7 @@ class Client extends EventEmitter {
 	 * Sends call mod command.
 	 * @param {string} message to mod
 	 */
-  sendZZ(msg) {
+  sendZZ(msg: string) {
     if (extrafeatures.includes('modcall_reason')) {
       this.sendServer(`ZZ#${msg}#%`);
     } else {
@@ -462,7 +462,7 @@ class Client extends EventEmitter {
 	 * Sends testimony command.
 	 * @param {string} testimony type
 	 */
-  sendRT(testimony) {
+  sendRT(testimony: string) {
     if (this.chars[this.charID].side === 'jud') {
       this.sendServer(`RT#${testimony}#%`);
     }
@@ -472,7 +472,7 @@ class Client extends EventEmitter {
 	 * Requests to change the music to the specified track.
 	 * @param {string} track the track ID
 	 */
-  sendMusicChange(track) {
+  sendMusicChange(track: string) {
     this.sendServer(`MC#${track}#${this.charID}#%`);
   }
 
@@ -533,7 +533,7 @@ class Client extends EventEmitter {
 
     (<HTMLInputElement>document.getElementById('ic_chat_name')).value = getCookie('ic_chat_name');
     (<HTMLInputElement>document.getElementById('showname')).checked = Boolean(getCookie('showname'));
-    showname_click(0);
+    showname_click(null);
 
     (<HTMLInputElement>document.getElementById('client_callwords')).value = getCookie('callwords');
   }
@@ -542,7 +542,7 @@ class Client extends EventEmitter {
 	 * Requests to play as a specified character.
 	 * @param {number} character the character ID
 	 */
-  sendCharacter(character) {
+  sendCharacter(character: number) {
     if (this.chars[character].name) { this.sendServer(`CC#${this.playerID}#${character}#web#%`); }
   }
 
@@ -550,7 +550,7 @@ class Client extends EventEmitter {
 	 * Requests to select a music track.
 	 * @param {number?} song the song to be played
 	 */
-  sendMusic(song) {
+  sendMusic(song: string) {
     this.sendServer(`MC#${song}#${this.charID}#%`);
   }
 
@@ -564,7 +564,7 @@ class Client extends EventEmitter {
   /**
 	 * Triggered when a connection is established to the server.
 	 */
-  onOpen(_e) {
+  onOpen(_e: Event) {
     client.joinServer();
   }
 
@@ -572,14 +572,14 @@ class Client extends EventEmitter {
 	 * Triggered when the connection to the server closes.
 	 * @param {CloseEvent} e
 	 */
-  onClose(e) {
+  onClose(e: CloseEvent) {
     console.error(`The connection was closed: ${e.reason} (${e.code})`);
     if (extrafeatures.length == 0 && this.banned === false) {
       document.getElementById('client_errortext').textContent = 'Could not connect to the server';
     }
     document.getElementById('client_error').style.display = 'flex';
     document.getElementById('client_loading').style.display = 'none';
-    document.getElementById('error_id').textContent = e.code;
+    document.getElementById('error_id').textContent = String(e.code);
     this.cleanup();
   }
 
@@ -587,7 +587,7 @@ class Client extends EventEmitter {
 	 * Triggered when a packet is received from the server.
 	 * @param {MessageEvent} e
 	 */
-  onMessage(e) {
+  onMessage(e: MessageEvent) {
     const msg = e.data;
     console.debug(`S: ${msg}`);
 
@@ -609,10 +609,9 @@ class Client extends EventEmitter {
 	 * Triggered when an network error occurs.
 	 * @param {ErrorEvent} e
 	 */
-  onError(e) {
-    console.error(`A network error occurred: ${e.reason} (${e.code})`);
+  onError(e: ErrorEvent) {
+    console.error(`A network error occurred`);
     document.getElementById('client_error').style.display = 'flex';
-    document.getElementById('error_id').textContent = e.code;
     this.cleanup();
   }
 
@@ -647,7 +646,7 @@ class Client extends EventEmitter {
         rtime = 0;
       }
 
-      setTimeout(() => onReplayGo(''), rtime);
+      setTimeout(() => onReplayGo(null), rtime);
     }
   }
 
@@ -680,7 +679,7 @@ class Client extends EventEmitter {
 	 * Handles an in-character chat message.
 	 * @param {*} args packet arguments
 	 */
-  handleMS(args) {
+  handleMS(args: string[]) {
 
     // TODO: this if-statement might be a bug.
     if (args[4] !== viewport.chatmsg.content) {
@@ -826,7 +825,7 @@ class Client extends EventEmitter {
 	 * Handles an out-of-character chat message.
 	 * @param {Array} args packet arguments
 	 */
-  handleCT(args) {
+  handleCT(args: string[]) {
     if (mode !== 'replay') {
       const oocLog = document.getElementById('client_ooclog');
       oocLog.innerHTML += `${prepChat(args[1])}: ${prepChat(args[2])}\r\n`;
@@ -841,7 +840,7 @@ class Client extends EventEmitter {
 	 * Handles a music change to an arbitrary resource.
 	 * @param {Array} args packet arguments
 	 */
-  handleMC(args) {
+  handleMC(args: string[]) {
     const track = prepChat(args[1]);
     let charID = Number(args[2]);
     const showname = args[3] || '';
@@ -880,7 +879,7 @@ class Client extends EventEmitter {
 	 * Handles a music change to an arbitrary resource, with an offset in seconds.
 	 * @param {Array} args packet arguments
 	 */
-  handleRMC(args) {
+  handleRMC(args: string[]) {
     viewport.music.pause();
     const { music } = viewport;
     // Music offset + drift from song loading
@@ -897,7 +896,7 @@ class Client extends EventEmitter {
 	 * @param {Array} chargs packet arguments
 	 * @param {Number} charid character ID
 	 */
-  async handleCharacterInfo(chargs, charid) {
+  async handleCharacterInfo(chargs: string[], charid: number) {
     if (chargs[0]) {
       let cini: any = {};
       const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
@@ -932,9 +931,9 @@ class Client extends EventEmitter {
       }
 
       const mute_select = <HTMLSelectElement>document.getElementById('mute_select');
-      mute_select.add(new Option(safeTags(chargs[0]), charid));
+      mute_select.add(new Option(safeTags(chargs[0]), String(charid)));
       const pair_select = <HTMLSelectElement>document.getElementById('pair_select');
-      pair_select.add(new Option(safeTags(chargs[0]), charid));
+      pair_select.add(new Option(safeTags(chargs[0]), String(charid)));
 
       // sometimes ini files lack important settings
       const default_options = {
@@ -984,19 +983,19 @@ class Client extends EventEmitter {
 	 * CI#0#Phoenix&description&&&&&#1#Miles ...
 	 * @param {Array} args packet arguments
 	 */
-  handleCI(args) {
+  handleCI(args: string[]) {
     // Loop through the 10 characters that were sent
 
     for (let i = 2; i <= args.length - 2; i++) {
       if (i % 2 === 0) {
         document.getElementById('client_loadingtext').innerHTML = `Loading Character ${args[1]}/${this.char_list_length}`;
         const chargs = args[i].split('&');
-        const charid = args[i - 1];
+        const charid = Number(args[i - 1]);
         setTimeout(() => this.handleCharacterInfo(chargs, charid), 500);
       }
     }
     // Request the next pack
-    this.sendServer(`AN#${(args[1] / 10) + 1}#%`);
+    this.sendServer(`AN#${(Number(args[1]) / 10) + 1}#%`);
   }
 
   /**
@@ -1004,8 +1003,8 @@ class Client extends EventEmitter {
 	 * in one packet.
 	 * @param {Array} args packet arguments
 	 */
-  async handleSC(args) {
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  async handleSC(args: string[]) {
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
     // Add this so people can see characters loading on the screen.
     document.getElementById('client_loading').style.display = 'none';
@@ -1030,7 +1029,7 @@ class Client extends EventEmitter {
 	 * Mostly unimplemented in webAO.
 	 * @param {Array} args packet arguments
 	 */
-  handleEI(args) {
+  handleEI(args: string[]) {
     document.getElementById('client_loadingtext').innerHTML = `Loading Evidence ${args[1]}/${this.evidence_list_length}`;
     this.sendServer('RM#%');
   }
@@ -1041,7 +1040,7 @@ class Client extends EventEmitter {
 	 *
 	 * @param {Array} args packet arguments
 	 */
-  handleLE(args) {
+  handleLE(args: string[]) {
     this.evidences = [];
     for (let i = 1; i < args.length - 1; i++) {
       const arg = args[i].split('&');
@@ -1087,7 +1086,7 @@ class Client extends EventEmitter {
       bg_select.innerHTML = '';
 
       bg_select.add(new Option('Custom', '0'));
-      bg_array.forEach((background) => {
+      bg_array.forEach((background: string) => {
         bg_select.add(new Option(background));
       });
     } catch (err) {
@@ -1104,7 +1103,7 @@ class Client extends EventEmitter {
       const char_select = <HTMLSelectElement>document.getElementById('client_ininame');
       char_select.innerHTML = '';
 
-      char_array.forEach((character) => {
+      char_array.forEach((character: string) => {
         char_select.add(new Option(character));
       });
     } catch (err) {
@@ -1121,7 +1120,7 @@ class Client extends EventEmitter {
       const evi_select = <HTMLSelectElement>document.getElementById('evi_select');
       evi_select.innerHTML = '';
 
-      evi_array.forEach((evi) => {
+      evi_array.forEach((evi: string) => {
         evi_select.add(new Option(evi));
       });
       evi_select.add(new Option('Custom', '0'));
@@ -1130,19 +1129,19 @@ class Client extends EventEmitter {
     }
   }
 
-  isAudio(trackname) {
+  isAudio(trackname: string) {
     const audioEndings = ['.wav', '.mp3', '.ogg', '.opus'];
     return audioEndings.filter((ending) => trackname.endsWith(ending)).length === 1;
   }
 
-  addTrack(trackname) {
+  addTrack(trackname: string) {
     const newentry = <HTMLOptionElement>document.createElement('OPTION');
     newentry.text = trackname;
     (<HTMLSelectElement>document.getElementById('client_musiclist')).options.add(newentry);
     this.musics.push(trackname);
   }
 
-  createArea(id, name) {
+  createArea(id: number, name: string) {
     const thisarea = {
       name,
       players: 0,
@@ -1163,7 +1162,7 @@ class Client extends EventEmitter {
 						+ `CM: ${thisarea.cm}\n`
 						+ `Area lock: ${thisarea.locked}`;
     newarea.onclick = function () {
-      area_click(this);
+      area_click(newarea);
     };
 
     document.getElementById('areas').appendChild(newarea);
@@ -1186,7 +1185,7 @@ class Client extends EventEmitter {
 	 * per packet.
 	 * @param {Array} args packet arguments
 	 */
-  handleEM(args) {
+  handleEM(args: string[]) {
     document.getElementById('client_loadingtext').innerHTML = 'Loading Music';
     if (args[1] === '0') {
       this.resetMusicList();
@@ -1198,7 +1197,7 @@ class Client extends EventEmitter {
       if (i % 2 === 0) {
         document.getElementById('client_loadingtext').innerHTML = `Loading Music ${args[1]}/${this.music_list_length}`;
         const trackname = safeTags(args[i]);
-        const trackindex = args[i - 1];
+        const trackindex = Number(args[i - 1]);
         if (this.musics_time) {
                 	this.addTrack(trackname);
             	} else if (this.isAudio(trackname)) {
@@ -1212,14 +1211,14 @@ class Client extends EventEmitter {
     }
 
     // get the next batch of tracks
-    this.sendServer(`AM#${(args[1] / 10) + 1}#%`);
+    this.sendServer(`AM#${(Number(args[1]) / 10) + 1}#%`);
   }
 
   /**
 	 * Handles incoming music information, containing all music in one packet.
 	 * @param {Array} args packet arguments
 	 */
-  handleSM(args) {
+  handleSM(args: string[]) {
     document.getElementById('client_loadingtext').innerHTML = 'Loading Music ';
     this.resetMusicList();
     this.resetAreaList();
@@ -1250,7 +1249,7 @@ class Client extends EventEmitter {
 	 * Handles updated music list
 	 * @param {Array} args packet arguments
 	 */
-  handleFM(args) {
+  handleFM(args: string[]) {
     this.resetMusicList();
 
     for (let i = 1; i < args.length - 1; i++) {
@@ -1263,7 +1262,7 @@ class Client extends EventEmitter {
 	 * Handles updated area list
 	 * @param {Array} args packet arguments
 	 */
-  handleFA(args) {
+  handleFA(args: string[]) {
     this.resetAreaList();
 
     for (let i = 1; i < args.length - 1; i++) {
@@ -1275,7 +1274,7 @@ class Client extends EventEmitter {
 	 * Handles the "MusicMode" packet
 	 * @param {Array} args packet arguments
 	 */
-  handleMM(_args) {
+  handleMM(_args: string[]) {
     // It's unused nowadays, as preventing people from changing the music is now serverside
   }
 
@@ -1284,7 +1283,7 @@ class Client extends EventEmitter {
 	 * @param {string} type is it a kick or a ban
 	 * @param {string} reason why
 	 */
-  handleBans(type, reason) {
+  handleBans(type: string, reason: string) {
     document.getElementById('client_error').style.display = 'flex';
     document.getElementById('client_errortext').innerHTML = `${type}:<br>${reason.replace(/\n/g, '<br />')}`;
     (<HTMLElement>document.getElementsByClassName('client_reconnect')[0]).style.display = 'none';
@@ -1295,7 +1294,7 @@ class Client extends EventEmitter {
 	 * Handles the kicked packet
 	 * @param {Array} args kick reason
 	 */
-  handleKK(args) {
+  handleKK(args: string[]) {
     this.handleBans('Kicked', safeTags(args[1]));
   }
 
@@ -1304,7 +1303,7 @@ class Client extends EventEmitter {
 	 * this one is sent when you are kicked off the server
 	 * @param {Array} args ban reason
 	 */
-  handleKB(args) {
+  handleKB(args: string[]) {
     this.handleBans('Banned', safeTags(args[1]));
     this.banned = true;
   }
@@ -1314,7 +1313,7 @@ class Client extends EventEmitter {
 	 * on client this spawns a message box you can't close for 2 seconds
 	 * @param {Array} args ban reason
 	 */
-		 handleBB(args) {
+		 handleBB(args: string[]) {
     alert(safeTags(args[1]));
   }
 
@@ -1323,7 +1322,7 @@ class Client extends EventEmitter {
 	 * this one is sent when you try to reconnect but you're banned
 	 * @param {Array} args ban reason
 	 */
-  handleBD(args) {
+  handleBD(args: string[]) {
     this.handleBans('Banned', safeTags(args[1]));
     this.banned = true;
   }
@@ -1334,7 +1333,7 @@ class Client extends EventEmitter {
 	 *
 	 * @param {Array} args packet arguments
 	 */
-  handleDONE(_args) {
+  handleDONE(_args: string[]) {
     document.getElementById('client_loading').style.display = 'none';
     if (mode === 'watch') {		// Spectators don't need to pick a character
       document.getElementById('client_charselect').style.display = 'none';
@@ -1346,7 +1345,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
   
-  handleBN(args) {
+  handleBN(args: string[]) {
     viewport.bgname = safeTags(args[1]);
     const bgfolder = viewport.bgFolder;
     const bg_index = getIndexFromSelect('bg_select', viewport.bgname);
@@ -1378,26 +1377,26 @@ class Client extends EventEmitter {
 	 * Handles a change in the health bars' states.
 	 * @param {Array} args packet arguments
 	 */
-  handleHP(args) {
+  handleHP(args: string[]) {
     const percent_hp = Number(args[2]) * 10;
     let healthbox;
     if (args[1] === '1') {
       // Def hp
-      this.hp[0] = args[2];
+      this.hp[0] = Number(args[2]);
       healthbox = document.getElementById('client_defense_hp');
     } else {
       // Pro hp
-      this.hp[1] = args[2];
+      this.hp[1] = Number(args[2]);
       healthbox = document.getElementById('client_prosecutor_hp');
     }
-    healthbox.getElementsByClassName('health-bar')[0].style.width = `${percent_hp}%`;
+    (<HTMLElement>healthbox.getElementsByClassName('health-bar')[0]).style.width = `${percent_hp}%`;
   }
 
   /**
 	 * Handles a testimony states.
 	 * @param {Array} args packet arguments
 	 */
-  handleRT(args) {
+  handleRT(args: string[]) {
     const judgeid = Number(args[2]);
     switch (args[1]) {
       case 'testimony1':
@@ -1420,7 +1419,7 @@ class Client extends EventEmitter {
 	 * Handles a timer update
 	 * @param {Array} args packet arguments
 	 */
-  handleTI(args) {
+  handleTI(args: string[]) {
     const timerid = Number(args[1]);
     const type = Number(args[2]);
     const timer_value = args[3];
@@ -1440,7 +1439,7 @@ class Client extends EventEmitter {
 	 * Handles a modcall
 	 * @param {Array} args packet arguments
 	 */
-  handleZZ(args) {
+  handleZZ(args: string[]) {
     const oocLog = document.getElementById('client_ooclog');
     oocLog.innerHTML += `$Alert: ${prepChat(args[1])}\r\n`;
     if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
@@ -1458,7 +1457,7 @@ class Client extends EventEmitter {
 	 * Handle the player
 	 * @param {Array} args packet arguments
 	 */
-  handleHI(args) {
+  handleHI(_args: string[]) {
     this.sendSelf(`ID#1#webAO#${version}#%`);
     this.sendSelf('FL#fastloading#yellowtext#cccc_ic_support#flipping#looping_sfx#effects#%');
   }
@@ -1467,7 +1466,7 @@ class Client extends EventEmitter {
 	 * Identifies the server and issues a playerID
 	 * @param {Array} args packet arguments
 	 */
-  handleID(args) {
+  handleID(args: string[]) {
     this.playerID = Number(args[1]);
     const serverSoftware = args[2].split('&')[0];
     let serverVersion;
@@ -1487,7 +1486,7 @@ class Client extends EventEmitter {
 	 * Indicates how many users are on this server
 	 * @param {Array} args packet arguments
 	 */
-  handlePN(_args) {
+  handlePN(_args: string[]) {
     this.sendServer('askchaa#%');
   }
 
@@ -1495,7 +1494,7 @@ class Client extends EventEmitter {
 	 * What? you want a character??
 	 * @param {Array} args packet arguments
 	 */
-  handleCC(args) {
+  handleCC(args: string[]) {
     this.sendSelf(`PV#1#CID#${args[2]}#%`);
   }
 
@@ -1503,7 +1502,7 @@ class Client extends EventEmitter {
 	 * What? you want a character list from me??
 	 * @param {Array} args packet arguments
 	 */
-  handleaskchaa(_args) {
+  handleaskchaa(_args: string[]) {
     this.sendSelf(`SI#${vanilla_character_arr.length}#0#0#%`);
   }
 
@@ -1511,7 +1510,7 @@ class Client extends EventEmitter {
 	 * Handle the change of players in an area.
 	 * @param {Array} args packet arguments
 	 */
-  handleARUP(args) {
+  handleARUP(args: string[]) {
     args = args.slice(1);
     for (let i = 0; i < args.length - 2; i++) {
       if (this.areas[i]) { // the server sends us ARUP before we even get the area list
@@ -1547,7 +1546,7 @@ class Client extends EventEmitter {
 	 * With this the server tells us which features it supports
 	 * @param {Array} args list of features
 	 */
-  handleFL(args) {
+  handleFL(args: string[]) {
     console.info('Server-supported features:');
     console.info(args);
     extrafeatures = args;
@@ -1589,7 +1588,7 @@ class Client extends EventEmitter {
 	 * but we use it as a cue to begin retrieving characters.
 	 * @param {Array} args packet arguments
 	 */
-  handleSI(args) {
+  handleSI(args: string[]) {
     this.char_list_length = Number(args[1]);
     this.char_list_length += 1; // some servers count starting from 0 some from 1...
     this.evidence_list_length = Number(args[2]);
@@ -1622,7 +1621,7 @@ class Client extends EventEmitter {
 	 * Handles the list of all used and vacant characters.
 	 * @param {Array} args list of all characters represented as a 0 for free or a -1 for taken
 	 */
-  handleCharsCheck(args) {
+  handleCharsCheck(args: string[]) {
     for (let i = 0; i < this.char_list_length; i++) {
       const img = document.getElementById(`demo_${i}`);
 
@@ -1635,7 +1634,7 @@ class Client extends EventEmitter {
 	 * PV # playerID (unused) # CID # character ID
 	 * @param {Array} args packet arguments
 	 */
-  async handlePV(args) {
+  async handlePV(args: string[]) {
     this.charID = Number(args[3]);
     document.getElementById('client_charselect').style.display = 'none';
 
@@ -1709,7 +1708,7 @@ class Client extends EventEmitter {
 
         iniedit_select.add(new Option(safeTags(me.name)));
 
-        cswap.forEach((inisw) => iniedit_select.add(new Option(safeTags(inisw))));
+        cswap.forEach((inisw: string) => iniedit_select.add(new Option(safeTags(inisw))));
       }
     } catch (err) {
       console.info("character doesn't have iniswaps");
@@ -1721,7 +1720,7 @@ class Client extends EventEmitter {
 	 * new asset url!!
 	 * @param {Array} args packet arguments
 	 */
-	 handleASS(args) {
+	 handleASS(args: string[]) {
     AO_HOST = args[1];
   }
 
@@ -1729,7 +1728,7 @@ class Client extends EventEmitter {
 	 * we are asking ourselves what characters there are
 	 * @param {Array} args packet arguments
 	 */
-  handleRC(_args) {
+  handleRC(_args: string[]) {
     this.sendSelf(`SC#${vanilla_character_arr.join('#')}#%`);
   }
 
@@ -1737,7 +1736,7 @@ class Client extends EventEmitter {
 	 * we are asking ourselves what characters there are
 	 * @param {Array} args packet arguments
 	 */
-  handleRM(_args) {
+  handleRM(_args: string[]) {
     this.sendSelf(`SM#${vanilla_music_arr.join('#')}#%`);
   }
 
@@ -1745,7 +1744,7 @@ class Client extends EventEmitter {
 	 * we are asking ourselves what characters there are
 	 * @param {Array} args packet arguments
 	 */
-  handleRD(_args) {
+  handleRD(_args: string[]) {
     this.sendSelf('BN#gs4#%');
     this.sendSelf('DONE#%');
     const ooclog = <HTMLInputElement>document.getElementById('client_ooclog');
@@ -1781,6 +1780,7 @@ class Viewport {
   startFirstTickCheck: boolean;
   startSecondTickCheck: boolean;
   startThirdTickCheck: boolean;
+  theme: string;
 
   constructor() {
     this.textnow = '';
@@ -1819,8 +1819,8 @@ class Viewport {
     // Allocate multiple blip audio channels to make blips less jittery
     const blipSelectors = document.getElementsByClassName('blipSound')
     this.blipChannels = [...blipSelectors];
-    this.blipChannels.forEach((channel) => channel.volume = 0.5);
-    this.blipChannels.forEach((channel) => channel.onerror = opusCheck(channel));
+    this.blipChannels.forEach((channel: HTMLAudioElement) => channel.volume = 0.5);
+    this.blipChannels.forEach((channel: HTMLAudioElement) => channel.onerror = opusCheck(channel));
     this.currentBlipChannel = 0;
 
     this.sfxaudio = document.getElementById('client_sfxaudio');
@@ -1836,8 +1836,8 @@ class Viewport {
 
     const audioChannels = document.getElementsByClassName('audioChannel')
     this.music = [...audioChannels];
-    this.music.forEach((channel) => channel.volume = 0.5);
-    this.music.forEach((channel) => channel.onerror = opusCheck(channel));
+    this.music.forEach((channel: HTMLAudioElement) => channel.volume = 0.5);
+    this.music.forEach((channel: HTMLAudioElement) => channel.onerror = opusCheck(channel));
 
     this.updater = null;
     this.testimonyUpdater = null;
@@ -1858,8 +1858,8 @@ class Viewport {
 	 * Sets the volume of the music.
 	 * @param {number} volume
 	 */
-  set musicVolume(volume) {
-    this.music.forEach((channel) => channel.volume = volume);
+  set musicVolume(volume: number) {
+    this.music.forEach((channel: HTMLAudioElement) => channel.volume = volume);
   }
 
   /**
@@ -1874,7 +1874,7 @@ class Viewport {
 	 *
 	 * @param {string} sfxname
 	 */
-  async playSFX(sfxname, looping) {
+  async playSFX(sfxname: string, looping: boolean) {
     this.sfxaudio.pause();
     this.sfxaudio.loop = looping;
     this.sfxaudio.src = sfxname;
@@ -1887,23 +1887,23 @@ class Viewport {
  * Valid positions: `def, pro, hld, hlp, wit, jud, jur, sea`
  * @param {string} position the position to change into
  */
-  async changeBackground(position) {
+  async changeBackground(position: string) {
     const bgfolder = viewport.bgFolder;
 
     const view = document.getElementById('client_fullview');
 
-    let bench;
+    let bench: HTMLImageElement;
     if ('def,pro,wit'.includes(position)) {
-    	bench = document.getElementById(`client_${position}_bench`);
+    	bench = <HTMLImageElement>document.getElementById(`client_${position}_bench`);
     } else {
-    	bench = document.getElementById('client_bench_classic');
+    	bench = <HTMLImageElement>document.getElementById('client_bench_classic');
     }
 
-    let court;
+    let court: HTMLImageElement;
     if ('def,pro,wit'.includes(position)) {
-    	court = document.getElementById(`client_court_${position}`);
+    	court = <HTMLImageElement>document.getElementById(`client_court_${position}`);
     } else {
-    	court = document.getElementById('client_court_classic');
+    	court = <HTMLImageElement>document.getElementById('client_court_classic');
     }
 
     const positions = {
@@ -2073,7 +2073,7 @@ class Viewport {
 	 * TODO: the preanim logic, on the other hand, should probably be moved to tick()
 	 * @param {object} chatmsg the new chat message
 	 */
-  async say(chatmsg) {
+  async say(chatmsg: any) {
 
     this.chatmsg = chatmsg;
     this.textnow = '';
@@ -2170,6 +2170,7 @@ class Viewport {
       this.chatmsg.startspeaking = false;
     } else {
       this.chatmsg.startspeaking = true;
+      chatContainerBox.style.opacity = '1';
     }
     this.chatmsg.preanimdelay = gifLength;
 
@@ -2204,7 +2205,7 @@ class Viewport {
     // flip the paired character
     pairLayers.style.transform = this.chatmsg.other_flip === 1 ? 'scaleX(-1)' : 'scaleX(1)';
 
-    this.blipChannels.forEach((channel) => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`);
+    this.blipChannels.forEach((channel: HTMLAudioElement) => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`);
 
     // process markup
     if (this.chatmsg.content.startsWith('~~')) {
@@ -2233,7 +2234,7 @@ class Viewport {
     this.tick();
   }
 
-  handleTextTick(charLayers) {
+  handleTextTick(charLayers: HTMLImageElement) {
     const chatBox = document.getElementById('client_chat');
     const waitingBox = document.getElementById('client_chatwaiting');
     const chatBoxInner = document.getElementById('client_inner_chat');
@@ -2303,12 +2304,12 @@ class Viewport {
     const shoutSprite = <HTMLImageElement>document.getElementById('client_shout');
     const effectlayer = <HTMLImageElement>document.getElementById('client_fg');
     const chatBoxInner = document.getElementById('client_inner_chat');
-    let charLayers = document.getElementById('client_char');
-    let pairLayers = document.getElementById('client_pair_char');
+    let charLayers = <HTMLImageElement>document.getElementById('client_char');
+    let pairLayers = <HTMLImageElement>document.getElementById('client_pair_char');
 
     if ('def,pro,wit'.includes(this.chatmsg.side)) {
-      charLayers = document.getElementById(`client_${this.chatmsg.side}_char`);
-      pairLayers = document.getElementById(`client_${this.chatmsg.side}_pair_char`);
+      charLayers = <HTMLImageElement>document.getElementById(`client_${this.chatmsg.side}_char`);
+      pairLayers = <HTMLImageElement>document.getElementById(`client_${this.chatmsg.side}_pair_char`);
     }
 
     const charName = this.chatmsg.name.toLowerCase();
@@ -2429,7 +2430,7 @@ class Viewport {
  * Triggered when the Return key is pressed on the out-of-character chat input box.
  * @param {KeyboardEvent} event
  */
-export function onOOCEnter(event) {
+export function onOOCEnter(event: KeyboardEvent) {
   if (event.keyCode === 13) {
     client.sendOOC((<HTMLInputElement>document.getElementById('client_oocinputbox')).value);
     (<HTMLInputElement>document.getElementById('client_oocinputbox')).value = '';
@@ -2441,7 +2442,7 @@ window.onOOCEnter = onOOCEnter;
  * Triggered when the user click replay GOOOOO
  * @param {KeyboardEvent} event
  */
-export function onReplayGo(_event) {
+export function onReplayGo(_event: Event) {
   client.handleReplay();
 }
 window.onReplayGo = onReplayGo;
@@ -2450,24 +2451,24 @@ window.onReplayGo = onReplayGo;
  * Triggered when the Return key is pressed on the in-character chat input box.
  * @param {KeyboardEvent} event
  */
-export function onEnter(event) {
+export function onEnter(event: KeyboardEvent) {
   if (event.keyCode === 13) {
     const mychar = client.character;
     const myemo = client.emote;
     const evi = client.evidence;
-    const flip = ((document.getElementById('button_flip').classList.contains('dark')) ? 1 : 0);
-    const flash = ((document.getElementById('button_flash').classList.contains('dark')) ? 1 : 0);
-    const screenshake = ((document.getElementById('button_shake').classList.contains('dark')) ? 1 : 0);
-    const noninterrupting_preanim = (((<HTMLInputElement>document.getElementById('check_nonint')).checked) ? 1 : 0);
-    const looping_sfx = (((<HTMLInputElement>document.getElementById('check_loopsfx')).checked) ? 1 : 0);
-    const color = (<HTMLInputElement>document.getElementById('textcolor')).value;
+    const flip = Boolean((document.getElementById('button_flip').classList.contains('dark')));
+    const flash = Boolean((document.getElementById('button_flash').classList.contains('dark')));
+    const screenshake = Boolean((document.getElementById('button_shake').classList.contains('dark')));
+    const noninterrupting_preanim = Boolean(((<HTMLInputElement>document.getElementById('check_nonint')).checked));
+    const looping_sfx = Boolean(((<HTMLInputElement>document.getElementById('check_loopsfx')).checked));
+    const color = Number((<HTMLInputElement>document.getElementById('textcolor')).value);
     const showname = (<HTMLInputElement>document.getElementById('ic_chat_name')).value;
     const text = (<HTMLInputElement>document.getElementById('client_inputbox')).value;
     const pairchar = (<HTMLInputElement>document.getElementById('pair_select')).value;
-    const pairoffset = (<HTMLInputElement>document.getElementById('pair_offset')).value;
-    const pairyoffset = (<HTMLInputElement>document.getElementById('pair_y_offset')).value;
+    const pairoffset = Number((<HTMLInputElement>document.getElementById('pair_offset')).value);
+    const pairyoffset = Number((<HTMLInputElement>document.getElementById('pair_y_offset')).value);
     const myrole = (<HTMLInputElement>document.getElementById('role_select')).value ? (<HTMLInputElement>document.getElementById('role_select')).value : mychar.side;
-    const additive = (((<HTMLInputElement>document.getElementById('check_additive')).checked) ? 1 : 0);
+    const additive = Boolean(((<HTMLInputElement>document.getElementById('check_additive')).checked));
     const effect = (<HTMLInputElement>document.getElementById('effect_select')).value;
 
     let sfxname = '0';
@@ -2534,7 +2535,7 @@ function resetICParams() {
   }
 }
 
-export function resetOffset(_event) {
+export function resetOffset(_event: Event) {
   (<HTMLInputElement>document.getElementById('pair_offset')).value = '0';
   (<HTMLInputElement>document.getElementById('pair_y_offset')).value = '0';
 }
@@ -2544,7 +2545,7 @@ window.resetOffset = resetOffset;
  * Triggered when the music search bar is changed
  * @param {MouseEvent} event
  */
-export function musiclist_filter(_event) {
+export function musiclist_filter(_event: Event) {
   const musiclist_element = <HTMLSelectElement>document.getElementById('client_musiclist');
   const searchname = (<HTMLInputElement>document.getElementById('client_musicsearch')).value;
 
@@ -2564,7 +2565,7 @@ window.musiclist_filter = musiclist_filter;
  * Triggered when an item on the music list is clicked.
  * @param {MouseEvent} event
  */
-export function musiclist_click(_event) {
+export function musiclist_click(_event: Event) {
   const playtrack = (<HTMLInputElement>document.getElementById('client_musiclist')).value;
   client.sendMusicChange(playtrack);
 
@@ -2581,7 +2582,7 @@ window.musiclist_click = musiclist_click;
  * Triggered when a character in the mute list is clicked
  * @param {MouseEvent} event
  */
-export function mutelist_click(_event) {
+export function mutelist_click(_event: Event) {
   const mutelist = <HTMLSelectElement>document.getElementById('mute_select');
   const selected_character = mutelist.options[mutelist.selectedIndex];
 
@@ -2600,7 +2601,7 @@ window.mutelist_click = mutelist_click;
  * Triggered when the showname checkboc is clicked
  * @param {MouseEvent} event
  */
-export function showname_click(_event) {
+export function showname_click(_event: Event) {
   setCookie('showname', String((<HTMLInputElement>document.getElementById('showname')).checked));
   setCookie('ic_chat_name', (<HTMLInputElement>document.getElementById('ic_chat_name')).value);
 
@@ -2612,9 +2613,9 @@ window.showname_click = showname_click;
 
 /**
  * Triggered when an item on the area list is clicked.
- * @param {MouseEvent} event
+ * @param {HTMLElement} el
  */
-export function area_click(el) {
+export function area_click(el: HTMLElement) {
   const area = client.areas[el.id.substr(4)].name;
   client.sendMusicChange(area);
 
@@ -2629,8 +2630,8 @@ window.area_click = area_click;
  * Triggered by the music volume slider.
  */
 export function changeMusicVolume() {
-  viewport.musicVolume = (<HTMLInputElement>document.getElementById('client_mvolume')).value;
-  setCookie('musicVolume', viewport.musicVolume);
+  viewport.musicVolume = Number((<HTMLInputElement>document.getElementById('client_mvolume')).value);
+  setCookie('musicVolume', String(viewport.musicVolume));
 }
 window.changeMusicVolume = changeMusicVolume;
 
@@ -2639,7 +2640,7 @@ window.changeMusicVolume = changeMusicVolume;
  */
 export function changeBlipVolume() {
   const blipVolume = (<HTMLInputElement>document.getElementById('client_bvolume')).value;
-  viewport.blipChannels.forEach((channel) => channel.volume = blipVolume);
+  viewport.blipChannels.forEach((channel: HTMLAudioElement) => channel.volume = Number(blipVolume));
   setCookie('blipVolume', blipVolume);
 }
 window.changeBlipVolume = changeBlipVolume;
@@ -2659,7 +2660,7 @@ window.reloadTheme = reloadTheme;
  */
 export function changeCallwords() {
   client.callwords = (<HTMLInputElement>document.getElementById('client_callwords')).value.split('\n');
-  setCookie('callwords', client.callwords);
+  setCookie('callwords', client.callwords.join('\n'));
 }
 window.changeCallwords = changeCallwords;
 
@@ -2685,7 +2686,7 @@ window.iniedit = iniedit;
 /**
  * Triggered by the pantilt checkbox
  */
-export async function switchPanTilt(addcheck) {
+export async function switchPanTilt(addcheck: number) {
   const background = document.getElementById('client_fullview');
   if (addcheck === 1) {
     (<HTMLInputElement>document.getElementById('client_pantilt')).checked = true;
@@ -2737,7 +2738,7 @@ window.switchChatOffset = switchChatOffset;
  * Triggered when a character icon is clicked in the character selection menu.
  * @param {MouseEvent} event
  */
-export function changeCharacter(_event) {
+export function changeCharacter(_event: Event) {
   document.getElementById('client_charselect').style.display = 'block';
   document.getElementById('client_emo').innerHTML = '';
 }
@@ -2747,7 +2748,7 @@ window.changeCharacter = changeCharacter;
  * Triggered when there was an error loading a character sprite.
  * @param {HTMLImageElement} image the element containing the missing image
  */
-export function charError(image) {
+export function charError(image: HTMLImageElement) {
   console.warn(`${image.src} is missing from webAO`);
   image.src = transparentPng;
   return true;
@@ -2758,8 +2759,8 @@ window.charError = charError;
  * Triggered when there was an error loading a generic sprite.
  * @param {HTMLImageElement} image the element containing the missing image
  */
-export function imgError(image) {
-  image.onerror = '';
+export function imgError(image: HTMLImageElement) {
+  image.onerror = null;
   image.src = ''; // unload so the old sprite doesn't persist
   return true;
 }
@@ -2769,7 +2770,7 @@ window.imgError = imgError;
  * Triggered when there was an error loading a sound
  * @param {HTMLAudioElement} image the element containing the missing sound
  */
-export function opusCheck(channel) {
+export function opusCheck(channel: HTMLAudioElement): OnErrorEventHandlerNonNull{
   const audio = channel.src
   if (audio === '') {
     return
@@ -2805,7 +2806,7 @@ window.ReconnectButton = ReconnectButton;
  * @param {string} msg the string to be added
  * @param {string} name the name of the sender
  */
-function appendICLog(msg, showname = '', nameplate = '', time = new Date()) {
+function appendICLog(msg: string, showname = '', nameplate = '', time = new Date()) {
   const entry = document.createElement('p');
   const shownameField = document.createElement('span');
   const nameplateField = document.createElement('span');
@@ -2849,10 +2850,10 @@ function appendICLog(msg, showname = '', nameplate = '', time = new Date()) {
  * check if the message contains an entry on our callword list
  * @param {string} message
  */
-export function checkCallword(message) {
+export function checkCallword(message: string) {
   client.callwords.forEach(testCallword);
 
-  function testCallword(item) {
+  function testCallword(item: string) {
     if (item !== '' && message.toLowerCase().includes(item.toLowerCase())) {
       viewport.sfxaudio.pause();
       viewport.sfxaudio.src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
@@ -2865,10 +2866,10 @@ export function checkCallword(message) {
  * Triggered when the music search bar is changed
  * @param {MouseEvent} event
  */
-export function chartable_filter(_event) {
+export function chartable_filter(_event: Event) {
   const searchname = (<HTMLInputElement>document.getElementById('client_charactersearch')).value;
 
-  client.chars.forEach((character, charid) => {
+  client.chars.forEach((character: any, charid: number) => {
     const demothing = document.getElementById(`demo_${charid}`);
     if (character.name.toLowerCase().indexOf(searchname.toLowerCase()) === -1) {
       demothing.style.display = 'none';
@@ -2884,7 +2885,7 @@ window.chartable_filter = chartable_filter;
  * @param {number} ccharacter the character ID; if this is a large number,
  * then spectator is chosen instead.
  */
-export function pickChar(ccharacter) {
+export function pickChar(ccharacter: number) {
   if (ccharacter === -1) {
     // Spectator
     document.getElementById('client_charselect').style.display = 'none';
@@ -2898,7 +2899,7 @@ window.pickChar = pickChar;
  * Highlights and selects an emotion for in-character chat.
  * @param {string} emo the new emotion to be selected
  */
-export function pickEmotion(emo) {
+export function pickEmotion(emo: number) {
   try {
     if (client.selectedEmote !== -1) {
       document.getElementById(`emo_${client.selectedEmote}`).className = 'emote_button';
@@ -2972,7 +2973,7 @@ window.addEvidence = addEvidence;
  */
 export function editEvidence() {
   const evidence_select = <HTMLSelectElement>document.getElementById('evi_select');
-  const id = parseInt(client.selectedEvidence) - 1;
+  const id = client.selectedEvidence - 1;
   client.sendEE(
     id,
     (<HTMLInputElement>document.getElementById('evi_name')).value,
@@ -2989,7 +2990,7 @@ window.editEvidence = editEvidence;
  * Delete selected evidence.
  */
 export function deleteEvidence() {
-  const id = parseInt(client.selectedEvidence) - 1;
+  const id = client.selectedEvidence - 1;
   client.sendDE(id);
   cancelEvidence();
 }
@@ -3201,7 +3202,7 @@ window.guilty = guilty;
  * Increment defense health point.
  */
 export function addHPD() {
-  client.sendHP(1, String(parseInt(client.hp[0]) + 1));
+  client.sendHP(1, (client.hp[0] + 1));
 }
 window.addHPD = addHPD;
 
@@ -3209,7 +3210,7 @@ window.addHPD = addHPD;
  * Decrement defense health point.
  */
 export function redHPD() {
-  client.sendHP(1, String(parseInt(client.hp[0]) - 1));
+  client.sendHP(1, (client.hp[0] - 1));
 }
 window.redHPD = redHPD;
 
@@ -3217,7 +3218,7 @@ window.redHPD = redHPD;
  * Increment prosecution health point.
  */
 export function addHPP() {
-  client.sendHP(2, String(parseInt(client.hp[1]) + 1));
+  client.sendHP(2, (client.hp[1] + 1));
 }
 window.addHPP = addHPP;
 
@@ -3225,7 +3226,7 @@ window.addHPP = addHPP;
  * Decrement prosecution health point.
  */
 export function redHPP() {
-  client.sendHP(2, String(parseInt(client.hp[1]) - 1));
+  client.sendHP(2, (client.hp[1] - 1));
 }
 window.redHPP = redHPP;
 
