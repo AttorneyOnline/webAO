@@ -388,10 +388,10 @@ class Client extends EventEmitter {
         other_emote = '##';
 		    	other_offset = '#0#0';
       }
-      extra_cccc = `${showname}#${other_charid}${other_emote}#${self_offset}${other_offset}#${noninterrupting_preanim}#`;
+      extra_cccc = `${showname}#${other_charid}${other_emote}#${self_offset}${other_offset}#${Number(noninterrupting_preanim)}#`;
 
       if (extrafeatures.includes('looping_sfx')) {
-        extra_27 = `${Number(looping_sfx)}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
+        extra_27 = `${Number(looping_sfx)}#${Number(screenshake)}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
         if (extrafeatures.includes('effects')) {
           extra_28 = `${Number(additive)}#${effect}#`;
         }
@@ -400,7 +400,7 @@ class Client extends EventEmitter {
 
     const serverMessage = `MS#${deskmod}#${preanim}#${name}#${emote}`
 			+ `#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}`
-			+ `#${this.charID}#${sfx_delay}#${Number(objection_modifier)}#${Number(evidence)}#${Number(flip)}#${realization}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
+			+ `#${this.charID}#${sfx_delay}#${Number(objection_modifier)}#${Number(evidence)}#${Number(flip)}#${Number(realization)}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
 
     this.sendServer(serverMessage);
     if (mode === 'replay') {
