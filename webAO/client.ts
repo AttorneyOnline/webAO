@@ -2307,14 +2307,14 @@ class Viewport {
       // Changing Text Speed
       if (textSpeeds.has(characterElement.innerHTML)) {
         // Grab them all in a row
-        const index = this.textnow.length
+        const MAX_SLOW_CHATSPEED = 120
         for(let i = this.textnow.length; i < this.chatmsg.content.length; i++) {
           const currentCharacter = this.chatmsg.parsed[i - 1].innerHTML
           if (currentCharacter === '{') {
             if (this.chatmsg.speed > 0) {
               this.chatmsg.speed -= 20
             }
-          } else if(currentCharacter === '}') {
+          } else if(currentCharacter === '}' && this.chatmsg.speed < MAX_SLOW_CHATSPEED) {
             this.chatmsg.speed += 20
           } else {
             // No longer at a speed character
