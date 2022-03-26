@@ -2314,8 +2314,10 @@ class Viewport {
             if (this.chatmsg.speed > 0) {
               this.chatmsg.speed -= 20
             }
-          } else if(currentCharacter === '}' && this.chatmsg.speed < MAX_SLOW_CHATSPEED) {
-            this.chatmsg.speed += 20
+          } else if(currentCharacter === '}') {
+            if(this.chatmsg.speed < MAX_SLOW_CHATSPEED) {
+              this.chatmsg.speed += 20
+            }
           } else {
             // No longer at a speed character
             this.textnow = this.chatmsg.content.substring(0, i);
