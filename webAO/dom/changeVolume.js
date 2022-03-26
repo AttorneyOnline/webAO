@@ -10,6 +10,14 @@ export function changeSFXVolume() {
 window.changeSFXVolume = changeSFXVolume;
 
 /**
+ * Triggered by the testimony volume slider.
+ */
+ export function changeTestimonyVolume() {
+  setCookie('testimonyVolume', document.getElementById('client_testimonyaudio').volume);
+}
+window.changeTestimonyVolume = changeTestimonyVolume;
+
+/**
  * Triggered by the shout volume slider.
  */
 
