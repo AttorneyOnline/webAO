@@ -1745,7 +1745,7 @@ class Viewport {
 
     this.testimonyTimer = 0;
     this.shoutTimer = 0;
-    this.textTimer = 0;
+    this.tickTimer = 0;
 
     this._animating = false;
   }
@@ -1974,8 +1974,11 @@ class Viewport {
     this.chatmsg = chatmsg;
     this.textnow = '';
     this.sfxplayed = 0;
-    this.textTimer = 0;
+    this.tickTimer = 0;
     this._animating = true;
+    this.startFirstTickCheck = true
+    this.startSecondTickCheck = false
+    this.startThirdTickCheck = false
     let charLayers = document.getElementById('client_char');
     let pairLayers = document.getElementById('client_pair_char');
 
@@ -2126,6 +2129,36 @@ class Viewport {
     this.tick();
   }
 
+  handleTextTick(charLayers) {
+    const chatBox = document.getElementById('client_chat');
+    const waitingBox = document.getElementById('client_chatwaiting');
+    const chatBoxInner = document.getElementById('client_inner_chat');
+    const charName = this.chatmsg.name.toLowerCase();
+    const charEmote = this.chatmsg.sprite.toLowerCase();
+
+
+    if (this.chatmsg.content.charAt(this.textnow.length) !== ' ') {
+      this.blipChannels[this.currentBlipChannel].play();
+      this.currentBlipChannel++;
+      this.currentBlipChannel %= this.blipChannels.length;
+    }
+    this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
+    const characterElement = this.chatmsg.parsed[this.textnow.length - 1]
+    if (characterElement) {
+      chatBoxInner.appendChild(this.chatmsg.parsed[this.textnow.length - 1]);
+    }
+
+    // scroll to bottom
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    if (this.textnow === this.chatmsg.content) {
+      this._animating = false;
+      setEmote(AO_HOST, this, charName, charEmote, '(a)', false, this.chatmsg.side);
+      charLayers.style.opacity = 1;
+      waitingBox.style.opacity = 1;
+      clearTimeout(this.updater);
+    }
+  }
   /**
 	 * Updates the chatbox based on the given text.
 	 *
@@ -2164,9 +2197,8 @@ class Viewport {
     const waitingBox = document.getElementById('client_chatwaiting');
     const eviBox = document.getElementById('client_evi');
     const shoutSprite = document.getElementById('client_shout');
-    const chatBoxInner = document.getElementById('client_inner_chat');
-    const chatBox = document.getElementById('client_chat');
     const effectlayer = document.getElementById('client_fg');
+    const chatBoxInner = document.getElementById('client_inner_chat');
     let charLayers = document.getElementById('client_char');
     let pairLayers = document.getElementById('client_pair_char');
 
@@ -2182,7 +2214,9 @@ class Viewport {
     const pairEmote = this.chatmsg.other_emote.toLowerCase();
 
     // TODO: preanims sometimes play when they're not supposed to
-    if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
+    const isShoutOver = this.tickTimer >= this.shoutTimer
+    const isShoutAndPreanimOver = this.tickTimer >= this.shoutTimer + this.chatmsg.preanimdelay
+    if (isShoutOver && this.startFirstTickCheck) {
       // Effect stuff
       if (this.chatmsg.screenshake === 1) {
         // Shake screen
@@ -2209,11 +2243,23 @@ class Viewport {
       } else {
         pairLayers.style.opacity = 0;
       }
+      // Done with first check, move to second
+      this.startFirstTickCheck = false
+      this.startSecondTickCheck = true
 
       this.chatmsg.startpreanim = false;
       this.chatmsg.startspeaking = true;
-    } else if (this.textTimer >= this.shoutTimer + this.chatmsg.preanimdelay && !this.chatmsg.startpreanim) {
+    }
+    const hasNonInterruptingPreAnim = this.chatmsg.noninterrupting_preanim === 1 
+    if (this.textnow !== this.chatmsg.content && hasNonInterruptingPreAnim) {
+      const chatContainerBox = document.getElementById('client_chatcontainer');
+      chatContainerBox.style.opacity = 1;
+      this.handleTextTick(charLayers)
+     
+    }else if (isShoutAndPreanimOver && this.startSecondTickCheck) {
       if (this.chatmsg.startspeaking) {
+        this.chatmsg.startspeaking = false;
+
         // Evidence Bullshit
         if (this.chatmsg.evidence > 0) {
           // Prepare evidence
@@ -2243,7 +2289,6 @@ class Viewport {
 
         chatBoxInner.className = `text_${this.colors[this.chatmsg.color]}`;
 
-        this.chatmsg.startspeaking = false;
 
         if (this.chatmsg.preanimdelay === 0) {
           shoutSprite.style.opacity = 0;
@@ -2268,37 +2313,17 @@ class Viewport {
           clearTimeout(this.updater);
         }
       } else if (this.textnow !== this.chatmsg.content) {
-        if (this.chatmsg.content.charAt(this.textnow.length) !== ' ') {
-          this.blipChannels[this.currentBlipChannel].play();
-          this.currentBlipChannel++;
-          this.currentBlipChannel %= this.blipChannels.length;
-        }
-        this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
-        const characterElement = this.chatmsg.parsed[this.textnow.length - 1]
-        if (characterElement) {
-          chatBoxInner.appendChild(this.chatmsg.parsed[this.textnow.length - 1]);
-        }
-
-        // scroll to bottom
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        if (this.textnow === this.chatmsg.content) {
-          this._animating = false;
-          setEmote(AO_HOST, this, charName, charEmote, '(a)', false, this.chatmsg.side);
-          charLayers.style.opacity = 1;
-          waitingBox.style.opacity = 1;
-          clearTimeout(this.updater);
-        }
+        this.handleTextTick(charLayers)
       }
     }
 
-    if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
+    if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.tickTimer) {
       this.sfxplayed = 1;
       if (this.chatmsg.sound !== '0' && this.chatmsg.sound !== '1' && this.chatmsg.sound !== '' && this.chatmsg.sound !== undefined && (this.chatmsg.type == 1 || this.chatmsg.type == 2 || this.chatmsg.type == 6)) {
         this.playSFX(`${AO_HOST}sounds/general/${encodeURI(this.chatmsg.sound.toLowerCase())}.opus`, this.chatmsg.looping_sfx);
       }
     }
-    this.textTimer += UPDATE_INTERVAL;
+    this.tickTimer += UPDATE_INTERVAL;
   }
 }
 
