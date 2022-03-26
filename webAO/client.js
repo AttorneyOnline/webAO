@@ -2129,6 +2129,7 @@ class Viewport {
     this.tick();
   }
 
+
   handleTextTick(charLayers) {
     const chatBox = document.getElementById('client_chat');
     const waitingBox = document.getElementById('client_chatwaiting');
@@ -2145,7 +2146,37 @@ class Viewport {
     this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
     const characterElement = this.chatmsg.parsed[this.textnow.length - 1]
     if (characterElement) {
-      chatBoxInner.appendChild(this.chatmsg.parsed[this.textnow.length - 1]);
+      const COMMAND_IDENTIFIER = '\\'
+
+      const nextCharacterElement = this.chatmsg.parsed[this.textnow.length]
+      const delay = ms => new Promise(res => setTimeout(res, ms));
+      const flash = async () => {
+        const effectlayer = document.getElementById('client_fg');
+        this.playSFX(`${AO_HOST}sounds/general/sfx-realization.opus`, false);
+        effectlayer.style.animation = 'flash 0.4s 1';
+        await delay(400)
+        effectlayer.style.removeProperty('animation')
+      }
+    
+      const shake = async () => {
+        const gamewindow = document.getElementById('client_gamewindow');
+        this.playSFX(`${AO_HOST}sounds/general/sfx-stab.opus`, false);
+        gamewindow.style.animation = 'shake 0.2s 1';
+        await delay(200)
+        gamewindow.style.removeProperty('animation')
+      }
+
+      const commands = new Map(Object.entries({
+        's': shake,
+        'f': flash
+      }))
+      
+      if (characterElement.innerHTML === COMMAND_IDENTIFIER && commands.has(nextCharacterElement?.innerHTML)) {
+        this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
+        commands.get(nextCharacterElement.innerHTML)()
+      } else {
+        chatBoxInner.appendChild(this.chatmsg.parsed[this.textnow.length - 1]);
+      }
     }
 
     // scroll to bottom
