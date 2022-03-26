@@ -3,7 +3,8 @@
     "outDir": "./dist",
     "allowJs": true,
     "target": "es5",
-    "strict": true,
+    "lib": ["DOM","DOM.Iterable"],
+    "strict": false,
     "strictNullChecks": false, //document.getElementBy
     "downlevelIteration": true
   },
