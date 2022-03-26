@@ -34,10 +34,21 @@ const version = process.env.npm_package_version;
 
 let client: Client;
 let viewport: Viewport;
+interface Testimony {
+  [key: number]: string
+}
+
 // Get the arguments from the URL bar
+interface QueryParams {
+  ip: string
+  serverIP: string
+  mode: string
+  asset: string
+  theme: string
+}
 let {
   ip: serverIP, mode, asset, theme,
-} = queryParser();
+} = queryParser() as QueryParams;
 // Unless there is an asset URL specified, use the wasabi one
 const DEFAULT_HOST = 'http://attorneyoffline.de/base/';
 let AO_HOST = asset || DEFAULT_HOST;
@@ -1906,45 +1917,59 @@ class Viewport {
     	court = <HTMLImageElement>document.getElementById('client_court_classic');
     }
 
-    const positions = {
+    interface Desk {
+      ao2?: string
+      ao1?: string
+    }
+    interface Position {
+      bg?: string
+      desk?: Desk
+      speedLines: string
+    }
+
+    interface Positions { 
+      [key: string]: Position
+    }
+
+    const positions: Positions = {
       def: {
         bg: 'defenseempty',
-        desk: { ao2: 'defensedesk.png', ao1: 'bancodefensa.png' },
+        desk: { ao2: 'defensedesk.png', ao1: 'bancodefensa.png' } as Desk,
         speedLines: 'defense_speedlines.gif',
       },
       pro: {
         bg: 'prosecutorempty',
-        desk: { ao2: 'prosecutiondesk.png', ao1: 'bancoacusacion.png' },
+        desk: { ao2: 'prosecutiondesk.png', ao1: 'bancoacusacion.png' } as Desk,
         speedLines: 'prosecution_speedlines.gif',
       },
       hld: {
         bg: 'helperstand',
-        desk: null,
+        desk: null as Desk,
         speedLines: 'defense_speedlines.gif',
       },
       hlp: {
         bg: 'prohelperstand',
-        desk: null,
+        desk: null as Desk,
         speedLines: 'prosecution_speedlines.gif',
       },
       wit: {
         bg: 'witnessempty',
-        desk: { ao2: 'stand.png', ao1: 'estrado.png' },
+        desk: { ao2: 'stand.png', ao1: 'estrado.png' } as Desk,
         speedLines: 'prosecution_speedlines.gif',
       },
       jud: {
         bg: 'judgestand',
-        desk: { ao2: 'judgedesk.png', ao1: 'judgedesk.gif' },
+        desk: { ao2: 'judgedesk.png', ao1: 'judgedesk.gif' } as Desk,
         speedLines: 'prosecution_speedlines.gif',
       },
       jur: {
         bg: 'jurystand',
-        desk: { ao2: 'jurydesk.png', ao1: 'estrado.png' },
+        desk: { ao2: 'jurydesk.png', ao1: 'estrado.png' } as Desk,
         speedLines: 'defense_speedlines.gif',
       },
       sea: {
         bg: 'seancestand',
-        desk: { ao2: 'seancedesk.png', ao1: 'estrado.png' },
+        desk: { ao2: 'seancedesk.png', ao1: 'estrado.png' } as Desk,
         speedLines: 'prosecution_speedlines.gif',
       },
     };
@@ -2004,7 +2029,8 @@ class Viewport {
 	 * Intialize testimony updater
 	 */
   initTestimonyUpdater() {
-    const testimonyFilenames = {
+
+    const testimonyFilenames: Testimony = {
       1: 'witnesstestimony',
       2: 'crossexamination',
       3: 'notguilty',
@@ -2032,7 +2058,7 @@ class Viewport {
 	 * Updates the testimony overaly
 	 */
   updateTestimony() {
-    const testimonyFilenames = {
+    const testimonyFilenames: Testimony = {
       1: 'witnesstestimony',
       2: 'crossexamination',
       3: 'notguilty',
