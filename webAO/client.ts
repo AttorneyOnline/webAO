@@ -744,6 +744,7 @@ class Client extends EventEmitter {
           flip: Number(args[13]),
           flash: Number(args[14]),
           color: Number(args[15]),
+          speed: UPDATE_INTERVAL
         };
 
         if (extrafeatures.includes('cccc_ic_support')) {
@@ -1806,6 +1807,7 @@ class Viewport {
       color: 0,
       snddelay: 0,
       preanimdelay: 0,
+      speed: UPDATE_INTERVAL
     };
 
     this.shouts = [
@@ -2260,7 +2262,7 @@ class Viewport {
     this.chatmsg.parsed = await attorneyMarkdown.applyMarkdown(chatmsg.content, this.colors[this.chatmsg.color])
     this.tick();
   }
-
+  
   async handleTextTick(charLayers: HTMLImageElement) {
     const chatBox = document.getElementById('client_chat');
     const waitingBox = document.getElementById('client_chatwaiting');
@@ -2300,7 +2302,28 @@ class Viewport {
         's': shake,
         'f': flash
       }))
+      const textSpeeds = new Set(['{', '}'])
 
+      // Changing Text Speed
+      if (textSpeeds.has(characterElement.innerHTML)) {
+        // Grab them all in a row
+        const index = this.textnow.length
+        for(let i = this.textnow.length; i < this.chatmsg.content.length; i++) {
+          const currentCharacter = this.chatmsg.parsed[i - 1].innerHTML
+          if (currentCharacter === '{') {
+            if (this.chatmsg.speed > 0) {
+              this.chatmsg.speed -= 20
+            }
+          } else if(currentCharacter === '}') {
+            this.chatmsg.speed += 20
+          } else {
+            // No longer at a speed character
+            this.textnow = this.chatmsg.content.substring(0, i);
+            break
+          }
+        }
+      } 
+      
       if (characterElement.innerHTML === COMMAND_IDENTIFIER && commands.has(nextCharacterElement?.innerHTML)) {
         this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
         await commands.get(nextCharacterElement.innerHTML)()
@@ -2350,7 +2373,7 @@ class Viewport {
 	 * XXX: This relies on a global variable `this.chatmsg`!
 	 */
   async tick() {
-    await delay(UPDATE_INTERVAL)
+    await delay(this.chatmsg.speed)
 
     if (this.textnow === this.chatmsg.content) {
       return
