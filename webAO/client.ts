@@ -365,8 +365,8 @@ class Client extends EventEmitter {
     text_color: number,
     showname: string,
     other_charid: string,
-    self_hoffset: string,
-    self_yoffset: string,
+    self_hoffset: number,
+    self_yoffset: number,
     noninterrupting_preanim: boolean,
     looping_sfx: boolean,
     screenshake: boolean,
@@ -2465,8 +2465,8 @@ export function onEnter(event: KeyboardEvent) {
     const showname = (<HTMLInputElement>document.getElementById('ic_chat_name')).value;
     const text = (<HTMLInputElement>document.getElementById('client_inputbox')).value;
     const pairchar = (<HTMLInputElement>document.getElementById('pair_select')).value;
-    const pairoffset = (<HTMLInputElement>document.getElementById('pair_offset')).value;
-    const pairyoffset = (<HTMLInputElement>document.getElementById('pair_y_offset')).value;
+    const pairoffset = Number((<HTMLInputElement>document.getElementById('pair_offset')).value);
+    const pairyoffset = Number((<HTMLInputElement>document.getElementById('pair_y_offset')).value);
     const myrole = (<HTMLInputElement>document.getElementById('role_select')).value ? (<HTMLInputElement>document.getElementById('role_select')).value : mychar.side;
     const additive = Boolean(((<HTMLInputElement>document.getElementById('check_additive')).checked));
     const effect = (<HTMLInputElement>document.getElementById('effect_select')).value;
