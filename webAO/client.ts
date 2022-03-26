@@ -93,7 +93,7 @@ declare global {
     pickChar: (ccharacter: any) => void;
     chartable_filter: (_event: any) => void;
     ReconnectButton: (_event: any) => void;
-    opusCheck: (channel: any) => void;
+    opusCheck: (channel: HTMLAudioElement) => OnErrorEventHandlerNonNull;
     imgError: (image: any) => void;
     charError: (image: any) => void;
     changeCharacter: (_event: any) => void;
@@ -391,16 +391,16 @@ class Client extends EventEmitter {
       extra_cccc = `${showname}#${other_charid}${other_emote}#${self_offset}${other_offset}#${noninterrupting_preanim}#`;
 
       if (extrafeatures.includes('looping_sfx')) {
-        extra_27 = `${looping_sfx}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
+        extra_27 = `${Number(looping_sfx)}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
         if (extrafeatures.includes('effects')) {
-          extra_28 = `${additive}#${effect}#`;
+          extra_28 = `${Number(additive)}#${effect}#`;
         }
       }
     }
 
     const serverMessage = `MS#${deskmod}#${preanim}#${name}#${emote}`
 			+ `#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}`
-			+ `#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
+			+ `#${this.charID}#${sfx_delay}#${Number(objection_modifier)}#${Number(evidence)}#${Number(flip)}#${realization}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
 
     this.sendServer(serverMessage);
     if (mode === 'replay') {
@@ -1162,7 +1162,7 @@ class Client extends EventEmitter {
 						+ `CM: ${thisarea.cm}\n`
 						+ `Area lock: ${thisarea.locked}`;
     newarea.onclick = function () {
-      area_click(this);
+      area_click(newarea);
     };
 
     document.getElementById('areas').appendChild(newarea);
@@ -2660,7 +2660,7 @@ window.reloadTheme = reloadTheme;
  */
 export function changeCallwords() {
   client.callwords = (<HTMLInputElement>document.getElementById('client_callwords')).value.split('\n');
-  setCookie('callwords', client.callwords);
+  setCookie('callwords', client.callwords.join('\n'));
 }
 window.changeCallwords = changeCallwords;
 
@@ -2770,7 +2770,7 @@ window.imgError = imgError;
  * Triggered when there was an error loading a sound
  * @param {HTMLAudioElement} image the element containing the missing sound
  */
-export function opusCheck(channel: HTMLAudioElement) {
+export function opusCheck(channel: HTMLAudioElement): OnErrorEventHandlerNonNull{
   const audio = channel.src
   if (audio === '') {
     return
