@@ -32,8 +32,8 @@ import transparentPng from './constants/transparentPng';
 import downloadFile from './services/downloadFile'
 const version = process.env.npm_package_version;
 
-let client;
-let viewport;
+let client: Client;
+let viewport: Viewport;
 // Get the arguments from the URL bar
 let {
   ip: serverIP, mode, asset, theme,
@@ -58,9 +58,9 @@ let oldLoading = false;
 let selectedMenu = 1;
 let selectedShout = 0;
 
-let extrafeatures = [];
+let extrafeatures: string[] = [];
 
-let hdid;
+let hdid: string;
 
 declare global {
   interface Window {
@@ -280,7 +280,7 @@ class Client extends EventEmitter {
 	 * Hook for sending messages to the server
 	 * @param {string} message the message to send
 	 */
-  sendServer(message) {
+  sendServer(message: string) {
     mode === 'replay' ? this.sendSelf(message) : this.serv.send(message);
   }
 
@@ -288,7 +288,7 @@ class Client extends EventEmitter {
 	 * Hook for sending messages to the client
 	 * @param {string} message the message to send
 	 */
-  handleSelf(message) {
+  handleSelf(message: string) {
     const message_event = new MessageEvent('websocket', { data: message });
     setTimeout(() => this.onMessage(message_event), 1);
   }
@@ -297,7 +297,7 @@ class Client extends EventEmitter {
 	 * Hook for sending messages to the client
 	 * @param {string} message the message to send
 	 */
-  sendSelf(message) {
+  sendSelf(message: string) {
     (<HTMLInputElement>document.getElementById('client_ooclog')).value += `${message}\r\n`;
     this.handleSelf(message);
   }
@@ -306,7 +306,7 @@ class Client extends EventEmitter {
 	 * Sends an out-of-character chat message.
 	 * @param {string} message the message to send
 	 */
-  sendOOC(message) {
+  sendOOC(message: string) {
     setCookie('OOC_name', (<HTMLInputElement>document.getElementById('OOC_name')).value);
     const oocName = `${escapeChat(encodeChat((<HTMLInputElement>document.getElementById('OOC_name')).value))}`;
     const oocMessage = `${escapeChat(encodeChat(message))}`;
@@ -349,32 +349,32 @@ class Client extends EventEmitter {
 	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
   sendIC(
-    deskmod,
-    preanim,
-    name,
-    emote,
-    message,
-    side,
-    sfx_name,
-    emote_modifier,
-    sfx_delay,
-    objection_modifier,
-    evidence,
-    flip,
-    realization,
-    text_color,
-    showname,
-    other_charid,
-    self_hoffset,
-    self_yoffset,
-    noninterrupting_preanim,
-    looping_sfx,
-    screenshake,
-    frame_screenshake,
-    frame_realization,
-    frame_sfx,
-    additive,
-    effect,
+    deskmod: string,
+    preanim: string,
+    name: string,
+    emote: string,
+    message: string,
+    side: string,
+    sfx_name: string,
+    emote_modifier: string,
+    sfx_delay: string,
+    objection_modifier: string,
+    evidence: string,
+    flip: string,
+    realization: string,
+    text_color: string,
+    showname: string,
+    other_charid: string,
+    self_hoffset: string,
+    self_yoffset: string,
+    noninterrupting_preanim: string,
+    looping_sfx: string,
+    screenshake: string,
+    frame_screenshake: string,
+    frame_realization: string,
+    frame_sfx: string,
+    additive: string,
+    effect: string,
   ) {
     let extra_cccc = '';
     let other_emote = '';
@@ -414,7 +414,7 @@ class Client extends EventEmitter {
 	 * @param {string} evidence description
 	 * @param {string} evidence image filename
 	 */
-  sendPE(name, desc, img) {
+  sendPE(name: string, desc: string, img: string) {
     this.sendServer(`PE#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
   }
 
@@ -425,7 +425,7 @@ class Client extends EventEmitter {
 	 * @param {string} evidence description
 	 * @param {string} evidence image filename
 	 */
-  sendEE(id, name, desc, img) {
+  sendEE(id: string, name: string, desc: string, img: string) {
     this.sendServer(`EE#${id}#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
   }
 
@@ -442,7 +442,7 @@ class Client extends EventEmitter {
 	 * @param {number} side the position
 	 * @param {number} hp the health point
 	 */
-  sendHP(side, hp) {
+  sendHP(side: string, hp: string) {
     this.sendServer(`HP#${side}#${hp}#%`);
   }
 
@@ -450,7 +450,7 @@ class Client extends EventEmitter {
 	 * Sends call mod command.
 	 * @param {string} message to mod
 	 */
-  sendZZ(msg) {
+  sendZZ(msg: string) {
     if (extrafeatures.includes('modcall_reason')) {
       this.sendServer(`ZZ#${msg}#%`);
     } else {
@@ -462,7 +462,7 @@ class Client extends EventEmitter {
 	 * Sends testimony command.
 	 * @param {string} testimony type
 	 */
-  sendRT(testimony) {
+  sendRT(testimony: string) {
     if (this.chars[this.charID].side === 'jud') {
       this.sendServer(`RT#${testimony}#%`);
     }
@@ -472,7 +472,7 @@ class Client extends EventEmitter {
 	 * Requests to change the music to the specified track.
 	 * @param {string} track the track ID
 	 */
-  sendMusicChange(track) {
+  sendMusicChange(track: string) {
     this.sendServer(`MC#${track}#${this.charID}#%`);
   }
 
@@ -542,7 +542,7 @@ class Client extends EventEmitter {
 	 * Requests to play as a specified character.
 	 * @param {number} character the character ID
 	 */
-  sendCharacter(character) {
+  sendCharacter(character: string) {
     if (this.chars[character].name) { this.sendServer(`CC#${this.playerID}#${character}#web#%`); }
   }
 
@@ -550,7 +550,7 @@ class Client extends EventEmitter {
 	 * Requests to select a music track.
 	 * @param {number?} song the song to be played
 	 */
-  sendMusic(song) {
+  sendMusic(song: string) {
     this.sendServer(`MC#${song}#${this.charID}#%`);
   }
 
@@ -564,7 +564,7 @@ class Client extends EventEmitter {
   /**
 	 * Triggered when a connection is established to the server.
 	 */
-  onOpen(_e) {
+  onOpen(_e: Event) {
     client.joinServer();
   }
 
@@ -572,14 +572,14 @@ class Client extends EventEmitter {
 	 * Triggered when the connection to the server closes.
 	 * @param {CloseEvent} e
 	 */
-  onClose(e) {
+  onClose(e: CloseEvent) {
     console.error(`The connection was closed: ${e.reason} (${e.code})`);
     if (extrafeatures.length == 0 && this.banned === false) {
       document.getElementById('client_errortext').textContent = 'Could not connect to the server';
     }
     document.getElementById('client_error').style.display = 'flex';
     document.getElementById('client_loading').style.display = 'none';
-    document.getElementById('error_id').textContent = e.code;
+    document.getElementById('error_id').textContent = String(e.code);
     this.cleanup();
   }
 
@@ -587,7 +587,7 @@ class Client extends EventEmitter {
 	 * Triggered when a packet is received from the server.
 	 * @param {MessageEvent} e
 	 */
-  onMessage(e) {
+  onMessage(e: MessageEvent) {
     const msg = e.data;
     console.debug(`S: ${msg}`);
 
@@ -609,10 +609,9 @@ class Client extends EventEmitter {
 	 * Triggered when an network error occurs.
 	 * @param {ErrorEvent} e
 	 */
-  onError(e) {
-    console.error(`A network error occurred: ${e.reason} (${e.code})`);
+  onError(e: ErrorEvent) {
+    console.error(`A network error occurred`);
     document.getElementById('client_error').style.display = 'flex';
-    document.getElementById('error_id').textContent = e.code;
     this.cleanup();
   }
 
@@ -680,7 +679,7 @@ class Client extends EventEmitter {
 	 * Handles an in-character chat message.
 	 * @param {*} args packet arguments
 	 */
-  handleMS(args) {
+  handleMS(args: string[]) {
 
     // TODO: this if-statement might be a bug.
     if (args[4] !== viewport.chatmsg.content) {
@@ -826,7 +825,7 @@ class Client extends EventEmitter {
 	 * Handles an out-of-character chat message.
 	 * @param {Array} args packet arguments
 	 */
-  handleCT(args) {
+  handleCT(args: string[]) {
     if (mode !== 'replay') {
       const oocLog = document.getElementById('client_ooclog');
       oocLog.innerHTML += `${prepChat(args[1])}: ${prepChat(args[2])}\r\n`;
@@ -841,7 +840,7 @@ class Client extends EventEmitter {
 	 * Handles a music change to an arbitrary resource.
 	 * @param {Array} args packet arguments
 	 */
-  handleMC(args) {
+  handleMC(args: string[]) {
     const track = prepChat(args[1]);
     let charID = Number(args[2]);
     const showname = args[3] || '';
@@ -880,7 +879,7 @@ class Client extends EventEmitter {
 	 * Handles a music change to an arbitrary resource, with an offset in seconds.
 	 * @param {Array} args packet arguments
 	 */
-  handleRMC(args) {
+  handleRMC(args: string[]) {
     viewport.music.pause();
     const { music } = viewport;
     // Music offset + drift from song loading
@@ -897,7 +896,7 @@ class Client extends EventEmitter {
 	 * @param {Array} chargs packet arguments
 	 * @param {Number} charid character ID
 	 */
-  async handleCharacterInfo(chargs, charid) {
+  async handleCharacterInfo(chargs: string[], charid: number) {
     if (chargs[0]) {
       let cini: any = {};
       const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
@@ -984,7 +983,7 @@ class Client extends EventEmitter {
 	 * CI#0#Phoenix&description&&&&&#1#Miles ...
 	 * @param {Array} args packet arguments
 	 */
-  handleCI(args) {
+  handleCI(args: string[]) {
     // Loop through the 10 characters that were sent
 
     for (let i = 2; i <= args.length - 2; i++) {
@@ -1004,7 +1003,7 @@ class Client extends EventEmitter {
 	 * in one packet.
 	 * @param {Array} args packet arguments
 	 */
-  async handleSC(args) {
+  async handleSC(args: string[]) {
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
     // Add this so people can see characters loading on the screen.
@@ -1030,7 +1029,7 @@ class Client extends EventEmitter {
 	 * Mostly unimplemented in webAO.
 	 * @param {Array} args packet arguments
 	 */
-  handleEI(args) {
+  handleEI(args: string[]) {
     document.getElementById('client_loadingtext').innerHTML = `Loading Evidence ${args[1]}/${this.evidence_list_length}`;
     this.sendServer('RM#%');
   }
@@ -1041,7 +1040,7 @@ class Client extends EventEmitter {
 	 *
 	 * @param {Array} args packet arguments
 	 */
-  handleLE(args) {
+  handleLE(args: string[]) {
     this.evidences = [];
     for (let i = 1; i < args.length - 1; i++) {
       const arg = args[i].split('&');
@@ -1087,7 +1086,7 @@ class Client extends EventEmitter {
       bg_select.innerHTML = '';
 
       bg_select.add(new Option('Custom', '0'));
-      bg_array.forEach((background) => {
+      bg_array.forEach((background: string) => {
         bg_select.add(new Option(background));
       });
     } catch (err) {
@@ -1104,7 +1103,7 @@ class Client extends EventEmitter {
       const char_select = <HTMLSelectElement>document.getElementById('client_ininame');
       char_select.innerHTML = '';
 
-      char_array.forEach((character) => {
+      char_array.forEach((character: string) => {
         char_select.add(new Option(character));
       });
     } catch (err) {
@@ -1121,7 +1120,7 @@ class Client extends EventEmitter {
       const evi_select = <HTMLSelectElement>document.getElementById('evi_select');
       evi_select.innerHTML = '';
 
-      evi_array.forEach((evi) => {
+      evi_array.forEach((evi: string) => {
         evi_select.add(new Option(evi));
       });
       evi_select.add(new Option('Custom', '0'));
@@ -1130,19 +1129,19 @@ class Client extends EventEmitter {
     }
   }
 
-  isAudio(trackname) {
+  isAudio(trackname: string) {
     const audioEndings = ['.wav', '.mp3', '.ogg', '.opus'];
     return audioEndings.filter((ending) => trackname.endsWith(ending)).length === 1;
   }
 
-  addTrack(trackname) {
+  addTrack(trackname: string) {
     const newentry = <HTMLOptionElement>document.createElement('OPTION');
     newentry.text = trackname;
     (<HTMLSelectElement>document.getElementById('client_musiclist')).options.add(newentry);
     this.musics.push(trackname);
   }
 
-  createArea(id, name) {
+  createArea(id: number, name: string) {
     const thisarea = {
       name,
       players: 0,
@@ -1186,7 +1185,7 @@ class Client extends EventEmitter {
 	 * per packet.
 	 * @param {Array} args packet arguments
 	 */
-  handleEM(args) {
+  handleEM(args: string[]) {
     document.getElementById('client_loadingtext').innerHTML = 'Loading Music';
     if (args[1] === '0') {
       this.resetMusicList();
@@ -1198,7 +1197,7 @@ class Client extends EventEmitter {
       if (i % 2 === 0) {
         document.getElementById('client_loadingtext').innerHTML = `Loading Music ${args[1]}/${this.music_list_length}`;
         const trackname = safeTags(args[i]);
-        const trackindex = args[i - 1];
+        const trackindex = Number(args[i - 1]);
         if (this.musics_time) {
                 	this.addTrack(trackname);
             	} else if (this.isAudio(trackname)) {
@@ -1212,14 +1211,14 @@ class Client extends EventEmitter {
     }
 
     // get the next batch of tracks
-    this.sendServer(`AM#${(args[1] / 10) + 1}#%`);
+    this.sendServer(`AM#${(Number(args[1]) / 10) + 1}#%`);
   }
 
   /**
 	 * Handles incoming music information, containing all music in one packet.
 	 * @param {Array} args packet arguments
 	 */
-  handleSM(args) {
+  handleSM(args: string[]) {
     document.getElementById('client_loadingtext').innerHTML = 'Loading Music ';
     this.resetMusicList();
     this.resetAreaList();
@@ -1250,7 +1249,7 @@ class Client extends EventEmitter {
 	 * Handles updated music list
 	 * @param {Array} args packet arguments
 	 */
-  handleFM(args) {
+  handleFM(args: string[]) {
     this.resetMusicList();
 
     for (let i = 1; i < args.length - 1; i++) {
@@ -1263,7 +1262,7 @@ class Client extends EventEmitter {
 	 * Handles updated area list
 	 * @param {Array} args packet arguments
 	 */
-  handleFA(args) {
+  handleFA(args: string[]) {
     this.resetAreaList();
 
     for (let i = 1; i < args.length - 1; i++) {
@@ -1275,7 +1274,7 @@ class Client extends EventEmitter {
 	 * Handles the "MusicMode" packet
 	 * @param {Array} args packet arguments
 	 */
-  handleMM(_args) {
+  handleMM(_args: string[]) {
     // It's unused nowadays, as preventing people from changing the music is now serverside
   }
 
@@ -1284,7 +1283,7 @@ class Client extends EventEmitter {
 	 * @param {string} type is it a kick or a ban
 	 * @param {string} reason why
 	 */
-  handleBans(type, reason) {
+  handleBans(type: string, reason: string) {
     document.getElementById('client_error').style.display = 'flex';
     document.getElementById('client_errortext').innerHTML = `${type}:<br>${reason.replace(/\n/g, '<br />')}`;
     (<HTMLElement>document.getElementsByClassName('client_reconnect')[0]).style.display = 'none';
@@ -1295,7 +1294,7 @@ class Client extends EventEmitter {
 	 * Handles the kicked packet
 	 * @param {Array} args kick reason
 	 */
-  handleKK(args) {
+  handleKK(args: string[]) {
     this.handleBans('Kicked', safeTags(args[1]));
   }
 
@@ -1304,7 +1303,7 @@ class Client extends EventEmitter {
 	 * this one is sent when you are kicked off the server
 	 * @param {Array} args ban reason
 	 */
-  handleKB(args) {
+  handleKB(args: string[]) {
     this.handleBans('Banned', safeTags(args[1]));
     this.banned = true;
   }
@@ -1314,7 +1313,7 @@ class Client extends EventEmitter {
 	 * on client this spawns a message box you can't close for 2 seconds
 	 * @param {Array} args ban reason
 	 */
-		 handleBB(args) {
+		 handleBB(args: string[]) {
     alert(safeTags(args[1]));
   }
 
@@ -1323,7 +1322,7 @@ class Client extends EventEmitter {
 	 * this one is sent when you try to reconnect but you're banned
 	 * @param {Array} args ban reason
 	 */
-  handleBD(args) {
+  handleBD(args: string[]) {
     this.handleBans('Banned', safeTags(args[1]));
     this.banned = true;
   }
@@ -1334,7 +1333,7 @@ class Client extends EventEmitter {
 	 *
 	 * @param {Array} args packet arguments
 	 */
-  handleDONE(_args) {
+  handleDONE(_args: string[]) {
     document.getElementById('client_loading').style.display = 'none';
     if (mode === 'watch') {		// Spectators don't need to pick a character
       document.getElementById('client_charselect').style.display = 'none';
@@ -1346,7 +1345,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
   
-  handleBN(args) {
+  handleBN(args: string[]) {
     viewport.bgname = safeTags(args[1]);
     const bgfolder = viewport.bgFolder;
     const bg_index = getIndexFromSelect('bg_select', viewport.bgname);
@@ -1378,7 +1377,7 @@ class Client extends EventEmitter {
 	 * Handles a change in the health bars' states.
 	 * @param {Array} args packet arguments
 	 */
-  handleHP(args) {
+  handleHP(args: string[]) {
     const percent_hp = Number(args[2]) * 10;
     let healthbox;
     if (args[1] === '1') {
@@ -1397,7 +1396,7 @@ class Client extends EventEmitter {
 	 * Handles a testimony states.
 	 * @param {Array} args packet arguments
 	 */
-  handleRT(args) {
+  handleRT(args: string[]) {
     const judgeid = Number(args[2]);
     switch (args[1]) {
       case 'testimony1':
@@ -1420,7 +1419,7 @@ class Client extends EventEmitter {
 	 * Handles a timer update
 	 * @param {Array} args packet arguments
 	 */
-  handleTI(args) {
+  handleTI(args: string[]) {
     const timerid = Number(args[1]);
     const type = Number(args[2]);
     const timer_value = args[3];
@@ -1440,7 +1439,7 @@ class Client extends EventEmitter {
 	 * Handles a modcall
 	 * @param {Array} args packet arguments
 	 */
-  handleZZ(args) {
+  handleZZ(args: string[]) {
     const oocLog = document.getElementById('client_ooclog');
     oocLog.innerHTML += `$Alert: ${prepChat(args[1])}\r\n`;
     if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
@@ -1458,7 +1457,7 @@ class Client extends EventEmitter {
 	 * Handle the player
 	 * @param {Array} args packet arguments
 	 */
-  handleHI(args) {
+  handleHI(_args: string[]) {
     this.sendSelf(`ID#1#webAO#${version}#%`);
     this.sendSelf('FL#fastloading#yellowtext#cccc_ic_support#flipping#looping_sfx#effects#%');
   }
@@ -1467,7 +1466,7 @@ class Client extends EventEmitter {
 	 * Identifies the server and issues a playerID
 	 * @param {Array} args packet arguments
 	 */
-  handleID(args) {
+  handleID(args: string[]) {
     this.playerID = Number(args[1]);
     const serverSoftware = args[2].split('&')[0];
     let serverVersion;
@@ -1487,7 +1486,7 @@ class Client extends EventEmitter {
 	 * Indicates how many users are on this server
 	 * @param {Array} args packet arguments
 	 */
-  handlePN(_args) {
+  handlePN(_args: string[]) {
     this.sendServer('askchaa#%');
   }
 
@@ -1495,7 +1494,7 @@ class Client extends EventEmitter {
 	 * What? you want a character??
 	 * @param {Array} args packet arguments
 	 */
-  handleCC(args) {
+  handleCC(args: string[]) {
     this.sendSelf(`PV#1#CID#${args[2]}#%`);
   }
 
@@ -1503,7 +1502,7 @@ class Client extends EventEmitter {
 	 * What? you want a character list from me??
 	 * @param {Array} args packet arguments
 	 */
-  handleaskchaa(_args) {
+  handleaskchaa(_args: string[]) {
     this.sendSelf(`SI#${vanilla_character_arr.length}#0#0#%`);
   }
 
@@ -1511,7 +1510,7 @@ class Client extends EventEmitter {
 	 * Handle the change of players in an area.
 	 * @param {Array} args packet arguments
 	 */
-  handleARUP(args) {
+  handleARUP(args: string[]) {
     args = args.slice(1);
     for (let i = 0; i < args.length - 2; i++) {
       if (this.areas[i]) { // the server sends us ARUP before we even get the area list
@@ -1547,7 +1546,7 @@ class Client extends EventEmitter {
 	 * With this the server tells us which features it supports
 	 * @param {Array} args list of features
 	 */
-  handleFL(args) {
+  handleFL(args: string[]) {
     console.info('Server-supported features:');
     console.info(args);
     extrafeatures = args;
@@ -1589,7 +1588,7 @@ class Client extends EventEmitter {
 	 * but we use it as a cue to begin retrieving characters.
 	 * @param {Array} args packet arguments
 	 */
-  handleSI(args) {
+  handleSI(args: string[]) {
     this.char_list_length = Number(args[1]);
     this.char_list_length += 1; // some servers count starting from 0 some from 1...
     this.evidence_list_length = Number(args[2]);
@@ -1622,7 +1621,7 @@ class Client extends EventEmitter {
 	 * Handles the list of all used and vacant characters.
 	 * @param {Array} args list of all characters represented as a 0 for free or a -1 for taken
 	 */
-  handleCharsCheck(args) {
+  handleCharsCheck(args: string[]) {
     for (let i = 0; i < this.char_list_length; i++) {
       const img = document.getElementById(`demo_${i}`);
 
@@ -1635,7 +1634,7 @@ class Client extends EventEmitter {
 	 * PV # playerID (unused) # CID # character ID
 	 * @param {Array} args packet arguments
 	 */
-  async handlePV(args) {
+  async handlePV(args: string[]) {
     this.charID = Number(args[3]);
     document.getElementById('client_charselect').style.display = 'none';
 
@@ -1721,7 +1720,7 @@ class Client extends EventEmitter {
 	 * new asset url!!
 	 * @param {Array} args packet arguments
 	 */
-	 handleASS(args) {
+	 handleASS(args: string[]) {
     AO_HOST = args[1];
   }
 
@@ -1729,7 +1728,7 @@ class Client extends EventEmitter {
 	 * we are asking ourselves what characters there are
 	 * @param {Array} args packet arguments
 	 */
-  handleRC(_args) {
+  handleRC(_args: string[]) {
     this.sendSelf(`SC#${vanilla_character_arr.join('#')}#%`);
   }
 
@@ -1737,7 +1736,7 @@ class Client extends EventEmitter {
 	 * we are asking ourselves what characters there are
 	 * @param {Array} args packet arguments
 	 */
-  handleRM(_args) {
+  handleRM(_args: string[]) {
     this.sendSelf(`SM#${vanilla_music_arr.join('#')}#%`);
   }
 
@@ -1745,7 +1744,7 @@ class Client extends EventEmitter {
 	 * we are asking ourselves what characters there are
 	 * @param {Array} args packet arguments
 	 */
-  handleRD(_args) {
+  handleRD(_args: string[]) {
     this.sendSelf('BN#gs4#%');
     this.sendSelf('DONE#%');
     const ooclog = <HTMLInputElement>document.getElementById('client_ooclog');
@@ -1858,7 +1857,7 @@ class Viewport {
 	 * Sets the volume of the music.
 	 * @param {number} volume
 	 */
-  set musicVolume(volume) {
+  set musicVolume(volume: number) {
     this.music.forEach((channel) => channel.volume = volume);
   }
 
@@ -1874,7 +1873,7 @@ class Viewport {
 	 *
 	 * @param {string} sfxname
 	 */
-  async playSFX(sfxname, looping) {
+  async playSFX(sfxname: string, looping: boolean) {
     this.sfxaudio.pause();
     this.sfxaudio.loop = looping;
     this.sfxaudio.src = sfxname;
@@ -1887,7 +1886,7 @@ class Viewport {
  * Valid positions: `def, pro, hld, hlp, wit, jud, jur, sea`
  * @param {string} position the position to change into
  */
-  async changeBackground(position) {
+  async changeBackground(position: string) {
     const bgfolder = viewport.bgFolder;
 
     const view = document.getElementById('client_fullview');
@@ -2170,6 +2169,7 @@ class Viewport {
       this.chatmsg.startspeaking = false;
     } else {
       this.chatmsg.startspeaking = true;
+      chatContainerBox.style.opacity = '1';
     }
     this.chatmsg.preanimdelay = gifLength;
 
