@@ -507,7 +507,7 @@ class Client extends EventEmitter {
     });
 
     // Read cookies and set the UI to its values
-    (<HTMLInputElement>document.getElementById('OOC_name')).value = getCookie('OOC_name') || `web${String(Math.random() * 100 + 10)}`;
+    (<HTMLInputElement>document.getElementById('OOC_name')).value = getCookie('OOC_name') || `web${String(Math.round(Math.random() * 100 + 10))}`;
 
     // Read cookies and set the UI to its values
     const cookietheme = getCookie('theme') || 'default';
