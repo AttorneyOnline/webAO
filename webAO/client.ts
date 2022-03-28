@@ -589,6 +589,7 @@ class Client extends EventEmitter {
     if (extrafeatures.length == 0 && this.banned === false) {
       document.getElementById('client_errortext').textContent = 'Could not connect to the server';
     }
+    document.getElementById('client_waiting').style.display = 'block';
     document.getElementById('client_error').style.display = 'flex';
     document.getElementById('client_loading').style.display = 'none';
     document.getElementById('error_id').textContent = String(e.code);
@@ -1001,9 +1002,10 @@ class Client extends EventEmitter {
 
     for (let i = 2; i <= args.length - 2; i++) {
       if (i % 2 === 0) {
-        document.getElementById('client_loadingtext').innerHTML = `Loading Character ${args[1]}/${this.char_list_length}`;
+        document.getElementById('client_loadingtext').innerHTML = `Loading Character ${args[1]}/${this.char_list_length}`;        
         const chargs = args[i].split('&');
         const charid = Number(args[i - 1]);
+        (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = charid;
         setTimeout(() => this.handleCharacterInfo(chargs, charid), 500);
       }
     }
@@ -1019,15 +1021,18 @@ class Client extends EventEmitter {
   async handleSC(args: string[]) {
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-    // Add this so people can see characters loading on the screen.
-    document.getElementById('client_loading').style.display = 'none';
-    document.getElementById('client_charselect').style.display = 'block';
+    if (mode === 'watch') {		// Spectators don't need to pick a character
+      document.getElementById('client_charselect').style.display = 'none';
+    } else {
+      document.getElementById('client_charselect').style.display = 'block';
+    }
 
     document.getElementById('client_loadingtext').innerHTML = 'Loading Characters';
     for (let i = 1; i < args.length; i++) {
       document.getElementById('client_loadingtext').innerHTML = `Loading Character ${i}/${this.char_list_length}`;
       const chargs = args[i].split('&');
       const charid = i - 1;
+      (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = charid;
       await sleep(0.1); // TODO: Too many network calls without this. net::ERR_INSUFFICIENT_RESOURCES
       this.handleCharacterInfo(chargs, charid);
     }
@@ -1039,12 +1044,24 @@ class Client extends EventEmitter {
 	 * Handles incoming evidence information, containing only one evidence
 	 * item per packet.
 	 *
-	 * Mostly unimplemented in webAO.
+	 * EI#id#name&description&type&image&##%    
+	 *
 	 * @param {Array} args packet arguments
 	 */
   handleEI(args: string[]) {
     document.getElementById('client_loadingtext').innerHTML = `Loading Evidence ${args[1]}/${this.evidence_list_length}`;
-    this.sendServer('RM#%');
+    const evidenceID = Number(args[1]);
+    (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = this.char_list_length + evidenceID;
+    
+    const arg = args[2].split('&');
+      this.evidences[evidenceID] = {
+        name: prepChat(arg[0]),
+        desc: prepChat(arg[1]),
+        filename: safeTags(arg[3]),
+        icon: `${AO_HOST}evidence/${encodeURI(arg[3].toLowerCase())}`,
+      };
+    
+    this.sendServer('AE'+(evidenceID+1)+'#%');
   }
 
   /**
@@ -1056,6 +1073,7 @@ class Client extends EventEmitter {
   handleLE(args: string[]) {
     this.evidences = [];
     for (let i = 1; i < args.length - 1; i++) {
+      (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = this.char_list_length + i;
       const arg = args[i].split('&');
       this.evidences[i - 1] = {
         name: prepChat(arg[0]),
@@ -1208,9 +1226,9 @@ class Client extends EventEmitter {
 
     for (let i = 2; i < args.length - 1; i++) {
       if (i % 2 === 0) {
-        document.getElementById('client_loadingtext').innerHTML = `Loading Music ${args[1]}/${this.music_list_length}`;
         const trackname = safeTags(args[i]);
         const trackindex = Number(args[i - 1]);
+        (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = this.char_list_length + this.evidence_list_length + trackindex;
         if (this.musics_time) {
                 	this.addTrack(trackname);
             	} else if (this.isAudio(trackname)) {
@@ -1243,6 +1261,7 @@ class Client extends EventEmitter {
       const trackname = safeTags(args[i]);
       const trackindex = i - 1;
       document.getElementById('client_loadingtext').innerHTML = `Loading Music ${i}/${this.music_list_length}`;
+      (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = this.char_list_length + this.evidence_list_length + i;
       if (this.musics_time) {
         this.addTrack(trackname);
       } else if (this.isAudio(trackname)) {
@@ -1349,7 +1368,7 @@ class Client extends EventEmitter {
   handleDONE(_args: string[]) {
     document.getElementById('client_loading').style.display = 'none';
     if (mode === 'watch') {		// Spectators don't need to pick a character
-      document.getElementById('client_charselect').style.display = 'none';
+      document.getElementById('client_waiting').style.display = 'none';
     }
   }
   
@@ -1606,6 +1625,8 @@ class Client extends EventEmitter {
     this.char_list_length += 1; // some servers count starting from 0 some from 1...
     this.evidence_list_length = Number(args[2]);
     this.music_list_length = Number(args[3]);
+    
+    (<HTMLProgressElement>document.getElementById('client_loadingbar')).max = this.char_list_length + this.evidence_list_length + this.music_list_length;
 
     // create the charselect grid, to be filled by the character loader
     document.getElementById('client_chartable').innerHTML = '';
@@ -1649,6 +1670,7 @@ class Client extends EventEmitter {
 	 */
   async handlePV(args: string[]) {
     this.charID = Number(args[3]);
+    document.getElementById('client_waiting').style.display = 'none';
     document.getElementById('client_charselect').style.display = 'none';
 
     const me = this.chars[this.charID];
@@ -2826,6 +2848,7 @@ window.switchChatOffset = switchChatOffset;
  * @param {MouseEvent} event
  */
 export function changeCharacter(_event: Event) {
+  document.getElementById('client_waiting').style.display = 'block';
   document.getElementById('client_charselect').style.display = 'block';
   document.getElementById('client_emo').innerHTML = '';
 }
@@ -2880,9 +2903,8 @@ window.opusCheck = opusCheck;
 export function ReconnectButton() {
   client.cleanup();
   client = new Client(serverIP);
+  
   if (client) {
-    mode = 'join'; // HACK: see client.onOpen
-
     document.getElementById('client_error').style.display = 'none';
   }
 }
@@ -2975,6 +2997,7 @@ window.chartable_filter = chartable_filter;
 export function pickChar(ccharacter: number) {
   if (ccharacter === -1) {
     // Spectator
+    document.getElementById('client_waiting').style.display = 'none';
     document.getElementById('client_charselect').style.display = 'none';
   } else {
     client.sendCharacter(ccharacter);
