@@ -75,6 +75,7 @@ let hdid: string;
 
 declare global {
   interface Window {
+    handleCredentialResponse: (response: any) => void;
     toggleShout: (shout: number) => void;
     toggleMenu: (menu: number) => void;
     updateBackgroundPreview: () => void;
@@ -495,7 +496,6 @@ class Client extends EventEmitter {
   joinServer() {
     this.sendServer('ID#webAO#webAO#%');
     this.sendServer(`HI#${hdid}#%`);
-    this.sendServer(`2T#${getCookie('g_csrf_token')}#%`);
     if (mode !== 'replay') { this.checkUpdater = setInterval(() => this.sendCheck(), 5000); }
   }
 
@@ -3369,4 +3369,10 @@ export function toggleShout(shout: number) {
   }
 }
 window.toggleShout = toggleShout;
+
+function handleCredentialResponse(response: any) {
+  client.sendServer(`2T#${response.credential}#%`);
+}
+window.handleCredentialResponse = handleCredentialResponse;
+
 export default Client
