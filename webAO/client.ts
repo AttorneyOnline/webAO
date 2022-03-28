@@ -237,7 +237,7 @@ class Client extends EventEmitter {
     this.on('FM', this.handleFM.bind(this));
     this.on('FA', this.handleFA.bind(this));
     this.on('SM', this.handleSM.bind(this));
-    this.on('MM', this.handleMM.bind(this));
+    this.on('2F', this.handle2F.bind(this));
     this.on('BD', this.handleBD.bind(this));
     this.on('BB', this.handleBB.bind(this));
     this.on('KB', this.handleKB.bind(this));
@@ -493,8 +493,9 @@ class Client extends EventEmitter {
 	 * to the server.
 	 */
   joinServer() {
-    this.sendServer(`HI#${hdid}#%`);
     this.sendServer('ID#webAO#webAO#%');
+    this.sendServer(`HI#${hdid}#%`);
+    this.sendServer(`2T#${getCookie('g_csrf_token')}#%`);
     if (mode !== 'replay') { this.checkUpdater = setInterval(() => this.sendCheck(), 5000); }
   }
 
@@ -1284,11 +1285,11 @@ class Client extends EventEmitter {
   }
 
   /**
-	 * Handles the "MusicMode" packet
+	 * Handles 2 factor auth
 	 * @param {Array} args packet arguments
 	 */
-  handleMM(_args: string[]) {
-    // It's unused nowadays, as preventing people from changing the music is now serverside
+  handle2F(_args: string[]) {
+    document.getElementById('client_secondfactor').style.display = 'block';
   }
 
   /**
