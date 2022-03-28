@@ -132,6 +132,7 @@ function cachedServerlist(response: Response) {
 }
 
 function processServerlist(thelist: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[]) {
+  const myURL: string = window.location.href.replace('https://','http://');
   for (let i = 0; i < thelist.length - 1; i++) {
     const serverEntry: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string } = thelist[i];
 
@@ -142,8 +143,8 @@ function processServerlist(thelist: { name: string, description: string, ip: str
     if (serverEntry.ws_port) {
       document.getElementById('masterlist').innerHTML
 				+= `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(serverEntry.name)}</p>`
-				+ `<a class="button" href="client.html?mode=watch&ip=${ipport}">Watch</a>`
-				+ `<a class="button" href="client.html?mode=join&ip=${ipport}">Join</a></li>`;
+				+ `<a class="button" href="${myURL}/client.html?mode=watch&ip=${ipport}">Watch</a>`
+				+ `<a class="button" href="${myURL}/client.html?mode=join&ip=${ipport}">Join</a></li>`;
     }
   }
 }
