@@ -43,11 +43,11 @@
 </head>
 
 <body>
+<div id="client_waiting">
+	<noscript><p style="color: red;">webAO requires JavaScript to work</p></noscript>
 	<div id="client_loading">
 		<h1 id="client_loadingtext">Loading</h1>
-		<noscript><p style="color: red;">webAO requires JavaScript to work</p></noscript>
-		<p>Having trouble? <a href="https://discord.gg/9rYQVVQ">Join us on Discord</a></p>
-		<button class="client_reconnect" onclick="ReconnectButton()">Reconnect</button>
+		<progress id="client_loadingbar" value="0"></progress>
 	</div>
 	<div id="client_charselect">
 		<p>Choose your character</p>
@@ -83,8 +83,11 @@
 		<p style="color: #a00">Code:
 			<span id="error_id">(none)</span>
 		</p>
-		<button class="client_reconnect" onclick="ReconnectButton()">Reconnect</button>
+		
 	</div>
+	<p>Having trouble? <a href="https://discord.gg/9rYQVVQ">Join us on Discord</a></p>
+	<button class="client_reconnect" onclick="ReconnectButton()">Reconnect</button>
+</div>
 </body>
 
 <template id="client_wrapper">
