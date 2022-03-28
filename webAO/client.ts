@@ -6,10 +6,10 @@
 
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { EventEmitter } from 'events';
-import fileExistsSync from './utils/fileExistsSync';
+import tryUrls from './utils/tryUrls'
 import {
   escapeChat, encodeChat, prepChat, safeTags,
-} from './encoding.js';
+} from './encoding';
 import mlConfig from './utils/aoml';
 // Load some defaults for the background and evidence dropdowns
 import vanilla_character_arr from './constants/characters.js';
@@ -22,22 +22,33 @@ import iniParse from './iniParse';
 import getCookie from './utils/getCookie.js';
 import setCookie from './utils/setCookie.js';
 import { request } from './services/request.js';
-import { changeShoutVolume, changeSFXVolume } from './dom/changeVolume.js';
+import { changeShoutVolume, changeSFXVolume, changeTestimonyVolume } from './dom/changeVolume.js';
 import setEmote from './client/setEmote.js';
 import fileExists from './utils/fileExists.js';
 import queryParser from './utils/queryParser.js';
 import getAnimLength from './utils/getAnimLength.js';
 import getResources from './utils/getResources.js';
 import transparentPng from './constants/transparentPng';
-
+import downloadFile from './services/downloadFile'
 const version = process.env.npm_package_version;
 
-let client;
-let viewport;
+let client: Client;
+let viewport: Viewport;
+interface Testimony {
+  [key: number]: string
+}
+
 // Get the arguments from the URL bar
+interface QueryParams {
+  ip: string
+  serverIP: string
+  mode: string
+  asset: string
+  theme: string
+}
 let {
   ip: serverIP, mode, asset, theme,
-} = queryParser();
+} = queryParser() as QueryParams;
 // Unless there is an asset URL specified, use the wasabi one
 const DEFAULT_HOST = 'http://attorneyoffline.de/base/';
 let AO_HOST = asset || DEFAULT_HOST;
@@ -58,9 +69,65 @@ let oldLoading = false;
 let selectedMenu = 1;
 let selectedShout = 0;
 
-let extrafeatures = [];
+let extrafeatures: string[] = [];
 
-let hdid;
+let hdid: string;
+
+declare global {
+  interface Window {
+    toggleShout: (shout: number) => void;
+    toggleMenu: (menu: number) => void;
+    updateBackgroundPreview: () => void;
+    redHPP: () => void;
+    addHPP: () => void;
+    redHPD: () => void;
+    addHPD: () => void;
+    guilty: () => void;
+    notguilty: () => void;
+    initCE: () => void;
+    initWT: () => void;
+    callMod: () => void;
+    randomCharacterOOC: () => void;
+    changeRoleOOC: () => void;
+    changeBackgroundOOC: () => void;
+    updateActionCommands: (side: string) => void;
+    updateEvidenceIcon: () => void;
+    resizeChatbox: () => void;
+    setChatbox: (style: string) => void;
+    getIndexFromSelect: (select_box: string, value: string) => Number;
+    cancelEvidence: () => void;
+    deleteEvidence: () => void;
+    editEvidence: () => void;
+    addEvidence: () => void;
+    pickEvidence: (evidence: any) => void;
+    pickEmotion: (emo: any) => void;
+    pickChar: (ccharacter: any) => void;
+    chartable_filter: (_event: any) => void;
+    ReconnectButton: (_event: any) => void;
+    opusCheck: (channel: HTMLAudioElement) => OnErrorEventHandlerNonNull;
+    imgError: (image: any) => void;
+    charError: (image: any) => void;
+    changeCharacter: (_event: any) => void;
+    switchChatOffset: () => void;
+    switchAspectRatio: () => void;
+    switchPanTilt: (addcheck: number) => void;
+    iniedit: () => void;
+    modcall_test: () => void;
+    reloadTheme: () => void;
+    changeCallwords: () => void;
+    changeBlipVolume: () => void;
+    changeMusicVolume: () => void;
+    area_click: (el: any) => void;
+    showname_click: (_event: any) => void;
+    mutelist_click: (_event: any) => void;
+    musiclist_click: (_event: any) => void;
+    musiclist_filter: (_event: any) => void;
+    resetOffset: (_event: any) => void;
+    onEnter: (event: any) => void;
+    onReplayGo: (_event: any) => void;
+    onOOCEnter: (_event: any) => void;
+  }
+}
 
 function isLowMemory() {
   if (/webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Nintendo|Opera Mini/i.test(navigator.userAgent)) {
@@ -78,11 +145,34 @@ fpPromise
     isLowMemory();
     client.loadResources();
   });
+const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 let lastICMessageTime = new Date(0);
 
 class Client extends EventEmitter {
-  constructor(address) {
+  serv: any;
+  hp: number[];
+  playerID: number;
+  charID: number;
+  char_list_length: number;
+  evidence_list_length: number;
+  music_list_length: number;
+  testimonyID: number;
+  chars: any;
+  emotes: any;
+  evidences: any;
+  areas: any;
+  musics: any;
+  musics_time: boolean;
+  callwords: string[];
+  banned: boolean;
+  resources: any;
+  selectedEmote: number;
+  selectedEvidence: number;
+  checkUpdater: any;
+  _lastTimeICReceived: any;
+
+  constructor(address: string) {
     super();
     if (mode !== 'replay') {
       this.serv = new WebSocket(`ws://${address}`);
@@ -202,7 +292,7 @@ class Client extends EventEmitter {
 	 * Hook for sending messages to the server
 	 * @param {string} message the message to send
 	 */
-  sendServer(message) {
+  sendServer(message: string) {
     mode === 'replay' ? this.sendSelf(message) : this.serv.send(message);
   }
 
@@ -210,7 +300,7 @@ class Client extends EventEmitter {
 	 * Hook for sending messages to the client
 	 * @param {string} message the message to send
 	 */
-  handleSelf(message) {
+  handleSelf(message: string) {
     const message_event = new MessageEvent('websocket', { data: message });
     setTimeout(() => this.onMessage(message_event), 1);
   }
@@ -219,8 +309,8 @@ class Client extends EventEmitter {
 	 * Hook for sending messages to the client
 	 * @param {string} message the message to send
 	 */
-  sendSelf(message) {
-    document.getElementById('client_ooclog').value += `${message}\r\n`;
+  sendSelf(message: string) {
+    (<HTMLInputElement>document.getElementById('client_ooclog')).value += `${message}\r\n`;
     this.handleSelf(message);
   }
 
@@ -228,11 +318,25 @@ class Client extends EventEmitter {
 	 * Sends an out-of-character chat message.
 	 * @param {string} message the message to send
 	 */
-  sendOOC(message) {
-    setCookie('OOC_name', document.getElementById('OOC_name').value);
-    const oocName = `${escapeChat(encodeChat(document.getElementById('OOC_name').value))}`;
+  sendOOC(message: string) {
+    setCookie('OOC_name', (<HTMLInputElement>document.getElementById('OOC_name')).value);
+    const oocName = `${escapeChat(encodeChat((<HTMLInputElement>document.getElementById('OOC_name')).value))}`;
     const oocMessage = `${escapeChat(encodeChat(message))}`;
-    this.sendServer(`CT#${oocName}#${oocMessage}#%`);
+
+    const commands = {
+      '/save_chatlog': this.saveChatlogHandle
+    }
+    const commandsMap = new Map(Object.entries(commands))
+
+    if (oocMessage && commandsMap.has(oocMessage.toLowerCase())) {
+      try {
+        commandsMap.get(oocMessage.toLowerCase())()
+      } catch (e) {
+        // Command Not Recognized
+      }
+    } else {
+      this.sendServer(`CT#${oocName}#${oocMessage}#%`);
+    }
   }
 
   /**
@@ -244,12 +348,12 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to be sent
 	 * @param {string} side the name of the side in the background
 	 * @param {string} sfx_name the name of the sound effect
-	 * @param {string} emote_modifier whether or not to zoom
+	 * @param {number} emote_modifier whether or not to zoom
 	 * @param {number} sfx_delay the delay (in milliseconds) to play the sound effect
-	 * @param {string} objection_modifier the number of the shout to play
+	 * @param {number} objection_modifier the number of the shout to play
 	 * @param {string} evidence the filename of evidence to show
-	 * @param {number} flip change to 1 to reverse sprite for position changes
-	 * @param {number} realization screen flash effect
+	 * @param {boolean} flip change to 1 to reverse sprite for position changes
+	 * @param {boolean} realization screen flash effect
 	 * @param {number} text_color text color
 	 * @param {string} showname custom name to be displayed (optional)
 	 * @param {number} other_charid paired character (optional)
@@ -257,32 +361,32 @@ class Client extends EventEmitter {
 	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
   sendIC(
-    deskmod,
-    preanim,
-    name,
-    emote,
-    message,
-    side,
-    sfx_name,
-    emote_modifier,
-    sfx_delay,
-    objection_modifier,
-    evidence,
-    flip,
-    realization,
-    text_color,
-    showname,
-    other_charid,
-    self_hoffset,
-    self_yoffset,
-    noninterrupting_preanim,
-    looping_sfx,
-    screenshake,
-    frame_screenshake,
-    frame_realization,
-    frame_sfx,
-    additive,
-    effect,
+    deskmod: string,
+    preanim: string,
+    name: string,
+    emote: string,
+    message: string,
+    side: string,
+    sfx_name: string,
+    emote_modifier: number,
+    sfx_delay: number,
+    objection_modifier: number,
+    evidence: number,
+    flip: boolean,
+    realization: boolean,
+    text_color: number,
+    showname: string,
+    other_charid: string,
+    self_hoffset: number,
+    self_yoffset: number,
+    noninterrupting_preanim: boolean,
+    looping_sfx: boolean,
+    screenshake: boolean,
+    frame_screenshake: string,
+    frame_realization: string,
+    frame_sfx: string,
+    additive: boolean,
+    effect: string,
   ) {
     let extra_cccc = '';
     let other_emote = '';
@@ -296,23 +400,23 @@ class Client extends EventEmitter {
         other_emote = '##';
 		    	other_offset = '#0#0';
       }
-      extra_cccc = `${showname}#${other_charid}${other_emote}#${self_offset}${other_offset}#${noninterrupting_preanim}#`;
+      extra_cccc = `${showname}#${other_charid}${other_emote}#${self_offset}${other_offset}#${Number(noninterrupting_preanim)}#`;
 
       if (extrafeatures.includes('looping_sfx')) {
-        extra_27 = `${looping_sfx}#${screenshake}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
+        extra_27 = `${Number(looping_sfx)}#${Number(screenshake)}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
         if (extrafeatures.includes('effects')) {
-          extra_28 = `${additive}#${effect}#`;
+          extra_28 = `${Number(additive)}#${effect}#`;
         }
       }
     }
 
     const serverMessage = `MS#${deskmod}#${preanim}#${name}#${emote}`
 			+ `#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}`
-			+ `#${this.charID}#${sfx_delay}#${objection_modifier}#${evidence}#${flip}#${realization}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
+			+ `#${this.charID}#${sfx_delay}#${Number(objection_modifier)}#${Number(evidence)}#${Number(flip)}#${Number(realization)}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
 
     this.sendServer(serverMessage);
     if (mode === 'replay') {
-      document.getElementById('client_ooclog').value += `wait#${document.getElementById('client_replaytimer').value}#%\r\n`;
+      (<HTMLInputElement>document.getElementById('client_ooclog')).value += `wait#${(<HTMLInputElement>document.getElementById('client_replaytimer')).value}#%\r\n`;
     }
   }
 
@@ -322,7 +426,7 @@ class Client extends EventEmitter {
 	 * @param {string} evidence description
 	 * @param {string} evidence image filename
 	 */
-  sendPE(name, desc, img) {
+  sendPE(name: string, desc: string, img: string) {
     this.sendServer(`PE#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
   }
 
@@ -333,7 +437,7 @@ class Client extends EventEmitter {
 	 * @param {string} evidence description
 	 * @param {string} evidence image filename
 	 */
-  sendEE(id, name, desc, img) {
+  sendEE(id: number, name: string, desc: string, img: string) {
     this.sendServer(`EE#${id}#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
   }
 
@@ -341,7 +445,7 @@ class Client extends EventEmitter {
 	 * Sends delete evidence command.
 	 * @param {number} evidence id
 	 */
-  sendDE(id) {
+  sendDE(id: number) {
     this.sendServer(`DE#${id}#%`);
   }
 
@@ -350,7 +454,7 @@ class Client extends EventEmitter {
 	 * @param {number} side the position
 	 * @param {number} hp the health point
 	 */
-  sendHP(side, hp) {
+  sendHP(side: number, hp: number) {
     this.sendServer(`HP#${side}#${hp}#%`);
   }
 
@@ -358,7 +462,7 @@ class Client extends EventEmitter {
 	 * Sends call mod command.
 	 * @param {string} message to mod
 	 */
-  sendZZ(msg) {
+  sendZZ(msg: string) {
     if (extrafeatures.includes('modcall_reason')) {
       this.sendServer(`ZZ#${msg}#%`);
     } else {
@@ -370,7 +474,7 @@ class Client extends EventEmitter {
 	 * Sends testimony command.
 	 * @param {string} testimony type
 	 */
-  sendRT(testimony) {
+  sendRT(testimony: string) {
     if (this.chars[this.charID].side === 'jud') {
       this.sendServer(`RT#${testimony}#%`);
     }
@@ -380,7 +484,7 @@ class Client extends EventEmitter {
 	 * Requests to change the music to the specified track.
 	 * @param {string} track the track ID
 	 */
-  sendMusicChange(track) {
+  sendMusicChange(track: string) {
     this.sendServer(`MC#${track}#${this.charID}#%`);
   }
 
@@ -401,56 +505,56 @@ class Client extends EventEmitter {
     document.getElementById('client_version').innerText = `version ${version}`;
 
     // Load background array to select
-    const background_select = document.getElementById('bg_select');
-    background_select.add(new Option('Custom', 0));
+    const background_select = <HTMLSelectElement>document.getElementById('bg_select');
+    background_select.add(new Option('Custom', '0'));
     vanilla_background_arr.forEach((background) => {
       background_select.add(new Option(background));
     });
 
     // Load evidence array to select
-    const evidence_select = document.getElementById('evi_select');
-    evidence_select.add(new Option('Custom', 0));
+    const evidence_select = <HTMLSelectElement>document.getElementById('evi_select');
+    evidence_select.add(new Option('Custom', '0'));
     vanilla_evidence_arr.forEach((evidence) => {
       evidence_select.add(new Option(evidence));
     });
 
     // Read cookies and set the UI to its values
-    document.getElementById('OOC_name').value = getCookie('OOC_name') || `web${parseInt(Math.random() * 100 + 10)}`;
+    (<HTMLInputElement>document.getElementById('OOC_name')).value = getCookie('OOC_name') || `web${String(Math.round(Math.random() * 100 + 10))}`;
 
     // Read cookies and set the UI to its values
     const cookietheme = getCookie('theme') || 'default';
 
-    document.querySelector(`#client_themeselect [value="${cookietheme}"]`).selected = true;
+    (<HTMLOptionElement>document.querySelector(`#client_themeselect [value="${cookietheme}"]`)).selected = true;
     reloadTheme();
 
     const cookiechatbox = getCookie('chatbox') || 'dynamic';
 
-    document.querySelector(`#client_chatboxselect [value="${cookiechatbox}"]`).selected = true;
+    (<HTMLOptionElement>document.querySelector(`#client_chatboxselect [value="${cookiechatbox}"]`)).selected = true;
     setChatbox(cookiechatbox);
 
-    document.getElementById('client_mvolume').value = getCookie('musicVolume') || 1;
+    (<HTMLInputElement>document.getElementById('client_mvolume')).value = getCookie('musicVolume') || '1';
     changeMusicVolume();
-    document.getElementById('client_sfxaudio').volume = getCookie('sfxVolume') || 1;
+    (<HTMLAudioElement>document.getElementById('client_sfxaudio')).volume = Number(getCookie('sfxVolume')) || 1;
     changeSFXVolume();
-    document.getElementById('client_shoutaudio').volume = getCookie('shoutVolume') || 1;
+    (<HTMLAudioElement>document.getElementById('client_shoutaudio')).volume = Number(getCookie('shoutVolume')) || 1;
     changeShoutVolume();
-    document.getElementById('client_testimonyaudio').volume = getCookie('testimonyVolume') || 1;
+    (<HTMLAudioElement>document.getElementById('client_testimonyaudio')).volume = Number(getCookie('testimonyVolume')) || 1;
     changeTestimonyVolume();
-    document.getElementById('client_bvolume').value = getCookie('blipVolume') || 1;
+    (<HTMLInputElement>document.getElementById('client_bvolume')).value = getCookie('blipVolume') || '1';
     changeBlipVolume();
 
-    document.getElementById('ic_chat_name').value = getCookie('ic_chat_name');
-    document.getElementById('showname').checked = getCookie('showname');
-    showname_click();
+    (<HTMLInputElement>document.getElementById('ic_chat_name')).value = getCookie('ic_chat_name');
+    (<HTMLInputElement>document.getElementById('showname')).checked = Boolean(getCookie('showname'));
+    showname_click(null);
 
-    document.getElementById('client_callwords').value = getCookie('callwords');
+    (<HTMLInputElement>document.getElementById('client_callwords')).value = getCookie('callwords');
   }
 
   /**
 	 * Requests to play as a specified character.
 	 * @param {number} character the character ID
 	 */
-  sendCharacter(character) {
+  sendCharacter(character: number) {
     if (this.chars[character].name) { this.sendServer(`CC#${this.playerID}#${character}#web#%`); }
   }
 
@@ -458,7 +562,7 @@ class Client extends EventEmitter {
 	 * Requests to select a music track.
 	 * @param {number?} song the song to be played
 	 */
-  sendMusic(song) {
+  sendMusic(song: string) {
     this.sendServer(`MC#${song}#${this.charID}#%`);
   }
 
@@ -472,7 +576,7 @@ class Client extends EventEmitter {
   /**
 	 * Triggered when a connection is established to the server.
 	 */
-  onOpen(_e) {
+  onOpen(_e: Event) {
     client.joinServer();
   }
 
@@ -480,7 +584,7 @@ class Client extends EventEmitter {
 	 * Triggered when the connection to the server closes.
 	 * @param {CloseEvent} e
 	 */
-  onClose(e) {
+  onClose(e: CloseEvent) {
     console.error(`The connection was closed: ${e.reason} (${e.code})`);
     if (extrafeatures.length == 0 && this.banned === false) {
       document.getElementById('client_errortext').textContent = 'Could not connect to the server';
@@ -488,7 +592,7 @@ class Client extends EventEmitter {
     document.getElementById('client_waiting').style.display = 'block';
     document.getElementById('client_error').style.display = 'flex';
     document.getElementById('client_loading').style.display = 'none';
-    document.getElementById('error_id').textContent = e.code;
+    document.getElementById('error_id').textContent = String(e.code);
     this.cleanup();
   }
 
@@ -496,7 +600,7 @@ class Client extends EventEmitter {
 	 * Triggered when a packet is received from the server.
 	 * @param {MessageEvent} e
 	 */
-  onMessage(e) {
+  onMessage(e: MessageEvent) {
     const msg = e.data;
     console.debug(`S: ${msg}`);
 
@@ -518,10 +622,9 @@ class Client extends EventEmitter {
 	 * Triggered when an network error occurs.
 	 * @param {ErrorEvent} e
 	 */
-  onError(e) {
-    console.error(`A network error occurred: ${e.reason} (${e.code})`);
+  onError(e: ErrorEvent) {
+    console.error(`A network error occurred`);
     document.getElementById('client_error').style.display = 'flex';
-    document.getElementById('error_id').textContent = e.code;
     this.cleanup();
   }
 
@@ -541,9 +644,9 @@ class Client extends EventEmitter {
 	 * @param {*} args packet arguments
 	 */
   handleReplay() {
-    const ooclog = document.getElementById('client_ooclog');
+    const ooclog = <HTMLInputElement>document.getElementById('client_ooclog');
     const rawLog = false;
-    let rtime = document.getElementById('client_replaytimer').value;
+    let rtime: number = Number((<HTMLInputElement>document.getElementById('client_replaytimer')).value);
 
     const clines = ooclog.value.split(/\r?\n/);
     if (clines[0]) {
@@ -551,20 +654,46 @@ class Client extends EventEmitter {
       this.handleSelf(currentLine);
       ooclog.value = clines.slice(1).join('\r\n');
       if (currentLine.substr(0, 4) === 'wait' && rawLog === false) {
-        rtime = currentLine.split('#')[1];
+        rtime = Number(currentLine.split('#')[1]);
       } else if (currentLine.substr(0, 2) !== 'MS') {
         rtime = 0;
       }
 
-      setTimeout(() => onReplayGo(''), rtime);
+      setTimeout(() => onReplayGo(null), rtime);
     }
   }
 
+  saveChatlogHandle = async () => {
+    const clientLog = document.getElementById('client_log')
+    const icMessageLogs = clientLog.getElementsByTagName('p')
+    const messages = []
+
+    for (let i = 0; i < icMessageLogs.length; i++) {
+      const SHOWNAME_POSITION = 0
+      const TEXT_POSITION = 2
+      const showname = icMessageLogs[i].children[SHOWNAME_POSITION].innerHTML
+      const text = icMessageLogs[i].children[TEXT_POSITION].innerHTML
+      const message = `${showname}: ${text}`
+      messages.push(message)
+    }
+    const d = new Date();
+    let ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(d);
+    let mo = new Intl.DateTimeFormat('en', { month: 'short' }).format(d);
+    let da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(d);
+
+    const filename = `chatlog-${da}-${mo}-${ye}`.toLowerCase();
+    downloadFile(messages.join('\n'), filename);
+
+    // Reset Chatbox to Empty
+    (<HTMLInputElement>document.getElementById('client_inputbox')).value = '';
+  }
+  
   /**
 	 * Handles an in-character chat message.
 	 * @param {*} args packet arguments
 	 */
-  handleMS(args) {
+  handleMS(args: string[]) {
+
     // TODO: this if-statement might be a bug.
     if (args[4] !== viewport.chatmsg.content) {
       document.getElementById('client_inner_chat').innerHTML = '';
@@ -616,6 +745,7 @@ class Client extends EventEmitter {
           flip: Number(args[13]),
           flash: Number(args[14]),
           color: Number(args[15]),
+          speed: UPDATE_INTERVAL
         };
 
         if (extrafeatures.includes('cccc_ic_support')) {
@@ -700,8 +830,7 @@ class Client extends EventEmitter {
         if (chatmsg.charid === this.charID) {
           resetICParams();
         }
-
-        viewport.say(chatmsg); // no await
+          viewport.say(chatmsg); // no await
       }
     }
   }
@@ -710,7 +839,7 @@ class Client extends EventEmitter {
 	 * Handles an out-of-character chat message.
 	 * @param {Array} args packet arguments
 	 */
-  handleCT(args) {
+  handleCT(args: string[]) {
     if (mode !== 'replay') {
       const oocLog = document.getElementById('client_ooclog');
       oocLog.innerHTML += `${prepChat(args[1])}: ${prepChat(args[2])}\r\n`;
@@ -718,13 +847,14 @@ class Client extends EventEmitter {
         oocLog.scrollTop = oocLog.scrollHeight;
       }
     }
+
   }
 
   /**
 	 * Handles a music change to an arbitrary resource.
 	 * @param {Array} args packet arguments
 	 */
-  handleMC(args) {
+  handleMC(args: string[]) {
     const track = prepChat(args[1]);
     let charID = Number(args[2]);
     const showname = args[3] || '';
@@ -763,7 +893,7 @@ class Client extends EventEmitter {
 	 * Handles a music change to an arbitrary resource, with an offset in seconds.
 	 * @param {Array} args packet arguments
 	 */
-  handleRMC(args) {
+  handleRMC(args: string[]) {
     viewport.music.pause();
     const { music } = viewport;
     // Music offset + drift from song loading
@@ -780,10 +910,10 @@ class Client extends EventEmitter {
 	 * @param {Array} chargs packet arguments
 	 * @param {Number} charid character ID
 	 */
-  async handleCharacterInfo(chargs, charid) {
+  async handleCharacterInfo(chargs: string[], charid: number) {
     if (chargs[0]) {
-      let cini = {};
-      const img = document.getElementById(`demo_${charid}`);
+      let cini: any = {};
+      const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
       const getCharIcon = async () => {
         const extensions = [
           '.png',
@@ -814,10 +944,10 @@ class Client extends EventEmitter {
         // If it does, give the user a visual indication that the character is unusable
       }
 
-      const mute_select = document.getElementById('mute_select');
-      mute_select.add(new Option(safeTags(chargs[0]), charid));
-      const pair_select = document.getElementById('pair_select');
-      pair_select.add(new Option(safeTags(chargs[0]), charid));
+      const mute_select = <HTMLSelectElement>document.getElementById('mute_select');
+      mute_select.add(new Option(safeTags(chargs[0]), String(charid)));
+      const pair_select = <HTMLSelectElement>document.getElementById('pair_select');
+      pair_select.add(new Option(safeTags(chargs[0]), String(charid)));
 
       // sometimes ini files lack important settings
       const default_options = {
@@ -852,7 +982,7 @@ class Client extends EventEmitter {
 
       if (this.chars[charid].blips === '') { this.chars[charid].blips = this.chars[charid].gender; }
 
-      const iniedit_select = document.getElementById('client_ininame');
+      const iniedit_select = <HTMLSelectElement>document.getElementById('client_ininame');
       iniedit_select.add(new Option(safeTags(chargs[0])));
     } else {
       console.warn(`missing charid ${charid}`);
@@ -867,20 +997,20 @@ class Client extends EventEmitter {
 	 * CI#0#Phoenix&description&&&&&#1#Miles ...
 	 * @param {Array} args packet arguments
 	 */
-  handleCI(args) {
+  handleCI(args: string[]) {
     // Loop through the 10 characters that were sent
 
     for (let i = 2; i <= args.length - 2; i++) {
       if (i % 2 === 0) {
-        document.getElementById('client_loadingtext').innerHTML = `Loading Character ${args[1]}/${this.char_list_length}`;
-        document.getElementById('client_loadingbar').value = charid;
+        document.getElementById('client_loadingtext').innerHTML = `Loading Character ${args[1]}/${this.char_list_length}`;        
         const chargs = args[i].split('&');
-        const charid = args[i - 1];
+        const charid = Number(args[i - 1]);
+        (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = charid;
         setTimeout(() => this.handleCharacterInfo(chargs, charid), 500);
       }
     }
     // Request the next pack
-    this.sendServer(`AN#${(args[1] / 10) + 1}#%`);
+    this.sendServer(`AN#${(Number(args[1]) / 10) + 1}#%`);
   }
 
   /**
@@ -888,8 +1018,8 @@ class Client extends EventEmitter {
 	 * in one packet.
 	 * @param {Array} args packet arguments
 	 */
-  async handleSC(args) {
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  async handleSC(args: string[]) {
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
     if (mode === 'watch') {		// Spectators don't need to pick a character
       document.getElementById('client_charselect').style.display = 'none';
@@ -902,7 +1032,7 @@ class Client extends EventEmitter {
       document.getElementById('client_loadingtext').innerHTML = `Loading Character ${i}/${this.char_list_length}`;
       const chargs = args[i].split('&');
       const charid = i - 1;
-      document.getElementById('client_loadingbar').value = charid;
+      (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = charid;
       await sleep(0.1); // TODO: Too many network calls without this. net::ERR_INSUFFICIENT_RESOURCES
       this.handleCharacterInfo(chargs, charid);
     }
@@ -918,10 +1048,10 @@ class Client extends EventEmitter {
 	 *
 	 * @param {Array} args packet arguments
 	 */
-  handleEI(args) {
+  handleEI(args: string[]) {
     document.getElementById('client_loadingtext').innerHTML = `Loading Evidence ${args[1]}/${this.evidence_list_length}`;
-    const evidenceID = args[1];
-    document.getElementById('client_loadingbar').value = this.char_list_length + evidenceID;
+    const evidenceID = Number(args[1]);
+    (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = this.char_list_length + evidenceID;
     
     const arg = args[2].split('&');
       this.evidences[evidenceID] = {
@@ -940,10 +1070,10 @@ class Client extends EventEmitter {
 	 *
 	 * @param {Array} args packet arguments
 	 */
-  handleLE(args) {
+  handleLE(args: string[]) {
     this.evidences = [];
     for (let i = 1; i < args.length - 1; i++) {
-      document.getElementById('client_loadingbar').value = this.char_list_length + i;
+      (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = this.char_list_length + i;
       const arg = args[i].split('&');
       this.evidences[i - 1] = {
         name: prepChat(arg[0]),
@@ -983,11 +1113,11 @@ class Client extends EventEmitter {
       const bg_array = JSON.parse(bgdata);
       // the try catch will fail before here when there is no file
 
-      const bg_select = document.getElementById('bg_select');
+      const bg_select = <HTMLSelectElement>document.getElementById('bg_select');
       bg_select.innerHTML = '';
 
-      bg_select.add(new Option('Custom', 0));
-      bg_array.forEach((background) => {
+      bg_select.add(new Option('Custom', '0'));
+      bg_array.forEach((background: string) => {
         bg_select.add(new Option(background));
       });
     } catch (err) {
@@ -1001,10 +1131,10 @@ class Client extends EventEmitter {
       const char_array = JSON.parse(chardata);
       // the try catch will fail before here when there is no file
 
-      const char_select = document.getElementById('client_ininame');
+      const char_select = <HTMLSelectElement>document.getElementById('client_ininame');
       char_select.innerHTML = '';
 
-      char_array.forEach((character) => {
+      char_array.forEach((character: string) => {
         char_select.add(new Option(character));
       });
     } catch (err) {
@@ -1018,31 +1148,31 @@ class Client extends EventEmitter {
       const evi_array = JSON.parse(evidata);
       // the try catch will fail before here when there is no file
 
-      const evi_select = document.getElementById('evi_select');
+      const evi_select = <HTMLSelectElement>document.getElementById('evi_select');
       evi_select.innerHTML = '';
 
-      evi_array.forEach((evi) => {
+      evi_array.forEach((evi: string) => {
         evi_select.add(new Option(evi));
       });
-      evi_select.add(new Option('Custom', 0));
+      evi_select.add(new Option('Custom', '0'));
     } catch (err) {
       console.warn('there was no evidence.json file');
     }
   }
 
-  isAudio(trackname) {
+  isAudio(trackname: string) {
     const audioEndings = ['.wav', '.mp3', '.ogg', '.opus'];
     return audioEndings.filter((ending) => trackname.endsWith(ending)).length === 1;
   }
 
-  addTrack(trackname) {
-    const newentry = document.createElement('OPTION');
+  addTrack(trackname: string) {
+    const newentry = <HTMLOptionElement>document.createElement('OPTION');
     newentry.text = trackname;
-    document.getElementById('client_musiclist').options.add(newentry);
+    (<HTMLSelectElement>document.getElementById('client_musiclist')).options.add(newentry);
     this.musics.push(trackname);
   }
 
-  createArea(id, name) {
+  createArea(id: number, name: string) {
     const thisarea = {
       name,
       players: 0,
@@ -1055,7 +1185,7 @@ class Client extends EventEmitter {
 
     // Create area button
     const newarea = document.createElement('SPAN');
-    newarea.classList = 'area-button area-default';
+    newarea.className = 'area-button area-default';
     newarea.id = `area${id}`;
     newarea.innerText = thisarea.name;
     newarea.title = `Players: ${thisarea.players}\n`
@@ -1063,7 +1193,7 @@ class Client extends EventEmitter {
 						+ `CM: ${thisarea.cm}\n`
 						+ `Area lock: ${thisarea.locked}`;
     newarea.onclick = function () {
-      area_click(this);
+      area_click(newarea);
     };
 
     document.getElementById('areas').appendChild(newarea);
@@ -1086,7 +1216,7 @@ class Client extends EventEmitter {
 	 * per packet.
 	 * @param {Array} args packet arguments
 	 */
-  handleEM(args) {
+  handleEM(args: string[]) {
     document.getElementById('client_loadingtext').innerHTML = 'Loading Music';
     if (args[1] === '0') {
       this.resetMusicList();
@@ -1097,8 +1227,8 @@ class Client extends EventEmitter {
     for (let i = 2; i < args.length - 1; i++) {
       if (i % 2 === 0) {
         const trackname = safeTags(args[i]);
-        const trackindex = args[i - 1];
-        document.getElementById('client_loadingbar').value = this.char_list_length + this.evidence_list_length + trackindex;
+        const trackindex = Number(args[i - 1]);
+        (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = this.char_list_length + this.evidence_list_length + trackindex;
         if (this.musics_time) {
                 	this.addTrack(trackname);
             	} else if (this.isAudio(trackname)) {
@@ -1112,14 +1242,14 @@ class Client extends EventEmitter {
     }
 
     // get the next batch of tracks
-    this.sendServer(`AM#${(args[1] / 10) + 1}#%`);
+    this.sendServer(`AM#${(Number(args[1]) / 10) + 1}#%`);
   }
 
   /**
 	 * Handles incoming music information, containing all music in one packet.
 	 * @param {Array} args packet arguments
 	 */
-  handleSM(args) {
+  handleSM(args: string[]) {
     document.getElementById('client_loadingtext').innerHTML = 'Loading Music ';
     this.resetMusicList();
     this.resetAreaList();
@@ -1131,7 +1261,7 @@ class Client extends EventEmitter {
       const trackname = safeTags(args[i]);
       const trackindex = i - 1;
       document.getElementById('client_loadingtext').innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-      document.getElementById('client_loadingbar').value = this.char_list_length + this.evidence_list_length + i;
+      (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = this.char_list_length + this.evidence_list_length + i;
       if (this.musics_time) {
         this.addTrack(trackname);
       } else if (this.isAudio(trackname)) {
@@ -1151,7 +1281,7 @@ class Client extends EventEmitter {
 	 * Handles updated music list
 	 * @param {Array} args packet arguments
 	 */
-  handleFM(args) {
+  handleFM(args: string[]) {
     this.resetMusicList();
 
     for (let i = 1; i < args.length - 1; i++) {
@@ -1164,7 +1294,7 @@ class Client extends EventEmitter {
 	 * Handles updated area list
 	 * @param {Array} args packet arguments
 	 */
-  handleFA(args) {
+  handleFA(args: string[]) {
     this.resetAreaList();
 
     for (let i = 1; i < args.length - 1; i++) {
@@ -1176,27 +1306,27 @@ class Client extends EventEmitter {
 	 * Handles the "MusicMode" packet
 	 * @param {Array} args packet arguments
 	 */
-  handleMM(_args) {
+  handleMM(_args: string[]) {
     // It's unused nowadays, as preventing people from changing the music is now serverside
   }
 
   /**
 	 * Handles the kicked packet
-	 * @param {String} type is it a kick or a ban
-	 * @param {String} reason why
+	 * @param {string} type is it a kick or a ban
+	 * @param {string} reason why
 	 */
-  handleBans(type, reason) {
+  handleBans(type: string, reason: string) {
     document.getElementById('client_error').style.display = 'flex';
     document.getElementById('client_errortext').innerHTML = `${type}:<br>${reason.replace(/\n/g, '<br />')}`;
-    document.getElementsByClassName('client_reconnect')[0].style.display = 'none';
-    document.getElementsByClassName('client_reconnect')[1].style.display = 'none';
+    (<HTMLElement>document.getElementsByClassName('client_reconnect')[0]).style.display = 'none';
+    (<HTMLElement>document.getElementsByClassName('client_reconnect')[1]).style.display = 'none';
   }
 
   /**
 	 * Handles the kicked packet
 	 * @param {Array} args kick reason
 	 */
-  handleKK(args) {
+  handleKK(args: string[]) {
     this.handleBans('Kicked', safeTags(args[1]));
   }
 
@@ -1205,7 +1335,7 @@ class Client extends EventEmitter {
 	 * this one is sent when you are kicked off the server
 	 * @param {Array} args ban reason
 	 */
-  handleKB(args) {
+  handleKB(args: string[]) {
     this.handleBans('Banned', safeTags(args[1]));
     this.banned = true;
   }
@@ -1215,7 +1345,7 @@ class Client extends EventEmitter {
 	 * on client this spawns a message box you can't close for 2 seconds
 	 * @param {Array} args ban reason
 	 */
-		 handleBB(args) {
+		 handleBB(args: string[]) {
     alert(safeTags(args[1]));
   }
 
@@ -1224,7 +1354,7 @@ class Client extends EventEmitter {
 	 * this one is sent when you try to reconnect but you're banned
 	 * @param {Array} args ban reason
 	 */
-  handleBD(args) {
+  handleBD(args: string[]) {
     this.handleBans('Banned', safeTags(args[1]));
     this.banned = true;
   }
@@ -1235,39 +1365,38 @@ class Client extends EventEmitter {
 	 *
 	 * @param {Array} args packet arguments
 	 */
-  handleDONE(_args) {
+  handleDONE(_args: string[]) {
     document.getElementById('client_loading').style.display = 'none';
     if (mode === 'watch') {		// Spectators don't need to pick a character
       document.getElementById('client_waiting').style.display = 'none';
     }
   }
-
+  
   /**
 	 * Handles a background change.
 	 * @param {Array} args packet arguments
 	 */
-  handleBN(args) {
+  
+  handleBN(args: string[]) {
     viewport.bgname = safeTags(args[1]);
     const bgfolder = viewport.bgFolder;
     const bg_index = getIndexFromSelect('bg_select', viewport.bgname);
-    document.getElementById('bg_select').selectedIndex = bg_index;
+    (<HTMLSelectElement>document.getElementById('bg_select')).selectedIndex = bg_index;
     updateBackgroundPreview();
     if (bg_index === 0) {
-      document.getElementById('bg_filename').value = viewport.bgname;
+      (<HTMLInputElement>document.getElementById('bg_filename')).value = viewport.bgname;
     }
-    document.getElementById('bg_preview').src = `${AO_HOST}background/${encodeURI(args[1].toLowerCase())}/defenseempty.png`;
-
-    document.getElementById('client_def_bench').src = `${bgfolder}defensedesk.png`;
-    document.getElementById('client_wit_bench').src = `${bgfolder}stand.png`;
-    document.getElementById('client_pro_bench').src = `${bgfolder}prosecutiondesk.png`;
-
-    document.getElementById('client_court').src = `${bgfolder}full.png`;
-
-    document.getElementById('client_court_def').src = `${bgfolder}defenseempty.png`;
-    document.getElementById('client_court_deft').src = `${bgfolder}transition_def.png`;
-    document.getElementById('client_court_wit').src = `${bgfolder}witnessempty.png`;
-    document.getElementById('client_court_prot').src = `${bgfolder}transition_pro.png`;
-    document.getElementById('client_court_pro').src = `${bgfolder}prosecutorempty.png`;
+    
+    tryUrls(`${AO_HOST}background/${encodeURI(args[1].toLowerCase())}/defenseempty`).then(resp => {(<HTMLImageElement>document.getElementById('bg_preview')).src = resp});
+    tryUrls(`${bgfolder}defensedesk`).then((resp)   => {(<HTMLImageElement>document.getElementById('client_def_bench')).src = resp});
+    tryUrls(`${bgfolder}stand`).then(resp           => {(<HTMLImageElement>document.getElementById('client_wit_bench')).src = resp});
+    tryUrls(`${bgfolder}prosecutiondesk`).then(resp => {(<HTMLImageElement>document.getElementById('client_pro_bench')).src = resp});
+    tryUrls(`${bgfolder}full`).then(resp            => {(<HTMLImageElement>document.getElementById('client_court')).src = resp});
+    tryUrls(`${bgfolder}defenseempty`).then(resp    => {(<HTMLImageElement>document.getElementById('client_court_def')).src = resp});
+    tryUrls(`${bgfolder}transition_def`).then(resp  => {(<HTMLImageElement>document.getElementById('client_court_deft')).src = resp});
+    tryUrls(`${bgfolder}witnessempty`).then(resp    => {(<HTMLImageElement>document.getElementById('client_court_wit')).src = resp});
+    tryUrls(`${bgfolder}transition_pro`).then(resp  => {(<HTMLImageElement>document.getElementById('client_court_prot')).src = resp});
+    tryUrls(`${bgfolder}prosecutorempty`).then(resp => {(<HTMLImageElement>document.getElementById('client_court_pro')).src = resp});
 
     if (this.charID === -1) {
       viewport.changeBackground('jud');
@@ -1280,26 +1409,26 @@ class Client extends EventEmitter {
 	 * Handles a change in the health bars' states.
 	 * @param {Array} args packet arguments
 	 */
-  handleHP(args) {
+  handleHP(args: string[]) {
     const percent_hp = Number(args[2]) * 10;
     let healthbox;
     if (args[1] === '1') {
       // Def hp
-      this.hp[0] = args[2];
+      this.hp[0] = Number(args[2]);
       healthbox = document.getElementById('client_defense_hp');
     } else {
       // Pro hp
-      this.hp[1] = args[2];
+      this.hp[1] = Number(args[2]);
       healthbox = document.getElementById('client_prosecutor_hp');
     }
-    healthbox.getElementsByClassName('health-bar')[0].style.width = `${percent_hp}%`;
+    (<HTMLElement>healthbox.getElementsByClassName('health-bar')[0]).style.width = `${percent_hp}%`;
   }
 
   /**
 	 * Handles a testimony states.
 	 * @param {Array} args packet arguments
 	 */
-  handleRT(args) {
+  handleRT(args: string[]) {
     const judgeid = Number(args[2]);
     switch (args[1]) {
       case 'testimony1':
@@ -1322,10 +1451,10 @@ class Client extends EventEmitter {
 	 * Handles a timer update
 	 * @param {Array} args packet arguments
 	 */
-  handleTI(args) {
+  handleTI(args: string[]) {
     const timerid = Number(args[1]);
     const type = Number(args[2]);
-    const timer_value = Number(args[3]);
+    const timer_value = args[3];
     switch (type) {
       case 0:
         //
@@ -1342,7 +1471,7 @@ class Client extends EventEmitter {
 	 * Handles a modcall
 	 * @param {Array} args packet arguments
 	 */
-  handleZZ(args) {
+  handleZZ(args: string[]) {
     const oocLog = document.getElementById('client_ooclog');
     oocLog.innerHTML += `$Alert: ${prepChat(args[1])}\r\n`;
     if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
@@ -1360,7 +1489,7 @@ class Client extends EventEmitter {
 	 * Handle the player
 	 * @param {Array} args packet arguments
 	 */
-  handleHI(args) {
+  handleHI(_args: string[]) {
     this.sendSelf(`ID#1#webAO#${version}#%`);
     this.sendSelf('FL#fastloading#yellowtext#cccc_ic_support#flipping#looping_sfx#effects#%');
   }
@@ -1369,22 +1498,27 @@ class Client extends EventEmitter {
 	 * Identifies the server and issues a playerID
 	 * @param {Array} args packet arguments
 	 */
-  handleID(args) {
+  handleID(args: string[]) {
     this.playerID = Number(args[1]);
-    this.serverSoftware = args[2].split('&')[0];
-    if (this.serverSoftware === 'serverD') { this.serverVersion = args[2].split('&')[1]; } else if (this.serverSoftware === 'webAO') {
+    const serverSoftware = args[2].split('&')[0];
+    let serverVersion;
+    if (serverSoftware === 'serverD') { 
+      serverVersion = args[2].split('&')[1]; 
+    } else if (serverSoftware === 'webAO') {
       oldLoading = false;
       this.sendSelf('PN#0#1#%');
-    } else { this.serverVersion = args[3]; }
+    } else { 
+      serverVersion = args[3]; 
+    }
 
-    if (this.serverSoftware === 'serverD' && this.serverVersion === '1377.152') { oldLoading = true; } // bugged version
+    if (serverSoftware === 'serverD' && serverVersion === '1377.152') { oldLoading = true; } // bugged version
   }
 
   /**
 	 * Indicates how many users are on this server
 	 * @param {Array} args packet arguments
 	 */
-  handlePN(_args) {
+  handlePN(_args: string[]) {
     this.sendServer('askchaa#%');
   }
 
@@ -1392,7 +1526,7 @@ class Client extends EventEmitter {
 	 * What? you want a character??
 	 * @param {Array} args packet arguments
 	 */
-  handleCC(args) {
+  handleCC(args: string[]) {
     this.sendSelf(`PV#1#CID#${args[2]}#%`);
   }
 
@@ -1400,7 +1534,7 @@ class Client extends EventEmitter {
 	 * What? you want a character list from me??
 	 * @param {Array} args packet arguments
 	 */
-  handleaskchaa(_args) {
+  handleaskchaa(_args: string[]) {
     this.sendSelf(`SI#${vanilla_character_arr.length}#0#0#%`);
   }
 
@@ -1408,7 +1542,7 @@ class Client extends EventEmitter {
 	 * Handle the change of players in an area.
 	 * @param {Array} args packet arguments
 	 */
-  handleARUP(args) {
+  handleARUP(args: string[]) {
     args = args.slice(1);
     for (let i = 0; i < args.length - 2; i++) {
       if (this.areas[i]) { // the server sends us ARUP before we even get the area list
@@ -1428,7 +1562,7 @@ class Client extends EventEmitter {
             break;
         }
 
-        thisarea.classList = `area-button area-${this.areas[i].status.toLowerCase()}`;
+        thisarea.className = `area-button area-${this.areas[i].status.toLowerCase()}`;
 
         thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players}) [${this.areas[i].status}]`;
 
@@ -1444,18 +1578,18 @@ class Client extends EventEmitter {
 	 * With this the server tells us which features it supports
 	 * @param {Array} args list of features
 	 */
-  handleFL(args) {
+  handleFL(args: string[]) {
     console.info('Server-supported features:');
     console.info(args);
     extrafeatures = args;
 
     if (args.includes('yellowtext')) {
-      const colorselect = document.getElementById('textcolor');
+      const colorselect = <HTMLSelectElement>document.getElementById('textcolor');
 
-      colorselect.options[colorselect.options.length] = new Option('Yellow', 5);
-      colorselect.options[colorselect.options.length] = new Option('Grey', 6);
-      colorselect.options[colorselect.options.length] = new Option('Pink', 7);
-      colorselect.options[colorselect.options.length] = new Option('Cyan', 8);
+      colorselect.options[colorselect.options.length] = new Option('Yellow', '5');
+      colorselect.options[colorselect.options.length] = new Option('Grey', '6');
+      colorselect.options[colorselect.options.length] = new Option('Pink', '7');
+      colorselect.options[colorselect.options.length] = new Option('Cyan', '8');
     }
 
     if (args.includes('cccc_ic_support')) {
@@ -1486,13 +1620,13 @@ class Client extends EventEmitter {
 	 * but we use it as a cue to begin retrieving characters.
 	 * @param {Array} args packet arguments
 	 */
-  handleSI(args) {
+  handleSI(args: string[]) {
     this.char_list_length = Number(args[1]);
     this.char_list_length += 1; // some servers count starting from 0 some from 1...
     this.evidence_list_length = Number(args[2]);
     this.music_list_length = Number(args[3]);
     
-    document.getElementById('client_loadingbar').max = this.char_list_length + this.evidence_list_length + this.music_list_length;
+    (<HTMLProgressElement>document.getElementById('client_loadingbar')).max = this.char_list_length + this.evidence_list_length + this.music_list_length;
 
     // create the charselect grid, to be filled by the character loader
     document.getElementById('client_chartable').innerHTML = '';
@@ -1521,11 +1655,11 @@ class Client extends EventEmitter {
 	 * Handles the list of all used and vacant characters.
 	 * @param {Array} args list of all characters represented as a 0 for free or a -1 for taken
 	 */
-  handleCharsCheck(args) {
+  handleCharsCheck(args: string[]) {
     for (let i = 0; i < this.char_list_length; i++) {
       const img = document.getElementById(`demo_${i}`);
 
-      if (args[i + 1] === '-1') { img.style.opacity = 0.25; } else if (args[i + 1] === '0') { img.style.opacity = 1; }
+      if (args[i + 1] === '-1') { img.style.opacity = '0.25'; } else if (args[i + 1] === '0') { img.style.opacity = '1'; }
     }
   }
 
@@ -1534,7 +1668,7 @@ class Client extends EventEmitter {
 	 * PV # playerID (unused) # CID # character ID
 	 * @param {Array} args packet arguments
 	 */
-  async handlePV(args) {
+  async handlePV(args: string[]) {
     this.charID = Number(args[3]);
     document.getElementById('client_waiting').style.display = 'none';
     document.getElementById('client_charselect').style.display = 'none';
@@ -1596,7 +1730,7 @@ class Client extends EventEmitter {
 
     if (await fileExists(`${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/custom.gif`)) { document.getElementById('button_4').style.display = ''; } else { document.getElementById('button_4').style.display = 'none'; }
 
-    const iniedit_select = document.getElementById('client_ininame');
+    const iniedit_select = <HTMLSelectElement>document.getElementById('client_ininame');
 
     // Load iniswaps if there are any
     try {
@@ -1607,12 +1741,9 @@ class Client extends EventEmitter {
       if (cswap.length > 0) {
         iniedit_select.innerHTML = '';
 
-        function addIniswap(value) {
-          iniedit_select.add(new Option(safeTags(value)));
-        }
+        iniedit_select.add(new Option(safeTags(me.name)));
 
-        addIniswap(me.name);
-        cswap.forEach(addIniswap);
+        cswap.forEach((inisw: string) => iniedit_select.add(new Option(safeTags(inisw))));
       }
     } catch (err) {
       console.info("character doesn't have iniswaps");
@@ -1624,7 +1755,7 @@ class Client extends EventEmitter {
 	 * new asset url!!
 	 * @param {Array} args packet arguments
 	 */
-	 handleASS(args) {
+	 handleASS(args: string[]) {
     AO_HOST = args[1];
   }
 
@@ -1632,7 +1763,7 @@ class Client extends EventEmitter {
 	 * we are asking ourselves what characters there are
 	 * @param {Array} args packet arguments
 	 */
-  handleRC(_args) {
+  handleRC(_args: string[]) {
     this.sendSelf(`SC#${vanilla_character_arr.join('#')}#%`);
   }
 
@@ -1640,7 +1771,7 @@ class Client extends EventEmitter {
 	 * we are asking ourselves what characters there are
 	 * @param {Array} args packet arguments
 	 */
-  handleRM(_args) {
+  handleRM(_args: string[]) {
     this.sendSelf(`SM#${vanilla_music_arr.join('#')}#%`);
   }
 
@@ -1648,10 +1779,10 @@ class Client extends EventEmitter {
 	 * we are asking ourselves what characters there are
 	 * @param {Array} args packet arguments
 	 */
-  handleRD(_args) {
+  handleRD(_args: string[]) {
     this.sendSelf('BN#gs4#%');
     this.sendSelf('DONE#%');
-    const ooclog = document.getElementById('client_ooclog');
+    const ooclog = <HTMLInputElement>document.getElementById('client_ooclog');
     ooclog.value = '';
     ooclog.readOnly = false;
 
@@ -1661,6 +1792,31 @@ class Client extends EventEmitter {
 }
 
 class Viewport {
+  textnow: string;
+  chatmsg: any;
+  shouts: string[];
+  colors: string[];
+  blipChannels: any;
+  currentBlipChannel: number;
+  sfxaudio: any;
+  sfxplayed: number;
+  shoutaudio: any;
+  testimonyAudio: any;
+  music: any;
+  updater: any;
+  testimonyUpdater: any;
+  bgname: string;
+  lastChar: string;
+  lastEvi: number;
+  testimonyTimer: number;
+  shoutTimer: number;
+  tickTimer: number;
+  _animating: boolean;
+  startFirstTickCheck: boolean;
+  startSecondTickCheck: boolean;
+  startThirdTickCheck: boolean;
+  theme: string;
+
   constructor() {
     this.textnow = '';
     this.chatmsg = {
@@ -1673,6 +1829,7 @@ class Viewport {
       color: 0,
       snddelay: 0,
       preanimdelay: 0,
+      speed: UPDATE_INTERVAL
     };
 
     this.shouts = [
@@ -1698,8 +1855,8 @@ class Viewport {
     // Allocate multiple blip audio channels to make blips less jittery
     const blipSelectors = document.getElementsByClassName('blipSound')
     this.blipChannels = [...blipSelectors];
-    this.blipChannels.forEach((channel) => channel.volume = 0.5);
-    this.blipChannels.forEach((channel) => channel.onerror = opusCheck(channel));
+    this.blipChannels.forEach((channel: HTMLAudioElement) => channel.volume = 0.5);
+    this.blipChannels.forEach((channel: HTMLAudioElement) => channel.onerror = opusCheck(channel));
     this.currentBlipChannel = 0;
 
     this.sfxaudio = document.getElementById('client_sfxaudio');
@@ -1715,8 +1872,8 @@ class Viewport {
 
     const audioChannels = document.getElementsByClassName('audioChannel')
     this.music = [...audioChannels];
-    this.music.forEach((channel) => channel.volume = 0.5);
-    this.music.forEach((channel) => channel.onerror = opusCheck(channel));
+    this.music.forEach((channel: HTMLAudioElement) => channel.volume = 0.5);
+    this.music.forEach((channel: HTMLAudioElement) => channel.onerror = opusCheck(channel));
 
     this.updater = null;
     this.testimonyUpdater = null;
@@ -1728,7 +1885,7 @@ class Viewport {
 
     this.testimonyTimer = 0;
     this.shoutTimer = 0;
-    this.textTimer = 0;
+    this.tickTimer = 0;
 
     this._animating = false;
   }
@@ -1737,8 +1894,8 @@ class Viewport {
 	 * Sets the volume of the music.
 	 * @param {number} volume
 	 */
-  set musicVolume(volume) {
-    this.music.forEach((channel) => channel.volume = volume);
+  set musicVolume(volume: number) {
+    this.music.forEach((channel: HTMLAudioElement) => channel.volume = volume);
   }
 
   /**
@@ -1753,7 +1910,7 @@ class Viewport {
 	 *
 	 * @param {string} sfxname
 	 */
-  async playSFX(sfxname, looping) {
+  async playSFX(sfxname: string, looping: boolean) {
     this.sfxaudio.pause();
     this.sfxaudio.loop = looping;
     this.sfxaudio.src = sfxname;
@@ -1766,64 +1923,78 @@ class Viewport {
  * Valid positions: `def, pro, hld, hlp, wit, jud, jur, sea`
  * @param {string} position the position to change into
  */
-  async changeBackground(position) {
+  async changeBackground(position: string) {
     const bgfolder = viewport.bgFolder;
 
     const view = document.getElementById('client_fullview');
 
-    let bench;
+    let bench: HTMLImageElement;
     if ('def,pro,wit'.includes(position)) {
-    	bench = document.getElementById(`client_${position}_bench`);
+    	bench = <HTMLImageElement>document.getElementById(`client_${position}_bench`);
     } else {
-    	bench = document.getElementById('client_bench_classic');
+    	bench = <HTMLImageElement>document.getElementById('client_bench_classic');
     }
 
-    let court;
+    let court: HTMLImageElement;
     if ('def,pro,wit'.includes(position)) {
-    	court = document.getElementById(`client_court_${position}`);
+    	court = <HTMLImageElement>document.getElementById(`client_court_${position}`);
     } else {
-    	court = document.getElementById('client_court_classic');
+    	court = <HTMLImageElement>document.getElementById('client_court_classic');
     }
 
-    const positions = {
+    interface Desk {
+      ao2?: string
+      ao1?: string
+    }
+    interface Position {
+      bg?: string
+      desk?: Desk
+      speedLines: string
+    }
+
+    interface Positions { 
+      [key: string]: Position
+    }
+
+    const positions: Positions = {
       def: {
-        bg: 'defenseempty.png',
-        desk: { ao2: 'defensedesk.png', ao1: 'bancodefensa.png' },
+        bg: 'defenseempty',
+        desk: { ao2: 'defensedesk.png', ao1: 'bancodefensa.png' } as Desk,
         speedLines: 'defense_speedlines.gif',
       },
       pro: {
-        bg: 'prosecutorempty.png',
-        desk: { ao2: 'prosecutiondesk.png', ao1: 'bancoacusacion.png' },
+        bg: 'prosecutorempty',
+        desk: { ao2: 'prosecutiondesk.png', ao1: 'bancoacusacion.png' } as Desk,
         speedLines: 'prosecution_speedlines.gif',
       },
       hld: {
-        bg: 'helperstand.png',
-        desk: null,
+        bg: 'helperstand',
+        desk: null as Desk,
         speedLines: 'defense_speedlines.gif',
       },
       hlp: {
-        bg: 'prohelperstand.png',
-        desk: null,
+        bg: 'prohelperstand',
+        desk: null as Desk,
         speedLines: 'prosecution_speedlines.gif',
       },
       wit: {
-        bg: 'witnessempty.png',
-        desk: { ao2: 'stand.png', ao1: 'estrado.png' },
+        bg: 'witnessempty',
+        desk: { ao2: 'stand.png', ao1: 'estrado.png' } as Desk,
         speedLines: 'prosecution_speedlines.gif',
       },
       jud: {
-        bg: 'judgestand.png',
-        desk: { ao2: 'judgedesk.png', ao1: 'judgedesk.gif' },
+        bg: 'judgestand',
+        desk: { ao2: 'judgedesk.png', ao1: 'judgedesk.gif' } as Desk,
         speedLines: 'prosecution_speedlines.gif',
       },
       jur: {
-        bg: 'jurystand.png',
-        desk: { ao2: 'jurydesk.png', ao1: 'estrado.png' },
+        bg: 'jurystand',
+        desk: { ao2: 'jurydesk.png', ao1: 'estrado.png' } as Desk,
         speedLines: 'defense_speedlines.gif',
       },
       sea: {
-        bg: 'seancestand.png',
-        desk: { ao2: 'seancedesk.png', ao1: 'estrado.png' },
+        bg: 'seancestand',
+        desk: { ao2: 'seancedesk.png', ao1: 'estrado.png' } as Desk,
         speedLines: 'prosecution_speedlines.gif',
       },
     };
@@ -1837,7 +2008,7 @@ class Viewport {
       desk = positions[position].desk;
       speedLines = positions[position].speedLines;
     } else {
-      bg = `${position}.png`;
+      bg = `${position}`;
       desk = { ao2: `${position}_overlay.png`, ao1: '_overlay.png' };
       speedLines = 'defense_speedlines.gif';
     }
@@ -1845,15 +2016,17 @@ class Viewport {
     if (viewport.chatmsg.type === 5) {
       console.warn('this is a zoom');
       court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
-      bench.style.opacity = 0;
+      bench.style.opacity = '0';
     } else {
-      court.src = bgfolder + bg;
+      // Set src here
+      
+      court.src = await tryUrls(bgfolder + bg)
       if (desk) {
         const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
         bench.src = bgfolder + deskFilename;
-        bench.style.opacity = 1;
+        bench.style.opacity = '1';
       } else {
-        bench.style.opacity = 0;
+        bench.style.opacity = '0';
       }
     }
 
@@ -1881,7 +2054,8 @@ class Viewport {
 	 * Intialize testimony updater
 	 */
   initTestimonyUpdater() {
-    const testimonyFilenames = {
+
+    const testimonyFilenames: Testimony = {
       1: 'witnesstestimony',
       2: 'crossexamination',
       3: 'notguilty',
@@ -1897,9 +2071,9 @@ class Viewport {
     this.testimonyAudio.src = client.resources[testimony].sfx;
     this.testimonyAudio.play();
 
-    const testimonyOverlay = document.getElementById('client_testimony');
+    const testimonyOverlay = <HTMLImageElement>document.getElementById('client_testimony');
     testimonyOverlay.src = client.resources[testimony].src;
-    testimonyOverlay.style.opacity = 1;
+    testimonyOverlay.style.opacity = '1';
 
     this.testimonyTimer = 0;
     this.testimonyUpdater = setTimeout(() => this.updateTestimony(), UPDATE_INTERVAL);
@@ -1909,7 +2083,7 @@ class Viewport {
 	 * Updates the testimony overaly
 	 */
   updateTestimony() {
-    const testimonyFilenames = {
+    const testimonyFilenames: Testimony = {
       1: 'witnesstestimony',
       2: 'crossexamination',
       3: 'notguilty',
@@ -1939,7 +2113,7 @@ class Viewport {
   disposeTestimony() {
     client.testimonyID = 0;
     this.testimonyTimer = 0;
-    document.getElementById('client_testimony').style.opacity = 0;
+    document.getElementById('client_testimony').style.opacity = '0';
     clearTimeout(this.testimonyUpdater);
   }
 
@@ -1950,13 +2124,16 @@ class Viewport {
 	 * TODO: the preanim logic, on the other hand, should probably be moved to tick()
 	 * @param {object} chatmsg the new chat message
 	 */
-  async say(chatmsg) {
+  async say(chatmsg: any) {
 
     this.chatmsg = chatmsg;
     this.textnow = '';
     this.sfxplayed = 0;
-    this.textTimer = 0;
+    this.tickTimer = 0;
     this._animating = true;
+    this.startFirstTickCheck = true
+    this.startSecondTickCheck = false
+    this.startThirdTickCheck = false
     let charLayers = document.getElementById('client_char');
     let pairLayers = document.getElementById('client_pair_char');
 
@@ -1966,13 +2143,13 @@ class Viewport {
     // stop last sfx from looping any longer
     this.sfxaudio.loop = false;
 
-    const fg = document.getElementById('client_fg');
+    const fg = <HTMLImageElement>document.getElementById('client_fg');
     const gamewindow = document.getElementById('client_gamewindow');
     const waitingBox = document.getElementById('client_chatwaiting');
 
     // Reset CSS animation
     gamewindow.style.animation = '';
-    waitingBox.style.opacity = 0;
+    waitingBox.style.opacity = '0';
 
     const eviBox = document.getElementById('client_evi');
 
@@ -1992,15 +2169,15 @@ class Viewport {
     const nameBoxInner = document.getElementById('client_inner_name');
     const chatBoxInner = document.getElementById('client_inner_chat');
 
-    const displayname = (document.getElementById('showname').checked && this.chatmsg.showname !== '') ? this.chatmsg.showname : this.chatmsg.nameplate;
+    const displayname = ((<HTMLInputElement>document.getElementById('showname')).checked && this.chatmsg.showname !== '') ? this.chatmsg.showname : this.chatmsg.nameplate;
 
     // Clear out the last message
     chatBoxInner.innerText = this.textnow;
     nameBoxInner.innerText = displayname;
 
     if (this.lastChar !== this.chatmsg.name) {
-      charLayers.style.opacity = 0;
-      pairLayers.style.opacity = 0;
+      charLayers.style.opacity = '0';
+      pairLayers.style.opacity = '0';
     }
     this.lastChar = this.chatmsg.name;
 
@@ -2015,18 +2192,18 @@ class Viewport {
     }
 
     // gets which shout shall played
-    const shoutSprite = document.getElementById('client_shout');
+    const shoutSprite = <HTMLImageElement>document.getElementById('client_shout');
     const shout = this.shouts[this.chatmsg.objection];
     if (shout) {
       // Hide message box
-      chatContainerBox.style.opacity = 0;
+      chatContainerBox.style.opacity = '0';
       if (this.chatmsg.objection === 4) {
         shoutSprite.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/custom.gif`;
       } else {
         shoutSprite.src = client.resources[shout].src;
         shoutSprite.style.animation = 'bubble 700ms steps(10, jump-both)';
       }
-      shoutSprite.style.opacity = 1;
+      shoutSprite.style.opacity = '1';
 
       this.shoutaudio.src = `${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${shout}.opus`;
       this.shoutaudio.play();
@@ -2039,13 +2216,14 @@ class Viewport {
     let gifLength = 0;
 
     if (this.chatmsg.type === 1 && this.chatmsg.preanim !== '-') {
-      chatContainerBox.style.opacity = 0;
+      chatContainerBox.style.opacity = '0';
       gifLength = await getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}`);
       this.chatmsg.startspeaking = false;
     } else {
       this.chatmsg.startspeaking = true;
+      chatContainerBox.style.opacity = '1';
     }
-    this.chatmsg.preanimdelay = parseInt(gifLength);
+    this.chatmsg.preanimdelay = gifLength;
 
     this.changeBackground(chatmsg.side);
 
@@ -2078,7 +2256,7 @@ class Viewport {
     // flip the paired character
     pairLayers.style.transform = this.chatmsg.other_flip === 1 ? 'scaleX(-1)' : 'scaleX(1)';
 
-    this.blipChannels.forEach((channel) => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`);
+    this.blipChannels.forEach((channel: HTMLAudioElement) => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`);
 
     // process markup
     if (this.chatmsg.content.startsWith('~~')) {
@@ -2106,7 +2284,89 @@ class Viewport {
     this.chatmsg.parsed = await attorneyMarkdown.applyMarkdown(chatmsg.content, this.colors[this.chatmsg.color])
     this.tick();
   }
+  
+  async handleTextTick(charLayers: HTMLImageElement) {
+    const chatBox = document.getElementById('client_chat');
+    const waitingBox = document.getElementById('client_chatwaiting');
+    const chatBoxInner = document.getElementById('client_inner_chat');
+    const charName = this.chatmsg.name.toLowerCase();
+    const charEmote = this.chatmsg.sprite.toLowerCase();
 
+
+    if (this.chatmsg.content.charAt(this.textnow.length) !== ' ') {
+      this.blipChannels[this.currentBlipChannel].play();
+      this.currentBlipChannel++;
+      this.currentBlipChannel %= this.blipChannels.length;
+    }
+    this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
+    const characterElement = this.chatmsg.parsed[this.textnow.length - 1]
+    if (characterElement) {
+      const COMMAND_IDENTIFIER = '\\'
+
+      const nextCharacterElement = this.chatmsg.parsed[this.textnow.length]
+      const flash = async () => {
+        const effectlayer = document.getElementById('client_fg');
+        this.playSFX(`${AO_HOST}sounds/general/sfx-realization.opus`, false);
+        effectlayer.style.animation = 'flash 0.4s 1';
+        await delay(400)
+        effectlayer.style.removeProperty('animation')
+      }
+
+      const shake = async () => {
+        const gamewindow = document.getElementById('client_gamewindow');
+        this.playSFX(`${AO_HOST}sounds/general/sfx-stab.opus`, false);
+        gamewindow.style.animation = 'shake 0.2s 1';
+        await delay(200)
+        gamewindow.style.removeProperty('animation')
+      }
+
+      const commands = new Map(Object.entries({
+        's': shake,
+        'f': flash
+      }))
+      const textSpeeds = new Set(['{', '}'])
+
+      // Changing Text Speed
+      if (textSpeeds.has(characterElement.innerHTML)) {
+        // Grab them all in a row
+        const MAX_SLOW_CHATSPEED = 120
+        for(let i = this.textnow.length; i < this.chatmsg.content.length; i++) {
+          const currentCharacter = this.chatmsg.parsed[i - 1].innerHTML
+          if (currentCharacter === '{') {
+            if (this.chatmsg.speed > 0) {
+              this.chatmsg.speed -= 20
+            }
+          } else if(currentCharacter === '}') {
+            if(this.chatmsg.speed < MAX_SLOW_CHATSPEED) {
+              this.chatmsg.speed += 20
+            }
+          } else {
+            // No longer at a speed character
+            this.textnow = this.chatmsg.content.substring(0, i);
+            break
+          }
+        }
+      } 
+      
+      if (characterElement.innerHTML === COMMAND_IDENTIFIER && commands.has(nextCharacterElement?.innerHTML)) {
+        this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
+        await commands.get(nextCharacterElement.innerHTML)()
+      } else {
+        chatBoxInner.appendChild(this.chatmsg.parsed[this.textnow.length - 1]);
+      }
+    }
+
+    // scroll to bottom
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    if (this.textnow === this.chatmsg.content) {
+      this._animating = false;
+      setEmote(AO_HOST, this, charName, charEmote, '(a)', false, this.chatmsg.side);
+      charLayers.style.opacity = '1';
+      waitingBox.style.opacity = '1';
+      clearTimeout(this.updater);
+    }
+  }
   /**
 	 * Updates the chatbox based on the given text.
 	 *
@@ -2136,24 +2396,25 @@ class Viewport {
 	 *
 	 * XXX: This relies on a global variable `this.chatmsg`!
 	 */
-  tick() {
-    if (this._animating) {
-      this.updater = setTimeout(() => this.tick(), UPDATE_INTERVAL);
+  async tick() {
+    await delay(this.chatmsg.speed)
+
+    if (this.textnow === this.chatmsg.content) {
+      return
     }
 
     const gamewindow = document.getElementById('client_gamewindow');
     const waitingBox = document.getElementById('client_chatwaiting');
-    const eviBox = document.getElementById('client_evi');
-    const shoutSprite = document.getElementById('client_shout');
+    const eviBox = <HTMLImageElement>document.getElementById('client_evi');
+    const shoutSprite = <HTMLImageElement>document.getElementById('client_shout');
+    const effectlayer = <HTMLImageElement>document.getElementById('client_fg');
     const chatBoxInner = document.getElementById('client_inner_chat');
-    const chatBox = document.getElementById('client_chat');
-    const effectlayer = document.getElementById('client_fg');
-    let charLayers = document.getElementById('client_char');
-    let pairLayers = document.getElementById('client_pair_char');
+    let charLayers = <HTMLImageElement>document.getElementById('client_char');
+    let pairLayers = <HTMLImageElement>document.getElementById('client_pair_char');
 
     if ('def,pro,wit'.includes(this.chatmsg.side)) {
-      charLayers = document.getElementById(`client_${this.chatmsg.side}_char`);
-      pairLayers = document.getElementById(`client_${this.chatmsg.side}_pair_char`);
+      charLayers = <HTMLImageElement>document.getElementById(`client_${this.chatmsg.side}_char`);
+      pairLayers = <HTMLImageElement>document.getElementById(`client_${this.chatmsg.side}_pair_char`);
     }
 
     const charName = this.chatmsg.name.toLowerCase();
@@ -2163,7 +2424,9 @@ class Viewport {
     const pairEmote = this.chatmsg.other_emote.toLowerCase();
 
     // TODO: preanims sometimes play when they're not supposed to
-    if (this.textTimer >= this.shoutTimer && this.chatmsg.startpreanim) {
+    const isShoutOver = this.tickTimer >= this.shoutTimer
+    const isShoutAndPreanimOver = this.tickTimer >= this.shoutTimer + this.chatmsg.preanimdelay
+    if (isShoutOver && this.startFirstTickCheck) {
       // Effect stuff
       if (this.chatmsg.screenshake === 1) {
         // Shake screen
@@ -2178,23 +2441,35 @@ class Viewport {
 
       // Pre-animation stuff
       if (this.chatmsg.preanimdelay > 0) {
-        shoutSprite.style.opacity = 0;
+        shoutSprite.style.opacity = '0';
         shoutSprite.style.animation = '';
         const preanim = this.chatmsg.preanim.toLowerCase();
         setEmote(AO_HOST, this, charName, preanim, '', false, this.chatmsg.side);
-        charLayers.style.opacity = 1;
+        charLayers.style.opacity = '1';
       }
 
       if (this.chatmsg.other_name) {
-        pairLayers.style.opacity = 1;
+        pairLayers.style.opacity = '1';
       } else {
-        pairLayers.style.opacity = 0;
+        pairLayers.style.opacity = '0';
       }
+      // Done with first check, move to second
+      this.startFirstTickCheck = false
+      this.startSecondTickCheck = true
 
       this.chatmsg.startpreanim = false;
       this.chatmsg.startspeaking = true;
-    } else if (this.textTimer >= this.shoutTimer + this.chatmsg.preanimdelay && !this.chatmsg.startpreanim) {
+    }
+    const hasNonInterruptingPreAnim = this.chatmsg.noninterrupting_preanim === 1 
+    if (this.textnow !== this.chatmsg.content && hasNonInterruptingPreAnim) {
+      const chatContainerBox = document.getElementById('client_chatcontainer');
+      chatContainerBox.style.opacity = '1';
+      await this.handleTextTick(charLayers)
+     
+    }else if (isShoutAndPreanimOver && this.startSecondTickCheck) {
       if (this.chatmsg.startspeaking) {
+        this.chatmsg.startspeaking = false;
+
         // Evidence Bullshit
         if (this.chatmsg.evidence > 0) {
           // Prepare evidence
@@ -2202,7 +2477,7 @@ class Viewport {
 
           eviBox.style.width = 'auto';
           eviBox.style.height = '36.5%';
-          eviBox.style.opacity = 1;
+          eviBox.style.opacity = '1';
 
           this.testimonyAudio.src = `${AO_HOST}sounds/general/sfx-evidenceshoop.opus`;
           this.testimonyAudio.play();
@@ -2216,70 +2491,47 @@ class Viewport {
             eviBox.style.left = '1em';
           }
         }
-
-        resizeChatbox();
-
-        const chatContainerBox = document.getElementById('client_chatcontainer');
-        chatContainerBox.style.opacity = 1;
-
         chatBoxInner.className = `text_${this.colors[this.chatmsg.color]}`;
 
-        this.chatmsg.startspeaking = false;
 
         if (this.chatmsg.preanimdelay === 0) {
-          shoutSprite.style.opacity = 0;
+          shoutSprite.style.opacity = '0';
           shoutSprite.style.animation = '';
         }
 
         if (this.chatmsg.other_name) {
           setEmote(AO_HOST, this, pairName, pairEmote, '(a)', true, this.chatmsg.side);
-          pairLayers.style.opacity = 1;
+          pairLayers.style.opacity = '1';
         } else {
-          pairLayers.style.opacity = 0;
+          pairLayers.style.opacity = '0';
         }
 
         setEmote(AO_HOST, this, charName, charEmote, '(b)', false, this.chatmsg.side);
-        charLayers.style.opacity = 1;
+        charLayers.style.opacity = '1';
 
         if (this.textnow === this.chatmsg.content) {
           setEmote(AO_HOST, this, charName, charEmote, '(a)', false, this.chatmsg.side);
-          charLayers.style.opacity = 1;
-          waitingBox.style.opacity = 1;
+          charLayers.style.opacity = '1';
+          waitingBox.style.opacity = '1';
           this._animating = false;
           clearTimeout(this.updater);
+          return
         }
       } else if (this.textnow !== this.chatmsg.content) {
-        if (this.chatmsg.content.charAt(this.textnow.length) !== ' ') {
-          this.blipChannels[this.currentBlipChannel].play();
-          this.currentBlipChannel++;
-          this.currentBlipChannel %= this.blipChannels.length;
-        }
-        this.textnow = this.chatmsg.content.substring(0, this.textnow.length + 1);
-        const characterElement = this.chatmsg.parsed[this.textnow.length - 1]
-        if (characterElement) {
-          chatBoxInner.appendChild(this.chatmsg.parsed[this.textnow.length - 1]);
-        }
-
-        // scroll to bottom
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        if (this.textnow === this.chatmsg.content) {
-          this._animating = false;
-          setEmote(AO_HOST, this, charName, charEmote, '(a)', false, this.chatmsg.side);
-          charLayers.style.opacity = 1;
-          waitingBox.style.opacity = 1;
-          clearTimeout(this.updater);
-        }
+        await this.handleTextTick(charLayers)
       }
     }
 
-    if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.textTimer) {
+    if (!this.sfxplayed && this.chatmsg.snddelay + this.shoutTimer >= this.tickTimer) {
       this.sfxplayed = 1;
       if (this.chatmsg.sound !== '0' && this.chatmsg.sound !== '1' && this.chatmsg.sound !== '' && this.chatmsg.sound !== undefined && (this.chatmsg.type == 1 || this.chatmsg.type == 2 || this.chatmsg.type == 6)) {
         this.playSFX(`${AO_HOST}sounds/general/${encodeURI(this.chatmsg.sound.toLowerCase())}.opus`, this.chatmsg.looping_sfx);
       }
     }
-    this.textTimer += UPDATE_INTERVAL;
+    if (this._animating) {
+      this.tick()
+    }
+    this.tickTimer += UPDATE_INTERVAL;
   }
 }
 
@@ -2287,10 +2539,10 @@ class Viewport {
  * Triggered when the Return key is pressed on the out-of-character chat input box.
  * @param {KeyboardEvent} event
  */
-export function onOOCEnter(event) {
+export function onOOCEnter(event: KeyboardEvent) {
   if (event.keyCode === 13) {
-    client.sendOOC(document.getElementById('client_oocinputbox').value);
-    document.getElementById('client_oocinputbox').value = '';
+    client.sendOOC((<HTMLInputElement>document.getElementById('client_oocinputbox')).value);
+    (<HTMLInputElement>document.getElementById('client_oocinputbox')).value = '';
   }
 }
 window.onOOCEnter = onOOCEnter;
@@ -2299,7 +2551,7 @@ window.onOOCEnter = onOOCEnter;
  * Triggered when the user click replay GOOOOO
  * @param {KeyboardEvent} event
  */
-export function onReplayGo(_event) {
+export function onReplayGo(_event: Event) {
   client.handleReplay();
 }
 window.onReplayGo = onReplayGo;
@@ -2308,36 +2560,36 @@ window.onReplayGo = onReplayGo;
  * Triggered when the Return key is pressed on the in-character chat input box.
  * @param {KeyboardEvent} event
  */
-export function onEnter(event) {
+export function onEnter(event: KeyboardEvent) {
   if (event.keyCode === 13) {
     const mychar = client.character;
     const myemo = client.emote;
     const evi = client.evidence;
-    const flip = ((document.getElementById('button_flip').classList.contains('dark')) ? 1 : 0);
-    const flash = ((document.getElementById('button_flash').classList.contains('dark')) ? 1 : 0);
-    const screenshake = ((document.getElementById('button_shake').classList.contains('dark')) ? 1 : 0);
-    const noninterrupting_preanim = ((document.getElementById('check_nonint').checked) ? 1 : 0);
-    const looping_sfx = ((document.getElementById('check_loopsfx').checked) ? 1 : 0);
-    const color = document.getElementById('textcolor').value;
-    const showname = document.getElementById('ic_chat_name').value;
-    const text = document.getElementById('client_inputbox').value;
-    const pairchar = document.getElementById('pair_select').value;
-    const pairoffset = document.getElementById('pair_offset').value;
-    const pairyoffset = document.getElementById('pair_y_offset').value;
-    const myrole = document.getElementById('role_select').value ? document.getElementById('role_select').value : mychar.side;
-    const additive = ((document.getElementById('check_additive').checked) ? 1 : 0);
-    const effect = document.getElementById('effect_select').value;
+    const flip = Boolean((document.getElementById('button_flip').classList.contains('dark')));
+    const flash = Boolean((document.getElementById('button_flash').classList.contains('dark')));
+    const screenshake = Boolean((document.getElementById('button_shake').classList.contains('dark')));
+    const noninterrupting_preanim = Boolean(((<HTMLInputElement>document.getElementById('check_nonint')).checked));
+    const looping_sfx = Boolean(((<HTMLInputElement>document.getElementById('check_loopsfx')).checked));
+    const color = Number((<HTMLInputElement>document.getElementById('textcolor')).value);
+    const showname = (<HTMLInputElement>document.getElementById('ic_chat_name')).value;
+    const text = (<HTMLInputElement>document.getElementById('client_inputbox')).value;
+    const pairchar = (<HTMLInputElement>document.getElementById('pair_select')).value;
+    const pairoffset = Number((<HTMLInputElement>document.getElementById('pair_offset')).value);
+    const pairyoffset = Number((<HTMLInputElement>document.getElementById('pair_y_offset')).value);
+    const myrole = (<HTMLInputElement>document.getElementById('role_select')).value ? (<HTMLInputElement>document.getElementById('role_select')).value : mychar.side;
+    const additive = Boolean(((<HTMLInputElement>document.getElementById('check_additive')).checked));
+    const effect = (<HTMLInputElement>document.getElementById('effect_select')).value;
 
     let sfxname = '0';
     let sfxdelay = 0;
     let emote_mod = myemo.zoom;
-    if (document.getElementById('sendsfx').checked) {
+    if ((<HTMLInputElement>document.getElementById('sendsfx')).checked) {
       sfxname = myemo.sfx;
       sfxdelay = myemo.sfxdelay;
     }
 
     // not to overwrite a 5 from the ini or anything else
-    if (document.getElementById('sendpreanim').checked) {
+    if ((<HTMLInputElement>document.getElementById('sendpreanim')).checked) {
       if (emote_mod === 0) { emote_mod = 1; }
     } else if (emote_mod === 1) { emote_mod = 0; }
 
@@ -2380,11 +2632,11 @@ window.onEnter = onEnter;
  * was successfully sent/presented.
  */
 function resetICParams() {
-  document.getElementById('client_inputbox').value = '';
+  (<HTMLInputElement>document.getElementById('client_inputbox')).value = '';
   document.getElementById('button_flash').className = 'client_button';
   document.getElementById('button_shake').className = 'client_button';
 
-  document.getElementById('sendpreanim').checked = false;
+  (<HTMLInputElement>document.getElementById('sendpreanim')).checked = false;
 
   if (selectedShout) {
     document.getElementById(`button_${selectedShout}`).className = 'client_button';
@@ -2392,9 +2644,9 @@ function resetICParams() {
   }
 }
 
-export function resetOffset(_event) {
-  document.getElementById('pair_offset').value = 0;
-  document.getElementById('pair_y_offset').value = 0;
+export function resetOffset(_event: Event) {
+  (<HTMLInputElement>document.getElementById('pair_offset')).value = '0';
+  (<HTMLInputElement>document.getElementById('pair_y_offset')).value = '0';
 }
 window.resetOffset = resetOffset;
 
@@ -2402,15 +2654,15 @@ window.resetOffset = resetOffset;
  * Triggered when the music search bar is changed
  * @param {MouseEvent} event
  */
-export function musiclist_filter(_event) {
-  const musiclist_element = document.getElementById('client_musiclist');
-  const searchname = document.getElementById('client_musicsearch').value;
+export function musiclist_filter(_event: Event) {
+  const musiclist_element = <HTMLSelectElement>document.getElementById('client_musiclist');
+  const searchname = (<HTMLInputElement>document.getElementById('client_musicsearch')).value;
 
   musiclist_element.innerHTML = '';
 
   for (const trackname of client.musics) {
     if (trackname.toLowerCase().indexOf(searchname.toLowerCase()) !== -1) {
-      const newentry = document.createElement('OPTION');
+      const newentry = <HTMLOptionElement>document.createElement('OPTION');
       newentry.text = trackname;
       musiclist_element.options.add(newentry);
     }
@@ -2422,13 +2674,13 @@ window.musiclist_filter = musiclist_filter;
  * Triggered when an item on the music list is clicked.
  * @param {MouseEvent} event
  */
-export function musiclist_click(_event) {
-  const playtrack = document.getElementById('client_musiclist').value;
+export function musiclist_click(_event: Event) {
+  const playtrack = (<HTMLInputElement>document.getElementById('client_musiclist')).value;
   client.sendMusicChange(playtrack);
 
   // This is here so you can't actually select multiple tracks,
   // even though the select tag has the multiple option to render differently
-  const musiclist_elements = document.getElementById('client_musiclist').selectedOptions;
+  const musiclist_elements = (<HTMLSelectElement>document.getElementById('client_musiclist')).selectedOptions;
   for (let i = 0; i < musiclist_elements.length; i++) {
     musiclist_elements[i].selected = false;
   }
@@ -2439,8 +2691,8 @@ window.musiclist_click = musiclist_click;
  * Triggered when a character in the mute list is clicked
  * @param {MouseEvent} event
  */
-export function mutelist_click(_event) {
-  const mutelist = document.getElementById('mute_select');
+export function mutelist_click(_event: Event) {
+  const mutelist = <HTMLSelectElement>document.getElementById('mute_select');
   const selected_character = mutelist.options[mutelist.selectedIndex];
 
   if (client.chars[selected_character.value].muted === false) {
@@ -2458,21 +2710,21 @@ window.mutelist_click = mutelist_click;
  * Triggered when the showname checkboc is clicked
  * @param {MouseEvent} event
  */
-export function showname_click(_event) {
-  setCookie('showname', document.getElementById('showname').checked);
-  setCookie('ic_chat_name', document.getElementById('ic_chat_name').value);
+export function showname_click(_event: Event) {
+  setCookie('showname', String((<HTMLInputElement>document.getElementById('showname')).checked));
+  setCookie('ic_chat_name', (<HTMLInputElement>document.getElementById('ic_chat_name')).value);
 
-  const css_s = document.getElementById('nameplate_setting');
+  const css_s = <HTMLAnchorElement>document.getElementById('nameplate_setting');
 
-  if (document.getElementById('showname').checked) { css_s.href = 'styles/shownames.css'; } else { css_s.href = 'styles/nameplates.css'; }
+  if ((<HTMLInputElement>document.getElementById('showname')).checked) { css_s.href = 'styles/shownames.css'; } else { css_s.href = 'styles/nameplates.css'; }
 }
 window.showname_click = showname_click;
 
 /**
  * Triggered when an item on the area list is clicked.
- * @param {MouseEvent} event
+ * @param {HTMLElement} el
  */
-export function area_click(el) {
+export function area_click(el: HTMLElement) {
   const area = client.areas[el.id.substr(4)].name;
   client.sendMusicChange(area);
 
@@ -2487,26 +2739,18 @@ window.area_click = area_click;
  * Triggered by the music volume slider.
  */
 export function changeMusicVolume() {
-  viewport.musicVolume = document.getElementById('client_mvolume').value;
-  setCookie('musicVolume', document.getElementById('client_mvolume').value);
+  viewport.musicVolume = Number((<HTMLInputElement>document.getElementById('client_mvolume')).value);
+  setCookie('musicVolume', String(viewport.musicVolume));
 }
 window.changeMusicVolume = changeMusicVolume;
-
-/**
- * Triggered by the testimony volume slider.
- */
-export function changeTestimonyVolume() {
-  setCookie('testimonyVolume', document.getElementById('client_testimonyaudio').volume);
-}
-window.changeTestimonyVolume = changeTestimonyVolume;
 
 /**
  * Triggered by the blip volume slider.
  */
 export function changeBlipVolume() {
-  const blipVolume = document.getElementById('client_bvolume').value;
-  viewport.blipChannels.forEach((channel) => channel.volume = blipVolume);
-  setCookie('blipVolume', document.getElementById('client_bvolume').value);
+  const blipVolume = (<HTMLInputElement>document.getElementById('client_bvolume')).value;
+  viewport.blipChannels.forEach((channel: HTMLAudioElement) => channel.volume = Number(blipVolume));
+  setCookie('blipVolume', blipVolume);
 }
 window.changeBlipVolume = changeBlipVolume;
 
@@ -2514,9 +2758,9 @@ window.changeBlipVolume = changeBlipVolume;
  * Triggered by the theme selector.
  */
 export function reloadTheme() {
-  viewport.theme = document.getElementById('client_themeselect').value;
+  viewport.theme = (<HTMLSelectElement>document.getElementById('client_themeselect')).value;
   setCookie('theme', viewport.theme);
-  document.getElementById('client_theme').href = `styles/${viewport.theme}.css`;
+  (<HTMLAnchorElement>document.getElementById('client_theme')).href = `styles/${viewport.theme}.css`;
 }
 window.reloadTheme = reloadTheme;
 
@@ -2524,8 +2768,8 @@ window.reloadTheme = reloadTheme;
  * Triggered by a changed callword list
  */
 export function changeCallwords() {
-  client.callwords = document.getElementById('client_callwords').value.split('\n');
-  setCookie('callwords', client.callwords);
+  client.callwords = (<HTMLInputElement>document.getElementById('client_callwords')).value.split('\n');
+  setCookie('callwords', client.callwords.join('\n'));
 }
 window.changeCallwords = changeCallwords;
 
@@ -2541,7 +2785,7 @@ window.modcall_test = modcall_test;
  * Triggered by the ini button.
  */
 export async function iniedit() {
-  const ininame = document.getElementById('client_ininame').value;
+  const ininame = (<HTMLInputElement>document.getElementById('client_ininame')).value;
   const inicharID = client.charID;
   await client.handleCharacterInfo(ininame.split('&'), inicharID);
   client.handlePV((`PV#0#CID#${inicharID}`).split('#'));
@@ -2551,16 +2795,16 @@ window.iniedit = iniedit;
 /**
  * Triggered by the pantilt checkbox
  */
-export async function switchPanTilt(addcheck) {
+export async function switchPanTilt(addcheck: number) {
   const background = document.getElementById('client_fullview');
   if (addcheck === 1) {
-    document.getElementById('client_pantilt').checked = true;
+    (<HTMLInputElement>document.getElementById('client_pantilt')).checked = true;
     document.getElementById('client_court').style.display = '';
   } else if (addcheck === 2) {
-    document.getElementById('client_pantilt').checked = false;
+    (<HTMLInputElement>document.getElementById('client_pantilt')).checked = false;
     document.getElementById('client_court').style.display = 'none';
   }
-  if (document.getElementById('client_pantilt').checked) {
+  if ((<HTMLInputElement>document.getElementById('client_pantilt')).checked) {
     background.style.transition = '0.5s ease-in-out';
   } else {
     background.style.transition = 'none';
@@ -2573,8 +2817,8 @@ window.switchPanTilt = switchPanTilt;
  */
 export async function switchAspectRatio() {
   const background = document.getElementById('client_background');
-  const offsetCheck = document.getElementById('client_hdviewport_offset');
-  if (document.getElementById('client_hdviewport').checked) {
+  const offsetCheck = <HTMLInputElement>document.getElementById('client_hdviewport_offset');
+  if ((<HTMLInputElement>document.getElementById('client_hdviewport')).checked) {
     background.style.paddingBottom = '56.25%';
     offsetCheck.disabled = false;
   } else {
@@ -2589,12 +2833,12 @@ window.switchAspectRatio = switchAspectRatio;
  */
 export async function switchChatOffset() {
   const container = document.getElementById('client_chatcontainer');
-  if (document.getElementById('client_hdviewport_offset').checked) {
+  if ((<HTMLInputElement>document.getElementById('client_hdviewport_offset')).checked) {
     container.style.width = '80%';
     container.style.left = '10%';
   } else {
     container.style.width = '100%';
-    container.style.left = 0;
+    container.style.left = '0';
   }
 }
 window.switchChatOffset = switchChatOffset;
@@ -2603,7 +2847,7 @@ window.switchChatOffset = switchChatOffset;
  * Triggered when a character icon is clicked in the character selection menu.
  * @param {MouseEvent} event
  */
-export function changeCharacter(_event) {
+export function changeCharacter(_event: Event) {
   document.getElementById('client_waiting').style.display = 'block';
   document.getElementById('client_charselect').style.display = 'block';
   document.getElementById('client_emo').innerHTML = '';
@@ -2614,7 +2858,7 @@ window.changeCharacter = changeCharacter;
  * Triggered when there was an error loading a character sprite.
  * @param {HTMLImageElement} image the element containing the missing image
  */
-export function charError(image) {
+export function charError(image: HTMLImageElement) {
   console.warn(`${image.src} is missing from webAO`);
   image.src = transparentPng;
   return true;
@@ -2625,8 +2869,8 @@ window.charError = charError;
  * Triggered when there was an error loading a generic sprite.
  * @param {HTMLImageElement} image the element containing the missing image
  */
-export function imgError(image) {
-  image.onerror = '';
+export function imgError(image: HTMLImageElement) {
+  image.onerror = null;
   image.src = ''; // unload so the old sprite doesn't persist
   return true;
 }
@@ -2634,15 +2878,16 @@ window.imgError = imgError;
 
 /**
  * Triggered when there was an error loading a sound
- * @param {HTMLImageElement} image the element containing the missing sound
+ * @param {HTMLAudioElement} image the element containing the missing sound
  */
-export function opusCheck(channel) {
+export function opusCheck(channel: HTMLAudioElement): OnErrorEventHandlerNonNull{
   const audio = channel.src
   if (audio === '') {
     return
   }
   console.info(`failed to load sound ${channel.src}`);
   let oldsrc = '';
+  let newsrc = '';
   oldsrc = channel.src;
   if (!oldsrc.endsWith('.opus')) {
     newsrc = oldsrc.replace('.mp3', '.opus');
@@ -2670,15 +2915,15 @@ window.ReconnectButton = ReconnectButton;
  * @param {string} msg the string to be added
  * @param {string} name the name of the sender
  */
-function appendICLog(msg, showname = '', nameplate = '', time = new Date()) {
+function appendICLog(msg: string, showname = '', nameplate = '', time = new Date()) {
   const entry = document.createElement('p');
   const shownameField = document.createElement('span');
   const nameplateField = document.createElement('span');
   const textField = document.createElement('span');
-  nameplateField.classList = 'iclog_name iclog_nameplate';
+  nameplateField.className = 'iclog_name iclog_nameplate';
   nameplateField.appendChild(document.createTextNode(nameplate));
 
-  shownameField.classList = 'iclog_name iclog_showname';
+  shownameField.className = 'iclog_name iclog_showname';
   if (showname === '' || !showname) { shownameField.appendChild(document.createTextNode(nameplate)); } else { shownameField.appendChild(document.createTextNode(showname)); }
 
   textField.className = 'iclog_text';
@@ -2712,12 +2957,12 @@ function appendICLog(msg, showname = '', nameplate = '', time = new Date()) {
 
 /**
  * check if the message contains an entry on our callword list
- * @param {String} message
+ * @param {string} message
  */
-export function checkCallword(message) {
+export function checkCallword(message: string) {
   client.callwords.forEach(testCallword);
 
-  function testCallword(item) {
+  function testCallword(item: string) {
     if (item !== '' && message.toLowerCase().includes(item.toLowerCase())) {
       viewport.sfxaudio.pause();
       viewport.sfxaudio.src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
@@ -2730,10 +2975,10 @@ export function checkCallword(message) {
  * Triggered when the music search bar is changed
  * @param {MouseEvent} event
  */
-export function chartable_filter(_event) {
-  const searchname = document.getElementById('client_charactersearch').value;
+export function chartable_filter(_event: Event) {
+  const searchname = (<HTMLInputElement>document.getElementById('client_charactersearch')).value;
 
-  client.chars.forEach((character, charid) => {
+  client.chars.forEach((character: any, charid: number) => {
     const demothing = document.getElementById(`demo_${charid}`);
     if (character.name.toLowerCase().indexOf(searchname.toLowerCase()) === -1) {
       demothing.style.display = 'none';
@@ -2749,7 +2994,7 @@ window.chartable_filter = chartable_filter;
  * @param {number} ccharacter the character ID; if this is a large number,
  * then spectator is chosen instead.
  */
-export function pickChar(ccharacter) {
+export function pickChar(ccharacter: number) {
   if (ccharacter === -1) {
     // Spectator
     document.getElementById('client_waiting').style.display = 'none';
@@ -2764,20 +3009,20 @@ window.pickChar = pickChar;
  * Highlights and selects an emotion for in-character chat.
  * @param {string} emo the new emotion to be selected
  */
-export function pickEmotion(emo) {
+export function pickEmotion(emo: number) {
   try {
     if (client.selectedEmote !== -1) {
-      document.getElementById(`emo_${client.selectedEmote}`).classList = 'emote_button';
+      document.getElementById(`emo_${client.selectedEmote}`).className = 'emote_button';
     }
   } catch (err) {
-    // do nothing
+        // do nothing
   }
   client.selectedEmote = emo;
-  document.getElementById(`emo_${emo}`).classList = 'emote_button dark';
+  document.getElementById(`emo_${emo}`).className = 'emote_button dark';
 
-  document.getElementById('sendsfx').checked = (client.emote.sfx.length > 1);
+  (<HTMLInputElement>document.getElementById('sendsfx')).checked = (client.emote.sfx.length > 1);
 
-  document.getElementById('sendpreanim').checked = (client.emote.zoom == 1);
+  (<HTMLInputElement>document.getElementById('sendpreanim')).checked = (client.emote.zoom == 1);
 }
 window.pickEmotion = pickEmotion;
 
@@ -2785,8 +3030,7 @@ window.pickEmotion = pickEmotion;
  * Highlights and selects an evidence for in-character chat.
  * @param {string} evidence the evidence to be presented
  */
-export function pickEvidence(evidenceID) {
-  const evidence = Number(evidenceID);
+export function pickEvidence(evidence: number) {
   if (client.selectedEvidence !== evidence) {
     // Update selected evidence
     if (client.selectedEvidence > 0) {
@@ -2796,14 +3040,14 @@ export function pickEvidence(evidenceID) {
     client.selectedEvidence = evidence;
 
     // Show evidence on information window
-    document.getElementById('evi_name').value = client.evidences[evidence - 1].name;
-    document.getElementById('evi_desc').value = client.evidences[evidence - 1].desc;
+    (<HTMLInputElement>document.getElementById('evi_name')).value = client.evidences[evidence - 1].name;
+    (<HTMLInputElement>document.getElementById('evi_desc')).value = client.evidences[evidence - 1].desc;
 
     // Update icon
     const icon_id = getIndexFromSelect('evi_select', client.evidences[evidence - 1].filename);
-    document.getElementById('evi_select').selectedIndex = icon_id;
+    (<HTMLSelectElement>document.getElementById('evi_select')).selectedIndex = icon_id;
     if (icon_id === 0) {
-      document.getElementById('evi_filename').value = client.evidences[evidence - 1].filename;
+      (<HTMLInputElement>document.getElementById('evi_filename')).value = client.evidences[evidence - 1].filename;
     }
     updateEvidenceIcon();
 
@@ -2822,12 +3066,12 @@ window.pickEvidence = pickEvidence;
  * Add evidence.
  */
 export function addEvidence() {
-  const evidence_select = document.getElementById('evi_select');
+  const evidence_select = <HTMLSelectElement>document.getElementById('evi_select');
   client.sendPE(
-    document.getElementById('evi_name').value,
-    document.getElementById('evi_desc').value,
+    (<HTMLInputElement>document.getElementById('evi_name')).value,
+    (<HTMLInputElement>document.getElementById('evi_desc')).value,
     evidence_select.selectedIndex === 0
-      ? document.getElementById('evi_filename').value
+      ? (<HTMLInputElement>document.getElementById('evi_filename')).value
       : evidence_select.options[evidence_select.selectedIndex].text,
   );
   cancelEvidence();
@@ -2838,14 +3082,14 @@ window.addEvidence = addEvidence;
  * Edit selected evidence.
  */
 export function editEvidence() {
-  const evidence_select = document.getElementById('evi_select');
-  const id = parseInt(client.selectedEvidence) - 1;
+  const evidence_select = <HTMLSelectElement>document.getElementById('evi_select');
+  const id = client.selectedEvidence - 1;
   client.sendEE(
     id,
-    document.getElementById('evi_name').value,
-    document.getElementById('evi_desc').value,
+    (<HTMLInputElement>document.getElementById('evi_name')).value,
+    (<HTMLInputElement>document.getElementById('evi_desc')).value,
     evidence_select.selectedIndex === 0
-      ? document.getElementById('evi_filename').value
+      ? (<HTMLInputElement>document.getElementById('evi_filename')).value
       : evidence_select.options[evidence_select.selectedIndex].text,
   );
   cancelEvidence();
@@ -2856,7 +3100,7 @@ window.editEvidence = editEvidence;
  * Delete selected evidence.
  */
 export function deleteEvidence() {
-  const id = parseInt(client.selectedEvidence) - 1;
+  const id = client.selectedEvidence - 1;
   client.sendDE(id);
   cancelEvidence();
 }
@@ -2873,12 +3117,12 @@ export function cancelEvidence() {
   client.selectedEvidence = 0;
 
   // Clear evidence on information window
-  document.getElementById('evi_select').selectedIndex = 0;
+  (<HTMLSelectElement>document.getElementById('evi_select')).selectedIndex = 0;
   updateEvidenceIcon(); // Update icon widget
-  document.getElementById('evi_filename').value = '';
-  document.getElementById('evi_name').value = '';
-  document.getElementById('evi_desc').value = '';
-  document.getElementById('evi_preview').src = `${AO_HOST}misc/empty.png`; // Clear icon
+  (<HTMLInputElement>document.getElementById('evi_filename')).value = '';
+  (<HTMLInputElement>document.getElementById('evi_name')).value = '';
+  (<HTMLInputElement>document.getElementById('evi_desc')).value = '';
+  (<HTMLImageElement>document.getElementById('evi_preview')).src = `${AO_HOST}misc/empty.png`; // Clear icon
 
   // Update button
   document.getElementById('evi_add').className = 'client_button hover_button';
@@ -2893,9 +3137,9 @@ window.cancelEvidence = cancelEvidence;
  * @param {string} select_box the select element name
  * @param {string} value the value that need to be compared
  */
-export function getIndexFromSelect(select_box, value) {
+export function getIndexFromSelect(select_box: string, value: string) {
   // Find if icon alraedy existed in select box
-  const select_element = document.getElementById(select_box);
+  const select_element = <HTMLSelectElement>document.getElementById(select_box);
   for (let i = 1; i < select_element.length; ++i) {
     if (select_element.options[i].value === value) {
       return i;
@@ -2908,9 +3152,11 @@ window.getIndexFromSelect = getIndexFromSelect;
 /**
  * Set the style of the chatbox
  */
-export function setChatbox(style) {
-  const chatbox_theme = document.getElementById('chatbox_theme');
-  const selected_theme = document.getElementById('client_chatboxselect').value;
+export function setChatbox(style: string) {
+  const chatbox_theme = <HTMLAnchorElement>document.getElementById('chatbox_theme');
+  const themeselect = <HTMLSelectElement>document.getElementById('client_chatboxselect');
+  const selected_theme = themeselect.value;
+
   setCookie('chatbox', selected_theme);
   if (selected_theme === 'dynamic') {
     if (chatbox_arr.includes(style)) {
@@ -2939,9 +3185,9 @@ window.resizeChatbox = resizeChatbox;
  * Update evidence icon.
  */
 export function updateEvidenceIcon() {
-  const evidence_select = document.getElementById('evi_select');
-  const evidence_filename = document.getElementById('evi_filename');
-  const evidence_iconbox = document.getElementById('evi_preview');
+  const evidence_select = <HTMLSelectElement>document.getElementById('evi_select');
+  const evidence_filename = <HTMLInputElement>document.getElementById('evi_filename');
+  const evidence_iconbox = <HTMLImageElement>document.getElementById('evi_preview');
 
   if (evidence_select.selectedIndex === 0) {
     evidence_filename.style.display = 'initial';
@@ -2956,7 +3202,7 @@ window.updateEvidenceIcon = updateEvidenceIcon;
 /**
  * Update evidence icon.
  */
-export function updateActionCommands(side) {
+export function updateActionCommands(side: string) {
   if (side === 'jud') {
     document.getElementById('judge_action').style.display = 'inline-table';
     document.getElementById('no_action').style.display = 'none';
@@ -2966,9 +3212,9 @@ export function updateActionCommands(side) {
   }
 
   // Update role selector
-  for (let i = 0, role_select = document.getElementById('role_select').options; i < role_select.length; i++) {
-    if (side === role_select[i].value) {
-      role_select.selectedIndex = i;
+  for (let i = 0, role_select = <HTMLSelectElement>document.getElementById('role_select'); i < role_select.options.length; i++) {
+    if (side === role_select.options[i].value) {
+      role_select.options.selectedIndex = i;
       return;
     }
   }
@@ -2979,9 +3225,9 @@ window.updateActionCommands = updateActionCommands;
  * Change background via OOC.
  */
 export function changeBackgroundOOC() {
-  const selectedBG = document.getElementById('bg_select');
-  const changeBGCommand = document.getElementById('bg_command').value;
-  const bgFilename = document.getElementById('bg_filename');
+  const selectedBG = <HTMLSelectElement>document.getElementById('bg_select');
+  const changeBGCommand = "bg $1";
+  const bgFilename = <HTMLInputElement>document.getElementById('bg_filename');
 
   let filename = '';
   if (selectedBG.selectedIndex === 0) {
@@ -2998,11 +3244,11 @@ window.changeBackgroundOOC = changeBackgroundOOC;
  * Change role via OOC.
  */
 export function changeRoleOOC() {
-  const new_role = document.getElementById('role_select').value;
+  const roleselect = <HTMLInputElement>document.getElementById('role_select');
 
-  client.sendOOC(`/pos ${new_role}`);
-  client.sendServer(`SP#${new_role}#%`);
-  updateActionCommands(new_role);
+  client.sendOOC(`/pos ${roleselect.value}`);
+  client.sendServer(`SP#${roleselect.value}#%`);
+  updateActionCommands(roleselect.value);
 }
 window.changeRoleOOC = changeRoleOOC;
 
@@ -3010,7 +3256,7 @@ window.changeRoleOOC = changeRoleOOC;
  * Random character via OOC.
  */
 export function randomCharacterOOC() {
-  client.sendOOC(`/${document.getElementById('randomchar_command').value}`);
+  client.sendOOC(`/randomchar`);
 }
 window.randomCharacterOOC = randomCharacterOOC;
 
@@ -3066,7 +3312,7 @@ window.guilty = guilty;
  * Increment defense health point.
  */
 export function addHPD() {
-  client.sendHP(1, String(parseInt(client.hp[0]) + 1));
+  client.sendHP(1, (client.hp[0] + 1));
 }
 window.addHPD = addHPD;
 
@@ -3074,7 +3320,7 @@ window.addHPD = addHPD;
  * Decrement defense health point.
  */
 export function redHPD() {
-  client.sendHP(1, String(parseInt(client.hp[0]) - 1));
+  client.sendHP(1, (client.hp[0] - 1));
 }
 window.redHPD = redHPD;
 
@@ -3082,7 +3328,7 @@ window.redHPD = redHPD;
  * Increment prosecution health point.
  */
 export function addHPP() {
-  client.sendHP(2, String(parseInt(client.hp[1]) + 1));
+  client.sendHP(2, (client.hp[1] + 1));
 }
 window.addHPP = addHPP;
 
@@ -3090,7 +3336,7 @@ window.addHPP = addHPP;
  * Decrement prosecution health point.
  */
 export function redHPP() {
-  client.sendHP(2, String(parseInt(client.hp[1]) - 1));
+  client.sendHP(2, (client.hp[1] - 1));
 }
 window.redHPP = redHPP;
 
@@ -3098,9 +3344,9 @@ window.redHPP = redHPP;
  * Update background preview.
  */
 export function updateBackgroundPreview() {
-  const background_select = document.getElementById('bg_select');
-  const background_filename = document.getElementById('bg_filename');
-  const background_preview = document.getElementById('bg_preview');
+  const background_select = <HTMLSelectElement>document.getElementById('bg_select');
+  const background_filename = <HTMLInputElement>document.getElementById('bg_filename');
+  const background_preview = <HTMLImageElement>document.getElementById('bg_preview');
 
   if (background_select.selectedIndex === 0) {
     background_filename.style.display = 'initial';
@@ -3114,9 +3360,9 @@ window.updateBackgroundPreview = updateBackgroundPreview;
 
 /**
  * Highlights and selects a menu.
- * @param {string} menu the menu to be selected
+ * @param {number} menu the menu to be selected
  */
-export function toggleMenu(menu) {
+export function toggleMenu(menu: number) {
   if (menu !== selectedMenu) {
     document.getElementById(`menu_${menu}`).className = 'menu_button active';
     document.getElementById(`content_${menu}`).className = 'menu_content active';
@@ -3130,9 +3376,9 @@ window.toggleMenu = toggleMenu;
 /**
  * Highlights and selects a shout for in-character chat.
  * If the same shout button is selected, then the shout is canceled.
- * @param {string} shout the new shout to be selected
+ * @param {number} shout the new shout to be selected
  */
-export function toggleShout(shout) {
+export function toggleShout(shout: number) {
   if (shout === selectedShout) {
     document.getElementById(`button_${shout}`).className = 'client_button';
     selectedShout = 0;

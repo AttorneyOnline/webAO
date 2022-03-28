@@ -14,7 +14,7 @@ dotenv.config();
 module.exports = {
   entry: {
     ui: './webAO/ui.js',
-    client: './webAO/client.js',
+    client: './webAO/client.ts',
     master: './webAO/master.ts',
     dom: glob.sync('./webAO/dom/*.js'),
     components: glob.sync('./webAO/components/*.js'),
