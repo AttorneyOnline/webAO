@@ -132,7 +132,7 @@ function cachedServerlist(response: Response) {
 }
 
 function processServerlist(thelist: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[]) {
-  const myURL: string = window.location.href.replace('https://','http://');
+  const myURL: string = window.location.href.replace('https://','http://').replace('index.html','');
   for (let i = 0; i < thelist.length - 1; i++) {
     const serverEntry: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string } = thelist[i];
 
