@@ -8,7 +8,7 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { EventEmitter } from 'events';
 import tryUrls from './utils/tryUrls'
 import {
-  escapeChat, encodeChat, prepChat, safeTags,
+  escapeChat, prepChat, safeTags,
 } from './encoding';
 import mlConfig from './utils/aoml';
 // Load some defaults for the background and evidence dropdowns
@@ -320,8 +320,8 @@ class Client extends EventEmitter {
 	 */
   sendOOC(message: string) {
     setCookie('OOC_name', (<HTMLInputElement>document.getElementById('OOC_name')).value);
-    const oocName = `${escapeChat(encodeChat((<HTMLInputElement>document.getElementById('OOC_name')).value))}`;
-    const oocMessage = `${escapeChat(encodeChat(message))}`;
+    const oocName = `${escapeChat((<HTMLInputElement>document.getElementById('OOC_name')).value)}`;
+    const oocMessage = `${escapeChat(message)}`;
 
     const commands = {
       '/save_chatlog': this.saveChatlogHandle
@@ -400,18 +400,18 @@ class Client extends EventEmitter {
         other_emote = '##';
 		    	other_offset = '#0#0';
       }
-      extra_cccc = `${showname}#${other_charid}${other_emote}#${self_offset}${other_offset}#${Number(noninterrupting_preanim)}#`;
+      extra_cccc = `${escapeChat(showname)}#${other_charid}${escapeChat(other_emote)}#${self_offset}${other_offset}#${Number(noninterrupting_preanim)}#`;
 
       if (extrafeatures.includes('looping_sfx')) {
         extra_27 = `${Number(looping_sfx)}#${Number(screenshake)}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
         if (extrafeatures.includes('effects')) {
-          extra_28 = `${Number(additive)}#${effect}#`;
+          extra_28 = `${Number(additive)}#${escapeChat(effect)}#`;
         }
       }
     }
 
-    const serverMessage = `MS#${deskmod}#${preanim}#${name}#${emote}`
-			+ `#${escapeChat(encodeChat(message))}#${side}#${sfx_name}#${emote_modifier}`
+    const serverMessage = `MS#${escapeChat(deskmod)}#${escapeChat(preanim)}#${escapeChat(name)}#${escapeChat(emote)}`
+			+ `#${escapeChat(message)}#${escapeChat(side)}#${escapeChat(sfx_name)}#${emote_modifier}`
 			+ `#${this.charID}#${sfx_delay}#${Number(objection_modifier)}#${Number(evidence)}#${Number(flip)}#${Number(realization)}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
 
     this.sendServer(serverMessage);
@@ -427,7 +427,7 @@ class Client extends EventEmitter {
 	 * @param {string} evidence image filename
 	 */
   sendPE(name: string, desc: string, img: string) {
-    this.sendServer(`PE#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
+    this.sendServer(`PE#${escapeChat(name)}#${escapeChat(desc)}#${img}#%`);
   }
 
   /**
@@ -438,7 +438,7 @@ class Client extends EventEmitter {
 	 * @param {string} evidence image filename
 	 */
   sendEE(id: number, name: string, desc: string, img: string) {
-    this.sendServer(`EE#${id}#${escapeChat(encodeChat(name))}#${escapeChat(encodeChat(desc))}#${img}#%`);
+    this.sendServer(`EE#${id}#${escapeChat(name)}#${escapeChat(desc)}#${img}#%`);
   }
 
   /**
@@ -2571,7 +2571,7 @@ export function onEnter(event: KeyboardEvent) {
     const noninterrupting_preanim = Boolean(((<HTMLInputElement>document.getElementById('check_nonint')).checked));
     const looping_sfx = Boolean(((<HTMLInputElement>document.getElementById('check_loopsfx')).checked));
     const color = Number((<HTMLInputElement>document.getElementById('textcolor')).value);
-    const showname = (<HTMLInputElement>document.getElementById('ic_chat_name')).value;
+    const showname = escapeChat((<HTMLInputElement>document.getElementById('ic_chat_name')).value);
     const text = (<HTMLInputElement>document.getElementById('client_inputbox')).value;
     const pairchar = (<HTMLInputElement>document.getElementById('pair_select')).value;
     const pairoffset = Number((<HTMLInputElement>document.getElementById('pair_offset')).value);
