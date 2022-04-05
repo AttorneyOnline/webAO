@@ -2637,6 +2637,7 @@ function resetICParams() {
   document.getElementById('button_shake').className = 'client_button';
 
   (<HTMLInputElement>document.getElementById('sendpreanim')).checked = false;
+  (<HTMLInputElement>document.getElementById('sendsfx')).checked = false;
 
   if (selectedShout) {
     document.getElementById(`button_${selectedShout}`).className = 'client_button';
