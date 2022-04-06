@@ -115,7 +115,7 @@
 	transform: rotate(180deg);
 }
 
-#char_select {
+#client_charselect {
 	display: block;
 	text-align: center;
 	margin: 0 auto;
@@ -172,7 +172,7 @@
 	}
 }
 
-#viewport {
+#client_background {
 	position: relative;
 	background-color: transparent;
 	top: 0;
@@ -439,7 +439,7 @@
 	opacity: 0.5;
 }
 
-#emotes {
+#client_emo {
 	position: relative;
 	top: 10px;
 	width: 95%;
@@ -475,7 +475,7 @@
 	flex: 1;
 }
 
-#ic_chatlog {
+#client_log {
 	position: relative;
 	height: 100%;
 	color: #fff;
@@ -489,7 +489,7 @@
 	line-height: .85em;
 }
 
-#ic_chatlog>p {
+#client_log>p {
 	line-height: 1.1em;
 }
 
@@ -504,7 +504,7 @@
 	color: #dbdbdb;
 }
 
-#server_chatlog {
+#client_ooclog {
 	position: relative;
 	background-color: #242424;
 	color: #fff;
@@ -524,19 +524,19 @@
 	whitespace: nowrap;	
 }
 
-#ooc_chat_message {
+#client_oocinputbox {
 	flex-grow:1;
 }
 
-#ooc_chat_name {
+#OOC_name {
 	width:15%;	
 }
 
-#music_search {
+#client_musicsearch {
 	width: 100%;
 }
 
-#music_list {
+#client_musiclist {
 	width: 99%;
 	height: 95%;
 	height: calc(95% - 16px);
