@@ -2796,19 +2796,23 @@ window.iniedit = iniedit;
 /**
  * Triggered by the pantilt checkbox
  */
-export async function switchPanTilt(addcheck: number) {
-  const background = document.getElementById('client_fullview');
-  if (addcheck === 1) {
-    (<HTMLInputElement>document.getElementById('client_pantilt')).checked = true;
-    document.getElementById('client_court').style.display = '';
-  } else if (addcheck === 2) {
-    (<HTMLInputElement>document.getElementById('client_pantilt')).checked = false;
-    document.getElementById('client_court').style.display = 'none';
-  }
-  if ((<HTMLInputElement>document.getElementById('client_pantilt')).checked) {
-    background.style.transition = '0.5s ease-in-out';
+export async function switchPanTilt() {
+  const fullview = document.getElementById('client_fullview');
+  const fullbg = <HTMLImageElement>document.getElementById('client_court');
+  const checkbox = <HTMLInputElement>document.getElementById('client_pantilt');
+
+  if (fullbg.src = transparentPng) {  
+    checkbox.checked = false;
+    fullbg.style.display = 'none';
   } else {
-    background.style.transition = 'none';
+    checkbox.checked = true;
+    fullbg.style.display = '';
+  }
+
+  if (checkbox.checked) {
+    fullview.style.transition = '0.5s ease-in-out';
+  } else {
+    fullview.style.transition = 'none';
   }
 }
 window.switchPanTilt = switchPanTilt;
