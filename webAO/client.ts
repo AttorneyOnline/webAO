@@ -982,7 +982,7 @@ class Client extends EventEmitter {
 
       if (this.chars[charid].blips === '') { this.chars[charid].blips = this.chars[charid].gender; }
 
-      const iniedit_select = <HTMLSelectElement>document.getElementById('client_ininame');
+      const iniedit_select = <HTMLSelectElement>document.getElementById('iniswap_dropdown');
       iniedit_select.add(new Option(safeTags(chargs[0])));
     } else {
       console.warn(`missing charid ${charid}`);
@@ -1131,7 +1131,7 @@ class Client extends EventEmitter {
       const char_array = JSON.parse(chardata);
       // the try catch will fail before here when there is no file
 
-      const char_select = <HTMLSelectElement>document.getElementById('client_ininame');
+      const char_select = <HTMLSelectElement>document.getElementById('iniswap_dropdown');
       char_select.innerHTML = '';
 
       char_array.forEach((character: string) => {
@@ -1728,9 +1728,9 @@ class Client extends EventEmitter {
       pickEmotion(1);
     }
 
-    if (await fileExists(`${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/custom.gif`)) { document.getElementById('button_4').style.display = ''; } else { document.getElementById('button_4').style.display = 'none'; }
+    if (await fileExists(`${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/custom.gif`)) { document.getElementById('custom_objection').style.display = ''; } else { document.getElementById('custom_objection').style.display = 'none'; }
 
-    const iniedit_select = <HTMLSelectElement>document.getElementById('client_ininame');
+    const iniedit_select = <HTMLSelectElement>document.getElementById('iniswap_dropdown');
 
     // Load iniswaps if there are any
     try {
@@ -2786,7 +2786,7 @@ window.modcall_test = modcall_test;
  * Triggered by the ini button.
  */
 export async function iniedit() {
-  const ininame = (<HTMLInputElement>document.getElementById('client_ininame')).value;
+  const ininame = (<HTMLInputElement>document.getElementById('iniswap_dropdown')).value;
   const inicharID = client.charID;
   await client.handleCharacterInfo(ininame.split('&'), inicharID);
   client.handlePV((`PV#0#CID#${inicharID}`).split('#'));
