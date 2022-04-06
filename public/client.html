@@ -421,20 +421,31 @@
 		<span class="menu_content" id="content_3">
 			<meta name="frame-title" lang="en" content="Settings">
 			<h2>Volume</h2>
-			<label id="music_label" for="music_slider">Blip</label>
+			<br>
+			<label id="music_label" for="music_slider">Music</label>
+			<br>
 			<input id="music_slider" class="long" type="range" min="0" max="1" value="1" step="0.01"
 					onchange="changeMusicVolume()">
+			<br>
 
-			<label id="sfx_label" for="sfx_slider">Blip</label>
+			<br>
+			<label id="sfx_label" for="sfx_slider">SFX</label>
+			<br>
 			<audio id="sfx_slider" onvolumechange="changeSFXVolume()" onerror="opusCheck()" controls></audio>
 
-			<p>Shouts</p>
+			<br>
+			<label for="client_shoutaudio">Shouts</label>
+			<br>
 			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" onerror="opusCheck()" controls></audio>
 			
-			<p>Testimony/Guilty</p>
+			<br>
+			<label for="client_testimonyaudio">Testimony/Guilty</label>
+			<br>
 			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" onerror="opusCheck()" controls></audio>
 
+			<br>
 			<label id="blip_label" for="blip_slider">Blip</label>
+			<br>
 			<input id="blip_slider" class="long" type="range" min="0" max="1" value="1" step="0.01"
 					onchange="changeBlipVolume()">
 			<br>
