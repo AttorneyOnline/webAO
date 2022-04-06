@@ -47,7 +47,7 @@
         
 </head>
 
-<body>
+<body id="lobby">
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
             <div class="collapse navbar-collapse" id="navbarResponsive">
@@ -95,7 +95,7 @@
             <p>webAO requires JavaScript to work</p>
         </div>
         </noscript>
-        <ul class="serverlist" id="masterlist">
+        <ul class="serverlist" id="server_list">
             <li id="server-2" class="available" onmouseover="setServ(-2)">
                 <p>Singleplayer (beta)</p>
                 <a class="button" href="client.html?mode=replay">Try</a>
@@ -108,7 +108,7 @@
         </ul>
         <div id="info_container">
             <p id="serverinfo">Masterserver version - ...</p>
-            <p id="clientinfo">Client version - ...</p>
+            <p id="version">Client version - ...</p>
 
             <iframe id="masterchat" src="https://servers.aceattorneyonline.com/motd" frameborder="0"></iframe>
 
