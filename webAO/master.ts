@@ -150,6 +150,6 @@ function processServerlist(thelist: { name: string, description: string, ip: str
 }
 
 function processVersion(data: string) {
-  document.getElementById('clientinfo').innerHTML = `Client version: ${version}`;
+  document.getElementById('version').innerHTML = `Client version: ${version}`;
   document.getElementById('serverinfo').innerHTML = `Master server version: ${data}`;
 }
