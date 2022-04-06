@@ -118,14 +118,14 @@ function checkOnline(serverID: number, coIP: string) {
 }
 
 function loadServerlist(thelist: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[]) {
-  localStorage.setItem('masterlist', JSON.stringify(thelist));
+  localStorage.setItem('server_list', JSON.stringify(thelist));
   processServerlist(thelist);
 }
 
 function cachedServerlist(response: Response) {
   if (!response.ok) {
     document.getElementById('ms_error').style.display = 'block';
-    processServerlist(JSON.parse(localStorage.getItem('masterlist')));
+    processServerlist(JSON.parse(localStorage.getItem('server_list')));
     return;
   }
   return response.json();
@@ -141,7 +141,7 @@ function processServerlist(thelist: { name: string, description: string, ip: str
     const ipport = `${serverEntry.ip}:${serverEntry.ws_port}`;
 
     if (serverEntry.ws_port) {
-      document.getElementById('masterlist').innerHTML
+      document.getElementById('server_list').innerHTML
 				+= `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(serverEntry.name)}</p>`
 				+ `<a class="button" href="${myURL}client.html?mode=watch&ip=${ipport}">Watch</a>`
 				+ `<a class="button" href="${myURL}client.html?mode=join&ip=${ipport}">Join</a></li>`;
