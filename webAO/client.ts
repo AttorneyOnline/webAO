@@ -2332,11 +2332,11 @@ class Viewport {
         const MAX_SLOW_CHATSPEED = 120
         for(let i = this.textnow.length; i < this.chatmsg.content.length; i++) {
           const currentCharacter = this.chatmsg.parsed[i - 1].innerHTML
-          if (currentCharacter === '{') {
+          if (currentCharacter === '}') {
             if (this.chatmsg.speed > 0) {
               this.chatmsg.speed -= 20
             }
-          } else if(currentCharacter === '}') {
+          } else if(currentCharacter === '{') {
             if(this.chatmsg.speed < MAX_SLOW_CHATSPEED) {
               this.chatmsg.speed += 20
             }
