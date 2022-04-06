@@ -400,7 +400,7 @@ class Client extends EventEmitter {
         other_emote = '##';
 		    	other_offset = '#0#0';
       }
-      extra_cccc = `${escapeChat(showname)}#${other_charid}${escapeChat(other_emote)}#${self_offset}${other_offset}#${Number(noninterrupting_preanim)}#`;
+      extra_cccc = `${escapeChat(showname)}#${other_charid}${other_emote}#${self_offset}${other_offset}#${Number(noninterrupting_preanim)}#`;
 
       if (extrafeatures.includes('looping_sfx')) {
         extra_27 = `${Number(looping_sfx)}#${Number(screenshake)}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
