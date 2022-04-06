@@ -5,7 +5,7 @@ import setCookie from '../utils/setCookie';
  */
 
 export function changeSFXVolume() {
-  setCookie('sfxVolume', document.getElementById('client_sfxaudio').volume);
+  setCookie('sfxVolume', document.getElementById('sfx_slider').volume);
 }
 window.changeSFXVolume = changeSFXVolume;
 

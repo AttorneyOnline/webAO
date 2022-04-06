@@ -83,7 +83,7 @@ declare global {
     redHPD: () => void;
     addHPD: () => void;
     guilty: () => void;
-    notguilty: () => void;
+    not_guilty: () => void;
     initCE: () => void;
     initWT: () => void;
     callMod: () => void;
@@ -310,7 +310,7 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
   sendSelf(message: string) {
-    (<HTMLInputElement>document.getElementById('client_ooclog')).value += `${message}\r\n`;
+    (<HTMLInputElement>document.getElementById('server_chatlog')).value += `${message}\r\n`;
     this.handleSelf(message);
   }
 
@@ -319,8 +319,8 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
   sendOOC(message: string) {
-    setCookie('OOC_name', (<HTMLInputElement>document.getElementById('OOC_name')).value);
-    const oocName = `${escapeChat((<HTMLInputElement>document.getElementById('OOC_name')).value)}`;
+    setCookie('ooc_chat_name', (<HTMLInputElement>document.getElementById('ooc_chat_name')).value);
+    const oocName = `${escapeChat((<HTMLInputElement>document.getElementById('ooc_chat_name')).value)}`;
     const oocMessage = `${escapeChat(message)}`;
 
     const commands = {
@@ -416,7 +416,7 @@ class Client extends EventEmitter {
 
     this.sendServer(serverMessage);
     if (mode === 'replay') {
-      (<HTMLInputElement>document.getElementById('client_ooclog')).value += `wait#${(<HTMLInputElement>document.getElementById('client_replaytimer')).value}#%\r\n`;
+      (<HTMLInputElement>document.getElementById('server_chatlog')).value += `wait#${(<HTMLInputElement>document.getElementById('client_replaytimer')).value}#%\r\n`;
     }
   }
 
@@ -519,7 +519,7 @@ class Client extends EventEmitter {
     });
 
     // Read cookies and set the UI to its values
-    (<HTMLInputElement>document.getElementById('OOC_name')).value = getCookie('OOC_name') || `web${String(Math.round(Math.random() * 100 + 10))}`;
+    (<HTMLInputElement>document.getElementById('ooc_chat_name')).value = getCookie('ooc_chat_name') || `web${String(Math.round(Math.random() * 100 + 10))}`;
 
     // Read cookies and set the UI to its values
     const cookietheme = getCookie('theme') || 'default';
@@ -532,19 +532,19 @@ class Client extends EventEmitter {
     (<HTMLOptionElement>document.querySelector(`#client_chatboxselect [value="${cookiechatbox}"]`)).selected = true;
     setChatbox(cookiechatbox);
 
-    (<HTMLInputElement>document.getElementById('client_mvolume')).value = getCookie('musicVolume') || '1';
+    (<HTMLInputElement>document.getElementById('music_slider')).value = getCookie('musicVolume') || '1';
     changeMusicVolume();
-    (<HTMLAudioElement>document.getElementById('client_sfxaudio')).volume = Number(getCookie('sfxVolume')) || 1;
+    (<HTMLAudioElement>document.getElementById('sfx_slider')).volume = Number(getCookie('sfxVolume')) || 1;
     changeSFXVolume();
     (<HTMLAudioElement>document.getElementById('client_shoutaudio')).volume = Number(getCookie('shoutVolume')) || 1;
     changeShoutVolume();
     (<HTMLAudioElement>document.getElementById('client_testimonyaudio')).volume = Number(getCookie('testimonyVolume')) || 1;
     changeTestimonyVolume();
-    (<HTMLInputElement>document.getElementById('client_bvolume')).value = getCookie('blipVolume') || '1';
+    (<HTMLInputElement>document.getElementById('blip_slider')).value = getCookie('blipVolume') || '1';
     changeBlipVolume();
 
     (<HTMLInputElement>document.getElementById('ic_chat_name')).value = getCookie('ic_chat_name');
-    (<HTMLInputElement>document.getElementById('showname')).checked = Boolean(getCookie('showname'));
+    (<HTMLInputElement>document.getElementById('showname_enable')).checked = Boolean(getCookie('showname_enable'));
     showname_click(null);
 
     (<HTMLInputElement>document.getElementById('client_callwords')).value = getCookie('callwords');
@@ -644,7 +644,7 @@ class Client extends EventEmitter {
 	 * @param {*} args packet arguments
 	 */
   handleReplay() {
-    const ooclog = <HTMLInputElement>document.getElementById('client_ooclog');
+    const ooclog = <HTMLInputElement>document.getElementById('server_chatlog');
     const rawLog = false;
     let rtime: number = Number((<HTMLInputElement>document.getElementById('client_replaytimer')).value);
 
@@ -664,7 +664,7 @@ class Client extends EventEmitter {
   }
 
   saveChatlogHandle = async () => {
-    const clientLog = document.getElementById('client_log')
+    const clientLog = document.getElementById('ic_chatlog')
     const icMessageLogs = clientLog.getElementsByTagName('p')
     const messages = []
 
@@ -841,7 +841,7 @@ class Client extends EventEmitter {
 	 */
   handleCT(args: string[]) {
     if (mode !== 'replay') {
-      const oocLog = document.getElementById('client_ooclog');
+      const oocLog = document.getElementById('server_chatlog');
       oocLog.innerHTML += `${prepChat(args[1])}: ${prepChat(args[2])}\r\n`;
       if (oocLog.scrollTop > oocLog.scrollHeight - 600) {
         oocLog.scrollTop = oocLog.scrollHeight;
@@ -1022,9 +1022,9 @@ class Client extends EventEmitter {
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
     if (mode === 'watch') {		// Spectators don't need to pick a character
-      document.getElementById('client_charselect').style.display = 'none';
+      document.getElementById('char_select').style.display = 'none';
     } else {
-      document.getElementById('client_charselect').style.display = 'block';
+      document.getElementById('char_select').style.display = 'block';
     }
 
     document.getElementById('client_loadingtext').innerHTML = 'Loading Characters';
@@ -1096,7 +1096,7 @@ class Client extends EventEmitter {
 
   resetMusicList() {
     this.musics = [];
-    document.getElementById('client_musiclist').innerHTML = '';
+    document.getElementById('music_list').innerHTML = '';
   }
 
   resetAreaList() {
@@ -1168,7 +1168,7 @@ class Client extends EventEmitter {
   addTrack(trackname: string) {
     const newentry = <HTMLOptionElement>document.createElement('OPTION');
     newentry.text = trackname;
-    (<HTMLSelectElement>document.getElementById('client_musiclist')).options.add(newentry);
+    (<HTMLSelectElement>document.getElementById('music_list')).options.add(newentry);
     this.musics.push(trackname);
   }
 
@@ -1472,7 +1472,7 @@ class Client extends EventEmitter {
 	 * @param {Array} args packet arguments
 	 */
   handleZZ(args: string[]) {
-    const oocLog = document.getElementById('client_ooclog');
+    const oocLog = document.getElementById('server_chatlog');
     oocLog.innerHTML += `$Alert: ${prepChat(args[1])}\r\n`;
     if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
       oocLog.scrollTop = oocLog.scrollHeight;
@@ -1598,11 +1598,11 @@ class Client extends EventEmitter {
     }
 
     if (args.includes('flipping')) {
-      document.getElementById('button_flip').style.display = '';
+      document.getElementById('flip').style.display = '';
     }
 
     if (args.includes('looping_sfx')) {
-      document.getElementById('button_shake').style.display = '';
+      document.getElementById('screenshake').style.display = '';
       document.getElementById('2.7').style.display = '';
     }
 
@@ -1671,12 +1671,12 @@ class Client extends EventEmitter {
   async handlePV(args: string[]) {
     this.charID = Number(args[3]);
     document.getElementById('client_waiting').style.display = 'none';
-    document.getElementById('client_charselect').style.display = 'none';
+    document.getElementById('char_select').style.display = 'none';
 
     const me = this.chars[this.charID];
     this.selectedEmote = -1;
     const { emotes } = this;
-    const emotesList = document.getElementById('client_emo');
+    const emotesList = document.getElementById('emotes');
     emotesList.style.display = '';
     emotesList.innerHTML = ''; // Clear emote box
     const ini = me.inifile;
@@ -1782,7 +1782,7 @@ class Client extends EventEmitter {
   handleRD(_args: string[]) {
     this.sendSelf('BN#gs4#%');
     this.sendSelf('DONE#%');
-    const ooclog = <HTMLInputElement>document.getElementById('client_ooclog');
+    const ooclog = <HTMLInputElement>document.getElementById('server_chatlog');
     ooclog.value = '';
     ooclog.readOnly = false;
 
@@ -1859,7 +1859,7 @@ class Viewport {
     this.blipChannels.forEach((channel: HTMLAudioElement) => channel.onerror = opusCheck(channel));
     this.currentBlipChannel = 0;
 
-    this.sfxaudio = document.getElementById('client_sfxaudio');
+    this.sfxaudio = document.getElementById('sfx_slider');
     this.sfxaudio.src = `${AO_HOST}sounds/general/sfx-realization.opus`;
 
     this.sfxplayed = 0;
@@ -2058,7 +2058,7 @@ class Viewport {
     const testimonyFilenames: Testimony = {
       1: 'witnesstestimony',
       2: 'crossexamination',
-      3: 'notguilty',
+      3: 'not_guilty',
       4: 'guilty',
     };
 
@@ -2086,7 +2086,7 @@ class Viewport {
     const testimonyFilenames: Testimony = {
       1: 'witnesstestimony',
       2: 'crossexamination',
-      3: 'notguilty',
+      3: 'not_guilty',
       4: 'guilty',
     };
 
@@ -2169,7 +2169,7 @@ class Viewport {
     const nameBoxInner = document.getElementById('client_inner_name');
     const chatBoxInner = document.getElementById('client_inner_chat');
 
-    const displayname = ((<HTMLInputElement>document.getElementById('showname')).checked && this.chatmsg.showname !== '') ? this.chatmsg.showname : this.chatmsg.nameplate;
+    const displayname = ((<HTMLInputElement>document.getElementById('showname_enable')).checked && this.chatmsg.showname !== '') ? this.chatmsg.showname : this.chatmsg.nameplate;
 
     // Clear out the last message
     chatBoxInner.innerText = this.textnow;
@@ -2541,8 +2541,8 @@ class Viewport {
  */
 export function onOOCEnter(event: KeyboardEvent) {
   if (event.keyCode === 13) {
-    client.sendOOC((<HTMLInputElement>document.getElementById('client_oocinputbox')).value);
-    (<HTMLInputElement>document.getElementById('client_oocinputbox')).value = '';
+    client.sendOOC((<HTMLInputElement>document.getElementById('ooc_chat_message')).value);
+    (<HTMLInputElement>document.getElementById('ooc_chat_message')).value = '';
   }
 }
 window.onOOCEnter = onOOCEnter;
@@ -2565,10 +2565,10 @@ export function onEnter(event: KeyboardEvent) {
     const mychar = client.character;
     const myemo = client.emote;
     const evi = client.evidence;
-    const flip = Boolean((document.getElementById('button_flip').classList.contains('dark')));
-    const flash = Boolean((document.getElementById('button_flash').classList.contains('dark')));
-    const screenshake = Boolean((document.getElementById('button_shake').classList.contains('dark')));
-    const noninterrupting_preanim = Boolean(((<HTMLInputElement>document.getElementById('check_nonint')).checked));
+    const flip = Boolean((document.getElementById('flip').classList.contains('dark')));
+    const flash = Boolean((document.getElementById('realization').classList.contains('dark')));
+    const screenshake = Boolean((document.getElementById('screenshake').classList.contains('dark')));
+    const noninterrupting_preanim = Boolean(((<HTMLInputElement>document.getElementById('pre_no_interrupt')).checked));
     const looping_sfx = Boolean(((<HTMLInputElement>document.getElementById('check_loopsfx')).checked));
     const color = Number((<HTMLInputElement>document.getElementById('textcolor')).value);
     const showname = escapeChat((<HTMLInputElement>document.getElementById('ic_chat_name')).value);
@@ -2578,7 +2578,7 @@ export function onEnter(event: KeyboardEvent) {
     const pairyoffset = Number((<HTMLInputElement>document.getElementById('pair_y_offset')).value);
     const myrole = (<HTMLInputElement>document.getElementById('role_select')).value ? (<HTMLInputElement>document.getElementById('role_select')).value : mychar.side;
     const additive = Boolean(((<HTMLInputElement>document.getElementById('check_additive')).checked));
-    const effect = (<HTMLInputElement>document.getElementById('effect_select')).value;
+    const effect = (<HTMLInputElement>document.getElementById('effects_dropdown')).value;
 
     let sfxname = '0';
     let sfxdelay = 0;
@@ -2589,7 +2589,7 @@ export function onEnter(event: KeyboardEvent) {
     }
 
     // not to overwrite a 5 from the ini or anything else
-    if ((<HTMLInputElement>document.getElementById('sendpreanim')).checked) {
+    if ((<HTMLInputElement>document.getElementById('pre')).checked) {
       if (emote_mod === 0) { emote_mod = 1; }
     } else if (emote_mod === 1) { emote_mod = 0; }
 
@@ -2633,10 +2633,10 @@ window.onEnter = onEnter;
  */
 function resetICParams() {
   (<HTMLInputElement>document.getElementById('client_inputbox')).value = '';
-  document.getElementById('button_flash').className = 'client_button';
-  document.getElementById('button_shake').className = 'client_button';
+  document.getElementById('realization').className = 'client_button';
+  document.getElementById('screenshake').className = 'client_button';
 
-  (<HTMLInputElement>document.getElementById('sendpreanim')).checked = false;
+  (<HTMLInputElement>document.getElementById('pre')).checked = false;
   (<HTMLInputElement>document.getElementById('sendsfx')).checked = false;
 
   if (selectedShout) {
@@ -2656,8 +2656,8 @@ window.resetOffset = resetOffset;
  * @param {MouseEvent} event
  */
 export function musiclist_filter(_event: Event) {
-  const musiclist_element = <HTMLSelectElement>document.getElementById('client_musiclist');
-  const searchname = (<HTMLInputElement>document.getElementById('client_musicsearch')).value;
+  const musiclist_element = <HTMLSelectElement>document.getElementById('music_list');
+  const searchname = (<HTMLInputElement>document.getElementById('music_search')).value;
 
   musiclist_element.innerHTML = '';
 
@@ -2676,12 +2676,12 @@ window.musiclist_filter = musiclist_filter;
  * @param {MouseEvent} event
  */
 export function musiclist_click(_event: Event) {
-  const playtrack = (<HTMLInputElement>document.getElementById('client_musiclist')).value;
+  const playtrack = (<HTMLInputElement>document.getElementById('music_list')).value;
   client.sendMusicChange(playtrack);
 
   // This is here so you can't actually select multiple tracks,
   // even though the select tag has the multiple option to render differently
-  const musiclist_elements = (<HTMLSelectElement>document.getElementById('client_musiclist')).selectedOptions;
+  const musiclist_elements = (<HTMLSelectElement>document.getElementById('music_list')).selectedOptions;
   for (let i = 0; i < musiclist_elements.length; i++) {
     musiclist_elements[i].selected = false;
   }
@@ -2712,12 +2712,12 @@ window.mutelist_click = mutelist_click;
  * @param {MouseEvent} event
  */
 export function showname_click(_event: Event) {
-  setCookie('showname', String((<HTMLInputElement>document.getElementById('showname')).checked));
+  setCookie('showname_enable', String((<HTMLInputElement>document.getElementById('showname_enable')).checked));
   setCookie('ic_chat_name', (<HTMLInputElement>document.getElementById('ic_chat_name')).value);
 
   const css_s = <HTMLAnchorElement>document.getElementById('nameplate_setting');
 
-  if ((<HTMLInputElement>document.getElementById('showname')).checked) { css_s.href = 'styles/shownames.css'; } else { css_s.href = 'styles/nameplates.css'; }
+  if ((<HTMLInputElement>document.getElementById('showname_enable')).checked) { css_s.href = 'styles/shownames.css'; } else { css_s.href = 'styles/nameplates.css'; }
 }
 window.showname_click = showname_click;
 
@@ -2732,7 +2732,7 @@ export function area_click(el: HTMLElement) {
   const areaHr = document.createElement('div');
   areaHr.className = 'hrtext';
   areaHr.textContent = `switched to ${el.textContent}`;
-  document.getElementById('client_log').appendChild(areaHr);
+  document.getElementById('ic_chatlog').appendChild(areaHr);
 }
 window.area_click = area_click;
 
@@ -2740,7 +2740,7 @@ window.area_click = area_click;
  * Triggered by the music volume slider.
  */
 export function changeMusicVolume() {
-  viewport.musicVolume = Number((<HTMLInputElement>document.getElementById('client_mvolume')).value);
+  viewport.musicVolume = Number((<HTMLInputElement>document.getElementById('music_slider')).value);
   setCookie('musicVolume', String(viewport.musicVolume));
 }
 window.changeMusicVolume = changeMusicVolume;
@@ -2749,7 +2749,7 @@ window.changeMusicVolume = changeMusicVolume;
  * Triggered by the blip volume slider.
  */
 export function changeBlipVolume() {
-  const blipVolume = (<HTMLInputElement>document.getElementById('client_bvolume')).value;
+  const blipVolume = (<HTMLInputElement>document.getElementById('blip_slider')).value;
   viewport.blipChannels.forEach((channel: HTMLAudioElement) => channel.volume = Number(blipVolume));
   setCookie('blipVolume', blipVolume);
 }
@@ -2817,7 +2817,7 @@ window.switchPanTilt = switchPanTilt;
  * Triggered by the change aspect ratio checkbox
  */
 export async function switchAspectRatio() {
-  const background = document.getElementById('client_background');
+  const background = document.getElementById('viewport');
   const offsetCheck = <HTMLInputElement>document.getElementById('client_hdviewport_offset');
   if ((<HTMLInputElement>document.getElementById('client_hdviewport')).checked) {
     background.style.paddingBottom = '56.25%';
@@ -2850,8 +2850,8 @@ window.switchChatOffset = switchChatOffset;
  */
 export function changeCharacter(_event: Event) {
   document.getElementById('client_waiting').style.display = 'block';
-  document.getElementById('client_charselect').style.display = 'block';
-  document.getElementById('client_emo').innerHTML = '';
+  document.getElementById('char_select').style.display = 'block';
+  document.getElementById('emotes').innerHTML = '';
 }
 window.changeCharacter = changeCharacter;
 
@@ -2945,7 +2945,7 @@ function appendICLog(msg: string, showname = '', nameplate = '', time = new Date
     entry.appendChild(timeStamp);
   }
 
-  const clientLog = document.getElementById('client_log');
+  const clientLog = document.getElementById('ic_chatlog');
   clientLog.appendChild(entry);
 
   /* This is a little buggy - some troubleshooting might be desirable */
@@ -2977,7 +2977,7 @@ export function checkCallword(message: string) {
  * @param {MouseEvent} event
  */
 export function chartable_filter(_event: Event) {
-  const searchname = (<HTMLInputElement>document.getElementById('client_charactersearch')).value;
+  const searchname = (<HTMLInputElement>document.getElementById('char_search')).value;
 
   client.chars.forEach((character: any, charid: number) => {
     const demothing = document.getElementById(`demo_${charid}`);
@@ -2999,7 +2999,7 @@ export function pickChar(ccharacter: number) {
   if (ccharacter === -1) {
     // Spectator
     document.getElementById('client_waiting').style.display = 'none';
-    document.getElementById('client_charselect').style.display = 'none';
+    document.getElementById('char_select').style.display = 'none';
   } else {
     client.sendCharacter(ccharacter);
   }
@@ -3023,7 +3023,7 @@ export function pickEmotion(emo: number) {
 
   (<HTMLInputElement>document.getElementById('sendsfx')).checked = (client.emote.sfx.length > 1);
 
-  (<HTMLInputElement>document.getElementById('sendpreanim')).checked = (client.emote.zoom == 1);
+  (<HTMLInputElement>document.getElementById('pre')).checked = (client.emote.zoom == 1);
 }
 window.pickEmotion = pickEmotion;
 
@@ -3176,7 +3176,7 @@ window.setChatbox = setChatbox;
  */
 export function resizeChatbox() {
   const chatContainerBox = document.getElementById('client_chatcontainer');
-  const gameHeight = document.getElementById('client_background').offsetHeight;
+  const gameHeight = document.getElementById('viewport').offsetHeight;
 
   chatContainerBox.style.fontSize = `${(gameHeight * 0.0521).toFixed(1)}px`;
 }
@@ -3296,10 +3296,10 @@ window.initCE = initCE;
 /**
  * Declare the defendant not guilty
  */
-export function notguilty() {
+export function not_guilty() {
   client.sendRT('judgeruling#0');
 }
-window.notguilty = notguilty;
+window.not_guilty = not_guilty;
 
 /**
  * Declare the defendant not guilty

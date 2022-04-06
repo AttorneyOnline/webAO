@@ -50,11 +50,11 @@
 		<h1 id="client_loadingtext">Loading</h1>
 		<progress id="client_loadingbar" value="0"></progress>
 	</div>
-	<div id="client_charselect">
+	<div id="char_select">
 		<p>Choose your character</p>
 		<button onclick="pickChar(-1)">Or spectate</button>
 		<br><br>
-		<input id="client_charactersearch" placeholder="Search" oninput="chartable_filter(event)"></input>
+		<input id="char_search" placeholder="Search" oninput="chartable_filter(event)"></input>
 		<br><br>
 		<div id="client_chartable"></div>
 	</div>
@@ -73,7 +73,7 @@
 <template id="client_wrapper">
 	<meta name="frame-title" lang="en" content="Game">
 	<div id="client_icwrapper">
-		<div id="client_background">
+		<div id="viewport">
 			<div id="client_gamewindow">
 				<div id="client_fullview">
 					<img id="client_court" onerror="switchPanTilt(2);" onload="switchPanTilt(1);">
@@ -145,17 +145,17 @@
 		</div>
 		<div id="client_iccontrols">
 			<meta name="frame-title" lang="en" content="miscellaneous">
-			<div id="client_emo">
+			<div id="emotes">
 			</div>
 			<br>
 			<div id="character_options">
 				<div id="emote_options">
-				<button id="button_1" alt="Hold it!" class="objection_button" onclick="toggleShout(1)">Hold it!</button>
-				<button id="button_2" alt="Objection!" class="objection_button"
+				<button id="hold_it" alt="Hold it!" class="objection_button" onclick="toggleShout(1)">Hold it!</button>
+				<button id="objection" alt="Objection!" class="objection_button"
 					onclick="toggleShout(2)">Objection!</button>
-				<button id="button_3" alt="Take That!" class="objection_button" onclick="toggleShout(3)">Take
+				<button id="take_that" alt="Take That!" class="objection_button" onclick="toggleShout(3)">Take
 					That!</button>
-				<button id="button_4" alt="Custom" class="objection_button" onclick="toggleShout(4)" style="display: none">
+				<button id="custom_objection" alt="Custom" class="objection_button" onclick="toggleShout(4)" style="display: none">
 					Custom</button>
 				<br>
 				<br>
@@ -169,13 +169,13 @@
 				</select>
 				<label for="sendsfx"> SFX: </label>
 				<input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx" checked>
-				<label for="sendpreanim"> Preanimation: </label>
-				<input type="checkbox" id="sendpreanim" name="sendpreanim" value="sendpreanim">
+				<label for="pre"> Preanimation: </label>
+				<input type="checkbox" id="pre" name="pre">
 				<br>
 				<br>
-				<button id="button_flip"  alt="Flip"  class="client_button" onclick="toggleEffect(this)" style="display: none">Flip</button>
-				<button id="button_flash" alt="Flash" class="client_button" onclick="toggleEffect(this)">Flash</button>
-				<button id="button_shake" alt="Shake" class="client_button" onclick="toggleEffect(this)" style="display: none">Shake</button>
+				<button id="flip"  alt="Flip"  class="client_button" onclick="toggleEffect(this)" style="display: none">Flip</button>
+				<button id="realization" alt="Flash" class="client_button" onclick="toggleEffect(this)">Flash</button>
+				<button id="screenshake" alt="Shake" class="client_button" onclick="toggleEffect(this)" style="display: none">Shake</button>
 			</div>
 			<br>
 			<br>
@@ -217,12 +217,12 @@
 					<label for="ic_chat_name">Custom Showname:</label>
 					<input id="ic_chat_name" name="ic_chat_name" type="text">
 					<br>
-					<label for="showname">Show others:</label>
-					<input id="showname" name="showname" type="checkbox" onclick="showname_click()">
+					<label for="showname_enable">Show others:</label>
+					<input id="showname_enable" name="showname_enable" type="checkbox" onclick="showname_click()">
 					<br>
 					<br>
-					<label for="check_nonint">Noninterrupting Preanimation:</label>
-					<input type="checkbox" name="check_nonint" id="check_nonint">
+					<label for="pre_no_interrupt">Noninterrupting Preanimation:</label>
+					<input type="checkbox" name="pre_no_interrupt" id="pre_no_interrupt">
 				</span>		
 				<br>
 				<br>
@@ -237,8 +237,8 @@
 					<input type="checkbox" name="check_additive" id="check_additive">
 					<br>
 					<br>
-					<label for="effect_select">Effect:</label>
-					<select id="effect_select" name="effect_select">
+					<label for="effects_dropdown">Effect:</label>
+					<select id="effects_select" name="effects_dropdown">
 						<option value="||">None</option>
 						<option value="realization||sfx-realization">Realization</option>
 						<option value="hearts||sfx-squee">Hearts</option>
@@ -258,10 +258,10 @@
 					<span id="menu_ce" onclick="initCE()" class="judge_button"
 						style="color: red"><i>Cross<br>Examination</i></span>
 
-					<span id="menu_nguilty" onclick="notguilty()" class="judge_button"
+					<span id="not_guilty" onclick="notguilty()" class="judge_button"
 						style="color: white; font-family: serif; text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; font-size: 1.5em; line-height: 0.75;">Not<br>Guilty</span>
 
-					<span id="menu_guilty" onclick="guilty()" class="judge_button"
+					<span id="guilty" onclick="guilty()" class="judge_button"
 						style="color: black; font-family: serif; font-size: 1.5em;">Guilty</span>
 
 					<br>
@@ -421,12 +421,12 @@
 		<span class="menu_content" id="content_3">
 			<meta name="frame-title" lang="en" content="Settings">
 			<h2>Volume</h2>
-			<p>Music</p>
-			<input id="client_mvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
+			<label id="music_label" for="music_slider">Blip</label>
+			<input id="music_slider" class="long" type="range" min="0" max="1" value="1" step="0.01"
 					onchange="changeMusicVolume()">
 
-			<p>SFX</p>
-			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" onerror="opusCheck()" controls></audio>
+			<label id="sfx_label" for="sfx_slider">Blip</label>
+			<audio id="sfx_slider" onvolumechange="changeSFXVolume()" onerror="opusCheck()" controls></audio>
 
 			<p>Shouts</p>
 			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" onerror="opusCheck()" controls></audio>
@@ -434,8 +434,8 @@
 			<p>Testimony/Guilty</p>
 			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" onerror="opusCheck()" controls></audio>
 
-			<p>Blip</p>
-			<input id="client_bvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
+			<label id="blip_label" for="blip_slider">Blip</label>
+			<input id="blip_slider" class="long" type="range" min="0" max="1" value="1" step="0.01"
 					onchange="changeBlipVolume()">
 			<br>
 			<br>
@@ -486,8 +486,8 @@
 			<br>
 			<br>
 			<p>Ini editing (experimental)</p>
-			<label for="client_ininame">Iniedit Character:</label>
-			<select type="text" id="client_ininame" name="client_ininame"></select>
+			<label for="iniswap_dropdown">Iniedit Character:</label>
+			<select type="text" id="iniswap_dropdown" name="iniswap_dropdown"></select>
 			<button id="client_inichange" onclick="iniedit()">Change</button>
 			<br>
 			<br>
@@ -534,7 +534,7 @@
 
 <template id="log">
 	<meta name="frame-title" lang="en" content="Log">
-	<div id="client_log">
+	<div id="ic_chatlog">
 		<div class="hrtext">&#8595; log starts here &#8595;</div>
 	</div>
 </template>
@@ -542,10 +542,10 @@
 <template id="ooc">
 	<meta name="frame-title" lang="en" content="Server">
 	<div style="height: 100%; display: flex; flex-direction: column;">
-		<textarea id="client_ooclog" style="flex: 1 auto" readonly></textarea>
+		<textarea id="server_chatlog" style="flex: 1 auto" readonly></textarea>
 		<span id="client_oocinput">
-			<input id="OOC_name" name="OOC_name" type="text">
-			<input id="client_oocinputbox" type="text" onkeypress="onOOCEnter(event)">
+			<input id="ooc_chat_name" name="OOC_name" type="text">
+			<input id="ooc_chat_message" type="text" onkeypress="onOOCEnter(event)">
 		</span>
 		<span id="client_replaycontrols" style="display: none; white-space: nowrap;">
 			<input id="client_replaygo" style="width: 25%;" type="button" onclick="onReplayGo(event)" value="GO">
@@ -556,8 +556,8 @@
 
 <template id="music">
 	<meta name="frame-title" lang="en" content="Music">
-	<input id="client_musicsearch" placeholder="Search" oninput="musiclist_filter(event)"></input>
-	<select id="client_musiclist" size="5" onchange="musiclist_click(event)">
+	<input id="music_search" placeholder="Search" oninput="musiclist_filter(event)"></input>
+	<select id="music_list" size="5" onchange="musiclist_click(event)">
 	</select>
 </template>
 
