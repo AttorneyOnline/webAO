@@ -911,9 +911,9 @@ class Client extends EventEmitter {
 	 * @param {Number} charid character ID
 	 */
   async handleCharacterInfo(chargs: string[], charid: number) {
+    const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
     if (chargs[0]) {
       let cini: any = {};
-      const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
       const getCharIcon = async () => {
         const extensions = [
           '.png',
@@ -986,7 +986,6 @@ class Client extends EventEmitter {
       iniedit_select.add(new Option(safeTags(chargs[0])));
     } else {
       console.warn(`missing charid ${charid}`);
-      const img = document.getElementById(`demo_${charid}`);
       img.style.display = 'none';
     }
   }
