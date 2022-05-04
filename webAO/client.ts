@@ -2622,6 +2622,7 @@ export function onEnter(event: KeyboardEvent) {
       effect,
     );
   }
+  return false;
 }
 window.onEnter = onEnter;
 
