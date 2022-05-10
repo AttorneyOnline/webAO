@@ -17,7 +17,7 @@ import vanilla_music_arr from './constants/music.js';
 import vanilla_background_arr from './constants/backgrounds.js';
 import vanilla_evidence_arr from './constants/evidence.js';
 
-const parseApache = require('parse-apache-directory-index');
+import apacheParse from './utils/directoryListing';
 
 import chatbox_arr from './styles/chatbox/chatboxes.js';
 import iniParse from './iniParse';
@@ -1031,7 +1031,7 @@ class Client extends EventEmitter {
     }
 
     const charfolder = await request(`${AO_HOST}characters/`);
-    this.char_listing = parseApache(charfolder);
+    this.char_listing = apacheParse(charfolder);
 
     document.getElementById('client_loadingtext').innerHTML = 'Loading Characters';
     for (let i = 1; i < args.length; i++) {
