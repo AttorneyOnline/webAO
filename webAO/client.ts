@@ -2517,6 +2517,8 @@ class Viewport {
           return
         }
       } else if (this.textnow !== this.chatmsg.content) {
+        const chatContainerBox = document.getElementById('client_chatcontainer');
+        chatContainerBox.style.opacity = '1';
         await this.handleTextTick(charLayers)
       }
     }
