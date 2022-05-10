@@ -17,6 +17,8 @@ import vanilla_music_arr from './constants/music.js';
 import vanilla_background_arr from './constants/backgrounds.js';
 import vanilla_evidence_arr from './constants/evidence.js';
 
+const parseApache = require('parse-apache-directory-index');
+
 import chatbox_arr from './styles/chatbox/chatboxes.js';
 import iniParse from './iniParse';
 import getCookie from './utils/getCookie.js';
@@ -158,6 +160,7 @@ class Client extends EventEmitter {
   evidence_list_length: number;
   music_list_length: number;
   testimonyID: number;
+  char_listing: any;
   chars: any;
   emotes: any;
   evidences: any;
@@ -201,7 +204,8 @@ class Client extends EventEmitter {
     this.music_list_length = 0;
     this.testimonyID = 0;
 
-    this.chars = [];
+    this.char_listing = null;
+
     this.emotes = [];
     this.evidences = [];
     this.areas = [];
@@ -1025,6 +1029,9 @@ class Client extends EventEmitter {
     } else {
       document.getElementById('client_charselect').style.display = 'block';
     }
+
+    const charfolder = await request(`${AO_HOST}characters/`);
+    this.char_listing = parseApache(charfolder);
 
     document.getElementById('client_loadingtext').innerHTML = 'Loading Characters';
     for (let i = 1; i < args.length; i++) {

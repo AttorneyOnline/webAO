@@ -50,6 +50,7 @@
     "@types/websocket": "^1.0.5",
     "core-js": "^3.21.1",
     "golden-layout": "^2.5.0",
+    "parse-apache-directory-index": "^2.1.0",
     "regenerator-runtime": "^0.13.9",
     "source-map-loader": "^3.0.1",
     "ts-loader": "^9.2.8",
