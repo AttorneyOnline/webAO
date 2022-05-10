@@ -1,16 +1,16 @@
 const cheerio = require('cheerio');
 
-const apacheParse = (src) => {
-  const $ = cheerio.load(src);
-  const dir = '/' + $('h1').text().split('/').slice(1).join('/');
-  const files = [];
+const apacheParse = (src: string) => {
+  const $: any = cheerio.load(src);
+  const dir: string = '/' + $('h1').text().split('/').slice(1).join('/');
+  const files: any = [];
 
-  const rows = $('table').find('tr').toArray();
+  const rows: any = $('table').find('tr').toArray();
 
   // Figure out the order of the columns,
   // by looking at the header row.
   // eg { 'Name': 0, 'Last modified': 1, 'Size': 2 }
-  const fieldCols = $(rows[0])
+  const fieldCols: any = $(rows[0])
     .children('th')
     .toArray()
     .reduce((fieldCols, th, i) =>
