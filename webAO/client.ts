@@ -427,7 +427,7 @@ class Client extends EventEmitter {
 	 * @param {string} evidence image filename
 	 */
   sendPE(name: string, desc: string, img: string) {
-    this.sendServer(`PE#${escapeChat(name)}#${escapeChat(desc)}#${img}#%`);
+    this.sendServer(`PE#${escapeChat(name)}#${escapeChat(desc)}#${escapeChat(img)}#%`);
   }
 
   /**
@@ -438,7 +438,7 @@ class Client extends EventEmitter {
 	 * @param {string} evidence image filename
 	 */
   sendEE(id: number, name: string, desc: string, img: string) {
-    this.sendServer(`EE#${id}#${escapeChat(name)}#${escapeChat(desc)}#${img}#%`);
+    this.sendServer(`EE#${id}#${escapeChat(name)}#${escapeChat(desc)}#${escapeChat(img)}#%`);
   }
 
   /**
