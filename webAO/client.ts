@@ -706,21 +706,33 @@ class Client extends EventEmitter {
       let char_chatbox = 'default';
       let char_muted = false;
 
-      try {
-        msg_nameplate = this.chars[char_id].showname;
-        msg_blips = this.chars[char_id].blips;
-        char_chatbox = this.chars[char_id].chat;
-        char_muted = this.chars[char_id].muted;
+      if (this.chars[char_id].name !== char_name) {
+        console.info(`${this.chars[char_id].name} is iniediting to ${char_name}`);
+        const chargs = (`${char_name}&` + 'iniediter').split('&');
+        this.handleCharacterInfo(chargs, char_id);
+      }
 
-        if (this.chars[char_id].name !== char_name) {
-          console.info(`${this.chars[char_id].name} is iniediting to ${char_name}`);
-          const chargs = (`${char_name}&` + 'iniediter').split('&');
-          this.handleCharacterInfo(chargs, char_id);
-        }
+      try {
+        msg_nameplate = this.chars[char_id].showname;        
       } catch (e) {
         msg_nameplate = args[3];
-        msg_blips = 'male';
+      }
+
+      try {
+        msg_blips = this.chars[char_id].blips;
+      } catch (e) {
+        ;
+      }
+
+      try {
+        char_chatbox = this.chars[char_id].chat;
+      } catch (e) {
         char_chatbox = 'default';
+      }
+
+      try {
+        char_muted = this.chars[char_id].muted;
+      } catch (e) {
         char_muted = false;
         console.error("we're still missing some character data");
       }
@@ -980,7 +992,7 @@ class Client extends EventEmitter {
         muted: false,
       };
 
-      if (this.chars[charid].blips === '') { this.chars[charid].blips = this.chars[charid].gender; }
+      if (this.chars[charid].blips === 'male' && this.chars[charid].gender !== 'male' && this.chars[charid].gender !== '') { this.chars[charid].blips = this.chars[charid].gender; }
 
       const iniedit_select = <HTMLSelectElement>document.getElementById('client_ininame');
       iniedit_select.add(new Option(safeTags(chargs[0])));
