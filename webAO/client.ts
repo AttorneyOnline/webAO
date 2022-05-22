@@ -985,7 +985,7 @@ class Client extends EventEmitter {
         blips: safeTags(cini.options.blips).toLowerCase(),
         gender: safeTags(cini.options.gender).toLowerCase(),
         side: safeTags(cini.options.side).toLowerCase(),
-        chat: (cini.options.chat === '') ? safeTags(cini.options.chat).toLowerCase() : safeTags(cini.options.category).toLowerCase(),
+        chat: (cini.options.chat === '' ) ? safeTags(cini.options.category).toLowerCase() : safeTags(cini.options.chat).toLowerCase(),
         evidence: chargs[3],
         icon: img.src,
         inifile: cini,
