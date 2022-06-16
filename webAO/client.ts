@@ -3018,9 +3018,8 @@ export function pickChar(ccharacter: number) {
     // Spectator
     document.getElementById('client_waiting').style.display = 'none';
     document.getElementById('client_charselect').style.display = 'none';
-  } else {
-    client.sendCharacter(ccharacter);
   }
+  client.sendCharacter(ccharacter);
 }
 window.pickChar = pickChar;
 
