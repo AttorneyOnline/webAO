@@ -634,9 +634,7 @@ class Client extends EventEmitter {
   cleanup() {
     clearInterval(this.checkUpdater);
 
-    // the connection got rekt, get rid of the old musiclist
-    this.resetMusicList();
-    document.getElementById('client_chartable').innerHTML = '';
+    this.serv.close()    
   }
 
   /**
