@@ -842,7 +842,7 @@ class Client extends EventEmitter {
         if (chatmsg.charid === this.charID) {
           resetICParams();
         }
-          viewport.say(chatmsg); // no await
+          viewport.handle_ic_speaking(chatmsg); // no await
       }
     }
   }
@@ -1410,9 +1410,9 @@ class Client extends EventEmitter {
     tryUrls(`${bgfolder}prosecutorempty`).then(resp => {(<HTMLImageElement>document.getElementById('client_court_pro')).src = resp});
 
     if (this.charID === -1) {
-      viewport.changeBackground('jud');
+      viewport.set_side('jud');
     } else {
-      viewport.changeBackground(this.chars[this.charID].side);
+      viewport.set_side(this.chars[this.charID].side);
     }
   }
 
@@ -1934,7 +1934,7 @@ class Viewport {
  * Valid positions: `def, pro, hld, hlp, wit, jud, jur, sea`
  * @param {string} position the position to change into
  */
-  async changeBackground(position: string) {
+  async set_side(position: string) {
     const bgfolder = viewport.bgFolder;
 
     const view = document.getElementById('client_fullview');
@@ -2135,7 +2135,7 @@ class Viewport {
 	 * TODO: the preanim logic, on the other hand, should probably be moved to tick()
 	 * @param {object} chatmsg the new chat message
 	 */
-  async say(chatmsg: any) {
+  async handle_ic_speaking(chatmsg: any) {
 
     this.chatmsg = chatmsg;
     this.textnow = '';
@@ -2170,7 +2170,7 @@ class Viewport {
     }
     this.lastEvi = this.chatmsg.evidence;
 
-    const validSides = ['def', 'pro', 'wit'];
+    const validSides: string[] = ['def', 'pro', 'wit']; // these are for the full view pan, the other positions use 'client_char'
     if (validSides.includes(this.chatmsg.side)) {
       charLayers = document.getElementById(`client_${this.chatmsg.side}_char`);
       pairLayers = document.getElementById(`client_${this.chatmsg.side}_pair_char`);
@@ -2226,7 +2226,7 @@ class Viewport {
     this.chatmsg.startpreanim = true;
     let gifLength = 0;
 
-    if (this.chatmsg.type === 1 && this.chatmsg.preanim !== '-') {
+    if (this.chatmsg.type === 1 && this.chatmsg.preanim !== '-') { //we have a preanim
       chatContainerBox.style.opacity = '0';
       gifLength = await getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}`);
       this.chatmsg.startspeaking = false;
@@ -2236,7 +2236,7 @@ class Viewport {
     }
     this.chatmsg.preanimdelay = gifLength;
 
-    this.changeBackground(chatmsg.side);
+    this.set_side(chatmsg.side);
 
     setChatbox(chatmsg.chatbox);
     resizeChatbox();
