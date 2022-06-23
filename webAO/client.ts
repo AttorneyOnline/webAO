@@ -2288,6 +2288,8 @@ class Viewport {
       fg.src = transparentPng;
     }
 
+    charLayers.style.opacity = '1';
+
     const soundChecks = ['0', '1', '', undefined];
     if (soundChecks.some((check) => this.chatmsg.sound === check)) {
       this.chatmsg.sound = this.chatmsg.effects[2];
@@ -2423,7 +2425,8 @@ class Viewport {
     let charLayers = <HTMLImageElement>document.getElementById('client_char');
     let pairLayers = <HTMLImageElement>document.getElementById('client_pair_char');
 
-    if ('def,pro,wit'.includes(this.chatmsg.side)) {
+    const validSides: string[] = ['def', 'pro', 'wit']; // these are for the full view pan, the other positions use 'client_char'
+    if (validSides.includes(this.chatmsg.side)) {
       charLayers = <HTMLImageElement>document.getElementById(`client_${this.chatmsg.side}_char`);
       pairLayers = <HTMLImageElement>document.getElementById(`client_${this.chatmsg.side}_pair_char`);
     }
@@ -2456,7 +2459,6 @@ class Viewport {
         shoutSprite.style.animation = '';
         const preanim = this.chatmsg.preanim.toLowerCase();
         setEmote(AO_HOST, this, charName, preanim, '', false, this.chatmsg.side);
-        charLayers.style.opacity = '1';
       }
 
       if (this.chatmsg.other_name) {
@@ -2471,6 +2473,7 @@ class Viewport {
       this.chatmsg.startpreanim = false;
       this.chatmsg.startspeaking = true;
     }
+
     const hasNonInterruptingPreAnim = this.chatmsg.noninterrupting_preanim === 1 
     if (this.textnow !== this.chatmsg.content && hasNonInterruptingPreAnim) {
       const chatContainerBox = document.getElementById('client_chatcontainer');
