@@ -293,6 +293,7 @@ class Client extends EventEmitter {
 	 * @param {string} message the message to send
 	 */
   sendServer(message: string) {
+    //console.log("C: "+message);
     mode === 'replay' ? this.sendSelf(message) : this.serv.send(message);
   }
 
@@ -555,7 +556,8 @@ class Client extends EventEmitter {
 	 * @param {number} character the character ID
 	 */
   sendCharacter(character: number) {
-    if (this.chars[character].name || character === -1) {
+    console.log("sending "+character);
+    if (character === -1 || this.chars[character].name) {
       this.sendServer(`CC#${this.playerID}#${character}#web#%`);
     }
   }
