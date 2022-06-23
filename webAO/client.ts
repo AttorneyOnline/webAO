@@ -2232,7 +2232,8 @@ class Viewport {
       this.chatmsg.startspeaking = false;
     } else {
       this.chatmsg.startspeaking = true;
-      chatContainerBox.style.opacity = '1';
+      if(this.chatmsg.content !== "")
+        chatContainerBox.style.opacity = '1';
     }
     this.chatmsg.preanimdelay = gifLength;
 
@@ -2295,7 +2296,7 @@ class Viewport {
       this.chatmsg.sound = this.chatmsg.effects[2];
     }
     this.chatmsg.parsed = await attorneyMarkdown.applyMarkdown(chatmsg.content, this.colors[this.chatmsg.color])
-    this.tick();
+    this.chat_tick();
   }
   
   async handleTextTick(charLayers: HTMLImageElement) {
@@ -2409,7 +2410,10 @@ class Viewport {
 	 *
 	 * XXX: This relies on a global variable `this.chatmsg`!
 	 */
-  async tick() {
+  async chat_tick() {
+  // note: this is called fairly often
+  // do not perform heavy operations here
+
     await delay(this.chatmsg.speed)
 
     if (this.textnow === this.chatmsg.content) {
@@ -2545,7 +2549,7 @@ class Viewport {
       }
     }
     if (this._animating) {
-      this.tick()
+      this.chat_tick()
     }
     this.tickTimer += UPDATE_INTERVAL;
   }
