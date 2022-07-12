@@ -2231,6 +2231,7 @@ class Viewport {
     if (this.chatmsg.type === 1 && this.chatmsg.preanim !== '-') { //we have a preanim
       chatContainerBox.style.opacity = '0';
       gifLength = await getAnimLength(`${AO_HOST}characters/${encodeURI(this.chatmsg.name.toLowerCase())}/${encodeURI(this.chatmsg.preanim)}`);
+      console.debug("preanim is "+gifLength+" long");
       this.chatmsg.startspeaking = false;
     } else {
       this.chatmsg.startspeaking = true;
