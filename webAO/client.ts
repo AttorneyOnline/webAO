@@ -486,7 +486,7 @@ class Client extends EventEmitter {
 	 * @param {string} track the track ID
 	 */
   sendMusicChange(track: string) {
-    this.sendServer(`MC#${track}#${this.charID}#%`);
+    this.sendServer(`MC#${escapeChat(track)}#${this.charID}#%`);
   }
 
   /**
