@@ -1239,7 +1239,7 @@ class Client extends EventEmitter {
 
     for (let i = 2; i < args.length - 1; i++) {
       if (i % 2 === 0) {
-        const trackname = safeTags(args[i]);
+        const trackname = args[i];
         const trackindex = Number(args[i - 1]);
         (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = this.char_list_length + this.evidence_list_length + trackindex;
         if (this.musics_time) {
@@ -1271,7 +1271,7 @@ class Client extends EventEmitter {
 
     for (let i = 1; i < args.length - 1; i++) {
       // Check when found the song for the first time
-      const trackname = safeTags(args[i]);
+      const trackname = args[i];
       const trackindex = i - 1;
       document.getElementById('client_loadingtext').innerHTML = `Loading Music ${i}/${this.music_list_length}`;
       (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = this.char_list_length + this.evidence_list_length + i;
@@ -1299,7 +1299,7 @@ class Client extends EventEmitter {
 
     for (let i = 1; i < args.length - 1; i++) {
       // Check when found the song for the first time
-      this.addTrack(safeTags(args[i]));
+      this.addTrack(args[i]);
     }
   }
 
@@ -2323,7 +2323,7 @@ class Viewport {
       const flash = async () => {
         const effectlayer = document.getElementById('client_fg');
         this.playSFX(`${AO_HOST}sounds/general/sfx-realization.opus`, false);
-        effectlayer.style.animation = 'flash 0.4s 1';
+        effectlayer.style.animation = 'flash 0.4s steps(10, jump-both)';
         await delay(400)
         effectlayer.style.removeProperty('animation')
       }
@@ -2331,7 +2331,7 @@ class Viewport {
       const shake = async () => {
         const gamewindow = document.getElementById('client_gamewindow');
         this.playSFX(`${AO_HOST}sounds/general/sfx-stab.opus`, false);
-        gamewindow.style.animation = 'shake 0.2s 1';
+        gamewindow.style.animation = 'shake 0.2s steps(10, jump-both)';
         await delay(200)
         gamewindow.style.removeProperty('animation')
       }
@@ -2451,12 +2451,12 @@ class Viewport {
       if (this.chatmsg.screenshake === 1) {
         // Shake screen
         this.playSFX(`${AO_HOST}sounds/general/sfx-stab.opus`, false);
-        gamewindow.style.animation = 'shake 0.2s 1';
+        gamewindow.style.animation = 'shake 0.2s steps(10, jump-both) 1';
       }
       if (this.chatmsg.flash === 1) {
         // Flash screen
         this.playSFX(`${AO_HOST}sounds/general/sfx-realization.opus`, false);
-        effectlayer.style.animation = 'flash 0.4s 1';
+        effectlayer.style.animation = 'flash 0.4s steps(10, jump-both) 1';
       }
 
       // Pre-animation stuff
