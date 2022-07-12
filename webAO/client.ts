@@ -8,7 +8,7 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { EventEmitter } from 'events';
 import tryUrls from './utils/tryUrls'
 import {
-  escapeChat, prepChat, safeTags,
+  escapeChat, unescapeChat, prepChat, safeTags,
 } from './encoding';
 import mlConfig from './utils/aoml';
 // Load some defaults for the background and evidence dropdowns
@@ -1180,7 +1180,7 @@ class Client extends EventEmitter {
 
   addTrack(trackname: string) {
     const newentry = <HTMLOptionElement>document.createElement('OPTION');
-    newentry.text = trackname;
+    newentry.text = unescapeChat(trackname);
     (<HTMLSelectElement>document.getElementById('client_musiclist')).options.add(newentry);
     this.musics.push(trackname);
   }
