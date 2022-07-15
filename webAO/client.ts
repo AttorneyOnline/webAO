@@ -8,7 +8,7 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { EventEmitter } from 'events';
 import tryUrls from './utils/tryUrls'
 import {
-  escapeChat, prepChat, safeTags,
+  escapeChat, prepChat, safeTags, unescapeChat,
 } from './encoding';
 import mlConfig from './utils/aoml';
 // Load some defaults for the background and evidence dropdowns
@@ -30,6 +30,7 @@ import getAnimLength from './utils/getAnimLength.js';
 import getResources from './utils/getResources.js';
 import transparentPng from './constants/transparentPng';
 import downloadFile from './services/downloadFile'
+import { getFilenameFromPath } from './utils/paths';
 const version = process.env.npm_package_version;
 
 let client: Client;
@@ -1180,7 +1181,9 @@ class Client extends EventEmitter {
 
   addTrack(trackname: string) {
     const newentry = <HTMLOptionElement>document.createElement('OPTION');
-    newentry.text = trackname;
+    const songName = getFilenameFromPath(trackname);
+    newentry.text = unescapeChat(songName);
+    newentry.value = trackname;
     (<HTMLSelectElement>document.getElementById('client_musiclist')).options.add(newentry);
     this.musics.push(trackname);
   }
@@ -1271,7 +1274,7 @@ class Client extends EventEmitter {
 
     for (let i = 1; i < args.length - 1; i++) {
       // Check when found the song for the first time
-      const trackname = safeTags(args[i]);
+      const trackname = args[i];
       const trackindex = i - 1;
       document.getElementById('client_loadingtext').innerHTML = `Loading Music ${i}/${this.music_list_length}`;
       (<HTMLProgressElement>document.getElementById('client_loadingbar')).value = this.char_list_length + this.evidence_list_length + i;
