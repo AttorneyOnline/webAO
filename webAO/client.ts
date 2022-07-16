@@ -2239,26 +2239,28 @@ class Viewport {
     }
     this.chatmsg.preanimdelay = gifLength;
 
+    let skipoffset: boolean = false;
     if (chatmsg.type === 5) {
       this.set_side(chatmsg.side,true,false);
     } else {
       switch(Number(chatmsg.deskmod)) {
-        case 0:
+        case 0: //desk is hidden
           this.set_side(chatmsg.side,false,false);
           break;
-        case 1:
+        case 1: //desk is shown
           this.set_side(chatmsg.side,false,true);
           break;
-        case 2:
+        case 2: //desk is hidden during preanim, but shown during idle/talk
           this.set_side(chatmsg.side,false,false);
           break;
-        case 3:
+        case 3: //opposite of 2
           this.set_side(chatmsg.side,false,false);
           break;
-        case 4:
+        case 4: //desk is hidden, character offset is ignored, pair character is hidden during preanim, normal behavior during idle/talk
           this.set_side(chatmsg.side,false,false);
+          skipoffset = true;
           break;
-        case 5:
+        case 5: //opposite of 4
           this.set_side(chatmsg.side,false,true);
           break;
         default:
@@ -2270,31 +2272,32 @@ class Viewport {
     setChatbox(chatmsg.chatbox);
     resizeChatbox();
 
-    // Flip the character
-    charLayers.style.transform = this.chatmsg.flip === 1 ? 'scaleX(-1)' : 'scaleX(1)';
+    if (!skipoffset) {
+      // Flip the character
+      charLayers.style.transform = this.chatmsg.flip === 1 ? 'scaleX(-1)' : 'scaleX(1)';      
+      pairLayers.style.transform = this.chatmsg.other_flip === 1 ? 'scaleX(-1)' : 'scaleX(1)';
 
-    // Shift by the horizontal offset
-    switch (this.chatmsg.side) {
-      case 'wit':
-        pairLayers.style.left = `${200 + Number(this.chatmsg.other_offset[0])}%`;
-        charLayers.style.left = `${200 + Number(this.chatmsg.self_offset[0])}%`;
-        break;
-      case 'pro':
-        pairLayers.style.left = `${400 + Number(this.chatmsg.other_offset[0])}%`;
-        charLayers.style.left = `${400 + Number(this.chatmsg.self_offset[0])}%`;
-        break;
-      default:
-        pairLayers.style.left = `${Number(this.chatmsg.other_offset[0])}%`;
-        charLayers.style.left = `${Number(this.chatmsg.self_offset[0])}%`;
-        break;
+      // Shift by the horizontal offset
+      switch (this.chatmsg.side) {
+        case 'wit':
+          pairLayers.style.left = `${200 + Number(this.chatmsg.other_offset[0])}%`;
+          charLayers.style.left = `${200 + Number(this.chatmsg.self_offset[0])}%`;
+          break;
+        case 'pro':
+          pairLayers.style.left = `${400 + Number(this.chatmsg.other_offset[0])}%`;
+          charLayers.style.left = `${400 + Number(this.chatmsg.self_offset[0])}%`;
+          break;
+        default:
+          pairLayers.style.left = `${Number(this.chatmsg.other_offset[0])}%`;
+          charLayers.style.left = `${Number(this.chatmsg.self_offset[0])}%`;
+          break;
+      }
+
+      // New vertical offsets
+      pairLayers.style.top = `${Number(this.chatmsg.other_offset[1])}%`;
+      charLayers.style.top = `${Number(this.chatmsg.self_offset[1])}%`;
+
     }
-
-    // New vertical offsets
-    pairLayers.style.top = `${Number(this.chatmsg.other_offset[1])}%`;
-    charLayers.style.top = `${Number(this.chatmsg.self_offset[1])}%`;
-
-    // flip the paired character
-    pairLayers.style.transform = this.chatmsg.other_flip === 1 ? 'scaleX(-1)' : 'scaleX(1)';
 
     this.blipChannels.forEach((channel: HTMLAudioElement) => channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(this.chatmsg.blips.toLowerCase())}.opus`);
 
