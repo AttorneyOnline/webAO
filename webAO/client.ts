@@ -1412,9 +1412,9 @@ class Client extends EventEmitter {
     tryUrls(`${bgfolder}prosecutorempty`).then(resp => {(<HTMLImageElement>document.getElementById('client_court_pro')).src = resp});
 
     if (this.charID === -1) {
-      viewport.set_side('jud');
+      viewport.set_side('jud',false,true);
     } else {
-      viewport.set_side(this.chars[this.charID].side);
+      viewport.set_side(this.chars[this.charID].side,false,true);
     }
   }
 
@@ -1936,7 +1936,7 @@ class Viewport {
  * Valid positions: `def, pro, hld, hlp, wit, jud, jur, sea`
  * @param {string} position the position to change into
  */
-  async set_side(position: string) {
+  async set_side(position: string, showspeedlines: boolean, showdesk: boolean) {
     const bgfolder = viewport.bgFolder;
 
     const view = document.getElementById('client_fullview');
@@ -2026,21 +2026,18 @@ class Viewport {
       speedLines = 'defense_speedlines.gif';
     }
 
-    if (viewport.chatmsg.type === 5) {
-      console.warn('this is a zoom');
+    if (showspeedlines) {
       court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
-      bench.style.opacity = '0';
     } else {
-      // Set src here
-      
       court.src = await tryUrls(bgfolder + bg)
-      if (desk) {
-        const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
-        bench.src = bgfolder + deskFilename;
-        bench.style.opacity = '1';
-      } else {
-        bench.style.opacity = '0';
-      }
+    }
+
+    if (showdesk && desk) {
+      const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
+      bench.src = bgfolder + deskFilename;
+      bench.style.opacity = '1';
+    } else {
+      bench.style.opacity = '0';
     }
 
     if ('def,pro,wit'.includes(position)) {
@@ -2240,7 +2237,33 @@ class Viewport {
     }
     this.chatmsg.preanimdelay = gifLength;
 
-    this.set_side(chatmsg.side);
+    if (chatmsg.type === 5) {
+      this.set_side(chatmsg.side,true,false);
+    } else {
+      switch(chatmsg.deskmod) {
+        case 0:
+          this.set_side(chatmsg.side,false,false);
+          break;
+        case 1:
+          this.set_side(chatmsg.side,false,true);
+          break;
+        case 2:
+          this.set_side(chatmsg.side,false,false);
+          break;
+        case 3:
+          this.set_side(chatmsg.side,false,false);
+          break;
+        case 4:
+          this.set_side(chatmsg.side,false,false);
+          break;
+        case 5:
+          this.set_side(chatmsg.side,false,true);
+          break;
+        default:
+          this.set_side(chatmsg.side,false,true);
+          break;
+      }
+    }
 
     setChatbox(chatmsg.chatbox);
     resizeChatbox();
@@ -2518,6 +2541,21 @@ class Viewport {
         if (this.chatmsg.preanimdelay === 0) {
           shoutSprite.style.opacity = '0';
           shoutSprite.style.animation = '';
+        }
+
+        switch(this.chatmsg.deskmod) {
+          case 2:
+            this.set_side(this.chatmsg.side,false,true);
+            break;
+          case 3:
+            this.set_side(this.chatmsg.side,false,false);
+            break;
+          case 4:
+            this.set_side(this.chatmsg.side,false,true);
+            break;
+          case 5:
+            this.set_side(this.chatmsg.side,false,false);
+            break;
         }
 
         if (this.chatmsg.other_name) {
