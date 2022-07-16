@@ -2864,22 +2864,15 @@ window.iniedit = iniedit;
  */
 export async function switchPanTilt() {
   const fullview = document.getElementById('client_fullview');
-  const fullbg = <HTMLImageElement>document.getElementById('client_court');
   const checkbox = <HTMLInputElement>document.getElementById('client_pantilt');
-
-  if (fullbg.src = transparentPng) {  
-    checkbox.checked = false;
-    fullbg.style.display = 'none';
-  } else {
-    checkbox.checked = true;
-    fullbg.style.display = '';
-  }
 
   if (checkbox.checked) {
     fullview.style.transition = '0.5s ease-in-out';
   } else {
     fullview.style.transition = 'none';
   }
+
+  return
 }
 window.switchPanTilt = switchPanTilt;
 
@@ -2887,7 +2880,7 @@ window.switchPanTilt = switchPanTilt;
  * Triggered by the change aspect ratio checkbox
  */
 export async function switchAspectRatio() {
-  const background = document.getElementById('client_background');
+  const background = document.getElementById('client_gamewindow');
   const offsetCheck = <HTMLInputElement>document.getElementById('client_hdviewport_offset');
   if ((<HTMLInputElement>document.getElementById('client_hdviewport')).checked) {
     background.style.paddingBottom = '56.25%';
