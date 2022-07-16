@@ -71,7 +71,7 @@ let selectedMenu = 1;
 let selectedShout = 0;
 
 let extrafeatures: string[] = [];
-
+let banned: boolean = false;
 let hdid: string;
 
 declare global {
@@ -211,8 +211,6 @@ class Client extends EventEmitter {
     this.musics_time = false;
 
     this.callwords = [];
-
-    this.banned = false;
 
     this.resources = getResources(AO_HOST, THEME);
 
@@ -591,7 +589,7 @@ class Client extends EventEmitter {
 	 */
   onClose(e: CloseEvent) {
     console.error(`The connection was closed: ${e.reason} (${e.code})`);
-    if (extrafeatures.length == 0 && this.banned === false) {
+    if (extrafeatures.length == 0 && banned === false) {
       document.getElementById('client_errortext').textContent = 'Could not connect to the server';
     }
     document.getElementById('client_waiting').style.display = 'block';
@@ -1353,7 +1351,7 @@ class Client extends EventEmitter {
 	 */
   handleKB(args: string[]) {
     this.handleBans('Banned', safeTags(args[1]));
-    this.banned = true;
+    banned = true;
   }
 
   /**
@@ -1372,7 +1370,7 @@ class Client extends EventEmitter {
 	 */
   handleBD(args: string[]) {
     this.handleBans('Banned', safeTags(args[1]));
-    this.banned = true;
+    banned = true;
   }
 
   /**
