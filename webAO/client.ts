@@ -343,7 +343,7 @@ class Client extends EventEmitter {
 
   /**
 	 * Sends an in-character chat message.
-	 * @param {string} deskmod controls the desk
+	 * @param {number} deskmod controls the desk
 	 * @param {string} speaking who is speaking
 	 * @param {string} name the name of the current character
 	 * @param {string} silent whether or not it's silent
@@ -363,7 +363,7 @@ class Client extends EventEmitter {
 	 * @param {number} noninterrupting_preanim play the full preanim (optional)
 	 */
   sendIC(
-    deskmod: string,
+    deskmod: number,
     preanim: string,
     name: string,
     emote: string,
@@ -412,7 +412,7 @@ class Client extends EventEmitter {
       }
     }
 
-    const serverMessage = `MS#${escapeChat(deskmod)}#${escapeChat(preanim)}#${escapeChat(name)}#${escapeChat(emote)}`
+    const serverMessage = `MS#${deskmod}#${escapeChat(preanim)}#${escapeChat(name)}#${escapeChat(emote)}`
 			+ `#${escapeChat(message)}#${escapeChat(side)}#${escapeChat(sfx_name)}#${emote_modifier}`
 			+ `#${this.charID}#${sfx_delay}#${Number(objection_modifier)}#${Number(evidence)}#${Number(flip)}#${Number(realization)}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
 
