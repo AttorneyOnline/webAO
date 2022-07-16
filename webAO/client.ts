@@ -2026,13 +2026,13 @@ class Viewport {
       speedLines = 'defense_speedlines.gif';
     }
 
-    if (showspeedlines) {
+    if (showspeedlines === true) {
       court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
     } else {
       court.src = await tryUrls(bgfolder + bg)
     }
 
-    if (showdesk && desk) {
+    if (showdesk === true && desk) {
       const deskFilename = await fileExists(bgfolder + desk.ao2) ? desk.ao2 : desk.ao1;
       bench.src = bgfolder + deskFilename;
       bench.style.opacity = '1';
@@ -2240,7 +2240,7 @@ class Viewport {
     if (chatmsg.type === 5) {
       this.set_side(chatmsg.side,true,false);
     } else {
-      switch(chatmsg.deskmod) {
+      switch(Number(chatmsg.deskmod)) {
         case 0:
           this.set_side(chatmsg.side,false,false);
           break;
@@ -2543,7 +2543,7 @@ class Viewport {
           shoutSprite.style.animation = '';
         }
 
-        switch(this.chatmsg.deskmod) {
+        switch(Number(this.chatmsg.deskmod)) {
           case 2:
             this.set_side(this.chatmsg.side,false,true);
             break;
