@@ -343,7 +343,7 @@ class Client extends EventEmitter {
 
   /**
 	 * Sends an in-character chat message.
-	 * @param {string} deskmod currently unused
+	 * @param {string} deskmod controls the desk
 	 * @param {string} speaking who is speaking
 	 * @param {string} name the name of the current character
 	 * @param {string} silent whether or not it's silent
@@ -1724,6 +1724,7 @@ class Client extends EventEmitter {
             preanim: emoteinfo[1].toLowerCase(),
             emote: emoteinfo[2].toLowerCase(),
             zoom: Number(emoteinfo[3]) || 0,
+            deskmod: Number(emoteinfo[4]) || 1,
             sfx: esfx.toLowerCase(),
             sfxdelay: esfxd,
             frame_screenshake: '',
@@ -2659,7 +2660,7 @@ export function onEnter(event: KeyboardEvent) {
 
 
     client.sendIC(
-      'chat',
+      myemo.deskmod,
       myemo.preanim,
       mychar.name,
       myemo.emote,
