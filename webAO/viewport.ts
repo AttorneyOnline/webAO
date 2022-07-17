@@ -405,8 +405,6 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
     startThirdTickCheck = false;
     let charLayers = document.getElementById("client_char");
     let pairLayers = document.getElementById("client_pair_char");
-    console.log(chatmsg);
-    console.log("FICLK YOPU");
     // stop updater
     clearTimeout(updater);
 
@@ -648,12 +646,10 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
       chatmsg.content,
       colors[chatmsg.color]
     );
-    console.log("ASSHOLE");
     chat_tick();
   };
 
   const handleTextTick = async (charLayers: HTMLImageElement) => {
-    console.log("tick");
     const chatBox = document.getElementById("client_chat");
     const waitingBox = document.getElementById("client_chatwaiting");
     const chatBoxInner = document.getElementById("client_inner_chat");
@@ -666,7 +662,6 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
       currentBlipChannel %= blipChannels.length;
     }
     textnow = chatmsg.content.substring(0, textnow.length + 1);
-    console.log(textnow);
     const characterElement = chatmsg.parsed[textnow.length - 1];
     if (characterElement) {
       const COMMAND_IDENTIFIER = "\\";
@@ -728,7 +723,6 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
         chatBoxInner.appendChild(chatmsg.parsed[textnow.length - 1]);
       }
     }
-    console.log("ass");
     // scroll to bottom
     chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -782,9 +776,6 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
     // do not perform heavy operations here
 
     await delay(chatmsg.speed);
-    console.log("WHERE IS THE CHATMSG");
-    console.log(chatmsg);
-    console.log(textnow + " UH " + chatmsg.content);
     if (textnow === chatmsg.content) {
       return;
     }
