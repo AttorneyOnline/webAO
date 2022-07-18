@@ -13,6 +13,7 @@ import setEmote from "./client/setEmote";
 import getAnimLength from "./utils/getAnimLength";
 import { safeTags } from "./encoding";
 import setCookie from "./utils/setCookie";
+import { AO_HOST } from "./client";
 interface ChatMsg {
   content: string;
   objection: number;
@@ -64,122 +65,181 @@ export interface Viewport {
   handleTextTick: Function;
   theme: string;
   chatmsg: ChatMsg;
-  sfxAudio: Function;
+  setSfxAudio: Function;
+  getSfxAudio: Function;
+  getBackgroundFolder: Function;
   blipChannels: HTMLAudioElement[];
   music: any;
   musicVolume: number;
-  changeBgName: Function;
-  bgFolder: Function;
-  bgName: Function;
+  setBackgroundName: Function;
   lastChar: string;
+  getBackgroundName: Function;
 }
-const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
-  const attorneyMarkdown = mlConfig(AO_HOST);
-  let client = masterClient;
-  let textnow = "";
-  let chatmsg = {
-    content: "",
-    objection: 0,
-    sound: "",
-    startpreanim: true,
-    startspeaking: false,
-    side: null,
-    color: 0,
-    snddelay: 0,
-    preanimdelay: 0,
-    speed: UPDATE_INTERVAL,
-  } as ChatMsg;
-  let shouts = [undefined, "holdit", "objection", "takethat", "custom"];
-  let colors = [
-    "white",
-    "green",
-    "red",
-    "orange",
-    "blue",
-    "yellow",
-    "pink",
-    "cyan",
-    "grey",
-  ];
+const SHOUTS = [undefined, "holdit", "objection", "takethat", "custom"];
+
+const COLORS = [
+  "white",
+  "green",
+  "red",
+  "orange",
+  "blue",
+  "yellow",
+  "pink",
+  "cyan",
+  "grey",
+];
+const createMusic = () => {
+  const audioChannels = document.getElementsByClassName(
+    "audioChannel"
+  ) as HTMLCollectionOf<HTMLAudioElement>;
+  let music = [...audioChannels];
+  music.forEach((channel: HTMLAudioElement) => (channel.volume = 0.5));
+  music.forEach(
+    (channel: HTMLAudioElement) => (channel.onerror = opusCheck(channel))
+  );
+  return music;
+};
+const createTestimonyAudio = () => {
+  const testimonyAudio = document.getElementById(
+    "client_testimonyaudio"
+  ) as HTMLAudioElement;
+  testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.opus`;
+  return testimonyAudio;
+};
+
+const createShoutAudio = () => {
+  const shoutAudio = document.getElementById(
+    "client_shoutaudio"
+  ) as HTMLAudioElement;
+  shoutAudio.src = `${AO_HOST}misc/default/objection.opus`;
+  return shoutAudio;
+};
+const createSfxAudio = () => {
+  const sfxAudio = document.getElementById(
+    "client_sfxaudio"
+  ) as HTMLAudioElement;
+  sfxAudio.src = `${AO_HOST}sounds/general/sfx-realization.opus`;
+  return sfxAudio;
+};
+const createBlipsChannels = () => {
   const blipSelectors = document.getElementsByClassName(
     "blipSound"
   ) as HTMLCollectionOf<HTMLAudioElement>;
 
-  let blipChannels = [...blipSelectors];
+  const blipChannels = [...blipSelectors];
   // Allocate multiple blip audio channels to make blips less jittery
   blipChannels.forEach((channel: HTMLAudioElement) => (channel.volume = 0.5));
   blipChannels.forEach(
     (channel: HTMLAudioElement) => (channel.onerror = opusCheck(channel))
   );
+  return blipChannels;
+};
+const defaultChatMsg = {
+  content: "",
+  objection: 0,
+  sound: "",
+  startpreanim: true,
+  startspeaking: false,
+  side: null,
+  color: 0,
+  snddelay: 0,
+  preanimdelay: 0,
+  speed: UPDATE_INTERVAL,
+} as ChatMsg;
+interface Desk {
+  ao2?: string;
+  ao1?: string;
+}
+interface Position {
+  bg?: string;
+  desk?: Desk;
+  speedLines: string;
+}
+
+interface Positions {
+  [key: string]: Position;
+}
+
+const positions: Positions = {
+  def: {
+    bg: "defenseempty",
+    desk: { ao2: "defensedesk.png", ao1: "bancodefensa.png" } as Desk,
+    speedLines: "defense_speedlines.gif",
+  },
+  pro: {
+    bg: "prosecutorempty",
+    desk: { ao2: "prosecutiondesk.png", ao1: "bancoacusacion.png" } as Desk,
+    speedLines: "prosecution_speedlines.gif",
+  },
+  hld: {
+    bg: "helperstand",
+    desk: null as Desk,
+    speedLines: "defense_speedlines.gif",
+  },
+  hlp: {
+    bg: "prohelperstand",
+    desk: null as Desk,
+    speedLines: "prosecution_speedlines.gif",
+  },
+  wit: {
+    bg: "witnessempty",
+    desk: { ao2: "stand.png", ao1: "estrado.png" } as Desk,
+    speedLines: "prosecution_speedlines.gif",
+  },
+  jud: {
+    bg: "judgestand",
+    desk: { ao2: "judgedesk.png", ao1: "judgedesk.gif" } as Desk,
+    speedLines: "prosecution_speedlines.gif",
+  },
+  jur: {
+    bg: "jurystand",
+    desk: { ao2: "jurydesk.png", ao1: "estrado.png" } as Desk,
+    speedLines: "defense_speedlines.gif",
+  },
+  sea: {
+    bg: "seancestand",
+    desk: { ao2: "seancedesk.png", ao1: "estrado.png" } as Desk,
+    speedLines: "prosecution_speedlines.gif",
+  },
+};
+const viewport = (masterClient: Client): Viewport => {
+  let animating = false;
+  let attorneyMarkdown = mlConfig(AO_HOST);
+  let blipChannels = createBlipsChannels();
+  let chatmsg = defaultChatMsg;
+  let client = masterClient;
   let currentBlipChannel = 0;
-  let sfxaudio = document.getElementById("client_sfxaudio") as HTMLAudioElement;
-  sfxaudio.src = `${AO_HOST}sounds/general/sfx-realization.opus`;
-  let sfxplayed = 0;
-
-  let shoutaudio = document.getElementById(
-    "client_shoutaudio"
-  ) as HTMLAudioElement;
-  shoutaudio.src = `${AO_HOST}misc/default/objection.opus`;
-
-  let testimonyAudio = document.getElementById(
-    "client_testimonyaudio"
-  ) as HTMLAudioElement;
-  testimonyAudio.src = `${AO_HOST}sounds/general/sfx-guilty.opus`;
-
-  const audioChannels = document.getElementsByClassName(
-    "audioChannel"
-  ) as HTMLCollectionOf<HTMLAudioElement>;
-  let music: any;
-  music = [...audioChannels];
-  music.forEach((channel: HTMLAudioElement) => (channel.volume = 0.5));
-  music.forEach(
-    (channel: HTMLAudioElement) => (channel.onerror = opusCheck(channel))
-  );
-  let musicVolume = 0;
-  let updater: any;
-  let testimonyUpdater: any;
-  let viewportBgName = "";
   let lastChar = "";
   let lastEvi = 0;
-  let testimonyTimer = 0;
+  let music = createMusic();
+  let musicVolume = 0;
+  let sfxAudio = createSfxAudio();
+  let sfxplayed = 0;
   let shoutTimer = 0;
-  let tickTimer = 0;
-  let _animating = false;
+  let shoutaudio = createShoutAudio();
   let startFirstTickCheck: boolean;
   let startSecondTickCheck: boolean;
   let startThirdTickCheck: boolean;
+  let testimonyAudio = createTestimonyAudio();
+  let testimonyTimer = 0;
+  let testimonyUpdater: any;
+  let textnow = "";
   let theme: string;
-  const sfxAudio = () => sfxaudio;
-  const bgName = () => viewportBgName;
-  const changeBgName = (bgName: string) => (viewportBgName = bgName);
-  const bgFolder = () =>
-    `${AO_HOST}background/${encodeURI(viewportBgName.toLowerCase())}/`;
-  /**
-   * Sets the volume of the music.
-   * @param {number} volume
-   */
-  const changeMusicVolume = (volume: number = -1) => {
-    const clientVolume = Number(
-      (<HTMLInputElement>document.getElementById("client_mvolume")).value
-    );
-    let musicVolume = volume === -1 ? clientVolume : volume;
-    music.forEach(
-      (channel: HTMLAudioElement) => (channel.volume = musicVolume)
-    );
-    setCookie("musicVolume", String(musicVolume));
-  };
-  window.changeMusicVolume = changeMusicVolume;
+  let tickTimer = 0;
+  let updater: any;
+  let backgroundName = "";
+  const getSfxAudio = () => sfxAudio;
+  const setSfxAudio = (value: HTMLAudioElement) => (sfxAudio = value);
+  const getBackgroundName = () => backgroundName;
+  const setBackgroundName = (value: string) => (backgroundName = value);
+  const getBackgroundFolder = () =>
+    `${AO_HOST}background/${encodeURI(backgroundName.toLowerCase())}/`;
 
-  /**
-   * Play any SFX
-   *
-   * @param {string} sfxname
-   */
   const playSFX = async (sfxname: string, looping: boolean) => {
-    sfxaudio.pause();
-    sfxaudio.loop = looping;
-    sfxaudio.src = sfxname;
-    sfxaudio.play();
+    sfxAudio.pause();
+    sfxAudio.loop = looping;
+    sfxAudio.src = sfxname;
+    sfxAudio.play();
   };
 
   /**
@@ -217,63 +277,6 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
       court = <HTMLImageElement>document.getElementById("client_court_classic");
     }
 
-    interface Desk {
-      ao2?: string;
-      ao1?: string;
-    }
-    interface Position {
-      bg?: string;
-      desk?: Desk;
-      speedLines: string;
-    }
-
-    interface Positions {
-      [key: string]: Position;
-    }
-
-    const positions: Positions = {
-      def: {
-        bg: "defenseempty",
-        desk: { ao2: "defensedesk.png", ao1: "bancodefensa.png" } as Desk,
-        speedLines: "defense_speedlines.gif",
-      },
-      pro: {
-        bg: "prosecutorempty",
-        desk: { ao2: "prosecutiondesk.png", ao1: "bancoacusacion.png" } as Desk,
-        speedLines: "prosecution_speedlines.gif",
-      },
-      hld: {
-        bg: "helperstand",
-        desk: null as Desk,
-        speedLines: "defense_speedlines.gif",
-      },
-      hlp: {
-        bg: "prohelperstand",
-        desk: null as Desk,
-        speedLines: "prosecution_speedlines.gif",
-      },
-      wit: {
-        bg: "witnessempty",
-        desk: { ao2: "stand.png", ao1: "estrado.png" } as Desk,
-        speedLines: "prosecution_speedlines.gif",
-      },
-      jud: {
-        bg: "judgestand",
-        desk: { ao2: "judgedesk.png", ao1: "judgedesk.gif" } as Desk,
-        speedLines: "prosecution_speedlines.gif",
-      },
-      jur: {
-        bg: "jurystand",
-        desk: { ao2: "jurydesk.png", ao1: "estrado.png" } as Desk,
-        speedLines: "defense_speedlines.gif",
-      },
-      sea: {
-        bg: "seancestand",
-        desk: { ao2: "seancedesk.png", ao1: "estrado.png" } as Desk,
-        speedLines: "prosecution_speedlines.gif",
-      },
-    };
-
     let bg;
     let desk;
     let speedLines;
@@ -291,14 +294,14 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
     if (showSpeedLines === true) {
       court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
     } else {
-      court.src = await tryUrls(bgFolder() + bg);
+      court.src = await tryUrls(getBackgroundFolder() + bg);
     }
 
     if (showDesk === true && desk) {
-      const deskFilename = (await fileExists(bgFolder() + desk.ao2))
+      const deskFilename = (await fileExists(getBackgroundFolder() + desk.ao2))
         ? desk.ao2
         : desk.ao1;
-      bench.src = bgFolder() + deskFilename;
+      bench.src = getBackgroundFolder() + deskFilename;
       bench.style.opacity = "1";
     } else {
       bench.style.opacity = "0";
@@ -406,7 +409,7 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
     textnow = "";
     sfxplayed = 0;
     tickTimer = 0;
-    _animating = true;
+    animating = true;
     startFirstTickCheck = true;
     startSecondTickCheck = false;
     startThirdTickCheck = false;
@@ -416,7 +419,7 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
     clearTimeout(updater);
 
     // stop last sfx from looping any longer
-    sfxaudio.loop = false;
+    sfxAudio.loop = false;
 
     const fg = <HTMLImageElement>document.getElementById("client_fg");
     const gamewindow = document.getElementById("client_gamewindow");
@@ -464,7 +467,7 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
 
     appendICLog(chatmsg.content, chatmsg.showname, chatmsg.nameplate);
 
-    checkCallword(chatmsg.content, sfxaudio);
+    checkCallword(chatmsg.content, sfxAudio);
 
     setEmote(
       AO_HOST,
@@ -492,7 +495,7 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
     const shoutSprite = <HTMLImageElement>(
       document.getElementById("client_shout")
     );
-    const shout = shouts[chatmsg.objection];
+    const shout = SHOUTS[chatmsg.objection];
     if (shout) {
       // Hide message box
       chatContainerBox.style.opacity = "0";
@@ -653,7 +656,7 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
     }
     chatmsg.parsed = await attorneyMarkdown.applyMarkdown(
       chatmsg.content,
-      colors[chatmsg.color]
+      COLORS[chatmsg.color]
     );
     chat_tick();
   };
@@ -736,7 +739,7 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     if (textnow === chatmsg.content) {
-      _animating = false;
+      animating = false;
       setEmote(
         AO_HOST,
         client,
@@ -888,7 +891,7 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
             eviBox.style.left = "1em";
           }
         }
-        chatBoxInner.className = `text_${colors[chatmsg.color]}`;
+        chatBoxInner.className = `text_${COLORS[chatmsg.color]}`;
 
         if (chatmsg.preanimdelay === 0) {
           shoutSprite.style.opacity = "0";
@@ -964,7 +967,7 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
           );
           charLayers.style.opacity = "1";
           waitingBox.style.opacity = "1";
-          _animating = false;
+          animating = false;
           clearTimeout(updater);
           return;
         }
@@ -994,7 +997,7 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
         );
       }
     }
-    if (_animating) {
+    if (animating) {
       chat_tick();
     }
     tickTimer += UPDATE_INTERVAL;
@@ -1026,6 +1029,18 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
   }
   window.changeBlipVolume = changeBlipVolume;
 
+  const changeMusicVolume = (volume: number = -1) => {
+    const clientVolume = Number(
+      (<HTMLInputElement>document.getElementById("client_mvolume")).value
+    );
+    let musicVolume = volume === -1 ? clientVolume : volume;
+    music.forEach(
+      (channel: HTMLAudioElement) => (channel.volume = musicVolume)
+    );
+    setCookie("musicVolume", String(musicVolume));
+  };
+  window.changeMusicVolume = changeMusicVolume;
+
   return {
     chat_tick,
     changeMusicVolume,
@@ -1033,21 +1048,22 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
     reloadTheme,
     playSFX,
     set_side,
-    changeBgName,
+    setBackgroundName,
     initTestimonyUpdater,
     updateTestimony,
     disposeTestimony,
     handle_ic_speaking,
     handleTextTick,
+    getBackgroundFolder,
+    getBackgroundName,
+    getSfxAudio,
+    setSfxAudio,
     theme,
     chatmsg,
-    sfxAudio,
     blipChannels,
     lastChar,
     music,
     musicVolume,
-    bgFolder,
-    bgName,
   };
 };
 

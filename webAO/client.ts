@@ -51,7 +51,7 @@ interface QueryParams {
 let { ip: serverIP, mode, asset, theme } = queryParser() as QueryParams;
 // Unless there is an asset URL specified, use the wasabi one
 const DEFAULT_HOST = "http://attorneyoffline.de/base/";
-let AO_HOST = asset || DEFAULT_HOST;
+export let AO_HOST = asset || DEFAULT_HOST;
 const THEME = theme || "default";
 
 let client: Client;
@@ -222,7 +222,7 @@ class Client extends EventEmitter {
     this.selectedEvidence = 0;
 
     this.checkUpdater = null;
-    this.viewport = masterViewport(this, AO_HOST);
+    this.viewport = masterViewport(this);
     /**
      * Assign handlers for all commands
      * If you implement a new command, you need to add it here
@@ -1516,15 +1516,18 @@ class Client extends EventEmitter {
 
   handleBN(args: string[]) {
     const bgFromArgs = safeTags(args[1]);
-    this.viewport.changeBgName(bgFromArgs);
-    const bgfolder = this.viewport.bgFolder();
-    const bg_index = getIndexFromSelect("bg_select", this.viewport.bgName());
+    this.viewport.setBackgroundName(bgFromArgs);
+    const bgfolder = this.viewport.getBackgroundFolder();
+    const bg_index = getIndexFromSelect(
+      "bg_select",
+      this.viewport.getBackgroundName()
+    );
     (<HTMLSelectElement>document.getElementById("bg_select")).selectedIndex =
       bg_index;
     updateBackgroundPreview();
     if (bg_index === 0) {
       (<HTMLInputElement>document.getElementById("bg_filename")).value =
-        this.viewport.bgName();
+        this.viewport.getBackgroundName();
     }
 
     tryUrls(
@@ -1660,12 +1663,12 @@ class Client extends EventEmitter {
       oocLog.scrollTop = oocLog.scrollHeight;
     }
 
-    this.viewport.sfxAudio().pause();
-    const oldvolume = this.viewport.sfxAudio().volume;
-    this.viewport.sfxAudio().volume = 1;
-    this.viewport.sfxAudio().src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
-    this.viewport.sfxAudio().play();
-    this.viewport.sfxAudio().volume = oldvolume;
+    this.viewport.getSfxAudio().pause();
+    const oldvolume = this.viewport.getSfxAudio().volume;
+    this.viewport.getSfxAudio().volume = 1;
+    this.viewport.getSfxAudio().src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
+    this.viewport.getSfxAudio().play();
+    this.viewport.getSfxAudio().volume = oldvolume;
   }
 
   /**
