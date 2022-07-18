@@ -2653,7 +2653,7 @@ export function onEnter(event: KeyboardEvent) {
       sfxname = myemo.sfx;
       sfxdelay = myemo.sfxdelay;
     }
-
+,
     // not to overwrite a 5 from the ini or anything else
     if ((<HTMLInputElement>document.getElementById('sendpreanim')).checked) {
       if (emote_mod === 0) { emote_mod = 1; }
