@@ -1515,15 +1515,16 @@ class Client extends EventEmitter {
    */
 
   handleBN(args: string[]) {
-    this.viewport.bgname = safeTags(args[1]);
-    const bgfolder = this.viewport.bgFolder;
-    const bg_index = getIndexFromSelect("bg_select", this.viewport.bgname);
+    const bgFromArgs = safeTags(args[1]);
+    this.viewport.changeBgName(bgFromArgs);
+    const bgfolder = this.viewport.bgFolder();
+    const bg_index = getIndexFromSelect("bg_select", this.viewport.bgName());
     (<HTMLSelectElement>document.getElementById("bg_select")).selectedIndex =
       bg_index;
     updateBackgroundPreview();
     if (bg_index === 0) {
       (<HTMLInputElement>document.getElementById("bg_filename")).value =
-        this.viewport.bgname;
+        this.viewport.bgName();
     }
 
     tryUrls(
@@ -1659,12 +1660,12 @@ class Client extends EventEmitter {
       oocLog.scrollTop = oocLog.scrollHeight;
     }
 
-    this.viewport.sfxaudio.pause();
-    const oldvolume = this.viewport.sfxaudio.volume;
-    this.viewport.sfxaudio.volume = 1;
-    this.viewport.sfxaudio.src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
-    this.viewport.sfxaudio.play();
-    this.viewport.sfxaudio.volume = oldvolume;
+    this.viewport.sfxAudio().pause();
+    const oldvolume = this.viewport.sfxAudio().volume;
+    this.viewport.sfxAudio().volume = 1;
+    this.viewport.sfxAudio().src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
+    this.viewport.sfxAudio().play();
+    this.viewport.sfxAudio().volume = oldvolume;
   }
 
   /**

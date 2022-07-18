@@ -64,12 +64,13 @@ export interface Viewport {
   handleTextTick: Function;
   theme: string;
   chatmsg: ChatMsg;
-  sfxaudio: HTMLAudioElement;
+  sfxAudio: Function;
   blipChannels: HTMLAudioElement[];
   music: any;
   musicVolume: number;
-  bgFolder: string;
-  bgname: string;
+  changeBgName: Function;
+  bgFolder: Function;
+  bgName: Function;
   lastChar: string;
 }
 const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
@@ -137,7 +138,7 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
   let musicVolume = 0;
   let updater: any;
   let testimonyUpdater: any;
-  let bgname = "gs4";
+  let viewportBgName = "";
   let lastChar = "";
   let lastEvi = 0;
   let testimonyTimer = 0;
@@ -148,7 +149,11 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
   let startSecondTickCheck: boolean;
   let startThirdTickCheck: boolean;
   let theme: string;
-  const bgFolder = `${AO_HOST}background/${encodeURI(bgname.toLowerCase())}/`;
+  const sfxAudio = () => sfxaudio;
+  const bgName = () => viewportBgName;
+  const changeBgName = (bgName: string) => (viewportBgName = bgName);
+  const bgFolder = () =>
+    `${AO_HOST}background/${encodeURI(viewportBgName.toLowerCase())}/`;
   /**
    * Sets the volume of the music.
    * @param {number} volume
@@ -286,14 +291,14 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
     if (showSpeedLines === true) {
       court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
     } else {
-      court.src = await tryUrls(bgFolder + bg);
+      court.src = await tryUrls(bgFolder() + bg);
     }
 
     if (showDesk === true && desk) {
-      const deskFilename = (await fileExists(bgFolder + desk.ao2))
+      const deskFilename = (await fileExists(bgFolder() + desk.ao2))
         ? desk.ao2
         : desk.ao1;
-      bench.src = bgFolder + deskFilename;
+      bench.src = bgFolder() + deskFilename;
       bench.style.opacity = "1";
     } else {
       bench.style.opacity = "0";
@@ -396,6 +401,8 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
    */
   const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
     chatmsg = playerChatMsg;
+    client.viewport.chatmsg = playerChatMsg;
+
     textnow = "";
     sfxplayed = 0;
     tickTimer = 0;
@@ -451,7 +458,9 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
       charLayers.style.opacity = "0";
       pairLayers.style.opacity = "0";
     }
+
     lastChar = chatmsg.name;
+    client.viewport.lastChar = chatmsg.name;
 
     appendICLog(chatmsg.content, chatmsg.showname, chatmsg.nameplate);
 
@@ -1024,6 +1033,7 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
     reloadTheme,
     playSFX,
     set_side,
+    changeBgName,
     initTestimonyUpdater,
     updateTestimony,
     disposeTestimony,
@@ -1031,13 +1041,13 @@ const viewport = (masterClient: Client, AO_HOST: string): Viewport => {
     handleTextTick,
     theme,
     chatmsg,
-    sfxaudio,
+    sfxAudio,
     blipChannels,
     lastChar,
     music,
     musicVolume,
     bgFolder,
-    bgname,
+    bgName,
   };
 };
 
