@@ -4,9 +4,10 @@
  * Handles a music change to an arbitrary resource, with an offset in seconds.
  * @param {Array} args packet arguments
  */
+import { music } from "../../viewport";
 export const handleRMC = (args: string[]) => {
-  this.viewport.music.pause();
-  const { music } = this.viewport;
+  music.pause();
+
   // Music offset + drift from song loading
   music.totime = args[1];
   music.offset = new Date().getTime() / 1000;

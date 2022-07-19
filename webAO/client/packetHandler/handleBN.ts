@@ -18,6 +18,7 @@ import {
 export const handleBN = (args: string[]) => {
   const bgFromArgs = safeTags(args[1]);
   setBackgroundName(bgFromArgs);
+  console.log(backgroundName + "FCK EVERYTHING");
   const bgfolder = backgroundFolder;
   const bg_index = getIndexFromSelect("bg_select", backgroundFolder);
   (<HTMLSelectElement>document.getElementById("bg_select")).selectedIndex =

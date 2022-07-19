@@ -1,6 +1,5 @@
 import tryUrls from "./utils/tryUrls";
 import fileExists from "./utils/fileExists";
-import Client from "./client";
 import { opusCheck } from "./dom/opusCheck";
 import { delay } from "./client";
 import { UPDATE_INTERVAL } from "./client";
@@ -15,6 +14,7 @@ import getAnimLength from "./utils/getAnimLength";
 import { safeTags } from "./encoding";
 import setCookie from "./utils/setCookie";
 import { AO_HOST } from "./client";
+import { client } from "./client";
 
 interface ChatMsg {
   content: string;
@@ -98,6 +98,8 @@ const createShoutAudio = () => {
   const shoutAudio = document.getElementById(
     "client_shoutaudio"
   ) as HTMLAudioElement;
+  console.log(document.getElementById("client_shoutaudio"));
+  console.log(shoutAudio);
   shoutAudio.src = `${AO_HOST}misc/default/objection.opus`;
   return shoutAudio;
 };
@@ -105,7 +107,7 @@ const createSfxAudio = () => {
   const sfxAudio = document.getElementById(
     "client_sfxaudio"
   ) as HTMLAudioElement;
-  sfxAudio.src = `${AO_HOST}sounds/general/sfx-realization.opus`;
+  // sfxAudio.src = `${AO_HOST}sounds/general/sfx-realization.opus`;
   return sfxAudio;
 };
 const createBlipsChannels = () => {
@@ -220,7 +222,6 @@ export const setBackgroundName = (val: string) => {
 export let backgroundFolder = `${AO_HOST}background/${encodeURI(
   backgroundName.toLowerCase()
 )}/`;
-let client: Client;
 const handleTextTick = async (charLayers: HTMLImageElement) => {
   const chatBox = document.getElementById("client_chat");
   const waitingBox = document.getElementById("client_chatwaiting");
@@ -300,82 +301,24 @@ const handleTextTick = async (charLayers: HTMLImageElement) => {
 
   if (textnow === chatmsg.content) {
     animating = false;
-    setEmote(AO_HOST, client, charName, charEmote, "(a)", false, chatmsg.side);
+    setEmote(AO_HOST, charName, charEmote, "(a)", false, chatmsg.side);
     charLayers.style.opacity = "1";
     waitingBox.style.opacity = "1";
     clearTimeout(updater);
   }
 };
-
-export const viewport = (masterClient: Client): Viewport => {
-  client = masterClient;
+export const viewport = (): Viewport => {
   /**
    * Intialize testimony updater
    */
-  const initTestimonyUpdater = () => {
-    const testimonyFilenames: Testimony = {
-      1: "witnesstestimony",
-      2: "crossexamination",
-      3: "notguilty",
-      4: "guilty",
-    };
-
-    const testimony = testimonyFilenames[masterClient.testimonyID];
-    if (!testimony) {
-      console.warn(`Invalid testimony ID ${masterClient.testimonyID}`);
-      return;
-    }
-
-    testimonyAudio.src = masterClient.resources[testimony].sfx;
-    testimonyAudio.play();
-
-    const testimonyOverlay = <HTMLImageElement>(
-      document.getElementById("client_testimony")
-    );
-    testimonyOverlay.src = masterClient.resources[testimony].src;
-    testimonyOverlay.style.opacity = "1";
-
-    testimonyTimer = 0;
-    testimonyUpdater = setTimeout(() => updateTestimony(), UPDATE_INTERVAL);
-  };
 
   /**
    * Updates the testimony overaly
    */
-  const updateTestimony = () => {
-    const testimonyFilenames: Testimony = {
-      1: "witnesstestimony",
-      2: "crossexamination",
-      3: "notguilty",
-      4: "guilty",
-    };
-
-    // Update timer
-    testimonyTimer += UPDATE_INTERVAL;
-
-    const testimony = testimonyFilenames[masterClient.testimonyID];
-    const resource = masterClient.resources[testimony];
-    if (!resource) {
-      disposeTestimony();
-      return;
-    }
-
-    if (testimonyTimer >= resource.duration) {
-      disposeTestimony();
-    } else {
-      testimonyUpdater = setTimeout(() => updateTestimony(), UPDATE_INTERVAL);
-    }
-  };
 
   /**
    * Dispose the testimony overlay
    */
-  const disposeTestimony = () => {
-    masterClient.testimonyID = 0;
-    testimonyTimer = 0;
-    document.getElementById("client_testimony").style.opacity = "0";
-    clearTimeout(testimonyUpdater);
-  };
 
   /**
    * Sets a new emote.
@@ -433,10 +376,10 @@ export const viewport = (masterClient: Client): Viewport => {
   };
 };
 const playSFX = async (sfxname: string, looping: boolean) => {
-  sfxAudio.pause();
-  sfxAudio.loop = looping;
-  sfxAudio.src = sfxname;
-  sfxAudio.play();
+  // sfxAudio.pause();
+  // sfxAudio.loop = looping;
+  // sfxAudio.src = sfxname;
+  // sfxAudio.play();
 };
 /**
  * Changes the viewport background based on a given position.
@@ -590,7 +533,6 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
 
   setEmote(
     AO_HOST,
-    client,
     chatmsg.name.toLowerCase(),
     chatmsg.sprite,
     "(a)",
@@ -601,7 +543,6 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
   if (chatmsg.other_name) {
     setEmote(
       AO_HOST,
-      client,
       chatmsg.other_name.toLowerCase(),
       chatmsg.other_emote,
       "(a)",
@@ -863,7 +804,7 @@ const chat_tick = async () => {
       shoutSprite.style.opacity = "0";
       shoutSprite.style.animation = "";
       const preanim = chatmsg.preanim.toLowerCase();
-      setEmote(AO_HOST, client, charName, preanim, "", false, chatmsg.side);
+      setEmote(AO_HOST, charName, preanim, "", false, chatmsg.side);
     }
 
     if (chatmsg.other_name) {
@@ -948,41 +889,17 @@ const chat_tick = async () => {
       }
 
       if (chatmsg.other_name) {
-        setEmote(
-          AO_HOST,
-          client,
-          pairName,
-          pairEmote,
-          "(a)",
-          true,
-          chatmsg.side
-        );
+        setEmote(AO_HOST, pairName, pairEmote, "(a)", true, chatmsg.side);
         pairLayers.style.opacity = "1";
       } else {
         pairLayers.style.opacity = "0";
       }
 
-      setEmote(
-        AO_HOST,
-        client,
-        charName,
-        charEmote,
-        "(b)",
-        false,
-        chatmsg.side
-      );
+      setEmote(AO_HOST, charName, charEmote, "(b)", false, chatmsg.side);
       charLayers.style.opacity = "1";
 
       if (textnow === chatmsg.content) {
-        setEmote(
-          AO_HOST,
-          client,
-          charName,
-          charEmote,
-          "(a)",
-          false,
-          chatmsg.side
-        );
+        setEmote(AO_HOST, charName, charEmote, "(a)", false, chatmsg.side);
         charLayers.style.opacity = "1";
         waitingBox.style.opacity = "1";
         animating = false;
@@ -1017,4 +934,61 @@ const chat_tick = async () => {
     chat_tick();
   }
   tickTimer += UPDATE_INTERVAL;
+};
+
+export const initTestimonyUpdater = () => {
+  // const testimonyFilenames: Testimony = {
+  //   1: "witnesstestimony",
+  //   2: "crossexamination",
+  //   3: "notguilty",
+  //   4: "guilty",
+  // };
+
+  // const testimony = testimonyFilenames[client.testimonyID];
+  // if (!testimony) {
+  //   console.warn(`Invalid testimony ID ${client.testimonyID}`);
+  //   return;
+  // }
+
+  // testimonyAudio.src = client.resources[testimony].sfx;
+  // testimonyAudio.play();
+
+  // const testimonyOverlay = <HTMLImageElement>(
+  //   document.getElementById("client_testimony")
+  // );
+  // testimonyOverlay.src = client.resources[testimony].src;
+  // testimonyOverlay.style.opacity = "1";
+
+  // testimonyTimer = 0;
+  testimonyUpdater = setTimeout(() => updateTestimony(), UPDATE_INTERVAL);
+};
+const updateTestimony = () => {
+  const testimonyFilenames: Testimony = {
+    1: "witnesstestimony",
+    2: "crossexamination",
+    3: "notguilty",
+    4: "guilty",
+  };
+
+  // Update timer
+  // testimonyTimer += UPDATE_INTERVAL;
+
+  // const testimony = testimonyFilenames[client.testimonyID];
+  // const resource = client.resources[testimony];
+  // if (!resource) {
+  //   disposeTestimony();
+  //   return;
+  // }
+
+  // if (testimonyTimer >= resource.duration) {
+  //   disposeTestimony();
+  // } else {
+  //   testimonyUpdater = setTimeout(() => updateTestimony(), UPDATE_INTERVAL);
+  // }
+};
+const disposeTestimony = () => {
+  client.testimonyID = 0;
+  testimonyTimer = 0;
+  document.getElementById("client_testimony").style.opacity = "0";
+  clearTimeout(testimonyUpdater);
 };

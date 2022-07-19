@@ -1,14 +1,23 @@
+import {
+  char_list_length,
+  client,
+  evidence_list_length,
+  musics_time,
+  setMusicsTime,
+} from "../../client";
 /**
  * Handles incoming music information, containing multiple entries
  * per packet.
  * @param {Array} args packet arguments
  */
+
+import { safeTags } from "../../encoding";
 export const handleEM = (args: string[]) => {
-  document.getElementById("client_loadingtext").innerHTML = "Loading Music";
+  document.getElementById("client_loadingtext")!.innerHTML = "Loading Music";
   if (args[1] === "0") {
-    this.resetMusicList();
-    this.resetAreaList();
-    this.musics_time = false;
+    client.resetMusicList();
+    client.resetAreaList();
+    setMusicsTime(false);
   }
 
   for (let i = 2; i < args.length - 1; i++) {
@@ -17,19 +26,19 @@ export const handleEM = (args: string[]) => {
       const trackindex = Number(args[i - 1]);
       (<HTMLProgressElement>(
         document.getElementById("client_loadingbar")
-      )).value = this.char_list_length + this.evidence_list_length + trackindex;
-      if (this.musics_time) {
-        this.addTrack(trackname);
-      } else if (this.isAudio(trackname)) {
-        this.musics_time = true;
-        this.fix_last_area();
-        this.addTrack(trackname);
+      )).value = char_list_length + evidence_list_length + trackindex;
+      if (musics_time) {
+        client.addTrack(trackname);
+      } else if (client.isAudio(trackname)) {
+        setMusicsTime(true);
+        client.fix_last_area();
+        client.addTrack(trackname);
       } else {
-        this.createArea(trackindex, trackname);
+        client.createArea(trackindex, trackname);
       }
     }
   }
 
   // get the next batch of tracks
-  this.sendServer(`AM#${Number(args[1]) / 10 + 1}#%`);
+  client.sendServer(`AM#${Number(args[1]) / 10 + 1}#%`);
 };

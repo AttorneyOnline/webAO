@@ -14,10 +14,10 @@ export const handleZZ = (args: string[]) => {
     oocLog.scrollTop = oocLog.scrollHeight;
   }
 
-  sfxAudio.pause();
-  const oldvolume = sfxAudio.volume;
-  sfxAudio.volume = 1;
-  sfxAudio.src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
-  sfxAudio.play();
-  sfxAudio.volume = oldvolume;
+  // sfxAudio.pause();
+  // const oldvolume = sfxAudio.volume;
+  // sfxAudio.volume = 1;
+  // sfxAudio.src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
+  // sfxAudio.play();
+  // sfxAudio.volume = oldvolume;
 };

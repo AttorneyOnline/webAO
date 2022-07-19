@@ -1,3 +1,11 @@
+import {
+  AO_HOST,
+  char_list_length,
+  evidences,
+  setEvidences,
+} from "../../client";
+import { prepChat, safeTags } from "../../encoding";
+
 /**
  * Handles incoming evidence list, all evidences at once
  * item per packet.
@@ -5,12 +13,12 @@
  * @param {Array} args packet arguments
  */
 export const handleLE = (args: string[]) => {
-  this.evidences = [];
+  setEvidences([]);
   for (let i = 1; i < args.length - 1; i++) {
     (<HTMLProgressElement>document.getElementById("client_loadingbar")).value =
-      this.char_list_length + i;
+      char_list_length + i;
     const arg = args[i].split("&");
-    this.evidences[i - 1] = {
+    evidences[i - 1] = {
       name: prepChat(arg[0]),
       desc: prepChat(arg[1]),
       filename: safeTags(arg[2]),
@@ -18,12 +26,12 @@ export const handleLE = (args: string[]) => {
     };
   }
 
-  const evidence_box = document.getElementById("evidences");
+  const evidence_box = document.getElementById("evidences")!;
   evidence_box.innerHTML = "";
-  for (let i = 1; i <= this.evidences.length; i++) {
-    evidence_box.innerHTML += `<img src="${this.evidences[i - 1].icon}" 
+  for (let i = 1; i <= evidences.length; i++) {
+    evidence_box.innerHTML += `<img src="${evidences[i - 1].icon}" 
 				id="evi_${i}" 
-				alt="${this.evidences[i - 1].name}"
+				alt="${evidences[i - 1].name}"
 				class="evi_icon"
 				onclick="pickEvidence(${i})">`;
   }

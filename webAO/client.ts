@@ -3,6 +3,7 @@
  * made by sD, refactored by oldmud0 and Qubrick
  * credits to aleks for original idea and source
  */
+console.log("GOING THROUGH IT AGAIN, CHIEF!");
 import queryParser from "./utils/queryParser";
 
 let { ip: serverIP, mode, asset, theme } = queryParser();
@@ -10,9 +11,46 @@ let { ip: serverIP, mode, asset, theme } = queryParser();
 const DEFAULT_HOST = "http://attorneyoffline.de/base/";
 console.log(asset);
 export let AO_HOST = asset || DEFAULT_HOST;
-import { pickChar } from "./dom/pickChar";
+
+export let client: Client;
+export const setClient = (val: Client) => {
+  client = val;
+};
+console.log("SAM");
+import { handleARUP } from "./client/packetHandler/handleARUP";
+
+import { handleHP } from "./client/packetHandler/handleHP";
+
+import { handleRT } from "./client/packetHandler/handleRT";
+
+import { handleTI } from "./client/packetHandler/handleTI";
+
+import { handleZZ } from "./client/packetHandler/handleZZ";
+
+import { handleMM } from "./client/packetHandler/handleMM";
+
+import { handleBD } from "./client/packetHandler/handleBD";
+
+import { handleBB } from "./client/packetHandler/handleBB";
+
+import { handleKB } from "./client/packetHandler/handleKB";
+
+import { handleKK } from "./client/packetHandler/handleKK";
+import { handleEI } from "./client/packetHandler/handleEI";
+console.log("MUMKEY CHEESE");
+
+import { handleLE } from "./client/packetHandler/handleLE";
+import { handleEM } from "./client/packetHandler/handleEM";
+import { handleFM } from "./client/packetHandler/handleFM";
+
+import { handleFA } from "./client/packetHandler/handleFA";
+import { handleCI } from "./client/packetHandler/handleCI";
+
 import { handleBN } from "./client/packetHandler/handleBN";
+console.log("MUMKEY BEE");
+
 import { handleFL } from "./client/packetHandler/handleFL";
+
 import { handleSM } from "./client/packetHandler/handleSM";
 import { handleSC } from "./client/packetHandler/handleSC";
 import { handleRD } from "./client/packetHandler/handleRD";
@@ -20,25 +58,25 @@ import { handleRM } from "./client/packetHandler/handleRM";
 import { handleRC } from "./client/packetHandler/handleRC";
 import { handleHI } from "./client/packetHandler/handleHI";
 import { handleSI } from "./client/packetHandler/handleSI";
+console.log("MUMKEY SUMKEE");
+
 import { handleaskchaa } from "./client/packetHandler/handleaskchaa";
 import { handlePN } from "./client/packetHandler/handlePN";
 import { handleID } from "./client/packetHandler/handleID";
 import { handleCharsCheck } from "./client/packetHandler/handleCharsCheck";
 import { setChatbox } from "./dom/setChatbox";
 import { handleASS } from "./client/packetHandler/handleASS";
-import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { handleDONE } from "./client/packetHandler/handleDONE";
 import { EventEmitter } from "events";
-import tryUrls from "./utils/tryUrls";
+console.log("MUMKEY TREE");
+
 import { escapeChat, prepChat, safeTags, unescapeChat } from "./encoding";
-import mlConfig from "./utils/aoml";
 import { area_click } from "./dom/areaClick";
 // Load some defaults for the background and evidence dropdowns
-import vanilla_character_arr from "./constants/characters.js";
-import vanilla_music_arr from "./constants/music.js";
 import vanilla_background_arr from "./constants/backgrounds.js";
 import vanilla_evidence_arr from "./constants/evidence.js";
 import { showname_click } from "./dom/shownameClick";
+console.log("MUMKEY BUMKEE");
 
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
@@ -50,11 +88,10 @@ import {
   changeSFXVolume,
   changeTestimonyVolume,
 } from "./dom/changeVolume";
-import setEmote from "./client/setEmote.js";
+console.log("MUMKEY Test");
+
 import fileExists from "./utils/fileExists.js";
-import getAnimLength from "./utils/getAnimLength.js";
 import getResources from "./utils/getResources.js";
-import transparentPng from "./constants/transparentPng";
 import downloadFile from "./services/downloadFile";
 import { getFilenameFromPath } from "./utils/paths";
 const version = process.env.npm_package_version;
@@ -62,6 +99,7 @@ import { viewport, Viewport } from "./viewport";
 import { handleMS } from "./client/packetHandler/handleMS";
 import { handleCT } from "./client/packetHandler/handleCT";
 import { handleMC } from "./client/packetHandler/handleMC";
+console.log("MUMKEY");
 interface Testimony {
   [key: number]: string;
 }
@@ -74,13 +112,6 @@ export const setAO_HOST = (val: string) => {
   AO_HOST = val;
 };
 const THEME = theme || "default";
-
-export let client: Client;
-export const setClient = (val: Client) => {
-  client = val;
-};
-
-const attorneyMarkdown = mlConfig();
 
 export const UPDATE_INTERVAL = 60;
 
@@ -109,7 +140,9 @@ export const setExtraFeatures = (val: string[]) => {
 };
 
 export let testimonyID = 0;
-
+export const setTestimonyID = (val: number) => {
+  testimonyID = val;
+};
 export let playerID = 1;
 export const setPlayerID = (val: number) => {
   playerID = val;
@@ -119,7 +152,11 @@ export let callwords: string[] = [];
 export const setCallwords = (val: string[]) => {
   callwords = val;
 };
-let banned: boolean = false;
+export let banned = false;
+export const setBanned = (val: boolean) => {
+  banned = val;
+};
+
 let hdid: string;
 interface Character {
   name: string;
@@ -194,7 +231,7 @@ declare global {
   }
 }
 
-function isLowMemory() {
+export function isLowMemory() {
   if (
     /webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Nintendo|Opera Mini/i.test(
       navigator.userAgent
@@ -203,16 +240,10 @@ function isLowMemory() {
     oldLoading = true;
   }
 }
-const fpPromise = FingerprintJS.load();
-fpPromise
-  .then((fp) => fp.get())
-  .then((result) => {
-    hdid = result.visitorId;
-    client = new Client(serverIP);
+console.log(" I AM THE CLIENT ");
+console.log(client);
 
-    isLowMemory();
-    client.loadResources();
-  });
+console.log(" I AM DONE WITH THE CLIENT");
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export let lastICMessageTime = new Date(0);
@@ -261,6 +292,11 @@ export let evidences: any[] = [];
 export const setEvidences = (val: any) => {
   evidences = val;
 };
+export let hp = [0, 0];
+export const Client1 = (b: any) => {
+  console.log("FUck you");
+};
+console.log("titty");
 export class Client extends EventEmitter {
   serv: any;
   hp: number[];
@@ -285,6 +321,7 @@ export class Client extends EventEmitter {
   _lastTimeICReceived: any;
   viewport: Viewport;
   constructor(address: string) {
+    console.log("WREREJKLEJRLTKJ");
     super();
     if (mode !== "replay") {
       this.serv = new WebSocket(`ws://${address}`);
@@ -321,40 +358,41 @@ export class Client extends EventEmitter {
     this.selectedEvidence = 0;
 
     this.checkUpdater = null;
-    this.viewport = viewport(this);
+    this.viewport = viewport();
     /**
      * Assign handlers for all commands
      * If you implement a new command, you need to add it here
      */
+
     this.on("MS", handleMS.bind(this));
     this.on("CT", handleCT.bind(this));
     this.on("MC", handleMC.bind(this));
     // this.on("RMC", handleRMC.bind(this));
-    // this.on("CI", handleCI.bind(this));
+    this.on("CI", handleCI.bind(this));
     this.on("SC", handleSC.bind(this));
-    // this.on("EI", handleEI.bind(this));
+    this.on("EI", handleEI.bind(this));
     this.on("FL", handleFL.bind(this));
-    // this.on("LE", handleLE.bind(this));
-    // this.on("EM", handleEM.bind(this));
-    // this.on("FM", handleFM.bind(this));
-    // this.on("FA", handleFA.bind(this));
+    this.on("LE", handleLE.bind(this));
+    this.on("EM", handleEM.bind(this));
+    this.on("FM", handleFM.bind(this));
+    this.on("FA", handleFA.bind(this));
     this.on("SM", handleSM.bind(this));
-    // this.on("MM", handleMM.bind(this));
-    // this.on("BD", handleBD.bind(this));
-    // this.on("BB", handleBB.bind(this));
-    // this.on("KB", handleKB.bind(this));
-    // this.on("KK", handleKK.bind(this));
+    this.on("MM", handleMM.bind(this));
+    this.on("BD", handleBD.bind(this));
+    this.on("BB", handleBB.bind(this));
+    this.on("KB", handleKB.bind(this));
+    this.on("KK", handleKK.bind(this));
     this.on("DONE", handleDONE.bind(this));
     this.on("BN", handleBN.bind(this));
-    // this.on("HP", handleHP.bind(this));
-    // this.on("RT", handleRT.bind(this));
-    // this.on("TI", handleTI.bind(this));
-    // this.on("ZZ", handleZZ.bind(this));
+    this.on("HP", handleHP.bind(this));
+    this.on("RT", handleRT.bind(this));
+    this.on("TI", handleTI.bind(this));
+    this.on("ZZ", handleZZ.bind(this));
     this.on("HI", handleHI.bind(this));
     this.on("ID", handleID.bind(this));
     this.on("PN", handlePN.bind(this));
     this.on("SI", handleSI.bind(this));
-    // this.on("ARUP", handleARUP.bind(this));
+    this.on("ARUP", handleARUP.bind(this));
     this.on("askchaa", handleaskchaa.bind(this));
     // this.on("CC", handleCC.bind(this));
     this.on("RC", handleRC.bind(this));
@@ -1120,4 +1158,4 @@ export const fetchCharacterList = async () => {
     console.warn("there was no characters.json file");
   }
 };
-export default Client;
+console.log("MUMKEY end");

@@ -1,4 +1,3 @@
-import Client from "../client";
 import transparentPng from "../constants/transparentPng";
 import fileExists from "../utils/fileExists";
 import { chatmsg, lastChar } from "../viewport";
@@ -10,7 +9,6 @@ import { chatmsg, lastChar } from "../viewport";
 
 const setEmote = async (
   AO_HOST: string,
-  client: Client,
   charactername: string,
   emotename: string,
   prefix: string,

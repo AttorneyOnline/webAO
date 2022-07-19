@@ -10,10 +10,11 @@ export const handleTI = (args: string[]) => {
     case 0:
     //
     case 1:
-      document.getElementById(`client_timer${timerid}`).innerText = timer_value;
+      document.getElementById(`client_timer${timerid}`)!.innerText =
+        timer_value;
     case 2:
-      document.getElementById(`client_timer${timerid}`).style.display = "";
+      document.getElementById(`client_timer${timerid}`)!.style.display = "";
     case 3:
-      document.getElementById(`client_timer${timerid}`).style.display = "none";
+      document.getElementById(`client_timer${timerid}`)!.style.display = "none";
   }
 };

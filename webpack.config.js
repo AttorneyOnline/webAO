@@ -13,6 +13,7 @@ dotenv.config();
 
 module.exports = {
   entry: {
+    bananana: './webAO/index.ts',
     ui: './webAO/ui.js',
     client: './webAO/client.ts',
     master: './webAO/master.ts',
@@ -33,7 +34,7 @@ module.exports = {
     compress: true,
     port: 8080,
   },
-  mode: 'production',
+  mode: 'development',
   module: {
     rules: [
       {
@@ -91,9 +92,11 @@ module.exports = {
     }),
 
     new HtmlWebpackPlugin({
+      inject: "body",
       title: 'Attorney Online',
       filename: 'client.html',
-      chunks: ['client', 'ui', 'dom', 'components'],
+      chunksSortMode: "manual",
+      chunks: ['ui', 'dom', 'components', 'bananana'],
       template: 'public/client.html',
     }),
     new webpack.DefinePlugin({
