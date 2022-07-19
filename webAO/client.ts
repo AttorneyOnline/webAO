@@ -3,6 +3,15 @@
  * made by sD, refactored by oldmud0 and Qubrick
  * credits to aleks for original idea and source
  */
+import queryParser from "./utils/queryParser";
+
+let { ip: serverIP, mode, asset, theme } = queryParser();
+// Unless there is an asset URL specified, use the wasabi one
+const DEFAULT_HOST = "http://attorneyoffline.de/base/";
+console.log(asset);
+export let AO_HOST = asset || DEFAULT_HOST;
+import { pickChar } from "./dom/pickChar";
+import { handleBN } from "./client/packetHandler/handleBN";
 import { handleFL } from "./client/packetHandler/handleFL";
 import { handleSM } from "./client/packetHandler/handleSM";
 import { handleSC } from "./client/packetHandler/handleSC";
@@ -40,10 +49,9 @@ import {
   changeShoutVolume,
   changeSFXVolume,
   changeTestimonyVolume,
-} from "./dom/changeVolume.js";
+} from "./dom/changeVolume";
 import setEmote from "./client/setEmote.js";
 import fileExists from "./utils/fileExists.js";
-import queryParser from "./utils/queryParser";
 import getAnimLength from "./utils/getAnimLength.js";
 import getResources from "./utils/getResources.js";
 import transparentPng from "./constants/transparentPng";
@@ -60,11 +68,7 @@ interface Testimony {
 
 // Get the arguments from the URL bar
 
-let { ip: serverIP, mode, asset, theme } = queryParser();
-// Unless there is an asset URL specified, use the wasabi one
-const DEFAULT_HOST = "http://attorneyoffline.de/base/";
-console.log(asset);
-export let AO_HOST = asset || DEFAULT_HOST;
+console.log("Right after I weas born " + AO_HOST);
 export const setAO_HOST = (val: string) => {
   console.log("Setting host to be" + val);
   AO_HOST = val;
@@ -72,8 +76,11 @@ export const setAO_HOST = (val: string) => {
 const THEME = theme || "default";
 
 export let client: Client;
+export const setClient = (val: Client) => {
+  client = val;
+};
 
-const attorneyMarkdown = mlConfig(AO_HOST);
+const attorneyMarkdown = mlConfig();
 
 export const UPDATE_INTERVAL = 60;
 
@@ -87,7 +94,10 @@ export const setOldLoading = (val: boolean) => {
   oldLoading = val;
 };
 // presettings
-let selectedMenu = 1;
+export let selectedMenu = 1;
+export const setSelectedMenu = (val: number) => {
+  selectedMenu = val;
+};
 export let selectedShout = 0;
 export const setSelectedShout = (val: number) => {
   selectedShout = val;
@@ -98,16 +108,32 @@ export const setExtraFeatures = (val: string[]) => {
   extrafeatures = val;
 };
 
+export let testimonyID = 0;
+
 export let playerID = 1;
 export const setPlayerID = (val: number) => {
   playerID = val;
 };
 
 export let callwords: string[] = [];
-
+export const setCallwords = (val: string[]) => {
+  callwords = val;
+};
 let banned: boolean = false;
 let hdid: string;
-
+interface Character {
+  name: string;
+  showname: string;
+  desc: string;
+  blips: string;
+  gender: string;
+  side: string;
+  chat: any;
+  evidence: any;
+  icon: string;
+  inifile: any;
+  muted: any;
+}
 declare global {
   interface Window {
     toggleShout: (shout: number) => void;
@@ -152,6 +178,10 @@ declare global {
     changeCallwords: () => void;
     changeBlipVolume: () => void;
     changeMusicVolume: () => void;
+    changeSFXVolume: () => void;
+    changeTestimonyVolume: () => void;
+    changeShoutVolume: () => void;
+    toggleEffect: (button: HTMLButtonElement) => void;
     area_click: (el: any) => void;
     showname_click: (_event: any) => void;
     mutelist_click: (_event: any) => void;
@@ -189,8 +219,11 @@ export let lastICMessageTime = new Date(0);
 export const setLastICMessageTime = (val: Date) => {
   lastICMessageTime = val;
 };
-export let chars: any[] = [];
+export let chars: Character[] = [];
 export let charID = -1;
+export let setCharID = (val: number) => {
+  charID = val;
+};
 export let areas: any = [];
 export let musics_time = false;
 export const setMusicsTime = (val: boolean) => {
@@ -208,7 +241,27 @@ export let char_list_length = 0;
 export const setCharListLength = (val: number) => {
   char_list_length = val;
 };
-class Client extends EventEmitter {
+export let musics: any[] = [];
+export const setMusics = (val: string[]) => {
+  musics = val;
+};
+export let selectedEmote = -1;
+export const setSelectedEmote = (val: number) => {
+  selectedEmote = val;
+};
+export let emotes: any[] = [];
+export const setEmotes = (val: any) => {
+  emotes = val;
+};
+export let selectedEvidence = 0;
+export const setSelectedEvidence = (val: number) => {
+  selectedEvidence = val;
+};
+export let evidences: any[] = [];
+export const setEvidences = (val: any) => {
+  evidences = val;
+};
+export class Client extends EventEmitter {
   serv: any;
   hp: number[];
   playerID: number;
@@ -253,14 +306,6 @@ class Client extends EventEmitter {
 
     this.hp = [0, 0];
 
-    this.playerID = playerID;
-    this.charID = charID;
-    this.char_list_length = char_list_length;
-    this.evidence_list_length = 0;
-    this.music_list_length = 0;
-    this.testimonyID = 0;
-
-    this.chars = chars;
     this.emotes = [];
     this.evidences = [];
     this.areas = areas;
@@ -300,7 +345,7 @@ class Client extends EventEmitter {
     // this.on("KB", handleKB.bind(this));
     // this.on("KK", handleKK.bind(this));
     this.on("DONE", handleDONE.bind(this));
-    // this.on("BN", handleBN.bind(this));
+    this.on("BN", handleBN.bind(this));
     // this.on("HP", handleHP.bind(this));
     // this.on("RT", handleRT.bind(this));
     // this.on("TI", handleTI.bind(this));
@@ -328,7 +373,7 @@ class Client extends EventEmitter {
    * Gets the current player's character.
    */
   get character() {
-    return chars[this.charID];
+    return chars[charID];
   }
 
   /**
@@ -830,25 +875,6 @@ class Client extends EventEmitter {
     }
   }
 
-  async fetchCharacterList() {
-    try {
-      const chardata = await request(`${AO_HOST}characters.json`);
-      const char_array = JSON.parse(chardata);
-      // the try catch will fail before here when there is no file
-
-      const char_select = <HTMLSelectElement>(
-        document.getElementById("client_ininame")
-      );
-      char_select.innerHTML = "";
-
-      char_array.forEach((character: string) => {
-        char_select.add(new Option(character));
-      });
-    } catch (err) {
-      console.warn("there was no characters.json file");
-    }
-  }
-
   async fetchEvidenceList() {
     try {
       const evidata = await request(`${AO_HOST}evidence.json`);
@@ -1075,5 +1101,23 @@ export const handleCharacterInfo = async (chargs: string[], charid: number) => {
  */
 export const sendMusicChange = (track: string) => {
   client.sendServer(`MC#${track}#${charID}#%`);
+};
+export const fetchCharacterList = async () => {
+  try {
+    const chardata = await request(`${AO_HOST}characters.json`);
+    const char_array = JSON.parse(chardata);
+    // the try catch will fail before here when there is no file
+
+    const char_select = <HTMLSelectElement>(
+      document.getElementById("client_ininame")
+    );
+    char_select.innerHTML = "";
+
+    char_array.forEach((character: string) => {
+      char_select.add(new Option(character));
+    });
+  } catch (err) {
+    console.warn("there was no characters.json file");
+  }
 };
 export default Client;

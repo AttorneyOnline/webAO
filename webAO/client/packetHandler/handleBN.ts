@@ -1,3 +1,15 @@
+import { AO_HOST, charID, chars } from "../../client";
+import { getIndexFromSelect } from "../../dom/getIndexFromSelect";
+import { updateBackgroundPreview } from "../../dom/updateBackgroundPreview";
+import { safeTags } from "../../encoding";
+import tryUrls from "../../utils/tryUrls";
+import {
+  backgroundFolder,
+  backgroundName,
+  setBackgroundName,
+  set_side,
+} from "../../viewport";
+
 /**
  * Handles a background change.
  * @param {Array} args packet arguments
@@ -5,18 +17,15 @@
 
 export const handleBN = (args: string[]) => {
   const bgFromArgs = safeTags(args[1]);
-  this.viewport.setBackgroundName(bgFromArgs);
-  const bgfolder = this.viewport.getBackgroundFolder();
-  const bg_index = getIndexFromSelect(
-    "bg_select",
-    this.viewport.getBackgroundName()
-  );
+  setBackgroundName(bgFromArgs);
+  const bgfolder = backgroundFolder;
+  const bg_index = getIndexFromSelect("bg_select", backgroundFolder);
   (<HTMLSelectElement>document.getElementById("bg_select")).selectedIndex =
     bg_index;
   updateBackgroundPreview();
   if (bg_index === 0) {
     (<HTMLInputElement>document.getElementById("bg_filename")).value =
-      this.viewport.getBackgroundName();
+      backgroundName;
   }
 
   tryUrls(
@@ -52,15 +61,15 @@ export const handleBN = (args: string[]) => {
     (<HTMLImageElement>document.getElementById("client_court_pro")).src = resp;
   });
 
-  if (this.charID === -1) {
-    this.viewport.set_side({
+  if (charID === -1) {
+    set_side({
       position: "jud",
       showSpeedLines: false,
       showDesk: true,
     });
   } else {
-    this.viewport.set_side({
-      position: this.chars[this.charID].side,
+    set_side({
+      position: chars[charID].side,
       showSpeedLines: false,
       showDesk: true,
     });

@@ -190,7 +190,7 @@ interface Positions {
 }
 
 let animating = false;
-let attorneyMarkdown = mlConfig(AO_HOST);
+let attorneyMarkdown = mlConfig();
 let blipChannels = createBlipsChannels();
 export let chatmsg = defaultChatMsg;
 let currentBlipChannel = 0;
@@ -199,7 +199,7 @@ export let lastChar = "";
 let lastEvi = 0;
 export let music = createMusic();
 let musicVolume = 0;
-let sfxAudio = createSfxAudio();
+export let sfxAudio = createSfxAudio();
 let sfxplayed = 0;
 let shoutTimer = 0;
 let shoutaudio = createShoutAudio();
@@ -213,8 +213,11 @@ let textnow = "";
 let theme: string;
 let tickTimer = 0;
 let updater: any;
-let backgroundName = "";
-let backgroundFolder = `${AO_HOST}background/${encodeURI(
+export let backgroundName = "";
+export const setBackgroundName = (val: string) => {
+  backgroundName = val;
+};
+export let backgroundFolder = `${AO_HOST}background/${encodeURI(
   backgroundName.toLowerCase()
 )}/`;
 let client: Client;
@@ -441,7 +444,7 @@ const playSFX = async (sfxname: string, looping: boolean) => {
  * Valid positions: `def, pro, hld, hlp, wit, jud, jur, sea`
  * @param {string} position the position to change into
  */
-const set_side = async ({
+export const set_side = async ({
   position,
   showSpeedLines,
   showDesk,

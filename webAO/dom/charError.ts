@@ -1,3 +1,5 @@
+import transparentPng from "../constants/transparentPng";
+
 /**
  * Triggered when there was an error loading a character sprite.
  * @param {HTMLImageElement} image the element containing the missing image

@@ -1,5 +1,5 @@
 import request from "../services/request";
-
+import { AO_HOST } from "../client";
 interface Aoml {
   [key: string]: string | number;
   name: string;
@@ -33,7 +33,8 @@ const aomlParser = (text: string) => {
   return parsed;
 };
 
-const mlConfig = (AO_HOST: string) => {
+const mlConfig = () => {
+  console.log("I am the AO_HOST cunt " + AO_HOST);
   console.log(AO_HOST);
   const defaultUrl = `${AO_HOST}themes/default/chat_config.ini`;
   let aomlParsed: Promise<{ [key: string]: Aoml }> = request(defaultUrl).then(

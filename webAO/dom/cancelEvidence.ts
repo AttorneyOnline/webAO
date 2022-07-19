@@ -1,13 +1,15 @@
+import { AO_HOST, selectedEvidence, setSelectedEvidence } from "../client";
+import { updateEvidenceIcon } from "./updateEvidenceIcon";
+
 /**
  * Cancel evidence selection.
  */
 export function cancelEvidence() {
   // Clear evidence data
-  if (client.selectedEvidence > 0) {
-    document.getElementById(`evi_${client.selectedEvidence}`).className =
-      "evi_icon";
+  if (selectedEvidence > 0) {
+    document.getElementById(`evi_${selectedEvidence}`)!.className = "evi_icon";
   }
-  client.selectedEvidence = 0;
+  setSelectedEvidence(0);
 
   // Clear evidence on information window
   (<HTMLSelectElement>document.getElementById("evi_select")).selectedIndex = 0;
@@ -20,12 +22,12 @@ export function cancelEvidence() {
   )).src = `${AO_HOST}misc/empty.png`; // Clear icon
 
   // Update button
-  document.getElementById("evi_add").className = "client_button hover_button";
-  document.getElementById("evi_edit").className =
+  document.getElementById("evi_add")!.className = "client_button hover_button";
+  document.getElementById("evi_edit")!.className =
     "client_button hover_button inactive";
-  document.getElementById("evi_cancel").className =
+  document.getElementById("evi_cancel")!.className =
     "client_button hover_button inactive";
-  document.getElementById("evi_del").className =
+  document.getElementById("evi_del")!.className =
     "client_button hover_button inactive";
 }
 window.cancelEvidence = cancelEvidence;

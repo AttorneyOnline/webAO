@@ -1,17 +1,32 @@
+import {
+  AO_HOST,
+  charID,
+  chars,
+  emotes,
+  fetchCharacterList,
+  setCharID,
+  setSelectedEmote,
+} from "../../client";
+import { pickEmotion } from "../../dom/pickEmotion";
+import { updateActionCommands } from "../../dom/updateActionCommands";
+import { safeTags } from "../../encoding";
+import request from "../../services/request";
+import fileExists from "../../utils/fileExists";
+
 /**
  * Handles the server's assignment of a character for the player to use.
  * PV # playerID (unused) # CID # character ID
  * @param {Array} args packet arguments
  */
 export const handlePV = async (args: string[]) => {
-  this.charID = Number(args[3]);
-  document.getElementById("client_waiting").style.display = "none";
-  document.getElementById("client_charselect").style.display = "none";
+  setCharID(Number(args[3]));
+  document.getElementById("client_waiting")!.style.display = "none";
+  document.getElementById("client_charselect")!.style.display = "none";
 
-  const me = this.chars[this.charID];
-  this.selectedEmote = -1;
-  const { emotes } = this;
-  const emotesList = document.getElementById("client_emo");
+  const me = chars[charID];
+  setSelectedEmote(-1);
+  emotes;
+  const emotesList = document.getElementById("client_emo")!;
   emotesList.style.display = "";
   emotesList.innerHTML = ""; // Clear emote box
   const ini = me.inifile;
@@ -70,9 +85,9 @@ export const handlePV = async (args: string[]) => {
       `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/custom.gif`
     )
   ) {
-    document.getElementById("button_4").style.display = "";
+    document.getElementById("button_4")!.style.display = "";
   } else {
-    document.getElementById("button_4").style.display = "none";
+    document.getElementById("button_4")!.style.display = "none";
   }
 
   const iniedit_select = <HTMLSelectElement>(
@@ -98,6 +113,6 @@ export const handlePV = async (args: string[]) => {
     }
   } catch (err) {
     console.info("character doesn't have iniswaps");
-    this.fetchCharacterList();
+    fetchCharacterList();
   }
 };

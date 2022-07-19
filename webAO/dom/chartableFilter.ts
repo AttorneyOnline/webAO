@@ -1,3 +1,5 @@
+import { chars } from "../client";
+
 /**
  * Triggered when the music search bar is changed
  * @param {MouseEvent} event
@@ -7,8 +9,8 @@ export function chartable_filter(_event: Event) {
     document.getElementById("client_charactersearch")
   )).value;
 
-  client.chars.forEach((character: any, charid: number) => {
-    const demothing = document.getElementById(`demo_${charid}`);
+  chars.forEach((character: any, charid: number) => {
+    const demothing = document.getElementById(`demo_${charid}`)!;
     if (character.name.toLowerCase().indexOf(searchname.toLowerCase()) === -1) {
       demothing.style.display = "none";
     } else {

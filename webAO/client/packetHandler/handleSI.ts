@@ -9,6 +9,7 @@ import {
 } from "../../client";
 import { oldLoading } from "../../client";
 import { extrafeatures } from "../../client";
+import { pickChar } from "../../dom/pickChar";
 
 /**
  * Received when the server announces its server info,

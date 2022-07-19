@@ -1,3 +1,4 @@
+import { client } from "../client";
 /**
  * Decrement defense health point.
  */

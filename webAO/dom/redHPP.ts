@@ -1,3 +1,4 @@
+import { client } from "../client";
 /**
  * Decrement prosecution health point.
  */

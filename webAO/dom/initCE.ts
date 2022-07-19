@@ -1,3 +1,4 @@
+import { client } from "../client";
 /**
  * Declare cross examination.
  */

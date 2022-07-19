@@ -1,3 +1,6 @@
+import { client } from "../client";
+import { updateActionCommands } from "./updateActionCommands";
+
 /**
  * Change role via OOC.
  */

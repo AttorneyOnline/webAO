@@ -3,11 +3,11 @@
  */
 export function updateActionCommands(side: string) {
   if (side === "jud") {
-    document.getElementById("judge_action").style.display = "inline-table";
-    document.getElementById("no_action").style.display = "none";
+    document.getElementById("judge_action")!.style.display = "inline-table";
+    document.getElementById("no_action")!.style.display = "none";
   } else {
-    document.getElementById("judge_action").style.display = "none";
-    document.getElementById("no_action").style.display = "inline-table";
+    document.getElementById("judge_action")!.style.display = "none";
+    document.getElementById("no_action")!.style.display = "inline-table";
   }
 
   // Update role selector

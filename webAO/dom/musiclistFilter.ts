@@ -1,3 +1,5 @@
+import { musics } from "../client";
+
 /**
  * Triggered when the music search bar is changed
  * @param {MouseEvent} event
@@ -12,7 +14,7 @@ export function musiclist_filter(_event: Event) {
 
   musiclist_element.innerHTML = "";
 
-  for (const trackname of client.musics) {
+  for (const trackname of musics) {
     if (trackname.toLowerCase().indexOf(searchname.toLowerCase()) !== -1) {
       const newentry = <HTMLOptionElement>document.createElement("OPTION");
       newentry.text = trackname;

@@ -1,3 +1,6 @@
+import { client, selectedShout } from "../client";
+import { escapeChat } from "../encoding";
+
 /**
  * Triggered when the Return key is pressed on the in-character chat input box.
  * @param {KeyboardEvent} event
@@ -8,13 +11,13 @@ export function onEnter(event: KeyboardEvent) {
     const myemo = client.emote;
     const evi = client.evidence;
     const flip = Boolean(
-      document.getElementById("button_flip").classList.contains("dark")
+      document.getElementById("button_flip")!.classList.contains("dark")
     );
     const flash = Boolean(
-      document.getElementById("button_flash").classList.contains("dark")
+      document.getElementById("button_flash")!.classList.contains("dark")
     );
     const screenshake = Boolean(
-      document.getElementById("button_shake").classList.contains("dark")
+      document.getElementById("button_shake")!.classList.contains("dark")
     );
     const noninterrupting_preanim = Boolean(
       (<HTMLInputElement>document.getElementById("check_nonint")).checked

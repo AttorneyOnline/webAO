@@ -1,3 +1,4 @@
+import { client } from "../client";
 /**
  * Declare the defendant not guilty
  */

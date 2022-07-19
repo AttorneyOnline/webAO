@@ -1,3 +1,4 @@
+import { client } from "../client";
 /**
  * Random character via OOC.
  */

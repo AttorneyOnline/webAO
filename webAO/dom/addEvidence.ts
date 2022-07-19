@@ -1,3 +1,6 @@
+import { client } from "../client";
+import { cancelEvidence } from "./cancelEvidence";
+
 /**
  * Add evidence.
  */

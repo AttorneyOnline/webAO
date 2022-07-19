@@ -1,3 +1,7 @@
+import { client } from "../client";
+import queryParser from "../utils/queryParser";
+
+let { mode } = queryParser();
 /**
  * Change background via OOC.
  */

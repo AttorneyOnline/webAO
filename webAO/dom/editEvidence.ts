@@ -1,3 +1,7 @@
+import { selectedEvidence } from "../client";
+import { client } from "../client";
+import { cancelEvidence } from "./cancelEvidence";
+
 /**
  * Edit selected evidence.
  */
@@ -5,7 +9,7 @@ export function editEvidence() {
   const evidence_select = <HTMLSelectElement>(
     document.getElementById("evi_select")
   );
-  const id = client.selectedEvidence - 1;
+  const id = selectedEvidence - 1;
   client.sendEE(
     id,
     (<HTMLInputElement>document.getElementById("evi_name")).value,

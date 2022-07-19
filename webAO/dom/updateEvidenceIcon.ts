@@ -1,3 +1,4 @@
+import { AO_HOST } from "../client";
 /**
  * Update evidence icon.
  */
