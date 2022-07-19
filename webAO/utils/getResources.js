@@ -1,4 +1,7 @@
-const getResources = (AO_HOST, THEME) => ({
+import { AO_HOST } from "../client";
+console.log("I AM DE HOSTY NOW" + AO_HOST)
+
+const getResources = (THEME) => ({
   holdit: {
     src: `${AO_HOST}misc/default/holdit_bubble.png`,
     duration: 720,

@@ -1,6 +1,7 @@
 import Client from "../client";
 import transparentPng from "../constants/transparentPng";
 import fileExists from "../utils/fileExists";
+import { chatmsg, lastChar } from "../viewport";
 
 /**
  * Sets all the img tags to the right sources
@@ -28,7 +29,7 @@ const setEmote = async (
   for (const extension of extensionsMap) {
     // Hides all sprites before creating a new sprite
 
-    if (client.viewport.lastChar !== client.viewport.chatmsg.name) {
+    if (lastChar !== chatmsg.name) {
       emoteSelector.src = transparentPng;
     }
     let url;
