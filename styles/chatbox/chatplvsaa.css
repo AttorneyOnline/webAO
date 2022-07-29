@@ -63,6 +63,8 @@
     border-image-slice: 6 fill;
 	border-image-width: 0.4em;
 	position: absolute;
+	font-weight: bold;
+	-webkit-text-stroke: 0.02em #000;
 	z-index: 1;
 }
 
