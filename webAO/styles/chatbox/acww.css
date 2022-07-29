@@ -2,6 +2,38 @@
 	color: #000;
 }
 
+.text_green {
+	color: #0f0;
+}
+
+.text_red {
+	color: #f00;
+}
+
+.text_orange {
+	color: #ffa500;
+}
+
+.text_blue {
+	color: #b3b2fa;
+}
+
+.text_yellow {
+	color: #ff0;
+}
+
+.text_pink {
+	color: #ffc0cb;
+}
+
+.text_cyan {
+	color: #0ff;
+}
+
+.text_grey {
+	color: #bbb;
+}
+
 #client_chatcontainer {
 	display: block;
 	position: absolute;
