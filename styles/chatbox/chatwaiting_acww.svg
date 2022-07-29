@@ -1,1 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 4.2 4.5"><image width="4.2" height="4.5" preserveAspectRatio="none" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAARCAYAAADUryzEAAAABHNCSVQICAgIfAhkiAAAALNJREFU OI2VkrsVwyAMRZ99UlBmlJSUKT2CR3DJKCkzgkdwSekxKD2COqeC8JEsrMrC8O4VhwGv7cTNov2d vh/1glbG+qIfucXewwAwENFprO+yMNZjeR6tQfzpArEHXSDRcgTKO8hDXKCir+lphGgAAMtqm03f eWcDPtv8H0G7A46eRuBoUp/TmwDJQqKzBjlVo7MBtcUVXTTopYsB0UKjA9k7kMpNq0gXDe6UGhCp HB0Afq/yUx1qGz9eAAAAAElFTkSuQmCC "/><path d="M0.9 0.9H4.1l-1.6 3.6z" style="fill:#6840a0;stroke-width:0.3"/><path d="M0.3 0.3 1.7 3.3 3.2 0.3Z" style="fill:#68d8f0;stroke-width:0.3px"/><path d="M0.3 0.3H3.2L1.7 1.5Z" style="fill:#fff;stroke-width:0.3"/><path d="M0.1 0.1H3.3l-1.6 3.4z" style="fill:none;stroke-width:0.3;stroke:#0030b8"/></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="16"
+   height="17"
+   viewBox="0 0 4.2 4.5"
+   version="1.1"
+   id="svg12"
+   sodipodi:docname="chatwaiting_acww.svg"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs16" />
+  <sodipodi:namedview
+     id="namedview14"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="51.352941"
+     inkscape:cx="7.9936999"
+     inkscape:cy="8.5"
+     inkscape:window-width="3840"
+     inkscape:window-height="2097"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg12" />
+  <path
+     d="M0.9 0.9H4.1l-1.6 3.6z"
+     style="fill:#6840a0;stroke-width:0.3"
+     id="path4" />
+  <path
+     d="M0.3 0.3 1.7 3.3 3.2 0.3Z"
+     style="fill:#68d8f0;stroke-width:0.3px"
+     id="path6" />
+  <path
+     d="M0.3 0.3H3.2L1.7 1.5Z"
+     style="fill:#fff;stroke-width:0.3"
+     id="path8" />
+  <path
+     d="M0.1 0.1H3.3l-1.6 3.4z"
+     style="fill:none;stroke-width:0.3;stroke:#0030b8"
+     id="path10" />
+</svg>

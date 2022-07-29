@@ -3,19 +3,19 @@
 }
 
 .text_green {
-	color: #0f0;
+	color: #009600;
 }
 
 .text_red {
-	color: #f00;
+	color: #ff0859;
 }
 
 .text_orange {
-	color: #ffa500;
+	color: #610000;
 }
 
 .text_blue {
-	color: #b3b2fa;
+	color: #7900ff;
 }
 
 .text_yellow {
@@ -23,15 +23,31 @@
 }
 
 .text_pink {
-	color: #ffc0cb;
+	color: #ff51ff;
 }
 
-.text_cyan {
-	color: #0ff;
+.text_cyan {	
+	color: #0038ff;
 }
 
 .text_grey {
 	color: #bbb;
+}
+
+/* Webfont CSS setup for Igiari by Caveras */
+
+@font-face {
+	font-family:'Igiari Cyrillic';
+		src: url('../igiari/igiari-cyrillic.ttf');
+	font-weight:normal;
+	font-style:normal;
+}
+
+@font-face {
+	font-family:'Ace Name';
+		src: url('./ace-name.ttf');
+	font-weight:normal;
+	font-style:normal;
 }
 
 #client_chatcontainer {
@@ -53,7 +69,7 @@
 	min-width: 11%;	
 	font-size: 0.8em;
     background: #d8f8a0;
-    color: #004000;
+    color: #040;
 	margin: 0;
 	padding-top: 0.4%;
 	padding-left: 1.955%;
@@ -61,11 +77,11 @@
 	border-color: #b0f818;
 	border-style: solid;
 	border-width: 0.3em 0.6em;
-    border-radius: 10%/50%;	
+    border-radius: 15%/50%;	
     box-shadow: 0 0.3em #70c020;
     line-height: 100%;
 	z-index: 1;
-	font-family: sans-serif;
+	font-family: "Ace Name", "Igiari Cyrillic", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 #client_inner_name {
@@ -83,11 +99,6 @@
 	width: 100%;
 	height: 87%;
 	margin: auto;
-	/*border-color: darkgray;
-	border-style: solid;
-	border-width: 0.15em;
-	border-radius: 0.15em;
-    background-color: white;*/
     background-image: url("acww.svg");
     background-size: cover;
     background-repeat: no-repeat;
@@ -96,11 +107,11 @@
 	text-align: left;
 	overflow: hidden;
 	scroll-behavior: smooth;
-	font-family: sans-serif;
+	font-family: "Igiari Cyrillic", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 #client_inner_chat {
-	padding: 5% 12%;
+	padding: 5% 16%;
 	margin: 0;
 	line-height: 100%;
 }
@@ -116,7 +127,7 @@
     height: 1.5em;
     background-image: url("chatwaiting_acww.svg");
 	background-size: contain;
-	animation: idling 0.4s linear infinite;
+	animation: idling 0.4s steps(1) infinite;
 }
 
 @keyframes idling {
