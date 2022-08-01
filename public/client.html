@@ -203,6 +203,8 @@
 				<br>
 				<br>
 				<span id="pairing" style="display: none">
+					<button id="button_toggle_pairing"  alt="Pairing"  class="client_button" onclick="toggleElement('pairing_settings')">Pairing</button>
+					<span id="pairing_settings" style="display: none">
 					<label for="pair_select">Pairing partner:</label>
 					<select name="pair_select" id="pair_select">
 						<option value="-1">None</option>
@@ -212,7 +214,8 @@
 						<tr id="y_offset" style="display: none"><td><p  >Vertical offset:</p></td><td><input type="range" name="pair_y_offset" id="pair_y_offset" min="-100" max="100" value="0"></td></tr>
 					</table>
 					<input id="pair_reset" type="button" value="Reset" onclick="resetOffset()">
-				<br>
+					</span>
+				</span>
 				<br>
 				<br>
 				<span id="cccc" style="display: none">
@@ -294,7 +297,7 @@
 				<br>
 				<span id="muting">
 					<label for="mute_select" style="float: left">Mute a character: </label>
-					<select name="mute_select" id="mute_select" size="15" style="float: left"
+					<select name="mute_select" id="mute_select"
 						onchange="mutelist_click(event)"></select>
 				</span>
 			</fieldset>
