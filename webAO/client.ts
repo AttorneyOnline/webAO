@@ -1135,7 +1135,7 @@ class Client extends EventEmitter {
 
     document.getElementById("client_loadingtext").innerHTML =
       "Loading Characters";
-    for (let i = 1; i < args.length; i++) {
+    for (let i = 1; i < args.length-1; i++) {
       document.getElementById(
         "client_loadingtext"
       ).innerHTML = `Loading Character ${i}/${this.char_list_length}`;
