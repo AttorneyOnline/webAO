@@ -23,7 +23,7 @@ const setEmote = async (
   const emoteSelector = document.getElementById(
     `client_${position}${pairID}_img`
   ) as HTMLImageElement;
-  const extensionsMap = [".gif", ".png", ".apng", ".webp"];
+  const extensionsMap = [".gif", ".png", ".apng", ".webp", ".webp.static"];
 
   for (const extension of extensionsMap) {
     // Hides all sprites before creating a new sprite
@@ -36,6 +36,10 @@ const setEmote = async (
       url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(
         emotename
       )}${extension}`;
+    } else if (extension === ".webp.static") {
+      url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(
+        emotename
+      )}.webp`;    
     } else {
       url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(
         prefix
