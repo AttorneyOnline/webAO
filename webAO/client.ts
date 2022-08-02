@@ -264,6 +264,10 @@ class Client extends EventEmitter {
     this.on("CharsCheck", this.handleCharsCheck.bind(this));
     this.on("PV", this.handlePV.bind(this));
     this.on("ASS", this.handleASS.bind(this));
+    this.on("ackMS", this.handleackMS.bind(this));
+    this.on("SP", this.handleSP.bind(this));
+    this.on("JD", this.handleJD.bind(this));
+    this.on("decryptor", () => {});
     this.on("CHECK", () => {});
     this.on("CH", () => {});
 
@@ -1979,6 +1983,35 @@ class Client extends EventEmitter {
    */
   handleASS(args: string[]) {
     AO_HOST = args[1];
+  }
+
+  /**
+ * server got our message
+ */
+  handleackMS() {
+    resetICParams();
+  }
+
+  /**
+* position change
+* @param {string} pos new position
+*/
+  handleSP(pos: string) {
+    updateActionCommands(pos);
+  }
+
+  /**
+* show/hide judge controls
+* @param {number} show either a 1 or a 0
+*/
+  handleJD(show: number) {
+    if (show === 1) {
+      document.getElementById("judge_action").style.display = "inline-table";
+      document.getElementById("no_action").style.display = "none";
+    } else {
+      document.getElementById("judge_action").style.display = "none";
+      document.getElementById("no_action").style.display = "inline-table";
+    }
   }
 
   /**
