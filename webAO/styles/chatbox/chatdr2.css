@@ -45,6 +45,7 @@
 
 #client_name {
     display: block;
+	position: absolute;
 	height: 100%;
 	width: 7%;
 	text-align: left;
@@ -55,8 +56,6 @@
 	box-shadow: 0.3em 0px 0 #ff9700;
 	left: 0;
     bottom: 0;
-	position: absolute;
-	z-index: 1;
 }
 
 #client_inner_name {
@@ -98,4 +97,24 @@
 
 #client_chatwaiting {
 	display: none;
+}
+
+#client_trackstatus {
+	display: block;
+	position: absolute;
+	width: 35%;
+	height: 35%;
+	top: 0;
+	left: 0;
+	background-image: url("music_dr2.svg");
+	background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#client_trackstatustext {
+	position: absolute;
+	top: 4%;
+	left: 4%;
+	color: #f84f00;
+    font-family: monospace;
 }
