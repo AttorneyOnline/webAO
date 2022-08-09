@@ -2762,6 +2762,9 @@ export function resizeChatbox() {
   const gameHeight = document.getElementById("client_background").offsetHeight;
 
   chatContainerBox.style.fontSize = `${(gameHeight * 0.0521).toFixed(1)}px`;
+
+  const trackstatus = <HTMLMarqueeElement>(document.getElementById("client_trackstatustext"));
+  trackstatus.width = (trackstatus.offsetWidth-1)+"px";
 }
 window.resizeChatbox = resizeChatbox;
 
