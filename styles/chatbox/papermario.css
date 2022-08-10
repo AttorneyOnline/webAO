@@ -91,3 +91,7 @@
 		transform: rotate(20deg);
 	}
 }
+
+#client_trackstatus {
+	display: none;
+}

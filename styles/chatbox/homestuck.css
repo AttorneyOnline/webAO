@@ -73,3 +73,7 @@
 	left: 2%;
 	bottom: 2%;
 }
+
+#client_trackstatus {
+	display: none;
+}

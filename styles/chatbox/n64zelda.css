@@ -107,3 +107,7 @@
         text-shadow: 0 0 0.2em #3282ff;
 	}
 }
+
+#client_trackstatus {
+	display: none;
+}

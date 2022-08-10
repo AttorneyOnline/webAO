@@ -133,3 +133,7 @@
 		color: #fff;
 	}
 }
+
+#client_trackstatus {
+	display: none;
+}

@@ -112,3 +112,7 @@
 		bottom: 2px;
 	}
 }
+
+#client_trackstatus {
+	display: none;
+}
