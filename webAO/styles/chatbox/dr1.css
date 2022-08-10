@@ -156,3 +156,7 @@
     from  { text-indent:  0% }
     to    { text-indent: -125% }
 }
+
+#client_trackstatus {
+	display: none;
+}

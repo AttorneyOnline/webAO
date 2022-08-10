@@ -133,3 +133,7 @@
 		right: 0.6em;
 	}
 }
+
+#client_trackstatus {
+	display: none;
+}

@@ -96,3 +96,7 @@
 #client_chatwaiting {
 	display: none;
 }
+
+#client_trackstatus {
+	color: transparent;
+}

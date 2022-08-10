@@ -87,3 +87,7 @@
 #client_chatwaiting {
 	display: none;
 }
+
+#client_trackstatus {
+	display: none;
+}
