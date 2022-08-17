@@ -138,3 +138,9 @@
 #client_trackstatus {
 	display: none;
 }
+
+#client_clock {
+	position: absolute;
+	top: 1%;
+	left: 1%;
+}
