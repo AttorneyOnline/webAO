@@ -773,12 +773,14 @@ class Client extends EventEmitter {
       let char_chatbox = "default";
       let char_muted = false;
 
-      if (char_id < this.char_list_length && this.chars[char_id].name !== char_name) {
+      if (char_id < this.char_list_length && char_id >= 0) {
+        if(this.chars[char_id].name !== char_name) {
         console.info(
           `${this.chars[char_id].name} is iniediting to ${char_name}`
         );
         const chargs = (`${char_name}&` + "iniediter").split("&");
         this.handleCharacterInfo(chargs, char_id);
+        }
       }
 
       try {
