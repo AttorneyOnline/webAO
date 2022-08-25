@@ -516,9 +516,7 @@ class Client extends EventEmitter {
    * @param {string} testimony type
    */
   sendRT(testimony: string) {
-    if (this.chars[this.charID].side === "jud") {
-      this.sendServer(`RT#${testimony}#%`);
-    }
+    this.sendServer(`RT#${testimony}#%`);
   }
 
   /**
@@ -1998,16 +1996,16 @@ class Client extends EventEmitter {
 * position change
 * @param {string} pos new position
 */
-  handleSP(pos: string) {
-    updateActionCommands(pos);
+  handleSP(args: string[]) {
+    updateActionCommands(args[1]);
   }
 
   /**
 * show/hide judge controls
 * @param {number} show either a 1 or a 0
 */
-  handleJD(show: number) {
-    if (show === 1) {
+  handleJD(args: string[]) {
+    if (Number(args[1]) === 1) {
       document.getElementById("judge_action").style.display = "inline-table";
       document.getElementById("no_action").style.display = "none";
     } else {
