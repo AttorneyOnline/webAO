@@ -638,6 +638,7 @@ const viewport = (masterClient: Client): Viewport => {
     const effectName = chatmsg.effects[0].toLowerCase();
     const badEffects = ["", "-", "none"];
     if (effectName.startsWith("rain") ) {
+      fg.innerHTML = '';
       (<HTMLLinkElement>document.getElementById("effect_css")).href = "styles/effects/rain.css";
       let intensity = 200;
       if(effectName.endsWith("weak")) {
