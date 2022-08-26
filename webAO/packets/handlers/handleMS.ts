@@ -6,7 +6,6 @@ import { prepChat, safeTags } from "../../encoding";
    * @param {*} args packet arguments
    */
 export const handleMS = (args: string[]) => {
-  console.log(args)
     // TODO: this if-statement might be a bug.
     if (args[4] !== client.viewport.chatmsg.content) {
       document.getElementById("client_inner_chat")!.innerHTML = "";

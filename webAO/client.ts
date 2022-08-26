@@ -8,7 +8,6 @@ import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { EventEmitter } from "events";
 import tryUrls from "./utils/tryUrls";
 import { escapeChat, prepChat, safeTags, unescapeChat } from "./encoding";
-import mlConfig from "./utils/aoml";
 // Load some defaults for the background and evidence dropdowns
 import vanilla_character_arr from "./constants/characters.js";
 import vanilla_music_arr from "./constants/music.js";
@@ -25,10 +24,8 @@ import {
   changeSFXVolume,
   changeTestimonyVolume,
 } from "./dom/changeVolume.js";
-import setEmote from "./client/setEmote.js";
 import fileExists from "./utils/fileExists.js";
 import queryParser from "./utils/queryParser.js";
-import getAnimLength from "./utils/getAnimLength.js";
 import getResources from "./utils/getResources.js";
 import transparentPng from "./constants/transparentPng";
 import downloadFile from "./services/downloadFile";
