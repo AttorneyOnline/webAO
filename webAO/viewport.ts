@@ -638,7 +638,6 @@ const viewport = (masterClient: Client): Viewport => {
     const effectName = chatmsg.effects[0].toLowerCase();
     const badEffects = ["", "-", "none"];
     if (effectName.startsWith("rain") ) {
-      fg.innerHTML = '';
       (<HTMLLinkElement>document.getElementById("effect_css")).href = "styles/effects/rain.css";
       let intensity = 200;
       if(effectName.endsWith("weak")) {
@@ -646,6 +645,11 @@ const viewport = (masterClient: Client): Viewport => {
       } else if (effectName.endsWith("strong")) {
         intensity = 400;
       }
+      if ( intensity < fg.childElementCount)
+        fg.innerHTML = '';
+      else
+        intensity = intensity - fg.childElementCount;
+
       for (let i = 0; i < intensity; i++) {
         let drop = document.createElement("p");
         drop.style.left = (Math.random() * 100) + "%";
@@ -657,6 +661,7 @@ const viewport = (masterClient: Client): Viewport => {
       !badEffects.includes(effectName)
     ) {
       (<HTMLLinkElement>document.getElementById("effect_css")).href = "";
+      fg.innerHTML = '';
       const baseEffectUrl = `${AO_HOST}themes/default/effects/`;
       fg.src = `${baseEffectUrl}${encodeURI(effectName)}.webp`;
     } else {
