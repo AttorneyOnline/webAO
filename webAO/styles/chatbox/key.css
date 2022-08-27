@@ -163,6 +163,8 @@
 	border: 2px white outset;
 	border-radius: 100%;
 	text-shadow: -1px -1px 0 #d7e5d9, 1px -1px 0 #d7e5d9, -1px 1px 0 #d7e5d9, 1px 1px 0 #d7e5d9;
+	font-size: small;
+	line-height: 1;
 }
 
 #client_clock_date {
@@ -188,9 +190,11 @@
 	text-shadow: -1px -1px 0 darkgray, 1px -1px 0 darkgray, -1px 1px 0 darkgray, 1px 1px 0 darkgray;
 	text-decoration: underline;
 	font-size: smaller;
+	font-weight: bold;
 	background-color: #c7856f;
 	border: #ffc89f 3px ridge;
 	border-radius: 100%;
+	line-height: 2;
 }
 
 #client_clock_time {
