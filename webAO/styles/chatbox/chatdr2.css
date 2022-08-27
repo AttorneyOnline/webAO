@@ -121,3 +121,7 @@
 	font-size: 1.2em;
 	white-space: nowrap;
 }
+
+#client_trackstatus {
+	display: fuck;
+}

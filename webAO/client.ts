@@ -38,7 +38,8 @@ let { ip: serverIP, mode, asset, theme } = queryParser() ;
 // Unless there is an asset URL specified, use the wasabi one
 const DEFAULT_HOST = "http://attorneyoffline.de/base/";
 export let AO_HOST = asset || DEFAULT_HOST;
-const THEME = theme || "default";
+let THEME: string = theme || "default";
+let CHATBOX: string;
 
 export let client: Client;
 
@@ -2536,17 +2537,17 @@ export function setChatbox(style: string) {
   const themeselect = <HTMLSelectElement>(
     document.getElementById("client_chatboxselect")
   );
-  const selected_theme = themeselect.value;
+  CHATBOX = themeselect.value;
 
-  setCookie("chatbox", selected_theme);
-  if (selected_theme === "dynamic") {
+  setCookie("chatbox", CHATBOX);
+  if (CHATBOX === "dynamic") {
     if (chatbox_arr.includes(style)) {
       chatbox_theme.href = `styles/chatbox/${style}.css`;
     } else {
       chatbox_theme.href = "styles/chatbox/aa.css";
     }
   } else {
-    chatbox_theme.href = `styles/chatbox/${selected_theme}.css`;
+    chatbox_theme.href = `styles/chatbox/${CHATBOX}.css`;
   }
 }
 window.setChatbox = setChatbox;
@@ -2562,6 +2563,25 @@ export function resizeChatbox() {
 
   const trackstatus = <HTMLMarqueeElement>(document.getElementById("client_trackstatustext"));
   trackstatus.width = (trackstatus.offsetWidth-1)+"px";
+
+
+  //clock
+  const now = new Date();
+  let weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  document.getElementById("client_clock_month").innerText = month[now.getMonth()];
+  console.debug(CHATBOX);
+  if (CHATBOX == "acww") {
+      weekday = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+      document.getElementById("client_clock_weekday").innerText = weekday[now.getDay()];
+      document.getElementById("client_clock_date").innerText = now.getDay()+"/"+now.getMonth();
+      document.getElementById("client_clock_time").innerText = now.getHours()+":"+now.getMinutes();
+  } else if (CHATBOX == "key") {
+      weekday = ["Sun.","Mon.","Tue.","Wed.","Thu.","Fri.","Sat."];
+      document.getElementById("client_clock_weekday").innerText = weekday[now.getDay()];
+      document.getElementById("client_clock_date").innerText = String(now.getDay());
+  }
+  
 }
 window.resizeChatbox = resizeChatbox;
 

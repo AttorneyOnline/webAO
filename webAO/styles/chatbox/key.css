@@ -47,6 +47,7 @@
 	width: 100%;
     filter: none;
     font-family: "Verdana";
+	transition: height 1s linear;
 }
 
 #client_chatdecoration {
@@ -136,5 +137,66 @@
 }
 
 #client_trackstatus {
+	display: none;
+}
+
+#client_clock {
+	position: absolute;
+	top: 1%;
+	left: 1%;
+	width: 12%;
+	height: 15%;
+	background-color: #d59a9a;
+	border: #ffbe9f 3px ridge;
+	border-radius: 100%;
+}
+
+#client_clock_month {
+	position: absolute;
+	width: 90%;
+	height: 15%;
+	left: 5%;
+	top: 8%;
+	margin: 0;
+	color: #52443c;
+	background: #ffb183;
+	border: 2px white outset;
+	border-radius: 100%;
+	text-shadow: -1px -1px 0 #d7e5d9, 1px -1px 0 #d7e5d9, -1px 1px 0 #d7e5d9, 1px 1px 0 #d7e5d9;
+	font-size: small;
+	line-height: 1;
+}
+
+#client_clock_date {
+	position: absolute;
+	width: 50%;
+	height: 50%;
+	left: 25%;
+	top: 25%;
+	margin: 0;
+	color: #fdf5e4;
+	text-shadow: -1px -1px 0 #78320b, 1px -1px 0 #78320b, -1px 1px 0 #78320b, 1px 1px 0 #78320b;
+	font-size: 3em;
+}
+
+#client_clock_weekday {
+	position: absolute;
+	width: 25%;
+	height: 25%;
+	right: 0;
+	bottom: 0;
+	margin: 0;
+	color: gray;
+	text-shadow: -1px -1px 0 darkgray, 1px -1px 0 darkgray, -1px 1px 0 darkgray, 1px 1px 0 darkgray;
+	text-decoration: underline;
+	font-size: smaller;
+	font-weight: bold;
+	background-color: #c7856f;
+	border: #ffc89f 3px ridge;
+	border-radius: 100%;
+	line-height: 2;
+}
+
+#client_clock_time {
 	display: none;
 }
