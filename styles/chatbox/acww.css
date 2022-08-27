@@ -147,3 +147,76 @@
 #client_trackstatus {
 	display: none;
 }
+
+#client_clock_date {
+	position: absolute;
+	width: 13%;
+	height: 4%;
+	right: 0;
+	top: 1%;
+	text-align: left;
+	color: #7d5500;
+	background: linear-gradient(
+  		to bottom,
+  		#ffef55,
+		#ffef55 20%,
+  		#ffcf3c 20%,
+  		#ffcf3c 40%,
+		#ffef55 40%,
+		#ffef55 60%,
+		#ffcf3c 60%,
+  		#ffcf3c 80%,
+		#ffef55 80%,
+		#ffef55 100%
+	);
+	border: 0.1em solid #ae4500;
+	border-radius: 50%;
+	border-bottom: none;
+	font-weight: bold;
+	padding-left: 1.5em;
+	padding-top: 0.5em;
+}
+
+#client_clock_month {
+	display: none;
+}
+
+#client_clock_weekday {
+	position: absolute;
+	width: 2.5%;
+	height: 3%;
+	right: 1%;
+	top: 2%;
+	color: white;
+	background: #00b63c;
+	background-size: 100% 40%;
+	border: 0.1em solid #00b63c;
+	border-radius: 100%;
+}
+
+#client_clock_time {
+	position: absolute;
+	width: 16%;
+	height: 4%;
+	right: 2%;
+	top: 4%;
+	text-align: center;
+	color: #5d5500;
+	background: linear-gradient(
+  		to bottom,
+  		rgba(255,255,0,0),
+ 		rgba(255,255,0,0) 20%,
+  		#ffcf3c 20%,
+  		#ffcf3c 40%,
+		#ffef55 40%,
+		#ffef55 60%,
+		#ffcf3c 60%,
+  		#ffcf3c 80%,
+		#ffef55 80%,
+		#ffef55 100%
+	);
+	border: 0.1em solid #ae4500;
+	border-radius: 50%;
+	border-top: none;
+	padding-top: 0.5em;
+}
