@@ -177,6 +177,10 @@
 	padding-top: 0.5em;
 }
 
+#client_clock_month {
+	display: none;
+}
+
 #client_clock_weekday {
 	position: absolute;
 	width: 2.5%;
