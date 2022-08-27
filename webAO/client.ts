@@ -908,10 +908,6 @@ class Client extends EventEmitter {
         this.chars[charid].blips = this.chars[charid].gender;
       }
 
-      const iniedit_select = <HTMLSelectElement>(
-        document.getElementById("client_ininame")
-      );
-      iniedit_select.add(new Option(safeTags(chargs[0])));
     } else {
       console.warn(`missing charid ${charid}`);
       img.style.display = "none";
@@ -1776,31 +1772,6 @@ class Client extends EventEmitter {
       document.getElementById("button_4").style.display = "none";
     }
 
-    const iniedit_select = <HTMLSelectElement>(
-      document.getElementById("client_ininame")
-    );
-
-    // Load iniswaps if there are any
-    try {
-      const cswapdata = await request(
-        `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/iniswaps.ini`
-      );
-      const cswap = cswapdata.split("\n");
-
-      // most iniswaps don't list their original char
-      if (cswap.length > 0) {
-        iniedit_select.innerHTML = "";
-
-        iniedit_select.add(new Option(safeTags(me.name)));
-
-        cswap.forEach((inisw: string) =>
-          iniedit_select.add(new Option(safeTags(inisw)))
-        );
-      }
-    } catch (err) {
-      console.info("character doesn't have iniswaps");
-      this.fetchCharacterList();
-    }
   }
 
   /**
