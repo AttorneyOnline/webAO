@@ -635,15 +635,35 @@ const viewport = (masterClient: Client): Viewport => {
 
     // apply effects
     fg.style.animation = "";
+    const effectName = chatmsg.effects[0].toLowerCase();
     const badEffects = ["", "-", "none"];
-    if (
+    if (effectName.startsWith("rain") ) {
+      (<HTMLLinkElement>document.getElementById("effect_css")).href = "styles/effects/rain.css";
+      let intensity = 200;
+      if(effectName.endsWith("weak")) {
+        intensity = 100;
+      } else if (effectName.endsWith("strong")) {
+        intensity = 400;
+      }
+      if ( intensity < fg.childElementCount)
+        fg.innerHTML = '';
+      else
+        intensity = intensity - fg.childElementCount;
+
+      for (let i = 0; i < intensity; i++) {
+        let drop = document.createElement("p");
+        drop.style.left = (Math.random() * 100) + "%";
+        drop.style.animationDelay = String(Math.random())+"s";
+        fg.appendChild(drop)
+      } 
+    } else if (
       chatmsg.effects[0] &&
-      !badEffects.includes(chatmsg.effects[0].toLowerCase())
+      !badEffects.includes(effectName)
     ) {
+      (<HTMLLinkElement>document.getElementById("effect_css")).href = "";
+      fg.innerHTML = '';
       const baseEffectUrl = `${AO_HOST}themes/default/effects/`;
-      fg.src = `${baseEffectUrl}${encodeURI(
-        chatmsg.effects[0].toLowerCase()
-      )}.webp`;
+      fg.src = `${baseEffectUrl}${encodeURI(effectName)}.webp`;
     } else {
       fg.src = transparentPng;
     }
