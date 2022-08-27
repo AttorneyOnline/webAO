@@ -114,3 +114,7 @@
 	background-size: contain;
     background-repeat: no-repeat;
 }
+
+#client_clock {
+	display: none;
+}
