@@ -845,91 +845,10 @@ class Client extends EventEmitter {
     }
   }
 
-  /**
-   * Handles incoming character information, bundling multiple characters
-   * per packet.
-   * CI#0#Phoenix&description&&&&&#1#Miles ...
-   * @param {Array} args packet arguments
-   */
-  handleCI(args: string[]) {
-    // Loop through the 10 characters that were sent
 
-    for (let i = 2; i <= args.length - 2; i++) {
-      if (i % 2 === 0) {
-        document.getElementById(
-          "client_loadingtext"
-        ).innerHTML = `Loading Character ${args[1]}/${this.char_list_length}`;
-        const chargs = args[i].split("&");
-        const charid = Number(args[i - 1]);
-        (<HTMLProgressElement>(
-          document.getElementById("client_loadingbar")
-        )).value = charid;
-        setTimeout(() => this.handleCharacterInfo(chargs, charid), 500);
-      }
-    }
-    // Request the next pack
-    this.sendServer(`AN#${Number(args[1]) / 10 + 1}#%`);
-  }
 
-  /**
-   * Handles incoming character information, containing all characters
-   * in one packet.
-   * @param {Array} args packet arguments
-   */
-  async handleSC(args: string[]) {
-    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-    if (mode === "watch") {
-      // Spectators don't need to pick a character
-      document.getElementById("client_charselect").style.display = "none";
-    } else {
-      document.getElementById("client_charselect").style.display = "block";
-    }
 
-    document.getElementById("client_loadingtext").innerHTML =
-      "Loading Characters";
-    for (let i = 1; i < args.length - 1; i++) {
-      document.getElementById(
-        "client_loadingtext"
-      ).innerHTML = `Loading Character ${i}/${this.char_list_length}`;
-      const chargs = args[i].split("&");
-      const charid = i - 1;
-      (<HTMLProgressElement>(
-        document.getElementById("client_loadingbar")
-      )).value = charid;
-      await sleep(0.1); // TODO: Too many network calls without this. net::ERR_INSUFFICIENT_RESOURCES
-      this.handleCharacterInfo(chargs, charid);
-    }
-    // We're done with the characters, request the music
-    this.sendServer("RM#%");
-  }
-
-  /**
-   * Handles incoming evidence information, containing only one evidence
-   * item per packet.
-   *
-   * EI#id#name&description&type&image&##%
-   *
-   * @param {Array} args packet arguments
-   */
-  handleEI(args: string[]) {
-    document.getElementById(
-      "client_loadingtext"
-    ).innerHTML = `Loading Evidence ${args[1]}/${this.evidence_list_length}`;
-    const evidenceID = Number(args[1]);
-    (<HTMLProgressElement>document.getElementById("client_loadingbar")).value =
-      this.char_list_length + evidenceID;
-
-    const arg = args[2].split("&");
-    this.evidences[evidenceID] = {
-      name: prepChat(arg[0]),
-      desc: prepChat(arg[1]),
-      filename: safeTags(arg[3]),
-      icon: `${AO_HOST}evidence/${encodeURI(arg[3].toLowerCase())}`,
-    };
-
-    this.sendServer("AE" + (evidenceID + 1) + "#%");
-  }
 
   /**
    * Handles incoming evidence list, all evidences at once
