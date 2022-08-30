@@ -16,6 +16,9 @@ import vanilla_evidence_arr from "./constants/evidence.js";
 import { handleCT } from './packets/handlers/handleCT'
 import { handleMC } from './packets/handlers/handleMC'
 import { handleRMC } from './packets/handlers/handleRMC'
+import {handleEI} from './packets/handlers/handleEI'
+import {handleSC} from './packets/handlers/handleSC'
+import {handleCI} from './packets/handlers/handleCI'
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
@@ -218,9 +221,9 @@ class Client extends EventEmitter {
     this.on("CT", handleCT);
     this.on("MC", handleMC);
     this.on("RMC", handleRMC);
-    this.on("CI", this.handleCI.bind(this));
-    this.on("SC", this.handleSC.bind(this));
-    this.on("EI", this.handleEI.bind(this));
+    this.on("CI", handleCI);
+    this.on("SC", handleSC);
+    this.on("EI", handleEI);
     this.on("FL", this.handleFL.bind(this));
     this.on("LE", this.handleLE.bind(this));
     this.on("EM", this.handleEM.bind(this));
