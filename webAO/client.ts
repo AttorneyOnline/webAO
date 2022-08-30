@@ -16,8 +16,8 @@ import vanilla_evidence_arr from "./constants/evidence.js";
 
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
-import getCookie from "./utils/getCookie.js";
-import setCookie from "./utils/setCookie.js";
+import getCookie from "./utils/getCookie";
+import setCookie from "./utils/setCookie";
 import { request } from "./services/request.js";
 import {
   changeShoutVolume,
