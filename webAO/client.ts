@@ -25,7 +25,7 @@ import {
   changeTestimonyVolume,
 } from "./dom/changeVolume.js";
 import fileExists from "./utils/fileExists.js";
-import queryParser from "./utils/queryParser.js";
+import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources.js";
 import transparentPng from "./constants/transparentPng";
 import downloadFile from "./services/downloadFile";
