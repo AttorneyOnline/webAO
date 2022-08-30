@@ -13,7 +13,8 @@ import vanilla_character_arr from "./constants/characters.js";
 import vanilla_music_arr from "./constants/music.js";
 import vanilla_background_arr from "./constants/backgrounds.js";
 import vanilla_evidence_arr from "./constants/evidence.js";
-
+import { handleCT } from './packets/handlers/handleCT'
+import { handleMC } from './packets/handlers/handleMC'
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
@@ -34,7 +35,7 @@ const version = process.env.npm_package_version;
 import masterViewport, { Viewport } from "./viewport";
 import { handleMS } from './packets/handlers/handleMS';
 
-let { ip: serverIP, mode, asset, theme } = queryParser() ;
+let { ip: serverIP, mode, asset, theme } = queryParser();
 // Unless there is an asset URL specified, use the wasabi one
 const DEFAULT_HOST = "http://attorneyoffline.de/base/";
 export let AO_HOST = asset || DEFAULT_HOST;
@@ -205,7 +206,7 @@ class Client extends EventEmitter {
 
     this.selectedEmote = -1;
     this.selectedEvidence = 0;
-    
+
     this.checkUpdater = null;
     this.viewport = masterViewport(this);
     /**
@@ -213,8 +214,8 @@ class Client extends EventEmitter {
      * If you implement a new command, you need to add it here
      */
     this.on("MS", handleMS);
-    this.on("CT", this.handleCT.bind(this));
-    this.on("MC", this.handleMC.bind(this));
+    this.on("CT", handleCT);
+    this.on("MC", handleMC);
     this.on("RMC", this.handleRMC.bind(this));
     this.on("CI", this.handleCI.bind(this));
     this.on("SC", this.handleSC.bind(this));
@@ -252,9 +253,9 @@ class Client extends EventEmitter {
     this.on("ackMS", this.handleackMS.bind(this));
     this.on("SP", this.handleSP.bind(this));
     this.on("JD", this.handleJD.bind(this));
-    this.on("decryptor", () => {});
-    this.on("CHECK", () => {});
-    this.on("CH", () => {});
+    this.on("decryptor", () => { });
+    this.on("CHECK", () => { });
+    this.on("CH", () => { });
 
     this._lastTimeICReceived = new Date(0);
   }
@@ -436,9 +437,8 @@ class Client extends EventEmitter {
     if (mode === "replay") {
       (<HTMLInputElement>(
         document.getElementById("client_ooclog")
-      )).value += `wait#${
-        (<HTMLInputElement>document.getElementById("client_replaytimer")).value
-      }#%\r\n`;
+      )).value += `wait#${(<HTMLInputElement>document.getElementById("client_replaytimer")).value
+        }#%\r\n`;
     }
   }
 
@@ -741,58 +741,9 @@ class Client extends EventEmitter {
 
 
 
-  /**
-   * Handles an out-of-character chat message.
-   * @param {Array} args packet arguments
-   */
-  handleCT(args: string[]) {
-    if (mode !== "replay") {
-      const oocLog = document.getElementById("client_ooclog");
-      oocLog.innerHTML += `${prepChat(args[1])}: ${prepChat(args[2])}\r\n`;
-      if (oocLog.scrollTop > oocLog.scrollHeight - 600) {
-        oocLog.scrollTop = oocLog.scrollHeight;
-      }
-    }
-  }
 
-  /**
-   * Handles a music change to an arbitrary resource.
-   * @param {Array} args packet arguments
-   */
-  handleMC(args: string[]) {
-    const track = prepChat(args[1]);
-    let charID = Number(args[2]);
-    const showname = args[3] || "";
-    const looping = Boolean(args[4]);
-    const channel = Number(args[5]) || 0;
-    // const fading = Number(args[6]) || 0; // unused in web
 
-    const music = this.viewport.music[channel];
-    let musicname;
-    music.pause();
-    if (track.startsWith("http")) {
-      music.src = track;
-    } else {
-      music.src = `${AO_HOST}sounds/music/${encodeURI(track.toLowerCase())}`;
-    }
-    music.loop = looping;
-    music.play();
 
-    try {
-      musicname = this.chars[charID].name;
-    } catch (e) {
-      charID = -1;
-    }
-
-    if (charID >= 0) {
-      musicname = this.chars[charID].name;
-      appendICLog(`${musicname} changed music to ${track}`);
-    } else {
-      appendICLog(`The music was changed to ${track}`);
-    }
-
-    document.getElementById("client_trackstatustext").innerText = track;
-  }
 
   // TODO BUG:
   // this.viewport.music is an array. Therefore you must access elements
@@ -958,7 +909,7 @@ class Client extends EventEmitter {
 
     document.getElementById("client_loadingtext").innerHTML =
       "Loading Characters";
-    for (let i = 1; i < args.length-1; i++) {
+    for (let i = 1; i < args.length - 1; i++) {
       document.getElementById(
         "client_loadingtext"
       ).innerHTML = `Loading Character ${i}/${this.char_list_length}`;
@@ -2050,9 +2001,8 @@ export function mutelist_click(_event: Event) {
 
   if (client.chars[selected_character.value].muted === false) {
     client.chars[selected_character.value].muted = true;
-    selected_character.text = `${
-      client.chars[selected_character.value].name
-    } (muted)`;
+    selected_character.text = `${client.chars[selected_character.value].name
+      } (muted)`;
     console.info(`muted ${client.chars[selected_character.value].name}`);
   } else {
     client.chars[selected_character.value].muted = false;
@@ -2562,26 +2512,26 @@ export function resizeChatbox() {
   chatContainerBox.style.fontSize = `${(gameHeight * 0.0521).toFixed(1)}px`;
 
   const trackstatus = <HTMLMarqueeElement>(document.getElementById("client_trackstatustext"));
-  trackstatus.width = (trackstatus.offsetWidth-1)+"px";
+  trackstatus.width = (trackstatus.offsetWidth - 1) + "px";
 
 
   //clock
   const now = new Date();
-  let weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  let weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   document.getElementById("client_clock_month").innerText = month[now.getMonth()];
   console.debug(CHATBOX);
   if (CHATBOX == "acww") {
-      weekday = ["Su","Mo","Tu","We","Th","Fr","Sa"];
-      document.getElementById("client_clock_weekday").innerText = weekday[now.getDay()];
-      document.getElementById("client_clock_date").innerText = now.getDay()+"/"+now.getMonth();
-      document.getElementById("client_clock_time").innerText = now.getHours()+":"+now.getMinutes();
+    weekday = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+    document.getElementById("client_clock_weekday").innerText = weekday[now.getDay()];
+    document.getElementById("client_clock_date").innerText = now.getDay() + "/" + now.getMonth();
+    document.getElementById("client_clock_time").innerText = now.getHours() + ":" + now.getMinutes();
   } else if (CHATBOX == "key") {
-      weekday = ["Sun.","Mon.","Tue.","Wed.","Thu.","Fri.","Sat."];
-      document.getElementById("client_clock_weekday").innerText = weekday[now.getDay()];
-      document.getElementById("client_clock_date").innerText = String(now.getDay());
+    weekday = ["Sun.", "Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat."];
+    document.getElementById("client_clock_weekday").innerText = weekday[now.getDay()];
+    document.getElementById("client_clock_date").innerText = String(now.getDay());
   }
-  
+
 }
 window.resizeChatbox = resizeChatbox;
 
@@ -2628,7 +2578,7 @@ export function updateActionCommands(side: string) {
   // Update role selector
   for (
     let i = 0,
-      role_select = <HTMLSelectElement>document.getElementById("role_select");
+    role_select = <HTMLSelectElement>document.getElementById("role_select");
     i < role_select.options.length;
     i++
   ) {
