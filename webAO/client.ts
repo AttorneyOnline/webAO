@@ -16,9 +16,12 @@ import vanilla_evidence_arr from "./constants/evidence.js";
 import { handleCT } from './packets/handlers/handleCT'
 import { handleMC } from './packets/handlers/handleMC'
 import { handleRMC } from './packets/handlers/handleRMC'
-import {handleEI} from './packets/handlers/handleEI'
-import {handleSC} from './packets/handlers/handleSC'
-import {handleCI} from './packets/handlers/handleCI'
+import { handleFL } from './packets/handlers/handleFL'
+import { handleLE } from './packets/handlers/handleLE'
+import { handleEM } from './packets/handlers/handleEM'
+import { handleEI } from './packets/handlers/handleEI'
+import { handleSC } from './packets/handlers/handleSC'
+import { handleCI } from './packets/handlers/handleCI'
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
@@ -62,6 +65,10 @@ let selectedMenu = 1;
 let selectedShout = 0;
 
 export let extrafeatures: string[] = [];
+export const setExtraFeatures = (val: any) => {
+  extrafeatures = val
+}
+
 let banned: boolean = false;
 let hdid: string;
 
@@ -224,9 +231,9 @@ class Client extends EventEmitter {
     this.on("CI", handleCI);
     this.on("SC", handleSC);
     this.on("EI", handleEI);
-    this.on("FL", this.handleFL.bind(this));
-    this.on("LE", this.handleLE.bind(this));
-    this.on("EM", this.handleEM.bind(this));
+    this.on("FL", handleFL);
+    this.on("LE", handleLE);
+    this.on("EM", handleEM);
     this.on("FM", this.handleFM.bind(this));
     this.on("FA", this.handleFA.bind(this));
     this.on("SM", this.handleSM.bind(this));
@@ -853,37 +860,6 @@ class Client extends EventEmitter {
 
 
 
-  /**
-   * Handles incoming evidence list, all evidences at once
-   * item per packet.
-   *
-   * @param {Array} args packet arguments
-   */
-  handleLE(args: string[]) {
-    this.evidences = [];
-    for (let i = 1; i < args.length - 1; i++) {
-      (<HTMLProgressElement>(
-        document.getElementById("client_loadingbar")
-      )).value = this.char_list_length + i;
-      const arg = args[i].split("&");
-      this.evidences[i - 1] = {
-        name: prepChat(arg[0]),
-        desc: prepChat(arg[1]),
-        filename: safeTags(arg[2]),
-        icon: `${AO_HOST}evidence/${encodeURI(arg[2].toLowerCase())}`,
-      };
-    }
-
-    const evidence_box = document.getElementById("evidences");
-    evidence_box.innerHTML = "";
-    for (let i = 1; i <= this.evidences.length; i++) {
-      evidence_box.innerHTML += `<img src="${this.evidences[i - 1].icon}" 
-				id="evi_${i}" 
-				alt="${this.evidences[i - 1].name}"
-				class="evi_icon"
-				onclick="pickEvidence(${i})">`;
-    }
-  }
 
   resetMusicList() {
     this.musics = [];
@@ -1013,42 +989,7 @@ class Client extends EventEmitter {
     }
   }
 
-  /**
-   * Handles incoming music information, containing multiple entries
-   * per packet.
-   * @param {Array} args packet arguments
-   */
-  handleEM(args: string[]) {
-    document.getElementById("client_loadingtext").innerHTML = "Loading Music";
-    if (args[1] === "0") {
-      this.resetMusicList();
-      this.resetAreaList();
-      this.musics_time = false;
-    }
 
-    for (let i = 2; i < args.length - 1; i++) {
-      if (i % 2 === 0) {
-        const trackname = safeTags(args[i]);
-        const trackindex = Number(args[i - 1]);
-        (<HTMLProgressElement>(
-          document.getElementById("client_loadingbar")
-        )).value =
-          this.char_list_length + this.evidence_list_length + trackindex;
-        if (this.musics_time) {
-          this.addTrack(trackname);
-        } else if (this.isAudio(trackname)) {
-          this.musics_time = true;
-          this.fix_last_area();
-          this.addTrack(trackname);
-        } else {
-          this.createArea(trackindex, trackname);
-        }
-      }
-    }
-
-    // get the next batch of tracks
-    this.sendServer(`AM#${Number(args[1]) / 10 + 1}#%`);
-  }
 
   /**
    * Handles incoming music information, containing all music in one packet.
@@ -1447,51 +1388,6 @@ class Client extends EventEmitter {
     }
   }
 
-  /**
-   * With this the server tells us which features it supports
-   * @param {Array} args list of features
-   */
-  handleFL(args: string[]) {
-    console.info("Server-supported features:");
-    console.info(args);
-    extrafeatures = args;
-
-    if (args.includes("yellowtext")) {
-      const colorselect = <HTMLSelectElement>(
-        document.getElementById("textcolor")
-      );
-
-      colorselect.options[colorselect.options.length] = new Option(
-        "Yellow",
-        "5"
-      );
-      colorselect.options[colorselect.options.length] = new Option("Grey", "6");
-      colorselect.options[colorselect.options.length] = new Option("Pink", "7");
-      colorselect.options[colorselect.options.length] = new Option("Cyan", "8");
-    }
-
-    if (args.includes("cccc_ic_support")) {
-      document.getElementById("cccc").style.display = "";
-      document.getElementById("pairing").style.display = "";
-    }
-
-    if (args.includes("flipping")) {
-      document.getElementById("button_flip").style.display = "";
-    }
-
-    if (args.includes("looping_sfx")) {
-      document.getElementById("button_shake").style.display = "";
-      document.getElementById("2.7").style.display = "";
-    }
-
-    if (args.includes("effects")) {
-      document.getElementById("2.8").style.display = "";
-    }
-
-    if (args.includes("y_offset")) {
-      document.getElementById("y_offset").style.display = "";
-    }
-  }
 
   /**
    * Received when the server announces its server info,
