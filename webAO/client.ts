@@ -25,6 +25,11 @@ import { handleCI } from './packets/handlers/handleCI'
 import { handleFM } from './packets/handlers/handleFM'
 import { handleFA } from './packets/handlers/handleFA'
 import { handleSM } from './packets/handlers/handleSM'
+import { handleMM } from './packets/handlers/handleMM'
+import { handleBD } from './packets/handlers/handleBD'
+import { handleBB } from './packets/handlers/handleBB'
+import { handleKB } from './packets/handlers/handleKB'
+import { handleKK } from './packets/handlers/handleKK'
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
@@ -72,7 +77,10 @@ export const setExtraFeatures = (val: any) => {
   extrafeatures = val
 }
 
-let banned: boolean = false;
+export let banned: boolean = false;
+export const setBanned = (val: boolean) => {
+  banned = val
+}
 let hdid: string;
 
 declare global {
@@ -240,11 +248,11 @@ class Client extends EventEmitter {
     this.on("FM", handleFM);
     this.on("FA", handleFA);
     this.on("SM", handleSM);
-    this.on("MM", this.handleMM.bind(this));
-    this.on("BD", this.handleBD.bind(this));
-    this.on("BB", this.handleBB.bind(this));
-    this.on("KB", this.handleKB.bind(this));
-    this.on("KK", this.handleKK.bind(this));
+    this.on("MM", handleMM);
+    this.on("BD", handleBD);
+    this.on("BB", handleBB);
+    this.on("KB", handleKB);
+    this.on("KK", handleKK);
     this.on("DONE", this.handleDONE.bind(this));
     this.on("BN", this.handleBN.bind(this));
     this.on("HP", this.handleHP.bind(this));
@@ -996,13 +1004,6 @@ class Client extends EventEmitter {
 
 
 
-  /**
-   * Handles the "MusicMode" packet
-   * @param {Array} args packet arguments
-   */
-  handleMM(_args: string[]) {
-    // It's unused nowadays, as preventing people from changing the music is now serverside
-  }
 
   /**
    * Handles the kicked packet
@@ -1022,42 +1023,11 @@ class Client extends EventEmitter {
     )).style.display = "none";
   }
 
-  /**
-   * Handles the kicked packet
-   * @param {Array} args kick reason
-   */
-  handleKK(args: string[]) {
-    this.handleBans("Kicked", safeTags(args[1]));
-  }
 
-  /**
-   * Handles the banned packet
-   * this one is sent when you are kicked off the server
-   * @param {Array} args ban reason
-   */
-  handleKB(args: string[]) {
-    this.handleBans("Banned", safeTags(args[1]));
-    banned = true;
-  }
 
-  /**
-   * Handles the warning packet
-   * on client this spawns a message box you can't close for 2 seconds
-   * @param {Array} args ban reason
-   */
-  handleBB(args: string[]) {
-    alert(safeTags(args[1]));
-  }
 
-  /**
-   * Handles the banned packet
-   * this one is sent when you try to reconnect but you're banned
-   * @param {Array} args ban reason
-   */
-  handleBD(args: string[]) {
-    this.handleBans("Banned", safeTags(args[1]));
-    banned = true;
-  }
+
+
 
   /**
    * Handles the handshake completion packet, meaning the player
