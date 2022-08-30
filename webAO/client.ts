@@ -30,6 +30,13 @@ import { handleBD } from './packets/handlers/handleBD'
 import { handleBB } from './packets/handlers/handleBB'
 import { handleKB } from './packets/handlers/handleKB'
 import { handleKK } from './packets/handlers/handleKK'
+import { handleDONE } from './packets/handlers/handleDONE'
+import { handleBN } from './packets/handlers/handleBN'
+import { handleHP } from './packets/handlers/handleHP'
+import { handleRT } from './packets/handlers/handleRT'
+import { handleTI } from './packets/handlers/handleTI'
+import { handleZZ } from './packets/handlers/handleZZ'
+import { handleHI } from './packets/handlers/handleHI'
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
@@ -253,13 +260,13 @@ class Client extends EventEmitter {
     this.on("BB", handleBB);
     this.on("KB", handleKB);
     this.on("KK", handleKK);
-    this.on("DONE", this.handleDONE.bind(this));
-    this.on("BN", this.handleBN.bind(this));
-    this.on("HP", this.handleHP.bind(this));
-    this.on("RT", this.handleRT.bind(this));
-    this.on("TI", this.handleTI.bind(this));
-    this.on("ZZ", this.handleZZ.bind(this));
-    this.on("HI", this.handleHI.bind(this));
+    this.on("DONE", handleDONE);
+    this.on("BN", handleBN);
+    this.on("HP", handleHP);
+    this.on("RT", handleRT);
+    this.on("TI", handleTI);
+    this.on("ZZ", handleZZ);
+    this.on("HI", handleHI);
     this.on("ID", this.handleID.bind(this));
     this.on("PN", this.handlePN.bind(this));
     this.on("SI", this.handleSI.bind(this));
@@ -1025,197 +1032,6 @@ class Client extends EventEmitter {
 
 
 
-
-
-
-
-  /**
-   * Handles the handshake completion packet, meaning the player
-   * is ready to select a character.
-   *
-   * @param {Array} args packet arguments
-   */
-  handleDONE(_args: string[]) {
-    document.getElementById("client_loading").style.display = "none";
-    if (mode === "watch") {
-      // Spectators don't need to pick a character
-      document.getElementById("client_waiting").style.display = "none";
-    }
-  }
-
-  /**
-   * Handles a background change.
-   * @param {Array} args packet arguments
-   */
-
-  handleBN(args: string[]) {
-    const bgFromArgs = safeTags(args[1]);
-    this.viewport.setBackgroundName(bgFromArgs);
-    const bgfolder = this.viewport.getBackgroundFolder();
-    const bg_index = getIndexFromSelect(
-      "bg_select",
-      this.viewport.getBackgroundName()
-    );
-    (<HTMLSelectElement>document.getElementById("bg_select")).selectedIndex =
-      bg_index;
-    updateBackgroundPreview();
-    if (bg_index === 0) {
-      (<HTMLInputElement>document.getElementById("bg_filename")).value =
-        this.viewport.getBackgroundName();
-    }
-
-    tryUrls(
-      `${AO_HOST}background/${encodeURI(args[1].toLowerCase())}/defenseempty`
-    ).then((resp) => {
-      (<HTMLImageElement>document.getElementById("bg_preview")).src = resp;
-    });
-    tryUrls(`${bgfolder}defensedesk`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_def_bench")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}stand`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_wit_bench")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}prosecutiondesk`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_pro_bench")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}full`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_court")).src = resp;
-    });
-    tryUrls(`${bgfolder}defenseempty`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_court_def")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}transition_def`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_court_deft")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}witnessempty`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_court_wit")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}transition_pro`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_court_prot")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}prosecutorempty`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_court_pro")).src =
-        resp;
-    });
-
-    if (this.charID === -1) {
-      this.viewport.set_side({
-        position: "jud",
-        showSpeedLines: false,
-        showDesk: true,
-      });
-    } else {
-      this.viewport.set_side({
-        position: this.chars[this.charID].side,
-        showSpeedLines: false,
-        showDesk: true,
-      });
-    }
-  }
-
-  /**
-   * Handles a change in the health bars' states.
-   * @param {Array} args packet arguments
-   */
-  handleHP(args: string[]) {
-    const percent_hp = Number(args[2]) * 10;
-    let healthbox;
-    if (args[1] === "1") {
-      // Def hp
-      this.hp[0] = Number(args[2]);
-      healthbox = document.getElementById("client_defense_hp");
-    } else {
-      // Pro hp
-      this.hp[1] = Number(args[2]);
-      healthbox = document.getElementById("client_prosecutor_hp");
-    }
-    (<HTMLElement>(
-      healthbox.getElementsByClassName("health-bar")[0]
-    )).style.width = `${percent_hp}%`;
-  }
-
-  /**
-   * Handles a testimony states.
-   * @param {Array} args packet arguments
-   */
-  handleRT(args: string[]) {
-    const judgeid = Number(args[2]);
-    switch (args[1]) {
-      case "testimony1":
-        this.testimonyID = 1;
-        break;
-      case "testimony2":
-        // Cross Examination
-        this.testimonyID = 2;
-        break;
-      case "judgeruling":
-        this.testimonyID = 3 + judgeid;
-        break;
-      default:
-        console.warn("Invalid testimony");
-    }
-    this.viewport.initTestimonyUpdater();
-  }
-
-  /**
-   * Handles a timer update
-   * @param {Array} args packet arguments
-   */
-  handleTI(args: string[]) {
-    const timerid = Number(args[1]);
-    const type = Number(args[2]);
-    const timer_value = args[3];
-    switch (type) {
-      case 0:
-      //
-      case 1:
-        document.getElementById(`client_timer${timerid}`).innerText =
-          timer_value;
-      case 2:
-        document.getElementById(`client_timer${timerid}`).style.display = "";
-      case 3:
-        document.getElementById(`client_timer${timerid}`).style.display =
-          "none";
-    }
-  }
-
-  /**
-   * Handles a modcall
-   * @param {Array} args packet arguments
-   */
-  handleZZ(args: string[]) {
-    const oocLog = document.getElementById("client_ooclog");
-    oocLog.innerHTML += `$Alert: ${prepChat(args[1])}\r\n`;
-    if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
-      oocLog.scrollTop = oocLog.scrollHeight;
-    }
-
-    this.viewport.getSfxAudio().pause();
-    const oldvolume = this.viewport.getSfxAudio().volume;
-    this.viewport.getSfxAudio().volume = 1;
-    this.viewport.getSfxAudio().src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
-    this.viewport.getSfxAudio().play();
-    this.viewport.getSfxAudio().volume = oldvolume;
-  }
-
-  /**
-   * Handle the player
-   * @param {Array} args packet arguments
-   */
-  handleHI(_args: string[]) {
-    this.sendSelf(`ID#1#webAO#${version}#%`);
-    this.sendSelf(
-      "FL#fastloading#yellowtext#cccc_ic_support#flipping#looping_sfx#effects#%"
-    );
-  }
-
   /**
    * Identifies the server and issues a playerID
    * @param {Array} args packet arguments
@@ -1776,7 +1592,7 @@ window.changeCallwords = changeCallwords;
  * Triggered by the modcall sfx dropdown
  */
 export function modcall_test() {
-  client.handleZZ("test#test".split("#"));
+  handleZZ("test#test".split("#"));
 }
 window.modcall_test = modcall_test;
 
