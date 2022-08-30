@@ -15,6 +15,7 @@ import vanilla_background_arr from "./constants/backgrounds.js";
 import vanilla_evidence_arr from "./constants/evidence.js";
 import { handleCT } from './packets/handlers/handleCT'
 import { handleMC } from './packets/handlers/handleMC'
+import { handleRMC } from './packets/handlers/handleRMC'
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
@@ -216,7 +217,7 @@ class Client extends EventEmitter {
     this.on("MS", handleMS);
     this.on("CT", handleCT);
     this.on("MC", handleMC);
-    this.on("RMC", this.handleRMC.bind(this));
+    this.on("RMC", handleRMC);
     this.on("CI", this.handleCI.bind(this));
     this.on("SC", this.handleSC.bind(this));
     this.on("EI", this.handleEI.bind(this));
@@ -438,7 +439,7 @@ class Client extends EventEmitter {
       (<HTMLInputElement>(
         document.getElementById("client_ooclog")
       )).value += `wait#${(<HTMLInputElement>document.getElementById("client_replaytimer")).value
-        }#%\r\n`;
+      }#%\r\n`;
     }
   }
 
@@ -745,29 +746,7 @@ class Client extends EventEmitter {
 
 
 
-  // TODO BUG:
-  // this.viewport.music is an array. Therefore you must access elements
-  /**
-   * Handles a music change to an arbitrary resource, with an offset in seconds.
-   * @param {Array} args packet arguments
-   */
-  handleRMC(args: string[]) {
-    this.viewport.music.pause();
-    const { music } = this.viewport;
-    // Music offset + drift from song loading
-    music.totime = args[1];
-    music.offset = new Date().getTime() / 1000;
-    music.addEventListener(
-      "loadedmetadata",
-      () => {
-        music.currentTime += parseFloat(
-          music.totime + (new Date().getTime() / 1000 - music.offset)
-        ).toFixed(3);
-        music.play();
-      },
-      false
-    );
-  }
+
 
   /**
    * Handles the incoming character information, and downloads the sprite + ini for it
