@@ -22,6 +22,9 @@ import { handleEM } from './packets/handlers/handleEM'
 import { handleEI } from './packets/handlers/handleEI'
 import { handleSC } from './packets/handlers/handleSC'
 import { handleCI } from './packets/handlers/handleCI'
+import { handleFM } from './packets/handlers/handleFM'
+import { handleFA } from './packets/handlers/handleFA'
+import { handleSM } from './packets/handlers/handleSM'
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
@@ -234,9 +237,9 @@ class Client extends EventEmitter {
     this.on("FL", handleFL);
     this.on("LE", handleLE);
     this.on("EM", handleEM);
-    this.on("FM", this.handleFM.bind(this));
-    this.on("FA", this.handleFA.bind(this));
-    this.on("SM", this.handleSM.bind(this));
+    this.on("FM", handleFM);
+    this.on("FA", handleFA);
+    this.on("SM", handleSM);
     this.on("MM", this.handleMM.bind(this));
     this.on("BD", this.handleBD.bind(this));
     this.on("BB", this.handleBB.bind(this));
@@ -991,66 +994,7 @@ class Client extends EventEmitter {
 
 
 
-  /**
-   * Handles incoming music information, containing all music in one packet.
-   * @param {Array} args packet arguments
-   */
-  handleSM(args: string[]) {
-    document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
-    this.resetMusicList();
-    this.resetAreaList();
 
-    this.musics_time = false;
-
-    for (let i = 1; i < args.length - 1; i++) {
-      // Check when found the song for the first time
-      const trackname = args[i];
-      const trackindex = i - 1;
-      document.getElementById(
-        "client_loadingtext"
-      ).innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-      (<HTMLProgressElement>(
-        document.getElementById("client_loadingbar")
-      )).value = this.char_list_length + this.evidence_list_length + i;
-      if (this.musics_time) {
-        this.addTrack(trackname);
-      } else if (this.isAudio(trackname)) {
-        this.musics_time = true;
-        this.fix_last_area();
-        this.addTrack(trackname);
-      } else {
-        this.createArea(trackindex, trackname);
-      }
-    }
-
-    // Music done, carry on
-    this.sendServer("RD#%");
-  }
-
-  /**
-   * Handles updated music list
-   * @param {Array} args packet arguments
-   */
-  handleFM(args: string[]) {
-    this.resetMusicList();
-
-    for (let i = 1; i < args.length - 1; i++) {
-      // Check when found the song for the first time
-      this.addTrack(safeTags(args[i]));
-    }
-  }
-
-  /**
-   * Handles updated area list
-   * @param {Array} args packet arguments
-   */
-  handleFA(args: string[]) {
-    this.resetAreaList();
-
-    for (let i = 1; i < args.length - 1; i++) {
-      this.createArea(i - 1, safeTags(args[i]));
-    }
-  }
 
   /**
    * Handles the "MusicMode" packet
