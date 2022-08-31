@@ -10,7 +10,7 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "build": "webpack --config webpack.config.js",
-    "start": "webpack serve --config webpack.config.js",
+    "start": "webpack serve --config webpack.config.js --mode development",
     "lint": "eslint webAO  --ext .js",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install"
