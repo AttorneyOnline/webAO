@@ -665,6 +665,7 @@ const viewport = (masterClient: Client): Viewport => {
       const baseEffectUrl = `${AO_HOST}themes/default/effects/`;
       fg.src = `${baseEffectUrl}${encodeURI(effectName)}.webp`;
     } else {
+      fg.innerHTML = '';
       fg.src = transparentPng;
     }
 
