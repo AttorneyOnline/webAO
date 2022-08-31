@@ -22,6 +22,28 @@ import { handleEM } from './packets/handlers/handleEM'
 import { handleEI } from './packets/handlers/handleEI'
 import { handleSC } from './packets/handlers/handleSC'
 import { handleCI } from './packets/handlers/handleCI'
+import { handleFM } from './packets/handlers/handleFM'
+import { handleFA } from './packets/handlers/handleFA'
+import { handleSM } from './packets/handlers/handleSM'
+import { handleMM } from './packets/handlers/handleMM'
+import { handleBD } from './packets/handlers/handleBD'
+import { handleBB } from './packets/handlers/handleBB'
+import { handleKB } from './packets/handlers/handleKB'
+import { handleKK } from './packets/handlers/handleKK'
+import { handleDONE } from './packets/handlers/handleDONE'
+import { handleBN } from './packets/handlers/handleBN'
+import { handleHP } from './packets/handlers/handleHP'
+import { handleRT } from './packets/handlers/handleRT'
+import { handleTI } from './packets/handlers/handleTI'
+import { handleZZ } from './packets/handlers/handleZZ'
+import { handleHI } from './packets/handlers/handleHI'
+import { handleID } from './packets/handlers/handleID'
+import { handlePN } from './packets/handlers/handlePN'
+import { handleSI } from './packets/handlers/handleSI'
+import { handleARUP } from './packets/handlers/handleARUP'
+import { handleaskchaa } from './packets/handlers/handleaskchaa'
+import { handleCC } from './packets/handlers/handleCC'
+import { handleRC } from './packets/handlers/handleRC'
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
@@ -58,7 +80,10 @@ export const UPDATE_INTERVAL = 60;
  * The old loading uses more smaller packets instead of a single big one,
  * which caused problems on low-memory devices in the past.
  */
-let oldLoading = false;
+export let oldLoading = false;
+export const setOldLoading = (val: boolean) => {
+  oldLoading = val
+}
 
 // presettings
 let selectedMenu = 1;
@@ -69,7 +94,10 @@ export const setExtraFeatures = (val: any) => {
   extrafeatures = val
 }
 
-let banned: boolean = false;
+export let banned: boolean = false;
+export const setBanned = (val: boolean) => {
+  banned = val
+}
 let hdid: string;
 
 declare global {
@@ -234,28 +262,28 @@ class Client extends EventEmitter {
     this.on("FL", handleFL);
     this.on("LE", handleLE);
     this.on("EM", handleEM);
-    this.on("FM", this.handleFM.bind(this));
-    this.on("FA", this.handleFA.bind(this));
-    this.on("SM", this.handleSM.bind(this));
-    this.on("MM", this.handleMM.bind(this));
-    this.on("BD", this.handleBD.bind(this));
-    this.on("BB", this.handleBB.bind(this));
-    this.on("KB", this.handleKB.bind(this));
-    this.on("KK", this.handleKK.bind(this));
-    this.on("DONE", this.handleDONE.bind(this));
-    this.on("BN", this.handleBN.bind(this));
-    this.on("HP", this.handleHP.bind(this));
-    this.on("RT", this.handleRT.bind(this));
-    this.on("TI", this.handleTI.bind(this));
-    this.on("ZZ", this.handleZZ.bind(this));
-    this.on("HI", this.handleHI.bind(this));
-    this.on("ID", this.handleID.bind(this));
-    this.on("PN", this.handlePN.bind(this));
-    this.on("SI", this.handleSI.bind(this));
-    this.on("ARUP", this.handleARUP.bind(this));
-    this.on("askchaa", this.handleaskchaa.bind(this));
-    this.on("CC", this.handleCC.bind(this));
-    this.on("RC", this.handleRC.bind(this));
+    this.on("FM", handleFM);
+    this.on("FA", handleFA);
+    this.on("SM", handleSM);
+    this.on("MM", handleMM);
+    this.on("BD", handleBD);
+    this.on("BB", handleBB);
+    this.on("KB", handleKB);
+    this.on("KK", handleKK);
+    this.on("DONE", handleDONE);
+    this.on("BN", handleBN);
+    this.on("HP", handleHP);
+    this.on("RT", handleRT);
+    this.on("TI", handleTI);
+    this.on("ZZ", handleZZ);
+    this.on("HI", handleHI);
+    this.on("ID", handleID);
+    this.on("PN", handlePN);
+    this.on("SI", handleSI);
+    this.on("ARUP", handleARUP);
+    this.on("askchaa", handleaskchaa);
+    this.on("CC", handleCC);
+    this.on("RC", handleRC);
     this.on("RM", this.handleRM.bind(this));
     this.on("RD", this.handleRD.bind(this));
     this.on("CharsCheck", this.handleCharsCheck.bind(this));
@@ -991,74 +1019,8 @@ class Client extends EventEmitter {
 
 
 
-  /**
-   * Handles incoming music information, containing all music in one packet.
-   * @param {Array} args packet arguments
-   */
-  handleSM(args: string[]) {
-    document.getElementById("client_loadingtext").innerHTML = "Loading Music ";
-    this.resetMusicList();
-    this.resetAreaList();
 
-    this.musics_time = false;
 
-    for (let i = 1; i < args.length - 1; i++) {
-      // Check when found the song for the first time
-      const trackname = args[i];
-      const trackindex = i - 1;
-      document.getElementById(
-        "client_loadingtext"
-      ).innerHTML = `Loading Music ${i}/${this.music_list_length}`;
-      (<HTMLProgressElement>(
-        document.getElementById("client_loadingbar")
-      )).value = this.char_list_length + this.evidence_list_length + i;
-      if (this.musics_time) {
-        this.addTrack(trackname);
-      } else if (this.isAudio(trackname)) {
-        this.musics_time = true;
-        this.fix_last_area();
-        this.addTrack(trackname);
-      } else {
-        this.createArea(trackindex, trackname);
-      }
-    }
-
-    // Music done, carry on
-    this.sendServer("RD#%");
-  }
-
-  /**
-   * Handles updated music list
-   * @param {Array} args packet arguments
-   */
-  handleFM(args: string[]) {
-    this.resetMusicList();
-
-    for (let i = 1; i < args.length - 1; i++) {
-      // Check when found the song for the first time
-      this.addTrack(safeTags(args[i]));
-    }
-  }
-
-  /**
-   * Handles updated area list
-   * @param {Array} args packet arguments
-   */
-  handleFA(args: string[]) {
-    this.resetAreaList();
-
-    for (let i = 1; i < args.length - 1; i++) {
-      this.createArea(i - 1, safeTags(args[i]));
-    }
-  }
-
-  /**
-   * Handles the "MusicMode" packet
-   * @param {Array} args packet arguments
-   */
-  handleMM(_args: string[]) {
-    // It's unused nowadays, as preventing people from changing the music is now serverside
-  }
 
   /**
    * Handles the kicked packet
@@ -1078,355 +1040,13 @@ class Client extends EventEmitter {
     )).style.display = "none";
   }
 
-  /**
-   * Handles the kicked packet
-   * @param {Array} args kick reason
-   */
-  handleKK(args: string[]) {
-    this.handleBans("Kicked", safeTags(args[1]));
-  }
-
-  /**
-   * Handles the banned packet
-   * this one is sent when you are kicked off the server
-   * @param {Array} args ban reason
-   */
-  handleKB(args: string[]) {
-    this.handleBans("Banned", safeTags(args[1]));
-    banned = true;
-  }
-
-  /**
-   * Handles the warning packet
-   * on client this spawns a message box you can't close for 2 seconds
-   * @param {Array} args ban reason
-   */
-  handleBB(args: string[]) {
-    alert(safeTags(args[1]));
-  }
-
-  /**
-   * Handles the banned packet
-   * this one is sent when you try to reconnect but you're banned
-   * @param {Array} args ban reason
-   */
-  handleBD(args: string[]) {
-    this.handleBans("Banned", safeTags(args[1]));
-    banned = true;
-  }
-
-  /**
-   * Handles the handshake completion packet, meaning the player
-   * is ready to select a character.
-   *
-   * @param {Array} args packet arguments
-   */
-  handleDONE(_args: string[]) {
-    document.getElementById("client_loading").style.display = "none";
-    if (mode === "watch") {
-      // Spectators don't need to pick a character
-      document.getElementById("client_waiting").style.display = "none";
-    }
-  }
-
-  /**
-   * Handles a background change.
-   * @param {Array} args packet arguments
-   */
-
-  handleBN(args: string[]) {
-    const bgFromArgs = safeTags(args[1]);
-    this.viewport.setBackgroundName(bgFromArgs);
-    const bgfolder = this.viewport.getBackgroundFolder();
-    const bg_index = getIndexFromSelect(
-      "bg_select",
-      this.viewport.getBackgroundName()
-    );
-    (<HTMLSelectElement>document.getElementById("bg_select")).selectedIndex =
-      bg_index;
-    updateBackgroundPreview();
-    if (bg_index === 0) {
-      (<HTMLInputElement>document.getElementById("bg_filename")).value =
-        this.viewport.getBackgroundName();
-    }
-
-    tryUrls(
-      `${AO_HOST}background/${encodeURI(args[1].toLowerCase())}/defenseempty`
-    ).then((resp) => {
-      (<HTMLImageElement>document.getElementById("bg_preview")).src = resp;
-    });
-    tryUrls(`${bgfolder}defensedesk`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_def_bench")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}stand`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_wit_bench")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}prosecutiondesk`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_pro_bench")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}full`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_court")).src = resp;
-    });
-    tryUrls(`${bgfolder}defenseempty`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_court_def")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}transition_def`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_court_deft")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}witnessempty`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_court_wit")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}transition_pro`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_court_prot")).src =
-        resp;
-    });
-    tryUrls(`${bgfolder}prosecutorempty`).then((resp) => {
-      (<HTMLImageElement>document.getElementById("client_court_pro")).src =
-        resp;
-    });
-
-    if (this.charID === -1) {
-      this.viewport.set_side({
-        position: "jud",
-        showSpeedLines: false,
-        showDesk: true,
-      });
-    } else {
-      this.viewport.set_side({
-        position: this.chars[this.charID].side,
-        showSpeedLines: false,
-        showDesk: true,
-      });
-    }
-  }
-
-  /**
-   * Handles a change in the health bars' states.
-   * @param {Array} args packet arguments
-   */
-  handleHP(args: string[]) {
-    const percent_hp = Number(args[2]) * 10;
-    let healthbox;
-    if (args[1] === "1") {
-      // Def hp
-      this.hp[0] = Number(args[2]);
-      healthbox = document.getElementById("client_defense_hp");
-    } else {
-      // Pro hp
-      this.hp[1] = Number(args[2]);
-      healthbox = document.getElementById("client_prosecutor_hp");
-    }
-    (<HTMLElement>(
-      healthbox.getElementsByClassName("health-bar")[0]
-    )).style.width = `${percent_hp}%`;
-  }
-
-  /**
-   * Handles a testimony states.
-   * @param {Array} args packet arguments
-   */
-  handleRT(args: string[]) {
-    const judgeid = Number(args[2]);
-    switch (args[1]) {
-      case "testimony1":
-        this.testimonyID = 1;
-        break;
-      case "testimony2":
-        // Cross Examination
-        this.testimonyID = 2;
-        break;
-      case "judgeruling":
-        this.testimonyID = 3 + judgeid;
-        break;
-      default:
-        console.warn("Invalid testimony");
-    }
-    this.viewport.initTestimonyUpdater();
-  }
-
-  /**
-   * Handles a timer update
-   * @param {Array} args packet arguments
-   */
-  handleTI(args: string[]) {
-    const timerid = Number(args[1]);
-    const type = Number(args[2]);
-    const timer_value = args[3];
-    switch (type) {
-      case 0:
-      //
-      case 1:
-        document.getElementById(`client_timer${timerid}`).innerText =
-          timer_value;
-      case 2:
-        document.getElementById(`client_timer${timerid}`).style.display = "";
-      case 3:
-        document.getElementById(`client_timer${timerid}`).style.display =
-          "none";
-    }
-  }
-
-  /**
-   * Handles a modcall
-   * @param {Array} args packet arguments
-   */
-  handleZZ(args: string[]) {
-    const oocLog = document.getElementById("client_ooclog");
-    oocLog.innerHTML += `$Alert: ${prepChat(args[1])}\r\n`;
-    if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
-      oocLog.scrollTop = oocLog.scrollHeight;
-    }
-
-    this.viewport.getSfxAudio().pause();
-    const oldvolume = this.viewport.getSfxAudio().volume;
-    this.viewport.getSfxAudio().volume = 1;
-    this.viewport.getSfxAudio().src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
-    this.viewport.getSfxAudio().play();
-    this.viewport.getSfxAudio().volume = oldvolume;
-  }
-
-  /**
-   * Handle the player
-   * @param {Array} args packet arguments
-   */
-  handleHI(_args: string[]) {
-    this.sendSelf(`ID#1#webAO#${version}#%`);
-    this.sendSelf(
-      "FL#fastloading#yellowtext#cccc_ic_support#flipping#looping_sfx#effects#%"
-    );
-  }
-
-  /**
-   * Identifies the server and issues a playerID
-   * @param {Array} args packet arguments
-   */
-  handleID(args: string[]) {
-    this.playerID = Number(args[1]);
-    const serverSoftware = args[2].split("&")[0];
-    let serverVersion;
-    if (serverSoftware === "serverD") {
-      serverVersion = args[2].split("&")[1];
-    } else if (serverSoftware === "webAO") {
-      oldLoading = false;
-      this.sendSelf("PN#0#1#%");
-    } else {
-      serverVersion = args[3];
-    }
-
-    if (serverSoftware === "serverD" && serverVersion === "1377.152") {
-      oldLoading = true;
-    } // bugged version
-  }
-
-  /**
-   * Indicates how many users are on this server
-   * @param {Array} args packet arguments
-   */
-  handlePN(_args: string[]) {
-    this.sendServer("askchaa#%");
-  }
-
-  /**
-   * What? you want a character??
-   * @param {Array} args packet arguments
-   */
-  handleCC(args: string[]) {
-    this.sendSelf(`PV#1#CID#${args[2]}#%`);
-  }
-
-  /**
-   * What? you want a character list from me??
-   * @param {Array} args packet arguments
-   */
-  handleaskchaa(_args: string[]) {
-    this.sendSelf(`SI#${vanilla_character_arr.length}#0#0#%`);
-  }
-
-  /**
-   * Handle the change of players in an area.
-   * @param {Array} args packet arguments
-   */
-  handleARUP(args: string[]) {
-    args = args.slice(1);
-    for (let i = 0; i < args.length - 2; i++) {
-      if (this.areas[i]) {
-        // the server sends us ARUP before we even get the area list
-        const thisarea = document.getElementById(`area${i}`);
-        switch (Number(args[0])) {
-          case 0: // playercount
-            this.areas[i].players = Number(args[i + 1]);
-            break;
-          case 1: // status
-            this.areas[i].status = safeTags(args[i + 1]);
-            break;
-          case 2:
-            this.areas[i].cm = safeTags(args[i + 1]);
-            break;
-          case 3:
-            this.areas[i].locked = safeTags(args[i + 1]);
-            break;
-        }
-
-        thisarea.className = `area-button area-${this.areas[
-          i
-        ].status.toLowerCase()}`;
-
-        thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players}) [${this.areas[i].status}]`;
-
-        thisarea.title =
-          `Players: ${this.areas[i].players}\n` +
-          `Status: ${this.areas[i].status}\n` +
-          `CM: ${this.areas[i].cm}\n` +
-          `Area lock: ${this.areas[i].locked}`;
-      }
-    }
-  }
 
 
-  /**
-   * Received when the server announces its server info,
-   * but we use it as a cue to begin retrieving characters.
-   * @param {Array} args packet arguments
-   */
-  handleSI(args: string[]) {
-    this.char_list_length = Number(args[1]);
-    this.char_list_length += 1; // some servers count starting from 0 some from 1...
-    this.evidence_list_length = Number(args[2]);
-    this.music_list_length = Number(args[3]);
 
-    (<HTMLProgressElement>document.getElementById("client_loadingbar")).max =
-      this.char_list_length +
-      this.evidence_list_length +
-      this.music_list_length;
 
-    // create the charselect grid, to be filled by the character loader
-    document.getElementById("client_chartable").innerHTML = "";
 
-    for (let i = 0; i < this.char_list_length; i++) {
-      const demothing = document.createElement("img");
 
-      demothing.className = "demothing";
-      demothing.id = `demo_${i}`;
-      const demoonclick = document.createAttribute("onclick");
-      demoonclick.value = `pickChar(${i})`;
-      demothing.setAttributeNode(demoonclick);
 
-      document.getElementById("client_chartable").appendChild(demothing);
-    }
-
-    // this is determined at the top of this file
-    if (!oldLoading && extrafeatures.includes("fastloading")) {
-      this.sendServer("RC#%");
-    } else {
-      this.sendServer("askchar2#%");
-    }
-  }
 
   /**
    * Handles the list of all used and vacant characters.
@@ -1560,13 +1180,6 @@ class Client extends EventEmitter {
     }
   }
 
-  /**
-   * we are asking ourselves what characters there are
-   * @param {Array} args packet arguments
-   */
-  handleRC(_args: string[]) {
-    this.sendSelf(`SC#${vanilla_character_arr.join("#")}#%`);
-  }
 
   /**
    * we are asking ourselves what characters there are
@@ -1862,7 +1475,7 @@ window.changeCallwords = changeCallwords;
  * Triggered by the modcall sfx dropdown
  */
 export function modcall_test() {
-  client.handleZZ("test#test".split("#"));
+  handleZZ("test#test".split("#"));
 }
 window.modcall_test = modcall_test;
 
