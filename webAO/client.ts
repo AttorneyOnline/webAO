@@ -37,6 +37,13 @@ import { handleRT } from './packets/handlers/handleRT'
 import { handleTI } from './packets/handlers/handleTI'
 import { handleZZ } from './packets/handlers/handleZZ'
 import { handleHI } from './packets/handlers/handleHI'
+import { handleID } from './packets/handlers/handleID'
+import { handlePN } from './packets/handlers/handlePN'
+import { handleSI } from './packets/handlers/handleSI'
+import { handleARUP } from './packets/handlers/handleARUP'
+import { handleaskchaa } from './packets/handlers/handleaskchaa'
+import { handleCC } from './packets/handlers/handleCC'
+import { handleRC } from './packets/handlers/handleRC'
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
@@ -73,7 +80,10 @@ export const UPDATE_INTERVAL = 60;
  * The old loading uses more smaller packets instead of a single big one,
  * which caused problems on low-memory devices in the past.
  */
-let oldLoading = false;
+export let oldLoading = false;
+export const setOldLoading = (val: boolean) => {
+  oldLoading = val
+}
 
 // presettings
 let selectedMenu = 1;
@@ -267,13 +277,13 @@ class Client extends EventEmitter {
     this.on("TI", handleTI);
     this.on("ZZ", handleZZ);
     this.on("HI", handleHI);
-    this.on("ID", this.handleID.bind(this));
-    this.on("PN", this.handlePN.bind(this));
-    this.on("SI", this.handleSI.bind(this));
-    this.on("ARUP", this.handleARUP.bind(this));
-    this.on("askchaa", this.handleaskchaa.bind(this));
-    this.on("CC", this.handleCC.bind(this));
-    this.on("RC", this.handleRC.bind(this));
+    this.on("ID", handleID);
+    this.on("PN", handlePN);
+    this.on("SI", handleSI);
+    this.on("ARUP", handleARUP);
+    this.on("askchaa", handleaskchaa);
+    this.on("CC", handleCC);
+    this.on("RC", handleRC);
     this.on("RM", this.handleRM.bind(this));
     this.on("RD", this.handleRD.bind(this));
     this.on("CharsCheck", this.handleCharsCheck.bind(this));
@@ -1032,131 +1042,11 @@ class Client extends EventEmitter {
 
 
 
-  /**
-   * Identifies the server and issues a playerID
-   * @param {Array} args packet arguments
-   */
-  handleID(args: string[]) {
-    this.playerID = Number(args[1]);
-    const serverSoftware = args[2].split("&")[0];
-    let serverVersion;
-    if (serverSoftware === "serverD") {
-      serverVersion = args[2].split("&")[1];
-    } else if (serverSoftware === "webAO") {
-      oldLoading = false;
-      this.sendSelf("PN#0#1#%");
-    } else {
-      serverVersion = args[3];
-    }
-
-    if (serverSoftware === "serverD" && serverVersion === "1377.152") {
-      oldLoading = true;
-    } // bugged version
-  }
-
-  /**
-   * Indicates how many users are on this server
-   * @param {Array} args packet arguments
-   */
-  handlePN(_args: string[]) {
-    this.sendServer("askchaa#%");
-  }
-
-  /**
-   * What? you want a character??
-   * @param {Array} args packet arguments
-   */
-  handleCC(args: string[]) {
-    this.sendSelf(`PV#1#CID#${args[2]}#%`);
-  }
-
-  /**
-   * What? you want a character list from me??
-   * @param {Array} args packet arguments
-   */
-  handleaskchaa(_args: string[]) {
-    this.sendSelf(`SI#${vanilla_character_arr.length}#0#0#%`);
-  }
-
-  /**
-   * Handle the change of players in an area.
-   * @param {Array} args packet arguments
-   */
-  handleARUP(args: string[]) {
-    args = args.slice(1);
-    for (let i = 0; i < args.length - 2; i++) {
-      if (this.areas[i]) {
-        // the server sends us ARUP before we even get the area list
-        const thisarea = document.getElementById(`area${i}`);
-        switch (Number(args[0])) {
-          case 0: // playercount
-            this.areas[i].players = Number(args[i + 1]);
-            break;
-          case 1: // status
-            this.areas[i].status = safeTags(args[i + 1]);
-            break;
-          case 2:
-            this.areas[i].cm = safeTags(args[i + 1]);
-            break;
-          case 3:
-            this.areas[i].locked = safeTags(args[i + 1]);
-            break;
-        }
-
-        thisarea.className = `area-button area-${this.areas[
-          i
-        ].status.toLowerCase()}`;
-
-        thisarea.innerText = `${this.areas[i].name} (${this.areas[i].players}) [${this.areas[i].status}]`;
-
-        thisarea.title =
-          `Players: ${this.areas[i].players}\n` +
-          `Status: ${this.areas[i].status}\n` +
-          `CM: ${this.areas[i].cm}\n` +
-          `Area lock: ${this.areas[i].locked}`;
-      }
-    }
-  }
 
 
-  /**
-   * Received when the server announces its server info,
-   * but we use it as a cue to begin retrieving characters.
-   * @param {Array} args packet arguments
-   */
-  handleSI(args: string[]) {
-    this.char_list_length = Number(args[1]);
-    this.char_list_length += 1; // some servers count starting from 0 some from 1...
-    this.evidence_list_length = Number(args[2]);
-    this.music_list_length = Number(args[3]);
 
-    (<HTMLProgressElement>document.getElementById("client_loadingbar")).max =
-      this.char_list_length +
-      this.evidence_list_length +
-      this.music_list_length;
 
-    // create the charselect grid, to be filled by the character loader
-    document.getElementById("client_chartable").innerHTML = "";
 
-    for (let i = 0; i < this.char_list_length; i++) {
-      const demothing = document.createElement("img");
-
-      demothing.className = "demothing";
-      demothing.id = `demo_${i}`;
-      const demoonclick = document.createAttribute("onclick");
-      demoonclick.value = `pickChar(${i})`;
-      demothing.setAttributeNode(demoonclick);
-
-      document.getElementById("client_chartable").appendChild(demothing);
-    }
-
-    // this is determined at the top of this file
-    if (!oldLoading && extrafeatures.includes("fastloading")) {
-      this.sendServer("RC#%");
-    } else {
-      this.sendServer("askchar2#%");
-    }
-  }
 
   /**
    * Handles the list of all used and vacant characters.
@@ -1290,13 +1180,6 @@ class Client extends EventEmitter {
     }
   }
 
-  /**
-   * we are asking ourselves what characters there are
-   * @param {Array} args packet arguments
-   */
-  handleRC(_args: string[]) {
-    this.sendSelf(`SC#${vanilla_character_arr.join("#")}#%`);
-  }
 
   /**
    * we are asking ourselves what characters there are
