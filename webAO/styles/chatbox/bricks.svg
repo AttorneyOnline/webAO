@@ -1,0 +1,11 @@
+<svg id="SVGRoot" width="16px" height="16px" version="1.1" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+ <rect width="16" height="16" fill="#a55"/>
+ <g transform="matrix(.9814 0 0 .9816 .04907 .04908)" fill="none" stroke="#744">
+  <path d="m0 0.2h16" stroke-width=".5"/>
+  <path d="m-0.05 16h16.3" stroke-width=".5"/>
+  <path d="m-0.05 8.1h16.3" stroke-width=".9"/>
+  <path d="m8.101 8.1v8.15" stroke-width=".9px"/>
+  <path d="m0.2047-0.05v8.15" stroke-width=".5"/>
+  <path d="m16-0.05v8.15" stroke-width=".5"/>
+ </g>
+</svg>
