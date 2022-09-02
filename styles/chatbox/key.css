@@ -146,9 +146,11 @@
 	left: 1%;
 	width: 12%;
 	height: 15%;
-	background-color: #d59a9a;
+	background: url("bricks.svg");
+	background-size: 1.5em;
 	border: #ffbe9f 3px ridge;
 	border-radius: 100%;
+	font-family: serif;
 }
 
 #client_clock_month {
@@ -171,12 +173,15 @@
 	position: absolute;
 	width: 50%;
 	height: 50%;
-	left: 25%;
-	top: 25%;
+	left: 11%;
+	top: 11%;
 	margin: 0;
-	color: #fdf5e4;
+	color: #ffe;
 	text-shadow: -1px -1px 0 #78320b, 1px -1px 0 #78320b, -1px 1px 0 #78320b, 1px 1px 0 #78320b;
 	font-size: 3em;
+	background: rgba(255,255,255,0.7);
+	border-radius: 100%;
+	padding: 0.25em;
 }
 
 #client_clock_weekday {
@@ -186,8 +191,8 @@
 	right: 0;
 	bottom: 0;
 	margin: 0;
-	color: gray;
-	text-shadow: -1px -1px 0 darkgray, 1px -1px 0 darkgray, -1px 1px 0 darkgray, 1px 1px 0 darkgray;
+	color: #ccc;
+	text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333;
 	text-decoration: underline;
 	font-size: smaller;
 	font-weight: bold;
