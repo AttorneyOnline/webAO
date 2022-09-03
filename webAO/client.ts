@@ -44,6 +44,14 @@ import { handleARUP } from './packets/handlers/handleARUP'
 import { handleaskchaa } from './packets/handlers/handleaskchaa'
 import { handleCC } from './packets/handlers/handleCC'
 import { handleRC } from './packets/handlers/handleRC'
+import { handleRM } from './packets/handlers/handleRM'
+import { handleRD } from './packets/handlers/handleRD'
+import { handleCharsCheck } from './packets/handlers/handleCharsCheck'
+import { handlePV } from './packets/handlers/handlePV'
+import { handleASS } from './packets/handlers/handleASS'
+import { handleackMS } from './packets/handlers/handleackMS'
+import { handleSP } from './packets/handlers/handleSP'
+import { handleJD } from './packets/handlers/handleJD'
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
@@ -68,6 +76,9 @@ let { ip: serverIP, mode, asset, theme } = queryParser();
 // Unless there is an asset URL specified, use the wasabi one
 const DEFAULT_HOST = "http://attorneyoffline.de/base/";
 export let AO_HOST = asset || DEFAULT_HOST;
+export const setAOhost = (val: string) => {
+  AO_HOST = val
+}
 let THEME: string = theme || "default";
 let CHATBOX: string;
 
@@ -284,14 +295,14 @@ class Client extends EventEmitter {
     this.on("askchaa", handleaskchaa);
     this.on("CC", handleCC);
     this.on("RC", handleRC);
-    this.on("RM", this.handleRM.bind(this));
-    this.on("RD", this.handleRD.bind(this));
-    this.on("CharsCheck", this.handleCharsCheck.bind(this));
-    this.on("PV", this.handlePV.bind(this));
-    this.on("ASS", this.handleASS.bind(this));
-    this.on("ackMS", this.handleackMS.bind(this));
-    this.on("SP", this.handleSP.bind(this));
-    this.on("JD", this.handleJD.bind(this));
+    this.on("RM", handleRM);
+    this.on("RD", handleRD);
+    this.on("CharsCheck", handleCharsCheck);
+    this.on("PV", handlePV);
+    this.on("ASS", handleASS);
+    this.on("ackMS", handleackMS);
+    this.on("SP", handleSP);
+    this.on("JD", handleJD);
     this.on("decryptor", () => { });
     this.on("CHECK", () => { });
     this.on("CH", () => { });
@@ -778,14 +789,6 @@ class Client extends EventEmitter {
     (<HTMLInputElement>document.getElementById("client_inputbox")).value = "";
   };
 
-
-
-
-
-
-
-
-
   /**
    * Handles the incoming character information, and downloads the sprite + ini for it
    * @param {Array} chargs packet arguments
@@ -1017,11 +1020,6 @@ class Client extends EventEmitter {
     }
   }
 
-
-
-
-
-
   /**
    * Handles the kicked packet
    * @param {string} type is it a kick or a ban
@@ -1038,171 +1036,6 @@ class Client extends EventEmitter {
     (<HTMLElement>(
       document.getElementsByClassName("client_reconnect")[1]
     )).style.display = "none";
-  }
-
-
-
-
-
-
-
-
-
-  /**
-   * Handles the list of all used and vacant characters.
-   * @param {Array} args list of all characters represented as a 0 for free or a -1 for taken
-   */
-  handleCharsCheck(args: string[]) {
-    for (let i = 0; i < this.char_list_length; i++) {
-      const img = document.getElementById(`demo_${i}`);
-
-      if (args[i + 1] === "-1") {
-        img.style.opacity = "0.25";
-      } else if (args[i + 1] === "0") {
-        img.style.opacity = "1";
-      }
-    }
-  }
-
-  /**
-   * Handles the server's assignment of a character for the player to use.
-   * PV # playerID (unused) # CID # character ID
-   * @param {Array} args packet arguments
-   */
-  async handlePV(args: string[]) {
-    this.charID = Number(args[3]);
-    document.getElementById("client_waiting").style.display = "none";
-    document.getElementById("client_charselect").style.display = "none";
-
-    const me = this.chars[this.charID];
-    this.selectedEmote = -1;
-    const { emotes } = this;
-    const emotesList = document.getElementById("client_emo");
-    emotesList.style.display = "";
-    emotesList.innerHTML = ""; // Clear emote box
-    const ini = me.inifile;
-    me.side = ini.options.side;
-    updateActionCommands(me.side);
-    if (ini.emotions.number === 0) {
-      emotesList.innerHTML = `<span
-					id="emo_0"
-					alt="unavailable"
-					class="emote_button">No emotes available</span>`;
-    } else {
-      for (let i = 1; i <= ini.emotions.number; i++) {
-        try {
-          const emoteinfo = ini.emotions[i].split("#");
-          let esfx;
-          let esfxd;
-          try {
-            esfx = ini.soundn[i] || "0";
-            esfxd = Number(ini.soundt[i]) || 0;
-          } catch (e) {
-            console.warn("ini sound is completly missing");
-            esfx = "0";
-            esfxd = 0;
-          }
-          // Make sure the asset server is case insensitive, or that everything on it is lowercase
-
-          emotes[i] = {
-            desc: emoteinfo[0].toLowerCase(),
-            preanim: emoteinfo[1].toLowerCase(),
-            emote: emoteinfo[2].toLowerCase(),
-            zoom: Number(emoteinfo[3]) || 0,
-            deskmod: Number(emoteinfo[4]) || 1,
-            sfx: esfx.toLowerCase(),
-            sfxdelay: esfxd,
-            frame_screenshake: "",
-            frame_realization: "",
-            frame_sfx: "",
-            button: `${AO_HOST}characters/${encodeURI(
-              me.name.toLowerCase()
-            )}/emotions/button${i}_off.png`,
-          };
-          emotesList.innerHTML += `<img src=${emotes[i].button}
-					id="emo_${i}"
-					alt="${emotes[i].desc}"
-					class="emote_button"
-					onclick="pickEmotion(${i})">`;
-        } catch (e) {
-          console.error(`missing emote ${i}`);
-        }
-      }
-      pickEmotion(1);
-    }
-
-    if (
-      await fileExists(
-        `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/custom.gif`
-      )
-    ) {
-      document.getElementById("button_4").style.display = "";
-    } else {
-      document.getElementById("button_4").style.display = "none";
-    }
-
-  }
-
-  /**
-   * new asset url!!
-   * @param {Array} args packet arguments
-   */
-  handleASS(args: string[]) {
-    AO_HOST = args[1];
-  }
-
-  /**
- * server got our message
- */
-  handleackMS() {
-    resetICParams();
-  }
-
-  /**
-* position change
-* @param {string} pos new position
-*/
-  handleSP(args: string[]) {
-    updateActionCommands(args[1]);
-  }
-
-  /**
-* show/hide judge controls
-* @param {number} show either a 1 or a 0
-*/
-  handleJD(args: string[]) {
-    if (Number(args[1]) === 1) {
-      document.getElementById("judge_action").style.display = "inline-table";
-      document.getElementById("no_action").style.display = "none";
-    } else {
-      document.getElementById("judge_action").style.display = "none";
-      document.getElementById("no_action").style.display = "inline-table";
-    }
-  }
-
-
-  /**
-   * we are asking ourselves what characters there are
-   * @param {Array} args packet arguments
-   */
-  handleRM(_args: string[]) {
-    this.sendSelf(`SM#${vanilla_music_arr.join("#")}#%`);
-  }
-
-  /**
-   * we are asking ourselves what characters there are
-   * @param {Array} args packet arguments
-   */
-  handleRD(_args: string[]) {
-    this.sendSelf("BN#gs4#%");
-    this.sendSelf("DONE#%");
-    const ooclog = <HTMLInputElement>document.getElementById("client_ooclog");
-    ooclog.value = "";
-    ooclog.readOnly = false;
-
-    document.getElementById("client_oocinput").style.display = "none";
-    document.getElementById("client_replaycontrols").style.display =
-      "inline-block";
   }
 }
 
@@ -1487,7 +1320,7 @@ export async function iniedit() {
     .value;
   const inicharID = client.charID;
   await client.handleCharacterInfo(ininame.split("&"), inicharID);
-  client.handlePV(`PV#0#CID#${inicharID}`.split("#"));
+  handlePV(`PV#0#CID#${inicharID}`.split("#"));
 }
 window.iniedit = iniedit;
 
