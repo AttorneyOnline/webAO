@@ -22,5 +22,6 @@ Link to the client in this repo: http://web.aceattorneyonline.com/
 
 # Running with Docker
 `docker build -t webao .`
+
 `docker run -d -it -p 8080:8080 webao`
 
