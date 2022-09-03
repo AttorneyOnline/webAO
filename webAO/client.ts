@@ -13,45 +13,6 @@ import vanilla_character_arr from "./constants/characters.js";
 import vanilla_music_arr from "./constants/music.js";
 import vanilla_background_arr from "./constants/backgrounds.js";
 import vanilla_evidence_arr from "./constants/evidence.js";
-import { handleCT } from './packets/handlers/handleCT'
-import { handleMC } from './packets/handlers/handleMC'
-import { handleRMC } from './packets/handlers/handleRMC'
-import { handleFL } from './packets/handlers/handleFL'
-import { handleLE } from './packets/handlers/handleLE'
-import { handleEM } from './packets/handlers/handleEM'
-import { handleEI } from './packets/handlers/handleEI'
-import { handleSC } from './packets/handlers/handleSC'
-import { handleCI } from './packets/handlers/handleCI'
-import { handleFM } from './packets/handlers/handleFM'
-import { handleFA } from './packets/handlers/handleFA'
-import { handleSM } from './packets/handlers/handleSM'
-import { handleMM } from './packets/handlers/handleMM'
-import { handleBD } from './packets/handlers/handleBD'
-import { handleBB } from './packets/handlers/handleBB'
-import { handleKB } from './packets/handlers/handleKB'
-import { handleKK } from './packets/handlers/handleKK'
-import { handleDONE } from './packets/handlers/handleDONE'
-import { handleBN } from './packets/handlers/handleBN'
-import { handleHP } from './packets/handlers/handleHP'
-import { handleRT } from './packets/handlers/handleRT'
-import { handleTI } from './packets/handlers/handleTI'
-import { handleZZ } from './packets/handlers/handleZZ'
-import { handleHI } from './packets/handlers/handleHI'
-import { handleID } from './packets/handlers/handleID'
-import { handlePN } from './packets/handlers/handlePN'
-import { handleSI } from './packets/handlers/handleSI'
-import { handleARUP } from './packets/handlers/handleARUP'
-import { handleaskchaa } from './packets/handlers/handleaskchaa'
-import { handleCC } from './packets/handlers/handleCC'
-import { handleRC } from './packets/handlers/handleRC'
-import { handleRM } from './packets/handlers/handleRM'
-import { handleRD } from './packets/handlers/handleRD'
-import { handleCharsCheck } from './packets/handlers/handleCharsCheck'
-import { handlePV } from './packets/handlers/handlePV'
-import { handleASS } from './packets/handlers/handleASS'
-import { handleackMS } from './packets/handlers/handleackMS'
-import { handleSP } from './packets/handlers/handleSP'
-import { handleJD } from './packets/handlers/handleJD'
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
@@ -70,8 +31,7 @@ import downloadFile from "./services/downloadFile";
 import { getFilenameFromPath } from "./utils/paths";
 const version = process.env.npm_package_version;
 import masterViewport, { Viewport } from "./viewport";
-import { handleMS } from './packets/handlers/handleMS';
-
+import { packetHandler } from './packets/packetHandler'
 let { ip: serverIP, mode, asset, theme } = queryParser();
 // Unless there is an asset URL specified, use the wasabi one
 const DEFAULT_HOST = "http://attorneyoffline.de/base/";
@@ -259,53 +219,6 @@ class Client extends EventEmitter {
 
     this.checkUpdater = null;
     this.viewport = masterViewport(this);
-    /**
-     * Assign handlers for all commands
-     * If you implement a new command, you need to add it here
-     */
-    this.on("MS", handleMS);
-    this.on("CT", handleCT);
-    this.on("MC", handleMC);
-    this.on("RMC", handleRMC);
-    this.on("CI", handleCI);
-    this.on("SC", handleSC);
-    this.on("EI", handleEI);
-    this.on("FL", handleFL);
-    this.on("LE", handleLE);
-    this.on("EM", handleEM);
-    this.on("FM", handleFM);
-    this.on("FA", handleFA);
-    this.on("SM", handleSM);
-    this.on("MM", handleMM);
-    this.on("BD", handleBD);
-    this.on("BB", handleBB);
-    this.on("KB", handleKB);
-    this.on("KK", handleKK);
-    this.on("DONE", handleDONE);
-    this.on("BN", handleBN);
-    this.on("HP", handleHP);
-    this.on("RT", handleRT);
-    this.on("TI", handleTI);
-    this.on("ZZ", handleZZ);
-    this.on("HI", handleHI);
-    this.on("ID", handleID);
-    this.on("PN", handlePN);
-    this.on("SI", handleSI);
-    this.on("ARUP", handleARUP);
-    this.on("askchaa", handleaskchaa);
-    this.on("CC", handleCC);
-    this.on("RC", handleRC);
-    this.on("RM", handleRM);
-    this.on("RD", handleRD);
-    this.on("CharsCheck", handleCharsCheck);
-    this.on("PV", handlePV);
-    this.on("ASS", handleASS);
-    this.on("ackMS", handleackMS);
-    this.on("SP", handleSP);
-    this.on("JD", handleJD);
-    this.on("decryptor", () => { });
-    this.on("CHECK", () => { });
-    this.on("CH", () => { });
 
     this._lastTimeICReceived = new Date(0);
   }
@@ -703,20 +616,14 @@ class Client extends EventEmitter {
     const msg = e.data;
     console.debug(`S: ${msg}`);
 
-    const lines = msg.split("%");
+    const data = msg.split("%")[0];
+    const splitPacket = data.split('#')
+    const packetHeader = splitPacket[0];
+    
+    packetHandler.has(packetHeader) 
+    ? packetHandler.get(packetHeader)(splitPacket) 
+    : console.warn(`Invalid packet header ${packetHeader}`);
 
-    for (const msg of lines) {
-      if (msg === "") {
-        break;
-      }
-
-      const args = msg.split("#");
-      const header = args[0];
-
-      if (!this.emit(header, args)) {
-        console.warn(`Invalid packet header ${header}`);
-      }
-    }
   }
 
   /**
@@ -1308,7 +1215,7 @@ window.changeCallwords = changeCallwords;
  * Triggered by the modcall sfx dropdown
  */
 export function modcall_test() {
-  handleZZ("test#test".split("#"));
+  packetHandler.get("ZZ")("test#test".split("#"));
 }
 window.modcall_test = modcall_test;
 
@@ -1320,7 +1227,7 @@ export async function iniedit() {
     .value;
   const inicharID = client.charID;
   await client.handleCharacterInfo(ininame.split("&"), inicharID);
-  handlePV(`PV#0#CID#${inicharID}`.split("#"));
+  packetHandler.get("PV")(`PV#0#CID#${inicharID}`.split("#"));
 }
 window.iniedit = iniedit;
 
