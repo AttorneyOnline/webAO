@@ -60,6 +60,7 @@ export const handlePV = async (args: string[]) => {
           emotesList.innerHTML += `<img src=${emotes[i].button}
 					id="emo_${i}"
 					alt="${emotes[i].desc}"
+          title="${emotes[i].desc}"
 					class="emote_button"
 					onclick="pickEmotion(${i})">`;
         } catch (e) {
