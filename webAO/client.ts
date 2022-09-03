@@ -716,6 +716,7 @@ class Client extends EventEmitter {
           const exists = await fileExists(fileUrl);
           if (exists) {
             img.alt = chargs[0];
+            img.title = chargs[0];
             img.src = fileUrl;
             return;
           }
