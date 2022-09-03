@@ -171,17 +171,17 @@
 
 #client_clock_date {
 	position: absolute;
-	width: 50%;
-	height: 50%;
-	left: 11%;
-	top: 11%;
+	width: 80%;
+	height: 80%;
+	left: 10%;
+	top: 10%;
 	margin: 0;
 	color: #ffe;
 	text-shadow: -1px -1px 0 #78320b, 1px -1px 0 #78320b, -1px 1px 0 #78320b, 1px 1px 0 #78320b;
 	font-size: 3em;
 	background: rgba(255,255,255,0.7);
 	border-radius: 100%;
-	padding: 0.25em;
+	line-height: 1.8;
 }
 
 #client_clock_weekday {
