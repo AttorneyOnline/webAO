@@ -35,6 +35,9 @@ import { packetHandler } from './packets/packetHandler'
 let { ip: serverIP, mode, asset, theme } = queryParser();
 // Unless there is an asset URL specified, use the wasabi one
 const DEFAULT_HOST = "http://attorneyoffline.de/base/";
+import { showname_click } from './dom/showNameClick'
+import { onReplayGo } from './dom/onReplayGo'
+import { updateActionCommands } from './dom/updateActionCommands'
 export let AO_HOST = asset || DEFAULT_HOST;
 export const setAOhost = (val: string) => {
   AO_HOST = val
@@ -619,10 +622,10 @@ class Client extends EventEmitter {
     const data = msg.split("%")[0];
     const splitPacket = data.split('#')
     const packetHeader = splitPacket[0];
-    
-    packetHandler.has(packetHeader) 
-    ? packetHandler.get(packetHeader)(splitPacket) 
-    : console.warn(`Invalid packet header ${packetHeader}`);
+
+    packetHandler.has(packetHeader)
+      ? packetHandler.get(packetHeader)(splitPacket)
+      : console.warn(`Invalid packet header ${packetHeader}`);
 
   }
 
@@ -947,29 +950,8 @@ class Client extends EventEmitter {
   }
 }
 
-/**
- * Triggered when the Return key is pressed on the out-of-character chat input box.
- * @param {KeyboardEvent} event
- */
-export function onOOCEnter(event: KeyboardEvent) {
-  if (event.keyCode === 13) {
-    client.sendOOC(
-      (<HTMLInputElement>document.getElementById("client_oocinputbox")).value
-    );
-    (<HTMLInputElement>document.getElementById("client_oocinputbox")).value =
-      "";
-  }
-}
-window.onOOCEnter = onOOCEnter;
 
-/**
- * Triggered when the user click replay GOOOOO
- * @param {KeyboardEvent} event
- */
-export function onReplayGo(_event: Event) {
-  client.handleReplay();
-}
-window.onReplayGo = onReplayGo;
+
 
 /**
  * Triggered when the Return key is pressed on the in-character chat input box.
@@ -1091,100 +1073,6 @@ export function resetICParams() {
   }
 }
 
-export function resetOffset(_event: Event) {
-  (<HTMLInputElement>document.getElementById("pair_offset")).value = "0";
-  (<HTMLInputElement>document.getElementById("pair_y_offset")).value = "0";
-}
-window.resetOffset = resetOffset;
-
-/**
- * Triggered when the music search bar is changed
- * @param {MouseEvent} event
- */
-export function musiclist_filter(_event: Event) {
-  const musiclist_element = <HTMLSelectElement>(
-    document.getElementById("client_musiclist")
-  );
-  const searchname = (<HTMLInputElement>(
-    document.getElementById("client_musicsearch")
-  )).value;
-
-  musiclist_element.innerHTML = "";
-
-  for (const trackname of client.musics) {
-    if (trackname.toLowerCase().indexOf(searchname.toLowerCase()) !== -1) {
-      const newentry = <HTMLOptionElement>document.createElement("OPTION");
-      newentry.text = trackname;
-      musiclist_element.options.add(newentry);
-    }
-  }
-}
-window.musiclist_filter = musiclist_filter;
-
-/**
- * Triggered when an item on the music list is clicked.
- * @param {MouseEvent} event
- */
-export function musiclist_click(_event: Event) {
-  const playtrack = (<HTMLInputElement>(
-    document.getElementById("client_musiclist")
-  )).value;
-  client.sendMusicChange(playtrack);
-
-  // This is here so you can't actually select multiple tracks,
-  // even though the select tag has the multiple option to render differently
-  const musiclist_elements = (<HTMLSelectElement>(
-    document.getElementById("client_musiclist")
-  )).selectedOptions;
-  for (let i = 0; i < musiclist_elements.length; i++) {
-    musiclist_elements[i].selected = false;
-  }
-}
-window.musiclist_click = musiclist_click;
-
-/**
- * Triggered when a character in the mute list is clicked
- * @param {MouseEvent} event
- */
-export function mutelist_click(_event: Event) {
-  const mutelist = <HTMLSelectElement>document.getElementById("mute_select");
-  const selected_character = mutelist.options[mutelist.selectedIndex];
-
-  if (client.chars[selected_character.value].muted === false) {
-    client.chars[selected_character.value].muted = true;
-    selected_character.text = `${client.chars[selected_character.value].name
-      } (muted)`;
-    console.info(`muted ${client.chars[selected_character.value].name}`);
-  } else {
-    client.chars[selected_character.value].muted = false;
-    selected_character.text = client.chars[selected_character.value].name;
-  }
-}
-window.mutelist_click = mutelist_click;
-
-/**
- * Triggered when the showname checkboc is clicked
- * @param {MouseEvent} event
- */
-export function showname_click(_event: Event) {
-  setCookie(
-    "showname",
-    String((<HTMLInputElement>document.getElementById("showname")).checked)
-  );
-  setCookie(
-    "ic_chat_name",
-    (<HTMLInputElement>document.getElementById("ic_chat_name")).value
-  );
-
-  const css_s = <HTMLAnchorElement>document.getElementById("nameplate_setting");
-
-  if ((<HTMLInputElement>document.getElementById("showname")).checked) {
-    css_s.href = "styles/shownames.css";
-  } else {
-    css_s.href = "styles/nameplates.css";
-  }
-}
-window.showname_click = showname_click;
 
 /**
  * Triggered when an item on the area list is clicked.
@@ -1714,55 +1602,9 @@ export function updateEvidenceIcon() {
 }
 window.updateEvidenceIcon = updateEvidenceIcon;
 
-/**
- * Update evidence icon.
- */
-export function updateActionCommands(side: string) {
-  if (side === "jud") {
-    document.getElementById("judge_action").style.display = "inline-table";
-    document.getElementById("no_action").style.display = "none";
-  } else {
-    document.getElementById("judge_action").style.display = "none";
-    document.getElementById("no_action").style.display = "inline-table";
-  }
 
-  // Update role selector
-  for (
-    let i = 0,
-    role_select = <HTMLSelectElement>document.getElementById("role_select");
-    i < role_select.options.length;
-    i++
-  ) {
-    if (side === role_select.options[i].value) {
-      role_select.options.selectedIndex = i;
-      return;
-    }
-  }
-}
-window.updateActionCommands = updateActionCommands;
 
-/**
- * Change background via OOC.
- */
-export function changeBackgroundOOC() {
-  const selectedBG = <HTMLSelectElement>document.getElementById("bg_select");
-  const changeBGCommand = "bg $1";
-  const bgFilename = <HTMLInputElement>document.getElementById("bg_filename");
 
-  let filename = "";
-  if (selectedBG.selectedIndex === 0) {
-    filename = bgFilename.value;
-  } else {
-    filename = selectedBG.value;
-  }
-
-  if (mode === "join") {
-    client.sendOOC(`/${changeBGCommand.replace("$1", filename)}`);
-  } else if (mode === "replay") {
-    client.sendSelf(`BN#${filename}#%`);
-  }
-}
-window.changeBackgroundOOC = changeBackgroundOOC;
 
 /**
  * Change role via OOC.
@@ -1863,34 +1705,6 @@ export function redHPP() {
   client.sendHP(2, client.hp[1] - 1);
 }
 window.redHPP = redHPP;
-
-/**
- * Update background preview.
- */
-export function updateBackgroundPreview() {
-  const background_select = <HTMLSelectElement>(
-    document.getElementById("bg_select")
-  );
-  const background_filename = <HTMLInputElement>(
-    document.getElementById("bg_filename")
-  );
-  const background_preview = <HTMLImageElement>(
-    document.getElementById("bg_preview")
-  );
-
-  if (background_select.selectedIndex === 0) {
-    background_filename.style.display = "initial";
-    background_preview.src = `${AO_HOST}background/${encodeURI(
-      background_filename.value.toLowerCase()
-    )}/defenseempty.png`;
-  } else {
-    background_filename.style.display = "none";
-    background_preview.src = `${AO_HOST}background/${encodeURI(
-      background_select.value.toLowerCase()
-    )}/defenseempty.png`;
-  }
-}
-window.updateBackgroundPreview = updateBackgroundPreview;
 
 /**
  * Highlights and selects a menu.
