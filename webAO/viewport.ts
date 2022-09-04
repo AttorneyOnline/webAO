@@ -1,7 +1,6 @@
 import tryUrls from "./utils/tryUrls";
 import fileExists from "./utils/fileExists";
-import Client, { opusCheck } from "./client";
-import { delay } from "./client";
+import Client, { opusCheck, delay } from "./client";
 import { UPDATE_INTERVAL } from "./client";
 import { setChatbox } from "./client";
 import { resizeChatbox } from "./client";

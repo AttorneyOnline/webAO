@@ -1,7 +1,6 @@
-import { AO_HOST, client, getIndexFromSelect } from "../../client";
+import { AO_HOST, client, getIndexFromSelect, updateBackgroundPreview } from "../../client";
 import { safeTags } from "../../encoding";
 import tryUrls from "../../utils/tryUrls";
-import { updateBackgroundPreview } from '../../dom/updateBackgroundPreview'
 
 /**
  * Handles a background change.
