@@ -1,5 +1,4 @@
-import { updateActionCommands } from "../../client";
-
+import { updateActionCommands } from '../../dom/updateActionCommands'
 /**
 * position change
 * @param {string} pos new position
