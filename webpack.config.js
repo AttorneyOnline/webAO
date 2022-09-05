@@ -16,7 +16,10 @@ module.exports = {
     ui: './webAO/ui.js',
     client: './webAO/client.ts',
     master: './webAO/master.ts',
-    dom: glob.sync('./webAO/dom/*.{js,ts}'),
+    dom: {
+      dependOn: 'client',
+      import: glob.sync('./webAO/dom/*.{js,ts}')
+    },
     components: glob.sync('./webAO/components/*.js'),
   },
   node: {
