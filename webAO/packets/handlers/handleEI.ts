@@ -1,4 +1,5 @@
-import { AO_HOST, client } from '../../client'
+import { client } from '../../client'
+import { AO_HOST } from '../../client/aoHost';
 import { prepChat, safeTags } from '../../encoding';
 
 /**

@@ -12,7 +12,7 @@ import setEmote from "./client/setEmote";
 import getAnimLength from "./utils/getAnimLength";
 import { safeTags } from "./encoding";
 import setCookie from "./utils/setCookie";
-import { AO_HOST } from "./client";
+import { AO_HOST } from "./client/aoHost";
 interface ChatMsg {
   content: string;
   objection: number;
