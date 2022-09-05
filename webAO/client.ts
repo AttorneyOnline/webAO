@@ -37,10 +37,7 @@ let { ip: serverIP, mode, asset, theme } = queryParser();
 const DEFAULT_HOST = "http://attorneyoffline.de/base/";
 import { showname_click } from './dom/showNameClick'
 import { updateActionCommands } from './dom/updateActionCommands'
-export let AO_HOST = asset || DEFAULT_HOST;
-export const setAOhost = (val: string) => {
-  AO_HOST = val
-}
+import {  AO_HOST } from './client/aoHost'
 let THEME: string = theme || "default";
 let CHATBOX: string;
 

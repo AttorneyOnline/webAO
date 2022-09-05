@@ -1,6 +1,7 @@
-import { AO_HOST, client, pickEmotion } from "../../client";
+import { client, pickEmotion } from "../../client";
 import fileExists from "../../utils/fileExists";
 import { updateActionCommands } from '../../dom/updateActionCommands'
+import { AO_HOST } from "../../client/aoHost";
 
 /**
  * Handles the server's assignment of a character for the player to use.
