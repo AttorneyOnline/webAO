@@ -6,11 +6,10 @@
 
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { EventEmitter } from "events";
-import tryUrls from "./utils/tryUrls";
+import { area_click } from './dom/areaClick'
+import { onReplayGo } from './dom/onReplayGo'
 import { escapeChat, prepChat, safeTags, unescapeChat } from "./encoding";
 // Load some defaults for the background and evidence dropdowns
-import vanilla_character_arr from "./constants/characters.js";
-import vanilla_music_arr from "./constants/music.js";
 import vanilla_background_arr from "./constants/backgrounds.js";
 import vanilla_evidence_arr from "./constants/evidence.js";
 import chatbox_arr from "./styles/chatbox/chatboxes.js";
@@ -34,10 +33,9 @@ import masterViewport, { Viewport } from "./viewport";
 import { packetHandler } from './packets/packetHandler'
 let { ip: serverIP, mode, asset, theme } = queryParser();
 // Unless there is an asset URL specified, use the wasabi one
-const DEFAULT_HOST = "http://attorneyoffline.de/base/";
 import { showname_click } from './dom/showNameClick'
 import { updateActionCommands } from './dom/updateActionCommands'
-import {  AO_HOST } from './client/aoHost'
+import { AO_HOST } from './client/aoHost'
 let THEME: string = theme || "default";
 let CHATBOX: string;
 
@@ -57,7 +55,7 @@ export const setOldLoading = (val: boolean) => {
 
 // presettings
 let selectedMenu = 1;
-let selectedShout = 0;
+export let selectedShout = 0;
 
 export let extrafeatures: string[] = [];
 export const setExtraFeatures = (val: any) => {
@@ -951,131 +949,6 @@ class Client extends EventEmitter {
 }
 
 /**
- * Triggered when the Return key is pressed on the out-of-character chat input box.
- * @param {KeyboardEvent} event
- */
- export function onOOCEnter(event: KeyboardEvent) {
-  if (event.keyCode === 13) {
-    client.sendOOC(
-      (<HTMLInputElement>document.getElementById("client_oocinputbox")).value
-    );
-    (<HTMLInputElement>document.getElementById("client_oocinputbox")).value =
-      "";
-  }
-}
-window.onOOCEnter = onOOCEnter;
-
-/**
- * Triggered when the user click replay GOOOOO
- * @param {KeyboardEvent} event
- */
- export function onReplayGo(_event: Event) {
-  client.handleReplay();
-}
-window.onReplayGo = onReplayGo;
-
-
-/**
- * Triggered when the Return key is pressed on the in-character chat input box.
- * @param {KeyboardEvent} event
- */
-export function onEnter(event: KeyboardEvent) {
-  if (event.keyCode === 13) {
-    const mychar = client.character;
-    const myemo = client.emote;
-    const evi = client.evidence;
-    const flip = Boolean(
-      document.getElementById("button_flip").classList.contains("dark")
-    );
-    const flash = Boolean(
-      document.getElementById("button_flash").classList.contains("dark")
-    );
-    const screenshake = Boolean(
-      document.getElementById("button_shake").classList.contains("dark")
-    );
-    const noninterrupting_preanim = Boolean(
-      (<HTMLInputElement>document.getElementById("check_nonint")).checked
-    );
-    const looping_sfx = Boolean(
-      (<HTMLInputElement>document.getElementById("check_loopsfx")).checked
-    );
-    const color = Number(
-      (<HTMLInputElement>document.getElementById("textcolor")).value
-    );
-    const showname = escapeChat(
-      (<HTMLInputElement>document.getElementById("ic_chat_name")).value
-    );
-    const text = (<HTMLInputElement>document.getElementById("client_inputbox"))
-      .value;
-    const pairchar = (<HTMLInputElement>document.getElementById("pair_select"))
-      .value;
-    const pairoffset = Number(
-      (<HTMLInputElement>document.getElementById("pair_offset")).value
-    );
-    const pairyoffset = Number(
-      (<HTMLInputElement>document.getElementById("pair_y_offset")).value
-    );
-    const myrole = (<HTMLInputElement>document.getElementById("role_select"))
-      .value
-      ? (<HTMLInputElement>document.getElementById("role_select")).value
-      : mychar.side;
-    const additive = Boolean(
-      (<HTMLInputElement>document.getElementById("check_additive")).checked
-    );
-    const effect = (<HTMLInputElement>document.getElementById("effect_select"))
-      .value;
-
-    let sfxname = "0";
-    let sfxdelay = 0;
-    let emote_mod = myemo.zoom;
-    if ((<HTMLInputElement>document.getElementById("sendsfx")).checked) {
-      sfxname = myemo.sfx;
-      sfxdelay = myemo.sfxdelay;
-    }
-
-    // not to overwrite a 5 from the ini or anything else
-    if ((<HTMLInputElement>document.getElementById("sendpreanim")).checked) {
-      if (emote_mod === 0) {
-        emote_mod = 1;
-      }
-    } else if (emote_mod === 1) {
-      emote_mod = 0;
-    }
-
-    client.sendIC(
-      myemo.deskmod,
-      myemo.preanim,
-      mychar.name,
-      myemo.emote,
-      text,
-      myrole,
-      sfxname,
-      emote_mod,
-      sfxdelay,
-      selectedShout,
-      evi,
-      flip,
-      flash,
-      color,
-      showname,
-      pairchar,
-      pairoffset,
-      pairyoffset,
-      noninterrupting_preanim,
-      looping_sfx,
-      screenshake,
-      "-",
-      "-",
-      "-",
-      additive,
-      effect
-    );
-  }
-  return false;
-}
-window.onEnter = onEnter;
-
-/**
  * Resets the IC parameters for the player to enter a new chat message.
  * This should only be called when the player's previous chat message
  * was successfully sent/presented.
@@ -1099,7 +972,7 @@ export function resetICParams() {
  * Triggered when the music search bar is changed
  * @param {MouseEvent} event
  */
- export function musiclist_filter(_event: Event) {
+export function musiclist_filter(_event: Event) {
   const musiclist_element = <HTMLSelectElement>(
     document.getElementById("client_musiclist")
   );
@@ -1140,20 +1013,7 @@ export function mutelist_click(_event: Event) {
 }
 window.mutelist_click = mutelist_click;
 
-/**
- * Triggered when an item on the area list is clicked.
- * @param {HTMLElement} el
- */
-export function area_click(el: HTMLElement) {
-  const area = client.areas[el.id.substr(4)].name;
-  client.sendMusicChange(area);
 
-  const areaHr = document.createElement("div");
-  areaHr.className = "hrtext";
-  areaHr.textContent = `switched to ${el.textContent}`;
-  document.getElementById("client_log").appendChild(areaHr);
-}
-window.area_click = area_click;
 
 /**
  * Triggered by a changed callword list
@@ -1671,7 +1531,7 @@ window.updateEvidenceIcon = updateEvidenceIcon;
 /**
  * Change background via OOC.
  */
- export function changeBackgroundOOC() {
+export function changeBackgroundOOC() {
   const selectedBG = <HTMLSelectElement>document.getElementById("bg_select");
   const changeBGCommand = "bg $1";
   const bgFilename = <HTMLInputElement>document.getElementById("bg_filename");
@@ -1795,27 +1655,27 @@ window.redHPP = redHPP;
 /**
  * Update background preview.
  */
- export function updateBackgroundPreview() {
+export function updateBackgroundPreview() {
   const background_select = <HTMLSelectElement>(
-      document.getElementById("bg_select")
+    document.getElementById("bg_select")
   );
   const background_filename = <HTMLInputElement>(
-      document.getElementById("bg_filename")
+    document.getElementById("bg_filename")
   );
   const background_preview = <HTMLImageElement>(
-      document.getElementById("bg_preview")
+    document.getElementById("bg_preview")
   );
 
   if (background_select.selectedIndex === 0) {
-      background_filename.style.display = "initial";
-      background_preview.src = `${AO_HOST}background/${encodeURI(
-          background_filename.value.toLowerCase()
-      )}/defenseempty.png`;
+    background_filename.style.display = "initial";
+    background_preview.src = `${AO_HOST}background/${encodeURI(
+      background_filename.value.toLowerCase()
+    )}/defenseempty.png`;
   } else {
-      background_filename.style.display = "none";
-      background_preview.src = `${AO_HOST}background/${encodeURI(
-          background_select.value.toLowerCase()
-      )}/defenseempty.png`;
+    background_filename.style.display = "none";
+    background_preview.src = `${AO_HOST}background/${encodeURI(
+      background_select.value.toLowerCase()
+    )}/defenseempty.png`;
   }
 }
 window.updateBackgroundPreview = updateBackgroundPreview;
