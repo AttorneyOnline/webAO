@@ -1,9 +1,10 @@
 import tryUrls from "./utils/tryUrls";
 import fileExists from "./utils/fileExists";
-import Client, { opusCheck, delay } from "./client";
+import Client, { delay } from "./client";
+import {opusCheck} from './dom/opusCheck'
 import { UPDATE_INTERVAL } from "./client";
 import { setChatbox } from "./client";
-import { resizeChatbox } from "./client";
+import { resizeChatbox } from "./dom/resizeChatbox";
 import transparentPng from "./constants/transparentPng";
 import mlConfig from "./utils/aoml";
 import { appendICLog } from "./client";

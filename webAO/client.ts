@@ -32,12 +32,13 @@ const version = process.env.npm_package_version;
 import masterViewport, { Viewport } from "./viewport";
 import { packetHandler } from './packets/packetHandler'
 let { ip: serverIP, mode, asset, theme } = queryParser();
+import { cancelEvidence } from './dom/cancelEvidence'
 // Unless there is an asset URL specified, use the wasabi one
 import { showname_click } from './dom/showNameClick'
 import { updateActionCommands } from './dom/updateActionCommands'
 import { AO_HOST } from './client/aoHost'
 let THEME: string = theme || "default";
-let CHATBOX: string;
+export let CHATBOX: string;
 
 export let client: Client;
 
@@ -56,7 +57,9 @@ export const setOldLoading = (val: boolean) => {
 // presettings
 let selectedMenu = 1;
 export let selectedShout = 0;
-
+export const setSelectedShout = (val: number) => {
+  selectedShout = val
+}
 export let extrafeatures: string[] = [];
 export const setExtraFeatures = (val: any) => {
   extrafeatures = val
@@ -795,12 +798,6 @@ class Client extends EventEmitter {
     }
   }
 
-
-
-
-
-
-
   resetMusicList() {
     this.musics = [];
     document.getElementById("client_musiclist").innerHTML = "";
@@ -969,53 +966,6 @@ export function resetICParams() {
 }
 
 /**
- * Triggered when the music search bar is changed
- * @param {MouseEvent} event
- */
-export function musiclist_filter(_event: Event) {
-  const musiclist_element = <HTMLSelectElement>(
-    document.getElementById("client_musiclist")
-  );
-  const searchname = (<HTMLInputElement>(
-    document.getElementById("client_musicsearch")
-  )).value;
-
-  musiclist_element.innerHTML = "";
-
-  for (const trackname of client.musics) {
-    if (trackname.toLowerCase().indexOf(searchname.toLowerCase()) !== -1) {
-      const newentry = <HTMLOptionElement>document.createElement("OPTION");
-      newentry.text = trackname;
-      musiclist_element.options.add(newentry);
-    }
-  }
-}
-window.musiclist_filter = musiclist_filter;
-
-
-/**
- * Triggered when a character in the mute list is clicked
- * @param {MouseEvent} event
- */
-export function mutelist_click(_event: Event) {
-  const mutelist = <HTMLSelectElement>document.getElementById("mute_select");
-  const selected_character = mutelist.options[mutelist.selectedIndex];
-
-  if (client.chars[selected_character.value].muted === false) {
-    client.chars[selected_character.value].muted = true;
-    selected_character.text = `${client.chars[selected_character.value].name
-      } (muted)`;
-    console.info(`muted ${client.chars[selected_character.value].name}`);
-  } else {
-    client.chars[selected_character.value].muted = false;
-    selected_character.text = client.chars[selected_character.value].name;
-  }
-}
-window.mutelist_click = mutelist_click;
-
-
-
-/**
  * Triggered by a changed callword list
  */
 export function changeCallwords() {
@@ -1133,29 +1083,6 @@ export function imgError(image: HTMLImageElement) {
   return true;
 }
 window.imgError = imgError;
-
-/**
- * Triggered when there was an error loading a sound
- * @param {HTMLAudioElement} image the element containing the missing sound
- */
-export function opusCheck(
-  channel: HTMLAudioElement
-): OnErrorEventHandlerNonNull {
-  const audio = channel.src;
-  if (audio === "") {
-    return;
-  }
-  console.info(`failed to load sound ${channel.src}`);
-  let oldsrc = "";
-  let newsrc = "";
-  oldsrc = channel.src;
-  if (!oldsrc.endsWith(".opus")) {
-    newsrc = oldsrc.replace(".mp3", ".opus");
-    newsrc = newsrc.replace(".wav", ".opus");
-    channel.src = newsrc; // unload so the old sprite doesn't persist
-  }
-}
-window.opusCheck = opusCheck;
 
 /**
  * Triggered when the reconnect button is pushed.
@@ -1298,52 +1225,6 @@ export function pickEmotion(emo: number) {
 }
 window.pickEmotion = pickEmotion;
 
-/**
- * Highlights and selects an evidence for in-character chat.
- * @param {string} evidence the evidence to be presented
- */
-export function pickEvidence(evidence: number) {
-  if (client.selectedEvidence !== evidence) {
-    // Update selected evidence
-    if (client.selectedEvidence > 0) {
-      document.getElementById(`evi_${client.selectedEvidence}`).className =
-        "evi_icon";
-    }
-    document.getElementById(`evi_${evidence}`).className = "evi_icon dark";
-    client.selectedEvidence = evidence;
-
-    // Show evidence on information window
-    (<HTMLInputElement>document.getElementById("evi_name")).value =
-      client.evidences[evidence - 1].name;
-    (<HTMLInputElement>document.getElementById("evi_desc")).value =
-      client.evidences[evidence - 1].desc;
-
-    // Update icon
-    const icon_id = getIndexFromSelect(
-      "evi_select",
-      client.evidences[evidence - 1].filename
-    );
-    (<HTMLSelectElement>document.getElementById("evi_select")).selectedIndex =
-      icon_id;
-    if (icon_id === 0) {
-      (<HTMLInputElement>document.getElementById("evi_filename")).value =
-        client.evidences[evidence - 1].filename;
-    }
-    updateEvidenceIcon();
-
-    // Update button
-    document.getElementById("evi_add").className =
-      "client_button hover_button inactive";
-    document.getElementById("evi_edit").className =
-      "client_button hover_button";
-    document.getElementById("evi_cancel").className =
-      "client_button hover_button";
-    document.getElementById("evi_del").className = "client_button hover_button";
-  } else {
-    cancelEvidence();
-  }
-}
-window.pickEvidence = pickEvidence;
 
 /**
  * Add evidence.
@@ -1393,37 +1274,6 @@ export function deleteEvidence() {
 }
 window.deleteEvidence = deleteEvidence;
 
-/**
- * Cancel evidence selection.
- */
-export function cancelEvidence() {
-  // Clear evidence data
-  if (client.selectedEvidence > 0) {
-    document.getElementById(`evi_${client.selectedEvidence}`).className =
-      "evi_icon";
-  }
-  client.selectedEvidence = 0;
-
-  // Clear evidence on information window
-  (<HTMLSelectElement>document.getElementById("evi_select")).selectedIndex = 0;
-  updateEvidenceIcon(); // Update icon widget
-  (<HTMLInputElement>document.getElementById("evi_filename")).value = "";
-  (<HTMLInputElement>document.getElementById("evi_name")).value = "";
-  (<HTMLInputElement>document.getElementById("evi_desc")).value = "";
-  (<HTMLImageElement>(
-    document.getElementById("evi_preview")
-  )).src = `${AO_HOST}misc/empty.png`; // Clear icon
-
-  // Update button
-  document.getElementById("evi_add").className = "client_button hover_button";
-  document.getElementById("evi_edit").className =
-    "client_button hover_button inactive";
-  document.getElementById("evi_cancel").className =
-    "client_button hover_button inactive";
-  document.getElementById("evi_del").className =
-    "client_button hover_button inactive";
-}
-window.cancelEvidence = cancelEvidence;
 
 /**
  * Find index of anything in select box.
@@ -1467,38 +1317,7 @@ export function setChatbox(style: string) {
 }
 window.setChatbox = setChatbox;
 
-/**
- * Set the font size for the chatbox
- */
-export function resizeChatbox() {
-  const chatContainerBox = document.getElementById("client_chatcontainer");
-  const gameHeight = document.getElementById("client_background").offsetHeight;
 
-  chatContainerBox.style.fontSize = `${(gameHeight * 0.0521).toFixed(1)}px`;
-
-  const trackstatus = <HTMLMarqueeElement>(document.getElementById("client_trackstatustext"));
-  trackstatus.width = (trackstatus.offsetWidth - 1) + "px";
-
-
-  //clock
-  const now = new Date();
-  let weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  document.getElementById("client_clock_month").innerText = month[now.getMonth()];
-  console.debug(CHATBOX);
-  if (CHATBOX == "acww") {
-    weekday = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-    document.getElementById("client_clock_weekday").innerText = weekday[now.getDay()];
-    document.getElementById("client_clock_date").innerText = now.getDay() + "/" + now.getMonth();
-    document.getElementById("client_clock_time").innerText = now.getHours() + ":" + now.getMinutes();
-  } else if (CHATBOX == "key") {
-    weekday = ["Sun.", "Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat."];
-    document.getElementById("client_clock_weekday").innerText = weekday[now.getDay()];
-    document.getElementById("client_clock_date").innerText = String(now.getDay());
-  }
-
-}
-window.resizeChatbox = resizeChatbox;
 
 /**
  * Update evidence icon.
@@ -1652,33 +1471,6 @@ export function redHPP() {
 }
 window.redHPP = redHPP;
 
-/**
- * Update background preview.
- */
-export function updateBackgroundPreview() {
-  const background_select = <HTMLSelectElement>(
-    document.getElementById("bg_select")
-  );
-  const background_filename = <HTMLInputElement>(
-    document.getElementById("bg_filename")
-  );
-  const background_preview = <HTMLImageElement>(
-    document.getElementById("bg_preview")
-  );
-
-  if (background_select.selectedIndex === 0) {
-    background_filename.style.display = "initial";
-    background_preview.src = `${AO_HOST}background/${encodeURI(
-      background_filename.value.toLowerCase()
-    )}/defenseempty.png`;
-  } else {
-    background_filename.style.display = "none";
-    background_preview.src = `${AO_HOST}background/${encodeURI(
-      background_select.value.toLowerCase()
-    )}/defenseempty.png`;
-  }
-}
-window.updateBackgroundPreview = updateBackgroundPreview;
 
 /**
  * Highlights and selects a menu.
@@ -1696,25 +1488,5 @@ export function toggleMenu(menu: number) {
   }
 }
 window.toggleMenu = toggleMenu;
-
-/**
- * Highlights and selects a shout for in-character chat.
- * If the same shout button is selected, then the shout is canceled.
- * @param {number} shout the new shout to be selected
- */
-export function toggleShout(shout: number) {
-  if (shout === selectedShout) {
-    document.getElementById(`button_${shout}`).className = "client_button";
-    selectedShout = 0;
-  } else {
-    document.getElementById(`button_${shout}`).className = "client_button dark";
-    if (selectedShout) {
-      document.getElementById(`button_${selectedShout}`).className =
-        "client_button";
-    }
-    selectedShout = shout;
-  }
-}
-window.toggleShout = toggleShout;
 
 export default Client;
