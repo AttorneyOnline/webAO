@@ -966,54 +966,6 @@ export function resetICParams() {
 }
 
 /**
- * Triggered by a changed callword list
- */
-export function changeCallwords() {
-  client.callwords = (<HTMLInputElement>(
-    document.getElementById("client_callwords")
-  )).value.split("\n");
-  setCookie("callwords", client.callwords.join("\n"));
-}
-window.changeCallwords = changeCallwords;
-
-/**
- * Triggered by the modcall sfx dropdown
- */
-export function modcall_test() {
-  packetHandler.get("ZZ")("test#test".split("#"));
-}
-window.modcall_test = modcall_test;
-
-/**
- * Triggered by the ini button.
- */
-export async function iniedit() {
-  const ininame = (<HTMLInputElement>document.getElementById("client_ininame"))
-    .value;
-  const inicharID = client.charID;
-  await client.handleCharacterInfo(ininame.split("&"), inicharID);
-  packetHandler.get("PV")(`PV#0#CID#${inicharID}`.split("#"));
-}
-window.iniedit = iniedit;
-
-/**
- * Triggered by the pantilt checkbox
- */
-export async function switchPanTilt() {
-  const fullview = document.getElementById("client_fullview");
-  const checkbox = <HTMLInputElement>document.getElementById("client_pantilt");
-
-  if (checkbox.checked) {
-    fullview.style.transition = "0.5s ease-in-out";
-  } else {
-    fullview.style.transition = "none";
-  }
-
-  return;
-}
-window.switchPanTilt = switchPanTilt;
-
-/**
  * Triggered by the change aspect ratio checkbox
  */
 export async function switchAspectRatio() {
@@ -1201,29 +1153,7 @@ export function pickChar(ccharacter: number) {
 }
 window.pickChar = pickChar;
 
-/**
- * Highlights and selects an emotion for in-character chat.
- * @param {string} emo the new emotion to be selected
- */
-export function pickEmotion(emo: number) {
-  try {
-    if (client.selectedEmote !== -1) {
-      document.getElementById(`emo_${client.selectedEmote}`).className =
-        "emote_button";
-    }
-  } catch (err) {
-    // do nothing
-  }
-  client.selectedEmote = emo;
-  document.getElementById(`emo_${emo}`).className = "emote_button dark";
 
-  (<HTMLInputElement>document.getElementById("sendsfx")).checked =
-    client.emote.sfx.length > 1;
-
-  (<HTMLInputElement>document.getElementById("sendpreanim")).checked =
-    client.emote.zoom == 1;
-}
-window.pickEmotion = pickEmotion;
 
 
 /**
@@ -1244,25 +1174,7 @@ export function addEvidence() {
 }
 window.addEvidence = addEvidence;
 
-/**
- * Edit selected evidence.
- */
-export function editEvidence() {
-  const evidence_select = <HTMLSelectElement>(
-    document.getElementById("evi_select")
-  );
-  const id = client.selectedEvidence - 1;
-  client.sendEE(
-    id,
-    (<HTMLInputElement>document.getElementById("evi_name")).value,
-    (<HTMLInputElement>document.getElementById("evi_desc")).value,
-    evidence_select.selectedIndex === 0
-      ? (<HTMLInputElement>document.getElementById("evi_filename")).value
-      : evidence_select.options[evidence_select.selectedIndex].text
-  );
-  cancelEvidence();
-}
-window.editEvidence = editEvidence;
+
 
 /**
  * Delete selected evidence.
@@ -1275,22 +1187,7 @@ export function deleteEvidence() {
 window.deleteEvidence = deleteEvidence;
 
 
-/**
- * Find index of anything in select box.
- * @param {string} select_box the select element name
- * @param {string} value the value that need to be compared
- */
-export function getIndexFromSelect(select_box: string, value: string) {
-  // Find if icon alraedy existed in select box
-  const select_element = <HTMLSelectElement>document.getElementById(select_box);
-  for (let i = 1; i < select_element.length; ++i) {
-    if (select_element.options[i].value === value) {
-      return i;
-    }
-  }
-  return 0;
-}
-window.getIndexFromSelect = getIndexFromSelect;
+
 
 /**
  * Set the style of the chatbox
@@ -1319,57 +1216,6 @@ window.setChatbox = setChatbox;
 
 
 
-/**
- * Update evidence icon.
- */
-export function updateEvidenceIcon() {
-  const evidence_select = <HTMLSelectElement>(
-    document.getElementById("evi_select")
-  );
-  const evidence_filename = <HTMLInputElement>(
-    document.getElementById("evi_filename")
-  );
-  const evidence_iconbox = <HTMLImageElement>(
-    document.getElementById("evi_preview")
-  );
-
-  if (evidence_select.selectedIndex === 0) {
-    evidence_filename.style.display = "initial";
-    evidence_iconbox.src = `${AO_HOST}evidence/${encodeURI(
-      evidence_filename.value.toLowerCase()
-    )}`;
-  } else {
-    evidence_filename.style.display = "none";
-    evidence_iconbox.src = `${AO_HOST}evidence/${encodeURI(
-      evidence_select.value.toLowerCase()
-    )}`;
-  }
-}
-window.updateEvidenceIcon = updateEvidenceIcon;
-
-/**
- * Change background via OOC.
- */
-export function changeBackgroundOOC() {
-  const selectedBG = <HTMLSelectElement>document.getElementById("bg_select");
-  const changeBGCommand = "bg $1";
-  const bgFilename = <HTMLInputElement>document.getElementById("bg_filename");
-
-  let filename = "";
-  if (selectedBG.selectedIndex === 0) {
-    filename = bgFilename.value;
-  } else {
-    filename = selectedBG.value;
-  }
-
-
-  if (mode === "join") {
-    client.sendOOC(`/${changeBGCommand.replace("$1", filename)}`);
-  } else if (mode === "replay") {
-    client.sendSelf(`BN#${filename}#%`);
-  }
-}
-window.changeBackgroundOOC = changeBackgroundOOC;
 
 /**
  * Change role via OOC.

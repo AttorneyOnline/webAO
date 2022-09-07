@@ -1,6 +1,7 @@
-import { client, pickEmotion } from "../../client";
+import { client } from "../../client";
 import fileExists from "../../utils/fileExists";
 import { updateActionCommands } from '../../dom/updateActionCommands'
+import { pickEmotion } from '../../dom/pickEmotion'
 import { AO_HOST } from "../../client/aoHost";
 
 /**
