@@ -1,7 +1,8 @@
-import { client, getIndexFromSelect } from "../../client";
+import { client } from "../../client";
 import { AO_HOST } from "../../client/aoHost";
 import { safeTags } from "../../encoding";
 import { updateBackgroundPreview } from '../../dom/updateBackgroundPreview'
+import { getIndexFromSelect } from '../../dom/getIndexFromSelect'
 import tryUrls from "../../utils/tryUrls";
 
 

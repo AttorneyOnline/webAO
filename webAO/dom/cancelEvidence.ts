@@ -1,4 +1,5 @@
-import { client, updateEvidenceIcon } from "../client";
+import { client, } from "../client";
+import { updateEvidenceIcon } from './updateEvidenceIcon'
 import { AO_HOST } from "../client/aoHost";
 
 
