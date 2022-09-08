@@ -3,7 +3,7 @@ import fileExists from "./utils/fileExists";
 import Client, { delay } from "./client";
 import {opusCheck} from './dom/opusCheck'
 import { UPDATE_INTERVAL } from "./client";
-import { setChatbox } from "./client";
+import { setChatbox } from "./dom/setChatbox";
 import { resizeChatbox } from "./dom/resizeChatbox";
 import transparentPng from "./constants/transparentPng";
 import mlConfig from "./utils/aoml";
