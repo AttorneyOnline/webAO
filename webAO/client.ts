@@ -5,42 +5,44 @@
  */
 
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { EventEmitter } from "events";
-import { area_click } from './dom/areaClick'
-import { onReplayGo } from './dom/onReplayGo'
-import { escapeChat, prepChat, safeTags, unescapeChat } from "./encoding";
-// Load some defaults for the background and evidence dropdowns
 import vanilla_background_arr from "./constants/backgrounds.js";
 import vanilla_evidence_arr from "./constants/evidence.js";
-import chatbox_arr from "./styles/chatbox/chatboxes.js";
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
 import setCookie from "./utils/setCookie";
+import fileExists from "./utils/fileExists.js";
+import queryParser from "./utils/queryParser";
+import getResources from "./utils/getResources.js";
+import downloadFile from "./services/downloadFile";
+import masterViewport, { Viewport } from "./viewport";
+import { EventEmitter } from "events";
+import { area_click } from './dom/areaClick'
+import { onReplayGo } from './dom/onReplayGo'
+import { escapeChat, safeTags, unescapeChat } from "./encoding";
+import { setChatbox } from "./dom/setChatbox";
 import { request } from "./services/request.js";
 import {
   changeShoutVolume,
   changeSFXVolume,
   changeTestimonyVolume,
 } from "./dom/changeVolume.js";
-import fileExists from "./utils/fileExists.js";
-import queryParser from "./utils/queryParser";
-import getResources from "./utils/getResources.js";
-import transparentPng from "./constants/transparentPng";
-import downloadFile from "./services/downloadFile";
 import { getFilenameFromPath } from "./utils/paths";
-const version = process.env.npm_package_version;
-import masterViewport, { Viewport } from "./viewport";
 import { packetHandler } from './packets/packetHandler'
-let { ip: serverIP, mode, asset, theme } = queryParser();
-import { cancelEvidence } from './dom/cancelEvidence'
-// Unless there is an asset URL specified, use the wasabi one
 import { showname_click } from './dom/showNameClick'
-import { updateActionCommands } from './dom/updateActionCommands'
 import { AO_HOST } from './client/aoHost'
+
+const version = process.env.npm_package_version;
+let { ip: serverIP, mode, theme } = queryParser();
+
 let THEME: string = theme || "default";
 export let CHATBOX: string;
-
+export const setCHATBOX = (val: string) => {
+  CHATBOX = val
+}
 export let client: Client;
+export const setClient = (val: Client) => {
+  client = val
+}
 
 export const UPDATE_INTERVAL = 60;
 
@@ -55,7 +57,10 @@ export const setOldLoading = (val: boolean) => {
 }
 
 // presettings
-let selectedMenu = 1;
+export let selectedMenu = 1;
+export const setSelectedMenu = (val: number) => {
+  selectedMenu = val
+}
 export let selectedShout = 0;
 export const setSelectedShout = (val: number) => {
   selectedShout = val
@@ -70,62 +75,6 @@ export const setBanned = (val: boolean) => {
   banned = val
 }
 let hdid: string;
-
-declare global {
-  interface Window {
-    toggleShout: (shout: number) => void;
-    toggleMenu: (menu: number) => void;
-    updateBackgroundPreview: () => void;
-    redHPP: () => void;
-    addHPP: () => void;
-    redHPD: () => void;
-    addHPD: () => void;
-    guilty: () => void;
-    notguilty: () => void;
-    initCE: () => void;
-    initWT: () => void;
-    callMod: () => void;
-    randomCharacterOOC: () => void;
-    changeRoleOOC: () => void;
-    changeBackgroundOOC: () => void;
-    updateActionCommands: (side: string) => void;
-    updateEvidenceIcon: () => void;
-    resizeChatbox: () => void;
-    setChatbox: (style: string) => void;
-    getIndexFromSelect: (select_box: string, value: string) => Number;
-    cancelEvidence: () => void;
-    deleteEvidence: () => void;
-    editEvidence: () => void;
-    addEvidence: () => void;
-    pickEvidence: (evidence: any) => void;
-    pickEmotion: (emo: any) => void;
-    pickChar: (ccharacter: any) => void;
-    chartable_filter: (_event: any) => void;
-    ReconnectButton: (_event: any) => void;
-    opusCheck: (channel: HTMLAudioElement) => OnErrorEventHandlerNonNull;
-    imgError: (image: any) => void;
-    charError: (image: any) => void;
-    changeCharacter: (_event: any) => void;
-    switchChatOffset: () => void;
-    switchAspectRatio: () => void;
-    switchPanTilt: (addcheck: number) => void;
-    iniedit: () => void;
-    modcall_test: () => void;
-    reloadTheme: () => void;
-    changeCallwords: () => void;
-    changeBlipVolume: () => void;
-    changeMusicVolume: () => void;
-    area_click: (el: any) => void;
-    showname_click: (_event: any) => void;
-    mutelist_click: (_event: any) => void;
-    musiclist_click: (_event: any) => void;
-    musiclist_filter: (_event: any) => void;
-    resetOffset: (_event: any) => void;
-    onEnter: (event: any) => void;
-    onReplayGo: (_event: any) => void;
-    onOOCEnter: (_event: any) => void;
-  }
-}
 
 function isLowMemory() {
   if (
@@ -966,90 +915,6 @@ export function resetICParams() {
 }
 
 /**
- * Triggered by the change aspect ratio checkbox
- */
-export async function switchAspectRatio() {
-  const background = document.getElementById("client_gamewindow");
-  const offsetCheck = <HTMLInputElement>(
-    document.getElementById("client_hdviewport_offset")
-  );
-  if (
-    (<HTMLInputElement>document.getElementById("client_hdviewport")).checked
-  ) {
-    background.style.paddingBottom = "56.25%";
-    offsetCheck.disabled = false;
-  } else {
-    background.style.paddingBottom = "75%";
-    offsetCheck.disabled = true;
-  }
-}
-window.switchAspectRatio = switchAspectRatio;
-
-/**
- * Triggered by the change aspect ratio checkbox
- */
-export async function switchChatOffset() {
-  const container = document.getElementById("client_chatcontainer");
-  if (
-    (<HTMLInputElement>document.getElementById("client_hdviewport_offset"))
-      .checked
-  ) {
-    container.style.width = "80%";
-    container.style.left = "10%";
-  } else {
-    container.style.width = "100%";
-    container.style.left = "0";
-  }
-}
-window.switchChatOffset = switchChatOffset;
-
-/**
- * Triggered when a character icon is clicked in the character selection menu.
- * @param {MouseEvent} event
- */
-export function changeCharacter(_event: Event) {
-  document.getElementById("client_waiting").style.display = "block";
-  document.getElementById("client_charselect").style.display = "block";
-  document.getElementById("client_emo").innerHTML = "";
-}
-window.changeCharacter = changeCharacter;
-
-/**
- * Triggered when there was an error loading a character sprite.
- * @param {HTMLImageElement} image the element containing the missing image
- */
-export function charError(image: HTMLImageElement) {
-  console.warn(`${image.src} is missing from webAO`);
-  image.src = transparentPng;
-  return true;
-}
-window.charError = charError;
-
-/**
- * Triggered when there was an error loading a generic sprite.
- * @param {HTMLImageElement} image the element containing the missing image
- */
-export function imgError(image: HTMLImageElement) {
-  image.onerror = null;
-  image.src = ""; // unload so the old sprite doesn't persist
-  return true;
-}
-window.imgError = imgError;
-
-/**
- * Triggered when the reconnect button is pushed.
- */
-export function ReconnectButton() {
-  client.cleanup();
-  client = new Client(serverIP);
-
-  if (client) {
-    document.getElementById("client_error").style.display = "none";
-  }
-}
-window.ReconnectButton = ReconnectButton;
-
-/**
  * Appends a message to the in-character chat log.
  * @param {string} msg the string to be added
  * @param {string} name the name of the sender
@@ -1117,222 +982,5 @@ export function checkCallword(message: string, sfxAudio: HTMLAudioElement) {
     }
   }
 }
-
-/**
- * Triggered when the music search bar is changed
- * @param {MouseEvent} event
- */
-export function chartable_filter(_event: Event) {
-  const searchname = (<HTMLInputElement>(
-    document.getElementById("client_charactersearch")
-  )).value;
-
-  client.chars.forEach((character: any, charid: number) => {
-    const demothing = document.getElementById(`demo_${charid}`);
-    if (character.name.toLowerCase().indexOf(searchname.toLowerCase()) === -1) {
-      demothing.style.display = "none";
-    } else {
-      demothing.style.display = "inline-block";
-    }
-  });
-}
-window.chartable_filter = chartable_filter;
-
-/**
- * Requests to play as a character.
- * @param {number} ccharacter the character ID; if this is a large number,
- * then spectator is chosen instead.
- */
-export function pickChar(ccharacter: number) {
-  if (ccharacter === -1) {
-    // Spectator
-    document.getElementById("client_waiting").style.display = "none";
-    document.getElementById("client_charselect").style.display = "none";
-  }
-  client.sendCharacter(ccharacter);
-}
-window.pickChar = pickChar;
-
-
-
-
-/**
- * Add evidence.
- */
-export function addEvidence() {
-  const evidence_select = <HTMLSelectElement>(
-    document.getElementById("evi_select")
-  );
-  client.sendPE(
-    (<HTMLInputElement>document.getElementById("evi_name")).value,
-    (<HTMLInputElement>document.getElementById("evi_desc")).value,
-    evidence_select.selectedIndex === 0
-      ? (<HTMLInputElement>document.getElementById("evi_filename")).value
-      : evidence_select.options[evidence_select.selectedIndex].text
-  );
-  cancelEvidence();
-}
-window.addEvidence = addEvidence;
-
-
-
-/**
- * Delete selected evidence.
- */
-export function deleteEvidence() {
-  const id = client.selectedEvidence - 1;
-  client.sendDE(id);
-  cancelEvidence();
-}
-window.deleteEvidence = deleteEvidence;
-
-
-
-
-/**
- * Set the style of the chatbox
- */
-export function setChatbox(style: string) {
-  const chatbox_theme = <HTMLAnchorElement>(
-    document.getElementById("chatbox_theme")
-  );
-  const themeselect = <HTMLSelectElement>(
-    document.getElementById("client_chatboxselect")
-  );
-  CHATBOX = themeselect.value;
-
-  setCookie("chatbox", CHATBOX);
-  if (CHATBOX === "dynamic") {
-    if (chatbox_arr.includes(style)) {
-      chatbox_theme.href = `styles/chatbox/${style}.css`;
-    } else {
-      chatbox_theme.href = "styles/chatbox/aa.css";
-    }
-  } else {
-    chatbox_theme.href = `styles/chatbox/${CHATBOX}.css`;
-  }
-}
-window.setChatbox = setChatbox;
-
-
-
-
-/**
- * Change role via OOC.
- */
-export function changeRoleOOC() {
-  const roleselect = <HTMLInputElement>document.getElementById("role_select");
-
-  client.sendOOC(`/pos ${roleselect.value}`);
-  client.sendServer(`SP#${roleselect.value}#%`);
-  updateActionCommands(roleselect.value);
-}
-window.changeRoleOOC = changeRoleOOC;
-
-/**
- * Random character via OOC.
- */
-export function randomCharacterOOC() {
-  client.sendOOC(`/randomchar`);
-}
-window.randomCharacterOOC = randomCharacterOOC;
-
-/**
- * Call mod.
- */
-export function callMod() {
-  let modcall;
-  if (extrafeatures.includes("modcall_reason")) {
-    modcall = prompt("Please enter the reason for the modcall", "");
-  }
-  if (modcall == null || modcall === "") {
-    // cancel
-  } else {
-    client.sendZZ(modcall);
-  }
-}
-window.callMod = callMod;
-
-/**
- * Declare witness testimony.
- */
-export function initWT() {
-  client.sendRT("testimony1");
-}
-window.initWT = initWT;
-
-/**
- * Declare cross examination.
- */
-export function initCE() {
-  client.sendRT("testimony2");
-}
-window.initCE = initCE;
-
-/**
- * Declare the defendant not guilty
- */
-export function notguilty() {
-  client.sendRT("judgeruling#0");
-}
-window.notguilty = notguilty;
-
-/**
- * Declare the defendant not guilty
- */
-export function guilty() {
-  client.sendRT("judgeruling#1");
-}
-window.guilty = guilty;
-
-/**
- * Increment defense health point.
- */
-export function addHPD() {
-  client.sendHP(1, client.hp[0] + 1);
-}
-window.addHPD = addHPD;
-
-/**
- * Decrement defense health point.
- */
-export function redHPD() {
-  client.sendHP(1, client.hp[0] - 1);
-}
-window.redHPD = redHPD;
-
-/**
- * Increment prosecution health point.
- */
-export function addHPP() {
-  client.sendHP(2, client.hp[1] + 1);
-}
-window.addHPP = addHPP;
-
-/**
- * Decrement prosecution health point.
- */
-export function redHPP() {
-  client.sendHP(2, client.hp[1] - 1);
-}
-window.redHPP = redHPP;
-
-
-/**
- * Highlights and selects a menu.
- * @param {number} menu the menu to be selected
- */
-export function toggleMenu(menu: number) {
-  if (menu !== selectedMenu) {
-    document.getElementById(`menu_${menu}`).className = "menu_button active";
-    document.getElementById(`content_${menu}`).className =
-      "menu_content active";
-    document.getElementById(`menu_${selectedMenu}`).className = "menu_button";
-    document.getElementById(`content_${selectedMenu}`).className =
-      "menu_content";
-    selectedMenu = menu;
-  }
-}
-window.toggleMenu = toggleMenu;
 
 export default Client;
