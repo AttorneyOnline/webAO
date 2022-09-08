@@ -5,5 +5,5 @@ import { client } from "../../client";
  * @param {Array} args packet arguments
  */
 export const handlePN = (_args: string[]) => {
-    client.sendServer("askchaa#%");
+    client.sender.sendServer("askchaa#%");
 }

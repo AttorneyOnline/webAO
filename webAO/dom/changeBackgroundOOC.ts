@@ -22,7 +22,7 @@ export function changeBackgroundOOC() {
     if (mode === "join") {
         client.sendOOC(`/${changeBGCommand.replace("$1", filename)}`);
     } else if (mode === "replay") {
-        client.sendSelf(`BN#${filename}#%`);
+        client.sender.sendSelf(`BN#${filename}#%`);
     }
 }
 window.changeBackgroundOOC = changeBackgroundOOC;

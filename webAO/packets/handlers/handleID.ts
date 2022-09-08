@@ -13,7 +13,7 @@ export const handleID = (args: string[]) => {
         serverVersion = args[2].split("&")[1];
     } else if (serverSoftware === "webAO") {
         setOldLoading(false);
-        client.sendSelf("PN#0#1#%");
+        client.sender.sendSelf("PN#0#1#%");
     } else {
         serverVersion = args[3];
     }

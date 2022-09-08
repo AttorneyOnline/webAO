@@ -7,6 +7,7 @@
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import vanilla_background_arr from "./constants/backgrounds.js";
 import vanilla_evidence_arr from "./constants/evidence.js";
+import {sender, ISender} from './client/sender/index'
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
 import setCookie from "./utils/setCookie";
@@ -87,13 +88,18 @@ function isLowMemory() {
 }
 
 const fpPromise = FingerprintJS.load();
+const connect = (address: string) => {
 
+}
 fpPromise
   .then((fp) => fp.get())
   .then((result) => {
     hdid = result.visitorId;
     console.log("NEW CLIENT");
+
+    // Create the new client and connect it
     client = new Client(serverIP);
+    client.connect()
 
     isLowMemory();
     client.loadResources();
@@ -123,56 +129,51 @@ class Client extends EventEmitter {
   resources: any;
   selectedEmote: number;
   selectedEvidence: number;
+  sender: ISender;
   checkUpdater: any;
   _lastTimeICReceived: any;
   viewport: Viewport;
+  connect: () => void;
   constructor(address: string) {
     super();
-    if (mode !== "replay") {
-      this.serv = new WebSocket(`ws://${address}`);
-      // Assign the websocket events
-      this.serv.addEventListener("open", this.emit.bind(this, "open"));
-      this.serv.addEventListener("close", this.emit.bind(this, "close"));
-      this.serv.addEventListener("message", this.emit.bind(this, "message"));
-      this.serv.addEventListener("error", this.emit.bind(this, "error"));
-    } else {
-      this.joinServer();
+
+    this.connect = () => {
+      this.on("open", this.onOpen.bind(this));
+      this.on("close", this.onClose.bind(this));
+      this.on("message", this.onMessage.bind(this));
+      this.on("error", this.onError.bind(this));
+      if (mode !== "replay") {
+        this.serv = new WebSocket(`ws://${address}`);
+        // Assign the websocket events
+        this.serv.addEventListener("open", this.emit.bind(this, "open"));
+        this.serv.addEventListener("close", this.emit.bind(this, "close"));
+        this.serv.addEventListener("message", this.emit.bind(this, "message"));
+        this.serv.addEventListener("error", this.emit.bind(this, "error"));
+      } else {
+        this.joinServer();
+      }
     }
 
-    this.on("open", this.onOpen.bind(this));
-    this.on("close", this.onClose.bind(this));
-    this.on("message", this.onMessage.bind(this));
-    this.on("error", this.onError.bind(this));
-
-    // Preset some of the variables
-
     this.hp = [0, 0];
-
     this.playerID = 1;
     this.charID = -1;
     this.char_list_length = 0;
     this.evidence_list_length = 0;
     this.music_list_length = 0;
     this.testimonyID = 0;
-
     this.chars = [];
     this.emotes = [];
     this.evidences = [];
     this.areas = [];
     this.musics = [];
-
     this.musics_time = false;
-
     this.callwords = [];
-
     this.resources = getResources(AO_HOST, THEME);
-
     this.selectedEmote = -1;
     this.selectedEvidence = 0;
-
     this.checkUpdater = null;
+    this.sender = sender
     this.viewport = masterViewport(this);
-
     this._lastTimeICReceived = new Date(0);
   }
 
@@ -199,13 +200,7 @@ class Client extends EventEmitter {
       : 0;
   }
 
-  /**
-   * Hook for sending messages to the server
-   * @param {string} message the message to send
-   */
-  sendServer(message: string) {
-    mode === "replay" ? this.sendSelf(message) : this.serv.send(message);
-  }
+
 
   /**
    * Hook for sending messages to the client
@@ -214,17 +209,6 @@ class Client extends EventEmitter {
   handleSelf(message: string) {
     const message_event = new MessageEvent("websocket", { data: message });
     setTimeout(() => this.onMessage(message_event), 1);
-  }
-
-  /**
-   * Hook for sending messages to the client
-   * @param {string} message the message to send
-   */
-  sendSelf(message: string) {
-    (<HTMLInputElement>(
-      document.getElementById("client_ooclog")
-    )).value += `${message}\r\n`;
-    this.handleSelf(message);
   }
 
   /**
@@ -253,110 +237,11 @@ class Client extends EventEmitter {
         // Command Not Recognized
       }
     } else {
-      this.sendServer(`CT#${oocName}#${oocMessage}#%`);
+      this.sender.sendServer(`CT#${oocName}#${oocMessage}#%`);
     }
   }
 
-  /**
-   * Sends an in-character chat message.
-   * @param {number} deskmod controls the desk
-   * @param {string} speaking who is speaking
-   * @param {string} name the name of the current character
-   * @param {string} silent whether or not it's silent
-   * @param {string} message the message to be sent
-   * @param {string} side the name of the side in the background
-   * @param {string} sfx_name the name of the sound effect
-   * @param {number} emote_modifier whether or not to zoom
-   * @param {number} sfx_delay the delay (in milliseconds) to play the sound effect
-   * @param {number} objection_modifier the number of the shout to play
-   * @param {string} evidence the filename of evidence to show
-   * @param {boolean} flip change to 1 to reverse sprite for position changes
-   * @param {boolean} realization screen flash effect
-   * @param {number} text_color text color
-   * @param {string} showname custom name to be displayed (optional)
-   * @param {number} other_charid paired character (optional)
-   * @param {number} self_offset offset to paired character (optional)
-   * @param {number} noninterrupting_preanim play the full preanim (optional)
-   */
-  sendIC(
-    deskmod: number,
-    preanim: string,
-    name: string,
-    emote: string,
-    message: string,
-    side: string,
-    sfx_name: string,
-    emote_modifier: number,
-    sfx_delay: number,
-    objection_modifier: number,
-    evidence: number,
-    flip: boolean,
-    realization: boolean,
-    text_color: number,
-    showname: string,
-    other_charid: string,
-    self_hoffset: number,
-    self_yoffset: number,
-    noninterrupting_preanim: boolean,
-    looping_sfx: boolean,
-    screenshake: boolean,
-    frame_screenshake: string,
-    frame_realization: string,
-    frame_sfx: string,
-    additive: boolean,
-    effect: string
-  ) {
-    let extra_cccc = "";
-    let other_emote = "";
-    let other_offset = "";
-    let extra_27 = "";
-    let extra_28 = "";
 
-    if (extrafeatures.includes("cccc_ic_support")) {
-      const self_offset = extrafeatures.includes("y_offset")
-        ? `${self_hoffset}<and>${self_yoffset}`
-        : self_hoffset; // HACK: this should be an & but client fucked it up and all the servers adopted it
-      if (mode === "replay") {
-        other_emote = "##";
-        other_offset = "#0#0";
-      }
-      extra_cccc = `${escapeChat(
-        showname
-      )}#${other_charid}${other_emote}#${self_offset}${other_offset}#${Number(
-        noninterrupting_preanim
-      )}#`;
-
-      if (extrafeatures.includes("looping_sfx")) {
-        extra_27 = `${Number(looping_sfx)}#${Number(
-          screenshake
-        )}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
-        if (extrafeatures.includes("effects")) {
-          extra_28 = `${Number(additive)}#${escapeChat(effect)}#`;
-        }
-      }
-    }
-
-    const serverMessage =
-      `MS#${deskmod}#${escapeChat(preanim)}#${escapeChat(name)}#${escapeChat(
-        emote
-      )}` +
-      `#${escapeChat(message)}#${escapeChat(side)}#${escapeChat(
-        sfx_name
-      )}#${emote_modifier}` +
-      `#${this.charID}#${sfx_delay}#${Number(objection_modifier)}#${Number(
-        evidence
-      )}#${Number(flip)}#${Number(
-        realization
-      )}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
-
-    this.sendServer(serverMessage);
-    if (mode === "replay") {
-      (<HTMLInputElement>(
-        document.getElementById("client_ooclog")
-      )).value += `wait#${(<HTMLInputElement>document.getElementById("client_replaytimer")).value
-      }#%\r\n`;
-    }
-  }
 
   /**
    * Sends add evidence command.
@@ -365,7 +250,7 @@ class Client extends EventEmitter {
    * @param {string} evidence image filename
    */
   sendPE(name: string, desc: string, img: string) {
-    this.sendServer(
+    this.sender.sendServer(
       `PE#${escapeChat(name)}#${escapeChat(desc)}#${escapeChat(img)}#%`
     );
   }
@@ -378,7 +263,7 @@ class Client extends EventEmitter {
    * @param {string} evidence image filename
    */
   sendEE(id: number, name: string, desc: string, img: string) {
-    this.sendServer(
+    this.sender.sendServer(
       `EE#${id}#${escapeChat(name)}#${escapeChat(desc)}#${escapeChat(img)}#%`
     );
   }
@@ -388,16 +273,17 @@ class Client extends EventEmitter {
    * @param {number} evidence id
    */
   sendDE(id: number) {
-    this.sendServer(`DE#${id}#%`);
+    this.sender.sendServer(`DE#${id}#%`);
+    
   }
-
+  
   /**
    * Sends health point command.
    * @param {number} side the position
    * @param {number} hp the health point
    */
   sendHP(side: number, hp: number) {
-    this.sendServer(`HP#${side}#${hp}#%`);
+    this.sender.sendServer(`HP#${side}#${hp}#%`);
   }
 
   /**
@@ -406,9 +292,9 @@ class Client extends EventEmitter {
    */
   sendZZ(msg: string) {
     if (extrafeatures.includes("modcall_reason")) {
-      this.sendServer(`ZZ#${msg}#%`);
+      this.sender.sendServer(`ZZ#${msg}#%`);
     } else {
-      this.sendServer("ZZ#%");
+      this.sender.sendServer("ZZ#%");
     }
   }
 
@@ -417,7 +303,7 @@ class Client extends EventEmitter {
    * @param {string} testimony type
    */
   sendRT(testimony: string) {
-    this.sendServer(`RT#${testimony}#%`);
+    this.sender.sendServer(`RT#${testimony}#%`);
   }
 
   /**
@@ -425,7 +311,7 @@ class Client extends EventEmitter {
    * @param {string} track the track ID
    */
   sendMusicChange(track: string) {
-    this.sendServer(`MC#${track}#${this.charID}#%`);
+    this.sender.sendServer(`MC#${track}#${this.charID}#%`);
   }
 
   /**
@@ -433,8 +319,9 @@ class Client extends EventEmitter {
    * to the server.
    */
   joinServer() {
-    this.sendServer(`HI#${hdid}#%`);
-    this.sendServer("ID#webAO#webAO#%");
+    console.log(this.sender)
+    this.sender.sendServer(`HI#${hdid}#%`);
+    this.sender.sendServer("ID#webAO#webAO#%");
     if (mode !== "replay") {
       this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
     }
@@ -518,7 +405,7 @@ class Client extends EventEmitter {
    */
   sendCharacter(character: number) {
     if (character === -1 || this.chars[character].name) {
-      this.sendServer(`CC#${this.playerID}#${character}#web#%`);
+      this.sender.sendServer(`CC#${this.playerID}#${character}#web#%`);
     }
   }
 
@@ -527,14 +414,14 @@ class Client extends EventEmitter {
    * @param {number?} song the song to be played
    */
   sendMusic(song: string) {
-    this.sendServer(`MC#${song}#${this.charID}#%`);
+    this.sender.sendServer(`MC#${song}#${this.charID}#%`);
   }
 
   /**
    * Sends a keepalive packet.
    */
   sendCheck() {
-    this.sendServer(`CH#${this.charID}#%`);
+    this.sender.sendServer(`CH#${this.charID}#%`);
   }
 
   /**

@@ -6,8 +6,8 @@ import { client } from "../../client";
  * @param {Array} args packet arguments
  */
 export const handleRD = (_args: string[]) => {
-    client.sendSelf("BN#gs4#%");
-    client.sendSelf("DONE#%");
+    client.sender.sendSelf("BN#gs4#%");
+    client.sender.sendSelf("DONE#%");
     const ooclog = <HTMLInputElement>document.getElementById("client_ooclog");
     ooclog.value = "";
     ooclog.readOnly = false;

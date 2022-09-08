@@ -34,8 +34,8 @@ export const handleSI = (args: string[]) => {
 
     // this is determined at the top of this file
     if (!oldLoading && extrafeatures.includes("fastloading")) {
-        client.sendServer("RC#%");
+        client.sender.sendServer("RC#%");
     } else {
-        client.sendServer("askchar2#%");
+        client.sender.sendServer("askchar2#%");
     }
 }
