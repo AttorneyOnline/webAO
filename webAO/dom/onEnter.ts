@@ -69,7 +69,7 @@ import { escapeChat } from "../encoding";
         emote_mod = 0;
       }
   
-      client.sendIC(
+      client.sender.sendIC(
         myemo.deskmod,
         myemo.preanim,
         mychar.name,

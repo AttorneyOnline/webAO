@@ -33,5 +33,5 @@ export const handleSC = async (args: string[]) => {
         client.handleCharacterInfo(chargs, charid);
     }
     // We're done with the characters, request the music
-    client.sendServer("RM#%");
+    client.sender.sendServer("RM#%");
 }

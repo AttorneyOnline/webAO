@@ -7,8 +7,8 @@ const version = process.env.npm_package_version;
  * @param {Array} args packet arguments
  */
 export const handleHI = (_args: string[]) => {
-    client.sendSelf(`ID#1#webAO#${version}#%`);
-    client.sendSelf(
+    client.sender.sendSelf(`ID#1#webAO#${version}#%`);
+    client.sender.sendSelf(
         "FL#fastloading#yellowtext#cccc_ic_support#flipping#looping_sfx#effects#%"
     );
 }

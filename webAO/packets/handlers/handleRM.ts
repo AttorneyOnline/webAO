@@ -6,5 +6,5 @@ import vanilla_music_arr from "../../constants/music.js";
    * @param {Array} args packet arguments
    */
 export const handleRM = (_args: string[]) => {
-    client.sendSelf(`SM#${vanilla_music_arr.join("#")}#%`);
+    client.sender.sendSelf(`SM#${vanilla_music_arr.join("#")}#%`);
   }

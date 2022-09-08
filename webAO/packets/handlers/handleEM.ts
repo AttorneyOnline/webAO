@@ -35,5 +35,5 @@ export const handleEM = (args: string[]) => {
     }
 
     // get the next batch of tracks
-    client.sendServer(`AM#${Number(args[1]) / 10 + 1}#%`);
+    client.sender.sendServer(`AM#${Number(args[1]) / 10 + 1}#%`);
 }

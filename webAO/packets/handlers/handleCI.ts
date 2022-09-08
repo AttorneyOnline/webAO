@@ -22,5 +22,5 @@ export const handleCI = (args: string[]) => {
         }
     }
     // Request the next pack
-    client.sendServer(`AN#${Number(args[1]) / 10 + 1}#%`);
+    client.sender.sendServer(`AN#${Number(args[1]) / 10 + 1}#%`);
 }

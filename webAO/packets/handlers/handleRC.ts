@@ -6,5 +6,5 @@ import vanilla_character_arr from "../../constants/characters.js";
  * @param {Array} args packet arguments
  */
 export const handleRC = (_args: string[]) => {
-    client.sendSelf(`SC#${vanilla_character_arr.join("#")}#%`);
+    client.sender.sendSelf(`SC#${vanilla_character_arr.join("#")}#%`);
 }

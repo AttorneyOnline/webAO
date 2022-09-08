@@ -6,5 +6,5 @@ import vanilla_character_arr from "../../constants/characters.js";
    * @param {Array} args packet arguments
    */
 export const handleaskchaa = (_args: string[]) => {
-    client.sendSelf(`SI#${vanilla_character_arr.length}#0#0#%`);
+    client.sender.sendSelf(`SI#${vanilla_character_arr.length}#0#0#%`);
 }

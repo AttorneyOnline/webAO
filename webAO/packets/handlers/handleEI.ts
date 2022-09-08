@@ -26,5 +26,5 @@ export const handleEI = (args: string[]) => {
         icon: `${AO_HOST}evidence/${encodeURI(arg[3].toLowerCase())}`,
     };
 
-    client.sendServer("AE" + (evidenceID + 1) + "#%");
+    client.sender.sendServer("AE" + (evidenceID + 1) + "#%");
 }

@@ -32,5 +32,5 @@ export const handleSM = (args: string[]) => {
     }
 
     // Music done, carry on
-    client.sendServer("RD#%");
+    client.sender.sendServer("RD#%");
 }
