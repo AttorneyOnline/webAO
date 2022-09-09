@@ -3,35 +3,18 @@
  * made by sD, refactored by oldmud0 and Qubrick
  * credits to aleks for original idea and source
  */
-import {isLowMemory} from './client/isLowMemory'
+import { isLowMemory } from './client/isLowMemory'
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import vanilla_background_arr from "./constants/backgrounds.js";
-import vanilla_evidence_arr from "./constants/evidence.js";
-import {sender, ISender} from './client/sender/index'
-import iniParse from "./iniParse";
-import getCookie from "./utils/getCookie";
-import fileExists from "./utils/fileExists.js";
+import { sender, ISender } from './client/sender/index'
 import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources.js";
-import downloadFile from "./services/downloadFile";
 import masterViewport, { Viewport } from "./viewport";
 import { EventEmitter } from "events";
-import { area_click } from './dom/areaClick'
 import { onReplayGo } from './dom/onReplayGo'
-import { safeTags, unescapeChat } from "./encoding";
-import { setChatbox } from "./dom/setChatbox";
-import { request } from "./services/request.js";
-import {
-  changeShoutVolume,
-  changeSFXVolume,
-  changeTestimonyVolume,
-} from "./dom/changeVolume.js";
-import { getFilenameFromPath } from "./utils/paths";
 import { packetHandler } from './packets/packetHandler'
-import { showname_click } from './dom/showNameClick'
+import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
-
-const version = process.env.npm_package_version;
+import { fetchBackgroundList, fetchEvidenceList } from './client/fetchLists'
 let { ip: serverIP, mode, theme } = queryParser();
 
 let THEME: string = theme || "default";
@@ -82,12 +65,10 @@ fpPromise
   .then((fp) => fp.get())
   .then((result) => {
     hdid = result.visitorId;
-    console.log("NEW CLIENT");
 
-    // Create the new client and connect it
     client = new Client(serverIP);
     client.connect()
-    isLowMemory();
+    client.isLowMemory();
     client.loadResources();
   });
 
@@ -122,6 +103,8 @@ class Client extends EventEmitter {
   _lastTimeICReceived: any;
   viewport: Viewport;
   connect: () => void;
+  loadResources: () => void
+  isLowMemory: () => void
   constructor(address: string) {
     super();
 
@@ -163,6 +146,8 @@ class Client extends EventEmitter {
     this.sender = sender
     this.viewport = masterViewport(this);
     this._lastTimeICReceived = new Date(0);
+    loadResources
+    isLowMemory
   }
 
   /**
@@ -188,8 +173,6 @@ class Client extends EventEmitter {
       : 0;
   }
 
-
-
   /**
    * Hook for sending messages to the client
    * @param {string} message the message to send
@@ -204,84 +187,11 @@ class Client extends EventEmitter {
    * to the server.
    */
   joinServer() {
-    console.log(this.sender)
     this.sender.sendServer(`HI#${hdid}#%`);
     this.sender.sendServer("ID#webAO#webAO#%");
     if (mode !== "replay") {
       this.checkUpdater = setInterval(() => this.sender.sendCheck(), 5000);
     }
-  }
-
-  /**
-   * Load game resources and stored settings.
-   */
-  loadResources() {
-    document.getElementById("client_version").innerText = `version ${version}`;
-
-    // Load background array to select
-    const background_select = <HTMLSelectElement>(
-      document.getElementById("bg_select")
-    );
-    background_select.add(new Option("Custom", "0"));
-    vanilla_background_arr.forEach((background) => {
-      background_select.add(new Option(background));
-    });
-
-    // Load evidence array to select
-    const evidence_select = <HTMLSelectElement>(
-      document.getElementById("evi_select")
-    );
-    evidence_select.add(new Option("Custom", "0"));
-    vanilla_evidence_arr.forEach((evidence) => {
-      evidence_select.add(new Option(evidence));
-    });
-
-    // Read cookies and set the UI to its values
-    (<HTMLInputElement>document.getElementById("OOC_name")).value =
-      getCookie("OOC_name") ||
-      `web${String(Math.round(Math.random() * 100 + 10))}`;
-
-    // Read cookies and set the UI to its values
-    const cookietheme = getCookie("theme") || "default";
-
-    (<HTMLOptionElement>(
-      document.querySelector(`#client_themeselect [value="${cookietheme}"]`)
-    )).selected = true;
-    this.viewport.reloadTheme();
-
-    const cookiechatbox = getCookie("chatbox") || "dynamic";
-
-    (<HTMLOptionElement>(
-      document.querySelector(`#client_chatboxselect [value="${cookiechatbox}"]`)
-    )).selected = true;
-    setChatbox(cookiechatbox);
-
-    (<HTMLInputElement>document.getElementById("client_mvolume")).value =
-      getCookie("musicVolume") || "1";
-    this.viewport.changeMusicVolume();
-    (<HTMLAudioElement>document.getElementById("client_sfxaudio")).volume =
-      Number(getCookie("sfxVolume")) || 1;
-    changeSFXVolume();
-    (<HTMLAudioElement>document.getElementById("client_shoutaudio")).volume =
-      Number(getCookie("shoutVolume")) || 1;
-    changeShoutVolume();
-    (<HTMLAudioElement>(
-      document.getElementById("client_testimonyaudio")
-    )).volume = Number(getCookie("testimonyVolume")) || 1;
-    changeTestimonyVolume();
-    (<HTMLInputElement>document.getElementById("client_bvolume")).value =
-      getCookie("blipVolume") || "1";
-    this.viewport.changeBlipVolume();
-
-    (<HTMLInputElement>document.getElementById("ic_chat_name")).value =
-      getCookie("ic_chat_name");
-    (<HTMLInputElement>document.getElementById("showname")).checked = Boolean(
-      getCookie("showname")
-    );
-    showname_click(null);
-
-    (<HTMLInputElement>document.getElementById("client_callwords")).value =
-      getCookie("callwords");
   }
 
   /**
@@ -369,129 +279,6 @@ class Client extends EventEmitter {
     }
   }
 
-  saveChatlogHandle = async () => {
-    const clientLog = document.getElementById("client_log");
-    const icMessageLogs = clientLog.getElementsByTagName("p");
-    const messages = [];
-
-    for (let i = 0; i < icMessageLogs.length; i++) {
-      const SHOWNAME_POSITION = 0;
-      const TEXT_POSITION = 2;
-      const showname = icMessageLogs[i].children[SHOWNAME_POSITION].innerHTML;
-      const text = icMessageLogs[i].children[TEXT_POSITION].innerHTML;
-      const message = `${showname}: ${text}`;
-      messages.push(message);
-    }
-    const d = new Date();
-    let ye = new Intl.DateTimeFormat("en", { year: "numeric" }).format(d);
-    let mo = new Intl.DateTimeFormat("en", { month: "short" }).format(d);
-    let da = new Intl.DateTimeFormat("en", { day: "2-digit" }).format(d);
-
-    const filename = `chatlog-${da}-${mo}-${ye}`.toLowerCase();
-    downloadFile(messages.join("\n"), filename);
-
-    // Reset Chatbox to Empty
-    (<HTMLInputElement>document.getElementById("client_inputbox")).value = "";
-  };
-
-  /**
-   * Handles the incoming character information, and downloads the sprite + ini for it
-   * @param {Array} chargs packet arguments
-   * @param {Number} charid character ID
-   */
-  async handleCharacterInfo(chargs: string[], charid: number) {
-    const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
-    if (chargs[0]) {
-      let cini: any = {};
-      const getCharIcon = async () => {
-        const extensions = [".png", ".webp"];
-        img.alt = chargs[0];
-        const charIconBaseUrl = `${AO_HOST}characters/${encodeURI(
-          chargs[0].toLowerCase()
-        )}/char_icon`;
-        for (let i = 0; i < extensions.length; i++) {
-          const fileUrl = charIconBaseUrl + extensions[i];
-          const exists = await fileExists(fileUrl);
-          if (exists) {
-            img.alt = chargs[0];
-            img.title = chargs[0];
-            img.src = fileUrl;
-            return;
-          }
-        }
-      };
-      getCharIcon();
-
-      // If the ini doesn't exist on the server this will throw an error
-      try {
-        const cinidata = await request(
-          `${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char.ini`
-        );
-        cini = iniParse(cinidata);
-      } catch (err) {
-        cini = {};
-        img.classList.add("noini");
-        console.warn(`character ${chargs[0]} is missing from webAO`);
-        // If it does, give the user a visual indication that the character is unusable
-      }
-
-      const mute_select = <HTMLSelectElement>(
-        document.getElementById("mute_select")
-      );
-      mute_select.add(new Option(safeTags(chargs[0]), String(charid)));
-      const pair_select = <HTMLSelectElement>(
-        document.getElementById("pair_select")
-      );
-      pair_select.add(new Option(safeTags(chargs[0]), String(charid)));
-
-      // sometimes ini files lack important settings
-      const default_options = {
-        name: chargs[0],
-        showname: chargs[0],
-        side: "def",
-        blips: "male",
-        chat: "",
-        category: "",
-      };
-      cini.options = Object.assign(default_options, cini.options);
-
-      // sometimes ini files lack important settings
-      const default_emotions = {
-        number: 0,
-      };
-      cini.emotions = Object.assign(default_emotions, cini.emotions);
-
-      this.chars[charid] = {
-        name: safeTags(chargs[0]),
-        showname: safeTags(cini.options.showname),
-        desc: safeTags(chargs[1]),
-        blips: safeTags(cini.options.blips).toLowerCase(),
-        gender: safeTags(cini.options.gender).toLowerCase(),
-        side: safeTags(cini.options.side).toLowerCase(),
-        chat:
-          cini.options.chat === ""
-            ? safeTags(cini.options.category).toLowerCase()
-            : safeTags(cini.options.chat).toLowerCase(),
-        evidence: chargs[3],
-        icon: img.src,
-        inifile: cini,
-        muted: false,
-      };
-
-      if (
-        this.chars[charid].blips === "male" &&
-        this.chars[charid].gender !== "male" &&
-        this.chars[charid].gender !== ""
-      ) {
-        this.chars[charid].blips = this.chars[charid].gender;
-      }
-
-    } else {
-      console.warn(`missing charid ${charid}`);
-      img.style.display = "none";
-    }
-  }
-
   resetMusicList() {
     this.musics = [];
     document.getElementById("client_musiclist").innerHTML = "";
@@ -501,144 +288,10 @@ class Client extends EventEmitter {
     this.areas = [];
     document.getElementById("areas").innerHTML = "";
 
-    this.fetchBackgroundList();
-    this.fetchEvidenceList();
+    fetchBackgroundList();
+    fetchEvidenceList();
   }
 
-  async fetchBackgroundList() {
-    try {
-      const bgdata = await request(`${AO_HOST}backgrounds.json`);
-      const bg_array = JSON.parse(bgdata);
-      // the try catch will fail before here when there is no file
-
-      const bg_select = <HTMLSelectElement>document.getElementById("bg_select");
-      bg_select.innerHTML = "";
-
-      bg_select.add(new Option("Custom", "0"));
-      bg_array.forEach((background: string) => {
-        bg_select.add(new Option(background));
-      });
-    } catch (err) {
-      console.warn("there was no backgrounds.json file");
-    }
-  }
-
-  async fetchCharacterList() {
-    try {
-      const chardata = await request(`${AO_HOST}characters.json`);
-      const char_array = JSON.parse(chardata);
-      // the try catch will fail before here when there is no file
-
-      const char_select = <HTMLSelectElement>(
-        document.getElementById("client_ininame")
-      );
-      char_select.innerHTML = "";
-
-      char_array.forEach((character: string) => {
-        char_select.add(new Option(character));
-      });
-    } catch (err) {
-      console.warn("there was no characters.json file");
-    }
-  }
-
-  async fetchEvidenceList() {
-    try {
-      const evidata = await request(`${AO_HOST}evidence.json`);
-      const evi_array = JSON.parse(evidata);
-      // the try catch will fail before here when there is no file
-
-      const evi_select = <HTMLSelectElement>(
-        document.getElementById("evi_select")
-      );
-      evi_select.innerHTML = "";
-
-      evi_array.forEach((evi: string) => {
-        evi_select.add(new Option(evi));
-      });
-      evi_select.add(new Option("Custom", "0"));
-    } catch (err) {
-      console.warn("there was no evidence.json file");
-    }
-  }
-
-  isAudio(trackname: string) {
-    const audioEndings = [".wav", ".mp3", ".ogg", ".opus"];
-    return (
-      audioEndings.filter((ending) => trackname.endsWith(ending)).length === 1
-    );
-  }
-
-  addTrack(trackname: string) {
-    const newentry = <HTMLOptionElement>document.createElement("OPTION");
-    const songName = getFilenameFromPath(trackname);
-    newentry.text = unescapeChat(songName);
-    newentry.value = trackname;
-    (<HTMLSelectElement>(
-      document.getElementById("client_musiclist")
-    )).options.add(newentry);
-    this.musics.push(trackname);
-  }
-
-  createArea(id: number, name: string) {
-    const thisarea = {
-      name,
-      players: 0,
-      status: "IDLE",
-      cm: "",
-      locked: "FREE",
-    };
-
-    this.areas.push(thisarea);
-
-    // Create area button
-    const newarea = document.createElement("SPAN");
-    newarea.className = "area-button area-default";
-    newarea.id = `area${id}`;
-    newarea.innerText = thisarea.name;
-    newarea.title =
-      `Players: ${thisarea.players}\n` +
-      `Status: ${thisarea.status}\n` +
-      `CM: ${thisarea.cm}\n` +
-      `Area lock: ${thisarea.locked}`;
-    newarea.onclick = function () {
-      area_click(newarea);
-    };
-
-    document.getElementById("areas").appendChild(newarea);
-  }
-
-  /**
-   * Area list fuckery
-   */
-  fix_last_area() {
-    if (this.areas.length > 0) {
-      const malplaced = this.areas.pop().name;
-      const areas = document.getElementById("areas");
-      areas.removeChild(areas.lastChild);
-      this.addTrack(malplaced);
-    }
-  }
-
-  /**
-   * Handles the kicked packet
-   * @param {string} type is it a kick or a ban
-   * @param {string} reason why
-   */
-  handleBans(type: string, reason: string) {
-    document.getElementById("client_error").style.display = "flex";
-    document.getElementById(
-      "client_errortext"
-    ).innerHTML = `${type}:<br>${reason.replace(/\n/g, "<br />")}`;
-    (<HTMLElement>(
-      document.getElementsByClassName("client_reconnect")[0]
-    )).style.display = "none";
-    (<HTMLElement>(
-      document.getElementsByClassName("client_reconnect")[1]
-    )).style.display = "none";
-  }
 }
-
-
 
 export default Client;
