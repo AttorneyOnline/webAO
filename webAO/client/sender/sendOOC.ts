@@ -1,7 +1,7 @@
 import { client } from '../../client'
 import { escapeChat } from '../../encoding';
 import setCookie from '../../utils/setCookie';
-
+import { saveChatlogHandle } from '../../client/saveChatLogHandle'
 /**
  * Sends an out-of-character chat message.
  * @param {string} message the message to send
@@ -17,7 +17,7 @@ export const sendOOC = (message: string) => {
     const oocMessage = `${escapeChat(message)}`;
 
     const commands = {
-        "/save_chatlog": client.saveChatlogHandle,
+        "/save_chatlog": saveChatlogHandle,
     };
     const commandsMap = new Map(Object.entries(commands));
 

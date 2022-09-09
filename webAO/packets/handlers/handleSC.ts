@@ -1,6 +1,7 @@
 import queryParser from "../../utils/queryParser";
 
 import { client } from '../../client'
+import { handleCharacterInfo } from "../../client/handleCharacterInfo";
 let { mode } = queryParser();
 
 /**
@@ -30,7 +31,7 @@ export const handleSC = async (args: string[]) => {
             document.getElementById("client_loadingbar")
         )).value = charid;
         await sleep(0.1); // TODO: Too many network calls without this. net::ERR_INSUFFICIENT_RESOURCES
-        client.handleCharacterInfo(chargs, charid);
+        handleCharacterInfo(chargs, charid);
     }
     // We're done with the characters, request the music
     client.sender.sendServer("RM#%");

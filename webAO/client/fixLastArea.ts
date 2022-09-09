@@ -1,4 +1,5 @@
 import { client } from "../client";
+import { addTrack } from "./addTrack";
 
 
 /**
@@ -9,6 +10,6 @@ export const fix_last_area = () => {
         const malplaced = client.areas.pop().name;
         const areas = document.getElementById("areas")!;
         areas.removeChild(areas.lastChild);
-        client.addTrack(malplaced);
+        addTrack(malplaced);
     }
 }
