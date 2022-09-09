@@ -5,7 +5,7 @@ import { client } from '../client'
  */
 export function area_click(el: HTMLElement) {
     const area = client.areas[el.id.substr(4)].name;
-    client.sendMusicChange(area);
+    client.sender.sendMusicChange(area);
 
     const areaHr = document.createElement("div");
     areaHr.className = "hrtext";
