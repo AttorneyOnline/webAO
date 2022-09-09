@@ -212,109 +212,6 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Sends an out-of-character chat message.
-   * @param {string} message the message to send
-   */
-  sendOOC(message: string) {
-    setCookie(
-      "OOC_name",
-      (<HTMLInputElement>document.getElementById("OOC_name")).value
-    );
-    const oocName = `${escapeChat(
-      (<HTMLInputElement>document.getElementById("OOC_name")).value
-    )}`;
-    const oocMessage = `${escapeChat(message)}`;
-
-    const commands = {
-      "/save_chatlog": this.saveChatlogHandle,
-    };
-    const commandsMap = new Map(Object.entries(commands));
-
-    if (oocMessage && commandsMap.has(oocMessage.toLowerCase())) {
-      try {
-        commandsMap.get(oocMessage.toLowerCase())();
-      } catch (e) {
-        // Command Not Recognized
-      }
-    } else {
-      this.sender.sendServer(`CT#${oocName}#${oocMessage}#%`);
-    }
-  }
-
-
-
-  /**
-   * Sends add evidence command.
-   * @param {string} evidence name
-   * @param {string} evidence description
-   * @param {string} evidence image filename
-   */
-  sendPE(name: string, desc: string, img: string) {
-    this.sender.sendServer(
-      `PE#${escapeChat(name)}#${escapeChat(desc)}#${escapeChat(img)}#%`
-    );
-  }
-
-  /**
-   * Sends edit evidence command.
-   * @param {number} evidence id
-   * @param {string} evidence name
-   * @param {string} evidence description
-   * @param {string} evidence image filename
-   */
-  sendEE(id: number, name: string, desc: string, img: string) {
-    this.sender.sendServer(
-      `EE#${id}#${escapeChat(name)}#${escapeChat(desc)}#${escapeChat(img)}#%`
-    );
-  }
-
-  /**
-   * Sends delete evidence command.
-   * @param {number} evidence id
-   */
-  sendDE(id: number) {
-    this.sender.sendServer(`DE#${id}#%`);
-    
-  }
-  
-  /**
-   * Sends health point command.
-   * @param {number} side the position
-   * @param {number} hp the health point
-   */
-  sendHP(side: number, hp: number) {
-    this.sender.sendServer(`HP#${side}#${hp}#%`);
-  }
-
-  /**
-   * Sends call mod command.
-   * @param {string} message to mod
-   */
-  sendZZ(msg: string) {
-    if (extrafeatures.includes("modcall_reason")) {
-      this.sender.sendServer(`ZZ#${msg}#%`);
-    } else {
-      this.sender.sendServer("ZZ#%");
-    }
-  }
-
-  /**
-   * Sends testimony command.
-   * @param {string} testimony type
-   */
-  sendRT(testimony: string) {
-    this.sender.sendServer(`RT#${testimony}#%`);
-  }
-
-  /**
-   * Requests to change the music to the specified track.
-   * @param {string} track the track ID
-   */
-  sendMusicChange(track: string) {
-    this.sender.sendServer(`MC#${track}#${this.charID}#%`);
-  }
-
-  /**
    * Begins the handshake process by sending an identifier
    * to the server.
    */
@@ -323,7 +220,7 @@ class Client extends EventEmitter {
     this.sender.sendServer(`HI#${hdid}#%`);
     this.sender.sendServer("ID#webAO#webAO#%");
     if (mode !== "replay") {
-      this.checkUpdater = setInterval(() => this.sendCheck(), 5000);
+      this.checkUpdater = setInterval(() => this.sender.sendCheck(), 5000);
     }
   }
 
@@ -397,31 +294,6 @@ class Client extends EventEmitter {
 
     (<HTMLInputElement>document.getElementById("client_callwords")).value =
       getCookie("callwords");
-  }
-
-  /**
-   * Requests to play as a specified character.
-   * @param {number} character the character ID
-   */
-  sendCharacter(character: number) {
-    if (character === -1 || this.chars[character].name) {
-      this.sender.sendServer(`CC#${this.playerID}#${character}#web#%`);
-    }
-  }
-
-  /**
-   * Requests to select a music track.
-   * @param {number?} song the song to be played
-   */
-  sendMusic(song: string) {
-    this.sender.sendServer(`MC#${song}#${this.charID}#%`);
-  }
-
-  /**
-   * Sends a keepalive packet.
-   */
-  sendCheck() {
-    this.sender.sendServer(`CH#${this.charID}#%`);
   }
 
   /**

@@ -6,7 +6,7 @@ import { client } from '../client'
 export function changeRoleOOC() {
     const roleselect = <HTMLInputElement>document.getElementById("role_select");
 
-    client.sendOOC(`/pos ${roleselect.value}`);
+    client.sender.sendOOC(`/pos ${roleselect.value}`);
     client.sender.sendServer(`SP#${roleselect.value}#%`);
     updateActionCommands(roleselect.value);
 }

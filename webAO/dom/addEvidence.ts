@@ -8,7 +8,7 @@ import { cancelEvidence } from "./cancelEvidence";
     const evidence_select = <HTMLSelectElement>(
       document.getElementById("evi_select")
     );
-    client.sendPE(
+    client.sender.sendPE(
       (<HTMLInputElement>document.getElementById("evi_name")).value,
       (<HTMLInputElement>document.getElementById("evi_desc")).value,
       evidence_select.selectedIndex === 0

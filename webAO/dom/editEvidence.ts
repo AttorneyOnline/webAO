@@ -9,7 +9,7 @@ export function editEvidence() {
         document.getElementById("evi_select")
     );
     const id = client.selectedEvidence - 1;
-    client.sendEE(
+    client.sender.sendEE(
         id,
         (<HTMLInputElement>document.getElementById("evi_name")).value,
         (<HTMLInputElement>document.getElementById("evi_desc")).value,

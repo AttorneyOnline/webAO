@@ -6,7 +6,7 @@ import { cancelEvidence } from "./cancelEvidence";
  */
 export function deleteEvidence() {
     const id = client.selectedEvidence - 1;
-    client.sendDE(id);
+    client.sender.sendDE(id);
     cancelEvidence();
 }
 window.deleteEvidence = deleteEvidence;
