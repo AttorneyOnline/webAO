@@ -3,14 +3,13 @@
  * made by sD, refactored by oldmud0 and Qubrick
  * credits to aleks for original idea and source
  */
-
+import {isLowMemory} from './client/isLowMemory'
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import vanilla_background_arr from "./constants/backgrounds.js";
 import vanilla_evidence_arr from "./constants/evidence.js";
 import {sender, ISender} from './client/sender/index'
 import iniParse from "./iniParse";
 import getCookie from "./utils/getCookie";
-import setCookie from "./utils/setCookie";
 import fileExists from "./utils/fileExists.js";
 import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources.js";
@@ -19,7 +18,7 @@ import masterViewport, { Viewport } from "./viewport";
 import { EventEmitter } from "events";
 import { area_click } from './dom/areaClick'
 import { onReplayGo } from './dom/onReplayGo'
-import { escapeChat, safeTags, unescapeChat } from "./encoding";
+import { safeTags, unescapeChat } from "./encoding";
 import { setChatbox } from "./dom/setChatbox";
 import { request } from "./services/request.js";
 import {
@@ -77,20 +76,8 @@ export const setBanned = (val: boolean) => {
 }
 let hdid: string;
 
-function isLowMemory() {
-  if (
-    /webOS|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|PlayStation|Nintendo|Opera Mini/i.test(
-      navigator.userAgent
-    )
-  ) {
-    oldLoading = true;
-  }
-}
-
 const fpPromise = FingerprintJS.load();
-const connect = (address: string) => {
 
-}
 fpPromise
   .then((fp) => fp.get())
   .then((result) => {
@@ -100,15 +87,16 @@ fpPromise
     // Create the new client and connect it
     client = new Client(serverIP);
     client.connect()
-
     isLowMemory();
     client.loadResources();
   });
 
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-let lastICMessageTime = new Date(0);
-
+export let lastICMessageTime = new Date(0);
+export const setLastICMessageTime = (val: Date) => {
+  lastICMessageTime = val
+}
 class Client extends EventEmitter {
   serv: any;
   hp: number[];
@@ -335,7 +323,6 @@ class Client extends EventEmitter {
     packetHandler.has(packetHeader)
       ? packetHandler.get(packetHeader)(splitPacket)
       : console.warn(`Invalid packet header ${packetHeader}`);
-
   }
 
   /**
@@ -353,7 +340,6 @@ class Client extends EventEmitter {
    */
   cleanup() {
     clearInterval(this.checkUpdater);
-
     this.serv.close();
   }
 
@@ -653,93 +639,6 @@ class Client extends EventEmitter {
   }
 }
 
-/**
- * Resets the IC parameters for the player to enter a new chat message.
- * This should only be called when the player's previous chat message
- * was successfully sent/presented.
- */
-export function resetICParams() {
-  (<HTMLInputElement>document.getElementById("client_inputbox")).value = "";
-  document.getElementById("button_flash").className = "client_button";
-  document.getElementById("button_shake").className = "client_button";
 
-  (<HTMLInputElement>document.getElementById("sendpreanim")).checked = false;
-  (<HTMLInputElement>document.getElementById("sendsfx")).checked = false;
-
-  if (selectedShout) {
-    document.getElementById(`button_${selectedShout}`).className =
-      "client_button";
-    selectedShout = 0;
-  }
-}
-
-/**
- * Appends a message to the in-character chat log.
- * @param {string} msg the string to be added
- * @param {string} name the name of the sender
- */
-export function appendICLog(
-  msg: string,
-  showname = "",
-  nameplate = "",
-  time = new Date()
-) {
-  const entry = document.createElement("p");
-  const shownameField = document.createElement("span");
-  const nameplateField = document.createElement("span");
-  const textField = document.createElement("span");
-  nameplateField.className = "iclog_name iclog_nameplate";
-  nameplateField.appendChild(document.createTextNode(nameplate));
-
-  shownameField.className = "iclog_name iclog_showname";
-  if (showname === "" || !showname) {
-    shownameField.appendChild(document.createTextNode(nameplate));
-  } else {
-    shownameField.appendChild(document.createTextNode(showname));
-  }
-
-  textField.className = "iclog_text";
-  textField.appendChild(document.createTextNode(msg));
-
-  entry.appendChild(shownameField);
-  entry.appendChild(nameplateField);
-  entry.appendChild(textField);
-
-  // Only put a timestamp if the minute has changed.
-  if (lastICMessageTime.getMinutes() !== time.getMinutes()) {
-    const timeStamp = document.createElement("span");
-    timeStamp.className = "iclog_time";
-    timeStamp.innerText = time.toLocaleTimeString(undefined, {
-      hour: "numeric",
-      minute: "2-digit",
-    });
-    entry.appendChild(timeStamp);
-  }
-
-  const clientLog = document.getElementById("client_log");
-  clientLog.appendChild(entry);
-
-  /* This is a little buggy - some troubleshooting might be desirable */
-  if (clientLog.scrollTop > clientLog.scrollHeight - 800) {
-    clientLog.scrollTop = clientLog.scrollHeight;
-  }
-
-  lastICMessageTime = new Date();
-}
-
-/**
- * check if the message contains an entry on our callword list
- * @param {string} message
- */
-export function checkCallword(message: string, sfxAudio: HTMLAudioElement) {
-  client.callwords.forEach(testCallword);
-  function testCallword(item: string) {
-    if (item !== "" && message.toLowerCase().includes(item.toLowerCase())) {
-      sfxAudio.pause();
-      sfxAudio.src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
-      sfxAudio.play();
-    }
-  }
-}
 
 export default Client;
