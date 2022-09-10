@@ -8,7 +8,8 @@ import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { sender, ISender } from './client/sender/index'
 import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources.js";
-import masterViewport, { Viewport } from "./viewport";
+import masterViewport from "./viewport/viewport";
+import { Viewport } from './viewport/interfaces/Viewport';
 import { EventEmitter } from "events";
 import { onReplayGo } from './dom/onReplayGo'
 import { packetHandler } from './packets/packetHandler'
