@@ -1,5 +1,6 @@
-import { client, setBanned } from "../../client";
+import { setBanned } from "../../client";
 import { safeTags } from "../../encoding";
+import { handleBans } from '../../client/handleBans'
 
 /**
  * Handles the banned packet
@@ -7,6 +8,6 @@ import { safeTags } from "../../encoding";
  * @param {Array} args ban reason
  */
 export const handleKB = (args: string[]) => {
-    client.handleBans("Banned", safeTags(args[1]));
+    handleBans("Banned", safeTags(args[1]));
     setBanned(true);
 }

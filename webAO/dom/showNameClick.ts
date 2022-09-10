@@ -5,7 +5,7 @@ import setCookie from "../utils/setCookie";
  * Triggered when the showname checkboc is clicked
  * @param {MouseEvent} event
  */
-export function showname_click(_event: Event) {
+export function showname_click(_event: Event | null) {
     setCookie(
         "showname",
         String((<HTMLInputElement>document.getElementById("showname")).checked)

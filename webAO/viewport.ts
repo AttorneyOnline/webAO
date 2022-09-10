@@ -1,19 +1,20 @@
 import tryUrls from "./utils/tryUrls";
 import fileExists from "./utils/fileExists";
 import Client, { delay } from "./client";
-import {opusCheck} from './dom/opusCheck'
+import { opusCheck } from './dom/opusCheck'
 import { UPDATE_INTERVAL } from "./client";
 import { setChatbox } from "./dom/setChatbox";
 import { resizeChatbox } from "./dom/resizeChatbox";
 import transparentPng from "./constants/transparentPng";
 import mlConfig from "./utils/aoml";
-import { appendICLog } from "./client";
-import { checkCallword } from "./client";
 import setEmote from "./client/setEmote";
 import getAnimLength from "./utils/getAnimLength";
 import { safeTags } from "./encoding";
 import setCookie from "./utils/setCookie";
 import { AO_HOST } from "./client/aoHost";
+import { appendICLog } from "./client/appendICLog";
+import { checkCallword } from './client/checkCallword'
+
 interface ChatMsg {
   content: string;
   objection: number;
@@ -449,7 +450,7 @@ const viewport = (masterClient: Client): Viewport => {
 
     const displayname =
       (<HTMLInputElement>document.getElementById("showname")).checked &&
-      chatmsg.showname !== ""
+        chatmsg.showname !== ""
         ? chatmsg.showname
         : chatmsg.nameplate;
 
@@ -620,9 +621,9 @@ const viewport = (masterClient: Client): Viewport => {
 
     blipChannels.forEach(
       (channel: HTMLAudioElement) =>
-        (channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(
-          chatmsg.blips.toLowerCase()
-        )}.opus`)
+      (channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(
+        chatmsg.blips.toLowerCase()
+      )}.opus`)
     );
 
     // process markup
@@ -637,15 +638,15 @@ const viewport = (masterClient: Client): Viewport => {
     fg.style.animation = "";
     const effectName = chatmsg.effects[0].toLowerCase();
     const badEffects = ["", "-", "none"];
-    if (effectName.startsWith("rain") ) {
+    if (effectName.startsWith("rain")) {
       (<HTMLLinkElement>document.getElementById("effect_css")).href = "styles/effects/rain.css";
       let intensity = 200;
-      if(effectName.endsWith("weak")) {
+      if (effectName.endsWith("weak")) {
         intensity = 100;
       } else if (effectName.endsWith("strong")) {
         intensity = 400;
       }
-      if ( intensity < fg.childElementCount)
+      if (intensity < fg.childElementCount)
         fg.innerHTML = '';
       else
         intensity = intensity - fg.childElementCount;
@@ -653,9 +654,9 @@ const viewport = (masterClient: Client): Viewport => {
       for (let i = 0; i < intensity; i++) {
         let drop = document.createElement("p");
         drop.style.left = (Math.random() * 100) + "%";
-        drop.style.animationDelay = String(Math.random())+"s";
+        drop.style.animationDelay = String(Math.random()) + "s";
         fg.appendChild(drop)
-      } 
+      }
     } else if (
       chatmsg.effects[0] &&
       !badEffects.includes(effectName)

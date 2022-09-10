@@ -1,5 +1,6 @@
-import { client, setBanned } from "../../client";
+import { setBanned } from "../../client";
 import { safeTags } from "../../encoding";
+import { handleBans } from '../../client/handleBans'
 
 
 /**
@@ -8,6 +9,6 @@ import { safeTags } from "../../encoding";
  * @param {Array} args ban reason
  */
 export const handleBD = (args: string[]) => {
-    client.handleBans("Banned", safeTags(args[1]));
+    handleBans("Banned", safeTags(args[1]));
     setBanned(true);
 }
