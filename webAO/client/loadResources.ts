@@ -5,7 +5,7 @@ import { client } from "../client";
 import { setChatbox } from "../dom/setChatbox";
 import { changeSFXVolume, changeShoutVolume, changeTestimonyVolume } from "../dom/changeVolume";
 import { showname_click } from "../dom/showNameClick";
-
+import { changeBlipVolume } from '../dom/changeBlipVolume'
 const version = process.env.npm_package_version;
 /**
    * Load game resources and stored settings.
@@ -65,7 +65,7 @@ export const loadResources = () => {
     changeTestimonyVolume();
     (<HTMLInputElement>document.getElementById("client_bvolume")).value =
         getCookie("blipVolume") || "1";
-    client.viewport.changeBlipVolume();
+    changeBlipVolume();
 
     (<HTMLInputElement>document.getElementById("ic_chat_name")).value =
         getCookie("ic_chat_name");
