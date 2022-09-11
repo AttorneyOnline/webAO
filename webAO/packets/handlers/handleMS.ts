@@ -9,7 +9,7 @@ import { handle_ic_speaking } from '../../viewport/utils/handleICSpeaking'
    */
 export const handleMS = (args: string[]) => {
   // TODO: this if-statement might be a bug.
-  if (args[4] !== client.viewport.chatmsg.content) {
+  if (args[4] !== client.viewport.getChatmsg().content) {
     document.getElementById("client_inner_chat")!.innerHTML = "";
 
     const char_id = Number(args[9]);
