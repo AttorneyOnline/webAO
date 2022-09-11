@@ -1,12 +1,14 @@
 import getCookie from "../utils/getCookie";
 import vanilla_evidence_arr from "../constants/evidence.js";
 import vanilla_background_arr from "../constants/backgrounds.js";
-import { client } from "../client";
+import { changeMusicVolume } from '../dom/changeMusicVolume'
 import { setChatbox } from "../dom/setChatbox";
 import { changeSFXVolume, changeShoutVolume, changeTestimonyVolume } from "../dom/changeVolume";
 import { showname_click } from "../dom/showNameClick";
 import { changeBlipVolume } from '../dom/changeBlipVolume'
+import { reloadTheme } from '../dom/reloadTheme'
 const version = process.env.npm_package_version;
+
 /**
    * Load game resources and stored settings.
    */
@@ -41,7 +43,7 @@ export const loadResources = () => {
     (<HTMLOptionElement>(
         document.querySelector(`#client_themeselect [value="${cookietheme}"]`)
     )).selected = true;
-    client.viewport.reloadTheme();
+    reloadTheme();
 
     const cookiechatbox = getCookie("chatbox") || "dynamic";
 
@@ -52,7 +54,7 @@ export const loadResources = () => {
 
     (<HTMLInputElement>document.getElementById("client_mvolume")).value =
         getCookie("musicVolume") || "1";
-    client.viewport.changeMusicVolume();
+    changeMusicVolume();
     (<HTMLAudioElement>document.getElementById("client_sfxaudio")).volume =
         Number(getCookie("sfxVolume")) || 1;
     changeSFXVolume();
