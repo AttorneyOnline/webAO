@@ -1,17 +1,35 @@
 import { ChatMsg } from "./ChatMsg";
+
 export interface Viewport {
+    getTextNow: Function;
+    setTextNow: Function;
+    getChatmsg: Function;
+    setChatmsg: Function;
+    getSfxPlayed: Function;
+    setSfxPlayed: Function;
+    setTickTimer: Function;
+    getTickTimer: Function;
+    getAnimating: Function;
+    setAnimating: Function;
+    getLastEvidence: Function;
+    setLastEvidence: Function;
+    setLastCharacter: Function;
+    getLastCharacter: Function;
+    setShoutTimer: Function;
+    getShoutTimer: Function;
+    setTestimonyTimer: Function;
+    getTestimonyTimer: Function;
+    setTestimonyUpdater: Function;
+    getTestimonyUpdater: Function;
+    getTheme: Function;
+    setTheme: Function;
+    testimonyAudio: HTMLAudioElement;
     chat_tick: Function;
-    changeMusicVolume: Function;
-    reloadTheme: Function;
     playSFX: Function;
     set_side: Function;
-    initTestimonyUpdater: Function;
     updateTestimony: Function;
     disposeTestimony: Function;
-    handle_ic_speaking: Function;
     handleTextTick: Function;
-    theme: string;
-    chatmsg: ChatMsg;
     setSfxAudio: Function;
     getSfxAudio: Function;
     getBackgroundFolder: Function;
@@ -19,6 +37,7 @@ export interface Viewport {
     music: any;
     musicVolume: number;
     setBackgroundName: Function;
-    lastChar: string;
     getBackgroundName: Function;
+    shoutaudio: HTMLAudioElement;
+    updater: any;
 }
