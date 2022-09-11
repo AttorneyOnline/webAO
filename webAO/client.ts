@@ -145,7 +145,7 @@ class Client extends EventEmitter {
     this.selectedEvidence = 0;
     this.checkUpdater = null;
     this.sender = sender
-    this.viewport = masterViewport(this);
+    this.viewport = masterViewport();
     this._lastTimeICReceived = new Date(0);
     loadResources
     isLowMemory
