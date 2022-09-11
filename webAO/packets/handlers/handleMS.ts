@@ -2,7 +2,7 @@ import { client, extrafeatures, UPDATE_INTERVAL } from "../../client";
 import { handleCharacterInfo } from "../../client/handleCharacterInfo";
 import { resetICParams } from "../../client/resetICParams";
 import { prepChat, safeTags } from "../../encoding";
-
+import { handle_ic_speaking } from '../../viewport/utils/handleICSpeaking'
 /**
    * Handles an in-character chat message.
    * @param {*} args packet arguments
@@ -55,7 +55,7 @@ export const handleMS = (args: string[]) => {
 
     if (char_muted === false) {
       let chatmsg = {
-        deskmod: safeTags(args[1]).toLowerCase(),
+        deskmod: Number(safeTags(args[1]).toLowerCase()),
         preanim: safeTags(args[2]).toLowerCase(), // get preanim
         nameplate: msg_nameplate,
         chatbox: char_chatbox,
@@ -69,7 +69,7 @@ export const handleMS = (args: string[]) => {
         charid: char_id,
         snddelay: Number(args[10]),
         objection: Number(args[11]),
-        evidence: safeTags(args[12]),
+        evidence: Number(safeTags(args[12])),
         flip: Number(args[13]),
         flash: Number(args[14]),
         color: Number(args[15]),
@@ -158,7 +158,8 @@ export const handleMS = (args: string[]) => {
       if (chatmsg.charid === client.charID) {
         resetICParams();
       }
-      client.viewport.handle_ic_speaking(chatmsg); // no await
+
+      handle_ic_speaking(chatmsg); // no await
     }
   }
 }
