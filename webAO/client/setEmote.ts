@@ -28,7 +28,7 @@ const setEmote = async (
   for (const extension of extensionsMap) {
     // Hides all sprites before creating a new sprite
 
-    if (client.viewport.lastChar !== client.viewport.chatmsg.name) {
+    if (client.viewport.getLastCharacter() !== client.viewport.getChatmsg().name) {
       emoteSelector.src = transparentPng;
     }
     let url;

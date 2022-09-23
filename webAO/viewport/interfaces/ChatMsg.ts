@@ -2,12 +2,12 @@ export interface ChatMsg {
     content: string;
     objection: number;
     sound: string;
-    startpreanim: boolean;
-    startspeaking: boolean;
+    startpreanim?: boolean;
+    startspeaking?: boolean;
     side: any;
     color: number;
     snddelay: number;
-    preanimdelay: number;
+    preanimdelay?: number;
     speed: number;
     blips: string;
     self_offset?: number[];
