@@ -132,8 +132,8 @@ function processServerlist(thelist: { name: string, description: string, ip: str
   for (let i = 0; i < thelist.length - 1; i++) {
     const serverEntry: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string } = thelist[i];
 
-    servers[i].online = "Offline";
     servers[i] = serverEntry;
+    servers[i].online = "Offline";
 
     const ipport = `${serverEntry.ip}:${serverEntry.ws_port}`;
 
