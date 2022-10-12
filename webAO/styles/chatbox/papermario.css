@@ -91,3 +91,11 @@
 		transform: rotate(20deg);
 	}
 }
+
+#client_trackstatus {
+	display: none;
+}
+
+#client_clock {
+	display: none;
+}

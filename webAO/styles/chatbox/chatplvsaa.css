@@ -1,5 +1,5 @@
 .text_white {
-	color: #fff;
+	color: #120f09;
 }
 
 .text_blue {
@@ -53,33 +53,39 @@
 
 #client_name {
     display: block;
-    left: 1%;
+    left: 2%;
     top: 0;
     height: 20%;
     min-width: 15%;
 	padding: 0px 6px;	
-    border: 2px ridge #b1822d;
-    border-radius: 0.4em;
-    background: #783500;
+	image-rendering: crisp-edges;
+	border-image-source: url("plvspw_name.png");
+    border-image-slice: 6 fill;
+	border-image-width: 0.4em;
 	position: absolute;
+	font-weight: bold;
+	-webkit-text-stroke: 0.02em #000;
 	z-index: 1;
 }
 
 #client_inner_name {
 	margin: 1px;
+	padding: 0 0.4em;
 }
 
 #client_chat {
 	font-size: 1em;
 	display: block;
     width: 99%;
-    width: calc(100% - 4px);
+    width: calc(100% - 0.4em);
 	margin: auto;
     height: 80%;
-    border: 2px ridge #d9a63b;
-    border-radius: 0.5em;
-	background-color: rgba(148,96,0,0.6);
+	image-rendering: crisp-edges;
+    border-image-source: url("plvspw.png");
+    border-image-slice: 10 fill;
+	border-image-width: 0.4em;
 	bottom: 0;
+	left: 0.2em;
 	position: absolute;
 	word-break: keep-all;
 	word-wrap: break-word;
@@ -90,10 +96,18 @@
 }
 
 #client_inner_chat {
-	margin: 6px;
-	padding: 6px 20px;
+	margin: 0.1em;
+	padding: 0.3em 0.6em;
 }
 
 #client_chatwaiting {
+	display: none;
+}
+
+#client_trackstatus {
+	display: none;
+}
+
+#client_clock {
 	display: none;
 }

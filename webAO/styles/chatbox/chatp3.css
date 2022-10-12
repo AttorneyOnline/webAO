@@ -111,3 +111,7 @@
         opacity: 1;
 	}
 }
+
+#client_trackstatus {
+	display: none;
+}

@@ -47,6 +47,7 @@
 	width: 100%;
     filter: none;
     font-family: "Verdana";
+	transition: height 1s linear;
 }
 
 #client_chatdecoration {
@@ -133,4 +134,74 @@
 	100% {
 		transform: rotate(90deg) scaleY(1);
 	}
+}
+
+#client_trackstatus {
+	display: none;
+}
+
+#client_clock {
+	position: absolute;
+	top: 1%;
+	left: 1%;
+	width: 12%;
+	height: 15%;
+	background: url("bricks.svg");
+	background-size: 1.5em;
+	border: #ffbe9f 3px ridge;
+	border-radius: 100%;
+	font-family: serif;
+}
+
+#client_clock_month {
+	position: absolute;
+	width: 90%;
+	height: 15%;
+	left: 5%;
+	top: 8%;
+	margin: 0;
+	color: #52443c;
+	background: #ffb183;
+	border: 2px white outset;
+	border-radius: 100%;
+	text-shadow: -1px -1px 0 #d7e5d9, 1px -1px 0 #d7e5d9, -1px 1px 0 #d7e5d9, 1px 1px 0 #d7e5d9;
+	font-size: small;
+	line-height: 1;
+}
+
+#client_clock_date {
+	position: absolute;
+	width: 80%;
+	height: 80%;
+	left: 10%;
+	top: 10%;
+	margin: 0;
+	color: #ffe;
+	text-shadow: -1px -1px 0 #78320b, 1px -1px 0 #78320b, -1px 1px 0 #78320b, 1px 1px 0 #78320b;
+	font-size: 3em;
+	background: rgba(255,255,255,0.7);
+	border-radius: 100%;
+	line-height: 1.8;
+}
+
+#client_clock_weekday {
+	position: absolute;
+	width: 25%;
+	height: 25%;
+	right: 0;
+	bottom: 0;
+	margin: 0;
+	color: #ccc;
+	text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333;
+	text-decoration: underline;
+	font-size: smaller;
+	font-weight: bold;
+	background-color: #c7856f;
+	border: #ffc89f 3px ridge;
+	border-radius: 100%;
+	line-height: 2;
+}
+
+#client_clock_time {
+	display: none;
 }

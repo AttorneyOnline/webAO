@@ -16,22 +16,22 @@ const getResources = (AO_HOST, THEME) => ({
     duration: 840,
   },
   witnesstestimony: {
-    src: `${AO_HOST}themes/${THEME}/witnesstestimony.gif`,
+    src: `${AO_HOST}themes/${THEME}/witnesstestimony_bubble.gif`,
     duration: 1560,
     sfx: `${AO_HOST}sounds/general/sfx-testimony.opus`,
   },
   crossexamination: {
-    src: `${AO_HOST}themes/${THEME}/crossexamination.gif`,
+    src: `${AO_HOST}themes/${THEME}/crossexamination_bubble.gif`,
     duration: 1600,
     sfx: `${AO_HOST}sounds/general/sfx-testimony2.opus`,
   },
   guilty: {
-    src: `${AO_HOST}themes/${THEME}/guilty.gif`,
+    src: `${AO_HOST}themes/${THEME}/guilty_bubble.gif`,
     duration: 2870,
     sfx: `${AO_HOST}sounds/general/sfx-guilty.opus`,
   },
   notguilty: {
-    src: `${AO_HOST}themes/${THEME}/notguilty.gif`,
+    src: `${AO_HOST}themes/${THEME}/notguilty_bubble.gif`,
     duration: 2440,
     sfx: `${AO_HOST}sounds/general/sfx-notguilty.opus`,
   },

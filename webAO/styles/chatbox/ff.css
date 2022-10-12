@@ -101,3 +101,11 @@
 	margin: 1px;
 	line-height: 100%;
 }
+
+#client_trackstatus {
+	display: none;
+}
+
+#client_clock {
+	display: none;
+}

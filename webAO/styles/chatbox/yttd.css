@@ -112,3 +112,11 @@
 		bottom: 2px;
 	}
 }
+
+#client_trackstatus {
+	display: none;
+}
+
+#client_clock {
+	display: none;
+}

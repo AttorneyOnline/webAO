@@ -1,17 +1,7 @@
 # webAO
 
 This is a client for the Attorney Online roleplaying chatroom written in HTML and JavaScript.
-It works with the tsuserver3/serverD software when the server has WebSockets enabled.
-
-webAO-only features:
- - Asset URLs
- - Automated testimony control
-
-Desktop-only features:
- - 2.6+ markup
- - Non-interrupting preanimations
-
-In short, webAO is in disrepair. Again.
+It works with the any AO server if it has WebSocket support.
 
 Link to the client in this repo: http://web.aceattorneyonline.com/
 
@@ -26,11 +16,12 @@ Link to the client in this repo: http://web.aceattorneyonline.com/
 
 
 # Running Locally on Linux
-1. `nvm use`
+1. `npm use`
 2. `npm install`
 3. `npm run start`
 
 # Running with Docker
 `docker build -t webao .`
+
 `docker run -d -it -p 8080:8080 webao`
 

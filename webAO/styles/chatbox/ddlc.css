@@ -1,46 +1,37 @@
 .text_white {
     color: #fff;
-    -webkit-text-stroke: 0.04em #523643;
 }
 
 .text_blue {
     color: #6bc6f7;
-    -webkit-text-stroke: 0.04em #523643;
 }
 
 .text_green {
     color: #00f700;
-    -webkit-text-stroke: 0.04em #523643;
 }
 
 .text_red {
     color: #f00;
-    -webkit-text-stroke: 0.04em #523643;
 }
 
 .text_orange {
     color: #f77339;
-    -webkit-text-stroke: 0.04em #523643;
 }
 
 .text_yellow {
     color: #ff0;
-    -webkit-text-stroke: 0.04em #523643;
 }
 
 .text_pink {
     color: #ffc0cb;
-    -webkit-text-stroke: 0.04em #523643;
 }
 
 .text_cyan {
     color: #0ff;
-    -webkit-text-stroke: 0.04em #523643;
 }
 
 .text_grey {
 	color: #bbb;
-	-webkit-text-stroke: 0.04em #523643;
 }
 
 #client_chatcontainer {
@@ -97,6 +88,7 @@
     font-family: "Aller", "OpenSans", sans-serif;
     font-size: 1em;
     font-weight: 600;
+	-webkit-text-stroke: 0.04em #523643;
 	word-break: keep-all;
 	overflow-wrap: break-word;
 	text-align: left;
@@ -131,4 +123,12 @@
 	100% {
 		right: 0;
 	}
+}
+
+#client_trackstatus {
+	display: none;
+}
+
+#client_clock {
+	display: none;
 }

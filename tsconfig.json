@@ -8,5 +8,5 @@
     "strictNullChecks": false, //document.getElementBy
     "downlevelIteration": true
   },
-  "include": ["./webAO/*"]
+  "include": ["./webAO/*", "webAO/viewport/viewport.ts"]
 }

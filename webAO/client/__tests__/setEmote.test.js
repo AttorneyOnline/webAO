@@ -9,10 +9,13 @@ jest.mock('../../utils/fileExists');
 describe('setEmote', () => {
   const AO_HOST = '';
   Client.mockReturnValue({
-    lastChar: 'long',
-    chatmsg: {
-      name: 'byte',
-    },
+    viewport: {
+      lastChar: 'long',
+      chatmsg: {
+        name: 'byte',
+      },
+    }
+
   });
   const client = new Client('127.0.0.1');
   const firstExtension = '.gif';

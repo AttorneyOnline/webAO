@@ -38,14 +38,6 @@ export function safeTags(unsafe: string): string {
 }
 
 /**
- * Encode text on client side.
- * @param {string} estring the string to be encoded
- */
-export function encodeChat(estring: string): string {
-  return estring;
-}
-
-/**
  * Decodes text on client side.
  * @param {string} estring the string to be decoded
  */

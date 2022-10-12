@@ -60,7 +60,6 @@
 
 #client_inner_name {
     transform: skew(-15deg);
-	padding: 0 2%;
 	margin: 1px;
 }
 
@@ -94,5 +93,28 @@
 }
 
 #client_chatwaiting {
+	display: none;
+}
+
+#client_trackstatus {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 10%;
+	background-image: url('drv3trackstatus.png');
+	background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#client_trackstatustext {
+	position: absolute;
+	left: 0;
+	top: 10%;
+	background-image: url('drv3trackstatustext.png');
+	background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#client_clock {
 	display: none;
 }
