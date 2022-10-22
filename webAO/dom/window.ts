@@ -51,6 +51,7 @@ declare global {
         onEnter: (event: any) => void;
         onReplayGo: (_event: any) => void;
         onOOCEnter: (_event: any) => void;
+        handleCredentialResponse: (_event: any) => void;
     }
 }
 export { }
