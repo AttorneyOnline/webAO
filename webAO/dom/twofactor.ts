@@ -6,6 +6,6 @@ function handleCredentialResponse(response: any) {
   }
 window.handleCredentialResponse = handleCredentialResponse;
 
-export function showFactorDialog(display: string) {
-  document.getElementById("client_secondfactor").style.display = display;
+export function showFactorDialog(args: string[]) {
+  document.getElementById("client_secondfactor").style.display = args[1];
 }
