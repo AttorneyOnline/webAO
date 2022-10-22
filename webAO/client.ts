@@ -69,8 +69,8 @@ fpPromise
 
     client = new Client(serverIP);
     client.connect()
-    client.isLowMemory();
-    client.loadResources();
+    isLowMemory();
+    loadResources();
   });
 
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
