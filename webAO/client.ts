@@ -16,6 +16,7 @@ import { packetHandler } from './packets/packetHandler'
 import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
 import { fetchBackgroundList, fetchEvidenceList } from './client/fetchLists'
+const version = process.env.npm_package_version;
 let { ip: serverIP, mode, theme } = queryParser();
 
 let THEME: string = theme || "default";
@@ -189,7 +190,7 @@ class Client extends EventEmitter {
    */
   joinServer() {
     this.sender.sendServer(`HI#${hdid}#%`);
-    this.sender.sendServer("ID#webAO#webAO#%");
+    this.sender.sendServer(`ID#webAO#${version}#%`);
     if (mode !== "replay") {
       this.checkUpdater = setInterval(() => this.sender.sendCheck(), 5000);
     }
