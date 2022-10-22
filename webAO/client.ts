@@ -294,3 +294,5 @@ class Client extends EventEmitter {
   }
 
 }
+
+export default Client;
