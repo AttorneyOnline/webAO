@@ -232,8 +232,6 @@ const viewport = (): Viewport => {
   const chat_tick = async () => {
     // note: this is called fairly often
     // do not perform heavy operations here
-    console.log(textnow)
-    console.log(chatmsg.content)
     await delay(chatmsg.speed);
     if (textnow === chatmsg.content) {
       return;
@@ -445,7 +443,6 @@ const viewport = (): Viewport => {
         );
       }
     }
-    console.log(animating)
     if (animating) {
       chat_tick();
     }
