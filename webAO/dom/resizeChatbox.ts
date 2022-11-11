@@ -17,7 +17,6 @@ export function resizeChatbox() {
     let weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     document.getElementById("client_clock_month")!.innerText = month[now.getMonth()];
-    console.debug(CHATBOX);
     if (CHATBOX == "acww") {
         weekday = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
         document.getElementById("client_clock_weekday")!.innerText = weekday[now.getDay()];

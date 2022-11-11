@@ -154,7 +154,6 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
                 client.viewport.getChatmsg().name!.toLowerCase()
             )}/${encodeURI(client.viewport.getChatmsg().preanim)}`
         );
-        console.debug("preanim is " + gifLength + " long");
         client.viewport.getChatmsg().startspeaking = false;
     } else {
         client.viewport.getChatmsg().startspeaking = true;

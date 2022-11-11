@@ -20,7 +20,6 @@ export const set_side = async ({
     showDesk: boolean;
 }) => {
     const view = document.getElementById("client_fullview")!;
-    console.log(position)
     let bench: HTMLImageElement;
     if (['def','pro','wit'].includes(position)) {
         bench = <HTMLImageElement>(
