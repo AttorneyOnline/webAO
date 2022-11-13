@@ -15,7 +15,7 @@ import { onReplayGo } from './dom/onReplayGo'
 import { packetHandler } from './packets/packetHandler'
 import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
-import { fetchBackgroundList, fetchEvidenceList } from './client/fetchLists'
+import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists'
 const version = process.env.npm_package_version;
 let { ip: serverIP, mode, theme } = queryParser();
 
@@ -292,6 +292,7 @@ class Client extends EventEmitter {
 
     fetchBackgroundList();
     fetchEvidenceList();
+    fetchCharacterList();
   }
 
 }
