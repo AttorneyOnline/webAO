@@ -3,10 +3,10 @@
  */
 export function updateIniswap() {
     const ini_select = <HTMLSelectElement>(
-        document.getElementById("evi_select")
+        document.getElementById("client_iniselect")
     );
     const ini_name = <HTMLInputElement>(
-        document.getElementById("evi_filename")
+        document.getElementById("client_ininame")
     );
 
     if (ini_select.selectedIndex === 0) {
