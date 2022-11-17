@@ -10,9 +10,9 @@ export function updateIniswap() {
     );
 
     if (ini_select.selectedIndex === 0) {
-        ini_filename.style.display = "initial";
+        ini_name.style.display = "initial";
     } else {
-        ini_filename.style.display = "none";
+        ini_name.style.display = "none";
     }
 }
 window.updateIniswap = updateIniswap;
