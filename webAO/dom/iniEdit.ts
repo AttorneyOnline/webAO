@@ -6,7 +6,7 @@ import { packetHandler } from "../packets/packetHandler";
  * Triggered by the ini button.
  */
 export async function iniedit() {
-    const ininame = (<HTMLInputElement>document.getElementById("client_ininame"))
+    const ininame = (<HTMLInputElement>document.getElementById("client_iniselect"))
         .value;
     const inicharID = client.charID;
     await handleCharacterInfo(ininame.split("&"), inicharID);
