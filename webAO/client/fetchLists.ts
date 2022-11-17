@@ -21,16 +21,16 @@ export const fetchBackgroundList = async () => {
 
 export const fetchCharacterList = async () => {
     try {
-        const chardata = await request(`${AO_HOST}characters.json`);
-        const char_array = JSON.parse(chardata);
-        // the try catch will fail before here when there is no file
-
         const char_select = <HTMLSelectElement>(
             document.getElementById("client_iniselect")
         );
         char_select.innerHTML = "";
 
         char_select.add(new Option("Custom", "0"));
+
+        const chardata = await request(`${AO_HOST}characters.json`);
+        const char_array = JSON.parse(chardata);
+        // the try catch will fail before here when there is no file
 
         char_array.forEach((character: string) => {
             char_select.add(new Option(character));
@@ -43,16 +43,16 @@ export const fetchCharacterList = async () => {
 
 export const fetchEvidenceList = async () => {
     try {
-        const evidata = await request(`${AO_HOST}evidence.json`);
-        const evi_array = JSON.parse(evidata);
-        // the try catch will fail before here when there is no file
-
         const evi_select = <HTMLSelectElement>(
             document.getElementById("evi_select")
         );
         evi_select.innerHTML = "";
 
         evi_select.add(new Option("Custom", "0"));
+
+        const evidata = await request(`${AO_HOST}evidence.json`);
+        const evi_array = JSON.parse(evidata);
+        // the try catch will fail before here when there is no file
 
         evi_array.forEach((evi: string) => {
             evi_select.add(new Option(evi));
