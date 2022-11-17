@@ -26,7 +26,7 @@ export const fetchCharacterList = async () => {
         // the try catch will fail before here when there is no file
 
         const char_select = <HTMLSelectElement>(
-            document.getElementById("client_ininame")
+            document.getElementById("client_iniselect")
         );
         char_select.innerHTML = "";
 
@@ -50,10 +50,12 @@ export const fetchEvidenceList = async () => {
         );
         evi_select.innerHTML = "";
 
+        evi_select.add(new Option("Custom", "0"));
+
         evi_array.forEach((evi: string) => {
             evi_select.add(new Option(evi));
         });
-        evi_select.add(new Option("Custom", "0"));
+        
     } catch (err) {
         console.warn("there was no evidence.json file");
     }
