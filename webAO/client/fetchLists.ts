@@ -30,6 +30,8 @@ export const fetchCharacterList = async () => {
         );
         char_select.innerHTML = "";
 
+        char_select.add(new Option("Custom", "0"));
+
         char_array.forEach((character: string) => {
             char_select.add(new Option(character));
         });
