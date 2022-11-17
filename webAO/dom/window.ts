@@ -17,6 +17,7 @@ declare global {
         changeBackgroundOOC: () => void;
         updateActionCommands: (side: string) => void;
         updateEvidenceIcon: () => void;
+        updateIniswap: () => void;
         resizeChatbox: () => void;
         setChatbox: (style: string) => void;
         getIndexFromSelect: (select_box: string, value: string) => Number;
