@@ -5,7 +5,7 @@ import setCookie from "../utils/setCookie";
 /**
  * Set the style of the chatbox
  */
-export function setChatbox(style: string) {
+export function setChatbox(setstyle: string) {
     const chatbox_theme = <HTMLAnchorElement>(
         document.getElementById("chatbox_theme")
     );
@@ -16,6 +16,7 @@ export function setChatbox(style: string) {
 
     setCookie("chatbox", CHATBOX);
     if (CHATBOX === "dynamic") {
+        const style = setstyle.replace("chat","");
         if (chatbox_arr.includes(style)) {
             chatbox_theme.href = `styles/chatbox/${style}.css`;
         } else {
