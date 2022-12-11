@@ -15,7 +15,7 @@ import { onReplayGo } from './dom/onReplayGo'
 import { packetHandler } from './packets/packetHandler'
 import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
-import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists'
+import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList, fetchManifest } from './client/fetchLists'
 const version = process.env.npm_package_version;
 let { ip: serverIP, mode, theme } = queryParser();
 
@@ -103,6 +103,7 @@ class Client extends EventEmitter {
   sender: ISender;
   checkUpdater: any;
   _lastTimeICReceived: any;
+  manifest: string[];
   viewport: Viewport;
   connect: () => void;
   loadResources: () => void
@@ -141,6 +142,7 @@ class Client extends EventEmitter {
     this.musics = [];
     this.musics_time = false;
     this.callwords = [];
+    this.manifest = [];
     this.resources = getResources(AO_HOST, THEME);
     this.selectedEmote = -1;
     this.selectedEvidence = 0;
@@ -293,6 +295,7 @@ class Client extends EventEmitter {
     fetchBackgroundList();
     fetchEvidenceList();
     fetchCharacterList();
+    fetchManifest();
   }
 
 }

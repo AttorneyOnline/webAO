@@ -1,3 +1,4 @@
+import { client } from "../client";
 import { AO_HOST } from "./aoHost";
 import { request } from "../services/request.js";
 
@@ -67,7 +68,7 @@ export const fetchEvidenceList = async () => {
 export const fetchManifest = async () => {
     try {
         const manifestdata = await request(`${AO_HOST}manifest.txt`);
-        const manifest_array = manifestdata.split(/\r\n|\n\r|\n|\r/);
+        client.manifest = manifestdata.split(/\r\n|\n\r|\n|\r/);
         // the try catch will fail before here when there is no file
 
     } catch (err) {
