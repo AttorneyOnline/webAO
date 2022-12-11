@@ -62,3 +62,15 @@ export const fetchEvidenceList = async () => {
         console.warn("there was no evidence.json file");
     }
 }
+
+
+export const fetchManifest = async () => {
+    try {
+        const manifestdata = await request(`${AO_HOST}manifest.txt`);
+        const manifest_array = manifestdata.split(/\r\n|\n\r|\n|\r/);
+        // the try catch will fail before here when there is no file
+
+    } catch (err) {
+        console.warn("there was no manifest.txt file");
+    }
+}
