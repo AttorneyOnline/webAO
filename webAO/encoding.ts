@@ -4,10 +4,10 @@
  */
 export function escapeChat(estring: string): string {
   return estring
-    .replace('#', '<num>')
-    .replace('&', '<and>')
-    .replace('%', '<percent>')
-    .replace('$', '<dollar>');
+    .replaceAll('#', '<num>')
+    .replaceAll('&', '<and>')
+    .replaceAll('%', '<percent>')
+    .replaceAll('$', '<dollar>');
 }
 
 /**
@@ -16,10 +16,10 @@ export function escapeChat(estring: string): string {
  */
 export function unescapeChat(estring: string): string {
   return estring
-    .replace('<num>', '#')
-    .replace('<and>', '&')
-    .replace('<percent>', '%')
-    .replace('<dollar>', '$');
+    .replaceAll('<num>', '#')
+    .replaceAll('<and>', '&')
+    .replaceAll('<percent>', '%')
+    .replaceAll('<dollar>', '$');
 }
 
 /**
