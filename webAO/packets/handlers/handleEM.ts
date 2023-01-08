@@ -20,7 +20,7 @@ export const handleEM = (args: string[]) => {
 
     for (let i = 2; i < args.length - 1; i++) {
         if (i % 2 === 0) {
-            const trackname = safeTags(args[i]);
+            const trackname = args[i];
             const trackindex = Number(args[i - 1]);
             (<HTMLProgressElement>(
                 document.getElementById("client_loadingbar")
