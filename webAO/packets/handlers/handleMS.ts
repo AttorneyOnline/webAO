@@ -78,7 +78,7 @@ export const handleMS = (args: string[]) => {
 
       if (extrafeatures.includes("cccc_ic_support")) {
         const extra_cccc = {
-          showname: safeTags(args[16]),
+          showname: prepChat(args[16]),
           other_charid: Number(args[17]),
           other_name: safeTags(args[18]),
           other_emote: safeTags(args[19]),
