@@ -154,6 +154,11 @@ export const handleMS = (args: string[]) => {
         chatmsg = Object.assign(extra_28, chatmsg);
       }
 
+      if (chatmsg.content.trim() === "") {
+        //blankpost
+        chatmsg.content = "";
+      }
+
       // our own message appeared, reset the buttons
       if (chatmsg.charid === client.charID) {
         resetICParams();
