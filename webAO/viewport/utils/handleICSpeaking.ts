@@ -157,7 +157,7 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
         client.viewport.getChatmsg().startspeaking = false;
     } else {
         client.viewport.getChatmsg().startspeaking = true;
-        if (client.viewport.getChatmsg().content !== "") chatContainerBox.style.opacity = "1";
+        if (client.viewport.getChatmsg().content.trim() !== "") chatContainerBox.style.opacity = "1";
     }
     client.viewport.getChatmsg().preanimdelay = gifLength;
     const setAside = {
