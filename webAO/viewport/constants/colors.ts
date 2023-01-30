@@ -8,4 +8,5 @@ export const COLORS = [
     "pink",
     "cyan",
     "grey",
+    "rainbow",
   ];
