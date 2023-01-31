@@ -61,10 +61,8 @@ export const set_side = async ({
 
     if (showDesk === true && desk) {
         const deskFilename = (await fileExistsManifest(
-            client.manifest,
-            AO_HOST,
-            (client.viewport.getBackgroundFolder() +
-                desk.ao2).slice(AO_HOST.length))
+          (client.viewport.getBackgroundFolder() +
+            desk.ao2)))
             ? desk.ao2
             : desk.ao1;
         bench.src = client.viewport.getBackgroundFolder() + deskFilename;

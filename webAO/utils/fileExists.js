@@ -1,3 +1,5 @@
+import {AO_HOST} from "../client/aoHost"
+import {client} from "../client"
 import {canonicalizePath} from "./paths"
 import {binarySearch} from "./binarySearch"
 
@@ -21,22 +23,18 @@ const fileExists = async (url) => new Promise((resolve, reject) => {
 export default fileExists;
 
 /* Returns whether file exists.
- * `manifest' is a sorted array of strings.
- * `ao_head' is the base URL.
- * `url' is a URL-encoded path.
+ * `url' is a URL, including the base URL for bw compat.
  * If manifest is empty, check the old way.
  * Otherwise, look it up in the manifest */
-const fileExistsManifest = async (manifest, ao_host, url) =>
+const fileExistsManifest = async (url) =>
       new Promise((resolve, reject) => {
+          if(client.manifest.length == 0) {
+              resolve(fileExists(url));
+              return;
+          }
+          const c_url = encodeURI(canonicalizePath(decodeURI(url.slice(AO_HOST.length))));
 
-          if(manifest == undefined ||
-             manifest == null ||
-             manifest.length == 0)
-              resolve(fileExists(ao_host + url));
-
-          const c_url = encodeURI(canonicalizePath(decodeURI(url)));
-
-          if(binarySearch(manifest, c_url) != null)
+          if(binarySearch(client.manifest, c_url) != null)
               resolve(true);
 
           resolve(false);

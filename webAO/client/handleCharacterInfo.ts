@@ -23,9 +23,7 @@ export const handleCharacterInfo = async (chargs: string[], charid: number) => {
             )}/char_icon`;
             for (let i = 0; i < extensions.length; i++) {
                 const fileUrl = charIconBaseUrl + extensions[i];
-                const exists = await fileExistsManifest(client,
-                                                        AO_HOST,
-                                                        fileUrl);
+                const exists = await fileExistsManifest(fileUrl);
                 if (exists) {
                     img.alt = chargs[0];
                     img.title = chargs[0];

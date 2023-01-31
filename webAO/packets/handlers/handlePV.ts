@@ -74,8 +74,6 @@ export const handlePV = async (args: string[]) => {
 
   if (
     await fileExistsManifest(
-      client.manifest,
-      AO_HOST,
       `characters/${encodeURI(me.name.toLowerCase())}/custom.gif`
     )
   ) {

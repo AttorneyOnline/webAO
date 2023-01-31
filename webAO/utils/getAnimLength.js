@@ -13,9 +13,7 @@ const getAnimLength = async (url) => {
   const extensions = ['.gif', '.webp', '.apng'];
   for (const extension of extensions) {
     const urlWithExtension = url + extension;
-      const exists = await fileExists(client.manifest,
-                                      AO_HOST,
-                                      urlWithExtension);
+      const exists = await fileExistsManifest(urlWithExtension);
     if (exists) {
       const fileBuffer = await requestBuffer(urlWithExtension);
       const length = calculatorHandler[extension](fileBuffer);

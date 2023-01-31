@@ -46,9 +46,7 @@ const setEmote = async (
       )}${encodeURI(emotename)}${extension}`;
     }
 
-    const exists = await fileExistsManifest(client.manifest,
-                                            AO_HOST,
-                                            url.slice(AO_HOST.length));
+    const exists = await fileExistsManifest(url);
     if (exists) {
       emoteSelector.src = url;
       break;
