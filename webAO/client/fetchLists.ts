@@ -1,6 +1,7 @@
 import { client } from "../client";
 import { AO_HOST } from "./aoHost";
 import { request } from "../services/request.js";
+import { canonicalizePath } from "../utils/paths";
 
 export const fetchBackgroundList = async () => {
     try {
@@ -27,7 +28,7 @@ export const fetchCharacterList = async () => {
     char_select.innerHTML = "";
 
     char_select.add(new Option("Custom", "0"));
-    
+
     try {
         const chardata = await request(`${AO_HOST}characters.json`);
         const char_array = JSON.parse(chardata);
@@ -58,7 +59,7 @@ export const fetchEvidenceList = async () => {
         evi_array.forEach((evi: string) => {
             evi_select.add(new Option(evi));
         });
-        
+
     } catch (err) {
         console.warn("there was no evidence.json file");
     }
@@ -68,10 +69,15 @@ export const fetchEvidenceList = async () => {
 export const fetchManifest = async () => {
     try {
         const manifestdata = await request(`${AO_HOST}manifest.txt`);
-        client.manifest = manifestdata.split(/\r\n|\n\r|\n|\r/);
+        const tmp: string[] = manifestdata
+            .replace("\\", "/")
+            .split(/\r\n|\n\r|\n|\r/);
+        client.manifest = tmp.map(x => canonicalizePath(x)).sort();
+
         // the try catch will fail before here when there is no file
 
     } catch (err) {
-        console.warn("there was no manifest.txt file");
+        console.warn("no manifest.txt, webao will be slow");
+        client.manifest = [];
     }
 }
