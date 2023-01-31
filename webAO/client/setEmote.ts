@@ -1,6 +1,6 @@
 import Client from "../client";
 import transparentPng from "../constants/transparentPng";
-import fileExists from "../utils/fileExists";
+import {fileExistsManifest} from "../utils/fileExists";
 
 /**
  * Sets all the img tags to the right sources
@@ -39,13 +39,16 @@ const setEmote = async (
     } else if (extension === ".webp.static") {
       url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(
         emotename
-      )}.webp`;    
+      )}.webp`;
     } else {
       url = `${characterFolder}${encodeURI(charactername)}/${encodeURI(
         prefix
       )}${encodeURI(emotename)}${extension}`;
     }
-    const exists = await fileExists(url);
+
+    const exists = await fileExistsManifest(client.manifest,
+                                            AO_HOST,
+                                            url.slice(AO_HOST.length));
     if (exists) {
       emoteSelector.src = url;
       break;

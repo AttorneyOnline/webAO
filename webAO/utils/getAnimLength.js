@@ -1,5 +1,7 @@
+import {client} from '../client'
+import {AO_HOST} from '../client/aoHost'
 import calculatorHandler from './calculatorHandler';
-import fileExists from './fileExists.js';
+import {fileExistsManifest} from './fileExists.js';
 import { requestBuffer } from '../services/request.js';
 /**
 	 * Gets animation length. If the animation cannot be found, it will
@@ -11,7 +13,9 @@ const getAnimLength = async (url) => {
   const extensions = ['.gif', '.webp', '.apng'];
   for (const extension of extensions) {
     const urlWithExtension = url + extension;
-    const exists = await fileExists(urlWithExtension);
+      const exists = await fileExists(client.manifest,
+                                      AO_HOST,
+                                      urlWithExtension);
     if (exists) {
       const fileBuffer = await requestBuffer(urlWithExtension);
       const length = calculatorHandler[extension](fileBuffer);

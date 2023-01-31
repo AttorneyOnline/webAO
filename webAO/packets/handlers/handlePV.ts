@@ -1,5 +1,5 @@
 import { client } from "../../client";
-import fileExists from "../../utils/fileExists";
+import { fileExistsManifest } from "../../utils/fileExists";
 import { updateActionCommands } from '../../dom/updateActionCommands'
 import { pickEmotion } from '../../dom/pickEmotion'
 import { AO_HOST } from "../../client/aoHost";
@@ -73,8 +73,10 @@ export const handlePV = async (args: string[]) => {
   }
 
   if (
-    await fileExists(
-      `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/custom.gif`
+    await fileExistsManifest(
+      client.manifest,
+      AO_HOST,
+      `characters/${encodeURI(me.name.toLowerCase())}/custom.gif`
     )
   ) {
     document.getElementById("button_4")!.style.display = "";

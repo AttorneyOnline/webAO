@@ -2,7 +2,7 @@ import { positions } from '../constants/positions'
 import { AO_HOST } from '../../client/aoHost'
 import { client } from '../../client'
 import tryUrls from '../../utils/tryUrls';
-import fileExists from '../../utils/fileExists';
+import { fileExistsManifest } from '../../utils/fileExists';
 
 /**
  * Changes the viewport background based on a given position.
@@ -57,10 +57,14 @@ export const set_side = async ({
     } else {
         court.src = await tryUrls(client.viewport.getBackgroundFolder() + bg);
     }
-    
-    
+
+
     if (showDesk === true && desk) {
-        const deskFilename = (await fileExists(client.viewport.getBackgroundFolder() + desk.ao2))
+        const deskFilename = (await fileExistsManifest(
+            client.manifest,
+            AO_HOST,
+            (client.viewport.getBackgroundFolder() +
+                desk.ao2).slice(AO_HOST.length))
             ? desk.ao2
             : desk.ao1;
         bench.src = client.viewport.getBackgroundFolder() + deskFilename;
