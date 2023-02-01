@@ -3,20 +3,14 @@ import Client from '../../client';
 import fileExists from '../../utils/fileExists';
 import transparentPng from '../../constants/transparentPng';
 
-jest.mock('../../client');
+jest.mock('../../viewport/utils/createMusic')
 jest.mock('../../utils/fileExists');
-
+jest.mock('../../viewport/utils/createSfxAudio')
+jest.mock('../../viewport/utils/createShoutAudio')
+jest.mock('../../viewport/utils/createTestimonyAudio')
 describe('setEmote', () => {
   const AO_HOST = '';
-  Client.mockReturnValue({
-    viewport: {
-      lastChar: 'long',
-      chatmsg: {
-        name: 'byte',
-      },
-    }
 
-  });
   const client = new Client('127.0.0.1');
   const firstExtension = '.gif';
 
