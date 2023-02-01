@@ -295,7 +295,6 @@ class Client extends EventEmitter {
     fetchBackgroundList();
     fetchEvidenceList();
     fetchCharacterList();
-    fetchManifest();
   }
 
 }
