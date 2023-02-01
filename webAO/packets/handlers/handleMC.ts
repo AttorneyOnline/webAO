@@ -1,6 +1,7 @@
 import { prepChat } from "../../encoding";
-import { appendICLog, client } from '../../client'
+import { client } from '../../client'
 import { AO_HOST } from "../../client/aoHost";
+import { appendICLog } from '../../client/appendICLog'
 
 /**
  * Handles a music change to an arbitrary resource.

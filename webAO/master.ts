@@ -20,10 +20,10 @@ let selectedServer: number = -1;
 
 let servers: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[] = [];
 servers[-2] = {
-  name: 'Singleplayer', description: 'Build cases, try out new things', ip: '127.0.0.1', port: 50001, ws_port: 50001, assets: '', online: '',
+  name: 'Singleplayer', description: 'Build cases, try out new things', ip: '127.0.0.1', port: 50001, ws_port: 50001, assets: '', online: 'Online: 0/1',
 };
 servers[-1] = {
-  name: 'Localhost', description: 'This is your computer on port 50001', ip: '127.0.0.1', port: 50001, ws_port: 50001, assets: '', online: 'Online: ?/?',
+  name: 'Localhost', description: 'This is your computer on port 50001', ip: '127.0.0.1', port: 50001, ws_port: 50001, assets: '', online: 'Offline',
 };
 
 const fpPromise = FingerprintJS.load();
@@ -58,11 +58,7 @@ export function setServ(ID: number) {
 
   if (document.getElementById(`server${ID}`).className === '') { checkOnline(ID, `${servers[ID].ip}:${servers[ID].ws_port}`); }
 
-  if (servers[ID].description !== undefined) {
-    document.getElementById('serverdescription_content').innerHTML = `<b>${servers[ID].online}</b><br>${safeTags(servers[ID].description)}`;
-  } else {
-    document.getElementById('serverdescription_content').innerHTML = '';
-  }
+  document.getElementById('serverdescription_content').innerHTML = `<b>${servers[ID].online}</b><br>${safeTags(servers[ID].description)}`;
 }
 window.setServ = setServ;
 
@@ -137,6 +133,7 @@ function processServerlist(thelist: { name: string, description: string, ip: str
     const serverEntry: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string } = thelist[i];
 
     servers[i] = serverEntry;
+    servers[i].online = "Offline";
 
     const ipport = `${serverEntry.ip}:${serverEntry.ws_port}`;
 

@@ -9,7 +9,7 @@ export function opusCheck(
   if (audio === "") {
     return;
   }
-  console.info(`failed to load sound ${channel.src}`);
+  console.warn(`failed to load sound ${channel.src}`);
   let oldsrc = "";
   let newsrc = "";
   oldsrc = channel.src;

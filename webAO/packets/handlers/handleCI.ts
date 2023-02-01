@@ -1,4 +1,5 @@
 import { client } from '../../client'
+import { handleCharacterInfo } from '../../client/handleCharacterInfo'
 /**
    * Handles incoming character information, bundling multiple characters
    * per packet.
@@ -18,7 +19,7 @@ export const handleCI = (args: string[]) => {
             (<HTMLProgressElement>(
                 document.getElementById("client_loadingbar")
             )).value = charid;
-            setTimeout(() => client.handleCharacterInfo(chargs, charid), 500);
+            setTimeout(() => handleCharacterInfo(chargs, charid), 500);
         }
     }
     // Request the next pack

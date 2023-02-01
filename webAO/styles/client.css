@@ -21,15 +21,12 @@
 
 .text_rainbow {
 	background-color: #fff;
-	background-image: repeating-linear-gradient(to right,
-			red 0% 8%, orange 8% 16%, yellow 16% 24%, green 24% 32%, blue 32% 40%,
-			red 40% 48%, orange 48% 56%, yellow 56% 64%, green 64% 72%, blue 72% 80%,
-			red 80% 88%, orange 88% 96%, yellow 96% 100%);
-	background-size: 40% 40%;
+	background-image: repeating-linear-gradient(to right, red 0% 20%, orange 20% 40%, yellow 40% 60%, green 60% 80%, blue 80% 100%);
+	background-size: 75% 75%;
 	background-clip: text;
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
-	animation: rainbow 4s linear infinite;
+	animation: rainbow 2s linear infinite;
 }
 
 @keyframes rainbow_alt {
@@ -73,6 +70,17 @@
 
 #client_errortext {
 	animation: error_blink 3s ease-in-out infinite;
+}
+
+#client_secondfactor {
+	display: block;
+	flex-direction: column;
+	justify-content: center;
+	text-align: center;
+	align-items: center;
+	background: black;
+	color: lightgreen;
+	font-size: large;
 }
 
 #client_waiting {

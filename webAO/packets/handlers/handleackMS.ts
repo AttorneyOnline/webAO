@@ -1,4 +1,4 @@
-import { resetICParams } from "../../client";
+import { resetICParams } from '../../client/resetICParams'
 
 /**
 * server got our message

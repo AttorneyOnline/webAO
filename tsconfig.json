@@ -3,10 +3,10 @@
     "outDir": "./dist",
     "allowJs": true,
     "target": "es5",
-    "lib": ["DOM","DOM.Iterable"],
+    "lib": ["DOM","DOM.Iterable","ES2021.String"],
     "strict": true,
     "strictNullChecks": false, //document.getElementBy
     "downlevelIteration": true
   },
-  "include": ["./webAO/*"]
+  "include": ["./webAO/*", "webAO/viewport/viewport.ts"]
 }

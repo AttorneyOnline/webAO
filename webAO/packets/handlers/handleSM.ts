@@ -1,4 +1,8 @@
 import { client } from '../../client'
+import { addTrack } from '../../client/addTrack'
+import { isAudio } from '../../client/isAudio'
+import { fix_last_area } from '../../client/fixLastArea'
+import { createArea } from '../../client/createArea'
 /**
  * Handles incoming music information, containing all music in one packet.
  * @param {Array} args packet arguments
@@ -21,14 +25,15 @@ export const handleSM = (args: string[]) => {
             document.getElementById("client_loadingbar")
         )).value = client.char_list_length + client.evidence_list_length + i;
         if (client.musics_time) {
-            client.addTrack(trackname);
-        } else if (client.isAudio(trackname)) {
+            addTrack(trackname);
+        } else if (isAudio(trackname)) {
             client.musics_time = true;
-            client.fix_last_area();
-            client.addTrack(trackname);
+            fix_last_area();
+            addTrack(trackname);
         } else {
-            client.createArea(trackindex, trackname);
+            createArea(trackindex, trackname);
         }
+
     }
 
     // Music done, carry on

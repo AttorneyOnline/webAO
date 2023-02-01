@@ -6,5 +6,6 @@ import { setAOhost } from "../../client/aoHost";
 * @param {Array} args packet arguments
 */
 export const handleASS = (args: string[]) => {
-    setAOhost(args[1]);
+    if(args[1] !== "None")
+        setAOhost(args[1]);
 }

@@ -1,4 +1,8 @@
 import { client } from '../../client'
+import { addTrack } from '../../client/addTrack';
+import { createArea } from '../../client/createArea';
+import { fix_last_area } from '../../client/fixLastArea';
+import { isAudio } from '../../client/isAudio';
 import { safeTags } from '../../encoding';
 
 /**
@@ -16,20 +20,20 @@ export const handleEM = (args: string[]) => {
 
     for (let i = 2; i < args.length - 1; i++) {
         if (i % 2 === 0) {
-            const trackname = safeTags(args[i]);
+            const trackname = args[i];
             const trackindex = Number(args[i - 1]);
             (<HTMLProgressElement>(
                 document.getElementById("client_loadingbar")
             )).value =
                 client.char_list_length + client.evidence_list_length + trackindex;
             if (client.musics_time) {
-                client.addTrack(trackname);
-            } else if (client.isAudio(trackname)) {
+                addTrack(trackname);
+            } else if (isAudio(trackname)) {
                 client.musics_time = true;
-                client.fix_last_area();
-                client.addTrack(trackname);
+                fix_last_area();
+                addTrack(trackname);
             } else {
-                client.createArea(trackindex, trackname);
+                createArea(trackindex, trackname);
             }
         }
     }

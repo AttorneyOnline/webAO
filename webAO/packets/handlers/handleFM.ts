@@ -1,6 +1,6 @@
 import { client } from "../../client";
+import { addTrack } from "../../client/addTrack";
 import { safeTags } from "../../encoding";
-
 
 /**
  * Handles updated music list
@@ -11,6 +11,6 @@ export const handleFM = (args: string[]) => {
 
     for (let i = 1; i < args.length - 1; i++) {
         // Check when found the song for the first time
-        client.addTrack(safeTags(args[i]));
+        addTrack(safeTags(args[i]));
     }
 }

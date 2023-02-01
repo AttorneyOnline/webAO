@@ -123,5 +123,9 @@
 }
 
 #client_trackstatus {
-	display: fuck;
+	display: block;
+}
+
+#client_clock {
+	display: none;
 }

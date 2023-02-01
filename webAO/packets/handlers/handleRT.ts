@@ -1,5 +1,5 @@
 import { client } from "../../client";
-
+import { initTestimonyUpdater } from '../../viewport/utils/initTestimonyUpdater'
 
 /**
   * Handles a testimony states.
@@ -21,5 +21,5 @@ export const handleRT = (args: string[]) => {
         default:
             console.warn("Invalid testimony");
     }
-    client.viewport.initTestimonyUpdater();
+    initTestimonyUpdater();
 }
