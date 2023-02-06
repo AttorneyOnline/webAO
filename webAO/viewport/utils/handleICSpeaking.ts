@@ -244,7 +244,7 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
 
     client.viewport.blipChannels.forEach(
         (channel: HTMLAudioElement) =>
-        (channel.src = `${AO_HOST}sounds/general/sfx-blip${encodeURI(
+        (channel.src = `${AO_HOST}sounds/blips/${encodeURI(
             client.viewport.getChatmsg().blips.toLowerCase()
         )}.opus`)
     );

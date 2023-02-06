@@ -7,7 +7,7 @@ import { AO_HOST } from '../client/aoHost'
 const createBlip = (amountOfBlips) => {
     for (let i = 0; i < amountOfBlips; i++) {
         const audio = document.createElement('audio')
-        const blipUrl = `${AO_HOST}sounds/general/sfx-blipmale.opus`
+        const blipUrl = `${AO_HOST}sounds/blips/male.opus`
         audio.setAttribute('class', 'blipSound')
         audio.setAttribute('src', blipUrl)
         document.body.appendChild(audio)
