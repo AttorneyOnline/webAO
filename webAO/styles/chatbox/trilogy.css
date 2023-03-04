@@ -50,7 +50,7 @@
     height: 20%;
     min-width: 10%;
 	border-image-source: url('trilogy.svg');
-	border-image-slice: 4 fill;
+	border-image-slice: 3 fill;
 	border-image-width: 30px;
     position: absolute;
     z-index: 1;
