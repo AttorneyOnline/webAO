@@ -55,8 +55,8 @@
 	background-color: rgba(0, 0, 0, 0.5);	
 	border-image-source: url("yttd.png");
     border-image-slice: 20;
-	border-image-width: 0.6em;
-	border-width: 0.6em;
+	border-image-width: 20px;
+	border-width: 20px;
 	padding: 0 2%;
 	z-index: 1;
 }
@@ -70,13 +70,13 @@
 	display: block;
 	position: absolute;
 	bottom: 0;
-	width: 100%;
+	width: 99.9%;
 	margin: auto;
 	height: 70%;
 	border-image-source: url("yttd.png");
     border-image-slice: 20;
-	border-image-width: 0.6em;
-	border-width: 0.6em;
+	border-image-width: 20px;
+	border-width: 20px;
 	background-color: rgba(0, 0, 0, 0.5);
 	overflow-wrap: break-word;
 	text-align: left;
