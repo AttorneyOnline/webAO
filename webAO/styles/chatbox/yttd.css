@@ -52,7 +52,7 @@
 	left: 0;	
 	height: 30%;
 	min-width: 10%;
-	background-color: rgba(0, 0, 0, 0.5);	
+	background-color: rgba(0, 0, 0, 0.6);	
 	border-image-source: url("yttd.png");
     border-image-slice: 20;
 	border-image-width: 20px;
@@ -77,7 +77,7 @@
     border-image-slice: 20;
 	border-image-width: 20px;
 	border-width: 20px;
-	background-color: rgba(0, 0, 0, 0.5);
+	background-color: rgba(0, 0, 0, 0.6);
 	overflow-wrap: break-word;
 	text-align: left;
 	overflow: hidden;
