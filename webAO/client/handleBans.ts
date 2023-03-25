@@ -14,4 +14,5 @@ export const handleBans = (type: string, reason: string) => {
     (<HTMLElement>(
         document.getElementsByClassName("client_reconnect")[1]
     )).style.display = "none";
+    alert(type+":\r"+reason)
 }
