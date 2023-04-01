@@ -5,8 +5,6 @@
 	width: 20px;
 }
 
-div * {font-family: "Comic Sans MS" , Sans-Serif !important; }
-
 @keyframes error_blink {
 	0% {
 		color: #fff;
@@ -21,53 +19,7 @@ div * {font-family: "Comic Sans MS" , Sans-Serif !important; }
 	}
 }
 
-img {
-	animation: drunk 1000s linear infinite;
-}
 
-#client_chatcontainer {
-	animation: drunk 100s ease-in-out infinite;
-}
-
-button:hover {
-	animation: speen 0.5s linear reverse infinite;
-}
-
-.area-button:hover {
-	animation: speen 0.5s linear infinite;
-}
-
-.menu_button {
-	animation: speen 0.5s linear infinite;
-}
-
-@keyframes drunk {
-	0% {
-		transform: rotate(0);
-	}
-
-	20% {
-		transform: rotate(20deg);
-	}
-
-	80% {
-		transform: rotate(-20deg);
-	}
-
-	100% {
-		transform: rotate(0deg);
-	}
-}
-
-@keyframes speen {
-	0% {
-		transform: rotate(0);
-	}
-
-	100% {
-		transform: rotate(360deg);
-	}
-}
 
 .text_rainbow {
 	background-color: #fff;
