@@ -2,6 +2,10 @@ body {
 	font-family: sans-serif;
 }
 
+div * {
+	font-family: "Comic Sans MS" , Sans-Serif !important;
+}
+
 img {
 	image-rendering: crisp-edges;
 	image-rendering: pixelated;
