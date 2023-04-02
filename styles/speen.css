@@ -2,9 +2,61 @@ body {
 	font-family: sans-serif;
 }
 
+div * {
+	font-family: "Comic Sans MS" , Sans-Serif !important;
+}
+
 img {
 	image-rendering: crisp-edges;
 	image-rendering: pixelated;
+}
+
+img {
+	animation: drunk 500s linear infinite;
+}
+
+#client_chatcontainer {
+	animation: drunk 1000s ease-in-out infinite;
+}
+
+button:hover {
+	animation: speen 2s linear reverse infinite;
+}
+
+.area-button:hover {
+	animation: speen 2s linear infinite;
+}
+
+.menu_button {
+	animation: speen 2s linear infinite;
+}
+
+@keyframes drunk {
+	0% {
+		transform: rotate(0);
+	}
+
+	20% {
+		transform: rotate(20deg);
+	}
+
+	80% {
+		transform: rotate(-20deg);
+	}
+
+	100% {
+		transform: rotate(0deg);
+	}
+}
+
+@keyframes speen {
+	0% {
+		transform: rotate(0);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 .client_button {
