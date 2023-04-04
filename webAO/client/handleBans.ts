@@ -9,10 +9,7 @@ export const handleBans = (type: string, reason: string) => {
         "client_errortext"
     )!.innerHTML = `${type}:<br>${reason.replace(/\n/g, "<br />")}`;
     (<HTMLElement>(
-        document.getElementsByClassName("client_reconnect")[0]
-    )).style.display = "none";
-    (<HTMLElement>(
-        document.getElementsByClassName("client_reconnect")[1]
+        document.getElementById("client_reconnect")
     )).style.display = "none";
     alert(type+":\r"+reason)
 }
