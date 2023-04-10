@@ -38,6 +38,7 @@ export const UPDATE_INTERVAL = 60;
  */
 export let oldLoading = false;
 export const setOldLoading = (val: boolean) => {
+  console.warn("old loading set to "+val)
   oldLoading = val
 }
 
@@ -261,7 +262,6 @@ class Client extends EventEmitter {
   }
 
   const packet_list = in_data.split("%");
-  console.log(packet_list)
 
   for (var packet of packet_list) {
     let f_contents;
@@ -280,12 +280,14 @@ class Client extends EventEmitter {
     }
     // Take the first arg as the command
     const command = f_contents[0];
-    console.log(command)
-    // The rest is contents of the packet
-      packetHandler.has(command)
-        ? packetHandler.get(command)(f_contents)
-        : console.warn(`Invalid packet header ${command}`);
-    };
+    if(command!=="")
+    {
+      // The rest is contents of the packet
+        packetHandler.has(command)
+          ? packetHandler.get(command)(f_contents)
+          : console.warn(`Invalid packet header ${command}`);
+      };
+    }
   }
 
 
