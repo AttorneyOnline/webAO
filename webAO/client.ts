@@ -196,8 +196,6 @@ class Client extends EventEmitter {
    */
   joinServer() {
     this.sender.sendServer(`HI#${hdid}#%`);
-    this.sender.sendServer(`ID#webAO#${version}#%`);
-    
     if (mode !== "replay") {
       this.checkUpdater = setInterval(() => this.sender.sendCheck(), 5000);
     }
