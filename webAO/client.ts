@@ -105,6 +105,8 @@ class Client extends EventEmitter {
   _lastTimeICReceived: any;
   manifest: string[];
   viewport: Viewport;
+  partial_packet: boolean;
+  temp_packet: String;
   connect: () => void;
   loadResources: () => void
   isLowMemory: () => void
@@ -150,6 +152,8 @@ class Client extends EventEmitter {
     this.sender = sender
     this.viewport = masterViewport();
     this._lastTimeICReceived = new Date(0);
+    this.partial_packet = false;
+    this.temp_packet = "";
     loadResources
     isLowMemory
   }
@@ -193,6 +197,7 @@ class Client extends EventEmitter {
   joinServer() {
     this.sender.sendServer(`HI#${hdid}#%`);
     this.sender.sendServer(`ID#webAO#${version}#%`);
+    
     if (mode !== "replay") {
       this.checkUpdater = setInterval(() => this.sender.sendCheck(), 5000);
     }
@@ -230,18 +235,61 @@ class Client extends EventEmitter {
     const msg = e.data;
     console.debug(`S: ${msg}`);
 
-    const packets = Array(msg.split("%"));
-
-    packets.forEach(function(data: String){  
-      const splitPacket = String(data).split('#')
-      const packetHeader = splitPacket[0];
-
-      packetHandler.has(packetHeader)
-        ? packetHandler.get(packetHeader)(splitPacket)
-        : console.warn(`Invalid packet header ${packetHeader}`);
-    });
+    this.handle_server_packet(msg);
     
   }
+
+  /**
+   * Decode the packet
+   * @param {MessageEvent} e
+   */
+  handle_server_packet(p_data: string)
+{
+  let in_data = p_data;
+
+  if (!p_data.endsWith("%")) {
+    this.partial_packet = true;
+    this.temp_packet = this.temp_packet + in_data
+    console.log("Partial packet")
+    return;
+  }
+
+  else {
+    if (this.partial_packet) {
+      in_data = this.temp_packet + in_data
+      this.temp_packet = "";
+      this.partial_packet = false;
+    }
+  }
+
+  const packet_list = in_data.split("%");
+  console.log(packet_list)
+
+  for (var packet of packet_list) {
+    let f_contents;
+    // Packet should *always* end with #
+    if (packet.endsWith("#")) {
+      f_contents = packet.slice(0, -1).split("#");
+    }
+    // But, if it somehow doesn't, we should still be able to handle it
+    else {
+      f_contents = packet.split("#");
+    }
+    // Empty packets are suspicious!
+    if (f_contents.length == 0) {
+      console.warn("WARNING: Empty packet received from server, skipping...");
+      continue;
+    }
+    // Take the first arg as the command
+    const command = f_contents[0];
+    console.log(command)
+    // The rest is contents of the packet
+      packetHandler.has(command)
+        ? packetHandler.get(command)(f_contents)
+        : console.warn(`Invalid packet header ${command}`);
+    };
+  }
+
 
   /**
    * Triggered when an network error occurs.
