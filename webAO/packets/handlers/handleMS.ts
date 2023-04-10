@@ -76,7 +76,7 @@ export const handleMS = (args: string[]) => {
         speed: UPDATE_INTERVAL,
       };
 
-      if (extrafeatures.includes("cccc_ic_support")) {
+      if (args.length>16) {
         const extra_cccc = {
           showname: prepChat(args[16]),
           other_charid: Number(args[17]),
@@ -89,7 +89,7 @@ export const handleMS = (args: string[]) => {
         };
         chatmsg = Object.assign(extra_cccc, chatmsg);
 
-        if (extrafeatures.includes("looping_sfx")) {
+        if (args.length>24) {
           const extra_27 = {
             looping_sfx: Number(args[24]),
             screenshake: Number(args[25]),
@@ -99,7 +99,7 @@ export const handleMS = (args: string[]) => {
           };
           chatmsg = Object.assign(extra_27, chatmsg);
 
-          if (extrafeatures.includes("effects")) {
+          if (args.length>29) {
             const extra_28 = {
               additive: Number(args[29]),
               effects: args[30].split("|"),
