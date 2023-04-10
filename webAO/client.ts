@@ -230,13 +230,17 @@ class Client extends EventEmitter {
     const msg = e.data;
     console.debug(`S: ${msg}`);
 
-    const data = msg.split("%")[0];
-    const splitPacket = data.split('#')
-    const packetHeader = splitPacket[0];
+    const packets = Array(msg.split("%"));
 
-    packetHandler.has(packetHeader)
-      ? packetHandler.get(packetHeader)(splitPacket)
-      : console.warn(`Invalid packet header ${packetHeader}`);
+    packets.forEach(function(data: String){  
+      const splitPacket = String(data).split('#')
+      const packetHeader = splitPacket[0];
+
+      packetHandler.has(packetHeader)
+        ? packetHandler.get(packetHeader)(splitPacket)
+        : console.warn(`Invalid packet header ${packetHeader}`);
+    });
+    
   }
 
   /**
