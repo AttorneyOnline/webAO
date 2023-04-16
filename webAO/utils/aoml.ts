@@ -35,9 +35,9 @@ const aomlParser = (text: string) => {
 
 const mlConfig = (AO_HOST: string) => {
     const defaultUrl = `${AO_HOST}themes/default/chat_config.ini`
-    let aomlParsed: Promise<{[key: string]: Aoml}> = request(defaultUrl).then((data) => aomlParser(data));
+    let aomlParsed: Promise<{ [key: string]: Aoml }> = request(defaultUrl).then((data) => aomlParser(data));
 
-    
+
 
     const createIdentifiers = async () => {
         const identifiers = new Map<string, Aoml>()
@@ -45,7 +45,7 @@ const mlConfig = (AO_HOST: string) => {
             if (value.start && value.end) {
                 identifiers.set(value.start, value)
                 identifiers.set(value.end, value)
-            }   
+            }
         }
         return identifiers
     }
@@ -54,7 +54,7 @@ const mlConfig = (AO_HOST: string) => {
         for (const [ruleName, value] of Object.entries(await aomlParsed)) {
             if (value?.start && value?.end) {
                 startingIdentifiers.add(value.start)
-            }   
+            }
         }
         return startingIdentifiers
     }
@@ -68,29 +68,29 @@ const mlConfig = (AO_HOST: string) => {
         for (const letter of text) {
             let currentSelector = document.createElement('span')
             let currentIdentifier = identifiers.get(letter)
-            const currentClosingLetter = closingStack[closingStack.length-1]
+            const currentClosingLetter = closingStack[closingStack.length - 1]
             const keepChar = Number(currentIdentifier?.remove) === 0
-
-            if (startIdentifiers.has(letter)) {
-                const color = identifiers.get(letter).color.split(',')
-                const r = color[0]
-                const g = color[1]
-                const b = color[2]
-                colorStack.push([r,g,b])
-                closingStack.push(currentIdentifier.end)
-                const currentColor = `color: rgb(${r},${g},${b});`
-                currentSelector.setAttribute('style', currentColor)
-                if (keepChar) {
-                    currentSelector.innerHTML = letter
-                }
-            } else if (currentClosingLetter === letter) {
-                const r = colorStack[colorStack.length-1][0]
-                const g = colorStack[colorStack.length-1][1]
-                const b = colorStack[colorStack.length-1][2]
+            if (currentClosingLetter === letter) {
+                const r = colorStack[colorStack.length - 1][0]
+                const g = colorStack[colorStack.length - 1][1]
+                const b = colorStack[colorStack.length - 1][2]
                 const currentColor = `color: rgb(${r},${g},${b});`
                 currentSelector.setAttribute('style', currentColor)
                 closingStack.pop()
                 colorStack.pop()
+                if (keepChar) {
+                    currentSelector.innerHTML = letter
+                }
+            }
+            else if (startIdentifiers.has(letter)) {
+                const color = identifiers.get(letter).color.split(',')
+                const r = color[0]
+                const g = color[1]
+                const b = color[2]
+                colorStack.push([r, g, b])
+                closingStack.push(currentIdentifier.end)
+                const currentColor = `color: rgb(${r},${g},${b});`
+                currentSelector.setAttribute('style', currentColor)
                 if (keepChar) {
                     currentSelector.innerHTML = letter
                 }
@@ -99,9 +99,9 @@ const mlConfig = (AO_HOST: string) => {
                 if (colorStack.length === 0) {
                     currentSelector.className = `text_${defaultColor}`
                 } else {
-                    const r = colorStack[colorStack.length-1][0]
-                    const g = colorStack[colorStack.length-1][1]
-                    const b = colorStack[colorStack.length-1][2]
+                    const r = colorStack[colorStack.length - 1][0]
+                    const g = colorStack[colorStack.length - 1][1]
+                    const b = colorStack[colorStack.length - 1][2]
                     const currentColor = `color: rgb(${r},${g},${b});`
                     currentSelector.setAttribute('style', currentColor)
                 }
