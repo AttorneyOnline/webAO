@@ -15,14 +15,13 @@ export function updateBackgroundPreview() {
 
     if (background_select.selectedIndex === 0) {
         background_filename.style.display = "initial";
-        background_preview.src = `${AO_HOST}background/${encodeURI(
-            background_filename.value.toLowerCase()
-        )}/defenseempty.png`;
     } else {
         background_filename.style.display = "none";
-        background_preview.src = `${AO_HOST}background/${encodeURI(
-            background_select.value.toLowerCase()
-        )}/defenseempty.png`;
     }
+    tryUrls(`${AO_HOST}background/${encodeURI(
+            background_select.value.toLowerCase()
+        )}/defenseempty`).then((resp) => {
+        background_preview.src = resp;
+    });
 }
 window.updateBackgroundPreview = updateBackgroundPreview;
