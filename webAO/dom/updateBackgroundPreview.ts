@@ -1,5 +1,5 @@
 import { AO_HOST } from '../client/aoHost';
-import tryUrls from "../../utils/tryUrls";
+import tryUrls from "../utils/tryUrls";
 
 /**
  * Update background preview.
