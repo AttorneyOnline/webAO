@@ -19,6 +19,7 @@ export default [
   'halla',
   'homestuck',
   'key',
+  'sonic',
   'yakuza',
   'yttd',
   'whentheycry',
