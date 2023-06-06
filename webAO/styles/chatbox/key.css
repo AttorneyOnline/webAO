@@ -167,6 +167,7 @@
 	text-shadow: -1px -1px 0 #d7e5d9, 1px -1px 0 #d7e5d9, -1px 1px 0 #d7e5d9, 1px 1px 0 #d7e5d9;
 	font-size: small;
 	line-height: 1;
+	font-size: 0.4em;
 }
 
 #client_clock_date {
@@ -178,7 +179,7 @@
 	margin: 0;
 	color: #ffe;
 	text-shadow: -1px -1px 0 #78320b, 1px -1px 0 #78320b, -1px 1px 0 #78320b, 1px 1px 0 #78320b;
-	font-size: 3em;
+	font-size: 1.5em;
 	background: rgba(255,255,255,0.7);
 	border-radius: 100%;
 	line-height: 1.8;
@@ -200,6 +201,7 @@
 	border: #ffc89f 3px ridge;
 	border-radius: 100%;
 	line-height: 2;
+	font-size: 0.4em;
 }
 
 #client_clock_time {
