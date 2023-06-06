@@ -3,13 +3,18 @@ import { CHATBOX } from "../client";
  * Set the font size for the chatbox
  */
 export function resizeChatbox() {
-    const chatContainerBox = document.getElementById("client_chatcontainer")!;
+    const chatContainerBox = document.getElementById("client_chatcontainer");
+    const clockBox = document.getElementById("client_clock");
+    const trackstatusBox = document.getElementById("client_trackstatus");
+
     const gameHeight = document.getElementById("client_background")!.offsetHeight;
 
     chatContainerBox.style.fontSize = `${(gameHeight * 0.0521).toFixed(1)}px`;
+    clockBox.style.fontSize = `${(gameHeight * 0.0521).toFixed(1)}px`;
+    trackstatusBox.style.fontSize = `${(gameHeight * 0.0521).toFixed(1)}px`;
 
     const trackstatus = <HTMLMarqueeElement>(document.getElementById("client_trackstatustext"));
-    trackstatus.width = (trackstatus.offsetWidth - 1) + "px";
+    trackstatus.style.width = (trackstatus.offsetWidth - 1) + "px";
 
 
     //clock
@@ -25,7 +30,7 @@ export function resizeChatbox() {
     } else if (CHATBOX == "key") {
         weekday = ["Sun.", "Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat."];
         document.getElementById("client_clock_weekday")!.innerText = weekday[now.getDay()];
-        document.getElementById("client_clock_date")!.innerText = String(now.getDay());
+        document.getElementById("client_clock_date")!.innerText = String(now.getDate());
     }
 
 }
