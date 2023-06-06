@@ -175,6 +175,7 @@
 	font-weight: bold;
 	padding-left: 1.5em;
 	padding-top: 0.5em;
+	font-size: 0.5em;
 }
 
 #client_clock_month {
@@ -192,6 +193,7 @@
 	background-size: 100% 40%;
 	border: 0.1em solid #00b63c;
 	border-radius: 100%;
+	font-size: 0.6em;
 }
 
 #client_clock_time {
@@ -219,4 +221,5 @@
 	border-radius: 50%;
 	border-top: none;
 	padding-top: 0.5em;
+	font-size: 0.5em;
 }

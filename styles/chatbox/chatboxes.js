@@ -1,1 +1,1 @@
-export default["aa","acww","dd","dgs","plvsaa","trilogy","future","legacy","ddlc","dr1","dr2","drv3","drae","p3","p4","p5","999","halla","homestuck","key","yakuza","yttd","whentheycry","n64zelda","papermario"];
+export default["aa","acww","dd","dgs","plvsaa","trilogy","future","legacy","ddlc","dr1","dr2","drv3","drae","p3","p4","p5","999","halla","homestuck","key","sonic","yakuza","yttd","whentheycry","n64zelda","papermario"];
