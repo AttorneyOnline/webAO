@@ -52,5 +52,5 @@ export function decodeChat(estring: string): string {
  */
 export function prepChat(msg: string): string {
   // TODO: make this less awful
-  return unescapeChat(decodeChat(msg));
+  return safeTags(unescapeChat(decodeChat(msg)));
 }
