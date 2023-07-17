@@ -59,12 +59,15 @@ export const handlePV = async (args: string[]) => {
             me.name.toLowerCase()
           )}/emotions/button${i}_off.png`,
         };
-        emotesList.innerHTML += `<img src=${emotes[i].button}
-					id="emo_${i}"
-					alt="${emotes[i].desc}"
-          title="${emotes[i].desc}"
-					class="emote_button"
-					onclick="pickEmotion(${i})">`;
+
+        let emote_item = new Image();
+        emote_item.id = "emo_"+i;
+        emote_item.className = "emote_button";
+        emote_item.src = emotes[i].button;
+        emote_item.alt = emotes[i].desc;
+        emote_item.title = emotes[i].desc;
+        emote_item.onclick = () => { window.pickEmotion(i) }
+        emotesList.appendChild(emote_item);
       } catch (e) {
         console.error(`missing emote ${i}`);
       }
