@@ -459,13 +459,13 @@
 					onchange="changeMusicVolume()">
 
 			<p>SFX</p>
-			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" onerror="opusCheck()" controls></audio>
+			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" onerror="opusCheck(this)" controls></audio>
 
 			<p>Shouts</p>
-			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" onerror="opusCheck()" controls></audio>
+			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" onerror="opusCheck(this)" controls></audio>
 			
 			<p>Testimony/Guilty</p>
-			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" onerror="opusCheck()" controls></audio>
+			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" onerror="opusCheck(this)" controls></audio>
 
 			<p>Blip</p>
 			<input id="client_bvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
@@ -507,6 +507,7 @@
 				<option value="p3">Persona 3</option>
 				<option value="p4">Persona 4</option>
 				<option value="p5">Persona 5</option>
+				<option value="sonic">Murder of Sonic</option>
 				<option value="halla">VA-11 HALL-A</option>
 				<option value="whentheycry">When They Cry Series</option>
 				<option value="yakuza">Yakuza</option>
