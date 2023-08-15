@@ -301,11 +301,16 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
         client.viewport.getChatmsg().sound = client.viewport.getChatmsg().effects[2];
     }
     
-    client.viewport.getChatmsg().parsed = await attorneyMarkdown.applyMarkdown(
-        client.viewport.getChatmsg().content,
-        
-        COLORS[client.viewport.getChatmsg().color]
-        
-    );
+    try {
+        client.viewport.getChatmsg().parsed = await attorneyMarkdown.applyMarkdown(
+            client.viewport.getChatmsg().content,
+            
+            COLORS[client.viewport.getChatmsg().color]
+            
+        );
+    } catch (error) {
+        console.warn("markdown failed");
+    }
+    
     client.viewport.chat_tick();
 };
