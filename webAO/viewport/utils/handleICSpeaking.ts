@@ -310,7 +310,14 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
         );
     } catch (error) {
         console.warn("markdown failed");
-        client.viewport.getChatmsg().parsed = client.viewport.getChatmsg().content;
+        let output: HTMLSpanElement[] = []
+        for (const letter of client.viewport.getChatmsg().content) {
+            let currentSelector = document.createElement('span')
+                currentSelector.innerHTML = letter
+                currentSelector.className = `text_${COLORS[client.viewport.getChatmsg().color]}`
+            output.push(currentSelector)
+        }
+        client.viewport.getChatmsg().parsed = output;
     }
     
     client.viewport.chat_tick();
