@@ -15,9 +15,6 @@ export const handleEI = (args: string[]) => {
         "client_loadingtext"
     )!.innerHTML = `Loading Evidence ${args[1]}/${client.evidence_list_length}`;
     const evidenceID = Number(args[1]);
-    (<HTMLProgressElement>document.getElementById("client_loadingbar")).value =
-        client.char_list_length + evidenceID;
-
     const arg = args[2].split("&");
     client.evidences[evidenceID] = {
         name: prepChat(arg[0]),

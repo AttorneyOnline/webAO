@@ -8,17 +8,13 @@ import { handleCharacterInfo } from '../../client/handleCharacterInfo'
    */
 export const handleCI = (args: string[]) => {
     // Loop through the 10 characters that were sent
-
+    document.getElementById(
+        "client_loadingtext"
+    )!.innerHTML = `Loading Character ${args[1]}/${client.char_list_length}`;
     for (let i = 2; i <= args.length - 2; i++) {
-        if (i % 2 === 0) {
-            document.getElementById(
-                "client_loadingtext"
-            )!.innerHTML = `Loading Character ${args[1]}/${client.char_list_length}`;
+        if (i % 2 === 0) {            
             const chargs = args[i].split("&");
             const charid = Number(args[i - 1]);
-            (<HTMLProgressElement>(
-                document.getElementById("client_loadingbar")
-            )).value = charid;
             setTimeout(() => handleCharacterInfo(chargs, charid), 500);
         }
     }

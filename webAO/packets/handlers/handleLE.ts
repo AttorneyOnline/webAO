@@ -11,9 +11,6 @@ import { prepChat, safeTags } from '../../encoding';
 export const handleLE = (args: string[]) => {
     client.evidences = [];
     for (let i = 1; i < args.length - 1; i++) {
-        (<HTMLProgressElement>(
-            document.getElementById("client_loadingbar")
-        )).value = client.char_list_length + i;
         const arg = args[i].split("&");
         client.evidences[i - 1] = {
             name: prepChat(arg[0]),

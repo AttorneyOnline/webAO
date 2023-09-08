@@ -12,11 +12,6 @@ export const handleSI = (args: string[]) => {
     client.evidence_list_length = Number(args[2]);
     client.music_list_length = Number(args[3]);
 
-    (<HTMLProgressElement>document.getElementById("client_loadingbar")).max =
-        client.char_list_length +
-        client.evidence_list_length +
-        client.music_list_length;
-
     // create the charselect grid, to be filled by the character loader
     document.getElementById("client_chartable")!.innerHTML = "";
 

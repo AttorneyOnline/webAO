@@ -22,10 +22,6 @@ export const handleEM = (args: string[]) => {
         if (i % 2 === 0) {
             const trackname = args[i];
             const trackindex = Number(args[i - 1]);
-            (<HTMLProgressElement>(
-                document.getElementById("client_loadingbar")
-            )).value =
-                client.char_list_length + client.evidence_list_length + trackindex;
             if (client.musics_time) {
                 addTrack(trackname);
             } else if (isAudio(trackname)) {
@@ -37,7 +33,6 @@ export const handleEM = (args: string[]) => {
             }
         }
     }
-
     // get the next batch of tracks
     client.sender.sendServer(`AM#${Number(args[1]) / 10 + 1}#%`);
 }
