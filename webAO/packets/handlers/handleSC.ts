@@ -23,7 +23,7 @@ export const handleSC = async (args: string[]) => {
         const chargs = args[i].split("&");
         const charid = i - 1;
 
-        setTimeout(() => handleCharacterInfo(chargs, charid), charid*2);
+        setTimeout(() => handleCharacterInfo(chargs, charid), charid*6);
     }
     // We're done with the characters, request the music
     client.sender.sendServer("RM#%");
