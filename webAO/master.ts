@@ -50,6 +50,7 @@ fpPromise
 export function check_https() {
   if (document.location.protocol === 'https:') {
     document.getElementById('https_error').style.display = '';
+    setTimeout(() => window.location.replace("http://web.aceattorneyonline.com/"), 5000);    
   }
 }
 
