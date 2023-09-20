@@ -64,10 +64,10 @@ const mlConfig = (AO_HOST: string) => {
         const closingStack = []
         const colorStack = []
         // each value in output will be an html element
-        let output: HTMLSpanElement[] = []
+        const output: HTMLSpanElement[] = []
         for (const letter of text) {
-            let currentSelector = document.createElement('span')
-            let currentIdentifier = identifiers.get(letter)
+            const currentSelector = document.createElement('span')
+            const currentIdentifier = identifiers.get(letter)
             const currentClosingLetter = closingStack[closingStack.length - 1]
             const keepChar = Number(currentIdentifier?.remove) === 0
             if (currentClosingLetter === letter) {

@@ -1,6 +1,6 @@
 import queryParser from '../../utils/queryParser'
 import { prepChat } from '../../encoding'
-let { mode } = queryParser();
+const { mode } = queryParser();
 
 /**
    * Handles an out-of-character chat message.

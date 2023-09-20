@@ -1,5 +1,5 @@
 import queryParser from '../utils/queryParser'
-let { asset } = queryParser();
+const { asset } = queryParser();
 const DEFAULT_HOST = 'http://attorneyoffline.de/base/';
 export let AO_HOST = asset || DEFAULT_HOST 
 export const setAOhost = (val: string) => {

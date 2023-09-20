@@ -1,9 +1,9 @@
 import downloadFile from '../downloadFile'
 jest
-  .useFakeTimers()
-  .setSystemTime(new Date('2020-01-01').getTime());
+    .useFakeTimers()
+    .setSystemTime(new Date('2020-01-01').getTime());
 
-  global.URL.createObjectURL = jest.fn();
+global.URL.createObjectURL = jest.fn();
 (window as any).global.Blob = function (content, options){return  ({content, options})}
 
 describe('downloadFile', () => {

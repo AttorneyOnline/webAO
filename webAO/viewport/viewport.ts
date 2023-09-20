@@ -20,18 +20,18 @@ import { setStartFirstTickCheck, setStartSecondTickCheck, startFirstTickCheck, s
 
 const viewport = (): Viewport => {
   let animating = false;
-  let blipChannels = createBlipsChannels();
+  const blipChannels = createBlipsChannels();
   let chatmsg = defaultChatMsg;
   let currentBlipChannel = 0;
   let lastChar = "";
   let lastEvi = 0;
-  let music = createMusic();
-  let musicVolume = 0;
+  const music = createMusic();
+  const musicVolume = 0;
   let sfxAudio = createSfxAudio();
   let sfxplayed = 0;
   let shoutTimer = 0;
-  let shoutaudio = createShoutAudio();
-  let testimonyAudio = createTestimonyAudio();
+  const shoutaudio = createShoutAudio();
+  const testimonyAudio = createTestimonyAudio();
   let testimonyTimer = 0;
   let testimonyUpdater: any;
   let textnow = "";

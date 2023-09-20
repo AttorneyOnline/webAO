@@ -14,9 +14,9 @@ export const saveChatlogHandle = async () => {
         messages.push(message);
     }
     const d = new Date();
-    let ye = new Intl.DateTimeFormat("en", { year: "numeric" }).format(d);
-    let mo = new Intl.DateTimeFormat("en", { month: "short" }).format(d);
-    let da = new Intl.DateTimeFormat("en", { day: "2-digit" }).format(d);
+    const ye = new Intl.DateTimeFormat("en", { year: "numeric" }).format(d);
+    const mo = new Intl.DateTimeFormat("en", { month: "short" }).format(d);
+    const da = new Intl.DateTimeFormat("en", { day: "2-digit" }).format(d);
 
     const filename = `chatlog-${da}-${mo}-${ye}`.toLowerCase();
     downloadFile(messages.join("\n"), filename);

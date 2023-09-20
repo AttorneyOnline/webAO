@@ -1,7 +1,7 @@
 
 import queryParser from '../utils/queryParser'
 import { client } from '../client'
-let { mode } = queryParser()
+const { mode } = queryParser()
 
 /**
  * Change background via OOC.

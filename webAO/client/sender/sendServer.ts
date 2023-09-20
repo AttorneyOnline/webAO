@@ -1,6 +1,6 @@
 import { client } from "../../client";
 import queryParser from "../../utils/queryParser";
-let { mode } = queryParser()
+const { mode } = queryParser()
 /**
  * Hook for sending messages to the server
  * @param {string} message the message to send

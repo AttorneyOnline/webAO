@@ -2,7 +2,7 @@ import queryParser from "../../utils/queryParser";
 
 import { client } from '../../client'
 import { handleCharacterInfo } from "../../client/handleCharacterInfo";
-let { mode } = queryParser();
+const { mode } = queryParser();
 
 /**
  * Handles incoming character information, containing all characters

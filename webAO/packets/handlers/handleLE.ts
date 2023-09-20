@@ -23,7 +23,7 @@ export const handleLE = (args: string[]) => {
     const evidence_box = document.getElementById("evidences")!;
     evidence_box.innerHTML = "";
     for (let i = 1; i <= client.evidences.length; i++) {
-        let evi_item = new Image();
+        const evi_item = new Image();
         evi_item.id = "evi_"+i;
         evi_item.className = "evi_icon"
         evi_item.src = client.evidences[i - 1].icon;

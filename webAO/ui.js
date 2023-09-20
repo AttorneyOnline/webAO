@@ -1,3 +1,4 @@
+/* eslint indent: ["error", 2, { "SwitchCase": 1 }] */
 /* eslint no-param-reassign: ["error",
 { "props": true, "ignorePropertyModificationsFor": ["container"] }] */
 import { GoldenLayout } from 'golden-layout';

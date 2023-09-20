@@ -275,7 +275,7 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
             intensity = intensity - fg.childElementCount;
 
         for (let i = 0; i < intensity; i++) {
-            let drop = document.createElement("p");
+            const drop = document.createElement("p");
             drop.style.left = (Math.random() * 100) + "%";
             drop.style.animationDelay = String(Math.random()) + "s";
             fg.appendChild(drop)
@@ -310,9 +310,9 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
         );
     } catch (error) {
         console.warn("markdown failed");
-        let output: HTMLSpanElement[] = []
+        const output: HTMLSpanElement[] = []
         for (const letter of client.viewport.getChatmsg().content) {
-            let currentSelector = document.createElement('span');
+            const currentSelector = document.createElement('span');
             currentSelector.innerHTML = letter;
             currentSelector.className = `text_${COLORS[client.viewport.getChatmsg().color]}`;
             output.push(currentSelector);

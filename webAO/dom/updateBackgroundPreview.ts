@@ -21,8 +21,8 @@ export function updateBackgroundPreview() {
         background_filename.style.display = "none";
     }
     tryUrls(`${AO_HOST}background/${encodeURI(
-            background_select.value.toLowerCase()
-        )}/defenseempty`).then((resp) => {
+        background_select.value.toLowerCase()
+    )}/defenseempty`).then((resp) => {
         background_preview.src = resp;
     });
 }

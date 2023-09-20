@@ -1,7 +1,7 @@
 import queryParser from "../../utils/queryParser";
 
-let { mode } = queryParser()
-  /**
+const { mode } = queryParser()
+/**
    * Handles the handshake completion packet, meaning the player
    * is ready to select a character.
    *
@@ -13,4 +13,4 @@ export const handleDONE = (_args: string[]) => {
       // Spectators don't need to pick a character
       document.getElementById("client_waiting")!.style.display = "none";
     }
-  }
+}

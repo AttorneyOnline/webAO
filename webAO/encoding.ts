@@ -3,11 +3,11 @@
  * @param {string} estring the string to be escaped
  */
 export function escapeChat(estring: string): string {
-  return estring
-    .replaceAll('#', '<num>')
-    .replaceAll('&', '<and>')
-    .replaceAll('%', '<percent>')
-    .replaceAll('$', '<dollar>');
+    return estring
+        .replaceAll('#', '<num>')
+        .replaceAll('&', '<and>')
+        .replaceAll('%', '<percent>')
+        .replaceAll('$', '<dollar>');
 }
 
 /**
@@ -15,11 +15,11 @@ export function escapeChat(estring: string): string {
  * @param {string} estring the string to be unescaped
  */
 export function unescapeChat(estring: string): string {
-  return estring
-    .replaceAll('<num>', '#')
-    .replaceAll('<and>', '&')
-    .replaceAll('<percent>', '%')
-    .replaceAll('<dollar>', '$');
+    return estring
+        .replaceAll('<num>', '#')
+        .replaceAll('<and>', '&')
+        .replaceAll('<percent>', '%')
+        .replaceAll('<dollar>', '$');
 }
 
 /**
@@ -29,12 +29,12 @@ export function unescapeChat(estring: string): string {
  * @param {string} unsafe an unsanitized string
  */
 export function safeTags(unsafe: string): string {
-  if (unsafe) {
-    return unsafe
-      .replaceAll('>', '＞')
-      .replaceAll('<', '＜');
-  }
-  return '';
+    if (unsafe) {
+        return unsafe
+            .replaceAll('>', '＞')
+            .replaceAll('<', '＜');
+    }
+    return '';
 }
 
 /**
@@ -51,6 +51,6 @@ export function decodeChat(estring: string): string {
  * @param {string} msg chat message to prepare for display
  */
 export function prepChat(msg: string): string {
-  // TODO: make this less awful
-  return safeTags(unescapeChat(decodeChat(msg)));
+    // TODO: make this less awful
+    return safeTags(unescapeChat(decodeChat(msg)));
 }

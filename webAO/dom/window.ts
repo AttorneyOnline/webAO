@@ -20,7 +20,7 @@ declare global {
         updateIniswap: () => void;
         resizeChatbox: () => void;
         setChatbox: (style: string) => void;
-        getIndexFromSelect: (select_box: string, value: string) => Number;
+        getIndexFromSelect: (select_box: string, value: string) => number;
         cancelEvidence: () => void;
         deleteEvidence: () => void;
         editEvidence: () => void;

@@ -2,7 +2,7 @@ import { extrafeatures } from "../../client";
 import { escapeChat } from "../../encoding";
 import {client} from '../../client'
 import queryParser from "../../utils/queryParser";
-let {mode} = queryParser()
+const {mode} = queryParser()
 
 /**
  * Sends an in-character chat message.

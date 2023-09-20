@@ -39,75 +39,75 @@ c6_talking = 0
 const mockRequest = request as jest.MockedFunction<typeof request>;
 mockRequest.mockReturnValue(Promise.resolve(networkRequest))
 
-  describe('mlConfig', () => {
+describe('mlConfig', () => {
     beforeEach(() => {
-      // Clear all instances and calls to constructor and all methods:
-      mockRequest.mockClear();
+        // Clear all instances and calls to constructor and all methods:
+        mockRequest.mockClear();
 
     });
 
     it('Should make a network request', () => {
         mlConfig('localhost')
         expect(mockRequest).toHaveBeenCalledTimes(1);
-      });
-  })
-  describe('applyMarkdown', () => {
+    });
+})
+describe('applyMarkdown', () => {
     const config = mlConfig('localhost')
 
     beforeEach(() => {
-      // Clear all instances and calls to constructor and all methods:
-      mockRequest.mockClear();
+        // Clear all instances and calls to constructor and all methods:
+        mockRequest.mockClear();
 
     });
-    
+
     it('Should create an array of spans containing letters', async () => {
-      const word = `hello`
-      const actual = await config.applyMarkdown(`hello`, `blue`)
-      let index = 0
-      for (const element of actual) {
-        expect(element.innerHTML).toBe(word[index])
-        index++
-      }
+        const word = `hello`
+        const actual = await config.applyMarkdown(`hello`, `blue`)
+        let index = 0
+        for (const element of actual) {
+            expect(element.innerHTML).toBe(word[index])
+            index++
+        }
     })
     it('Should add colors based on settings', async () => {
-      const config = mlConfig('localhost')
-      const actual = await config.applyMarkdown(`(heya)`, `blue`)
-      expect(actual[0].getAttribute('style')).toBe('color: rgb(107, 198, 247);')
+        const config = mlConfig('localhost')
+        const actual = await config.applyMarkdown(`(heya)`, `blue`)
+        expect(actual[0].getAttribute('style')).toBe('color: rgb(107, 198, 247);')
     })
     it('Should keep a letter if remove = 0', async () => {
-      const config = mlConfig('localhost')
-      
-      const actual = await config.applyMarkdown(`(What())Hey!`, `white`)
-      const expected = `(`
-      expect(actual[5].innerHTML).toBe(expected)
+        const config = mlConfig('localhost')
+
+        const actual = await config.applyMarkdown(`(What())Hey!`, `white`)
+        const expected = `(`
+        expect(actual[5].innerHTML).toBe(expected)
     })
     it('Should remove a letter if remove = 1', async () => {
-      const config = mlConfig('localhost')
-      
-      const actual = await config.applyMarkdown(`~What~()Hey!`, `white`)
-      const expected = ``
-      expect(actual[0].innerHTML).toBe(expected)
+        const config = mlConfig('localhost')
+
+        const actual = await config.applyMarkdown(`~What~()Hey!`, `white`)
+        const expected = ``
+        expect(actual[0].innerHTML).toBe(expected)
     })
     it('Should remove a letter if remove = 1', async () => {
-      const config = mlConfig('localhost')
-      
-      const actual = await config.applyMarkdown(`~What~()Hey!`, `white`)
-      const expected = ``
-      expect(actual[0].innerHTML).toBe(expected)
+        const config = mlConfig('localhost')
+
+        const actual = await config.applyMarkdown(`~What~()Hey!`, `white`)
+        const expected = ``
+        expect(actual[0].innerHTML).toBe(expected)
     })
     it('Should keep a closing letter if remove = 0', async () => {
-      const config = mlConfig('localhost')
-      
-      const actual = await config.applyMarkdown(`~NO[]~!`, `white`)
-      const expected = ``
-      expect(actual[4].innerHTML).toBe(expected)
+        const config = mlConfig('localhost')
+
+        const actual = await config.applyMarkdown(`~NO[]~!`, `white`)
+        const expected = ``
+        expect(actual[4].innerHTML).toBe(expected)
     })
     it('Should remove a closing letter if remove = 1', async () => {
-      const config = mlConfig('localhost')
-      const actual = await config.applyMarkdown(`~NO||~!`, `white`)
-      const expected = ``
-      expect(actual[5].innerHTML).toBe(expected)
+        const config = mlConfig('localhost')
+        const actual = await config.applyMarkdown(`~NO||~!`, `white`)
+        const expected = ``
+        expect(actual[5].innerHTML).toBe(expected)
     })
-  
-  })
-  
+
+})
+

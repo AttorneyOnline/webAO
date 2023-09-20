@@ -1,3 +1,5 @@
+/* eslint indent: ["error", 2, { "SwitchCase": 1 }] */
+
 import { client, extrafeatures, UPDATE_INTERVAL } from "../../client";
 import { handleCharacterInfo } from "../../client/handleCharacterInfo";
 import { resetICParams } from "../../client/resetICParams";

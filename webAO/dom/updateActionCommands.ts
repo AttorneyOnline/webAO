@@ -14,7 +14,7 @@ export function updateActionCommands(side: string) {
     // Update role selector
     for (
         let i = 0,
-        role_select = <HTMLSelectElement>document.getElementById("role_select");
+            role_select = <HTMLSelectElement>document.getElementById("role_select");
         i < role_select.options.length;
         i++
     ) {
