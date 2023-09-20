@@ -1,3 +1,5 @@
+/* eslint indent: ["error", 2, { "SwitchCase": 1 }] */
+
 import { client, delay } from "../client";
 import { UPDATE_INTERVAL } from "../client";
 import setEmote from "../client/setEmote";

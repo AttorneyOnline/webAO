@@ -4,7 +4,7 @@ export interface ChatMsg {
     sound: string;
     startpreanim?: boolean;
     startspeaking?: boolean;
-    side: any;
+    side: string;
     color: number;
     snddelay: number;
     preanimdelay?: number;

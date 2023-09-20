@@ -9,4 +9,4 @@ export const COLORS = [
     "cyan",
     "grey",
     "rainbow",
-  ];
+];

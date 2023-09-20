@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/ban-types: "off" */
 import { ChatMsg } from "./ChatMsg";
 
 export interface Viewport {

@@ -12,4 +12,4 @@ export const defaultChatMsg = {
     snddelay: 0,
     preanimdelay: 0,
     speed: UPDATE_INTERVAL,
-  } as ChatMsg;
+} as ChatMsg;

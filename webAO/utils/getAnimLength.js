@@ -12,16 +12,16 @@ import { requestBuffer } from '../services/request';
    */
 
 const getAnimLength = async (url) => {
-  const extensions = ['.gif', '.webp', '.apng'];
-  for (const extension of extensions) {
-    const urlWithExtension = url + extension;
-    const exists = await fileExists(urlWithExtension);
-    if (exists) {
-      const fileBuffer = await requestBuffer(urlWithExtension);
-      const length = calculatorHandler[extension](fileBuffer);
-      return length;
+    const extensions = ['.gif', '.webp', '.apng'];
+    for (const extension of extensions) {
+        const urlWithExtension = url + extension;
+        const exists = await fileExists(urlWithExtension);
+        if (exists) {
+            const fileBuffer = await requestBuffer(urlWithExtension);
+            const length = calculatorHandler[extension](fileBuffer);
+            return length;
+        }
     }
-  }
-  return 0;
+    return 0;
 };
 export default getAnimLength;

@@ -244,9 +244,9 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
 
     client.viewport.blipChannels.forEach(
         (channel: HTMLAudioElement) =>
-        (channel.src = `${AO_HOST}sounds/blips/${encodeURI(
-            client.viewport.getChatmsg().blips.toLowerCase()
-        )}.opus`)
+            (channel.src = `${AO_HOST}sounds/blips/${encodeURI(
+                client.viewport.getChatmsg().blips.toLowerCase()
+            )}.opus`)
     );
 
     // process markup
@@ -312,10 +312,10 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
         console.warn("markdown failed");
         let output: HTMLSpanElement[] = []
         for (const letter of client.viewport.getChatmsg().content) {
-            let currentSelector = document.createElement('span')
-                currentSelector.innerHTML = letter
-                currentSelector.className = `text_${COLORS[client.viewport.getChatmsg().color]}`
-            output.push(currentSelector)
+            let currentSelector = document.createElement('span');
+            currentSelector.innerHTML = letter;
+            currentSelector.className = `text_${COLORS[client.viewport.getChatmsg().color]}`;
+            output.push(currentSelector);
         }
         client.viewport.getChatmsg().parsed = output;
     }

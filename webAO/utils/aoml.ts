@@ -10,7 +10,7 @@ interface Aoml {
     color: string;
 }
 const aomlParser = (text: string) => {
-    let parsed: {[key: string]: Aoml}= {}
+    const parsed: {[key: string]: Aoml}= {}
     let currentHeader = ''
     for (const line of text.split(/\r?\n/)) {
         if (line === '') {
@@ -35,7 +35,7 @@ const aomlParser = (text: string) => {
 
 const mlConfig = (AO_HOST: string) => {
     const defaultUrl = `${AO_HOST}themes/default/chat_config.ini`
-    let aomlParsed: Promise<{ [key: string]: Aoml }> = request(defaultUrl).then((data) => aomlParser(data));
+    const aomlParsed: Promise<{ [key: string]: Aoml }> = request(defaultUrl).then((data) => aomlParser(data));
 
 
 
