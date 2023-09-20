@@ -26,7 +26,6 @@ const viewport = (): Viewport => {
   let lastChar = "";
   let lastEvi = 0;
   const music = createMusic();
-  const musicVolume = 0;
   let sfxAudio = createSfxAudio();
   let sfxplayed = 0;
   let shoutTimer = 0;
@@ -488,7 +487,6 @@ const viewport = (): Viewport => {
     setSfxAudio,
     blipChannels,
     music,
-    musicVolume,
     shoutaudio,
     updater,
   };

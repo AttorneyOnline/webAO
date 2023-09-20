@@ -36,7 +36,6 @@ export interface Viewport {
     getBackgroundFolder: Function;
     blipChannels: HTMLAudioElement[];
     music: any;
-    musicVolume: number;
     setBackgroundName: Function;
     getBackgroundName: Function;
     shoutaudio: HTMLAudioElement;
