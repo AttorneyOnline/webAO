@@ -1,4 +1,4 @@
-import setCookie from '../utils/setCookie';
+import setCookie from '../utils/setCookie.ts';
 
 /**
  * Triggered by the sound effect volume slider.
@@ -12,7 +12,7 @@ window.changeSFXVolume = changeSFXVolume;
 /**
  * Triggered by the testimony volume slider.
  */
- export function changeTestimonyVolume() {
+export function changeTestimonyVolume() {
   setCookie('testimonyVolume', document.getElementById('client_testimonyaudio').volume);
 }
 window.changeTestimonyVolume = changeTestimonyVolume;

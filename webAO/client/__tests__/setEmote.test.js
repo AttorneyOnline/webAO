@@ -1,13 +1,13 @@
-import setEmote from '../setEmote';
-import Client from '../../client';
+import setEmote from '../setEmote.ts';
+import Client from '../../client.ts';
 import fileExists from '../../utils/fileExists';
 import transparentPng from '../../constants/transparentPng';
 
-jest.mock('../../viewport/utils/createMusic')
+jest.mock('../../viewport/utils/createMusic');
 jest.mock('../../utils/fileExists');
-jest.mock('../../viewport/utils/createSfxAudio')
-jest.mock('../../viewport/utils/createShoutAudio')
-jest.mock('../../viewport/utils/createTestimonyAudio')
+jest.mock('../../viewport/utils/createSfxAudio');
+jest.mock('../../viewport/utils/createShoutAudio');
+jest.mock('../../viewport/utils/createTestimonyAudio');
 describe('setEmote', () => {
   const AO_HOST = '';
 

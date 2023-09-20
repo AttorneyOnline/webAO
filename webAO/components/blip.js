@@ -1,17 +1,17 @@
-import { AO_HOST } from '../client/aoHost'
+import { AO_HOST } from '../client/aoHost.ts';
 
 /**
- * 
+ *
  * @param {number} amountOfBlips Amount of Blips to put on page
  */
 const createBlip = (amountOfBlips) => {
-    for (let i = 0; i < amountOfBlips; i++) {
-        const audio = document.createElement('audio')
-        const blipUrl = `${AO_HOST}sounds/blips/male.opus`
-        audio.setAttribute('class', 'blipSound')
-        audio.setAttribute('src', blipUrl)
-        document.body.appendChild(audio)
-    }
-}
-createBlip(6)
-export default createBlip
+  for (let i = 0; i < amountOfBlips; i++) {
+    const audio = document.createElement('audio');
+    const blipUrl = `${AO_HOST}sounds/blips/male.opus`;
+    audio.setAttribute('class', 'blipSound');
+    audio.setAttribute('src', blipUrl);
+    document.body.appendChild(audio);
+  }
+};
+createBlip(6);
+export default createBlip;

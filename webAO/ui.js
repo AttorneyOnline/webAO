@@ -1,6 +1,4 @@
-/* eslint indent: ["error", 2] */
-
-import { GoldenLayout } from "golden-layout";
+import { GoldenLayout } from 'golden-layout';
 
 const config = {
   settings: {
@@ -73,5 +71,4 @@ golden.registerComponentFactoryFunction('template', (container, componentState) 
   // TODO: support multiple locales
   // container.setTitle(document.querySelector(`#${componentState.id} meta[name='frame-title']`).getAttribute("content"));
 });
-golden.loadLayout(config)
-
+golden.loadLayout(config);
