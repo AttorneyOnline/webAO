@@ -1,9 +1,9 @@
 /**
  * Hides and shows any html element
- * @param {string} element_id the id of the element to toggle
+ * @param {string} elementId the id of the element to toggle
  */
-export function toggleElement(element_id) {
-  const element = document.getElementById(element_id);
+export function toggleElement(elementId) {
+  const element = document.getElementById(elementId);
   if (element.style.display !== 'none') {
     element.style.display = 'none';
   } else {
@@ -11,3 +11,4 @@ export function toggleElement(element_id) {
   }
 }
 window.toggleElement = toggleElement;
+export default toggleElement;

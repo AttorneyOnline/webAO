@@ -1,3 +1,5 @@
+/* eslint no-param-reassign: ["error",
+{ "props": true, "ignorePropertyModificationsFor": ["button"] }] */
 /**
  * Highlights and selects an effect for in-character chat.
  * If the same effect button is selected, then the effect is canceled.
@@ -11,3 +13,4 @@ export function toggleEffect(button) {
   }
 }
 window.toggleEffect = toggleEffect;
+export default toggleEffect;

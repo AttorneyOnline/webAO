@@ -1,7 +1,7 @@
-const fileExists = async (url) => new Promise((resolve, reject) => {
+const fileExists = async (url) => new Promise((resolve) => {
   const xhr = new XMLHttpRequest();
   xhr.open('HEAD', url);
-  xhr.onload = function (e) {
+  xhr.onload = function checkLoad() {
     if (xhr.readyState === 4) {
       if (xhr.status === 200) {
         resolve(true);
@@ -10,7 +10,7 @@ const fileExists = async (url) => new Promise((resolve, reject) => {
       }
     }
   };
-  xhr.onerror = function (e) {
+  xhr.onerror = function checkError() {
     resolve(false);
   };
   xhr.send(null);

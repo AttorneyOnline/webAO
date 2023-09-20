@@ -1,3 +1,7 @@
+/* eslint no-await-in-loop: "warn" */
+/* eslint no-restricted-syntax: "off" */
+/* TODO: use promises for this */
+
 import calculatorHandler from './calculatorHandler';
 import fileExists from './fileExists';
 import { requestBuffer } from '../services/request';

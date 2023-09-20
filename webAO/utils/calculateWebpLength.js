@@ -1,3 +1,5 @@
+/* eslint no-bitwise: "off" */
+
 const calculateWebpLength = (webpFile) => {
   const d = new Uint8Array(webpFile);
   // https://developers.google.com/speed/webp/docs/riff_container#animation

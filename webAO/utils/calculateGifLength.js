@@ -1,3 +1,5 @@
+/* eslint no-bitwise: "off" */
+
 /**
    * Adds up the frame delays to find out how long a GIF is
    * I totally didn't steal this

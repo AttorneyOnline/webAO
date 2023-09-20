@@ -17,11 +17,11 @@ const calculateApngLength = (apngFile) => {
       const delayDen = Number(d[i + 25]);
       let delay;
       // minimum is 100ms
-      if (delayDen === 0)
+      if (delayDen === 0) {
         delay = delayNum / 100;
-      else
+      } else {
         delay = delayNum / delayDen;
-
+      }
       duration += delay;
     }
   }

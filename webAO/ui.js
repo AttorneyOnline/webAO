@@ -1,3 +1,5 @@
+/* eslint no-param-reassign: ["error",
+{ "props": true, "ignorePropertyModificationsFor": ["container"] }] */
 import { GoldenLayout } from 'golden-layout';
 
 const config = {
@@ -68,7 +70,5 @@ const golden = new GoldenLayout();
 golden.registerComponentFactoryFunction('template', (container, componentState) => {
   const template = document.querySelector(`#${componentState.id}`);
   container.element.innerHTML = template.innerHTML;
-  // TODO: support multiple locales
-  // container.setTitle(document.querySelector(`#${componentState.id} meta[name='frame-title']`).getAttribute("content"));
 });
 golden.loadLayout(config);
