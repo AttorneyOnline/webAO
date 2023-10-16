@@ -34,12 +34,12 @@ fpPromise
 
         check_https();
 
-        fetch('https://servers.aceattorneyonline.com/servers')
+        fetch('http://servers.aceattorneyonline.com/servers')
             .then(cachedServerlist)
             .then((response) => loadServerlist(response))
             .catch(cachedServerlist);
 
-        fetch('https://servers.aceattorneyonline.com/version')
+        fetch('http://servers.aceattorneyonline.com/version')
             .then((response) => response.text())
             .then((response) => processVersion(response));
 
