@@ -7,7 +7,7 @@ import { safeTags } from "../../encoding";
    */
 export const handleARUP = (args: string[]) => {
     args = args.slice(1);
-    for (let i = 0; i < args.length - 2; i++) {
+    for (let i = 0; i < args.length - 1; i++) {
         if (client.areas[i]) {
             // the server sends us ARUP before we even get the area list
             const thisarea = document.getElementById(`area${i}`)!;
