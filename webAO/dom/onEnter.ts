@@ -6,7 +6,7 @@ import { escapeChat } from "../encoding";
  * @param {KeyboardEvent} event
  */
 export function onEnter(event: KeyboardEvent) {
-    if (event.keyCode === 13) {
+    if (event.key === "Enter") {
         const mychar = client.character;
         const myemo = client.emote;
         const evi = client.evidence;
