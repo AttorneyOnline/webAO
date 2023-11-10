@@ -68,6 +68,11 @@ export function onEnter(event: KeyboardEvent) {
             emote_mod = 0;
         }
 
+        // Never send empty messages
+        if (text === '') {
+            return false;
+        }
+
         client.sender.sendIC(
             myemo.deskmod,
             myemo.preanim,
