@@ -17,7 +17,9 @@ import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
 import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists'
 
-const { ip: serverIP, mode, theme } = queryParser();
+const { ip: serverIP, mode, theme, serverName } = queryParser();
+
+document.title = serverName;
 
 export let CHATBOX: string;
 export const setCHATBOX = (val: string) => {

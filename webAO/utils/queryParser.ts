@@ -5,6 +5,7 @@ interface QueryParams {
     mode: string;
     asset: string;
     theme: string;
+    serverName: string;
 }
 
 const queryParser = (): QueryParams => {
@@ -14,6 +15,7 @@ const queryParser = (): QueryParams => {
         mode: urlParams.get("mode") || "join",
         asset: urlParams.get("asset") || "http://attorneyoffline.de/base/",
         theme: urlParams.get("theme") || "default",
+        serverName: urlParams.get("serverName") || "Attorney Online session"
     }
     return queryParams as QueryParams;
 };
