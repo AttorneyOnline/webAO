@@ -19,7 +19,6 @@ import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList, fetchManife
 const version = process.env.npm_package_version;
 const { ip: serverIP, mode, theme } = queryParser();
 
-const THEME: string = theme || "default";
 export let CHATBOX: string;
 export const setCHATBOX = (val: string) => {
     CHATBOX = val
@@ -68,6 +67,11 @@ fpPromise
     .then((fp) => fp.get())
     .then((result) => {
         hdid = result.visitorId;
+
+        if (!serverIP) {
+            alert("No server IP specified!");
+            return;
+        }
 
         client = new Client(serverIP);
         client.connect()
@@ -146,7 +150,7 @@ class Client extends EventEmitter {
         this.musics_time = false;
         this.callwords = [];
         this.manifest = [];
-        this.resources = getResources(AO_HOST, THEME);
+        this.resources = getResources(AO_HOST, theme);
         this.selectedEmote = -1;
         this.selectedEvidence = 0;
         this.checkUpdater = null;

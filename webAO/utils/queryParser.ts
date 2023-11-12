@@ -2,24 +2,19 @@
 
 interface QueryParams {
     ip: string;
-    serverIP: string;
     mode: string;
     asset: string;
     theme: string;
 }
 
-interface StringMap {
-    [key: string]: any;
-}
-
 const queryParser = (): QueryParams => {
-    const queryDict: StringMap = {};
-    location.search
-        .substr(1)
-        .split("&")
-        .forEach((item) => {
-            queryDict[item.split("=")[0]] = item.split("=")[1];
-        });
-    return queryDict as QueryParams;
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryParams = {
+        ip: urlParams.get("ip") || "",
+        mode: urlParams.get("mode") || "join",
+        asset: urlParams.get("asset") || "http://attorneyoffline.de/base/",
+        theme: urlParams.get("theme") || "default",
+    }
+    return queryParams as QueryParams;
 };
 export default queryParser;
