@@ -37,7 +37,7 @@ export const UPDATE_INTERVAL = 60;
  */
 export let oldLoading = false;
 export const setOldLoading = (val: boolean) => {
-    console.warn("old loading set to "+val)
+    console.warn("old loading set to " + val)
     oldLoading = val
 }
 
@@ -221,7 +221,7 @@ class Client extends EventEmitter {
         console.error(`The connection was closed: ${e.reason} (${e.code})`);
         if (extrafeatures.length == 0 && banned === false) {
             document.getElementById("client_errortext").textContent =
-        "Could not connect to the server";
+                "Could not connect to the server";
         }
         document.getElementById("client_waiting").style.display = "block";
         document.getElementById("client_error").style.display = "flex";
@@ -239,15 +239,14 @@ class Client extends EventEmitter {
         console.debug(`S: ${msg}`);
 
         this.handle_server_packet(msg);
-    
+
     }
 
     /**
    * Decode the packet
    * @param {MessageEvent} e
    */
-    handle_server_packet(p_data: string)
-    {
+    handle_server_packet(p_data: string) {
         let in_data = p_data;
 
         if (!p_data.endsWith("%")) {
@@ -284,8 +283,7 @@ class Client extends EventEmitter {
             }
             // Take the first arg as the command
             const command = f_contents[0];
-            if(command!=="")
-            {
+            if (command !== "") {
                 // The rest is contents of the packet
                 packetHandler.has(command)
                     ? packetHandler.get(command)(f_contents)
