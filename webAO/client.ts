@@ -15,8 +15,8 @@ import { onReplayGo } from './dom/onReplayGo'
 import { packetHandler } from './packets/packetHandler'
 import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
-import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList, fetchManifest } from './client/fetchLists'
-const version = process.env.npm_package_version;
+import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists'
+
 const { ip: serverIP, mode, theme } = queryParser();
 
 export let CHATBOX: string;
