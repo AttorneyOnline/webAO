@@ -137,12 +137,13 @@ function processServerlist(thelist: { name: string, description: string, ip: str
         servers[i].online = "Offline";
 
         const ipport = `${serverEntry.ip}:${serverEntry.ws_port}`;
+        const serverName = serverEntry.name;
 
         if (serverEntry.ws_port) {
             document.getElementById('masterlist').innerHTML
                 += `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(serverEntry.name)}</p>`
-                + `<a class="button" href="${myURL}client.html?mode=watch&ip=${ipport}">Watch</a>`
-                + `<a class="button" href="${myURL}client.html?mode=join&ip=${ipport}">Join</a></li>`;
+                + `<a class="button" href="${myURL}client.html?mode=watch&ip=${ipport}&serverName=${serverName}">Watch</a>`
+                + `<a class="button" href="${myURL}client.html?mode=join&ip=${ipport}&serverName=${serverName}">Join</a></li>`;
         }
     }
 }
