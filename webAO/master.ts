@@ -12,6 +12,7 @@ interface AOServer {
     name: string,
     description: string,
     ip: string,
+    players: number,
     port?: number,
     ws_port?: number,
     wss_port?: number,
@@ -33,10 +34,22 @@ let selectedServer: number = -1;
 
 const servers: AOServer[] = [];
 servers[-2] = {
-    name: 'Singleplayer', description: 'Build cases, try out new things', ip: '127.0.0.1', port: 50001, ws_port: 50001, assets: '', online: 'Online: 0/1',
+    name: 'Singleplayer',
+    description: 'Build cases, try out new things',
+    ip: '127.0.0.1',
+    port: 50001,
+    assets: '',
+    online: 'Online: 0/1',
+    players: 0,
 };
 servers[-1] = {
-    name: 'Localhost', description: 'This is your computer on port 50001', ip: '127.0.0.1', port: 50001, ws_port: 50001, assets: '', online: 'Offline',
+    name: 'Localhost',
+    description: 'This is your computer on port 50001',
+    ip: '127.0.0.1',
+    port: 50001,
+    assets: '',
+    online: 'Offline',
+    players: 0,
 };
 
 const fpPromise = FingerprintJS.load();
@@ -162,6 +175,7 @@ async function getServerlist(): Promise<AOServer[]> {
             name: item.name,
             description: item.description,
             ip: item.ip,
+            players: item.players || 0,
         }
 
         if (item.ws_port) {
@@ -181,7 +195,6 @@ async function getServerlist(): Promise<AOServer[]> {
         console.log(newServer)
 
         serverlist.push(newServer);
-        servers.push(newServer);
     }
 
     // Always cache the result when we get it
@@ -215,7 +228,8 @@ function processServerlist(serverlist: AOServer[]) {
 
         const ipport = `${server.ip}:${port}`;
         const serverName = server.name;
-        servers[i].online = 'Offline';
+        server.online = 'Offline';
+        servers.push(server);
 
         document.getElementById('masterlist').innerHTML
             += `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(server.name)}</p>`
