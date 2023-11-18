@@ -21,9 +21,11 @@ interface AOServer {
 
 const myStorage = window.localStorage;
 
-const version = process.env.npm_package_version;
+const clientVersion = process.env.npm_package_version;
 
 const MASTERSERVER_IP = 'master.aceattorneyonline.com:27014';
+const serverlist_domain = 'servers.aceattorneyonline.com';
+const protocol = window.location.protocol;
 
 const serverlist_cache_key = 'masterlist';
 
@@ -47,30 +49,20 @@ fpPromise
 
         check_https();
 
-        const serverlist = await (async () => {
-            try {
-                return await getServerlist();
-            } catch (err) {
-                console.error(err);
-                // Something went wrong, try to use the cached serverlist
-                document.getElementById('ms_error').style.display = 'block';
-                // This returns an empty list if there is no cached serverlist, which is the best we can do at this point
-                return getCachedServerlist();
-            }
-        })();
-
+        const serverlist = await getServerlist();
         processServerlist(serverlist);
 
-        fetch('http://servers.aceattorneyonline.com/version')
-            .then((response) => response.text())
-            .then((response) => processVersion(response));
+        processClientVersion(clientVersion);
+
+        const masterVersion = await getMasterVersion();
+        processMasterVersion(masterVersion);
 
         // i don't need the ms to play alone
         setTimeout(() => checkOnline(-1, '127.0.0.1:50001'), 0);
     });
 
 export function check_https() {
-    if (document.location.protocol === 'https:') {
+    if (protocol === 'https:') {
         document.getElementById('https_error').style.display = '';
         setTimeout(() => window.location.replace("http://web.aceattorneyonline.com/"), 5000);
     }
@@ -140,11 +132,13 @@ function checkOnline(serverID: number, coIP: string) {
 // Returns a properly typed list of servers
 async function getServerlist(): Promise<AOServer[]> {
     // get if we're on http or https
-    const protocol = window.location.protocol;
     const response = await fetch(protocol + '//servers.aceattorneyonline.com/servers');
 
     if (!response.ok) {
-        throw new Error(`Bad status code from masterserver. status: ${response.status}, body: ${response.body}`);
+        console.error(`Bad status code from masterserver. status: ${response.status}, body: ${response.body}`);
+        document.getElementById('ms_error').style.display = 'block';
+        // If we get a bad status code, try to use the cached serverlist
+        return getCachedServerlist();
     }
 
     const data = await response.json();
@@ -200,7 +194,6 @@ function getCachedServerlist(): AOServer[] {
 }
 
 function processServerlist(serverlist: AOServer[]) {
-    const protocol = window.location.protocol;
     const domain = window.location.hostname;
     const clientURL: string = `${protocol}//${domain}/client.html`;
     for (let i = 0; i < serverlist.length - 1; i++) {
@@ -228,7 +221,21 @@ function processServerlist(serverlist: AOServer[]) {
     }
 }
 
-function processVersion(data: string) {
-    document.getElementById('clientinfo').innerHTML = `Client version: ${version}`;
+async function getMasterVersion(): Promise<string> {
+    const url = `${protocol}//${serverlist_domain}/version`;
+    const response = await fetch(url);
+    if (!response.ok) {
+        console.error(`Bad status code from masterserver version check. status: ${response.status}, body: ${response.body}`);
+        return 'Unknown';
+    }
+
+    return await response.text();
+}
+
+function processClientVersion(data: string) {
+    document.getElementById('clientinfo').innerHTML = `Client version: ${data}`;
+}
+
+function processMasterVersion(data: string) {
     document.getElementById('serverinfo').innerHTML = `Master server version: ${data}`;
 }
