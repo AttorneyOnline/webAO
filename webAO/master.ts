@@ -25,6 +25,7 @@ const clientVersion = process.env.npm_package_version;
 // const MASTERSERVER_IP = 'master.aceattorneyonline.com:27014';
 const serverlist_domain = 'servers.aceattorneyonline.com';
 const protocol = window.location.protocol;
+const host = window.location.host;
 
 const serverlist_cache_key = 'masterlist';
 
@@ -77,7 +78,7 @@ fpPromise
 export function check_https() {
     if (protocol === 'https:') {
         document.getElementById('https_error').style.display = '';
-        setTimeout(() => window.location.replace("http://web.aceattorneyonline.com/"), 5000);
+        setTimeout(() => window.location.replace(`http://${host}/`), 5000);
     }
 }
 
@@ -210,7 +211,6 @@ function getCachedServerlist(): AOServer[] {
 }
 
 function processServerlist(serverlist: AOServer[]) {
-    const host = window.location.host;
     const clientURL: string = `${protocol}//${host}/client.html`;
     for (let i = 0; i < serverlist.length - 1; i++) {
         const server = serverlist[i];
