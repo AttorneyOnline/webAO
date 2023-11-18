@@ -192,8 +192,6 @@ async function getServerlist(): Promise<AOServer[]> {
             continue;
         }
 
-        console.log(newServer)
-
         serverlist.push(newServer);
     }
 
