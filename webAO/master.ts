@@ -144,8 +144,8 @@ function checkOnline(serverID: number, coIP: string) {
 // Fetches the serverlist from the masterserver
 // Returns a properly typed list of servers
 async function getServerlist(): Promise<AOServer[]> {
-    // get if we're on http or https
-    const response = await fetch(protocol + '//servers.aceattorneyonline.com/servers');
+    const url = `${protocol}//${serverlist_domain}/servers`;
+    const response = await fetch(url);
 
     if (!response.ok) {
         console.error(`Bad status code from masterserver. status: ${response.status}, body: ${response.body}`);
@@ -210,8 +210,8 @@ function getCachedServerlist(): AOServer[] {
 }
 
 function processServerlist(serverlist: AOServer[]) {
-    const domain = window.location.hostname;
-    const clientURL: string = `${protocol}//${domain}/client.html`;
+    const host = window.location.host;
+    const clientURL: string = `${protocol}//${host}/client.html`;
     for (let i = 0; i < serverlist.length - 1; i++) {
         const server = serverlist[i];
         let port = 0;
