@@ -16,7 +16,7 @@ interface AOServer {
     ws_port?: number,
     wss_port?: number,
     assets?: string,
-    onlineStatus?: string,
+    online?: string,
 }
 
 const clientVersion = process.env.npm_package_version;
@@ -31,7 +31,7 @@ let hdid: string;
 
 let selectedServer: number = -1;
 
-const servers: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[] = [];
+const servers: AOServer[] = [];
 servers[-2] = {
     name: 'Singleplayer', description: 'Build cases, try out new things', ip: '127.0.0.1', port: 50001, ws_port: 50001, assets: '', online: 'Online: 0/1',
 };
@@ -123,6 +123,8 @@ function checkOnline(serverID: number, coIP: string) {
 
     serverConnection.onerror = function (_evt: Event) {
         document.getElementById(`server${serverID}`).className = 'unavailable';
+        console.error(`Error connecting to ${coIP}`);
+        console.error(_evt);
     };
 }
 
@@ -159,7 +161,7 @@ async function getServerlist(): Promise<AOServer[]> {
         const newServer: AOServer = {
             name: item.name,
             description: item.description,
-            ip: item.id,
+            ip: item.ip,
         }
 
         if (item.ws_port) {
@@ -176,7 +178,10 @@ async function getServerlist(): Promise<AOServer[]> {
             continue;
         }
 
+        console.log(newServer)
+
         serverlist.push(newServer);
+        servers.push(newServer);
     }
 
     // Always cache the result when we get it
@@ -210,7 +215,7 @@ function processServerlist(serverlist: AOServer[]) {
 
         const ipport = `${server.ip}:${port}`;
         const serverName = server.name;
-        servers[i].onlineStatus = 'Offline';
+        servers[i].online = 'Offline';
 
         document.getElementById('masterlist').innerHTML
             += `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(server.name)}</p>`
