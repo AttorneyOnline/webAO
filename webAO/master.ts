@@ -215,26 +215,29 @@ function processServerlist(serverlist: AOServer[]) {
     for (let i = 0; i < serverlist.length - 1; i++) {
         const server = serverlist[i];
         let port = 0;
+        let protocol = '';
 
         if (server.ws_port) {
             port = server.ws_port;
+            protocol = 'ws';
         }
         if (server.wss_port) {
             port = server.wss_port;
+            protocol = 'wss';
         }
-        if (port === 0) {
+        if (port === 0 || protocol === '') {
             continue;
         }
 
-        const ipport = `${server.ip}:${port}`;
+        const connect = `${protocol}://${server.ip}:${port}`;
         const serverName = server.name;
         server.online = 'Offline';
         servers.push(server);
 
         document.getElementById('masterlist').innerHTML
             += `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(server.name)} (${server.players})</p>`
-            + `<a class="button" href="${clientURL}?mode=watch&ip=${ipport}&serverName=${serverName}">Watch</a>`
-            + `<a class="button" href="${clientURL}?mode=join&ip=${ipport}&serverName=${serverName}">Join</a></li>`;
+            + `<a class="button" href="${clientURL}?mode=watch&connect=${connect}&serverName=${serverName}">Watch</a>`
+            + `<a class="button" href="${clientURL}?mode=join&connect=${connect}&serverName=${serverName}">Join</a></li>`;
     }
 }
 
