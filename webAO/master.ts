@@ -1,54 +1,81 @@
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
-import { unescapeChat, safeTags } from './encoding';
+import { safeTags } from './encoding';
 
 declare global {
     interface Window {
-        setServ: (ID: any) => void;
+        setServ: (ID: number) => void;
     }
 }
 
-const myStorage = window.localStorage;
+interface AOServer {
+    name: string,
+    description: string,
+    ip: string,
+    players: number,
+    port?: number,
+    ws_port?: number,
+    wss_port?: number,
+    assets?: string,
+    online?: string,
+}
 
-const version = process.env.npm_package_version;
+const clientVersion = process.env.npm_package_version;
 
-const MASTERSERVER_IP = 'master.aceattorneyonline.com:27014';
+// const MASTERSERVER_IP = 'master.aceattorneyonline.com:27014';
+const serverlist_domain = 'servers.aceattorneyonline.com';
+const protocol = window.location.protocol;
+
+const serverlist_cache_key = 'masterlist';
 
 let hdid: string;
 
 let selectedServer: number = -1;
 
-const servers: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[] = [];
+const servers: AOServer[] = [];
 servers[-2] = {
-    name: 'Singleplayer', description: 'Build cases, try out new things', ip: '127.0.0.1', port: 50001, ws_port: 50001, assets: '', online: 'Online: 0/1',
+    name: 'Singleplayer',
+    description: 'Build cases, try out new things',
+    ip: '127.0.0.1',
+    port: 50001,
+    assets: '',
+    online: 'Online: 0/1',
+    players: 0,
 };
 servers[-1] = {
-    name: 'Localhost', description: 'This is your computer on port 50001', ip: '127.0.0.1', port: 50001, ws_port: 50001, assets: '', online: 'Offline',
+    name: 'Localhost',
+    description: 'This is your computer on port 50001',
+    ip: '127.0.0.1',
+    port: 50001,
+    assets: '',
+    online: 'Offline',
+    players: 0,
 };
 
 const fpPromise = FingerprintJS.load();
 fpPromise
     .then((fp) => fp.get())
-    .then((result) => {
+    .then(async (result) => {
         hdid = result.visitorId;
 
         check_https();
 
-        fetch('http://servers.aceattorneyonline.com/servers')
-            .then(cachedServerlist)
-            .then((response) => loadServerlist(response))
-            .catch(cachedServerlist);
+        getServerlist().then((serverlist) => {
+            processServerlist(serverlist);
+        });
 
-        fetch('http://servers.aceattorneyonline.com/version')
-            .then((response) => response.text())
-            .then((response) => processVersion(response));
+        processClientVersion(clientVersion);
+
+        getMasterVersion().then((masterVersion) => {
+            processMasterVersion(masterVersion);
+        });
 
         // i don't need the ms to play alone
         setTimeout(() => checkOnline(-1, '127.0.0.1:50001'), 0);
     });
 
 export function check_https() {
-    if (document.location.protocol === 'https:') {
+    if (protocol === 'https:') {
         document.getElementById('https_error').style.display = '';
         setTimeout(() => window.location.replace("http://web.aceattorneyonline.com/"), 5000);
     }
@@ -111,44 +138,121 @@ function checkOnline(serverID: number, coIP: string) {
 
     serverConnection.onerror = function (_evt: Event) {
         document.getElementById(`server${serverID}`).className = 'unavailable';
+        console.error(`Error connecting to ${coIP}`);
+        console.error(_evt);
     };
 }
 
-function loadServerlist(thelist: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[]) {
-    localStorage.setItem('masterlist', JSON.stringify(thelist));
-    processServerlist(thelist);
-}
+// Fetches the serverlist from the masterserver
+// Returns a properly typed list of servers
+async function getServerlist(): Promise<AOServer[]> {
+    const url = `${protocol}//${serverlist_domain}/servers`;
+    const response = await fetch(url);
 
-function cachedServerlist(response: Response) {
     if (!response.ok) {
+        console.error(`Bad status code from masterserver. status: ${response.status}, body: ${response.body}`);
         document.getElementById('ms_error').style.display = 'block';
-        processServerlist(JSON.parse(localStorage.getItem('masterlist')));
-        return;
+        // If we get a bad status code, try to use the cached serverlist
+        return getCachedServerlist();
     }
-    return response.json();
-}
 
-function processServerlist(thelist: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string }[]) {
-    const myURL: string = window.location.href.replace('https://', 'http://').replace('index.html', '');
-    for (let i = 0; i < thelist.length - 1; i++) {
-        const serverEntry: { name: string, description: string, ip: string, port: number, ws_port: number, assets: string, online: string } = thelist[i];
+    const data = await response.json();
+    const serverlist: AOServer[] = [];
 
-        servers[i] = serverEntry;
-        servers[i].online = "Offline";
-
-        const ipport = `${serverEntry.ip}:${serverEntry.ws_port}`;
-        const serverName = serverEntry.name;
-
-        if (serverEntry.ws_port) {
-            document.getElementById('masterlist').innerHTML
-                += `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(serverEntry.name)}</p>`
-                + `<a class="button" href="${myURL}client.html?mode=watch&ip=${ipport}&serverName=${serverName}">Watch</a>`
-                + `<a class="button" href="${myURL}client.html?mode=join&ip=${ipport}&serverName=${serverName}">Join</a></li>`;
+    for (const item of data) {
+        if (!item.name) {
+            console.warn(`Server ${item} has no name, skipping`);
+            continue;
         }
+        if (!item.ip) {
+            console.warn(`Server ${item.name} has no ip, skipping`);
+            continue;
+        }
+        if (!item.description) {
+            console.warn(`Server ${item.name} has no description, skipping`);
+            continue;
+        }
+
+        const newServer: AOServer = {
+            name: item.name,
+            description: item.description,
+            ip: item.ip,
+            players: item.players || 0,
+        }
+
+        if (item.ws_port) {
+            newServer.ws_port = item.ws_port;
+        }
+        if (item.wss_port) {
+            newServer.wss_port = item.wss_port;
+        }
+
+        // if none of ws_port or wss_port are defined, skip
+        // Note that this is not an error condition, as many servers only has port (TCP) enabled
+        // Which means they don't support webAO
+        if (!newServer.ws_port && !newServer.wss_port) {
+            continue;
+        }
+
+        serverlist.push(newServer);
+    }
+
+    // Always cache the result when we get it
+    localStorage.setItem(serverlist_cache_key, JSON.stringify(serverlist));
+
+    return serverlist;
+}
+
+function getCachedServerlist(): AOServer[] {
+    // If it's not in the cache, return an empty list
+    const cached = localStorage.getItem(serverlist_cache_key) || '[]';
+    return JSON.parse(cached) as AOServer[];
+}
+
+function processServerlist(serverlist: AOServer[]) {
+    const host = window.location.host;
+    const clientURL: string = `${protocol}//${host}/client.html`;
+    for (let i = 0; i < serverlist.length - 1; i++) {
+        const server = serverlist[i];
+        let port = 0;
+
+        if (server.ws_port) {
+            port = server.ws_port;
+        }
+        if (server.wss_port) {
+            port = server.wss_port;
+        }
+        if (port === 0) {
+            continue;
+        }
+
+        const ipport = `${server.ip}:${port}`;
+        const serverName = server.name;
+        server.online = 'Offline';
+        servers.push(server);
+
+        document.getElementById('masterlist').innerHTML
+            += `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(server.name)} (${server.players})</p>`
+            + `<a class="button" href="${clientURL}?mode=watch&ip=${ipport}&serverName=${serverName}">Watch</a>`
+            + `<a class="button" href="${clientURL}?mode=join&ip=${ipport}&serverName=${serverName}">Join</a></li>`;
     }
 }
 
-function processVersion(data: string) {
-    document.getElementById('clientinfo').innerHTML = `Client version: ${version}`;
+async function getMasterVersion(): Promise<string> {
+    const url = `${protocol}//${serverlist_domain}/version`;
+    const response = await fetch(url);
+    if (!response.ok) {
+        console.error(`Bad status code from masterserver version check. status: ${response.status}, body: ${response.body}`);
+        return 'Unknown';
+    }
+
+    return await response.text();
+}
+
+function processClientVersion(data: string) {
+    document.getElementById('clientinfo').innerHTML = `Client version: ${data}`;
+}
+
+function processMasterVersion(data: string) {
     document.getElementById('serverinfo').innerHTML = `Master server version: ${data}`;
 }
