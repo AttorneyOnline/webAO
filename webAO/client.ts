@@ -17,7 +17,7 @@ import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
 import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists'
 
-const { ip: serverIP, mode, theme, serverName } = queryParser();
+const { connect, mode, theme, serverName } = queryParser();
 
 document.title = serverName;
 
@@ -70,12 +70,12 @@ fpPromise
     .then((result) => {
         hdid = result.visitorId;
 
-        if (!serverIP) {
-            alert("No server IP specified!");
+        if (!connect) {
+            alert("No connection string specified!");
             return;
         }
 
-        client = new Client(serverIP);
+        client = new Client(connect);
         client.connect()
         isLowMemory();
         loadResources();
@@ -117,7 +117,7 @@ class Client extends EventEmitter {
     connect: () => void;
     loadResources: () => void
     isLowMemory: () => void
-    constructor(address: string) {
+    constructor(connectionString: string) {
         super();
 
         this.connect = () => {
@@ -126,7 +126,7 @@ class Client extends EventEmitter {
             this.on("message", this.onMessage.bind(this));
             this.on("error", this.onError.bind(this));
             if (mode !== "replay") {
-                this.serv = new WebSocket(`ws://${address}`);
+                this.serv = new WebSocket(connectionString);
                 // Assign the websocket events
                 this.serv.addEventListener("open", this.emit.bind(this, "open"));
                 this.serv.addEventListener("close", this.emit.bind(this, "close"));
