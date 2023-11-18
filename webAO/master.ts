@@ -60,13 +60,15 @@ fpPromise
 
         check_https();
 
-        const serverlist = await getServerlist();
-        processServerlist(serverlist);
+        getServerlist().then((serverlist) => {
+            processServerlist(serverlist);
+        });
 
         processClientVersion(clientVersion);
 
-        const masterVersion = await getMasterVersion();
-        processMasterVersion(masterVersion);
+        getMasterVersion().then((masterVersion) => {
+            processMasterVersion(masterVersion);
+        });
 
         // i don't need the ms to play alone
         setTimeout(() => checkOnline(-1, '127.0.0.1:50001'), 0);
