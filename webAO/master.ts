@@ -1,10 +1,10 @@
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
-import { unescapeChat, safeTags } from './encoding';
+import { safeTags } from './encoding';
 
 declare global {
     interface Window {
-        setServ: (ID: any) => void;
+        setServ: (ID: number) => void;
     }
 }
 
@@ -19,11 +19,9 @@ interface AOServer {
     onlineStatus?: string,
 }
 
-const myStorage = window.localStorage;
-
 const clientVersion = process.env.npm_package_version;
 
-const MASTERSERVER_IP = 'master.aceattorneyonline.com:27014';
+// const MASTERSERVER_IP = 'master.aceattorneyonline.com:27014';
 const serverlist_domain = 'servers.aceattorneyonline.com';
 const protocol = window.location.protocol;
 
