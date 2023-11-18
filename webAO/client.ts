@@ -17,7 +17,7 @@ import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
 import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists'
 
-const { connect, mode, theme, serverName } = queryParser();
+const { ip: serverIP, connect, mode, theme, serverName } = queryParser();
 
 document.title = serverName;
 
@@ -70,12 +70,20 @@ fpPromise
     .then((result) => {
         hdid = result.visitorId;
 
-        if (!connect) {
-            alert("No connection string specified!");
-            return;
+        let connectionString = connect;
+
+        if (!connectionString) {
+            if (serverIP) {
+                // if connectionString is not set, try IP
+                // and just guess ws, though it could be wss
+                connectionString = `ws://${serverIP}`;
+            } else {
+                alert("No connection string specified!");
+                return;
+            }
         }
 
-        client = new Client(connect);
+        client = new Client(connectionString);
         client.connect()
         isLowMemory();
         loadResources();
