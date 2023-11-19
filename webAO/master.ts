@@ -153,6 +153,7 @@ function processServerlist(serverlist: AOServer[]) {
             protocol = 'wss';
         }
         if (port === 0 || protocol === '') {
+            console.warn(`Server ${server.name} has no websocket port, skipping`)
             continue;
         }
 
