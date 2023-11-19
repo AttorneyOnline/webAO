@@ -139,7 +139,7 @@ function getCachedServerlist(): AOServer[] {
 
 function processServerlist(serverlist: AOServer[]) {
     const clientURL: string = `${protocol}//${host}/client.html`;
-    for (let i = 0; i < serverlist.length - 1; i++) {
+    for (let i = 0; i < serverlist.length; i++) {
         const server = serverlist[i];
         let port = 0;
         let protocol = '';
