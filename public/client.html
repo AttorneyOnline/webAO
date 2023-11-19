@@ -6,18 +6,22 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="An off-the-cuff courtroom drama simulator">
-    <meta name="author" content="stonedDiscord">
-    <meta property="og:title" content="Attorney Online">
-    <meta property="og:description" content="Attorney Online is an online version of the world-renowned courtroom drama simulator that allows you to create and play out cases in an off-the-cuff format.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="http://web.aceattorneyonline.com/">
-    <meta property="og:image" content="https://repository-images.githubusercontent.com/78860508/89fcba80-aafd-11e9-80db-c5b10c01aba9">
+	<meta name="author" content="stonedDiscord">
+	<meta property="og:title" content="Attorney Online">
+	<meta property="og:description"
+		content="Attorney Online is an online version of the world-renowned courtroom drama simulator that allows you to create and play out cases in an off-the-cuff format.">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="http://web.aceattorneyonline.com/">
+	<meta property="og:image"
+		content="https://repository-images.githubusercontent.com/78860508/89fcba80-aafd-11e9-80db-c5b10c01aba9">
 
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="Attorney Online">
-    <meta property="twitter:description" content="Attorney Online is an online version of the world-renowned courtroom drama simulator that allows you to create and play out cases in an off-the-cuff format.">
-    <meta property="twitter:url" content="http://web.aceattorneyonline.com/">
-    <meta property="twitter:image" content="https://repository-images.githubusercontent.com/78860508/89fcba80-aafd-11e9-80db-c5b10c01aba9">
+	<meta property="twitter:card" content="summary_large_image">
+	<meta property="twitter:title" content="Attorney Online">
+	<meta property="twitter:description"
+		content="Attorney Online is an online version of the world-renowned courtroom drama simulator that allows you to create and play out cases in an off-the-cuff format.">
+	<meta property="twitter:url" content="http://web.aceattorneyonline.com/">
+	<meta property="twitter:image"
+		content="https://repository-images.githubusercontent.com/78860508/89fcba80-aafd-11e9-80db-c5b10c01aba9">
 
 	<meta http-equiv="Content-Security-Policy" content="
 		script-src-elem 'self' 'unsafe-inline' https://ajax.googleapis.com https://accounts.google.com/gsi/client;
@@ -29,7 +33,7 @@
 		media-src 'self' file: *;">
 
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="logo-new.png"/>
+	<link rel="apple-touch-icon" href="logo-new.png" />
 	<link rel="stylesheet" type="text/css" href="styles/client.css?v=1.0.3" id="client_stylesheet">
 	<link rel="stylesheet" type="text/css" href="styles/default.css?v=1.0.1" id="client_theme">
 	<link rel="stylesheet" type="text/css" href="styles/chatbox/aa.css?v=1.0.1" id="chatbox_theme">
@@ -38,54 +42,55 @@
 	<link type="text/css" rel="stylesheet" href="golden/css/goldenlayout.css" />
 	<link type="text/css" rel="stylesheet"
 		href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css" />
+	<style>
+		#client_ooclog {
+			text-align: left;
+		}
+
+		#client_ooclog a {
+			color: white;
+		}
+	</style>
 	<script src="lib/jdataview.min.js" async defer></script>
 </head>
 
 <body>
-<div id="client_waiting">
-	<noscript><p style="color: red;">webAO requires JavaScript to work</p></noscript>
-	<div id="client_loading">
-		<h1 id="client_loadingtext">Loading</h1>
-	</div>
-	<div id="client_secondfactor" style="display: none">
-		<center>
-		<p>You need to authorize to continue</p>
-		<div id="g_id_onload"
-			data-client_id="107239014890-eo1vg90jdn2l7fgudsp9mdk8c1nraq0g"
-			data-context="use"
-			data-ux_mode="popup"
-			data-callback="handleCredentialResponse"
-			data-nonce=""
-			data-auto_select="true">
+	<div id="client_waiting">
+		<noscript>
+			<p style="color: red;">webAO requires JavaScript to work</p>
+		</noscript>
+		<div id="client_loading">
+			<h1 id="client_loadingtext">Loading</h1>
 		</div>
-		<div class="g_id_signin"
-			data-type="standard"
-			data-shape="rectangular"
-			data-theme="outline"
-			data-text="continue_with"
-			data-size="large"
-			data-logo_alignment="left">
+		<div id="client_secondfactor" style="display: none">
+			<center>
+				<p>You need to authorize to continue</p>
+				<div id="g_id_onload" data-client_id="107239014890-eo1vg90jdn2l7fgudsp9mdk8c1nraq0g" data-context="use"
+					data-ux_mode="popup" data-callback="handleCredentialResponse" data-nonce="" data-auto_select="true">
+				</div>
+				<div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+					data-text="continue_with" data-size="large" data-logo_alignment="left">
+				</div>
+			</center>
 		</div>
-		</center>
+		<div id="client_charselect">
+			<p>Choose your character</p>
+			<button onclick="pickChar(-1)">Or spectate</button>
+			<br><br>
+			<input id="client_charactersearch" placeholder="Search" oninput="chartable_filter(event)"></input>
+			<br><br>
+			<div id="client_chartable"></div>
+		</div>
+		<div id="client_error" class="error" style="display: none">
+			<h1 id="client_errortext">You were disconnected from the server.</h1>
+			<p style="color: #a00">Code:
+				<span id="error_id">(none)</span>
+			</p>
+
+		</div>
+		<p>Having trouble? <a href="https://discord.gg/9rYQVVQ">Join us on Discord</a></p>
+		<button id="client_reconnect" onclick="ReconnectButton()">Reconnect</button>
 	</div>
-	<div id="client_charselect">
-		<p>Choose your character</p>
-		<button onclick="pickChar(-1)">Or spectate</button>
-		<br><br>
-		<input id="client_charactersearch" placeholder="Search" oninput="chartable_filter(event)"></input>
-		<br><br>
-		<div id="client_chartable"></div>
-	</div>
-	<div id="client_error" class="error" style="display: none">
-		<h1 id="client_errortext">You were disconnected from the server.</h1>
-		<p style="color: #a00">Code:
-			<span id="error_id">(none)</span>
-		</p>
-		
-	</div>
-	<p>Having trouble? <a href="https://discord.gg/9rYQVVQ">Join us on Discord</a></p>
-	<button id="client_reconnect" onclick="ReconnectButton()">Reconnect</button>
-</div>
 </body>
 
 <template id="client_wrapper">
@@ -125,19 +130,24 @@
 					<img id="client_pro_bench" class="client_bench">
 				</div>
 				<div id="client_classicview">
-				<img id="client_court_classic" onerror="imgError(this);">
-				<div id="client_pair_char" class="client_char" alt="Paired character">
-					<img id="client_pair_img" onerror="charError(this);">
+					<img id="client_court_classic" onerror="imgError(this);">
+					<div id="client_pair_char" class="client_char" alt="Paired character">
+						<img id="client_pair_img" onerror="charError(this);">
+					</div>
+					<div id="client_char" class="client_char" alt="Character">
+						<img id="client_char_img" onerror="charError(this);">
+					</div>
+					<img id="client_bench_classic" class="client_bench">
 				</div>
-				<div id="client_char" class="client_char" alt="Character">
-					<img id="client_char_img" onerror="charError(this);">
+				<div id="client_fg" alt="Various overlay"
+					src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
 				</div>
-				<img id="client_bench_classic" class="client_bench">	
-				</div>
-				<div id="client_fg" alt="Various overlay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="></div>
 				<img id="client_evi" src="" alt="Character Evidence" onerror="imgError(this);">
-				<img id="client_testimony" alt="Testimony overlay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" onerror="imgError(this);">
-				<img id="client_shout" alt="Shout overlay" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
+				<img id="client_testimony" alt="Testimony overlay"
+					src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+					onerror="imgError(this);">
+				<img id="client_shout" alt="Shout overlay"
+					src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
 				<div id="client_chatcontainer" style="font-size: 12px; opacity: 0;">
 					<div id="client_chatdecoration"></div>
 					<div id="client_name">
@@ -148,7 +158,9 @@
 						<div id="client_chatwaiting">&#9658;</div>
 					</div>
 				</div>
-				<div id="client_trackstatus"><marquee id="client_trackstatustext">None</marquee></div>
+				<div id="client_trackstatus">
+					<marquee id="client_trackstatustext">None</marquee>
+				</div>
 				<div id="client_clock">
 					<p id="client_clock_date"></p>
 					<p id="client_clock_time"></p>
@@ -176,109 +188,128 @@
 			<br>
 			<div id="character_options">
 				<div id="emote_options">
-				<button id="button_1" alt="Hold it!" class="objection_button" onclick="toggleShout(1)">Hold it!</button>
-				<button id="button_2" alt="Objection!" class="objection_button"
-					onclick="toggleShout(2)">Objection!</button>
-				<button id="button_3" alt="Take That!" class="objection_button" onclick="toggleShout(3)">Take
-					That!</button>
-				<button id="button_4" alt="Custom" class="objection_button" onclick="toggleShout(4)" style="display: none">
-					Custom</button>
-				<br>
-				<br>
-				<label for="textcolor">Text Color:</label>
-				<select id="textcolor" name="textcolor">
-					<option value="0">White</option>
-					<option value="1">Green</option>
-					<option value="2">Red</option>
-					<option value="3">Orange</option>
-					<option value="4">Blue</option>
-				</select>
-				<label for="sendsfx"> SFX: </label>
-				<input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx" checked>
-				<label for="sendpreanim"> Preanimation: </label>
-				<input type="checkbox" id="sendpreanim" name="sendpreanim" value="sendpreanim">
-				<br>
-				<br>
-				<button id="button_flip"  alt="Flip"  class="client_button" onclick="toggleEffect(this)" style="display: none">Flip</button>
-				<button id="button_flash" alt="Flash" class="client_button" onclick="toggleEffect(this)">Flash</button>
-				<button id="button_shake" alt="Shake" class="client_button" onclick="toggleEffect(this)" style="display: none">Shake</button>
-			</div>
-			<br>
-			<br>
-			<div id="character_options">
-				<label for="role_select">Role:</label>
-				<select id="role_select" name="role_select" onchange="changeRoleOOC()">
-					<option value="">Default</option>
-					<option value="def">Defense</option>
-					<option value="pro">Prosecution</option>
-					<option value="jud">Judge</option>
-					<option value="wit">Witness</option>
-					<option value="hld">Helper Defense</option>
-					<option value="hlp">Helper Prosecution</option>
-					<option value="jur">Jury</option>
-					<option value="sea">Seance</option>
-				</select>
-				<br>
-				<br>
-				<button id="char_change" alt="Change" class="client_button hover_button" onclick="changeCharacter()">Change
-					Character</button>
-				<button id="char_random" alt="Random" class="client_button hover_button"
-					onclick="randomCharacterOOC()">Random Character</button>
-				<br>
-				<br>
-				<span id="pairing" style="display: none">
-					<button id="button_toggle_pairing"  alt="Pairing"  class="client_button" onclick="toggleElement('pairing_settings')">Pairing</button>
-					<span id="pairing_settings" style="display: none">
-					<label for="pair_select">Pairing partner:</label>
-					<select name="pair_select" id="pair_select">
-						<option value="-1">None</option>
+					<button id="button_1" alt="Hold it!" class="objection_button" onclick="toggleShout(1)">Hold
+						it!</button>
+					<button id="button_2" alt="Objection!" class="objection_button"
+						onclick="toggleShout(2)">Objection!</button>
+					<button id="button_3" alt="Take That!" class="objection_button" onclick="toggleShout(3)">Take
+						That!</button>
+					<button id="button_4" alt="Custom" class="objection_button" onclick="toggleShout(4)"
+						style="display: none">
+						Custom</button>
+					<br>
+					<br>
+					<label for="textcolor">Text Color:</label>
+					<select id="textcolor" name="textcolor">
+						<option value="0">White</option>
+						<option value="1">Green</option>
+						<option value="2">Red</option>
+						<option value="3">Orange</option>
+						<option value="4">Blue</option>
 					</select>
-					<table style="border: none;margin-left: auto;margin-right: auto;">
-						<tr                                    ><td><p>Horizontal offset:</p></td><td><input type="range" name="pair_offset"   id="pair_offset"   min="-100" max="100" value="0"></td></tr>
-						<tr id="y_offset" style="display: none"><td><p  >Vertical offset:</p></td><td><input type="range" name="pair_y_offset" id="pair_y_offset" min="-100" max="100" value="0"></td></tr>
-					</table>
-					<input id="pair_reset" type="button" value="Reset" onclick="resetOffset()">
+					<label for="sendsfx"> SFX: </label>
+					<input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx" checked>
+					<label for="sendpreanim"> Preanimation: </label>
+					<input type="checkbox" id="sendpreanim" name="sendpreanim" value="sendpreanim">
+					<br>
+					<br>
+					<button id="button_flip" alt="Flip" class="client_button" onclick="toggleEffect(this)"
+						style="display: none">Flip</button>
+					<button id="button_flash" alt="Flash" class="client_button"
+						onclick="toggleEffect(this)">Flash</button>
+					<button id="button_shake" alt="Shake" class="client_button" onclick="toggleEffect(this)"
+						style="display: none">Shake</button>
+				</div>
+				<br>
+				<br>
+				<div id="character_options">
+					<label for="role_select">Role:</label>
+					<select id="role_select" name="role_select" onchange="changeRoleOOC()">
+						<option value="">Default</option>
+						<option value="def">Defense</option>
+						<option value="pro">Prosecution</option>
+						<option value="jud">Judge</option>
+						<option value="wit">Witness</option>
+						<option value="hld">Helper Defense</option>
+						<option value="hlp">Helper Prosecution</option>
+						<option value="jur">Jury</option>
+						<option value="sea">Seance</option>
+					</select>
+					<br>
+					<br>
+					<button id="char_change" alt="Change" class="client_button hover_button"
+						onclick="changeCharacter()">Change
+						Character</button>
+					<button id="char_random" alt="Random" class="client_button hover_button"
+						onclick="randomCharacterOOC()">Random Character</button>
+					<br>
+					<br>
+					<span id="pairing" style="display: none">
+						<button id="button_toggle_pairing" alt="Pairing" class="client_button"
+							onclick="toggleElement('pairing_settings')">Pairing</button>
+						<span id="pairing_settings" style="display: none">
+							<label for="pair_select">Pairing partner:</label>
+							<select name="pair_select" id="pair_select">
+								<option value="-1">None</option>
+							</select>
+							<table style="border: none;margin-left: auto;margin-right: auto;">
+								<tr>
+									<td>
+										<p>Horizontal offset:</p>
+									</td>
+									<td><input type="range" name="pair_offset" id="pair_offset" min="-100" max="100"
+											value="0"></td>
+								</tr>
+								<tr id="y_offset" style="display: none">
+									<td>
+										<p>Vertical offset:</p>
+									</td>
+									<td><input type="range" name="pair_y_offset" id="pair_y_offset" min="-100" max="100"
+											value="0"></td>
+								</tr>
+							</table>
+							<input id="pair_reset" type="button" value="Reset" onclick="resetOffset()">
+						</span>
 					</span>
-				</span>
-				<br>
-				<br>
-				<span id="cccc" style="display: none">
-					<label for="ic_chat_name">Custom Showname:</label>
-					<input id="ic_chat_name" name="ic_chat_name" type="text">
-					<br>
-					<label for="showname">Show others:</label>
-					<input id="showname" name="showname" type="checkbox" onclick="showname_click()" checked>
 					<br>
 					<br>
-					<label for="check_nonint">Noninterrupting Preanimation:</label>
-					<input type="checkbox" name="check_nonint" id="check_nonint">
-				</span>		
-				<br>
-				<br>
-				<span id="2.7" style="display: none">
-					<label for="check_loopsfx">Looping SFX:</label>
-					<input type="checkbox" name="check_loopsfx" id="check_loopsfx">
-				</span>
-				<br>
-				<br>
-				<span id="2.8" style="display: none">
-					<label for="check_additive">Additive:</label>
-					<input type="checkbox" name="check_additive" id="check_additive">
+					<span id="cccc" style="display: none">
+						<label for="ic_chat_name">Custom Showname:</label>
+						<input id="ic_chat_name" name="ic_chat_name" type="text">
+						<br>
+						<label for="showname">Show others:</label>
+						<input id="showname" name="showname" type="checkbox" onclick="showname_click()" checked>
+						<br>
+						<br>
+						<label for="check_nonint">Noninterrupting Preanimation:</label>
+						<input type="checkbox" name="check_nonint" id="check_nonint">
+					</span>
 					<br>
 					<br>
-					<label for="effect_select">Effect:</label>
-					<select id="effect_select" name="effect_select">
-						<option value="||">None</option>
-						<option value="realization||sfx-realization">Realization</option>
-						<option value="hearts||sfx-squee">Hearts</option>
-						<option value="reaction||sfx-reactionding">Reaction</option>
-						<option value="impact||sfx-fan">Impact</option>
-						<option value="rain-weak||sfx-rain">Weak Rain</option>
-						<option value="rain||sfx-rain">Rain</option>
-						<option value="rain-strong||sfx-rain">Strong Rain</option>
-					</select>
-				</span>	
-			</div>			
+					<span id="2.7" style="display: none">
+						<label for="check_loopsfx">Looping SFX:</label>
+						<input type="checkbox" name="check_loopsfx" id="check_loopsfx">
+					</span>
+					<br>
+					<br>
+					<span id="2.8" style="display: none">
+						<label for="check_additive">Additive:</label>
+						<input type="checkbox" name="check_additive" id="check_additive">
+						<br>
+						<br>
+						<label for="effect_select">Effect:</label>
+						<select id="effect_select" name="effect_select">
+							<option value="||">None</option>
+							<option value="realization||sfx-realization">Realization</option>
+							<option value="hearts||sfx-squee">Hearts</option>
+							<option value="reaction||sfx-reactionding">Reaction</option>
+							<option value="impact||sfx-fan">Impact</option>
+							<option value="rain-weak||sfx-rain">Weak Rain</option>
+							<option value="rain||sfx-rain">Rain</option>
+							<option value="rain-strong||sfx-rain">Strong Rain</option>
+						</select>
+					</span>
+				</div>
 			</div>
 			<fieldset style="margin:10px;">
 				<legend>Actions</legend>
@@ -308,7 +339,7 @@
 					</span>
 					<span style="display:inline-block; vertical-align: middle;">
 						<span id="menu_ahpp" onclick="addHPP()" class="healthchange_button">
-							&#8862;							
+							&#8862;
 						</span>
 						<span style="font-size: 1.25em">Prosecution</span>
 						<span id="menu_rhpp" onclick="redHPP()" class="healthchange_button">
@@ -324,8 +355,7 @@
 				<br>
 				<span id="muting">
 					<label for="mute_select" style="float: left">Mute a character: </label>
-					<select name="mute_select" id="mute_select"
-						onchange="mutelist_click(event)"></select>
+					<select name="mute_select" id="mute_select" onchange="mutelist_click(event)"></select>
 				</span>
 			</fieldset>
 		</div>
@@ -369,7 +399,9 @@
 			<fieldset style="text-align: left">
 				<legend>Current Area Background</legend>
 				<span>
-					<img id="bg_preview" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="Background Preview" onerror="imgError(this);">
+					<img id="bg_preview"
+						src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+						alt="Background Preview" onerror="imgError(this);">
 				</span>
 				<span style="display:inline-block">
 					<label for="bg_filename">Background:</label>
@@ -416,15 +448,14 @@
 			<fieldset style="text-align: left; display: flex; flex-direction: column;">
 				<legend>Information</legend>
 				<hr>
-				<div style="display: flex;">					
+				<div style="display: flex;">
 					<img id="evi_preview" class="evi_icon" src="" alt="Evidence Icon" onerror="imgError(this);">
 					<div id="evi_options">
 						<input id="evi_name" name="evi_name" type="text" placeholder="Evidence name">
 						<br>
 						<label for="evi_filename">Icon:</label>
 						<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
-						<input id="evi_filename" name="evi_filename" type="text"
-							placeholder="Custom filename">
+						<input id="evi_filename" name="evi_filename" type="text" placeholder="Custom filename">
 					</div>
 				</div>
 				<hr>
@@ -446,7 +477,8 @@
 			<br>
 			<div id="evidences"></div>
 			<br>
-			<button id="button_present" alt="Present" class="client_button" onclick="toggleEffect(this)">Present</button>
+			<button id="button_present" alt="Present" class="client_button"
+				onclick="toggleEffect(this)">Present</button>
 		</span>
 
 		<!-- Settings section -->
@@ -455,20 +487,22 @@
 			<h2>Volume</h2>
 			<p>Music</p>
 			<input id="client_mvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
-					onchange="changeMusicVolume()">
+				onchange="changeMusicVolume()">
 
 			<p>SFX</p>
 			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" onerror="opusCheck(this)" controls></audio>
 
 			<p>Shouts</p>
-			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" onerror="opusCheck(this)" controls></audio>
-			
+			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" onerror="opusCheck(this)"
+				controls></audio>
+
 			<p>Testimony/Guilty</p>
-			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" onerror="opusCheck(this)" controls></audio>
+			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" onerror="opusCheck(this)"
+				controls></audio>
 
 			<p>Blip</p>
 			<input id="client_bvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
-					onchange="changeBlipVolume()">
+				onchange="changeBlipVolume()">
 			<br>
 			<br>
 			<label for="client_themeselect">Menu theme:</label>
@@ -536,13 +570,14 @@
 			<input type="checkbox" id="client_hdviewport" name="client_hdviewport" onclick="switchAspectRatio()">
 			<br>
 			<label for="client_hdviewport_offset">Offset chatbox:</label>
-			<input type="checkbox" id="client_hdviewport_offset" id="client_hdviewport_offset" onclick="switchChatOffset()">
+			<input type="checkbox" id="client_hdviewport_offset" id="client_hdviewport_offset"
+				onclick="switchChatOffset()">
 			<br>
 			<br>
 			<label for="client_callwords">Callwords:</label>
 			<br>
 			<textarea id="client_callwords" name="client_callwords" rows="4" cols="10"
-						placeholder="Put 1 callword per line here" onchange="changeCallwords()"></textarea>
+				placeholder="Put 1 callword per line here" onchange="changeCallwords()"></textarea>
 			<br>
 			<br>
 			<span style="color:blue">Changing these settings will save them as a cookie.<br>
@@ -559,7 +594,8 @@
 			<p>Client created by
 				<a href="https://github.com/stonedDiscord">@stonedDiscord</a> and fixed up by
 				<a href="https://github.com/oldmud0">@oldmud0</a> and
-				<a href="https://github.com/qubrick">Qubrick</a>.</p>
+				<a href="https://github.com/qubrick">Qubrick</a>.
+			</p>
 			<p><a href="https://github.com/AttorneyOnline/webAO">Follow development on our GitHub</a></p>
 			<p>Special thanks to Aleks for the first webAO PoC.</p>
 			<p><a href="styles/igiari/readme.txt">Igiari font by Caveras</a></p>
@@ -577,7 +613,7 @@
 <template id="ooc">
 	<meta name="frame-title" lang="en" content="Server">
 	<div style="height: 100%; display: flex; flex-direction: column;">
-		<textarea id="client_ooclog" style="flex: 1 auto" readonly></textarea>
+		<div id="client_ooclog" style="flex: 1 auto" readonly></div>
 		<span id="client_oocinput">
 			<input id="OOC_name" name="OOC_name" type="text">
 			<input id="client_oocinputbox" type="text" onkeypress="onOOCEnter(event)">

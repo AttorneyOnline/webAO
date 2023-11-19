@@ -9,9 +9,20 @@ const { mode } = queryParser();
 export const handleCT = (args: string[]) => {
     if (mode !== "replay") {
         const oocLog = document.getElementById("client_ooclog")!;
-        oocLog.innerHTML += `${prepChat(args[1])}: ${prepChat(args[2])}\r\n`;
+        const username = prepChat(args[1]);
+        let message = addLinks(prepChat(args[2]));
+        // Replace newlines with br
+        message = message.replace(/\n/g, "<br>");
+
+        oocLog.innerHTML += `${username}: ${message}<br>`;
         if (oocLog.scrollTop > oocLog.scrollHeight - 600) {
             oocLog.scrollTop = oocLog.scrollHeight;
         }
     }
+}
+
+// If the incoming message contains a link, add a href hyperlink to it
+function addLinks(message: string) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return message.replace(urlRegex, (url) => `<a href="${url}" target="_blank">${url}</a>`);
 }
