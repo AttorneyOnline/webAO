@@ -23,7 +23,6 @@ const clientVersion = process.env.npm_package_version;
 // const MASTERSERVER_IP = 'master.aceattorneyonline.com:27014';
 const serverlist_domain = 'servers.aceattorneyonline.com';
 const protocol = window.location.protocol;
-const host = window.location.host;
 
 const serverlist_cache_key = 'masterlist';
 
