@@ -143,23 +143,35 @@ function processServerlist(serverlist: AOServer[]) {
         let port = 0;
         let ws_protocol = '';
         let http_protocol = '';
+        let domain = '';
 
         if (server.ws_port) {
             port = server.ws_port;
             ws_protocol = 'ws';
             http_protocol = 'http';
+            domain = 'insecure';
         }
         if (server.wss_port) {
             port = server.wss_port;
             ws_protocol = 'wss';
             http_protocol = 'https';
+            domain = 'web';
         }
         if (port === 0 || protocol === '') {
             console.warn(`Server ${server.name} has no websocket port, skipping`)
             continue;
         }
 
-        const clientURL: string = `${http_protocol}://${host}/client.html`;
+        // Replace the first element of the domain with the correct subdomain
+        const domainElements = window.location.hostname.split('.');
+        domainElements[0] = domain;
+        let hostname = domainElements.join('.');
+
+        if (window.location.port) {
+            hostname += `:${window.location.port}`;
+        }
+
+        const clientURL: string = `${http_protocol}://${hostname}/client.html`;
         const connect = `${ws_protocol}://${server.ip}:${port}`;
         const serverName = server.name;
         server.online = `Players: ${server.players}`;
