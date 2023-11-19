@@ -59,8 +59,6 @@ fpPromise
     .then(async (result) => {
         hdid = result.visitorId;
 
-        check_https();
-
         getServerlist().then((serverlist) => {
             processServerlist(serverlist);
         });
@@ -74,13 +72,6 @@ fpPromise
         // i don't need the ms to play alone
         setTimeout(() => checkOnline(-1, '127.0.0.1:50001'), 0);
     });
-
-export function check_https() {
-    if (protocol === 'https:') {
-        document.getElementById('https_error').style.display = '';
-        setTimeout(() => window.location.replace(`http://${host}/`), 5000);
-    }
-}
 
 export function setServ(ID: number) {
     selectedServer = ID;
