@@ -138,26 +138,29 @@ function getCachedServerlist(): AOServer[] {
 }
 
 function processServerlist(serverlist: AOServer[]) {
-    const clientURL: string = `${protocol}//${host}/client.html`;
     for (let i = 0; i < serverlist.length; i++) {
         const server = serverlist[i];
         let port = 0;
-        let protocol = '';
+        let ws_protocol = '';
+        let http_protocol = '';
 
         if (server.ws_port) {
             port = server.ws_port;
-            protocol = 'ws';
+            ws_protocol = 'ws';
+            http_protocol = 'http';
         }
         if (server.wss_port) {
             port = server.wss_port;
-            protocol = 'wss';
+            ws_protocol = 'wss';
+            http_protocol = 'https';
         }
         if (port === 0 || protocol === '') {
             console.warn(`Server ${server.name} has no websocket port, skipping`)
             continue;
         }
 
-        const connect = `${protocol}://${server.ip}:${port}`;
+        const clientURL: string = `${http_protocol}//${host}/client.html`;
+        const connect = `${ws_protocol}://${server.ip}:${port}`;
         const serverName = server.name;
         server.online = `Players: ${server.players}`;
         servers.push(server);
