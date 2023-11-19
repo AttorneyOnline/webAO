@@ -2,12 +2,6 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 import { safeTags } from './encoding';
 
-declare global {
-    interface Window {
-        setServ: (ID: number) => void;
-    }
-}
-
 interface AOServer {
     name: string,
     description: string,
@@ -72,15 +66,6 @@ fpPromise
         // i don't need the ms to play alone
         setTimeout(() => checkOnline(-1, '127.0.0.1:50001'), 0);
     });
-
-export function setServ(ID: number) {
-    selectedServer = ID;
-
-    if (document.getElementById(`server${ID}`).className === '') { checkOnline(ID, `${servers[ID].ip}:${servers[ID].ws_port}`); }
-
-    document.getElementById('serverdescription_content').innerHTML = `<b>${servers[ID].online}</b><br>${safeTags(servers[ID].description)}`;
-}
-window.setServ = setServ;
 
 function checkOnline(serverID: number, coIP: string) {
     let serverConnection: WebSocket;
@@ -226,7 +211,7 @@ function processServerlist(serverlist: AOServer[]) {
         servers.push(server);
 
         document.getElementById('masterlist').innerHTML
-            += `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(server.name)} (${server.players})</p>`
+            += `<li id="server${i}"><p>${safeTags(server.name)} (${server.players})</p>`
             + `<a class="button" href="${clientURL}?mode=watch&connect=${connect}&serverName=${serverName}">Watch</a>`
             + `<a class="button" href="${clientURL}?mode=join&connect=${connect}&serverName=${serverName}">Join</a></li>`;
     }
