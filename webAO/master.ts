@@ -143,29 +143,34 @@ function processServerlist(serverlist: AOServer[]) {
         let port = 0;
         let ws_protocol = '';
         let http_protocol = '';
-        let domain = '';
+        let client_subdomain = '';
 
         if (server.ws_port) {
             port = server.ws_port;
             ws_protocol = 'ws';
             http_protocol = 'http';
-            domain = 'insecure';
+            client_subdomain = 'insecure';
         }
         if (server.wss_port) {
             port = server.wss_port;
             ws_protocol = 'wss';
             http_protocol = 'https';
-            domain = 'web';
+            client_subdomain = 'web';
         }
+
         if (port === 0 || protocol === '') {
             console.warn(`Server ${server.name} has no websocket port, skipping`)
             continue;
         }
 
+        let hostname = window.location.hostname;
         // Replace the first element of the domain with the correct subdomain
         const domainElements = window.location.hostname.split('.');
-        domainElements[0] = domain;
-        let hostname = domainElements.join('.');
+        // If there is only one element, it's typically localhost or something, so don't replace it
+        if (domainElements.length >= 2) {
+            domainElements[0] = client_subdomain;
+            hostname = domainElements.join('.');
+        }
 
         if (window.location.port) {
             hostname += `:${window.location.port}`;
