@@ -159,7 +159,7 @@ function processServerlist(serverlist: AOServer[]) {
             continue;
         }
 
-        const clientURL: string = `${http_protocol}//${host}/client.html`;
+        const clientURL: string = `${http_protocol}://${host}/client.html`;
         const connect = `${ws_protocol}://${server.ip}:${port}`;
         const serverName = server.name;
         server.online = `Players: ${server.players}`;
