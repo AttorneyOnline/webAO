@@ -63,7 +63,6 @@ function main() {
 main();
 
 export function setServ(ID: number) {
-    console.log(`Setting server to ${ID}`);
     const server = servers[ID];
     const onlineStr = server.online;
     const serverDesc = safeTags(server.description);
