@@ -1,5 +1,11 @@
 import { safeTags } from './encoding';
 
+declare global {
+    interface Window {
+        setServ: (ID: number) => void;
+    }
+}
+
 interface AOServer {
     name: string,
     description: string,
@@ -55,6 +61,15 @@ function main() {
 }
 
 main();
+
+export function setServ(ID: number) {
+    console.log(`Setting server to ${ID}`);
+    const server = servers[ID];
+    const onlineStr = server.online;
+    const serverDesc = safeTags(server.description);
+    document.getElementById('serverdescription_content').innerHTML = `<b>${onlineStr}</b><br>${serverDesc})`;
+}
+window.setServ = setServ;
 
 
 // Fetches the serverlist from the masterserver
@@ -144,11 +159,11 @@ function processServerlist(serverlist: AOServer[]) {
 
         const connect = `${protocol}://${server.ip}:${port}`;
         const serverName = server.name;
-        server.online = 'Offline';
+        server.online = `Players: ${server.players}`;
         servers.push(server);
 
         document.getElementById('masterlist').innerHTML
-            += `<li id="server${i}"><p>${safeTags(server.name)} (${server.players})</p>`
+            += `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(server.name)} (${server.players})</p>`
             + `<a class="button" href="${clientURL}?mode=watch&connect=${connect}&serverName=${serverName}">Watch</a>`
             + `<a class="button" href="${clientURL}?mode=join&connect=${connect}&serverName=${serverName}">Join</a></li>`;
     }
