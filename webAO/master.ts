@@ -67,7 +67,7 @@ export function setServ(ID: number) {
     const server = servers[ID];
     const onlineStr = server.online;
     const serverDesc = safeTags(server.description);
-    document.getElementById('serverdescription_content').innerHTML = `<b>${onlineStr}</b><br>${serverDesc})`;
+    document.getElementById('serverdescription_content').innerHTML = `<b>${onlineStr}</b><br>${serverDesc}`;
 }
 window.setServ = setServ;
 
