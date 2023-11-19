@@ -76,8 +76,10 @@ fpPromise
 
 export function check_https() {
     if (protocol === 'https:') {
+        const newURL: string = window.location.href.replace('https:', 'http:');
         document.getElementById('https_error').style.display = '';
-        setTimeout(() => window.location.replace("http://web.aceattorneyonline.com/"), 5000);
+        console.log('HTTPS detected, redirecting to HTTP');
+        setTimeout(() => window.location.replace(newURL), 5000);
     }
 }
 
