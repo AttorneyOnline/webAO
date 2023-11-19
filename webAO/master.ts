@@ -164,8 +164,8 @@ function processServerlist(serverlist: AOServer[]) {
 
         document.getElementById('masterlist').innerHTML
             += `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(server.name)} (${server.players})</p>`
-            + `<a class="button" href="${clientURL}?mode=watch&connect=${connect}&serverName=${serverName}">Watch</a>`
-            + `<a class="button" href="${clientURL}?mode=join&connect=${connect}&serverName=${serverName}">Join</a></li>`;
+            + `<a class="button" href="${clientURL}?mode=watch&connect=${connect}&serverName=${serverName}" target="_blank">Watch</a>`
+            + `<a class="button" href="${clientURL}?mode=join&connect=${connect}&serverName=${serverName}" target="_blank">Join</a></li>`;
     }
 }
 
