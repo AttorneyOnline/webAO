@@ -1,5 +1,3 @@
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
-
 import { safeTags } from './encoding';
 
 interface AOServer {
@@ -23,10 +21,6 @@ const host = window.location.host;
 
 const serverlist_cache_key = 'masterlist';
 
-let hdid: string;
-
-let selectedServer: number = -1;
-
 const servers: AOServer[] = [];
 servers[-2] = {
     name: 'Singleplayer',
@@ -47,78 +41,21 @@ servers[-1] = {
     players: 0,
 };
 
-const fpPromise = FingerprintJS.load();
-fpPromise
-    .then((fp) => fp.get())
-    .then(async (result) => {
-        hdid = result.visitorId;
 
-        getServerlist().then((serverlist) => {
-            processServerlist(serverlist);
-        });
-
-        processClientVersion(clientVersion);
-
-        getMasterVersion().then((masterVersion) => {
-            processMasterVersion(masterVersion);
-        });
-
-        // i don't need the ms to play alone
-        setTimeout(() => checkOnline(-1, '127.0.0.1:50001'), 0);
+function main() {
+    getServerlist().then((serverlist) => {
+        processServerlist(serverlist);
     });
 
-function checkOnline(serverID: number, coIP: string) {
-    let serverConnection: WebSocket;
-    if (serverID !== -2) {
-        try {
-            serverConnection = new WebSocket(`ws://${coIP}`);
-        } catch (SecurityError) {
-            document.getElementById(`server${serverID}`).className = 'unavailable';
-            return;
-        }
-    }
+    processClientVersion(clientVersion);
 
-    // define what the callbacks do
-    function onCOOpen() {
-        document.getElementById(`server${serverID}`).className = 'available';
-        serverConnection.send(`HI#${hdid}#%`);
-        serverConnection.send('ID#webAO#webAO#%');
-    }
-
-    function onCOMessage(e: MessageEvent) {
-        const comsg = e.data;
-        const coheader = comsg.split('#', 2)[0];
-        const coarguments = comsg.split('#').slice(1);
-        if (coheader === 'PN') {
-            servers[serverID].online = `Online: ${Number(coarguments[0])}/${Number(coarguments[1])}`;
-            serverConnection.close();
-            return;
-        } if (coheader === 'BD') {
-            servers[serverID].online = 'Banned';
-            servers[serverID].description = coarguments[0];
-            serverConnection.close();
-            return;
-        }
-        if (serverID === selectedServer) {
-            document.getElementById('serverdescription_content').innerHTML = `<b>${servers[serverID].online}</b><br>${safeTags(servers[serverID].description)}`;
-        }
-    }
-
-    // assign the callbacks
-    serverConnection.onopen = function () {
-        onCOOpen();
-    };
-
-    serverConnection.onmessage = function (evt: MessageEvent) {
-        onCOMessage(evt);
-    };
-
-    serverConnection.onerror = function (_evt: Event) {
-        document.getElementById(`server${serverID}`).className = 'unavailable';
-        console.error(`Error connecting to ${coIP}`);
-        console.error(_evt);
-    };
+    getMasterVersion().then((masterVersion) => {
+        processMasterVersion(masterVersion);
+    });
 }
+
+main();
+
 
 // Fetches the serverlist from the masterserver
 // Returns a properly typed list of servers
