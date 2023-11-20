@@ -136,55 +136,67 @@ function getCachedServerlist(): AOServer[] {
     return JSON.parse(cached) as AOServer[];
 }
 
+// Constructs the client URL robustly, independent of domain and path
+function constructClientURL(protocol: string): string {
+    const clientURL = new URL(window.location.href);
+
+    // Use the given protocol
+    clientURL.protocol = protocol;
+
+    // Remove the last part of the pathname (e.g., "index.html")
+    const pathname = clientURL.pathname;
+    const parts = pathname.split('/');
+    parts.pop();
+
+    // Reconstruct the pathname
+    clientURL.pathname = parts.join('/');
+
+    // If clientURL.pathname does not end with a slash, add one
+    if (clientURL.pathname[clientURL.pathname.length - 1] !== '/') {
+        clientURL.pathname += '/'
+    }
+
+    clientURL.pathname += "client.html";
+
+    return clientURL.href;
+}
+
 function processServerlist(serverlist: AOServer[]) {
     for (let i = 0; i < serverlist.length; i++) {
         const server = serverlist[i];
-        let port = 0;
+        let ws_port = 0;
         let ws_protocol = '';
         let http_protocol = '';
-        let client_subdomain = '';
 
         if (server.ws_port) {
-            port = server.ws_port;
+            ws_port = server.ws_port;
             ws_protocol = 'ws';
             http_protocol = 'http';
-            client_subdomain = 'insecure';
         }
         if (server.wss_port) {
-            port = server.wss_port;
+            ws_port = server.wss_port;
             ws_protocol = 'wss';
             http_protocol = 'https';
-            client_subdomain = 'web';
         }
 
-        if (port === 0 || protocol === '') {
+        if (ws_port === 0 || ws_protocol === '' || http_protocol === '') {
             console.warn(`Server ${server.name} has no websocket port, skipping`)
             continue;
         }
 
-        let hostname = window.location.hostname;
-        // Replace the first element of the domain with the correct subdomain
-        const domainElements = window.location.hostname.split('.');
-        // If there is only one element, it's typically localhost or something, so don't replace it
-        if (domainElements.length >= 2) {
-            domainElements[0] = client_subdomain;
-            hostname = domainElements.join('.');
-        }
-
-        if (window.location.port) {
-            hostname += `:${window.location.port}`;
-        }
-
-        const clientURL: string = `${http_protocol}://${hostname}/client.html`;
-        const connect = `${ws_protocol}://${server.ip}:${port}`;
+        const clientURL = constructClientURL(http_protocol);
+        const connect = `${ws_protocol}://${server.ip}:${ws_port}`;
         const serverName = server.name;
+        const fullClientWatchURL = `${clientURL}?mode=watch&connect=${connect}&serverName=${serverName}`;
+        const fullClientJoinURL = `${clientURL}?mode=join&connect=${connect}&serverName=${serverName}`;
+
         server.online = `Players: ${server.players}`;
         servers.push(server);
 
         document.getElementById('masterlist').innerHTML
             += `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(server.name)} (${server.players})</p>`
-            + `<a class="button" href="${clientURL}?mode=watch&connect=${connect}&serverName=${serverName}" target="_blank">Watch</a>`
-            + `<a class="button" href="${clientURL}?mode=join&connect=${connect}&serverName=${serverName}" target="_blank">Join</a></li>`;
+            + `<a class="button" href="${fullClientWatchURL}" target="_blank">Watch</a>`
+            + `<a class="button" href="${fullClientJoinURL}" target="_blank">Join</a></li>`;
     }
 }
 
