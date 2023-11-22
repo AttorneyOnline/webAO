@@ -234,9 +234,6 @@ const viewport = (): Viewport => {
     // note: this is called fairly often
     // do not perform heavy operations here
     await delay(chatmsg.speed);
-    if (textnow === chatmsg.content) {
-      return;
-    }
 
     const gamewindow = document.getElementById("client_gamewindow");
     const waitingBox = document.getElementById("client_chatwaiting");
@@ -443,6 +440,9 @@ const viewport = (): Viewport => {
           chatmsg.looping_sfx
         );
       }
+    }
+    if (textnow === chatmsg.content) {
+      return;
     }
     if (animating) {
       chat_tick();
