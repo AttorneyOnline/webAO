@@ -98,6 +98,14 @@ fpPromise
 
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
+export enum clientState {
+    NotConnected,
+    // Should be set once the client has established a connection
+    Connected,
+    // Should be set once the client has joined the server (after handshake)
+    Joined
+}
+
 export let lastICMessageTime = new Date(0);
 export const setLastICMessageTime = (val: Date) => {
     lastICMessageTime = val
@@ -129,12 +137,14 @@ class Client extends EventEmitter {
     viewport: Viewport;
     partial_packet: boolean;
     temp_packet: string;
+    state: clientState;
     connect: () => void;
     loadResources: () => void
     isLowMemory: () => void
     constructor(connectionString: string) {
         super();
 
+        this.state = clientState.NotConnected;
         this.connect = () => {
             this.on("open", this.onOpen.bind(this));
             this.on("close", this.onClose.bind(this));
@@ -227,6 +237,7 @@ class Client extends EventEmitter {
    * Triggered when a connection is established to the server.
    */
     onOpen(_e: Event) {
+        client.state = clientState.Connected;
         client.joinServer();
     }
 
@@ -235,6 +246,7 @@ class Client extends EventEmitter {
    * @param {CloseEvent} e
    */
     onClose(e: CloseEvent) {
+        client.state = clientState.NotConnected;
         console.error(`The connection was closed: ${e.reason} (${e.code})`);
         if (extrafeatures.length == 0 && banned === false) {
             document.getElementById("client_errortext").textContent =
@@ -315,6 +327,7 @@ class Client extends EventEmitter {
    * @param {ErrorEvent} e
    */
     onError(e: ErrorEvent) {
+        client.state = clientState.NotConnected;
         console.error(`A network error occurred`);
         document.getElementById("client_error").style.display = "flex";
         this.cleanup();
