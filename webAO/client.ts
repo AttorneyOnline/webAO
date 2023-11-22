@@ -83,6 +83,13 @@ fpPromise
             }
         }
 
+        if (window.location.protocol === "https:" && connectionString.startsWith("ws://")) {
+            // If protocol is https: and connectionString is ws://
+            // We have a problem, since it's impossible to connect to ws:// from https://
+            // Connection will fail, but at least warn the user
+            alert('Attempted to connect using insecure websockets on https page. Please try removing s from https:// in the URL bar.')
+        }
+
         client = new Client(connectionString);
         client.connect()
         isLowMemory();
