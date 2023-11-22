@@ -337,6 +337,7 @@ class Client extends EventEmitter {
     onError(e: ErrorEvent) {
         client.state = clientState.NotConnected;
         console.error(`A network error occurred`);
+        console.error(e);
         document.getElementById("client_error").style.display = "flex";
         this.cleanup();
     }
