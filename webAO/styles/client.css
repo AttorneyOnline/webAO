@@ -206,11 +206,9 @@
 #client_court_static {
 	position: absolute;
 	height: 100%;
+	width: 100%;
 	top: 0;
 	left: 0;
-	top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
 }
 
 #client_court {
@@ -218,9 +216,6 @@
 	height: 100%;
 	top: 0;
 	left: 0;
-	top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
 }
 
 #client_stitch_court {
@@ -234,10 +229,8 @@
 #client_stitch_court>img {
 	position: absolute;
 	height: 100%;
+	width: 100%;
 	bottom: 0;
-	top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
 }
 
 #client_court_classic {
@@ -245,9 +238,6 @@
 	height: 100%;
 	top: 0;
 	left: 0;
-	top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
 }
 
 .def_court {
@@ -285,7 +275,6 @@
 	bottom: 0;
 }
 
-
 .client_char>img {
 	position: absolute;
 	height: 100%;
@@ -296,8 +285,6 @@
     transform: translate(-50%, -50%);
 
 }
-
-
 
 #client_bench_classic {
 	left: 0;
@@ -326,7 +313,6 @@
 .client_bench {
 	position: absolute;
 	height: 100%;
-	width: 1;
 	bottom: 0;
 	object-fit: contain;
 }
