@@ -48,10 +48,8 @@ export function appendICLog(
     const clientLog = document.getElementById("client_log")!;
     clientLog.appendChild(entry);
 
-    /* This is a little buggy - some troubleshooting might be desirable */
-    if (clientLog.scrollTop > clientLog.scrollHeight - 800) {
-        clientLog.scrollTop = clientLog.scrollHeight;
-    }
+    if (clientLog.scrollTop+clientLog.offsetHeight+50>clientLog.scrollHeight)
+    clientLog.scrollTo(0, clientLog.scrollHeight);
 
     setLastICMessageTime(new Date());
 }
