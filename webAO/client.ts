@@ -17,7 +17,7 @@ import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
 import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists'
 
-const { ip: serverIP, mode, theme, serverName } = queryParser();
+const { ip: serverIP, connect, mode, theme, serverName } = queryParser();
 
 document.title = serverName;
 
@@ -70,12 +70,27 @@ fpPromise
     .then((result) => {
         hdid = result.visitorId;
 
-        if (!serverIP) {
-            alert("No server IP specified!");
-            return;
+        let connectionString = connect;
+
+        if (!connectionString) {
+            if (serverIP) {
+                // if connectionString is not set, try IP
+                // and just guess ws, though it could be wss
+                connectionString = `ws://${serverIP}`;
+            } else {
+                alert("No connection string specified!");
+                return;
+            }
         }
 
-        client = new Client(serverIP);
+        if (window.location.protocol === "https:" && connectionString.startsWith("ws://")) {
+            // If protocol is https: and connectionString is ws://
+            // We have a problem, since it's impossible to connect to ws:// from https://
+            // Connection will fail, but at least warn the user
+            alert('Attempted to connect using insecure websockets on https page. Please try removing s from https:// in the URL bar.')
+        }
+
+        client = new Client(connectionString);
         client.connect()
         isLowMemory();
         loadResources();
@@ -117,7 +132,7 @@ class Client extends EventEmitter {
     connect: () => void;
     loadResources: () => void
     isLowMemory: () => void
-    constructor(address: string) {
+    constructor(connectionString: string) {
         super();
 
         this.connect = () => {
@@ -126,7 +141,7 @@ class Client extends EventEmitter {
             this.on("message", this.onMessage.bind(this));
             this.on("error", this.onError.bind(this));
             if (mode !== "replay") {
-                this.serv = new WebSocket(`ws://${address}`);
+                this.serv = new WebSocket(connectionString);
                 // Assign the websocket events
                 this.serv.addEventListener("open", this.emit.bind(this, "open"));
                 this.serv.addEventListener("close", this.emit.bind(this, "close"));
