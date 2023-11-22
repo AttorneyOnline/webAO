@@ -157,6 +157,14 @@ class Client extends EventEmitter {
                 this.serv.addEventListener("close", this.emit.bind(this, "close"));
                 this.serv.addEventListener("message", this.emit.bind(this, "message"));
                 this.serv.addEventListener("error", this.emit.bind(this, "error"));
+
+                // If the client is still not connected 5 seconds after attempting to join
+                // It's fair to assume that the server is not reachable
+                setTimeout(() => {
+                    if (this.state === clientState.NotConnected) {
+                        this.serv.close();
+                    }
+                }, 5000);
             } else {
                 this.joinServer();
             }
