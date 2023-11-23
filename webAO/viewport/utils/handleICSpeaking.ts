@@ -15,11 +15,11 @@ import mlConfig from "../../utils/aoml";
 const attorneyMarkdown = mlConfig(AO_HOST);
 
 export let startFirstTickCheck: boolean;
-export const setStartFirstTickCheck = (val: boolean) => {startFirstTickCheck = val}
+export const setStartFirstTickCheck = (val: boolean) => { startFirstTickCheck = val }
 export let startSecondTickCheck: boolean;
-export const setStartSecondTickCheck = (val: boolean) => {startSecondTickCheck = val}
+export const setStartSecondTickCheck = (val: boolean) => { startSecondTickCheck = val }
 export let startThirdTickCheck: boolean;
-export const setStartThirdTickCheck = (val: boolean) => {startThirdTickCheck = val}
+export const setStartThirdTickCheck = (val: boolean) => { startThirdTickCheck = val }
 /**
  * Sets a new emote.
  * This sets up everything before the tick() loops starts
@@ -73,7 +73,7 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
 
     const displayname =
         (<HTMLInputElement>document.getElementById("showname")).checked &&
-        client.viewport.getChatmsg().showname !== ""
+            client.viewport.getChatmsg().showname !== ""
             ? client.viewport.getChatmsg().showname!
             : client.viewport.getChatmsg().nameplate!;
 
@@ -91,7 +91,7 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
     appendICLog(client.viewport.getChatmsg().content, client.viewport.getChatmsg().showname, client.viewport.getChatmsg().nameplate);
 
     checkCallword(client.viewport.getChatmsg().content, client.viewport.getSfxAudio());
-    
+
     setEmote(
         AO_HOST,
         client,
@@ -118,7 +118,7 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
     const shoutSprite = <HTMLImageElement>(
         document.getElementById("client_shout")
     );
-    
+
     const shout = SHOUTS[client.viewport.getChatmsg().objection];
     if (shout) {
         // Hide message box
@@ -148,7 +148,7 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
     if (client.viewport.getChatmsg().type === 1 && client.viewport.getChatmsg().preanim !== "-") {
         //we have a preanim
         chatContainerBox.style.opacity = "0";
-        
+
         gifLength = await getAnimLength(
             `${AO_HOST}characters/${encodeURI(
                 client.viewport.getChatmsg().name!.toLowerCase()
@@ -217,9 +217,9 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
     if (!skipoffset) {
         // Flip the character
         charLayers.style.transform =
-        client.viewport.getChatmsg().flip === 1 ? "scaleX(-1)" : "scaleX(1)";
+            client.viewport.getChatmsg().flip === 1 ? "scaleX(-1)" : "scaleX(1)";
         pairLayers.style.transform =
-        client.viewport.getChatmsg().other_flip === 1 ? "scaleX(-1)" : "scaleX(1)";
+            client.viewport.getChatmsg().other_flip === 1 ? "scaleX(-1)" : "scaleX(1)";
 
         // Shift by the horizontal offset
         switch (client.viewport.getChatmsg().side) {
@@ -244,9 +244,9 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
 
     client.viewport.blipChannels.forEach(
         (channel: HTMLAudioElement) =>
-            (channel.src = `${AO_HOST}sounds/blips/${encodeURI(
-                client.viewport.getChatmsg().blips.toLowerCase()
-            )}.opus`)
+        (channel.src = `${AO_HOST}sounds/blips/${encodeURI(
+            client.viewport.getChatmsg().blips.toLowerCase()
+        )}.opus`)
     );
 
     // process markup
@@ -293,20 +293,20 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
         fg.src = transparentPng;
     }
 
-    
+
     charLayers.style.opacity = "1";
 
     const soundChecks = ["0", "1", "", undefined];
     if (soundChecks.some((check) => client.viewport.getChatmsg().sound === check)) {
         client.viewport.getChatmsg().sound = client.viewport.getChatmsg().effects[2];
     }
-    
+
     try {
         client.viewport.getChatmsg().parsed = await attorneyMarkdown.applyMarkdown(
             client.viewport.getChatmsg().content,
-            
+
             COLORS[client.viewport.getChatmsg().color]
-            
+
         );
     } catch (error) {
         console.warn("markdown failed");
@@ -319,6 +319,6 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
         }
         client.viewport.getChatmsg().parsed = output;
     }
-    
+
     client.viewport.chat_tick();
 };
