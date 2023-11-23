@@ -2,10 +2,24 @@ body {
 	font-family: sans-serif;
 }
 
+@media (max-height: 270x) {
+	img {
+		image-rendering: crisp-edges;
+		image-rendering: pixelated;
+	}
+
+}
+
 img {
+	image-rendering: auto;
+}
+
+img[src$=".gif"],
+img[src$=".apng"] {
 	image-rendering: crisp-edges;
 	image-rendering: pixelated;
 }
+
 
 .client_button {
 	margin: 1px;

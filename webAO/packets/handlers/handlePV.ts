@@ -44,6 +44,20 @@ export const handlePV = async (args: string[]) => {
                 }
                 // Make sure the asset server is case insensitive, or that everything on it is lowercase
 
+                const extensionsMap = [".png", ".webp"];
+                let url;
+                for (const extension of extensionsMap) {
+                    url = `${AO_HOST}characters/${encodeURI(
+                        me.name.toLowerCase()
+                    )}/emotions/button${i}_off${extension}`;
+
+                    const exists = await fileExists(url);
+
+                    if (exists) {
+                        break;
+                    }
+                }
+
                 emotes[i] = {
                     desc: emoteinfo[0].toLowerCase(),
                     preanim: emoteinfo[1].toLowerCase(),
@@ -55,9 +69,7 @@ export const handlePV = async (args: string[]) => {
                     frame_screenshake: "",
                     frame_realization: "",
                     frame_sfx: "",
-                    button: `${AO_HOST}characters/${encodeURI(
-                        me.name.toLowerCase()
-                    )}/emotions/button${i}_off.png`,
+                    button: url,
                 };
 
                 const emote_item = new Image();
