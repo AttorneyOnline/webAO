@@ -213,6 +213,10 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
 
     setChatbox(client.viewport.getChatmsg().chatbox);
     resizeChatbox();
+    if (client.viewport.getChatmsg().chatbox === "") {
+        // No chatbox means hide it
+        chatContainerBox.style.opacity = "0";
+    }
 
     if (!skipoffset) {
         // Flip the character

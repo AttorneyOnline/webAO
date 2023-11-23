@@ -159,6 +159,8 @@ export const handleMS = (args: string[]) => {
       if (chatmsg.content.trim() === "") {
         //blankpost
         chatmsg.content = "";
+        // empty string as chatbox means hide it
+        chatmsg.chatbox = "";
       }
 
       // our own message appeared, reset the buttons
