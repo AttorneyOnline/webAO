@@ -78,7 +78,7 @@ export const handleMS = (args: string[]) => {
         speed: UPDATE_INTERVAL,
       };
 
-      if (args.length>16) {
+      if (args.length > 16) {
         const extra_cccc = {
           showname: prepChat(args[16]),
           other_charid: Number(args[17]),
@@ -91,7 +91,7 @@ export const handleMS = (args: string[]) => {
         };
         chatmsg = Object.assign(extra_cccc, chatmsg);
 
-        if (args.length>24) {
+        if (args.length > 24) {
           const extra_27 = {
             looping_sfx: Number(args[24]),
             screenshake: Number(args[25]),
@@ -101,7 +101,7 @@ export const handleMS = (args: string[]) => {
           };
           chatmsg = Object.assign(extra_27, chatmsg);
 
-          if (args.length>29) {
+          if (args.length > 29) {
             const extra_28 = {
               additive: Number(args[29]),
               effects: args[30].split("|"),
@@ -159,6 +159,8 @@ export const handleMS = (args: string[]) => {
       if (chatmsg.content.trim() === "") {
         //blankpost
         chatmsg.content = "";
+        // empty string as chatbox means hide it
+        chatmsg.chatbox = "";
       }
 
       // our own message appeared, reset the buttons
