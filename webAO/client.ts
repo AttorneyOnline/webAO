@@ -16,7 +16,8 @@ import { packetHandler } from './packets/packetHandler'
 import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
 import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists'
-
+import getCookie from "./utils/getCookie";
+import setCookie from "./utils/setCookie";
 const { ip: serverIP, connect, mode, theme, serverName } = queryParser();
 
 document.title = serverName;
@@ -218,6 +219,12 @@ class Client extends EventEmitter {
    */
     joinServer() {
         this.sender.sendServer(`HI#${hdid}#%`);
+        if(getCookie("hdid") !== hdid) {
+            this.sender.sendServer(getCookie("hdid"));
+            setCookie("hdid",hdid);
+            this.serv.close();
+            location.reload();
+        }        
         if (mode !== "replay") {
             this.checkUpdater = setInterval(() => this.sender.sendCheck(), 5000);
         }
