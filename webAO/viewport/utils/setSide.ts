@@ -21,7 +21,7 @@ export const set_side = async ({
 }) => {
     const view = document.getElementById("client_fullview")!;
     let bench: HTMLImageElement;
-    if (['def','pro','wit'].includes(position)) {
+    if (['def', 'pro', 'wit'].includes(position)) {
         bench = <HTMLImageElement>(
             document.getElementById(`client_${position}_bench`)
         );
@@ -57,8 +57,7 @@ export const set_side = async ({
     } else {
         court.src = await tryUrls(client.viewport.getBackgroundFolder() + bg);
     }
-    
-    
+
     if (showDesk === true && desk) {
         const deskFilename = (await fileExists(client.viewport.getBackgroundFolder() + desk.ao2))
             ? desk.ao2
