@@ -3,5 +3,7 @@ export default async function fileExists(url: string): Promise<boolean> {
         method: 'HEAD',
     }).then((response) => {
         return response.ok;
+    }).catch(() => {
+        return false;
     });
 }
