@@ -31,20 +31,19 @@ servers[-2] = {
     name: 'Singleplayer',
     description: 'Build cases, try out new things',
     ip: '127.0.0.1',
-    port: 50001,
-    assets: '',
-    online: 'Online: 0/1',
     players: 0,
-};
+    online: 'Singleplayer',
+    port: 50001,
+} as AOServer;
+
 servers[-1] = {
     name: 'Localhost',
     description: 'This is your computer on port 50001',
     ip: '127.0.0.1',
-    port: 50001,
-    assets: '',
-    online: 'Offline',
     players: 0,
-};
+    online: 'Localhost',
+    port: 50001,
+} as AOServer;
 
 
 function main() {
