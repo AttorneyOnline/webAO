@@ -101,17 +101,17 @@
             </div>
         </noscript>
         <ul class="serverlist">
-            <li id="server-2" class="available" onmouseover="setServ(-2)">
+            <li id="server-2" class="available">
                 <p>Singleplayer (beta)</p>
                 <a class="button" href="client.html?mode=replay">Try</a>
             </li>
         </ul>
         <ul class="serverlist" id="masterlist"></ul>
         <ul class="serverlist">
-            <li id="server-1" class="unavailable" onmouseover="setServ(-1)">
+            <li id="server-1" class="unavailable">
                 <p>Localhost</p>
-                <a class="button" href="client.html?mode=watch&ip=127.0.0.1:50001">Watch</a>
-                <a class="button" href="client.html?mode=join&ip=127.0.0.1:50001">Join</a>
+                <a class="button" href="client.html?mode=watch&connect=ws://127.0.0.1:50001">Watch</a>
+                <a class="button" href="client.html?mode=join&connect=ws://127.0.0.1:50001">Join</a>
             </li>
         </ul>
         <div id="info_container">
