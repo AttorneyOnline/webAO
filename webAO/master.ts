@@ -104,6 +104,7 @@ async function getServerlist(): Promise<AOServer[]> {
             description: item.description,
             ip: item.ip,
             players: item.players || 0,
+            online: `Players: ${item.players}`,
         }
 
         if (item.ws_port) {
@@ -189,7 +190,6 @@ function processServerlist(serverlist: AOServer[]) {
         const fullClientWatchURL = `${clientURL}?mode=watch&connect=${connect}&serverName=${serverName}`;
         const fullClientJoinURL = `${clientURL}?mode=join&connect=${connect}&serverName=${serverName}`;
 
-        server.online = `Players: ${server.players}`;
         servers.push(server);
 
         document.getElementById('masterlist').innerHTML
