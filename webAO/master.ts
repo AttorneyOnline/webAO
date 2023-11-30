@@ -11,11 +11,11 @@ interface AOServer {
     description: string,
     ip: string,
     players: number,
+    online: string,
     port?: number,
     ws_port?: number,
     wss_port?: number,
     assets?: string,
-    online?: string,
 }
 
 const clientVersion = process.env.npm_package_version;
@@ -31,20 +31,19 @@ servers[-2] = {
     name: 'Singleplayer',
     description: 'Build cases, try out new things',
     ip: '127.0.0.1',
-    port: 50001,
-    assets: '',
-    online: 'Online: 0/1',
     players: 0,
-};
+    online: 'Singleplayer',
+    port: 50001,
+} as AOServer;
+
 servers[-1] = {
     name: 'Localhost',
     description: 'This is your computer on port 50001',
     ip: '127.0.0.1',
-    port: 50001,
-    assets: '',
-    online: 'Offline',
     players: 0,
-};
+    online: 'Localhost',
+    port: 50001,
+} as AOServer;
 
 
 function main() {
@@ -105,6 +104,7 @@ async function getServerlist(): Promise<AOServer[]> {
             description: item.description,
             ip: item.ip,
             players: item.players || 0,
+            online: `Players: ${item.players}`,
         }
 
         if (item.ws_port) {
@@ -190,7 +190,6 @@ function processServerlist(serverlist: AOServer[]) {
         const fullClientWatchURL = `${clientURL}?mode=watch&connect=${connect}&serverName=${serverName}`;
         const fullClientJoinURL = `${clientURL}?mode=join&connect=${connect}&serverName=${serverName}`;
 
-        server.online = `Players: ${server.players}`;
         servers.push(server);
 
         document.getElementById('masterlist').innerHTML
