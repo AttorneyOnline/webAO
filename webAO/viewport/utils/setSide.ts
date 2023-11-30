@@ -2,7 +2,7 @@ import { positions } from '../constants/positions'
 import { AO_HOST } from '../../client/aoHost'
 import { client } from '../../client'
 import tryUrls from '../../utils/tryUrls';
-import fileExists from '../../utils/fileExists';
+import findImgSrc from '../../utils/findImgSrc';
 
 /**
  * Changes the viewport background based on a given position.
@@ -21,7 +21,7 @@ export const set_side = async ({
 }) => {
     const view = document.getElementById("client_fullview")!;
     let bench: HTMLImageElement;
-    if (['def','pro','wit'].includes(position)) {
+    if (['def', 'pro', 'wit'].includes(position)) {
         bench = <HTMLImageElement>(
             document.getElementById(`client_${position}_bench`)
         );
@@ -57,13 +57,14 @@ export const set_side = async ({
     } else {
         court.src = await tryUrls(client.viewport.getBackgroundFolder() + bg);
     }
-    
-    
+
     if (showDesk === true && desk) {
-        const deskFilename = (await fileExists(client.viewport.getBackgroundFolder() + desk.ao2))
-            ? desk.ao2
-            : desk.ao1;
-        bench.src = client.viewport.getBackgroundFolder() + deskFilename;
+        const bg_folder = client.viewport.getBackgroundFolder();
+        const urls_to_try = [
+            bg_folder + desk.ao2,
+            bg_folder + desk.ao1,
+        ];
+        bench.src = await findImgSrc(urls_to_try);
         bench.style.opacity = "1";
     } else {
         bench.style.opacity = "0";
