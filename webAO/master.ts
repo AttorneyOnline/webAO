@@ -11,11 +11,11 @@ interface AOServer {
     description: string,
     ip: string,
     players: number,
+    online: string,
     port?: number,
     ws_port?: number,
     wss_port?: number,
     assets?: string,
-    online?: string,
 }
 
 const clientVersion = process.env.npm_package_version;
