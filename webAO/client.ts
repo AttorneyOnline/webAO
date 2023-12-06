@@ -73,7 +73,7 @@ fpPromise
 
         let connectionString = connect;
 
-        if (!connectionString) {
+        if (!connectionString && mode !== "replay") {
             if (serverIP) {
                 // if connectionString is not set, try IP
                 // and just guess ws, though it could be wss
