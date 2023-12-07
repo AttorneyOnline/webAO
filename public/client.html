@@ -139,13 +139,9 @@
 					</div>
 					<img id="client_bench_classic" class="client_bench">
 				</div>
-				<div id="client_fg" alt="Various overlay"
-					src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
-				</div>
+				<div id="client_fg" alt="Various overlay"></div>
 				<img id="client_evi" src="" alt="Character Evidence" onerror="imgError(this);">
-				<img id="client_testimony" alt="Testimony overlay"
-					src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-					onerror="imgError(this);">
+				<div id="client_testimony" alt="Testimony overlay"></div>
 				<img id="client_shout" alt="Shout overlay"
 					src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
 				<div id="client_chatcontainer" style="font-size: 12px; opacity: 0;">
@@ -315,17 +311,13 @@
 				<legend>Actions</legend>
 				<!-- Judge Commands -->
 				<span id="judge_action" style="display:none">
-					<span id="menu_wt" onclick="initWT()" class="judge_button"
-						style="color: blue"><i>Witness<br>Testimony</i></span>
+					<span id="menu_wt" onclick="initWT()" class="judge_button wt"><i>Witness<br>Testimony</i></span>
 
-					<span id="menu_ce" onclick="initCE()" class="judge_button"
-						style="color: red"><i>Cross<br>Examination</i></span>
+					<span id="menu_ce" onclick="initCE()" class="judge_button ce"><i>Cross<br>Examination</i></span>
 
-					<span id="menu_nguilty" onclick="notguilty()" class="judge_button"
-						style="color: white; font-family: serif; text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; font-size: 1.5em; line-height: 0.75;">Not<br>Guilty</span>
+					<span id="menu_nguilty" onclick="notguilty()" class="judge_button ng" style="font-size: 1.5em;">Not<br>Guilty</span>
 
-					<span id="menu_guilty" onclick="guilty()" class="judge_button"
-						style="color: black; font-family: serif; font-size: 1.5em;">Guilty</span>
+					<span id="menu_guilty" onclick="guilty()" class="judge_button guilty" style="font-size: 1.5em;">Guilty</span>
 
 					<br>
 					<span style="display:inline-block; vertical-align: middle;">

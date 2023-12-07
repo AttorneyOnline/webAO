@@ -471,10 +471,6 @@
 	margin: 5px 1px;
 	padding: 2px;
 	cursor: pointer;
-	text-align: center;
-	font-weight: bold;
-	font-family: sans-serif;
-	text-shadow: -2px 0 #fff, 0 2px #fff, 2px 0 #fff, 0 -2px #fff;
 	background-color: #c1c1c1;
 	border-radius: 5px;
 	border-style: solid;
@@ -482,6 +478,99 @@
 	border-color: #919191;
 	box-shadow: 1px 1px white inset;
 	vertical-align: middle;
+}
+
+.wt {
+	text-align: center;
+	font-weight: bold;
+	font-family: sans-serif;
+	text-shadow: -2px 0 #fff, 0 2px #fff, 2px 0 #fff, 0 -2px #fff;
+	color: blue;
+}
+
+.testimony_anim {
+  position: absolute;
+  font-size: 8vh;
+  margin: 0;
+}
+
+@keyframes from_left {
+	0% {
+		margin-left: -8em;
+		filter: brightness(1);
+		filter: contrast(1);
+	}
+	80% {
+		margin-left: 1em;
+		filter: brightness(1);
+		filter: contrast(1);
+	}
+	90% {
+		margin-left: 1em;
+		filter: brightness(50);
+		filter: contrast(0);
+	}
+	100% {
+		margin-left: 1em;
+		filter: brightness(1);
+		filter: contrast(1);
+	}
+}
+
+@keyframes from_right {
+	0% {
+		margin-left: 8em;
+		filter: brightness(1);
+	}
+	80% {
+		margin-left: 1em;
+		filter: brightness(1);
+		filter: contrast(1);
+	}
+	90% {
+		margin-left: 1em;
+		filter: brightness(50);
+		filter: contrast(0);
+	}
+	100% {
+		margin-left: 1em;
+		filter: brightness(1);
+		filter: contrast(1);
+	}
+}
+
+.ce {
+	text-align: center;
+	font-weight: bold;
+	font-family: sans-serif;
+	text-shadow: -2px 0 #fff, 0 2px #fff, 2px 0 #fff, 0 -2px #fff;
+	color: red;
+}
+
+.ng {
+	text-align: center;
+	font-weight: bold;
+	font-family: serif;
+	text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000;
+	line-height: 0.75;
+	color: white;
+}
+
+.guilty {
+	text-align: center;
+	font-weight: bold;
+	font-family: serif;
+	text-shadow: -2px 0 #fff, 0 2px #fff, 2px 0 #fff, 0 -2px #fff;
+	color: black;
+}
+
+.testimony {
+	text-align: center;
+	font-weight: bold;
+	font-family: sans-serif;
+	text-shadow: -1px 0 #00c639, 0 1px #00c639, 1px 0 #00c639, 0 -1px #00c639;
+	line-height: 0.75;
+	color: white;
 }
 
 .healthchange_button {

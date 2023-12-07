@@ -9,6 +9,7 @@ export const initTestimonyUpdater = () => {
         2: "crossexamination",
         3: "notguilty",
         4: "guilty",
+        5: "testimony"
     };
 
     const testimony = testimonyFilenames[client.testimonyID];
@@ -23,7 +24,8 @@ export const initTestimonyUpdater = () => {
     const testimonyOverlay = <HTMLImageElement>(
         document.getElementById("client_testimony")
     );
-    testimonyOverlay.src = client.resources[testimony].src;
+    
+    testimonyOverlay.innerHTML = client.resources[testimony].html;
     testimonyOverlay.style.opacity = "1";
 
     client.viewport.setTestimonyTimer(0);

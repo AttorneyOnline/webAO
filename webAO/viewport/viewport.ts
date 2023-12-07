@@ -81,6 +81,7 @@ const viewport = (): Viewport => {
       2: "crossexamination",
       3: "notguilty",
       4: "guilty",
+      5: "testimony"
     };
 
     // Update timer

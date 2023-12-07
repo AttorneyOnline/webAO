@@ -16,24 +16,31 @@ const getResources = (AO_HOST, THEME) => ({
         duration: 840,
     },
     witnesstestimony: {
-        src: `${AO_HOST}themes/${THEME}/witnesstestimony_bubble.gif`,
+        html: `<p id='testimony1' class='testimony_anim wt' style='top: 30%;animation: from_left 1560ms linear 1;'>Witness</p><p id='testimony2' class='testimony_anim wt' style='top: 50%;animation: from_right 1560ms linear 1;'>Testimony</p>`,
         duration: 1560,
         sfx: `${AO_HOST}sounds/general/sfx-testimony.opus`,
     },
     crossexamination: {
-        src: `${AO_HOST}themes/${THEME}/crossexamination_bubble.gif`,
+        html: `<p id='testimony1' class='testimony_anim ce'>Cross</p><p id='testimony2' class='testimony_anim ce'>Examination</p>`,
         duration: 1600,
         sfx: `${AO_HOST}sounds/general/sfx-testimony2.opus`,
     },
     guilty: {
-        src: `${AO_HOST}themes/${THEME}/guilty_bubble.gif`,
+        html: `<p id='testimony1' class='guilty'>G</p><p id='testimony2' class='guilty'>u</p>
+               <p id='testimony3' class='guilty'>i</p><p id='testimony4' class='guilty'>l</p>
+               <p id='testimony5' class='guilty'>t</p><p id='testimony6' class='guilty'>y</p>`,
         duration: 2870,
         sfx: `${AO_HOST}sounds/general/sfx-guilty.opus`,
     },
     notguilty: {
-        src: `${AO_HOST}themes/${THEME}/notguilty_bubble.gif`,
+        html: `<p id='testimony1' class='ng'>Not</p><p id='testimony2' class='ng'>Guilty</p>`,
         duration: 2440,
         sfx: `${AO_HOST}sounds/general/sfx-notguilty.opus`,
+    },
+    testimony: {
+        html: `<p id='testimony1' class='testimony'>Testimony</p>`,
+        duration: 0,
+        sfx: ``,
     },
 });
 export default getResources;
