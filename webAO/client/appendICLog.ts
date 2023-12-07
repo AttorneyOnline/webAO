@@ -49,7 +49,7 @@ export function appendICLog(
     clientLog.appendChild(entry);
 
     if (clientLog.scrollTop+clientLog.offsetHeight+120>clientLog.scrollHeight)
-    clientLog.scrollTo(0, clientLog.scrollHeight);
+        clientLog.scrollTo(0, clientLog.scrollHeight);
 
     setLastICMessageTime(new Date());
 }

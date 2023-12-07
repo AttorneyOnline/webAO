@@ -15,9 +15,8 @@ export const handleCT = (args: string[]) => {
         message = message.replace(/\n/g, "<br>");
 
         oocLog.innerHTML += `${username}: ${message}<br>`;
-        if (oocLog.scrollTop > oocLog.scrollHeight - 600) {
-            oocLog.scrollTop = oocLog.scrollHeight;
-        }
+        if (oocLog.scrollTop+oocLog.offsetHeight+120>oocLog.scrollHeight)
+            oocLog.scrollTo(0, oocLog.scrollHeight);
     }
 }
 
