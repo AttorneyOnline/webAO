@@ -1,10 +1,10 @@
 import { client } from "../client";
+import setCookie from "../utils/setCookie";
 
-function handleCredentialResponse(response: any) {
-    client.sender.sendServer(`2T#${response.credential}#%`);
+export function hcallback(hcaptcharesponse: string) {
+    setCookie('hdid', client.hdid);
+    client.sender.sendServer(`2T#${hcaptcharesponse}#%`);
+    location.reload();
 }
-window.handleCredentialResponse = handleCredentialResponse;
 
-export function showFactorDialog(args: string[]) {
-    document.getElementById("client_secondfactor").style.display = args[1];
-}
+window.hcallback = hcallback;
