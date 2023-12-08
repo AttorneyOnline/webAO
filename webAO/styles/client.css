@@ -83,6 +83,7 @@
 	background: black;
 	color: lightgreen;
 	font-size: large;
+	z-index: 200;
 }
 
 #client_waiting {
