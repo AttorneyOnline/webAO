@@ -2,7 +2,6 @@ import { handleMS } from './handlers/handleMS';
 import { handleCT } from './handlers/handleCT'
 import { handleMC } from './handlers/handleMC'
 import { handleRMC } from './handlers/handleRMC'
-import { showFactorDialog } from '../dom/twofactor'
 import { handleFL } from './handlers/handleFL'
 import { handleLE } from './handlers/handleLE'
 import { handleEM } from './handlers/handleEM'
@@ -48,7 +47,6 @@ export const packets = {
     "CI": handleCI,
     "SC": handleSC,
     "EI": handleEI,
-    "2A": showFactorDialog,
     "FL": handleFL,
     "LE": handleLE,
     "EM": handleEM,
