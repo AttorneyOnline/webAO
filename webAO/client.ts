@@ -93,6 +93,7 @@ fpPromise
 
         client = new Client(connectionString);
         client.connect()
+        client.hdid = hdid;
         isLowMemory();
         loadResources();
     });
@@ -128,6 +129,7 @@ class Client extends EventEmitter {
     musics_time: boolean;
     callwords: string[];
     banned: boolean;
+    hdid: string;
     resources: any;
     selectedEmote: number;
     selectedEvidence: number;
@@ -239,9 +241,9 @@ class Client extends EventEmitter {
         this.sender.sendServer(`HI#${hdid}#%`);
         if(getCookie("hdid") !== hdid) {
             this.sender.sendServer(getCookie("hdid"));
-            setCookie("hdid",hdid);
-            this.serv.close();
-            location.reload();
+            document.getElementById("client_secondfactor").style.display = "block";
+            document.getElementById("client_charselect").remove();
+            document.getElementById("client_ooc").remove();
         }        
         if (mode !== "replay") {
             this.checkUpdater = setInterval(() => this.sender.sendCheck(), 5000);
