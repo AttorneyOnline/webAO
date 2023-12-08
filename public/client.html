@@ -24,12 +24,13 @@
 		content="https://repository-images.githubusercontent.com/78860508/89fcba80-aafd-11e9-80db-c5b10c01aba9">
 
 	<meta http-equiv="Content-Security-Policy" content="
-		script-src-elem 'self' 'unsafe-inline' https://ajax.googleapis.com https://accounts.google.com/gsi/client;
-		style-src-elem 'self' 'unsafe-inline' https://golden-layout.com https://accounts.google.com/gsi/style;
-		script-src 'self' 'unsafe-inline' 'unsafe-eval' https://ajax.googleapis.com https://accounts.google.com/gsi/client;
-		style-src 'self' 'unsafe-inline' https://golden-layout.com https://accounts.google.com/gsi/style;
+		script-src-elem 'self' 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com;
+		style-src-elem 'self' 'unsafe-inline' https://golden-layout.com;
+		script-src 'self' 'unsafe-inline' 'unsafe-eval' https://hcaptcha.com https://*.hcaptcha.com;
+		style-src 'self' 'unsafe-inline' https://golden-layout.com https://hcaptcha.com https://*.hcaptcha.com;
 		img-src 'self' data: file: *;
-		connect-src 'self' ws: file: *;
+		frame-src https://hcaptcha.com https://*.hcaptcha.com;
+		connect-src 'self' ws: file: * https://hcaptcha.com https://*.hcaptcha.com;
 		media-src 'self' file: *;">
 
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
@@ -64,13 +65,11 @@
 		</div>
 		<div id="client_secondfactor" style="display: none">
 			<center>
-				<p>You need to authorize to continue</p>
-				<div id="g_id_onload" data-client_id="107239014890-eo1vg90jdn2l7fgudsp9mdk8c1nraq0g" data-context="use"
-					data-ux_mode="popup" data-callback="handleCredentialResponse" data-nonce="" data-auto_select="true">
-				</div>
-				<div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
-					data-text="continue_with" data-size="large" data-logo_alignment="left">
-				</div>
+				<p>You seem to be new 👋</p>
+				<form method="POST">
+					<div class="h-captcha" data-sitekey="6cbe7d73-706d-4e4b-9147-8b9aebb83b5d" data-theme="dark" data-callback="hcallback"></div>
+					<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+				  </form>
 			</center>
 		</div>
 		<div id="client_charselect">
@@ -612,7 +611,7 @@
 
 <template id="ooc">
 	<meta name="frame-title" lang="en" content="Server">
-	<div style="height: 100%; display: flex; flex-direction: column;">
+	<div id="client_ooc" style="height: 100%; display: flex; flex-direction: column;">
 		<div id="client_ooclog" style="flex: 1 auto" readonly></div>
 		<span id="client_oocinput">
 			<input id="OOC_name" name="OOC_name" type="text">
