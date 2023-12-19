@@ -13,24 +13,13 @@ body {
 	border: 2px solid white;
 }
 
-.objection_button {
-	margin: 1px;
-	padding: 2px 15px;
-	cursor: pointer;
-	text-align: center;
-	font-weight: bold;
-	color: white;
-	background-color: #2781b2;
-	border: 2px solid white;
-}
-
 .client_button:hover {
-    outline:  1px solid #ffc31d;
-    outline-offset: 7px;
+	outline: 1px solid #ffc31d;
+	outline-offset: 7px;
 }
 
 .client_button:active {
-    background-color: #f2b91c;
+	background-color: #f2b91c;
 }
 
 #client_defense_hp {
@@ -72,13 +61,13 @@ body {
 }
 
 #client_menu {
-    background-image: url("trilogy_bg.png");
-    background-repeat: repeat;
+	background-image: url("trilogy_bg.png");
+	background-repeat: repeat;
 }
 
 #client_iccontrols {
-    background-image: url("trilogy_bg.png");
-    background-repeat: repeat;
+	background-image: url("trilogy_bg.png");
+	background-repeat: repeat;
 }
 
 .evi_icon {
