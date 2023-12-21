@@ -51,10 +51,10 @@ export const handleCharacterInfo = async (chargs: string[], charid: number) => {
             document.getElementById("mute_select")
         );
         mute_select.add(new Option(safeTags(chargs[0]), String(charid)));
-        const pair_select = <HTMLDataListElement>(
+        const pair_select = <HTMLSelectElement>(
             document.getElementById("pair_select")
         );
-        pair_select.appendChild(new Option(safeTags(chargs[0]), String(charid)));
+        pair_select.add(new Option(safeTags(chargs[0]), String(charid)));
 
         // sometimes ini files lack important settings
         const default_options = {
