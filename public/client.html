@@ -67,9 +67,10 @@
 			<center>
 				<p>You seem to be new 👋</p>
 				<form method="POST">
-					<div class="h-captcha" data-sitekey="6cbe7d73-706d-4e4b-9147-8b9aebb83b5d" data-theme="dark" data-callback="hcallback"></div>
+					<div class="h-captcha" data-sitekey="6cbe7d73-706d-4e4b-9147-8b9aebb83b5d" data-theme="dark"
+						data-callback="hcallback"></div>
 					<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-				  </form>
+				</form>
 			</center>
 		</div>
 		<div id="client_charselect">
@@ -248,9 +249,10 @@
 							onclick="toggleElement('pairing_settings')">Pairing</button>
 						<span id="pairing_settings" style="display: none">
 							<label for="pair_select">Pairing partner:</label>
-							<select name="pair_select" id="pair_select">
+							<input list="pair_select" placeholder="Search...">
+							<datalist name="pair_select" id="pair_select">
 								<option value="-1">None</option>
-							</select>
+							</datalist>
 							<table style="border: none;margin-left: auto;margin-right: auto;">
 								<tr>
 									<td>
