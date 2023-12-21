@@ -8,8 +8,13 @@ img {
 }
 
 @keyframes bg-scrolling {
-    0% { background-position: 0 0; }
-    100% { background-position: 5px 5px; }
+	0% {
+		background-position: 0 0;
+	}
+
+	100% {
+		background-position: 5px 5px;
+	}
 }
 
 @keyframes idling {
@@ -28,13 +33,13 @@ img {
 
 #evi_name {
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAFElEQVQImWNgYGDYjAVTV/A/w2YAfxQSe53wkNkAAAAASUVORK5CYII=) repeat;
-    animation: bg-scrolling 0.2s infinite linear;
+	animation: bg-scrolling 0.2s infinite linear;
 }
 
 #evi_desc {
 	flex: 1 auto;
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAFElEQVQImWNgYGDYjAVTV/A/w2YAfxQSe53wkNkAAAAASUVORK5CYII=) repeat;
-    animation: bg-scrolling 0.2s infinite linear;
+	animation: bg-scrolling 0.2s infinite linear;
 }
 
 .evi_icon {
@@ -49,20 +54,25 @@ img {
 
 #client_menu {
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAFElEQVQImWNgYGDYjAVTV/A/w2YAfxQSe53wkNkAAAAASUVORK5CYII=) repeat;
-    animation: bg-scrolling 0.2s infinite linear;
+	animation: bg-scrolling 0.2s infinite linear;
 	overflow-y: auto;
 	height: 100%;
 }
 
 @keyframes shutter-effect {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 4px; }
+	0% {
+		background-position: 0 0;
+	}
+
+	100% {
+		background-position: 0 4px;
+	}
 }
 
 #client_iccontrols {
-    width: 100%;
-    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAFElEQVQImWNgYGDYjAVTV/A/w2YAfxQSe53wkNkAAAAASUVORK5CYII=) repeat;
-    animation: bg-scrolling 0.2s infinite linear;
+	width: 100%;
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAFElEQVQImWNgYGDYjAVTV/A/w2YAfxQSe53wkNkAAAAASUVORK5CYII=) repeat;
+	animation: bg-scrolling 0.2s infinite linear;
 }
 
 .menu_text {
@@ -93,21 +103,10 @@ img {
 	border: green solid 1px;
 }
 
-.objection_button {
-	min-width: 6em;
-	margin: 1px;
-	padding: 6px 2px;
-	cursor: pointer;
-	text-align: center;
-	color: black;
-	background-color: green;
-	border: greenyellow solid 1px;
-}
-
 #client_log {
 	color: white;
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAFElEQVQImWNgYGDYjAVTV/A/w2YAfxQSe53wkNkAAAAASUVORK5CYII=) repeat;
-    animation: bg-scrolling 0.2s infinite linear;
+	animation: bg-scrolling 0.2s infinite linear;
 }
 
 #client_defense_hp {
@@ -139,7 +138,7 @@ img {
 	position: relative;
 	display: inline-block;
 	transition: 1s linear;
-    transition-property: width;
-    background-color: #00b800;
+	transition-property: width;
+	background-color: #00b800;
 	border-color: #84ff84 transparent #009c00 transparent;
 }

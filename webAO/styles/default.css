@@ -36,21 +36,6 @@ img[src$=".apng"] {
 	box-shadow: 1px 1px inset;
 }
 
-.objection_button {
-	margin: 1px;
-	padding: 7px 15px;
-	cursor: pointer;
-	text-align: center;
-	font-weight: bold;
-	color: white;
-	background-color: #7b2900;
-	border-radius: 3px;
-	border-style: solid;
-	border-width: 1px;
-	border-color: #fff;
-	box-shadow: 1px 1px inset;
-}
-
 .evi_icon {
 	width: 70px;
 	min-width: 70px;

@@ -1,13 +1,13 @@
 body {
-	font-family: "Igiari Cyrillic", "Ace Attorney", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi" , sans-serif;
+	font-family: "Igiari Cyrillic", "Ace Attorney", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 /* Webfont CSS setup for Igiari by Caveras */
 @font-face {
-	font-family:'Igiari Cyrillic';
-		src: url('./igiari/igiari-cyrillic.ttf');
-	font-weight:normal;
-	font-style:normal;
+	font-family: 'Igiari Cyrillic';
+	src: url('./igiari/igiari-cyrillic.ttf');
+	font-weight: normal;
+	font-style: normal;
 }
 
 img {
@@ -19,7 +19,7 @@ hr {
 	height: 6px;
 	width: 100%;
 	background-color: #c6c6c6;
-	background: repeating-linear-gradient(to right,#f7f7f7, #f7f7f7 1px, #8c8c8c 1px, #8c8c8c 2px, #c6c6c6 2px, #c6c6c6 16px);
+	background: repeating-linear-gradient(to right, #f7f7f7, #f7f7f7 1px, #8c8c8c 1px, #8c8c8c 2px, #c6c6c6 2px, #c6c6c6 16px);
 	margin: 0;
 }
 
@@ -55,8 +55,13 @@ hr {
 }
 
 @keyframes shutter-effect {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 4px; }
+	0% {
+		background-position: 0 0;
+	}
+
+	100% {
+		background-position: 0 4px;
+	}
 }
 
 #client_menu:after {
@@ -112,19 +117,6 @@ hr {
 	text-shadow: 0 0 1px #000;
 	border: #909090 solid 1px;
 	border-radius: 4px;
-}
-
-.objection_button {
-	min-width: 6em;
-	margin: 1px;
-	padding: 6px 2px;
-	clip-path: polygon(75% 0, 100% 50%, 100% 100%, 0 100%, 0 50%, 25% 0);
-	cursor: pointer;
-	text-align: center;
-	color: white;
-	background-color: #7b2900;
-	text-shadow: 0 0 4px #000;
-	border: #000 solid 1px;
 }
 
 #button_2 {
@@ -194,13 +186,13 @@ hr {
 }
 
 #client_ooclog {
-    background-color: #8b8b8b;
+	background-color: #8b8b8b;
 	color: #000;
 }
 
 #client_inputbox {
-    background-color: #6d6d6d;
-    color: #000;
+	background-color: #6d6d6d;
+	color: #000;
 }
 
 #client_iccontrols {
