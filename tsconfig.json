@@ -2,11 +2,28 @@
   "compilerOptions": {
     "outDir": "./dist",
     "allowJs": true,
-    "target": "es5",
-    "lib": ["DOM","DOM.Iterable","ES2021.String"],
-    "strict": true,
-    "strictNullChecks": false, //document.getElementBy
-    "downlevelIteration": true
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable", "ES2021.String"],
+    "skipLibCheck": true,
+
+    /* Makes 'value could be null' errors to not be errors */
+    "strictNullChecks": false,
+    "downlevelIteration": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+
+    /* Linting */
+    "strict": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["./webAO/*", "./webAO/viewport/viewport.ts"]
+  "include": ["webAO"]
 }
