@@ -9,5 +9,3 @@ describe('getFilenameFromPath', () => {
         expect(actual).toBe(expected);
     });
 })
-
-  
