@@ -2,7 +2,6 @@
   "name": "webao",
   "version": "2.8.0",
   "description": "Web-based Attorney Online client",
-  "type": "module",
   "scripts": {
     "babel": "babel webAO/ui.js -o webAO/ui.b.js",
     "test": "jest",
