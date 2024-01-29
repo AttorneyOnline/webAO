@@ -5,7 +5,7 @@
  */
 import { isLowMemory } from './client/isLowMemory'
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { sender, ISender } from './client/sender/index'
+import { sender, ISender } from './client/sender'
 import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources.js";
 import masterViewport from "./viewport/viewport";
@@ -17,7 +17,7 @@ import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
 import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists'
 import getCookie from "./utils/getCookie";
-import setCookie from "./utils/setCookie";
+
 const { ip: serverIP, connect, mode, theme, serverName } = queryParser();
 
 document.title = serverName;
@@ -128,7 +128,7 @@ class Client extends EventEmitter {
     musics: any;
     musics_time: boolean;
     callwords: string[];
-    banned: boolean;
+    // banned: boolean;
     hdid: string;
     resources: any;
     selectedEmote: number;
@@ -142,8 +142,8 @@ class Client extends EventEmitter {
     temp_packet: string;
     state: clientState;
     connect: () => void;
-    loadResources: () => void
-    isLowMemory: () => void
+    // loadResources: () => void
+    // isLowMemory: () => void
     constructor(connectionString: string) {
         super();
 
@@ -289,9 +289,9 @@ class Client extends EventEmitter {
     }
 
     /**
-   * Decode the packet
-   * @param {MessageEvent} e
-   */
+     * Decode the packet
+     * @param p_data
+     */
     handle_server_packet(p_data: string) {
         let in_data = p_data;
 
@@ -360,9 +360,8 @@ class Client extends EventEmitter {
     }
 
     /**
-   * Parse the lines in the OOC and play them
-   * @param {*} args packet arguments
-   */
+     * Parse the lines in the OOC and play them
+     */
     handleReplay() {
         const ooclog = <HTMLInputElement>document.getElementById("client_ooclog");
         const rawLog = false;

@@ -8,14 +8,14 @@ export const handleTI = (args: string[]) => {
     const timer_value = args[3];
     switch (type) {
         case 0:
-        //
         case 1:
-            document.getElementById(`client_timer${timerid}`)!.innerText =
-                timer_value;
+            document.getElementById(`client_timer${timerid}`)!.innerText = timer_value;
+            break;
         case 2:
             document.getElementById(`client_timer${timerid}`)!.style.display = "";
+            break;
         case 3:
-            document.getElementById(`client_timer${timerid}`)!.style.display =
-                "none";
+            document.getElementById(`client_timer${timerid}`)!.style.display = "none";
+            break;
     }
 }

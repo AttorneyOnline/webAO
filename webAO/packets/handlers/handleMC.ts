@@ -10,7 +10,7 @@ import { appendICLog } from '../../client/appendICLog'
 export const handleMC = (args: string[]) => {
     const track = prepChat(args[1]);
     let charID = Number(args[2]);
-    const showname = args[3] || "";
+    // const showname = args[3] || "";
     const looping = Boolean(args[4]);
     const channel = Number(args[5]) || 0;
     // const fading = Number(args[6]) || 0; // unused in web

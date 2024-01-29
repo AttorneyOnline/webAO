@@ -41,7 +41,7 @@ const mlConfig = (AO_HOST: string) => {
 
     const createIdentifiers = async () => {
         const identifiers = new Map<string, Aoml>()
-        for (const [ruleName, value] of Object.entries(await aomlParsed)) {
+        for (const [_, value] of Object.entries(await aomlParsed)) {
             if (value.start && value.end) {
                 identifiers.set(value.start, value)
                 identifiers.set(value.end, value)
@@ -51,7 +51,7 @@ const mlConfig = (AO_HOST: string) => {
     }
     const createStartIdentifiers = async () => {
         const startingIdentifiers = new Set<string>()
-        for (const [ruleName, value] of Object.entries(await aomlParsed)) {
+        for (const [_, value] of Object.entries(await aomlParsed)) {
             if (value?.start && value?.end) {
                 startingIdentifiers.add(value.start)
             }

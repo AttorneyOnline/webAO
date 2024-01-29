@@ -43,7 +43,7 @@ export function safeTags(unsafe: string): string {
  */
 export function decodeChat(estring: string): string {
     // Source: https://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode
-    return estring.replace(/\\u([\d\w]{1,})/gi, (match, group) => String.fromCharCode(parseInt(group, 16)));
+    return estring.replace(/\\u([\d\w]{1,})/gi, (_, group) => String.fromCharCode(parseInt(group, 16)));
 }
 
 /**
