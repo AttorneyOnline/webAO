@@ -1,25 +1,31 @@
-import { ChatMsg } from "../interfaces/ChatMsg";
-import { client } from "../../client";
-import { appendICLog } from "../../client/appendICLog";
-import { checkCallword } from "../../client/checkCallword";
+import {ChatMsg} from "../interfaces/ChatMsg";
+import {client} from "../../client";
+import {appendICLog} from "../../client/appendICLog";
+import {checkCallword} from "../../client/checkCallword";
 import setEmote from "../../client/setEmote";
-import { AO_HOST } from "../../client/aoHost";
-import { SHOUTS } from "../constants/shouts";
+import {AO_HOST} from "../../client/aoHost";
+import {SHOUTS} from "../constants/shouts";
 import getAnimLength from "../../utils/getAnimLength";
-import { setChatbox } from "../../dom/setChatbox";
-import { resizeChatbox } from "../../dom/resizeChatbox";
+import {setChatbox} from "../../dom/setChatbox";
+import {resizeChatbox} from "../../dom/resizeChatbox";
 import transparentPng from "../../constants/transparentPng";
-import { COLORS } from "../constants/colors";
+import {COLORS} from "../constants/colors";
 import mlConfig from "../../utils/aoml";
 
 const attorneyMarkdown = mlConfig(AO_HOST);
 
 export let startFirstTickCheck: boolean;
-export const setStartFirstTickCheck = (val: boolean) => { startFirstTickCheck = val }
+export const setStartFirstTickCheck = (val: boolean) => {
+    startFirstTickCheck = val
+}
 export let startSecondTickCheck: boolean;
-export const setStartSecondTickCheck = (val: boolean) => { startSecondTickCheck = val }
+export const setStartSecondTickCheck = (val: boolean) => {
+    startSecondTickCheck = val
+}
 export let startThirdTickCheck: boolean;
-export const setStartThirdTickCheck = (val: boolean) => { startThirdTickCheck = val }
+export const setStartThirdTickCheck = (val: boolean) => {
+    startThirdTickCheck = val
+}
 /**
  * Sets a new emote.
  * This sets up everything before the tick() loops starts
@@ -73,7 +79,7 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
 
     const displayname =
         (<HTMLInputElement>document.getElementById("showname")).checked &&
-            client.viewport.getChatmsg().showname !== ""
+        client.viewport.getChatmsg().showname !== ""
             ? client.viewport.getChatmsg().showname!
             : client.viewport.getChatmsg().nameplate!;
 
@@ -248,9 +254,9 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
 
     client.viewport.blipChannels.forEach(
         (channel: HTMLAudioElement) =>
-        (channel.src = `${AO_HOST}sounds/blips/${encodeURI(
-            client.viewport.getChatmsg().blips.toLowerCase()
-        )}.opus`)
+            (channel.src = `${AO_HOST}sounds/blips/${encodeURI(
+                client.viewport.getChatmsg().blips.toLowerCase()
+            )}.opus`)
     );
 
     // process markup
@@ -310,7 +316,6 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
             client.viewport.getChatmsg().content,
 
             COLORS[client.viewport.getChatmsg().color]
-
         );
     } catch (error) {
         console.warn("markdown failed");

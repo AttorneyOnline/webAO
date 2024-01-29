@@ -40,7 +40,9 @@ export const handleMS = (args: string[]) => {
 
     try {
       msg_blips = client.chars[char_id].blips;
-    } catch (e) { }
+    } catch (e) {
+      console.warn("Failed to get blips");
+    }
 
     try {
       char_chatbox = client.chars[char_id].chat;
