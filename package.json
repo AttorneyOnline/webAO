@@ -4,9 +4,15 @@
   "description": "Web-based Attorney Online client",
   "type": "module",
   "scripts": {
+    "babel": "babel ui.js -o ui.b.js",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint webAO  --ext .js",
+    "lint:fix": "npm run lint -- --fix",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
