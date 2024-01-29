@@ -50,7 +50,7 @@
     "workbox-webpack-plugin": "^6.5.1"
   },
   "dependencies": {
-    "@fingerprintjs/fingerprintjs": "^3.4.0",
+    "@fingerprintjs/fingerprintjs": "^3.4.2",
     "@types/websocket": "^1.0.5",
     "core-js": "^3.21.1",
     "golden-layout": "^2.5.0",

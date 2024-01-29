@@ -4,8 +4,8 @@
  * credits to aleks for original idea and source
  */
 import { isLowMemory } from './client/isLowMemory'
-import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { sender, ISender } from './client/sender'
+import * as FingerprintJS from '@fingerprintjs/fingerprintjs';
+import { sender, ISender } from './client/sender/index'
 import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources.js";
 import masterViewport from "./viewport/viewport";
