@@ -26,4 +26,5 @@ export function updateBackgroundPreview() {
         background_preview.src = resp;
     });
 }
+// @ts-ignore
 window.updateBackgroundPreview = updateBackgroundPreview;

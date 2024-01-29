@@ -24,4 +24,5 @@ export function updateActionCommands(side: string) {
         }
     }
 }
+// @ts-ignore
 window.updateActionCommands = updateActionCommands;

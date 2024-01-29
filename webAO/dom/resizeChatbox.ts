@@ -34,4 +34,5 @@ export function resizeChatbox() {
     }
 
 }
+// @ts-ignore
 window.resizeChatbox = resizeChatbox;

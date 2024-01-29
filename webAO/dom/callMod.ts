@@ -13,4 +13,5 @@ export function callMod() {
         client.sender.sendZZ(modcall);
     }
 }
+// @ts-ignore
 window.callMod = callMod;

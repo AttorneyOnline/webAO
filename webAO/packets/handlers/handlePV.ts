@@ -78,7 +78,10 @@ export const handlePV = async (args: string[]) => {
                 emote_item.src = emotes[i].button;
                 emote_item.alt = emotes[i].desc;
                 emote_item.title = emotes[i].desc;
-                emote_item.onclick = () => { window.pickEmotion(i) }
+                emote_item.onclick = () => {
+                    // @ts-ignore
+                    window.pickEmotion(i)
+                }
                 emotesList.appendChild(emote_item);
             } catch (e) {
                 console.error(`missing emote ${i}`);

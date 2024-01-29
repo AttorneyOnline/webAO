@@ -23,4 +23,5 @@ export function pickEmotion(emo: number) {
 
     (<HTMLInputElement>document.getElementById("client_inputbox")).focus();
 }
+// @ts-ignore
 window.pickEmotion = pickEmotion;

@@ -13,4 +13,5 @@ export function getIndexFromSelect(select_box: string, value: string) {
     }
     return 0;
 }
+// @ts-ignore
 window.getIndexFromSelect = getIndexFromSelect;

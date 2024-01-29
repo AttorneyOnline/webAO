@@ -12,4 +12,5 @@ export function area_click(el: HTMLElement) {
     areaHr.textContent = `switched to ${el.textContent}`;
     document.getElementById("client_log")!.appendChild(areaHr);
 }
+// @ts-ignore
 window.area_click = area_click;

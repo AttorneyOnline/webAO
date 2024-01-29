@@ -19,4 +19,5 @@ export function opusCheck(
         channel.src = newsrc; // unload so the old sprite doesn't persist
     }
 }
+// @ts-ignore
 window.opusCheck = opusCheck;

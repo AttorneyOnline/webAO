@@ -28,7 +28,10 @@ export const handleLE = (args: string[]) => {
         evi_item.className = "evi_icon"
         evi_item.src = client.evidences[i - 1].icon;
         evi_item.alt = client.evidences[i - 1].name;
-        evi_item.onclick = () => { window.pickEvidence(i) }
+        evi_item.onclick = () => {
+            // @ts-ignore
+            window.pickEvidence(i)
+        }
         evidence_box.appendChild(evi_item);
     }
 }

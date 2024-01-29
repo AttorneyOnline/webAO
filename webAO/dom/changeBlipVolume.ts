@@ -12,4 +12,5 @@ export const changeBlipVolume = () => {
     );
     setCookie("blipVolume", blipVolume);
 }
+// @ts-ignore
 window.changeBlipVolume = changeBlipVolume;

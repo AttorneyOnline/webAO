@@ -13,4 +13,5 @@ export const reloadTheme = () => {
         document.getElementById("client_theme")
     )).href = `styles/${client.viewport.getTheme()}.css`;
 }
+// @ts-ignore
 window.reloadTheme = reloadTheme;
