@@ -9,7 +9,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint webAO  --ext .js",
+    "lint": "eslint webAO",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install"
   },
