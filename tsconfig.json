@@ -25,5 +25,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["webAO"]
+  "include": ["./webAO/*", "./webAO/viewport/viewport.ts"]
 }
