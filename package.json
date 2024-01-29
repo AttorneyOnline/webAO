@@ -4,7 +4,7 @@
   "description": "Web-based Attorney Online client",
   "type": "module",
   "scripts": {
-    "babel": "babel ui.js -o ui.b.js",
+    "babel": "babel webAO/ui.js -o webAO/ui.b.js",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "dev": "vite",
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/AttorneyOnline/webAO#readme",
   "devDependencies": {
+    "@babel/cli": "^7.23.9",
     "@babel/core": "^7.17.5",
     "@babel/plugin-transform-modules-commonjs": "^7.16.8",
     "@babel/preset-env": "^7.16.11",
@@ -43,11 +44,11 @@
     "husky": "^8.0.3",
     "jest": "^29.4.3",
     "typescript": "^5.2.2",
+    "vite": "^5.0.8",
     "webpack": "^5.76.0",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.7.4",
-    "workbox-webpack-plugin": "^6.5.1",
-    "vite": "^5.0.8"
+    "workbox-webpack-plugin": "^6.5.1"
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^3.4.0",
