@@ -1,11 +1,5 @@
 import { safeTags } from './encoding';
 
-declare global {
-    interface Window {
-        setServ: (ID: number) => void;
-    }
-}
-
 interface AOServer {
     name: string,
     description: string,
@@ -18,7 +12,8 @@ interface AOServer {
     assets?: string,
 }
 
-const clientVersion = process.env.npm_package_version;
+declare let __APP_VERSION__: string;
+const clientVersion = __APP_VERSION__;
 
 // const MASTERSERVER_IP = 'master.aceattorneyonline.com:27014';
 const serverlist_domain = 'servers.aceattorneyonline.com';
@@ -66,8 +61,7 @@ export function setServ(ID: number) {
     const serverDesc = safeTags(server.description);
     document.getElementById('serverdescription_content').innerHTML = `<b>${onlineStr}</b><br>${serverDesc}`;
 }
-window.setServ = setServ;
-
+(window as any).setServ = setServ;
 
 // Fetches the serverlist from the masterserver
 // Returns a properly typed list of servers

@@ -1,5 +1,7 @@
 import path from 'path';
 import dotenv from 'dotenv';
+import packageJson from './package.json'
+
 import { defineConfig } from 'vite';
 
 // this will update the process.env with environment variables in .env file
@@ -24,4 +26,7 @@ export default defineConfig({
         emptyOutDir: true,
         sourcemap: true,
     },
+    define: {
+        __APP_VERSION__: JSON.stringify(packageJson.version)
+    }
 });
