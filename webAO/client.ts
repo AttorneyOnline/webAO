@@ -88,7 +88,7 @@ fpPromise
             // If protocol is https: and connectionString is ws://
             // We have a problem, since it's impossible to connect to ws:// from https://
             // Connection will fail, but at least warn the user
-            alert('Attempted to connect using insecure websockets on https page. Please try removing s from https:// in the URL bar.')
+            alert('WS not supported on HTTPS. Please try removing the s from https:// at the start of the URL bar. (You might have to click inside the URL bar to see it)')
         }
 
         client = new Client(connectionString);
