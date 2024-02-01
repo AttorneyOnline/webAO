@@ -3,20 +3,20 @@
  * made by sD, refactored by oldmud0 and Qubrick
  * credits to aleks for original idea and source
  */
-import { isLowMemory } from './client/isLowMemory'
+import { isLowMemory } from './client/isLowMemory.js'
 import * as FingerprintJS from '@fingerprintjs/fingerprintjs';
-import { sender, ISender } from './client/sender/index'
-import queryParser from "./utils/queryParser";
+import { sender, ISender } from './client/sender/index.js'
+import queryParser from "./utils/queryParser.js";
 import getResources from "./utils/getResources.js";
-import masterViewport from "./viewport/viewport";
-import { Viewport } from './viewport/interfaces/Viewport';
+import masterViewport from "./viewport/viewport.js";
+import { Viewport } from './viewport/interfaces/Viewport.js';
 import { EventEmitter } from "events";
-import { onReplayGo } from './dom/onReplayGo'
-import { packetHandler } from './packets/packetHandler'
-import { loadResources } from './client/loadResources'
-import { AO_HOST } from './client/aoHost'
-import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists'
-import getCookie from "./utils/getCookie";
+import { onReplayGo } from './dom/onReplayGo.js'
+import { packetHandler } from './packets/packetHandler.js'
+import { loadResources } from './client/loadResources.js'
+import { AO_HOST } from './client/aoHost.js'
+import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists.js'
+import getCookie from "./utils/getCookie.js";
 
 const { ip: serverIP, connect, mode, theme, serverName } = queryParser();
 
