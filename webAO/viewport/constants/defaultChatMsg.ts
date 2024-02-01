@@ -1,5 +1,5 @@
-import { UPDATE_INTERVAL } from "../../client";
-import { ChatMsg } from "../interfaces/ChatMsg";
+import { UPDATE_INTERVAL } from "../../client.js";
+import { ChatMsg } from "../interfaces/ChatMsg.js";
 
 export const defaultChatMsg = {
     content: "",
