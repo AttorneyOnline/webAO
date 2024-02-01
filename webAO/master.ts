@@ -88,14 +88,10 @@ async function getServerlist(): Promise<AOServer[]> {
             console.warn(`Server ${item.name} has no ip, skipping`);
             continue;
         }
-        if (!item.description) {
-            console.warn(`Server ${item.name} has no description, skipping`);
-            continue;
-        }
 
         const newServer: AOServer = {
             name: item.name,
-            description: item.description,
+            description: item.description ?? "",
             ip: item.ip,
             players: item.players || 0,
             online: `Players: ${item.players}`,
