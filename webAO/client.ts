@@ -311,7 +311,7 @@ class Client extends EventEmitter {
         const packet_list = in_data.split("%");
 
         for (const packet of packet_list) {
-            let f_contents;
+            let f_contents: string[];
             // Packet should *always* end with #
             if (packet.endsWith("#")) {
                 f_contents = packet.slice(0, -1).split("#");
