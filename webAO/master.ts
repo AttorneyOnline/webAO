@@ -38,8 +38,7 @@ servers[-1] = {
     port: 50001,
 } as AOServer;
 
-
-function main() {
+export function main() {
     getServerlist().then((serverlist) => {
         processServerlist(serverlist);
     });
@@ -51,15 +50,12 @@ function main() {
     });
 }
 
-main();
-
 export function setServ(ID: number) {
     const server = servers[ID];
     const onlineStr = server.online;
     const serverDesc = safeTags(server.description);
     document.getElementById('serverdescription_content').innerHTML = `<b>${onlineStr}</b><br>${serverDesc}`;
 }
-(window as any).setServ = setServ;
 
 // Fetches the serverlist from the masterserver
 // Returns a properly typed list of servers
