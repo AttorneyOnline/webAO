@@ -240,15 +240,17 @@ class Client extends EventEmitter {
    * to the server.
    */
     joinServer() {
-        this.sender.sendServer(`HI#${hdid}#%`);
-        if(getCookie("hdid") !== hdid) {
-            this.sender.sendServer(getCookie("hdid"));
+        const isKnownSession: boolean = getCookie("hdid") === hdid;
+
+        if (!isKnownSession) {
             document.getElementById("client_secondfactor").style.display = "block";
             document.getElementById("client_charselect").remove();
             document.getElementById("client_ooc").remove();
-        }        
-        if (mode !== "replay") {
-            this.checkUpdater = setInterval(() => this.sender.sendCheck(), 5000);
+        } else {
+            this.sender.sendServer(`HI#${hdid}#%`);
+            if (mode !== "replay") {
+                this.checkUpdater = setInterval(() => this.sender.sendCheck(), 5000);
+            }
         }
     }
 
