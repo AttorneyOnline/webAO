@@ -88,7 +88,7 @@ fpPromise
             // If protocol is https: and connectionString is ws://
             // We have a problem, since it's impossible to connect to ws:// from https://
             // Connection will fail, but at least warn the user
-            alert('WS not supported on HTTPS. Please try removing the s from https:// at the start of the URL bar. (You might have to click inside the URL bar to see it)')
+            alert('WS not supported on HTTPS. Please try removing the s from https:// at the start of the URL bar. (You might have to click inside the URL bar to see it). If you do not know how to do this, press Win+X, then U, then U again.')
         }
 
         client = new Client(connectionString);
