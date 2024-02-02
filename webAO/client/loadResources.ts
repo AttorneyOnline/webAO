@@ -7,7 +7,7 @@ import { changeSFXVolume, changeShoutVolume, changeTestimonyVolume } from "../do
 import { showname_click } from "../dom/showNameClick.js";
 import { changeBlipVolume } from '../dom/changeBlipVolume.js'
 import { reloadTheme } from '../dom/reloadTheme.js'
-import { clientVersion } from "../constants/clientVersion.js";
+import { clientVersion } from "../constants/clientData.js";
 
 /**
    * Load game resources and stored settings.

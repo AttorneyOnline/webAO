@@ -1,5 +1,5 @@
 import { safeTags } from './encoding.js';
-import { clientVersion } from "./constants/clientVersion.js";
+import { clientVersion } from "./constants/clientData.js";
 
 interface AOServer {
     name: string,

@@ -1,5 +1,5 @@
 import { client, setOldLoading } from "../../client.js";
-import { clientVersion } from "../../constants/clientVersion.js";
+import { clientVersion } from "../../constants/clientData.js";
 
 /**
    * Identifies the server and issues a playerID

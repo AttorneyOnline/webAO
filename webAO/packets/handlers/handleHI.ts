@@ -1,5 +1,5 @@
 import { client } from "../../client.js";
-import { clientVersion } from "../../constants/clientVersion.js";
+import { clientVersion } from "../../constants/clientData.js";
 
 
 /**

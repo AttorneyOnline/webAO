@@ -27,6 +27,7 @@ export default defineConfig({
         sourcemap: true,
     },
     define: {
-        __APP_VERSION__: JSON.stringify(packageJson.version)
+        __APP_VERSION__: JSON.stringify(packageJson.version),
+        __MODE__: import.meta.env.MODE
     }
 });
