@@ -1,6 +1,7 @@
 /* eslint indent: ["error", 2, { "SwitchCase": 1 }] */
 
-import { client, UPDATE_INTERVAL } from "../../client";
+import { UPDATE_INTERVAL } from "../../viewport/constants/defaultChatMsg.js";
+import { client } from '../../client.js';
 import { handleCharacterInfo } from "../../client/handleCharacterInfo";
 import { resetICParams } from "../../client/resetICParams";
 import { prepChat, safeTags } from "../../encoding";

@@ -1,5 +1,6 @@
-import { Testimony } from '../interfaces/Testimony'
-import { client, UPDATE_INTERVAL } from '../../client'
+import { Testimony } from '../interfaces/Testimony.js'
+import { UPDATE_INTERVAL } from '../constants/defaultChatMsg.js'
+import { client } from '../../client.js'
 /**
  * Intialize testimony updater
  */

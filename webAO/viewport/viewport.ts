@@ -1,7 +1,7 @@
 /* eslint indent: ["error", 2, { "SwitchCase": 1 }] */
 
 import { client, delay } from "../client";
-import { UPDATE_INTERVAL } from "../client";
+import { UPDATE_INTERVAL } from "./constants/defaultChatMsg.js";
 import setEmote from "../client/setEmote";
 import { safeTags } from "../encoding";
 import { AO_HOST } from "../client/aoHost";

@@ -31,8 +31,6 @@ export const setClient = (val: Client) => {
     client = val
 }
 
-export const UPDATE_INTERVAL = 60;
-
 /**
  * Toggles AO1-style loading using paginated music packets for mobile platforms.
  * The old loading uses more smaller packets instead of a single big one,
