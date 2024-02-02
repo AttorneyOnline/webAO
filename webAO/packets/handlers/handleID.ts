@@ -1,5 +1,5 @@
-import { client, setOldLoading } from "../../client";
-const version = process.env.npm_package_version;
+import { client, setOldLoading } from "../../client.js";
+import { clientVersion } from "../../constants/clientVersion.js";
 
 /**
    * Identifies the server and issues a playerID
@@ -23,6 +23,6 @@ export const handleID = (args: string[]) => {
     } // bugged version
 
     if (serverSoftware !== "webAO") {
-        client.sender.sendServer(`ID#webAO#${version}#%`);
+        client.sender.sendServer(`ID#webAO#${clientVersion}#%`);
     }
 }

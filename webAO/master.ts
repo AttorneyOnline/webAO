@@ -1,4 +1,5 @@
 import { safeTags } from './encoding.js';
+import { clientVersion } from "./constants/clientVersion.js";
 
 interface AOServer {
     name: string,
@@ -11,9 +12,6 @@ interface AOServer {
     wss_port?: number,
     assets?: string,
 }
-
-declare let __APP_VERSION__: string;
-const clientVersion = __APP_VERSION__;
 
 // const MASTERSERVER_IP = 'master.aceattorneyonline.com:27014';
 const serverlist_domain = 'servers.aceattorneyonline.com';

@@ -1,19 +1,19 @@
-import getCookie from "../utils/getCookie";
+import getCookie from "../utils/getCookie.js";
 import vanilla_evidence_arr from "../constants/evidence.js";
 import vanilla_background_arr from "../constants/backgrounds.js";
-import { changeMusicVolume } from '../dom/changeMusicVolume'
-import { setChatbox } from "../dom/setChatbox";
-import { changeSFXVolume, changeShoutVolume, changeTestimonyVolume } from "../dom/changeVolume";
-import { showname_click } from "../dom/showNameClick";
-import { changeBlipVolume } from '../dom/changeBlipVolume'
-import { reloadTheme } from '../dom/reloadTheme'
-const version = process.env.npm_package_version;
+import { changeMusicVolume } from '../dom/changeMusicVolume.js'
+import { setChatbox } from "../dom/setChatbox.js";
+import { changeSFXVolume, changeShoutVolume, changeTestimonyVolume } from "../dom/changeVolume.js";
+import { showname_click } from "../dom/showNameClick.js";
+import { changeBlipVolume } from '../dom/changeBlipVolume.js'
+import { reloadTheme } from '../dom/reloadTheme.js'
+import { clientVersion } from "../constants/clientVersion.js";
 
 /**
    * Load game resources and stored settings.
    */
 export const loadResources = () => {
-    document.getElementById("client_version")!.innerText = `version ${version}`;
+    document.getElementById("client_version")!.innerText = `version ${clientVersion}`;
     // Load background array to select
     const background_select = <HTMLSelectElement>(
         document.getElementById("bg_select")
