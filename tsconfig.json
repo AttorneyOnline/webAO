@@ -20,8 +20,7 @@
     "strict": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "types": ["vite/client"]
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["./webAO/**/*.ts", "./webAO/viewport/viewport.ts"]
 }
