@@ -1,4 +1,4 @@
-import { AO_HOST } from "../../client/aoHost";
+import { AO_HOST } from "../../client/aoHost.js";
 
 export const createSfxAudio = () => {
     const sfxAudio = document.getElementById(
