@@ -5,8 +5,6 @@ import { setExtraFeatures } from "../../client";
  * @param {Array} args list of features
  */
 export const handleFL = (args: string[]) => {
-    console.info("Server-supported features:");
-    console.info(args);
     setExtraFeatures(args);
 
     if (args.includes("yellowtext")) {
