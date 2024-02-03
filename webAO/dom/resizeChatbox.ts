@@ -1,4 +1,4 @@
-import { CHATBOX } from "../client";
+import { CHATBOX } from "../client.js";
 /**
  * Set the font size for the chatbox
  */

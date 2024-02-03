@@ -1,5 +1,5 @@
-import fileExists from './fileExists'
-import transparentPng from '../constants/transparentPng'
+import fileExists from './fileExists.js'
+import transparentPng from '../constants/transparentPng.js'
 const urlExtensionsToTry = [
     '.png',
     '.gif',

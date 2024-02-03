@@ -1,6 +1,6 @@
-import Client from "../client";
-import transparentPng from "../constants/transparentPng";
-import fileExists from "../utils/fileExists";
+import Client from "../client.js";
+import transparentPng from "../constants/transparentPng.js";
+import fileExists from "../utils/fileExists.js";
 
 /**
  * Sets all the img tags to the right sources

@@ -1,5 +1,5 @@
-import { client } from "../client";
-import { addTrack } from "./addTrack";
+import { client } from "../client.js";
+import { addTrack } from "./addTrack.js";
 
 
 /**

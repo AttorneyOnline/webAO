@@ -1,4 +1,4 @@
-import { safeTags } from "../../encoding";
+import { safeTags } from "../../encoding.js";
 
 
 /**

@@ -1,4 +1,4 @@
-import { client } from "../client";
+import { client } from "../client.js";
 /**
  * Triggered when an item on the music list is clicked.
  * @param {MouseEvent} event

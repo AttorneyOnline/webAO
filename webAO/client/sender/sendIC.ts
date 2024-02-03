@@ -1,7 +1,7 @@
-import { extrafeatures } from "../../client";
-import { escapeChat } from "../../encoding";
-import {client} from '../../client'
-import queryParser from "../../utils/queryParser";
+import { extrafeatures } from "../../client.js";
+import { escapeChat } from "../../encoding.js";
+import {client} from '../../client.js'
+import queryParser from "../../utils/queryParser.js";
 const {mode} = queryParser()
 
 /**

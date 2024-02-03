@@ -1,4 +1,4 @@
-import downloadFile from "../services/downloadFile";
+import downloadFile from "../services/downloadFile.js";
 
 export const saveChatlogHandle = async () => {
     const clientLog = document.getElementById("client_log")!;

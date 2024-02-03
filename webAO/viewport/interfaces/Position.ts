@@ -1,4 +1,4 @@
-import { Desk } from './Desk'
+import { Desk } from './Desk.js'
 
 export interface Position {
     bg?: string;

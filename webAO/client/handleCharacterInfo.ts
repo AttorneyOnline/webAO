@@ -1,9 +1,9 @@
-import { client } from "../client";
-import { safeTags } from "../encoding";
-import iniParse from "../iniParse";
-import request from "../services/request";
-import fileExists from "../utils/fileExists";
-import { AO_HOST } from "./aoHost";
+import { client } from "../client.js";
+import { safeTags } from "../encoding.js";
+import iniParse from "../iniParse.js";
+import request from "../services/request.js";
+import fileExists from "../utils/fileExists.js";
+import { AO_HOST } from "./aoHost.js";
 
 
 /**

@@ -1,4 +1,4 @@
-import { setExtraFeatures } from "../../client";
+import { setExtraFeatures } from "../../client.js";
 
 /**
  * With this the server tells us which features it supports

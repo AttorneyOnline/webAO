@@ -1,5 +1,5 @@
-import { client } from "../client";
-import { area_click } from "../dom/areaClick";
+import { client } from "../client.js";
+import { area_click } from "../dom/areaClick.js";
 
 export const createArea = (id: number, name: string) => {
     const thisarea = {

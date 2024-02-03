@@ -1,6 +1,6 @@
-import { client, } from "../client";
-import { updateEvidenceIcon } from './updateEvidenceIcon'
-import { AO_HOST } from "../client/aoHost";
+import { client, } from "../client.js";
+import { updateEvidenceIcon } from './updateEvidenceIcon.js'
+import { AO_HOST } from "../client/aoHost.js";
 
 
 /**

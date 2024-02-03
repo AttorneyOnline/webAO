@@ -1,5 +1,5 @@
-import { client } from "../../client";
-import { initTestimonyUpdater } from '../../viewport/utils/initTestimonyUpdater'
+import { client } from "../../client.js";
+import { initTestimonyUpdater } from '../../viewport/utils/initTestimonyUpdater.js'
 
 /**
   * Handles a testimony states.

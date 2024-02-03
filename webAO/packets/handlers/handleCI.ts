@@ -1,5 +1,5 @@
-import { client } from '../../client'
-import { handleCharacterInfo } from '../../client/handleCharacterInfo'
+import { client } from '../../client.js'
+import { handleCharacterInfo } from '../../client/handleCharacterInfo.js'
 /**
    * Handles incoming character information, bundling multiple characters
    * per packet.

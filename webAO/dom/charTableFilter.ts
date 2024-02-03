@@ -1,4 +1,4 @@
-import { client } from '../client'
+import { client } from '../client.js'
 /**
  * Triggered when the music search bar is changed
  * @param {MouseEvent} event

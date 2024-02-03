@@ -1,5 +1,5 @@
-import filesExist from "./filesExist";
-import transparentPng from '../constants/transparentPng'
+import filesExist from "./filesExist.js";
+import transparentPng from '../constants/transparentPng.js'
 
 /**
  * This function takes a list of urls and returns the first one that exists.

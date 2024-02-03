@@ -1,5 +1,5 @@
-import { AO_HOST } from '../client/aoHost';
-import tryUrls from "../utils/tryUrls";
+import { AO_HOST } from '../client/aoHost.js';
+import tryUrls from "../utils/tryUrls.js";
 
 /**
  * Update background preview.

@@ -2,10 +2,10 @@
 
 import { UPDATE_INTERVAL } from "../../viewport/constants/defaultChatMsg.js";
 import { client } from '../../client.js';
-import { handleCharacterInfo } from "../../client/handleCharacterInfo";
-import { resetICParams } from "../../client/resetICParams";
-import { prepChat, safeTags } from "../../encoding";
-import { handle_ic_speaking } from '../../viewport/utils/handleICSpeaking'
+import { handleCharacterInfo } from "../../client/handleCharacterInfo.js";
+import { resetICParams } from "../../client/resetICParams.js";
+import { prepChat, safeTags } from "../../encoding.js";
+import { handle_ic_speaking } from '../../viewport/utils/handleICSpeaking.js'
 /**
    * Handles an in-character chat message.
    * @param {*} args packet arguments

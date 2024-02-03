@@ -1,4 +1,4 @@
-import { packetHandler } from "../packets/packetHandler";
+import { packetHandler } from "../packets/packetHandler.js";
 /**
  * Triggered by the modcall sfx dropdown
  */

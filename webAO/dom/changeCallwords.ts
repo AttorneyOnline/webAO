@@ -1,5 +1,5 @@
-import { client } from '../client'
-import setCookie from '../utils/setCookie';
+import { client } from '../client.js'
+import setCookie from '../utils/setCookie.js';
 
 /**
  * Triggered by a changed callword list

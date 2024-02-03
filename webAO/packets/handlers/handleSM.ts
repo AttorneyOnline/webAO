@@ -1,8 +1,8 @@
-import { client } from '../../client'
-import { addTrack } from '../../client/addTrack'
-import { isAudio } from '../../client/isAudio'
-import { fix_last_area } from '../../client/fixLastArea'
-import { createArea } from '../../client/createArea'
+import { client } from '../../client.js'
+import { addTrack } from '../../client/addTrack.js'
+import { isAudio } from '../../client/isAudio.js'
+import { fix_last_area } from '../../client/fixLastArea.js'
+import { createArea } from '../../client/createArea.js'
 /**
  * Handles incoming music information, containing all music in one packet.
  * @param {Array} args packet arguments

@@ -1,5 +1,5 @@
-import { client } from "../../client";
-import queryParser from "../../utils/queryParser";
+import { client } from "../../client.js";
+import queryParser from "../../utils/queryParser.js";
 const { mode } = queryParser()
 /**
  * Hook for sending messages to the server

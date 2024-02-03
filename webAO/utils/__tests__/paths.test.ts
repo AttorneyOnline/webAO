@@ -1,4 +1,4 @@
-import {getFilenameFromPath} from '../paths'
+import {getFilenameFromPath} from '../paths.js'
 jest.mock('../fileExists')
 
 describe('getFilenameFromPath', () => {

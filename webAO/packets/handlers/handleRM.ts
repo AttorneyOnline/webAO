@@ -1,4 +1,4 @@
-import {client} from '../../client'
+import {client} from '../../client.js'
 import vanilla_music_arr from "../../constants/music.js";
 
 /**

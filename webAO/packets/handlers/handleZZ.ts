@@ -1,6 +1,6 @@
-import { client } from "../../client";
-import { AO_HOST } from "../../client/aoHost";
-import { prepChat } from "../../encoding";
+import { client } from "../../client.js";
+import { AO_HOST } from "../../client/aoHost.js";
+import { prepChat } from "../../encoding.js";
 
 
 /**

@@ -1,4 +1,4 @@
-import fileExists from "./fileExists";
+import fileExists from "./fileExists.js";
 
 /**
  * This function takes a list of urls and returns the first one that exists.

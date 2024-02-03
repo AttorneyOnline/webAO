@@ -1,4 +1,4 @@
-import { client } from "../client";
+import { client } from "../client.js";
 /**
  * Triggered when a character in the mute list is clicked
  * @param {MouseEvent} event

@@ -1,5 +1,5 @@
-import setCookie from "../utils/setCookie";
-import { client } from '../client'
+import setCookie from "../utils/setCookie.js";
+import { client } from '../client.js'
 /**
  * Triggered by the blip volume slider.
  */

@@ -1,5 +1,5 @@
-import { client } from "../client";
-import { AO_HOST } from "./aoHost";
+import { client } from "../client.js";
+import { AO_HOST } from "./aoHost.js";
 import { request } from "../services/request.js";
 
 export const fetchBackgroundList = async () => {

@@ -1,5 +1,5 @@
-import queryParser from "../../utils/queryParser";
-import {client, clientState} from "../../client";
+import queryParser from "../../utils/queryParser.js";
+import {client, clientState} from "../../client.js";
 
 const {mode} = queryParser()
 /**

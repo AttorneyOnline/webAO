@@ -1,5 +1,5 @@
-import { client, selectedShout } from "../client";
-import { escapeChat } from "../encoding";
+import { client, selectedShout } from "../client.js";
+import { escapeChat } from "../encoding.js";
 
 /**
  * Triggered when the Return key is pressed on the in-character chat input box.

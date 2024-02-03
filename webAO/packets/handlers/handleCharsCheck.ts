@@ -1,4 +1,4 @@
-import { client } from "../../client";
+import { client } from "../../client.js";
 
 /**
  * Handles the list of all used and vacant characters.

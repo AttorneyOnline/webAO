@@ -1,4 +1,4 @@
-import { client } from "../../client";
+import { client } from "../../client.js";
 
 /**
  * Handles a change in the health bars' states.

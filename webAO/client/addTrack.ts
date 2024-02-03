@@ -1,6 +1,6 @@
-import { client } from "../client";
-import { unescapeChat } from "../encoding";
-import { getFilenameFromPath } from "../utils/paths";
+import { client } from "../client.js";
+import { unescapeChat } from "../encoding.js";
+import { getFilenameFromPath } from "../utils/paths.js";
 
 
 export const addTrack = (trackname: string) => {

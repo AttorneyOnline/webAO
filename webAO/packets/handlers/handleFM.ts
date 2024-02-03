@@ -1,6 +1,6 @@
-import { client } from "../../client";
-import { addTrack } from "../../client/addTrack";
-import { safeTags } from "../../encoding";
+import { client } from "../../client.js";
+import { addTrack } from "../../client/addTrack.js";
+import { safeTags } from "../../encoding.js";
 
 /**
  * Handles updated music list

@@ -1,4 +1,4 @@
-import { selectedShout, setSelectedShout } from "../client";
+import { selectedShout, setSelectedShout } from "../client.js";
 
 /**
  * Highlights and selects a shout for in-character chat.

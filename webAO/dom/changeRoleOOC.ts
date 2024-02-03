@@ -1,5 +1,5 @@
-import { updateActionCommands } from './updateActionCommands'
-import { client } from '../client'
+import { updateActionCommands } from './updateActionCommands.js'
+import { client } from '../client.js'
 /**
  * Change role via OOC.
  */

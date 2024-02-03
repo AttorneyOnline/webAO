@@ -1,6 +1,6 @@
-import { setBanned } from "../../client";
-import { safeTags } from "../../encoding";
-import { handleBans } from '../../client/handleBans'
+import { setBanned } from "../../client.js";
+import { safeTags } from "../../encoding.js";
+import { handleBans } from '../../client/handleBans.js'
 
 /**
  * Handles the banned packet

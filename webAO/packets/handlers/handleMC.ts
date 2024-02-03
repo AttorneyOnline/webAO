@@ -1,7 +1,7 @@
-import { prepChat } from "../../encoding";
-import { client } from '../../client'
-import { AO_HOST } from "../../client/aoHost";
-import { appendICLog } from '../../client/appendICLog'
+import { prepChat } from "../../encoding.js";
+import { client } from '../../client.js'
+import { AO_HOST } from "../../client/aoHost.js";
+import { appendICLog } from '../../client/appendICLog.js'
 
 /**
  * Handles a music change to an arbitrary resource.

@@ -1,4 +1,4 @@
-import { selectedShout, setSelectedShout } from "../client";
+import { selectedShout, setSelectedShout } from "../client.js";
 
 /**
  * Resets the IC parameters for the player to enter a new chat message.

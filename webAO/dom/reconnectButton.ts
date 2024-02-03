@@ -1,5 +1,5 @@
-import Client, { client, setClient } from "../client";
-import queryParser from "../utils/queryParser";
+import Client, { client, setClient } from "../client.js";
+import queryParser from "../utils/queryParser.js";
 const { ip: serverIP } = queryParser();
 
 /**

@@ -1,4 +1,4 @@
-import { lastICMessageTime, setLastICMessageTime } from "../client";
+import { lastICMessageTime, setLastICMessageTime } from "../client.js";
 
 
 

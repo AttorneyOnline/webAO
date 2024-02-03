@@ -1,5 +1,5 @@
-import { client } from "../../client";
-import { safeTags } from "../../encoding";
+import { client } from "../../client.js";
+import { safeTags } from "../../encoding.js";
 
 /**
    * Handle the change of players in an area.

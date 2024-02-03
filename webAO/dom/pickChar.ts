@@ -1,4 +1,4 @@
-import { client } from "../client";
+import { client } from "../client.js";
 
 /**
  * Requests to play as a character.

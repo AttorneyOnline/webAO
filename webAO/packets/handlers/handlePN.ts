@@ -1,4 +1,4 @@
-import { client } from "../../client";
+import { client } from "../../client.js";
 
 /**
  * Indicates how many users are on this server

@@ -1,6 +1,6 @@
-import { CHATBOX, setCHATBOX } from "../client";
+import { CHATBOX, setCHATBOX } from "../client.js";
 import chatbox_arr from "../styles/chatbox/chatboxes.js";
-import setCookie from "../utils/setCookie";
+import setCookie from "../utils/setCookie.js";
 
 /**
  * Set the style of the chatbox

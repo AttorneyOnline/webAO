@@ -1,4 +1,4 @@
-import queryParser from '../utils/queryParser'
+import queryParser from '../utils/queryParser.js'
 
 const { asset } = queryParser();
 export let AO_HOST = asset;

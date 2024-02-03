@@ -1,4 +1,4 @@
-import downloadFile from '../downloadFile'
+import downloadFile from '../downloadFile.js'
 
 jest
     .useFakeTimers()

@@ -1,6 +1,6 @@
-import { client } from "../client";
-import { handleCharacterInfo } from "../client/handleCharacterInfo";
-import { packetHandler } from "../packets/packetHandler";
+import { client } from "../client.js";
+import { handleCharacterInfo } from "../client/handleCharacterInfo.js";
+import { packetHandler } from "../packets/packetHandler.js";
 
 /**
  * Triggered by the ini button.

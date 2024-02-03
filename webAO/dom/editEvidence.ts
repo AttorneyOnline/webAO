@@ -1,5 +1,5 @@
-import { client } from '../client'
-import { cancelEvidence } from './cancelEvidence';
+import { client } from '../client.js'
+import { cancelEvidence } from './cancelEvidence.js';
 
 /**
  * Edit selected evidence.

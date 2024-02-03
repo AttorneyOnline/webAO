@@ -1,5 +1,5 @@
-import { safeTags } from "../../encoding";
-import { handleBans } from '../../client/handleBans'
+import { safeTags } from "../../encoding.js";
+import { handleBans } from '../../client/handleBans.js'
 
 /**
  * Handles the kicked packet

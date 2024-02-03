@@ -1,6 +1,5 @@
-
-import queryParser from '../utils/queryParser'
-import { client } from '../client'
+import queryParser from '../utils/queryParser.js'
+import { client } from '../client.js'
 const { mode } = queryParser()
 
 /**

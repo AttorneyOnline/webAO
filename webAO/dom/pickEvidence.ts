@@ -1,7 +1,7 @@
-import { client } from '../client'
-import { cancelEvidence } from './cancelEvidence';
-import { updateEvidenceIcon } from './updateEvidenceIcon'
-import { getIndexFromSelect } from './getIndexFromSelect'
+import { client } from '../client.js'
+import { cancelEvidence } from './cancelEvidence.js';
+import { updateEvidenceIcon } from './updateEvidenceIcon.js'
+import { getIndexFromSelect } from './getIndexFromSelect.js'
 
 /**
  * Highlights and selects an evidence for in-character chat.

@@ -1,9 +1,9 @@
-import { client } from "../../client";
-import { AO_HOST } from "../../client/aoHost";
-import { safeTags } from "../../encoding";
-import { updateBackgroundPreview } from '../../dom/updateBackgroundPreview'
-import { getIndexFromSelect } from '../../dom/getIndexFromSelect'
-import tryUrls from "../../utils/tryUrls";
+import { client } from "../../client.js";
+import { AO_HOST } from "../../client/aoHost.js";
+import { safeTags } from "../../encoding.js";
+import { updateBackgroundPreview } from '../../dom/updateBackgroundPreview.js'
+import { getIndexFromSelect } from '../../dom/getIndexFromSelect.js'
+import tryUrls from "../../utils/tryUrls.js";
 
 /**
  * Handles a background change.

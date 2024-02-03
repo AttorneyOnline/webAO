@@ -1,5 +1,5 @@
-import { client } from "../../client";
-import { escapeChat } from "../../encoding";
+import { client } from "../../client.js";
+import { escapeChat } from "../../encoding.js";
 
 /**
  * Sends add evidence command.

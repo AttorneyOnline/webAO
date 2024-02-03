@@ -1,5 +1,5 @@
-import queryParser from '../../utils/queryParser'
-import { prepChat } from '../../encoding'
+import queryParser from '../../utils/queryParser.js'
+import { prepChat } from '../../encoding.js'
 const { mode } = queryParser();
 
 /**

@@ -1,7 +1,7 @@
-import { client } from '../../client'
-import { escapeChat } from '../../encoding';
-import setCookie from '../../utils/setCookie';
-import { saveChatlogHandle } from '../../client/saveChatLogHandle'
+import { client } from '../../client.js'
+import { escapeChat } from '../../encoding.js';
+import setCookie from '../../utils/setCookie.js';
+import { saveChatlogHandle } from '../saveChatLogHandle.js'
 /**
  * Sends an out-of-character chat message.
  * @param {string} message the message to send

@@ -1,6 +1,6 @@
-import { client } from '../../client'
-import { createArea } from '../../client/createArea';
-import { safeTags } from '../../encoding';
+import { client } from '../../client.js'
+import { createArea } from '../../client/createArea.js';
+import { safeTags } from '../../encoding.js';
 
 /**
  * Handles updated area list

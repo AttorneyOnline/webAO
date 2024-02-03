@@ -1,22 +1,22 @@
 /* eslint indent: ["error", 2, { "SwitchCase": 1 }] */
 
-import { client, delay } from "../client";
+import { client, delay } from "../client.js";
 import { UPDATE_INTERVAL } from "./constants/defaultChatMsg.js";
-import setEmote from "../client/setEmote";
-import { safeTags } from "../encoding";
-import { AO_HOST } from "../client/aoHost";
-import { Viewport } from './interfaces/Viewport'
-import { createBlipsChannels } from './utils/createBlipChannels'
-import { defaultChatMsg } from './constants/defaultChatMsg'
-import { createMusic } from './utils/createMusic'
-import { createSfxAudio } from './utils/createSfxAudio'
-import { createShoutAudio } from './utils/createShoutAudio'
-import { createTestimonyAudio } from './utils/createTestimonyAudio'
-import { Testimony } from './interfaces/Testimony'
-import { COLORS } from './constants/colors'
-import { set_side } from './utils/setSide'
-import { ChatMsg } from "./interfaces/ChatMsg";
-import { setStartFirstTickCheck, setStartSecondTickCheck, startFirstTickCheck, startSecondTickCheck } from "./utils/handleICSpeaking";
+import setEmote from "../client/setEmote.js";
+import { safeTags } from "../encoding.js";
+import { AO_HOST } from "../client/aoHost.js";
+import { Viewport } from './interfaces/Viewport.js'
+import { createBlipsChannels } from './utils/createBlipChannels.js'
+import { defaultChatMsg } from './constants/defaultChatMsg.js'
+import { createMusic } from './utils/createMusic.js'
+import { createSfxAudio } from './utils/createSfxAudio.js'
+import { createShoutAudio } from './utils/createShoutAudio.js'
+import { createTestimonyAudio } from './utils/createTestimonyAudio.js'
+import { Testimony } from './interfaces/Testimony.js'
+import { COLORS } from './constants/colors.js'
+import { set_side } from './utils/setSide.js'
+import { ChatMsg } from "./interfaces/ChatMsg.js";
+import { setStartFirstTickCheck, setStartSecondTickCheck, startFirstTickCheck, startSecondTickCheck } from "./utils/handleICSpeaking.js";
 
 const viewport = (): Viewport => {
   let animating = false;

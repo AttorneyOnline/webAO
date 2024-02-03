@@ -1,4 +1,4 @@
-import { client } from "../client";
+import { client } from "../client.js";
 /**
  * Triggered when the Return key is pressed on the out-of-character chat input box.
  * @param {KeyboardEvent} event

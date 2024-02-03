@@ -1,5 +1,5 @@
-import { client } from "../client";
-import { AO_HOST } from "./aoHost";
+import { client } from "../client.js";
+import { AO_HOST } from "./aoHost.js";
 
 /**
  * check if the message contains an entry on our callword list

@@ -1,8 +1,8 @@
-import { client } from "../../client";
-import fileExists from "../../utils/fileExists";
-import { updateActionCommands } from '../../dom/updateActionCommands'
-import { pickEmotion } from '../../dom/pickEmotion'
-import { AO_HOST } from "../../client/aoHost";
+import { client } from "../../client.js";
+import fileExists from "../../utils/fileExists.js";
+import { updateActionCommands } from '../../dom/updateActionCommands.js'
+import { pickEmotion } from '../../dom/pickEmotion.js'
+import { AO_HOST } from "../../client/aoHost.js";
 
 /**
  * Handles the server's assignment of a character for the player to use.

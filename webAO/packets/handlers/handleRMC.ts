@@ -1,4 +1,4 @@
-import { client } from '../../client'
+import { client } from '../../client.js'
 // TODO BUG:
 // this.viewport.music is an array. Therefore you must access elements
 /**

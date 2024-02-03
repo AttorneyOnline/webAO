@@ -1,4 +1,4 @@
-import { client } from '../client'
+import { client } from '../client.js'
 /**
  * Highlights and selects an emotion for in-character chat.
  * @param {string} emo the new emotion to be selected

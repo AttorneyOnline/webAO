@@ -1,5 +1,5 @@
-import { Positions } from '../interfaces/Positions'
-import { Desk } from '../interfaces/Desk';
+import { Positions } from '../interfaces/Positions.js'
+import { Desk } from '../interfaces/Desk.js';
 
 export const positions: Positions = {
     def: {

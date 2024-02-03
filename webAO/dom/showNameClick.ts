@@ -1,4 +1,4 @@
-import setCookie from "../utils/setCookie";
+import setCookie from "../utils/setCookie.js";
 
 
 /**

@@ -1,4 +1,4 @@
-import { selectedMenu, setSelectedMenu } from "../client";
+import { selectedMenu, setSelectedMenu } from "../client.js";
 
 /**
  * Highlights and selects a menu.

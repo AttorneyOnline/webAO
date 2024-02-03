@@ -1,4 +1,4 @@
-import { client } from '../client'
+import { client } from '../client.js'
 /**
  * Triggered when an item on the area list is clicked.
  * @param {HTMLElement} el

@@ -1,4 +1,4 @@
-import transparentPng from "../constants/transparentPng";
+import transparentPng from "../constants/transparentPng.js";
 
 /**
  * Triggered when there was an error loading a character sprite.

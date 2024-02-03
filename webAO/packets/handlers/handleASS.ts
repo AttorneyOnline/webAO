@@ -1,4 +1,4 @@
-import { setAOhost } from "../../client/aoHost";
+import { setAOhost } from "../../client/aoHost.js";
 
 
 /** 

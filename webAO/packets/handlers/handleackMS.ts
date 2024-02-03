@@ -1,4 +1,4 @@
-import { resetICParams } from '../../client/resetICParams'
+import { resetICParams } from '../../client/resetICParams.js'
 
 /**
 * server got our message

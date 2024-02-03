@@ -1,4 +1,4 @@
-import { client } from "../../client";
+import { client } from "../../client.js";
 import vanilla_character_arr from "../../constants/characters.js";
 
 /**

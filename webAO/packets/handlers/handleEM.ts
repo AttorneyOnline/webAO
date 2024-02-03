@@ -1,8 +1,8 @@
-import { client } from '../../client'
-import { addTrack } from '../../client/addTrack';
-import { createArea } from '../../client/createArea';
-import { fix_last_area } from '../../client/fixLastArea';
-import { isAudio } from '../../client/isAudio';
+import { client } from '../../client.js'
+import { addTrack } from '../../client/addTrack.js';
+import { createArea } from '../../client/createArea.js';
+import { fix_last_area } from '../../client/fixLastArea.js';
+import { isAudio } from '../../client/isAudio.js';
 
 /**
  * Handles incoming music information, containing multiple entries

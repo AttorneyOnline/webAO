@@ -1,4 +1,4 @@
-import { client, extrafeatures, oldLoading } from "../../client";
+import { client, extrafeatures, oldLoading } from "../../client.js";
 
 
 /**

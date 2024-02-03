@@ -1,4 +1,4 @@
-import { opusCheck } from "../../dom/opusCheck";
+import { opusCheck } from "../../dom/opusCheck.js";
 
 export const createBlipsChannels = () => {
     const blipSelectors = document.getElementsByClassName(

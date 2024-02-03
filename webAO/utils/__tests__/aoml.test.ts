@@ -1,5 +1,5 @@
-import request from '../../services/request'
-import mlConfig from '../aoml';
+import request from '../../services/request.js'
+import mlConfig from '../aoml.js';
 
 jest.mock('../../services/request')
 const networkRequest = `

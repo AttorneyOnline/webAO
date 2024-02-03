@@ -1,7 +1,7 @@
-import queryParser from "../../utils/queryParser";
+import queryParser from "../../utils/queryParser.js";
 
-import { client } from '../../client'
-import { handleCharacterInfo } from "../../client/handleCharacterInfo";
+import { client } from '../../client.js'
+import { handleCharacterInfo } from "../../client/handleCharacterInfo.js";
 const { mode } = queryParser();
 
 /**

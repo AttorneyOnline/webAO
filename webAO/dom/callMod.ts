@@ -1,4 +1,4 @@
-import { client, extrafeatures } from "../client";
+import { client, extrafeatures } from "../client.js";
 /**
  * Call mod.
  */

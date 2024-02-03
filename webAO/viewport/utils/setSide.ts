@@ -1,8 +1,8 @@
-import { positions } from '../constants/positions'
-import { AO_HOST } from '../../client/aoHost'
-import { client } from '../../client'
-import tryUrls from '../../utils/tryUrls';
-import findImgSrc from '../../utils/findImgSrc';
+import { positions } from '../constants/positions.js'
+import { AO_HOST } from '../../client/aoHost.js'
+import { client } from '../../client.js'
+import tryUrls from '../../utils/tryUrls.js';
+import findImgSrc from '../../utils/findImgSrc.js';
 
 /**
  * Changes the viewport background based on a given position.
