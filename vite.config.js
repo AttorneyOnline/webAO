@@ -13,9 +13,6 @@ export default defineConfig({
     server: {
         open: true,
         port: 8080,
-        static: {
-            directory: path.join(__dirname, 'webAO'),
-        },
     },
     build: {
         outDir: 'dist',
