@@ -3,7 +3,7 @@
 
 import calculatorHandler from './calculatorHandler';
 import fileExists from './fileExists';
-import { requestBuffer } from '@/services/request';
+import { requestBuffer } from '../services/request.js';
 
 /**
  * Gets animation length. If the animation cannot be found, it will
