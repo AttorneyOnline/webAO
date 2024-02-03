@@ -1,11 +1,7 @@
 import path from 'path';
-import dotenv from 'dotenv';
 import packageJson from './package.json'
 
 import { defineConfig } from 'vite';
-
-// this will update the process.env with environment variables in .env file
-dotenv.config();
 
 export default defineConfig({
     resolve: {
