@@ -11,7 +11,7 @@ export const reloadTheme = () => {
     setCookie("theme", client.viewport.getTheme());
     (<HTMLAnchorElement>(
         document.getElementById("client_theme")
-    )).href = `styles/${client.viewport.getTheme()}.css`;
+    )).href = `webAO/styles/${client.viewport.getTheme()}.css`;
 }
 // @ts-ignore
 window.reloadTheme = reloadTheme;
