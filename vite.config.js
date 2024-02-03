@@ -1,4 +1,3 @@
-import path from 'path';
 import packageJson from './package.json'
 
 import { defineConfig } from 'vite';
@@ -6,7 +5,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
     resolve: {
         alias: {
-            '@': path.resolve(__dirname, 'webAO'),
+            '@': './webAO'
         },
         extensions: ['.js', '.jsx', '.tsx', '.ts', '.json'],
     },
