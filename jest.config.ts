@@ -4,6 +4,26 @@
  */
 
 const config = {
+  collectCoverage: true,
+  coverageDirectory: 'coverage',
+  coverageProvider: 'babel',
+  globals: {
+    'ts-jest': {
+      useESM: true
+    }
+  },
+  moduleNameMapper: {
+    '(.+)\\.js': '$1'
+  },
+  testEnvironment: 'jsdom',
+  testPathIgnorePatterns: [
+    "node_modules/",
+    "dist/"
+  ],
+  transform: {
+    '\\.[jt]sx?$': ['ts-jest', { useESM: true }]
+  },
+  extensionsToTreatAsEsm: ['.ts'],
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -17,13 +37,13 @@ const config = {
   // clearMocks: false,
 
   // Indicates whether the coverage information should be collected while executing the test
-  collectCoverage: true,
+  // collectCoverage: true,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   // collectCoverageFrom: undefined,
 
   // The directory where Jest should output its coverage files
-  coverageDirectory: 'coverage',
+  // coverageDirectory: 'coverage',
 
   // An array of regexp pattern strings used to skip coverage collection
   // coveragePathIgnorePatterns: [
@@ -31,7 +51,7 @@ const config = {
   // ],
 
   // Indicates which provider should be used to instrument code for coverage
-  coverageProvider: 'babel',
+  // coverageProvider: 'babel',
 
   // A list of reporter names that Jest uses when writing coverage reports
   // coverageReporters: [
@@ -137,7 +157,7 @@ const config = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: 'jsdom',
+  // testEnvironment: 'jsdom',
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
