@@ -3,6 +3,10 @@
  * https://jestjs.io/docs/configuration
  */
 
+import packageJson from './package.json'
+
+const appVersion = JSON.stringify(packageJson.version);
+
 const config = {
   collectCoverage: true,
   coverageDirectory: 'coverage',
@@ -10,7 +14,8 @@ const config = {
   globals: {
     'ts-jest': {
       useESM: true
-    }
+    },
+    '__APP_VERSION__': appVersion
   },
   moduleNameMapper: {
     '(.+)\\.js': '$1'
