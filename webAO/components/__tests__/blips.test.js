@@ -1,4 +1,4 @@
-import createBlip from '../blip';
+import createBlip from '../blip.js';
 
 describe('createBlip', () => {
     test('create 3 blips audios', () => {
