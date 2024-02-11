@@ -12,6 +12,8 @@
     "skipLibCheck": true,
     "noEmit": false,
 
+    "resolveJsonModule": true,
+
     /* Makes 'value could be null' errors to not be errors */
     "strictNullChecks": false,
     "downlevelIteration": true,
