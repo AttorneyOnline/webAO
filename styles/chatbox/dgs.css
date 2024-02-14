@@ -68,8 +68,8 @@
 	min-width: 20%;
 	color: #fff7de;
 	text-shadow: 0 0 4px #000;
-	border: 1px solid #a59252;
-    background-image: linear-gradient(#635529, #8c7d42);
+	border: 0.05em solid #9e9150;
+    background-image: linear-gradient(#625726, #87793f);
     left: 4%;
 	top: 0;
 	border-radius: 3px;
@@ -88,7 +88,7 @@
 	margin: auto;
 	height: 80%;
 	border-image-source: url("dgs_chat_bg.png");
-    border-image-slice: 12 fill;
+    border-image-slice: 45 fill;
 	border-image-width: 0.8em;
 	border-width: 0.8em;
 	bottom: 0;
