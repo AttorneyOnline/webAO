@@ -11,6 +11,6 @@ export const handleFM = (args: string[]) => {
 
     for (let i = 1; i < args.length - 1; i++) {
         // Check when found the song for the first time
-        addTrack(safeTags(args[i]));
+        addTrack(args[i]);
     }
 }
