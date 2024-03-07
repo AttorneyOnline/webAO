@@ -19,7 +19,7 @@ export const handleSC = async (args: string[]) => {
 
     document.getElementById("client_loadingtext")!.innerHTML =
         "Loading Characters";
-    for (let i = 1; i < args.length - 1; i++) {
+    for (let i = 1; i < args.length; i++) {
         const chargs = args[i].split("&");
         const charid = i - 1;
 
