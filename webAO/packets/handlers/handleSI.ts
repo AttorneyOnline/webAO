@@ -8,7 +8,6 @@ import { client, extrafeatures, oldLoading } from "../../client";
    */
 export const handleSI = (args: string[]) => {
     client.char_list_length = Number(args[1]);
-    client.char_list_length += 1; // some servers count starting from 0 some from 1...
     client.evidence_list_length = Number(args[2]);
     client.music_list_length = Number(args[3]);
 
