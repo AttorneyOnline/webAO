@@ -16,6 +16,13 @@ export function resizeChatbox() {
     const trackstatus = <HTMLMarqueeElement>(document.getElementById("client_trackstatustext"));
     trackstatus.style.width = (trackstatus.offsetWidth - 1) + "px";
 
+    //name spacing
+    const namePlate = document.getElementById("client_name");
+    if (CHATBOX == "aa" && namePlate.innerText.length<5) {
+        namePlate.style.letterSpacing = "0.2em";        
+    }else{
+        namePlate.style.letterSpacing = "normal";
+    }
 
     //clock
     const now = new Date();
