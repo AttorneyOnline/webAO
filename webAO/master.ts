@@ -173,7 +173,7 @@ function processServerlist(serverlist: AOServer[]) {
             ws_protocol = 'ws';
             http_protocol = 'http';
         }
-        if (server.wss_port) {
+        if (server.wss_port && !window.navigator.userAgent.includes("Nintendo")) {
             ws_port = server.wss_port;
             ws_protocol = 'wss';
             http_protocol = 'https';
