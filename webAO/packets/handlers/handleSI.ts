@@ -27,7 +27,7 @@ export const handleSI = (args: string[]) => {
     }
 
     // this is determined at the top of this file
-    if (!oldLoading && extrafeatures.includes("fastloading")) {
+    if (!oldLoading) {
         client.sender.sendServer("RC#%");
     } else {
         client.sender.sendServer("askchar2#%");
