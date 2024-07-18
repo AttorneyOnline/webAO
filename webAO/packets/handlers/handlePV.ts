@@ -80,11 +80,11 @@ export const handlePV = async (args: string[]) => {
                 emote_item.title = emotes[i].desc;
                 emote_item.onclick = () => { window.pickEmotion(i) }
                 emotesList.appendChild(emote_item);
+                if (i = 1) pickEmotion(1);
             } catch (e) {
                 console.error(`missing emote ${i}`);
             }
         }
-        pickEmotion(1);
     }
 
     if (
@@ -96,5 +96,4 @@ export const handlePV = async (args: string[]) => {
     } else {
         document.getElementById("button_4")!.style.display = "none";
     }
-
 }
