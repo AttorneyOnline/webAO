@@ -4,6 +4,19 @@ import { updateActionCommands } from '../../dom/updateActionCommands'
 import { pickEmotion } from '../../dom/pickEmotion'
 import { AO_HOST } from "../../client/aoHost";
 
+function addEmoteButton(i: Number, imgurl: string, desc: string) {
+    const emotesList = document.getElementById("client_emo");
+    const emote_item = new Image();
+    emote_item.id = "emo_" + i;
+    emote_item.className = "emote_button";
+    emote_item.src = imgurl;
+    emote_item.alt = desc;
+    emote_item.title = desc;
+    emote_item.onclick = () => { window.pickEmotion(i) }
+    emotesList.appendChild(emote_item);
+}
+
+
 /**
  * Handles the server's assignment of a character for the player to use.
  * PV # playerID (unused) # CID # character ID
@@ -17,7 +30,7 @@ export const handlePV = async (args: string[]) => {
     const me = client.chars[client.charID];
     client.selectedEmote = -1;
     const { emotes } = client;
-    const emotesList = document.getElementById("client_emo")!;
+    const emotesList = document.getElementById("client_emo");
     emotesList.style.display = "";
     emotesList.innerHTML = ""; // Clear emote box
     const ini = me.inifile;
@@ -72,14 +85,8 @@ export const handlePV = async (args: string[]) => {
                     button: url,
                 };
 
-                const emote_item = new Image();
-                emote_item.id = "emo_" + i;
-                emote_item.className = "emote_button";
-                emote_item.src = emotes[i].button;
-                emote_item.alt = emotes[i].desc;
-                emote_item.title = emotes[i].desc;
-                emote_item.onclick = () => { window.pickEmotion(i) }
-                emotesList.appendChild(emote_item);
+                addEmoteButton(i, url, emotes[i].desc);
+
                 if (i === 1) pickEmotion(1);
             } catch (e) {
                 console.error(`missing emote ${i}`);
