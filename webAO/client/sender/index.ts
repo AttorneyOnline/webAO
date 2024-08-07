@@ -11,6 +11,7 @@ import {sendZZ} from './sendZZ'
 import {sendEE} from './sendEE'
 import {sendDE} from './sendDE'
 import {sendPE} from './sendPE'
+import {sendMA} from './sendMA'
 export interface ISender {
     sendIC: (deskmod: number,
         preanim: string,
@@ -50,6 +51,7 @@ export interface ISender {
     sendEE: (id: number, name: string, desc: string, img: string) => void
     sendDE:  (id: number) => void
     sendPE: (name: string, desc: string, img: string) => void
+    sendMA: (id: number, length: number, reason: string) => void
 }
 export const sender = {
     sendIC,
@@ -64,5 +66,6 @@ export const sender = {
     sendZZ,
     sendEE,
     sendDE,
-    sendPE
+    sendPE,
+    sendMA
 }

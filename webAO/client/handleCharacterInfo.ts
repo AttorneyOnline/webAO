@@ -6,6 +6,24 @@ import fileExists from "../utils/fileExists";
 import { AO_HOST } from "./aoHost";
 
 
+export const getCharIcon = async (img: HTMLImageElement, charname: string) => {
+    const extensions = [".png", ".webp"];
+    img.alt = charname;
+    const charIconBaseUrl = `${AO_HOST}characters/${encodeURI(
+        charname.toLowerCase()
+    )}/char_icon`;
+    for (let i = 0; i < extensions.length; i++) {
+        const fileUrl = charIconBaseUrl + extensions[i];
+        const exists = await fileExists(fileUrl);
+        if (exists) {
+            img.alt = charname;
+            img.title = charname;
+            img.src = fileUrl;
+            return;
+        }
+    }
+};
+
 /**
  * Handles the incoming character information, and downloads the sprite + ini for it
  * @param {Array} chargs packet arguments
@@ -15,24 +33,8 @@ export const handleCharacterInfo = async (chargs: string[], charid: number) => {
     const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
     if (chargs[0]) {
         let cini: any = {};
-        const getCharIcon = async () => {
-            const extensions = [".png", ".webp"];
-            img.alt = chargs[0];
-            const charIconBaseUrl = `${AO_HOST}characters/${encodeURI(
-                chargs[0].toLowerCase()
-            )}/char_icon`;
-            for (let i = 0; i < extensions.length; i++) {
-                const fileUrl = charIconBaseUrl + extensions[i];
-                const exists = await fileExists(fileUrl);
-                if (exists) {
-                    img.alt = chargs[0];
-                    img.title = chargs[0];
-                    img.src = fileUrl;
-                    return;
-                }
-            }
-        };
-        getCharIcon();
+        
+        getCharIcon(img, chargs[0]);
 
         // If the ini doesn't exist on the server this will throw an error
         try {

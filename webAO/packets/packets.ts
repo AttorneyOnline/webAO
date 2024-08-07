@@ -38,6 +38,8 @@ import { handleASS } from './handlers/handleASS'
 import { handleackMS } from './handlers/handleackMS'
 import { handleSP } from './handlers/handleSP'
 import { handleJD } from './handlers/handleJD'
+import { handlePU } from './handlers/handlePU'
+import { handlePR } from './handlers/handlePR'
 
 export const packets = {
     "MS": handleMS,
@@ -80,6 +82,8 @@ export const packets = {
     "ackMS": handleackMS,
     "SP": handleSP,
     "JD": handleJD,
+    "PU": handlePU,
+    "PR": handlePR,
     "decryptor": () => { },
     "CHECK": () => { },
     "CH": () => { },

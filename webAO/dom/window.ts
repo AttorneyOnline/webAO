@@ -26,7 +26,7 @@ declare global {
         editEvidence: () => void;
         addEvidence: () => void;
         pickEvidence: (evidence: any) => void;
-        pickEmotion: (emo: any) => void;
+        pickEmotion: (emo: number) => void;
         pickChar: (ccharacter: any) => void;
         chartable_filter: (_event: any) => void;
         ReconnectButton: (_event: any) => void;
@@ -52,6 +52,7 @@ declare global {
         onEnter: (event: any) => void;
         onReplayGo: (_event: any) => void;
         onOOCEnter: (_event: any) => void;
+        banPlayer: (id: number) => void;
         hcallback: (_event: any) => void;
     }
 }
