@@ -6,7 +6,7 @@ import fileExists from "../utils/fileExists";
 import { AO_HOST } from "./aoHost";
 
 
-const getCharIcon = async (img: HTMLImageElement, charname: string) => {
+export const getCharIcon = async (img: HTMLImageElement, charname: string) => {
     const extensions = [".png", ".webp"];
     img.alt = charname;
     const charIconBaseUrl = `${AO_HOST}characters/${encodeURI(
