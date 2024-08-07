@@ -6,8 +6,8 @@ import { client } from '../client'
 export function banPlayer(id: number) {
     let reason;
     let length;
-    reason = prompt("Please enter the ban reason", "");
-    length = Number(prompt("Please enter the ban length in hours", ""));
+    reason = prompt("Please enter the ban reason", "Being annoying");
+    length = Number(prompt("Please enter the ban length in minutes", "60"));
 
     client.sender.sendMA(id, length, reason);
 }
