@@ -4,7 +4,7 @@ import { updateActionCommands } from '../../dom/updateActionCommands'
 import { pickEmotion } from '../../dom/pickEmotion'
 import { AO_HOST } from "../../client/aoHost";
 
-function addEmoteButton(i: Number, imgurl: string, desc: string) {
+function addEmoteButton(i: number, imgurl: string, desc: string) {
     const emotesList = document.getElementById("client_emo");
     const emote_item = new Image();
     emote_item.id = "emo_" + i;
