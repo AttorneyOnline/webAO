@@ -9,9 +9,14 @@ function addPlayer(playerID: Number) {
     const img = document.createElement('img');
     imgCell.appendChild(img);
 
-    const nameCell = playerRow.insertCell(1);
     const name = document.createTextNode('Unknown');
-    nameCell.appendChild(name);
+
+    const charNameCell = playerRow.insertCell(1);
+    charNameCell.appendChild(name);
+    const showNameCell = playerRow.insertCell(2);
+    showNameCell.appendChild(name);
+    const oocNameCell = playerRow.insertCell(3);
+    oocNameCell.appendChild(name);
 }
 
 function removePlayer(playerID: Number) {

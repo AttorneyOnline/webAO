@@ -5,5 +5,25 @@ import { getCharIcon } from "../../client/handleCharacterInfo";
   * @param {Array} args packet arguments
   */
 export const handlePU = (args: string[]) => {
-    const playerID = Number(args[1]);
+    const playerRow = <HTMLTableElement>document.getElementById(`client_playerlist_entry${Number(args[1])}`);
+    const type = Number(args[2]);
+    const data = args[3];
+    switch (type) {
+        case 0:
+            const oocName = <HTMLElement>playerRow.childNodes[3];
+            oocName.innerText = data;
+            break;
+        case 1:
+            const playerImg = <HTMLImageElement>playerRow.childNodes[0].firstChild;
+            getCharIcon(playerImg, data);
+            const charName = <HTMLElement>playerRow.childNodes[1];
+            charName.innerText = data;
+            break;
+        case 2:
+            const showName = <HTMLElement>playerRow.childNodes[2];
+            showName.innerText = data;
+            break;
+        default:
+            break;
+    }
 }
