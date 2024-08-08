@@ -8,11 +8,11 @@ import { AO_HOST } from "../client/aoHost";
  */
 export function cancelEvidence() {
     // Clear evidence data
-    if (client.selectedEvidence > 0) {
+    if (client.selectedEvidence >= 0) {
         document.getElementById(`evi_${client.selectedEvidence}`)!.className =
             "evi_icon";
     }
-    client.selectedEvidence = 0;
+    client.selectedEvidence = -1;
 
     // Clear evidence on information window
     (<HTMLSelectElement>document.getElementById("evi_select")).selectedIndex = 0;

@@ -5,7 +5,7 @@ import { cancelEvidence } from "./cancelEvidence";
  * Delete selected evidence.
  */
 export function deleteEvidence() {
-    const id = client.selectedEvidence - 1;
+    const id = client.selectedEvidence;
     client.sender.sendDE(id);
     cancelEvidence();
 }

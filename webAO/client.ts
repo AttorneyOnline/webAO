@@ -190,7 +190,7 @@ class Client extends EventEmitter {
         this.manifest = [];
         this.resources = getResources(AO_HOST, theme);
         this.selectedEmote = -1;
-        this.selectedEvidence = 0;
+        this.selectedEvidence = -1;
         this.checkUpdater = null;
         this.sender = sender
         this.viewport = masterViewport();
@@ -221,7 +221,7 @@ class Client extends EventEmitter {
     get evidence() {
         return document.getElementById("button_present").classList.contains("dark")
             ? this.selectedEvidence
-            : 0;
+            : -1;
     }
 
     /**

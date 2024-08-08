@@ -9,7 +9,7 @@ export function onEnter(event: KeyboardEvent) {
     if (event.keyCode === 13) {
         const mychar = client.character;
         const myemo = client.emote;
-        const evi = client.evidence;
+        const evi = client.evidence + 1;
         const flip = Boolean(
             document.getElementById("button_flip")!.classList.contains("dark")
         );
