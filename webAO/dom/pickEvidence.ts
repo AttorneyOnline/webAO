@@ -10,7 +10,7 @@ import { getIndexFromSelect } from './getIndexFromSelect'
 export function pickEvidence(evidence: number) {
     if (client.selectedEvidence !== evidence) {
         // Update selected evidence
-        if (client.selectedEvidence > 0) {
+        if (client.selectedEvidence >= 0) {
             document.getElementById(`evi_${client.selectedEvidence}`)!.className =
                 "evi_icon";
         }
@@ -19,20 +19,20 @@ export function pickEvidence(evidence: number) {
 
         // Show evidence on information window
         (<HTMLInputElement>document.getElementById("evi_name")).value =
-            client.evidences[evidence - 1].name;
+            client.evidences[evidence].name;
         (<HTMLInputElement>document.getElementById("evi_desc")).value =
-            client.evidences[evidence - 1].desc;
+            client.evidences[evidence].desc;
 
         // Update icon
         const icon_id = getIndexFromSelect(
             "evi_select",
-            client.evidences[evidence - 1].filename
+            client.evidences[evidence].filename
         );
         (<HTMLSelectElement>document.getElementById("evi_select")).selectedIndex =
             icon_id;
         if (icon_id === 0) {
             (<HTMLInputElement>document.getElementById("evi_filename")).value =
-                client.evidences[evidence - 1].filename;
+                client.evidences[evidence].filename;
         }
         updateEvidenceIcon();
 
