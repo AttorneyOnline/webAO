@@ -104,6 +104,7 @@ hr {
 	border: 2px ridge #dec6bd;
 	border-radius: 2px;
 	margin-bottom: 2px;
+	line-height: 1.5;
 }
 
 .client_button {
