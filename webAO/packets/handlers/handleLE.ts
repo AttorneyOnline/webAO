@@ -10,7 +10,7 @@ import { prepChat, safeTags } from '../../encoding';
  */
 export const handleLE = (args: string[]) => {
     client.evidences = [];
-    for (let i = 1; i < args.length - 1; i++) {
+    for (let i = 1; i < args.length; i++) {
         const arg = args[i].split("&");
         client.evidences[i - 1] = {
             name: prepChat(arg[0]),
@@ -20,14 +20,14 @@ export const handleLE = (args: string[]) => {
         };
     }
 
-    const evidence_box = document.getElementById("evidences")!;
+    const evidence_box = document.getElementById("evidences");
     evidence_box.innerHTML = "";
-    for (let i = 1; i <= client.evidences.length; i++) {
+    for (let i = 0; i <= client.evidences.length; i++) {
         const evi_item = new Image();
         evi_item.id = "evi_"+i;
         evi_item.className = "evi_icon"
-        evi_item.src = client.evidences[i - 1].icon;
-        evi_item.alt = client.evidences[i - 1].name;
+        evi_item.src = client.evidences[i].icon;
+        evi_item.alt = client.evidences[i].name;
         evi_item.onclick = () => { window.pickEvidence(i) }
         evidence_box.appendChild(evi_item);
     }
