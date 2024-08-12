@@ -11,6 +11,8 @@ import { prepChat, safeTags } from '../../encoding';
 export const handleLE = (args: string[]) => {
     client.evidences = [];
     for (let i = 1; i < args.length; i++) {
+        if (!args[i].includes("&"))
+            break;
         const arg = args[i].split("&");
         client.evidences[i - 1] = {
             name: prepChat(arg[0]),
@@ -22,7 +24,7 @@ export const handleLE = (args: string[]) => {
 
     const evidence_box = document.getElementById("evidences");
     evidence_box.innerHTML = "";
-    for (let i = 0; i <= client.evidences.length; i++) {
+    for (let i = 0; i <= client.evidences.length-1; i++) {
         const evi_item = new Image();
         evi_item.id = "evi_"+i;
         evi_item.className = "evi_icon"
