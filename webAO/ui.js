@@ -47,11 +47,22 @@ const config = {
           }],
         },
         {
-          type: 'component',
-          title: 'Music',
+          type: 'stack',
           width: 30,
-          componentName: 'template',
-          componentState: { id: 'music' },
+          content: [{
+            type: 'component',
+            isClosable: false,
+            title: 'Music',
+            componentName: 'template',
+            componentState: { id: 'music' },
+          },
+          {
+            type: 'component',
+            isClosable: false,
+            title: 'Players',
+            componentName: 'template',
+            componentState: { id: 'players' },
+          }],
         }],
       },
       {
