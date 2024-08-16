@@ -18,11 +18,20 @@ const config = {
       width: 40,
       content: [{
         type: 'component',
+        height: 67,
         isClosable: false,
         componentName: 'template',
-        title: 'Game',
+        title: 'IC',
         componentState: { id: 'client_wrapper' },
-      }],
+      },
+      {
+        type: 'component',
+        height: 33,
+        isClosable: false,
+        title: 'IC Options',
+        componentName: 'template',
+        componentState: { id: 'icoptions' },
+      }]
     },
     {
       type: 'column',
@@ -69,7 +78,7 @@ const config = {
         type: 'row',
         content: [{
           type: 'component',
-          title: 'Server chat',
+          title: 'OOC',
           componentName: 'template',
           componentState: { id: 'ooc' },
         }],
@@ -78,9 +87,87 @@ const config = {
   }],
 };
 
+
+const configMobile = {
+  settings: {
+    showPopoutIcon: false,
+    showCloseIcon: false,
+  },
+  dimensions: {
+    minItemHeight: 40,
+  },
+  content: [{
+    type: 'row',
+    content: [{
+      type: 'column',
+      content: [{
+        type: 'component',
+        isClosable: false,
+        reorderEnabled: false,
+        componentName: 'template',
+        title: 'IC',
+        componentState: { id: 'client_wrapper' },
+        height: 56 // Adjust the height proportion as needed
+      },
+      {
+        type: 'stack',
+        height: 44,
+        content: [{
+            type: 'component',
+            isClosable: false,
+            reorderEnabled: false,
+            title: 'IC Options',
+            componentName: 'template',
+            componentState: { id: 'icoptions' },
+          },
+          {
+          type: 'component',
+          isClosable: false,
+          reorderEnabled: false,
+          title: 'Main',
+          componentName: 'template',
+          componentState: { id: 'mainmenu' },
+        },
+        {
+          type: 'component',
+          isClosable: false,
+          reorderEnabled: false,
+          title: 'Log',
+          componentName: 'template',
+          componentState: { id: 'log' },
+        },
+        {
+          type: 'component',
+          isClosable: false,
+          reorderEnabled: false,
+          title: 'Music',
+          componentName: 'template',
+          componentState: { id: 'music' },
+        },
+        {
+          type: 'component',
+          isClosable: false,
+          reorderEnabled: false,
+          title: 'OOC',
+          componentName: 'template',
+          componentState: { id: 'ooc' },
+        }]
+      }]
+    }]
+  }]
+}
+
+
+const isMobileDevice = window.innerWidth <= window.innerHeight; 
+
 const golden = new GoldenLayout();
 golden.registerComponentFactoryFunction('template', (container, componentState) => {
   const template = document.querySelector(`#${componentState.id}`);
   container.element.innerHTML = template.innerHTML;
 });
-golden.loadLayout(config);
+if (isMobileDevice){
+  golden.loadLayout(configMobile);
+}
+else {
+  golden.loadLayout(config);
+}

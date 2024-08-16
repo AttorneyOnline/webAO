@@ -180,184 +180,187 @@
 				<div class="health-bar"></div>
 			</span>
 		</div>
-		<div id="client_iccontrols">
-			<meta name="frame-title" lang="en" content="miscellaneous">
-			<div id="client_emo">
+	</div>
+</template>
+
+<template id="icoptions">
+	<div id="client_iccontrols">
+		<meta name="frame-title" lang="en" content="miscellaneous">
+		<div id="client_emo">
+		</div>
+		<br>
+		<div id="character_options">
+			<div id="emote_options">
+				<button id="button_1" alt="Hold it!" class="client_button" onclick="toggleShout(1)">Hold
+					it!</button>
+				<button id="button_2" alt="Objection!" class="client_button"
+					onclick="toggleShout(2)">Objection!</button>
+				<button id="button_3" alt="Take That!" class="client_button" onclick="toggleShout(3)">Take
+					That!</button>
+				<button id="button_4" alt="Custom" class="client_button" onclick="toggleShout(4)"
+					style="display: none">
+					Custom</button>
+				<br>
+				<br>
+				<label for="textcolor">Text Color:</label>
+				<select id="textcolor" name="textcolor">
+					<option value="0">White</option>
+					<option value="1">Green</option>
+					<option value="2">Red</option>
+					<option value="3">Orange</option>
+					<option value="4">Blue</option>
+				</select>
+				<label for="sendsfx"> SFX: </label>
+				<input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx" checked>
+				<label for="sendpreanim"> Preanimation: </label>
+				<input type="checkbox" id="sendpreanim" name="sendpreanim" value="sendpreanim">
+				<br>
+				<br>
+				<button id="button_flip" alt="Flip" class="client_button" onclick="toggleEffect(this)"
+					style="display: none">Flip</button>
+				<button id="button_flash" alt="Flash" class="client_button"
+					onclick="toggleEffect(this)">Flash</button>
+				<button id="button_shake" alt="Shake" class="client_button" onclick="toggleEffect(this)"
+					style="display: none">Shake</button>
 			</div>
 			<br>
+			<br>
 			<div id="character_options">
-				<div id="emote_options">
-					<button id="button_1" alt="Hold it!" class="client_button" onclick="toggleShout(1)">Hold
-						it!</button>
-					<button id="button_2" alt="Objection!" class="client_button"
-						onclick="toggleShout(2)">Objection!</button>
-					<button id="button_3" alt="Take That!" class="client_button" onclick="toggleShout(3)">Take
-						That!</button>
-					<button id="button_4" alt="Custom" class="client_button" onclick="toggleShout(4)"
-						style="display: none">
-						Custom</button>
-					<br>
-					<br>
-					<label for="textcolor">Text Color:</label>
-					<select id="textcolor" name="textcolor">
-						<option value="0">White</option>
-						<option value="1">Green</option>
-						<option value="2">Red</option>
-						<option value="3">Orange</option>
-						<option value="4">Blue</option>
-					</select>
-					<label for="sendsfx"> SFX: </label>
-					<input type="checkbox" id="sendsfx" name="sendsfx" value="sendsfx" checked>
-					<label for="sendpreanim"> Preanimation: </label>
-					<input type="checkbox" id="sendpreanim" name="sendpreanim" value="sendpreanim">
-					<br>
-					<br>
-					<button id="button_flip" alt="Flip" class="client_button" onclick="toggleEffect(this)"
-						style="display: none">Flip</button>
-					<button id="button_flash" alt="Flash" class="client_button"
-						onclick="toggleEffect(this)">Flash</button>
-					<button id="button_shake" alt="Shake" class="client_button" onclick="toggleEffect(this)"
-						style="display: none">Shake</button>
-				</div>
+				<label for="role_select">Role:</label>
+				<select id="role_select" name="role_select" onchange="changeRoleOOC()">
+					<option value="">Default</option>
+					<option value="def">Defense</option>
+					<option value="pro">Prosecution</option>
+					<option value="jud">Judge</option>
+					<option value="wit">Witness</option>
+					<option value="hld">Helper Defense</option>
+					<option value="hlp">Helper Prosecution</option>
+					<option value="jur">Jury</option>
+					<option value="sea">Seance</option>
+				</select>
 				<br>
 				<br>
-				<div id="character_options">
-					<label for="role_select">Role:</label>
-					<select id="role_select" name="role_select" onchange="changeRoleOOC()">
-						<option value="">Default</option>
-						<option value="def">Defense</option>
-						<option value="pro">Prosecution</option>
-						<option value="jud">Judge</option>
-						<option value="wit">Witness</option>
-						<option value="hld">Helper Defense</option>
-						<option value="hlp">Helper Prosecution</option>
-						<option value="jur">Jury</option>
-						<option value="sea">Seance</option>
-					</select>
-					<br>
-					<br>
-					<button id="char_change" alt="Change" class="client_button hover_button"
-						onclick="changeCharacter()">Change
-						Character</button>
-					<button id="char_random" alt="Random" class="client_button hover_button"
-						onclick="randomCharacterOOC()">Random Character</button>
-					<br>
-					<br>
-					<span id="pairing" style="display: none">
-						<button id="button_toggle_pairing" alt="Pairing" class="client_button"
-							onclick="toggleElement('pairing_settings')">Pairing</button>
-						<span id="pairing_settings" style="display: none">
-							<label for="pair_select">Pairing partner:</label>
-							<select name="pair_select" id="pair_select">
-								<option value="-1">None</option>
-							</select>
-							<table style="border: none;margin-left: auto;margin-right: auto;">
-								<tr>
-									<td>
-										<p>Horizontal offset:</p>
-									</td>
-									<td><input type="range" name="pair_offset" id="pair_offset" min="-100" max="100"
-											value="0"></td>
-								</tr>
-								<tr id="y_offset" style="display: none">
-									<td>
-										<p>Vertical offset:</p>
-									</td>
-									<td><input type="range" name="pair_y_offset" id="pair_y_offset" min="-100" max="100"
-											value="0"></td>
-								</tr>
-							</table>
-							<input id="pair_reset" type="button" value="Reset" onclick="resetOffset()">
-						</span>
-					</span>
-					<br>
-					<br>
-					<span id="cccc" style="display: none">
-						<label for="ic_chat_name">Custom Showname:</label>
-						<input id="ic_chat_name" name="ic_chat_name" type="text">
-						<br>
-						<label for="showname">Show others:</label>
-						<input id="showname" name="showname" type="checkbox" onclick="showname_click()" checked>
-						<br>
-						<br>
-						<label for="check_nonint">Noninterrupting Preanimation:</label>
-						<input type="checkbox" name="check_nonint" id="check_nonint">
-					</span>
-					<br>
-					<br>
-					<span id="2.7" style="display: none">
-						<label for="check_loopsfx">Looping SFX:</label>
-						<input type="checkbox" name="check_loopsfx" id="check_loopsfx">
-					</span>
-					<br>
-					<br>
-					<span id="2.8" style="display: none">
-						<label for="check_additive">Additive:</label>
-						<input type="checkbox" name="check_additive" id="check_additive">
-						<br>
-						<br>
-						<label for="effect_select">Effect:</label>
-						<select id="effect_select" name="effect_select">
-							<option value="||">None</option>
-							<option value="realization||sfx-realization">Realization</option>
-							<option value="hearts||sfx-squee">Hearts</option>
-							<option value="reaction||sfx-reactionding">Reaction</option>
-							<option value="impact||sfx-fan">Impact</option>
-							<option value="rain-weak||sfx-rain">Weak Rain</option>
-							<option value="rain||sfx-rain">Rain</option>
-							<option value="rain-strong||sfx-rain">Strong Rain</option>
+				<button id="char_change" alt="Change" class="client_button hover_button"
+					onclick="changeCharacter()">Change
+					Character</button>
+				<button id="char_random" alt="Random" class="client_button hover_button"
+					onclick="randomCharacterOOC()">Random Character</button>
+				<br>
+				<br>
+				<span id="pairing" style="display: none">
+					<button id="button_toggle_pairing" alt="Pairing" class="client_button"
+						onclick="toggleElement('pairing_settings')">Pairing</button>
+					<span id="pairing_settings" style="display: none">
+						<label for="pair_select">Pairing partner:</label>
+						<select name="pair_select" id="pair_select">
+							<option value="-1">None</option>
 						</select>
+						<table style="border: none;margin-left: auto;margin-right: auto;">
+							<tr>
+								<td>
+									<p>Horizontal offset:</p>
+								</td>
+								<td><input type="range" name="pair_offset" id="pair_offset" min="-100" max="100"
+										value="0"></td>
+							</tr>
+							<tr id="y_offset" style="display: none">
+								<td>
+									<p>Vertical offset:</p>
+								</td>
+								<td><input type="range" name="pair_y_offset" id="pair_y_offset" min="-100" max="100"
+										value="0"></td>
+							</tr>
+						</table>
+						<input id="pair_reset" type="button" value="Reset" onclick="resetOffset()">
 					</span>
-				</div>
-			</div>
-			<fieldset style="margin:10px;">
-				<legend>Actions</legend>
-				<!-- Judge Commands -->
-				<span id="judge_action" style="display:none">
-					<span id="menu_wt" onclick="initWT()" class="judge_button"
-						style="color: blue"><i>Witness<br>Testimony</i></span>
-
-					<span id="menu_ce" onclick="initCE()" class="judge_button"
-						style="color: red"><i>Cross<br>Examination</i></span>
-
-					<span id="menu_nguilty" onclick="notguilty()" class="judge_button"
-						style="color: white; font-family: serif; text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; font-size: 1.5em; line-height: 0.75;">Not<br>Guilty</span>
-
-					<span id="menu_guilty" onclick="guilty()" class="judge_button"
-						style="color: black; font-family: serif; font-size: 1.5em;">Guilty</span>
-
+				</span>
+				<br>
+				<br>
+				<span id="cccc" style="display: none">
+					<label for="ic_chat_name">Custom Showname:</label>
+					<input id="ic_chat_name" name="ic_chat_name" type="text">
 					<br>
-					<span style="display:inline-block; vertical-align: middle;">
-						<span id="menu_rhpd" onclick="redHPD()" class="healthchange_button">
-							&#8863;
-						</span>
-						<span style="font-size: 1.25em">Defense</span>
-						<span id="menu_ahpd" onclick="addHPD()" class="healthchange_button">
-							&#8862;
-						</span>
-					</span>
-					<span style="display:inline-block; vertical-align: middle;">
-						<span id="menu_ahpp" onclick="addHPP()" class="healthchange_button">
-							&#8862;
-						</span>
-						<span style="font-size: 1.25em">Prosecution</span>
-						<span id="menu_rhpp" onclick="redHPP()" class="healthchange_button">
-							&#8863;
-						</span>
-					</span>
-				</span>
-				<!-- No Commands -->
-				<span id="no_action">
-					No judge actions available for this role.
+					<label for="showname">Show others:</label>
+					<input id="showname" name="showname" type="checkbox" onclick="showname_click()" checked>
+					<br>
+					<br>
+					<label for="check_nonint">Noninterrupting Preanimation:</label>
+					<input type="checkbox" name="check_nonint" id="check_nonint">
 				</span>
 				<br>
 				<br>
-				<span id="muting">
-					<label for="mute_select" style="float: left">Mute a character: </label>
-					<select name="mute_select" id="mute_select" onchange="mutelist_click(event)"></select>
+				<span id="2.7" style="display: none">
+					<label for="check_loopsfx">Looping SFX:</label>
+					<input type="checkbox" name="check_loopsfx" id="check_loopsfx">
 				</span>
-			</fieldset>
+				<br>
+				<br>
+				<span id="2.8" style="display: none">
+					<label for="check_additive">Additive:</label>
+					<input type="checkbox" name="check_additive" id="check_additive">
+					<br>
+					<br>
+					<label for="effect_select">Effect:</label>
+					<select id="effect_select" name="effect_select">
+						<option value="||">None</option>
+						<option value="realization||sfx-realization">Realization</option>
+						<option value="hearts||sfx-squee">Hearts</option>
+						<option value="reaction||sfx-reactionding">Reaction</option>
+						<option value="impact||sfx-fan">Impact</option>
+						<option value="rain-weak||sfx-rain">Weak Rain</option>
+						<option value="rain||sfx-rain">Rain</option>
+						<option value="rain-strong||sfx-rain">Strong Rain</option>
+					</select>
+				</span>
+			</div>
 		</div>
+		<fieldset style="margin:10px;">
+			<legend>Actions</legend>
+			<!-- Judge Commands -->
+			<span id="judge_action" style="display:none">
+				<span id="menu_wt" onclick="initWT()" class="judge_button"
+					style="color: blue"><i>Witness<br>Testimony</i></span>
+
+				<span id="menu_ce" onclick="initCE()" class="judge_button"
+					style="color: red"><i>Cross<br>Examination</i></span>
+
+				<span id="menu_nguilty" onclick="notguilty()" class="judge_button"
+					style="color: white; font-family: serif; text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000; font-size: 1.5em; line-height: 0.75;">Not<br>Guilty</span>
+
+				<span id="menu_guilty" onclick="guilty()" class="judge_button"
+					style="color: black; font-family: serif; font-size: 1.5em;">Guilty</span>
+
+				<br>
+				<span style="display:inline-block; vertical-align: middle;">
+					<span id="menu_rhpd" onclick="redHPD()" class="healthchange_button">
+						&#8863;
+					</span>
+					<span style="font-size: 1.25em">Defense</span>
+					<span id="menu_ahpd" onclick="addHPD()" class="healthchange_button">
+						&#8862;
+					</span>
+				</span>
+				<span style="display:inline-block; vertical-align: middle;">
+					<span id="menu_ahpp" onclick="addHPP()" class="healthchange_button">
+						&#8862;
+					</span>
+					<span style="font-size: 1.25em">Prosecution</span>
+					<span id="menu_rhpp" onclick="redHPP()" class="healthchange_button">
+						&#8863;
+					</span>
+				</span>
+			</span>
+			<!-- No Commands -->
+			<span id="no_action">
+				No judge actions available for this role.
+			</span>
+			<br>
+			<br>
+			<span id="muting">
+				<label for="mute_select" style="float: left">Mute a character: </label>
+				<select name="mute_select" id="mute_select" onchange="mutelist_click(event)"></select>
+			</span>
+		</fieldset>
 	</div>
 </template>
 
