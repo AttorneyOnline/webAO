@@ -147,7 +147,7 @@ const configMobile = {
 }
 
 
-const isMobileDevice = window.innerWidth <= 768; 
+const isMobileDevice = window.innerWidth <= window.innerHeight; 
 
 const golden = new GoldenLayout();
 golden.registerComponentFactoryFunction('template', (container, componentState) => {
