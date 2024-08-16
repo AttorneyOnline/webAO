@@ -13,7 +13,7 @@ dotenv.config();
 
 module.exports = {
   entry: {
-    ui: './webAO/multiUI.js',
+    ui: './webAO/ui.js',
     client: './webAO/client.ts',
     master: './webAO/master.ts',
     dom: {
