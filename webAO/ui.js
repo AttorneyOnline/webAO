@@ -67,7 +67,7 @@ const config = {
           },
           {
             type: 'component',
-            isClosable: false,
+            isClosable: true,
             title: 'Players',
             componentName: 'template',
             componentState: { id: 'players' },
@@ -143,6 +143,13 @@ const configMobile = {
           title: 'Music',
           componentName: 'template',
           componentState: { id: 'music' },
+        },
+        {
+          type: 'component',
+          isClosable: true,
+          title: 'Players',
+          componentName: 'template',
+          componentState: { id: 'players' },
         },
         {
           type: 'component',
