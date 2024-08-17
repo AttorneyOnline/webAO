@@ -142,15 +142,13 @@
 
 #client_icwrapper {
 	overflow-x: hidden;
-	overflow-y: auto;
-	height: 100%;
 	background: inherit;
 }
 
 #client_iccontrols {
-	position: relative;
 	background: inherit;
-	overflow-y:auto;
+	height: 100%;
+	overflow-y: auto;
 }
 
 
