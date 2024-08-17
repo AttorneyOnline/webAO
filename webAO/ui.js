@@ -18,7 +18,7 @@ const config = {
       width: 40,
       content: [{
         type: 'component',
-        height: 68,
+        height: 80,
         isClosable: false,
         componentName: 'template',
         title: 'IC',
@@ -26,7 +26,7 @@ const config = {
       },
       {
         type: 'component',
-        height: 32,
+        height: 20,
         isClosable: false,
         title: 'IC Options',
         componentName: 'template',
@@ -178,3 +178,10 @@ if (isMobileDevice){
 else {
   golden.loadLayout(config);
 }
+
+console.log(golden.root.contentItems[0].contentItems[0].contentItems[0]);
+
+golden.root.contentItems[0].contentItems[0].contentItems[0].on('resize',function(){
+  console.log("IC pane resized");  //TEMP
+  console.log(golden.root.contentItems[0].contentItems[0]);
+  });
