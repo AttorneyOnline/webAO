@@ -141,7 +141,7 @@
 }
 
 #client_icwrapper {
-	overflow-x: hidden;
+	position: relative;
 	background: inherit;
 }
 
@@ -318,6 +318,7 @@
 #client_fg {
 	position: absolute;
 	height: 100%;
+	width: 100%;
 	bottom: 0;
 	left: 0;
 	top: 50%;
@@ -557,7 +558,7 @@
 #client_musiclist {
 	width: 99%;
 	height: 95%;
-	height: calc(95% - 16px);
+	height: calc(99% - 18px);
 	background-color: #222;
 	color: #fff;
 }
