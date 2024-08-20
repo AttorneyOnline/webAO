@@ -28,7 +28,7 @@ const config = {
         type: 'component',
         height: 20,
         isClosable: false,
-        title: 'IC Options',
+        title: 'Emote',
         componentName: 'template',
         componentState: { id: 'icoptions' },
       }]
@@ -45,7 +45,7 @@ const config = {
             isClosable: false,
             title: 'Areas',
             componentName: 'template',
-            componentState: { id: 'areas' },
+            componentState: { id: 'areamenu' },
           },
           {
             type: 'component',
@@ -59,7 +59,7 @@ const config = {
             isClosable: true,
             title: 'Evidence',
             componentName: 'template',
-            componentState: { id: 'evidence' },
+            componentState: { id: 'evidencemenu' },
           },
           {
             type: 'component',
@@ -145,7 +145,7 @@ const configMobile = {
           type: 'component',
           isClosable: false,
           reorderEnabled: false,
-          title: 'IC Options',
+          title: 'Emote',
           componentName: 'template',
           componentState: { id: 'icoptions' },
         },
@@ -153,9 +153,23 @@ const configMobile = {
           type: 'component',
           isClosable: false,
           reorderEnabled: false,
-          title: 'Main',
+          title: 'Areas',
           componentName: 'template',
-          componentState: { id: 'mainmenu' },
+          componentState: { id: 'areamenu' },
+        },
+        {
+          type: 'component',
+          isClosable: false,
+          title: 'Settings',
+          componentName: 'template',
+          componentState: { id: 'settings' },
+        },
+        {
+          type: 'component',
+          isClosable: true,
+          title: 'Evidence',
+          componentName: 'template',
+          componentState: { id: 'evidencemenu' },
         },
         {
           type: 'component',
@@ -164,6 +178,13 @@ const configMobile = {
           title: 'Log',
           componentName: 'template',
           componentState: { id: 'log' },
+        },
+        {
+          type: 'component',
+          isClosable: false,
+          title: 'Help',
+          componentName: 'template',
+          componentState: { id: 'help' },
         },
         {
           type: 'component',
@@ -187,6 +208,13 @@ const configMobile = {
           title: 'OOC',
           componentName: 'template',
           componentState: { id: 'ooc' },
+        },
+        {
+          type: 'component',
+          isClosable: true,
+          title: 'About',
+          componentName: 'template',
+          componentState: { id: 'about' },
         }]
       }]
     }]
