@@ -444,45 +444,6 @@
 			</fieldset>
 		</span>
 
-		<!--  Evidence section  -->
-		<span class="menu_content" id="content_2">
-			<meta name="frame-title" lang="en" content="Evidence">
-			<fieldset style="text-align: left; display: flex; flex-direction: column;">
-				<legend>Information</legend>
-				<hr>
-				<div style="display: flex;">
-					<img id="evi_preview" class="evi_icon" src="" alt="Evidence Icon" onerror="imgError(this);">
-					<div id="evi_options">
-						<input id="evi_name" name="evi_name" type="text" placeholder="Evidence name">
-						<br>
-						<label for="evi_filename">Icon:</label>
-						<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
-						<input id="evi_filename" name="evi_filename" type="text" placeholder="Custom filename">
-					</div>
-				</div>
-				<hr>
-				<div style="display: flex; padding-top: 5px;">
-					<textarea id="evi_desc" name="evi_desc" rows="2" cols="20"
-						placeholder="Evidence description"></textarea>
-				</div>
-				<div style="display: block; text-align: center; padding-top: 20px;">
-					<button id="evi_add" alt="Add Evidence" class="client_button hover_button"
-						onclick="addEvidence()">Add</button>
-					<button id="evi_edit" alt="Edit Evidence" class="client_button hover_button inactive"
-						onclick="editEvidence()">Edit</button>
-					<button id="evi_cancel" alt="Cancel Evidence" class="client_button hover_button inactive"
-						onclick="cancelEvidence()">Cancel</button>
-					<button id="evi_del" alt="Remove Evidence" class="client_button hover_button inactive"
-						onclick="deleteEvidence()">Remove</button>
-				</div>
-			</fieldset>
-			<br>
-			<div id="evidences"></div>
-			<br>
-			<button id="button_present" alt="Present" class="client_button"
-				onclick="toggleEffect(this)">Present</button>
-		</span>
-
 		<!-- Settings section -->
 		<span class="menu_content" id="content_3">
 			<meta name="frame-title" lang="en" content="Settings">
@@ -603,6 +564,44 @@
 			<p><a href="styles/igiari/readme.txt">Igiari font by Caveras</a></p>
 		</span>
 	</div>
+</template>
+
+<template id="evidence">
+	<meta name="frame-title" lang="en" content="Evidence">
+				<fieldset style="text-align: left; display: flex; flex-direction: column;">
+					<legend>Information</legend>
+					<hr>
+					<div style="display: flex;">
+						<img id="evi_preview" class="evi_icon" src="" alt="Evidence Icon" onerror="imgError(this);">
+						<div id="evi_options">
+							<input id="evi_name" name="evi_name" type="text" placeholder="Evidence name">
+							<br>
+							<label for="evi_filename">Icon:</label>
+							<select id="evi_select" name="evi_select" onchange="updateEvidenceIcon()"></select>
+							<input id="evi_filename" name="evi_filename" type="text" placeholder="Custom filename">
+						</div>
+					</div>
+					<hr>
+					<div style="display: flex; padding-top: 5px;">
+						<textarea id="evi_desc" name="evi_desc" rows="2" cols="20"
+							placeholder="Evidence description"></textarea>
+					</div>
+					<div style="display: block; text-align: center; padding-top: 20px;">
+						<button id="evi_add" alt="Add Evidence" class="client_button hover_button"
+							onclick="addEvidence()">Add</button>
+						<button id="evi_edit" alt="Edit Evidence" class="client_button hover_button inactive"
+							onclick="editEvidence()">Edit</button>
+						<button id="evi_cancel" alt="Cancel Evidence" class="client_button hover_button inactive"
+							onclick="cancelEvidence()">Cancel</button>
+						<button id="evi_del" alt="Remove Evidence" class="client_button hover_button inactive"
+							onclick="deleteEvidence()">Remove</button>
+					</div>
+				</fieldset>
+				<br>
+				<div id="evidences"></div>
+				<br>
+				<button id="button_present" alt="Present" class="client_button"
+					onclick="toggleEffect(this)">Present</button>
 </template>
 
 <template id="log">
