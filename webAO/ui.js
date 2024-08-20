@@ -43,9 +43,9 @@ const config = {
           content: [{
             type: 'component',
             isClosable: false,
-            title: 'Main',
+            title: 'Areas',
             componentName: 'template',
-            componentState: { id: 'mainmenu' },
+            componentState: { id: 'areas' },
           },
           {
             type: 'component',
