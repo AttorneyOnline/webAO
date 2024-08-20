@@ -63,10 +63,10 @@ const config = {
           },
           {
             type: 'component',
-            isClosable: true,
-            title: 'About',
+            isClosable: false,
+            title: 'Help',
             componentName: 'template',
-            componentState: { id: 'about' },
+            componentState: { id: 'help' },
           }],
         },
         {
@@ -89,13 +89,20 @@ const config = {
         }],
       },
       {
-        type: 'row',
+        type: 'stack',
         content: [{
           type: 'component',
           isClosable: false,
           title: 'OOC',
           componentName: 'template',
           componentState: { id: 'ooc' },
+        },
+        {
+          type: 'component',
+          isClosable: true,
+          title: 'About',
+          componentName: 'template',
+          componentState: { id: 'about' },
         }],
       }],
     }],

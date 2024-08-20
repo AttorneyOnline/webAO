@@ -354,12 +354,6 @@
 			<span id="no_action">
 				No judge actions available for this role.
 			</span>
-			<br>
-			<br>
-			<span id="muting">
-				<label for="mute_select" style="float: left">Mute a character: </label>
-				<select name="mute_select" id="mute_select" onchange="mutelist_click(event)"></select>
-			</span>
 		</fieldset>
 	</div>
 </template>
@@ -373,17 +367,9 @@
 				<b class="menu_icon">&#128205;</b>
 				<div class="menu_text">Areas</div>
 			</span>
-			<span id="menu_2" onclick="toggleMenu(2)" class="menu_button">
-				<b class="menu_icon">&#128188;</b>
-				<div class="menu_text">Evidence</div>
-			</span>
 			<span id="menu_3" onclick="toggleMenu(3)" class="menu_button">
 				<b class="menu_icon">&#128295;</b>
 				<div class="menu_text">Settings</div>
-			</span>
-			<span id="menu_4" onclick="toggleMenu(4)" class="menu_button">
-				<b class="menu_icon">&#10067;</b>
-				<div class="menu_text">About</div>
 			</span>
 			<span id="menu_cm" onclick="callMod()" class="menu_button">
 				<b class="menu_icon">&#128680;</b>
@@ -595,6 +581,24 @@
 	</div>
 </template>
 
+<template id="help">
+	<meta name="frame-title" lang="en" content="Help">
+	<p>Annonying Player?</p>
+	<span id="muting">
+		<label for="mute_select" style="float: left">Mute a character: </label>
+		<select name="mute_select" id="mute_select" onchange="mutelist_click(event)"></select>
+	</span>
+
+	<p>Malicious Player?</p>
+	<span id="menu_cm" onclick="callMod()" class="menu_button">
+		<b class="menu_icon">&#128680;</b>
+		<div class="menu_text" style="color: #ce2727;">Call Mod</div>
+	</span>
+
+	<p>Confused?</p>
+	<p><a href="https://youtu.be/xxxxx">Tutorial video</a></p>
+	
+</template>
 
 <template id="about">
 			<meta name="frame-title" lang="en" content="About">
