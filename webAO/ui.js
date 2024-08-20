@@ -49,6 +49,13 @@ const config = {
           },
           {
             type: 'component',
+            isClosable: false,
+            title: 'Settings',
+            componentName: 'template',
+            componentState: { id: 'settings' },
+          },
+          {
+            type: 'component',
             isClosable: true,
             title: 'Evidence',
             componentName: 'template',

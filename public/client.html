@@ -429,111 +429,105 @@
 				<span id="client_timer20">00:00:00</span>
 			</fieldset>
 		</span>
-
-		<!-- Settings section -->
-		<span class="menu_content" id="content_3">
-			<meta name="frame-title" lang="en" content="Settings">
-			<h2>Volume</h2>
-			<p>Music</p>
-			<input id="client_mvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
-				onchange="changeMusicVolume()">
-
-			<p>SFX</p>
-			<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" onerror="opusCheck(this)" controls></audio>
-
-			<p>Shouts</p>
-			<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" onerror="opusCheck(this)"
-				controls></audio>
-
-			<p>Testimony/Guilty</p>
-			<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" onerror="opusCheck(this)"
-				controls></audio>
-
-			<p>Blip</p>
-			<input id="client_bvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
-				onchange="changeBlipVolume()">
-			<br>
-			<br>
-			<label for="client_themeselect">Menu theme:</label>
-			<select id="client_themeselect" name="client_themeselect" onchange="reloadTheme()">
-				<option value="default" selected>Default</option>
-				<option value="classic">Classic</option>
-				<option value="soj">DD / SoJ</option>
-				<option value="cyber">Cyber</option>
-				<option value="trilogy">Trilogy</option>
-				<option value="speen">April</option>
-			</select>
-			<br>
-			<br>
-			<label for="client_chatboxselect">Chatbox theme:</label>
-			<select id="client_chatboxselect" name="client_chatboxselect" onchange="setChatbox(this.value)">
-				<option value="dynamic" selected>Use characters</option>
-				<option value="aa">AA</option>
-				<option value="dd">DD / SoJ</option>
-				<option value="dgs">Chronicles</option>
-				<option value="plvsaa">PL vs AA</option>
-				<option value="trilogy">Trilogy</option>
-				<option value="future">Future theme</option>
-				<option value="legacy">old webAO</option>
-				<option value="999">999</option>
-				<option value="acww">Animal Crossing</option>
-				<option value="dr1">DR 1</option>
-				<option value="dr2">DR 2</option>
-				<option value="drv3">DR 3</option>
-				<option value="drae">DR: AE</option>
-				<option value="ddlc">DDLC</option>
-				<option value="homestuck">Homestuck</option>
-				<option value="key">Key</option>
-				<option value="n64zelda">N64 Zelda</option>
-				<option value="papermario">Paper Mario</option>
-				<option value="p3">Persona 3</option>
-				<option value="p4">Persona 4</option>
-				<option value="p5">Persona 5</option>
-				<option value="sonic">Murder of Sonic</option>
-				<option value="halla">VA-11 HALL-A</option>
-				<option value="whentheycry">When They Cry Series</option>
-				<option value="yakuza">Yakuza</option>
-				<option value="yttd">YTTD</option>
-			</select>
-			<!--
-			<br>
-			<br>
-			<button id="client_modcall" onclick="modcall_test()">Test modcall</button>
-			-->
-			<br>
-			<br>
-			<p>Ini editing (experimental)</p>
-			<label for="client_iniselect">Iniedit Character:</label>
-			<select id="client_iniselect" name="client_iniselect" onchange="updateIniswap()"></select>
-			<input id="client_ininame" name="client_ininame"></input>
-			<button id="client_inichange" onclick="iniedit()">Change</button>
-			<br>
-			<br>
-			<p>Pan-tilt (experimental)</p>
-			<label for="client_pantilt">Enable:</label>
-			<input type="checkbox" id="client_pantilt" name="client_pantilt" onclick="switchPanTilt()">
-			<br>
-			<br>
-			<p>16:9 viewport (experimental)</p>
-			<label for="client_hdviewport">Enable:</label>
-			<input type="checkbox" id="client_hdviewport" name="client_hdviewport" onclick="switchAspectRatio()">
-			<br>
-			<label for="client_hdviewport_offset">Offset chatbox:</label>
-			<input type="checkbox" id="client_hdviewport_offset" id="client_hdviewport_offset"
-				onclick="switchChatOffset()">
-			<br>
-			<br>
-			<label for="client_callwords">Callwords:</label>
-			<br>
-			<textarea id="client_callwords" name="client_callwords" rows="4" cols="10"
-				placeholder="Put 1 callword per line here" onchange="changeCallwords()"></textarea>
-			<br>
-			<br>
-			<span style="color:blue">Changing these settings will save them as a cookie.<br>
-				By doing so, you agree to it being saved.<br>
-				If you don't agree, disable cookies for this site in your browser.</span>
-		</span>
 	</div>
+</template>
+
+<template id="settings">
+		<meta name="frame-title" lang="en" content="Settings">
+		<h2>Volume</h2>
+		<p>Music</p>
+		<input id="client_mvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
+			onchange="changeMusicVolume()">
+
+		<p>SFX</p>
+		<audio id="client_sfxaudio" onvolumechange="changeSFXVolume()" onerror="opusCheck(this)" controls></audio>
+
+		<p>Shouts</p>
+		<audio id="client_shoutaudio" onvolumechange="changeShoutVolume()" onerror="opusCheck(this)"
+			controls></audio>
+
+		<p>Testimony/Guilty</p>
+		<audio id="client_testimonyaudio" onvolumechange="changeTestimonyVolume()" onerror="opusCheck(this)"
+			controls></audio>
+
+		<p>Blip</p>
+		<input id="client_bvolume" class="long" type="range" min="0" max="1" value="1" step="0.01"
+			onchange="changeBlipVolume()">
+		<br>
+		<br>
+		<label for="client_themeselect">Menu theme:</label>
+		<select id="client_themeselect" name="client_themeselect" onchange="reloadTheme()">
+			<option value="default" selected>Default</option>
+			<option value="classic">Classic</option>
+			<option value="soj">DD / SoJ</option>
+			<option value="cyber">Cyber</option>
+			<option value="trilogy">Trilogy</option>
+			<option value="speen">April</option>
+		</select>
+		<br>
+		<br>
+		<label for="client_chatboxselect">Chatbox theme:</label>
+		<select id="client_chatboxselect" name="client_chatboxselect" onchange="setChatbox(this.value)">
+			<option value="dynamic" selected>Use characters</option>
+			<option value="aa">AA</option>
+			<option value="dd">DD / SoJ</option>
+			<option value="dgs">Chronicles</option>
+			<option value="plvsaa">PL vs AA</option>
+			<option value="trilogy">Trilogy</option>
+			<option value="future">Future theme</option>
+			<option value="legacy">old webAO</option>
+			<option value="999">999</option>
+			<option value="acww">Animal Crossing</option>
+			<option value="dr1">DR 1</option>
+			<option value="dr2">DR 2</option>
+			<option value="drv3">DR 3</option>
+			<option value="drae">DR: AE</option>
+			<option value="ddlc">DDLC</option>
+			<option value="homestuck">Homestuck</option>
+			<option value="key">Key</option>
+			<option value="n64zelda">N64 Zelda</option>
+			<option value="papermario">Paper Mario</option>
+			<option value="p3">Persona 3</option>
+			<option value="p4">Persona 4</option>
+			<option value="p5">Persona 5</option>
+			<option value="sonic">Murder of Sonic</option>
+			<option value="halla">VA-11 HALL-A</option>
+			<option value="whentheycry">When They Cry Series</option>
+			<option value="yakuza">Yakuza</option>
+			<option value="yttd">YTTD</option>
+		</select>
+		<br>
+		<br>
+		<p>Ini editing (experimental)</p>
+		<label for="client_iniselect">Iniedit Character:</label>
+		<select id="client_iniselect" name="client_iniselect" onchange="updateIniswap()"></select>
+		<input id="client_ininame" name="client_ininame"></input>
+		<button id="client_inichange" onclick="iniedit()">Change</button>
+		<br>
+		<br>
+		<p>Pan-tilt (experimental)</p>
+		<label for="client_pantilt">Enable:</label>
+		<input type="checkbox" id="client_pantilt" name="client_pantilt" onclick="switchPanTilt()">
+		<br>
+		<br>
+		<p>16:9 viewport (experimental)</p>
+		<label for="client_hdviewport">Enable:</label>
+		<input type="checkbox" id="client_hdviewport" name="client_hdviewport" onclick="switchAspectRatio()">
+		<br>
+		<label for="client_hdviewport_offset">Offset chatbox:</label>
+		<input type="checkbox" id="client_hdviewport_offset" id="client_hdviewport_offset"
+			onclick="switchChatOffset()">
+		<br>
+		<br>
+		<label for="client_callwords">Callwords:</label>
+		<br>
+		<textarea id="client_callwords" name="client_callwords" rows="4" cols="10"
+			placeholder="Put 1 callword per line here" onchange="changeCallwords()"></textarea>
+		<br>
+		<br>
+		<span style="color:blue">Changing these settings will save them as a cookie.<br>
+			By doing so, you agree to it being saved.<br>
+			If you don't agree, disable cookies for this site in your browser.</span>
 </template>
 
 <template id="evidence">
