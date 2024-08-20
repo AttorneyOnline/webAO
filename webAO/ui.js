@@ -60,6 +60,13 @@ const config = {
             title: 'Log',
             componentName: 'template',
             componentState: { id: 'log' },
+          },
+          {
+            type: 'component',
+            isClosable: true,
+            title: 'About',
+            componentName: 'template',
+            componentState: { id: 'about' },
           }],
         },
         {
@@ -85,6 +92,7 @@ const config = {
         type: 'row',
         content: [{
           type: 'component',
+          isClosable: false,
           title: 'OOC',
           componentName: 'template',
           componentState: { id: 'ooc' },
