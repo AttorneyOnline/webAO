@@ -142,14 +142,14 @@ const configMobile = {
         type: 'stack',
         height: 44,
         content: [{
-            type: 'component',
-            isClosable: false,
-            reorderEnabled: false,
-            title: 'IC Options',
-            componentName: 'template',
-            componentState: { id: 'icoptions' },
-          },
-          {
+          type: 'component',
+          isClosable: false,
+          reorderEnabled: false,
+          title: 'IC Options',
+          componentName: 'template',
+          componentState: { id: 'icoptions' },
+        },
+        {
           type: 'component',
           isClosable: false,
           reorderEnabled: false,
@@ -194,14 +194,14 @@ const configMobile = {
 }
 
 
-const isMobileDevice = window.innerWidth <= window.innerHeight; 
+const isMobileDevice = window.innerWidth <= window.innerHeight;
 
 const golden = new GoldenLayout();
 golden.registerComponentFactoryFunction('template', (container, componentState) => {
   const template = document.querySelector(`#${componentState.id}`);
   container.element.innerHTML = template.innerHTML;
 });
-if (isMobileDevice){
+if (isMobileDevice) {
   golden.loadLayout(configMobile);
 }
 else {
@@ -210,7 +210,7 @@ else {
 
 console.log(golden.root.contentItems[0].contentItems[0].contentItems[0]);
 
-golden.root.contentItems[0].contentItems[0].contentItems[0].on('resize',function(){
+golden.root.contentItems[0].contentItems[0].contentItems[0].on('resize', function () {
   console.log("IC pane resized");  //TEMP
   console.log(golden.root.contentItems[0].contentItems[0]);
-  });
+});
