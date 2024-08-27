@@ -3,6 +3,8 @@ import { AO_HOST } from "../../client/aoHost";
 import { safeTags } from "../../encoding";
 import { updateBackgroundPreview } from '../../dom/updateBackgroundPreview'
 import { getIndexFromSelect } from '../../dom/getIndexFromSelect'
+import { switchPanTilt } from '../../dom/switchPanTilt'
+import transparentPng from '../../constants/transparentPng'
 import tryUrls from "../../utils/tryUrls";
 
 /**
@@ -45,6 +47,10 @@ export const handleBN = (args: string[]) => {
     });
     tryUrls(`${bgfolder}court`).then((resp) => {
         (<HTMLImageElement>document.getElementById("client_court")).src = resp;
+        if (resp !== transparentPng) {
+            (<HTMLInputElement>document.getElementById("client_pantilt")).checked = true;
+            switchPanTilt()
+        }
     });
     tryUrls(`${bgfolder}defenseempty`).then((resp) => {
         (<HTMLImageElement>document.getElementById("client_court_def")).src =
