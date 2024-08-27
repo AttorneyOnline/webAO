@@ -43,7 +43,7 @@ export const handleBN = (args: string[]) => {
         (<HTMLImageElement>document.getElementById("client_pro_bench")).src =
             resp;
     });
-    tryUrls(`${bgfolder}full`).then((resp) => {
+    tryUrls(`${bgfolder}court`).then((resp) => {
         (<HTMLImageElement>document.getElementById("client_court")).src = resp;
     });
     tryUrls(`${bgfolder}defenseempty`).then((resp) => {
