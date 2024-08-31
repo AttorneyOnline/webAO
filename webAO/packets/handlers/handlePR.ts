@@ -8,6 +8,7 @@ function addPlayer(playerID: number) {
     playerRow.className = `area0`;
 
     const imgCell = playerRow.insertCell(0);
+    imgCell.style.width = "64px";
     const img = document.createElement('img');
     imgCell.appendChild(img);
 
@@ -21,12 +22,14 @@ function addPlayer(playerID: number) {
     oocNameCell.appendChild(name);
 
     const kickCell = playerRow.insertCell(4);
+    kickCell.style.width = "64px";
     const kick = <HTMLButtonElement>document.createElement("button");
     kick.innerText = "Kick";
     kick.onclick = () => { window.kickPlayer(playerID) }
     kickCell.appendChild(kick);
 
     const banCell = playerRow.insertCell(5);
+    banCell.style.width = "64px";
     const ban = <HTMLButtonElement>document.createElement("button");
     ban.innerText = "Ban";
     ban.onclick = () => { window.banPlayer(playerID) }
