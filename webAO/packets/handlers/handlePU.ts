@@ -1,4 +1,6 @@
+import { client } from "../../client";
 import { getCharIcon } from "../../client/handleCharacterInfo";
+import { updatePlayerAreas } from '../../dom/updatePlayerAreas'
 
 /**
   * Handles a playerlist update
@@ -23,6 +25,9 @@ export const handlePU = (args: string[]) => {
             const showName = <HTMLElement>playerRow.childNodes[2];
             showName.innerText = data;
             break;
+        case 3:
+            playerRow.className = `area${data}`;
+            updatePlayerAreas(client.area);
         default:
             break;
     }

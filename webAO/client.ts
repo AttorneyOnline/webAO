@@ -124,6 +124,7 @@ class Client extends EventEmitter {
     chars: any;
     emotes: any;
     evidences: any;
+    area: number;
     areas: any;
     musics: any;
     musics_time: boolean;
@@ -183,6 +184,7 @@ class Client extends EventEmitter {
         this.chars = [];
         this.emotes = [];
         this.evidences = [];
+        this.area = 0;
         this.areas = [];
         this.musics = [];
         this.musics_time = false;

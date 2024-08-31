@@ -5,6 +5,7 @@ function addPlayer(playerID: number) {
     const list = <HTMLTableElement>document.getElementById("client_playerlist");
     const playerRow = list.insertRow();
     playerRow.id = `client_playerlist_entry${playerID}`;
+    playerRow.className = `area0`;
 
     const imgCell = playerRow.insertCell(0);
     const img = document.createElement('img');
