@@ -27,6 +27,7 @@ import { handleID } from './handlers/handleID'
 import { handlePN } from './handlers/handlePN'
 import { handleSI } from './handlers/handleSI'
 import { handleARUP } from './handlers/handleARUP'
+import { handleAUTH } from './handlers/handleAUTH'
 import { handleaskchaa } from './handlers/handleaskchaa'
 import { handleCC } from './handlers/handleCC'
 import { handleRC } from './handlers/handleRC'
@@ -71,6 +72,7 @@ export const packets = {
     "PN": handlePN,
     "SI": handleSI,
     "ARUP": handleARUP,
+    "AUTH": handleAUTH,
     "askchaa": handleaskchaa,
     "CC": handleCC,
     "RC": handleRC,

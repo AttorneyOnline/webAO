@@ -52,6 +52,7 @@ declare global {
         onEnter: (event: any) => void;
         onReplayGo: (_event: any) => void;
         onOOCEnter: (_event: any) => void;
+        kickPlayer: (id: number) => void;
         banPlayer: (id: number) => void;
         hcallback: (_event: any) => void;
     }

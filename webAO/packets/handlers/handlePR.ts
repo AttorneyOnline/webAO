@@ -1,5 +1,5 @@
 import { client } from "../../client";
-import { banPlayer } from '../../dom/banPlayer'
+import { kickPlayer, banPlayer } from '../../dom/banPlayer'
 
 function addPlayer(playerID: number) {
     const list = <HTMLTableElement>document.getElementById("client_playerlist");
@@ -19,7 +19,13 @@ function addPlayer(playerID: number) {
     const oocNameCell = playerRow.insertCell(3);
     oocNameCell.appendChild(name);
 
-    const banCell = playerRow.insertCell(4);
+    const kickCell = playerRow.insertCell(4);
+    const kick = <HTMLButtonElement>document.createElement("button");
+    kick.innerText = "Kick";
+    kick.onclick = () => { window.kickPlayer(playerID) }
+    kickCell.appendChild(kick);
+
+    const banCell = playerRow.insertCell(5);
     const ban = <HTMLButtonElement>document.createElement("button");
     ban.innerText = "Ban";
     ban.onclick = () => { window.banPlayer(playerID) }
