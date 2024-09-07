@@ -5,6 +5,10 @@
 	width: 20px;
 }
 
+.lm_content {
+	overflow-y: scroll;
+  }
+
 @keyframes error_blink {
 	0% {
 		color: #fff;
@@ -565,7 +569,6 @@
 
 #client_playerlist {
 	width: 100%;
-	overflow-y: scroll;
 }
 
 #client_menu {
