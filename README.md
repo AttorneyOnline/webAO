@@ -1,7 +1,7 @@
 # webAO
 
 This is a client for the Attorney Online roleplaying chatroom written in HTML and JavaScript.
-It works with the any AO server if it has WebSocket support.
+It works with any AO server if it has WebSocket support.
 
 Link to the client in this repo: <http://web.aceattorneyonline.com/>
 
