@@ -2,6 +2,7 @@ import queryParser from "../../utils/queryParser";
 
 import { client } from '../../client'
 import { handleCharacterInfo } from "../../client/handleCharacterInfo";
+import { CharData } from "../../client/CharData";
 const { mode } = queryParser();
 
 /**
@@ -22,6 +23,17 @@ export const handleSC = async (args: string[]) => {
     for (let i = 1; i < args.length; i++) {
         const chargs = args[i].split("&");
         const charid = i - 1;
+        const charName = chargs[0];
+        const charDesc = chargs.length > 1 ? chargs[1] : '';
+
+        // Initial data, the rest is set by handleCharacterInfo
+        const charData: CharData = {
+            charid: charid,
+            charName: charName,
+            charDesc: charDesc
+        };
+
+        client.chars.set(charid, charData);
 
         setTimeout(() => handleCharacterInfo(chargs, charid), charid*6);
     }

@@ -17,7 +17,8 @@ import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
 import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists'
 import getCookie from "./utils/getCookie";
-import setCookie from "./utils/setCookie";
+import { CharData } from "./client/CharData";
+
 const { ip: serverIP, connect, mode, theme, serverName } = queryParser();
 
 document.title = serverName;
@@ -121,7 +122,7 @@ class Client extends EventEmitter {
     evidence_list_length: number;
     music_list_length: number;
     testimonyID: number;
-    chars: any;
+    chars: Map<number, CharData>;
     emotes: any;
     evidences: any;
     area: number;
