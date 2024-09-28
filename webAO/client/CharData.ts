@@ -1,6 +1,6 @@
 
 export type CharData = {
-    charid: number;
-    charName: string;
-    charDesc: string;
+    id: number;
+    name: string;
+    desc: string;
 }

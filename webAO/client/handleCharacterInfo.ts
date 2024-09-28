@@ -75,6 +75,16 @@ export const handleCharacterInfo = async (chargs: string[], charid: number) => {
         };
         cini.emotions = Object.assign(default_emotions, cini.emotions);
 
+        const charData = client.chars.get(charid);
+
+        if (!charData) {
+            console.warn(`missing initial charData for ${charid}`);
+            img.style.display = "none";
+            return;
+        }
+
+        // charData.showname = safeTags(cini.options.showname);
+
         client.chars[charid] = {
             name: safeTags(chargs[0]),
             showname: safeTags(cini.options.showname),

@@ -28,9 +28,9 @@ export const handleSC = async (args: string[]) => {
 
         // Initial data, the rest is set by handleCharacterInfo
         const charData: CharData = {
-            charid: charid,
-            charName: charName,
-            charDesc: charDesc
+            id: charid,
+            name: charName,
+            desc: charDesc
         };
 
         client.chars.set(charid, charData);
