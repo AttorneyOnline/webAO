@@ -1,19 +1,23 @@
 import { client } from "../client";
+
 /**
  * Triggered when a character in the mute list is clicked
- * @param {MouseEvent} event
  */
-export function mutelist_click(_event: Event) {
-    const mutelist = <HTMLSelectElement>(document.getElementById('mute_select'));
-    const selected_character = mutelist.options[mutelist.selectedIndex];
+export function mutelist_click() {
+    const mutelist: HTMLSelectElement = <HTMLSelectElement>(document.getElementById('mute_select'));
+    const selectedCharElement: HTMLOptionElement = mutelist.options[mutelist.selectedIndex];
 
-    if (client.chars[selected_character.value].muted === false) {
-        client.chars[selected_character.value].muted = true;
-        selected_character.text = `${client.chars[selected_character.value].name} (muted)`;
-        console.info(`muted ${client.chars[selected_character.value].name}`);
+    const charId: number = parseInt(selectedCharElement.value, 10);
+    const selectedChar = client.chars.get(charId);
+
+    if (selectedChar.muted === false) {
+        selectedChar.muted = true;
+        selectedCharElement.text = `${selectedChar.name} (muted)`;
+        console.info(`muted ${selectedChar.name}`);
     } else {
-        client.chars[selected_character.value].muted = false;
-        selected_character.text = client.chars[selected_character.value].name;
+        selectedChar.muted = false;
+        selectedCharElement.text = selectedChar.name;
     }
 }
+
 window.mutelist_click = mutelist_click;
