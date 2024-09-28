@@ -122,7 +122,7 @@ class Client extends EventEmitter {
     evidence_list_length: number;
     music_list_length: number;
     testimonyID: number;
-    chars: Map<number, CharData>;
+    chars: Map<number, CharData> = new Map();
     emotes: any;
     evidences: any;
     area: number;
