@@ -24,17 +24,23 @@ export const handleSC = async (args: string[]) => {
         const chargs = args[i].split("&");
         const charid = i - 1;
         const charName = chargs[0];
+        // Optional field
         const charDesc = chargs.length > 1 ? chargs[1] : '';
+        // Puzzling optional field that seems to be documented nowhere
+        const charEvidence = chargs.length > 3 ? chargs[3] : '';
 
-        // Initial data, the rest is set by handleCharacterInfo
         const charData: CharData = {
             id: charid,
             name: charName,
-            desc: charDesc
+            desc: charDesc,
+            evidence: charEvidence,
         };
 
+        // Set initial known data
         client.chars.set(charid, charData);
 
+        // Load the rest of the char data here
+        // Stagger the requests with 6ms intervals
         setTimeout(() => handleCharacterInfo(chargs, charid), charid*6);
     }
     // We're done with the characters, request the music

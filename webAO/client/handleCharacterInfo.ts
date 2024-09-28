@@ -83,31 +83,24 @@ export const handleCharacterInfo = async (chargs: string[], charid: number) => {
             return;
         }
 
-        // charData.showname = safeTags(cini.options.showname);
-
-        client.chars[charid] = {
-            name: safeTags(chargs[0]),
-            showname: safeTags(cini.options.showname),
-            desc: safeTags(chargs[1]),
-            blips: safeTags(cini.options.blips).toLowerCase(),
-            gender: safeTags(cini.options.gender).toLowerCase(),
-            side: safeTags(cini.options.side).toLowerCase(),
-            chat:
-                cini.options.chat === ""
-                    ? safeTags(cini.options.category).toLowerCase()
-                    : safeTags(cini.options.chat).toLowerCase(),
-            evidence: chargs[3],
-            icon: img.src,
-            inifile: cini,
-            muted: false,
-        };
+        charData.showname = safeTags(cini.options.showname);
+        charData.blips = safeTags(cini.options.blips).toLowerCase();
+        charData.gender = safeTags(cini.options.gender).toLowerCase();
+        charData.side = safeTags(cini.options.side).toLowerCase();
+        charData.chat =
+            cini.options.chat === ""
+                ? safeTags(cini.options.category).toLowerCase()
+                : safeTags(cini.options.chat).toLowerCase();
+        charData.icon = img.src;
+        charData.inifile = cini;
+        charData.muted = false;
 
         if (
-            client.chars[charid].blips === "male" &&
-            client.chars[charid].gender !== "male" &&
-            client.chars[charid].gender !== ""
+            client.chars.get(charid).blips === "male" &&
+            client.chars.get(charid).gender !== "male" &&
+            client.chars.get(charid).gender !== ""
         ) {
-            client.chars[charid].blips = client.chars[charid].gender;
+            client.chars.get(charid).blips = client.chars.get(charid).gender;
         }
 
     } else {
