@@ -81,7 +81,7 @@ export const handleBN = (args: string[]) => {
         });
     } else {
         client.viewport.set_side({
-            position: client.chars[client.charID].side,
+            position: client.chars.get(client.charID).side,
             showSpeedLines: false,
             showDesk: true,
         });

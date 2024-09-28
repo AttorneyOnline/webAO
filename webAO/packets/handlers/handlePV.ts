@@ -27,7 +27,7 @@ export const handlePV = async (args: string[]) => {
     document.getElementById("client_waiting")!.style.display = "none";
     document.getElementById("client_charselect")!.style.display = "none";
 
-    const me = client.chars[client.charID];
+    const me = client.chars.get(client.charID);
     client.selectedEmote = -1;
     const { emotes } = client;
     const emotesList = document.getElementById("client_emo");

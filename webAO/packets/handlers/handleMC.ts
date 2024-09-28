@@ -10,7 +10,7 @@ import { appendICLog } from '../../client/appendICLog'
 export const handleMC = (args: string[]) => {
     const track = prepChat(args[1]);
     let charID = Number(args[2]);
-    const showname = args[3] || "";
+    // const showname = args[3] || ""; // Unused here
     const looping = Boolean(args[4]);
     const channel = Number(args[5]) || 0;
     // const fading = Number(args[6]) || 0; // unused in web
@@ -27,13 +27,13 @@ export const handleMC = (args: string[]) => {
     music.play();
 
     try {
-        musicname = client.chars[charID].name;
+        musicname = client.chars.get(charID).name;
     } catch (e) {
         charID = -1;
     }
 
     if (charID >= 0) {
-        musicname = client.chars[charID].name;
+        musicname = client.chars.get(charID).name;
         appendICLog(`${musicname} changed music to ${track}`);
     } else {
         appendICLog(`The music was changed to ${track}`);
