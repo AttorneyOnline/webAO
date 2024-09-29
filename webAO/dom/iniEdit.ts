@@ -12,7 +12,7 @@ export async function iniedit() {
 
     const newname = iniselect.selectedIndex === 0 ? ininame.value : iniselect.value;
 
-    await handleCharacterInfo(newname.split("&"), inicharID);
+    await handleCharacterInfo(newname.split("&")[0], inicharID);
     packetHandler.get("PV")!(`PV#0#CID#${inicharID}`.split("#"));
 }
 window.iniedit = iniedit;

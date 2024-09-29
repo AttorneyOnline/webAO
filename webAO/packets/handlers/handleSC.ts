@@ -46,7 +46,7 @@ export async function handleSC(args: string[]) {
 
         // Load the rest of the char data here
         // Stagger the requests with 6ms intervals
-        setTimeout(() => handleCharacterInfo(chargs, charid), charid*6);
+        setTimeout(() => handleCharacterInfo(chargs[0], charid), charid*6);
     }
     // We're done with the characters, request the music
     client.sender.sendServer("RM#%");

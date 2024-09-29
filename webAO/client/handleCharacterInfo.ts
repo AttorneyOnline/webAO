@@ -27,18 +27,11 @@ export const getCharIcon = async (charButtonDiv: HTMLDivElement, charname: strin
 
 /**
  * Handles the incoming character information, and downloads the sprite + ini for it
- * @param {Array} chargs packet arguments
+ * @param {string} charName name of the character
  * @param {Number} charid character ID
  */
-export const handleCharacterInfo = async (chargs: string[], charid: number) => {
+export const handleCharacterInfo = async (charName: string, charid: number) => {
     const charButtonDiv = <HTMLDivElement>document.getElementById(`demo_${charid}`);
-    if (!chargs[0]) {
-        console.warn(`missing charid ${charid}`);
-        charButtonDiv.style.display = "none";
-        return;
-    }
-
-    const charName: string = chargs[0];
     let cini: any = {};
 
     getCharIcon(charButtonDiv, charName);

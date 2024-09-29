@@ -28,7 +28,7 @@ export const handleMS = (args: string[]) => {
           `${client.chars.get(char_id).name} is iniediting to ${char_name}`
         );
         const chargs = (`${char_name}&` + "iniediter").split("&");
-        handleCharacterInfo(chargs, char_id);
+        handleCharacterInfo(chargs[0], char_id);
       }
     }
 
