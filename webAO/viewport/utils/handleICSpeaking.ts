@@ -78,7 +78,9 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
             : client.viewport.getChatmsg().nameplate!;
 
     // Clear out the last message
-    chatBoxInner.innerText = client.viewport.getTextNow();
+    if (!client.viewport.getChatmsg().additive) {
+        chatBoxInner.innerText = client.viewport.getTextNow();
+    }
     nameBoxInner.innerText = displayname;
 
     if (client.viewport.getLastCharacter() !== client.viewport.getChatmsg().name) {
