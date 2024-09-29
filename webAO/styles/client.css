@@ -131,6 +131,10 @@
 	margin: 3px;
 	border: 1px solid #000;
 	vertical-align: top;
+	overflow-wrap: break-word;
+	overflow: hidden;
+	font-weight: bold;
+	font-size: 12px;
 }
 
 .noini {

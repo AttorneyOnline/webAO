@@ -1,7 +1,7 @@
 import queryParser from "../../utils/queryParser";
 
 import { client } from '../../client'
-import { handleCharacterInfo } from "../../client/handleCharacterInfo";
+import { handleCharacterInfo, getCharIcon } from "../../client/handleCharacterInfo";
 import { CharData } from "../../client/CharData";
 const { mode } = queryParser();
 
@@ -10,7 +10,7 @@ const { mode } = queryParser();
  * in one packet.
  * @param {Array} args packet arguments
  */
-export const handleSC = async (args: string[]) => {
+export async function handleSC(args: string[]) {
     if (mode === "watch") {
         // Spectators don't need to pick a character
         document.getElementById("client_charselect")!.style.display = "none";
@@ -38,6 +38,11 @@ export const handleSC = async (args: string[]) => {
 
         // Set initial known data
         client.chars.set(charid, charData);
+
+        const charButtonElement: HTMLDivElement = <HTMLDivElement>document.getElementById(`demo_${charid}`);
+
+        // Text hint before the char icon is loaded
+        charButtonElement.textContent = charName;
 
         // Load the rest of the char data here
         // Stagger the requests with 6ms intervals
