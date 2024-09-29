@@ -18,7 +18,6 @@ const config = {
       width: 40,
       content: [{
         type: 'component',
-        height: 80,
         isClosable: false,
         componentName: 'template',
         title: 'IC',
@@ -26,7 +25,7 @@ const config = {
       },
       {
         type: 'component',
-        height: 20,
+        height: 50,
         isClosable: false,
         title: 'IC Options',
         componentName: 'template',
