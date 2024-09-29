@@ -1,4 +1,5 @@
 import { client } from "../client";
+import { handleCharacterInfo } from "../client/handleCharacterInfo";
 
 /**
  * Requests to play as a character.
@@ -13,14 +14,17 @@ export function pickChar(ccharacter: number) {
     }
 
     const charData = client.chars.get(ccharacter);
-    if (!charData.inifile) {
+
+    if (charData.inifile) {
+        client.sender.sendCharacter(ccharacter);
+    } else {
         // This means the character is not fully loaded yet
         // and we need to do so before picking it for playing
         console.log(`fast-tracking loading for ${ccharacter}`);
-        return;
+        handleCharacterInfo(charData.name, ccharacter).then(() => {
+            client.sender.sendCharacter(ccharacter);
+        });
     }
-
-    client.sender.sendCharacter(ccharacter);
 }
 
 window.pickChar = pickChar;
