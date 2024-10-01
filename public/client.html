@@ -74,7 +74,6 @@
 			</center>
 		</div>
 		<div id="client_charselect">
-			<p>Choose your character</p>
 			<button onclick="pickChar(-1)">Or spectate</button>
 			<br><br>
 			<input id="client_charactersearch" placeholder="Search" oninput="chartable_filter(event)"></input>
@@ -359,7 +358,7 @@
 			<br>
 			<span id="muting">
 				<label for="mute_select" style="float: left">Mute a character: </label>
-				<select name="mute_select" id="mute_select" onchange="mutelist_click(event)"></select>
+				<select name="mute_select" id="mute_select" onchange="mutelist_click"></select>
 			</span>
 		</fieldset>
 	</div>

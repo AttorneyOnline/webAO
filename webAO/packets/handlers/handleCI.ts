@@ -15,7 +15,7 @@ export const handleCI = (args: string[]) => {
         if (i % 2 === 0) {            
             const chargs = args[i].split("&");
             const charid = Number(args[i - 1]);
-            setTimeout(() => handleCharacterInfo(chargs, charid), 500);
+            setTimeout(() => handleCharacterInfo(chargs[0], charid), 500);
         }
     }
     // Request the next pack

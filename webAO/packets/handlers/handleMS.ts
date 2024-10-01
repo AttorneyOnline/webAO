@@ -21,33 +21,35 @@ export const handleMS = (args: string[]) => {
     let char_muted = false;
 
     if (char_id < client.char_list_length && char_id >= 0) {
-      if (client.chars[char_id].name !== char_name) {
+      if (client.chars.get(char_id).name !== char_name) {
         console.info(
-          `${client.chars[char_id].name} is iniediting to ${char_name}`
+          `${client.chars.get(char_id).name} is iniediting to ${char_name}`
         );
         const chargs = (`${char_name}&` + "iniediter").split("&");
-        handleCharacterInfo(chargs, char_id);
+        handleCharacterInfo(chargs[0], char_id);
       }
     }
 
     try {
-      msg_nameplate = client.chars[char_id].showname;
+      msg_nameplate = client.chars.get(char_id).showname;
     } catch (e) {
       msg_nameplate = args[3];
     }
 
     try {
-      msg_blips = client.chars[char_id].blips;
-    } catch (e) { }
+      msg_blips = client.chars.get(char_id).blips;
+    } catch (e) {
+      // ¯\_(ツ)_/¯
+    }
 
     try {
-      char_chatbox = client.chars[char_id].chat;
+      char_chatbox = client.chars.get(char_id).chat;
     } catch (e) {
       char_chatbox = "default";
     }
 
     try {
-      char_muted = client.chars[char_id].muted;
+      char_muted = client.chars.get(char_id).muted;
     } catch (e) {
       char_muted = false;
       console.error("we're still missing some character data");

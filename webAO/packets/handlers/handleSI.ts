@@ -1,4 +1,4 @@
-import { client, extrafeatures, oldLoading } from "../../client";
+import { client, oldLoading } from "../../client";
 
 
 /**
@@ -15,18 +15,19 @@ export const handleSI = (args: string[]) => {
     document.getElementById("client_chartable")!.innerHTML = "";
 
     for (let i = 0; i < client.char_list_length; i++) {
-        const demothing = document.createElement("img");
+        const charButtonElement: HTMLDivElement = document.createElement("div");
 
-        demothing.className = "demothing";
-        demothing.id = `demo_${i}`;
-        const demoonclick = document.createAttribute("onclick");
-        demoonclick.value = `pickChar(${i})`;
-        demothing.setAttributeNode(demoonclick);
+        charButtonElement.className = "demothing";
 
-        document.getElementById("client_chartable")!.appendChild(demothing);
+        charButtonElement.id = `demo_${i}`;
+        const charButtonOnClick = document.createAttribute("onclick");
+        charButtonOnClick.value = `pickChar(${i})`;
+
+        charButtonElement.setAttributeNode(charButtonOnClick);
+
+        document.getElementById("client_chartable")!.appendChild(charButtonElement);
     }
 
-    // this is determined at the top of this file
     if (!oldLoading) {
         client.sender.sendServer("RC#%");
     } else {

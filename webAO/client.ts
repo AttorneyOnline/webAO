@@ -5,7 +5,7 @@
  */
 import { isLowMemory } from './client/isLowMemory'
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { sender, ISender } from './client/sender/index'
+import { sender, ISender } from './client/sender'
 import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources.js";
 import masterViewport from "./viewport/viewport";
@@ -17,7 +17,8 @@ import { loadResources } from './client/loadResources'
 import { AO_HOST } from './client/aoHost'
 import { fetchBackgroundList, fetchEvidenceList, fetchCharacterList } from './client/fetchLists'
 import getCookie from "./utils/getCookie";
-import setCookie from "./utils/setCookie";
+import { CharData } from "./client/CharData";
+
 const { ip: serverIP, connect, mode, theme, serverName } = queryParser();
 
 document.title = serverName;
@@ -121,7 +122,7 @@ class Client extends EventEmitter {
     evidence_list_length: number;
     music_list_length: number;
     testimonyID: number;
-    chars: any;
+    chars: Map<number, CharData>;
     emotes: any;
     evidences: any;
     area: number;
@@ -181,7 +182,7 @@ class Client extends EventEmitter {
         this.evidence_list_length = 0;
         this.music_list_length = 0;
         this.testimonyID = 0;
-        this.chars = [];
+        this.chars = new Map<number, CharData>();
         this.emotes = [];
         this.evidences = [];
         this.area = 0;
@@ -207,7 +208,7 @@ class Client extends EventEmitter {
    * Gets the current player's character.
    */
     get character() {
-        return this.chars[this.charID];
+        return this.chars.get(this.charID);
     }
 
     /**
@@ -292,7 +293,6 @@ class Client extends EventEmitter {
 
     /**
    * Decode the packet
-   * @param {MessageEvent} e
    */
     handle_server_packet(p_data: string) {
         let in_data = p_data;
@@ -363,7 +363,6 @@ class Client extends EventEmitter {
 
     /**
    * Parse the lines in the OOC and play them
-   * @param {*} args packet arguments
    */
     handleReplay() {
         const ooclog = <HTMLInputElement>document.getElementById("client_ooclog");
