@@ -4,16 +4,14 @@ import { client, extrafeatures, UPDATE_INTERVAL } from "../../client";
 import { handleCharacterInfo } from "../../client/handleCharacterInfo";
 import { resetICParams } from "../../client/resetICParams";
 import { prepChat, safeTags } from "../../encoding";
-import { handle_ic_speaking } from '../../viewport/utils/handleICSpeaking'
+import { handle_ic_speaking } from "../../viewport/utils/handleICSpeaking";
 /**
-   * Handles an in-character chat message.
-   * @param {*} args packet arguments
-   */
+ * Handles an in-character chat message.
+ * @param {*} args packet arguments
+ */
 export const handleMS = (args: string[]) => {
   // TODO: this if-statement might be a bug.
   if (args[4] !== client.viewport.getChatmsg().content) {
-    document.getElementById("client_inner_chat")!.innerHTML = "";
-
     const char_id = Number(args[9]);
     const char_name = safeTags(args[3]);
 
