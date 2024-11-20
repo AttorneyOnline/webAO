@@ -1,113 +1,117 @@
 .text_white {
-	color: #120f09;
+  color: #120f09;
 }
 
 .text_blue {
-	color: #93bbe6;
+  color: #93bbe6;
 }
 
 .text_green {
-	color: #6ab057;
+  color: #6ab057;
 }
 
 .text_red {
-	color: #e1522a;
+  color: #e1522a;
 }
 
 .text_orange {
-	color: #cf714c;
+  color: #cf714c;
 }
 
 .text_yellow {
-	color: #fef9ad;
+  color: #fef9ad;
 }
 
 .text_pink {
-	color: #ffc0cb;
+  color: #ffc0cb;
 }
 
 .text_cyan {
-	color: #0ff;
+  color: #0ff;
 }
 
 .text_grey {
-	color: #bbb;
+  color: #bbb;
 }
 
 @font-face {
-	font-family: 'Cabin Condensed';
-	font-style: normal;
-	font-weight: 400;
-	font-display: swap;
-	src: local('Cabin Condensed'), local('CabinCondensed-Regular'), url(https://fonts.gstatic.com/s/cabincondensed/v13/nwpMtK6mNhBK2err_hqkYhHRqmwqZ-LY.woff2) format('woff2');
+  font-family: "Cabin Condensed";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local("Cabin Condensed"),
+    local("CabinCondensed-Regular"),
+    url(https://fonts.gstatic.com/s/cabincondensed/v13/nwpMtK6mNhBK2err_hqkYhHRqmwqZ-LY.woff2)
+      format("woff2");
 }
 
 #client_chatcontainer {
-	font-family: 'Cabin Condensed', sans-serif;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	height: 35%;
-	width: 100%;
+  font-family: "Cabin Condensed", sans-serif;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 35%;
+  width: 100%;
 }
 
 #client_name {
-    display: block;
-    left: 2%;
-    top: 0;
-    height: 20%;
-    min-width: 15%;
-	padding: 0px 6px;	
-	image-rendering: crisp-edges;
-	border-image-source: url("plvspw_name.png");
-    border-image-slice: 6 fill;
-	border-image-width: 0.4em;
-	position: absolute;
-	font-weight: bold;
-	-webkit-text-stroke: 0.02em #000;
-	z-index: 1;
+  display: block;
+  left: 2%;
+  top: 0;
+  height: 20%;
+  min-width: 15%;
+  padding: 0px 6px;
+  image-rendering: crisp-edges;
+  border-image-source: url("plvspw_name.png");
+  border-image-slice: 6 fill;
+  border-image-width: 0.4em;
+  position: absolute;
+  font-weight: bold;
+  -webkit-text-stroke: 0.02em #000;
+  z-index: 1;
 }
 
 #client_inner_name {
-	margin: 1px;
-	padding: 0 0.4em;
+  margin: 1px;
+  padding: 0 0.4em;
 }
 
 #client_chat {
-	font-size: 1em;
-	display: block;
-    width: 99%;
-    width: calc(100% - 0.4em);
-	margin: auto;
-    height: 80%;
-	image-rendering: crisp-edges;
-    border-image-source: url("plvspw.png");
-    border-image-slice: 10 fill;
-	border-image-width: 0.4em;
-	bottom: 0;
-	left: 0.2em;
-	position: absolute;
-	word-break: keep-all;
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	text-align: left;
-	overflow: hidden;
-	scroll-behavior: smooth;
+  font-size: 1em;
+  display: block;
+  width: 99%;
+  width: calc(100% - 0.4em);
+  margin: auto;
+  height: 80%;
+  image-rendering: crisp-edges;
+  border-image-source: url("plvspw.png");
+  border-image-slice: 10 fill;
+  border-image-width: 0.4em;
+  bottom: 0;
+  left: 0.2em;
+  position: absolute;
+  word-break: keep-all;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  text-align: left;
+  overflow: hidden;
+  scroll-behavior: smooth;
 }
 
 #client_inner_chat {
-	margin: 0.1em;
-	padding: 0.3em 0.6em;
+  margin: 0.1em;
+  padding: 0.3em 0.6em;
 }
 
 #client_chatwaiting {
-	display: none;
+  display: none;
 }
 
 #client_trackstatus {
-	display: none;
+  display: none;
 }
 
 #client_clock {
-	display: none;
+  display: none;
 }

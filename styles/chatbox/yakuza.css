@@ -1,111 +1,125 @@
 .text_white {
-	color: #fff;
+  color: #fff;
 }
 
 .text_blue {
-	color: #6bc6f7;
+  color: #6bc6f7;
 }
 
 .text_green {
-	color: #00f700;
+  color: #00f700;
 }
 
 .text_red {
-	color: #f00;
+  color: #f00;
 }
 
 .text_orange {
-	color: #f77339;
+  color: #f77339;
 }
 
 .text_yellow {
-	color: #ff0;
+  color: #ff0;
 }
 
 .text_pink {
-	color: #ffc0cb;
+  color: #ffc0cb;
 }
 
 .text_cyan {
-	color: #0ff;
+  color: #0ff;
 }
 
 .text_grey {
-	color: #bbb;
+  color: #bbb;
 }
 
 #client_chatcontainer {
-	display: block;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	height: 25%;
-	width: 100%;
-    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-    text-align: left;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 25%;
+  width: 100%;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+  text-align: left;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 #client_name {
-	display: block;
-	position: absolute;
-	left: 0;
-	top: 0;
-	height: 15%;
-	width: 100%;	
-	background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0), rgba(0,0,0,0));
-    border-left: 0.3em solid #e3dcc5;
-    font-size: 0.6em;
-    z-index: 1;
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 15%;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.8),
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0)
+  );
+  border-left: 0.3em solid #e3dcc5;
+  font-size: 0.6em;
+  z-index: 1;
 }
 
 #client_inner_name {
-    text-justify: distribute;
-    padding: 0 3%;
-	margin: 0;
+  text-justify: distribute;
+  padding: 0 3%;
+  margin: 0;
 }
 
 #client_chat {
-	display: block;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	height: 85%;
-    border-top: 0.1em solid rgba(100,100,100,0.5);
-    box-shadow: inset 0 0.2em 0.2em 0 rgba(0,0,0,0.75);
-	background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.4), rgba(0,0,0,0));
-	word-break: keep-all;
-	overflow-wrap: break-word;
-	text-align: left;
-	overflow: hidden;
-    scroll-behavior: smooth;
-    font-size: 0.6em;
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 85%;
+  border-top: 0.1em solid rgba(100, 100, 100, 0.5);
+  box-shadow: inset 0 0.2em 0.2em 0 rgba(0, 0, 0, 0.75);
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.8),
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0)
+  );
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  text-align: left;
+  overflow: hidden;
+  scroll-behavior: smooth;
+  font-size: 0.6em;
 }
 
 #client_inner_chat {
-    margin: 0;
-	padding: 2% 12%;
+  margin: 0;
+  padding: 2% 12%;
 }
 
 #client_chatwaiting {
-	display: block;
-	position: absolute;
-	color: transparent;
-	text-shadow: none;
-	right: 4em;
-	bottom: 35%;
-    width: 1.5em;
-    height: 1.5em;
-    background-image: url("x_button.svg");
-	background-size: contain;
-	transition: opacity 0.2s;
+  display: block;
+  position: absolute;
+  color: transparent;
+  text-shadow: none;
+  right: 4em;
+  bottom: 35%;
+  width: 1.5em;
+  height: 1.5em;
+  background-image: url("x_button.svg");
+  background-size: contain;
+  transition: opacity 0.2s;
 }
 
 #client_trackstatus {
-	display: none;
+  display: none;
 }
 
 #client_clock {
-	display: none;
+  display: none;
 }

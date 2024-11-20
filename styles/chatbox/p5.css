@@ -1,115 +1,115 @@
 .text_white {
-	color: #fff;
+  color: #fff;
 }
 
 .text_blue {
-	color: #05fcf6;
+  color: #05fcf6;
 }
 
 .text_green {
-	color: #98f548;
+  color: #98f548;
 }
 
 .text_red {
-	color: #ff3a3a;
+  color: #ff3a3a;
 }
 
 .text_orange {
-	color: #fcb405;
+  color: #fcb405;
 }
 
 .text_yellow {
-	color: #eef540;
+  color: #eef540;
 }
 
 .text_pink {
-	color: #d459c3;
+  color: #d459c3;
 }
 
 .text_cyan {
-	color: #5ce1c2;
+  color: #5ce1c2;
 }
 
 .text_grey {
-	color: #bbb;
+  color: #bbb;
 }
 
 #client_chatcontainer {
-	position: absolute;
-	bottom: 0;
-	height: 35%;
-    width: 100%;
-    font-family: sans-serif;
-	background-image: url("p5.svg");
-	background-size: cover;
- 	background-repeat: no-repeat;
+  position: absolute;
+  bottom: 0;
+  height: 35%;
+  width: 100%;
+  font-family: sans-serif;
+  background-image: url("p5.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 #client_name {
-	display: block;
-	top: 13%;
-    left: 2%;
-	padding: 0 10px;
-	height: 22%;
-    width: 25%;
-	position: absolute;
+  display: block;
+  top: 13%;
+  left: 2%;
+  padding: 0 10px;
+  height: 22%;
+  width: 25%;
+  position: absolute;
 }
 
 #client_inner_name {
-	margin: 0;
-	padding: 5% 0;
-    transform: rotate(-15deg);
-    color: black;
+  margin: 0;
+  padding: 5% 0;
+  transform: rotate(-15deg);
+  color: black;
 }
 
 #client_chat {
-	display: block;
-	width: 75%;
-	margin: auto;
-	height: 55%;
-    left: 20%;
-	bottom: 10%;
-	position: absolute;
-	word-break: keep-all;
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	text-align: left;
-	overflow: hidden;
-	scroll-behavior: smooth;
+  display: block;
+  width: 75%;
+  margin: auto;
+  height: 55%;
+  left: 20%;
+  bottom: 10%;
+  position: absolute;
+  word-break: keep-all;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  text-align: left;
+  overflow: hidden;
+  scroll-behavior: smooth;
 }
 
 #client_inner_chat {
-	padding: 1% 3%;
-	margin: 0;
+  padding: 1% 3%;
+  margin: 0;
 }
 
 #client_chatwaiting {
-	display: block;
-	right: 1em;
-	bottom: 0.6em;
-	width: 1em;
-	position: absolute;
-	animation: idling 1s linear infinite;
+  display: block;
+  right: 1em;
+  bottom: 0.6em;
+  width: 1em;
+  position: absolute;
+  animation: idling 1s linear infinite;
 }
 
 @keyframes idling {
-	0% {
-		right: 0;
-	}
+  0% {
+    right: 0;
+  }
 
-	50% {
-		right: 2%;
-	}
+  50% {
+    right: 2%;
+  }
 
-	100% {
-		right: 0;
-	}
+  100% {
+    right: 0;
+  }
 }
 
 #client_trackstatus {
-	display: none;
+  display: none;
 }
 
 #client_clock {
-	display: none;
+  display: none;
 }
