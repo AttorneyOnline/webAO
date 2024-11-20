@@ -1,3 +1,3 @@
 export interface Testimony {
-    [key: number]: string;
+  [key: number]: string;
 }

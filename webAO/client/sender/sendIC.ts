@@ -1,8 +1,8 @@
 import { extrafeatures } from "../../client";
 import { escapeChat } from "../../encoding";
-import {client} from '../../client'
+import { client } from "../../client";
 import queryParser from "../../utils/queryParser";
-const {mode} = queryParser()
+const { mode } = queryParser();
 
 /**
  * Sends an in-character chat message.
@@ -26,81 +26,81 @@ const {mode} = queryParser()
  * @param {number} noninterrupting_preanim play the full preanim (optional)
  */
 export const sendIC = (
-    deskmod: number,
-    preanim: string,
-    name: string,
-    emote: string,
-    message: string,
-    side: string,
-    sfx_name: string,
-    emote_modifier: number,
-    sfx_delay: number,
-    objection_modifier: number,
-    evidence: number,
-    flip: boolean,
-    realization: boolean,
-    text_color: number,
-    showname: string,
-    other_charid: string,
-    self_hoffset: number,
-    self_yoffset: number,
-    noninterrupting_preanim: boolean,
-    looping_sfx: boolean,
-    screenshake: boolean,
-    frame_screenshake: string,
-    frame_realization: string,
-    frame_sfx: string,
-    additive: boolean,
-    effect: string
+  deskmod: number,
+  preanim: string,
+  name: string,
+  emote: string,
+  message: string,
+  side: string,
+  sfx_name: string,
+  emote_modifier: number,
+  sfx_delay: number,
+  objection_modifier: number,
+  evidence: number,
+  flip: boolean,
+  realization: boolean,
+  text_color: number,
+  showname: string,
+  other_charid: string,
+  self_hoffset: number,
+  self_yoffset: number,
+  noninterrupting_preanim: boolean,
+  looping_sfx: boolean,
+  screenshake: boolean,
+  frame_screenshake: string,
+  frame_realization: string,
+  frame_sfx: string,
+  additive: boolean,
+  effect: string,
 ) => {
-    let extra_cccc = "";
-    let other_emote = "";
-    let other_offset = "";
-    let extra_27 = "";
-    let extra_28 = "";
+  let extra_cccc = "";
+  let other_emote = "";
+  let other_offset = "";
+  let extra_27 = "";
+  let extra_28 = "";
 
-    if (extrafeatures.includes("cccc_ic_support")) {
-        const self_offset = extrafeatures.includes("y_offset")
-            ? `${self_hoffset}<and>${self_yoffset}`
-            : self_hoffset; // HACK: this should be an & but client fucked it up and all the servers adopted it
-        if (mode === "replay") {
-            other_emote = "##";
-            other_offset = "#0#0";
-        }
-        extra_cccc = `${escapeChat(
-            showname
-        )}#${other_charid}${other_emote}#${self_offset}${other_offset}#${Number(
-            noninterrupting_preanim
-        )}#`;
-
-        if (extrafeatures.includes("looping_sfx")) {
-            extra_27 = `${Number(looping_sfx)}#${Number(
-                screenshake
-            )}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
-            if (extrafeatures.includes("effects")) {
-                extra_28 = `${Number(additive)}#${escapeChat(effect)}#`;
-            }
-        }
-    }
-
-    const serverMessage =
-        `MS#${deskmod}#${escapeChat(preanim)}#${escapeChat(name)}#${escapeChat(
-            emote
-        )}` +
-        `#${escapeChat(message)}#${escapeChat(side)}#${escapeChat(
-            sfx_name
-        )}#${emote_modifier}` +
-        `#${client.charID}#${sfx_delay}#${Number(objection_modifier)}#${Number(
-            evidence
-        )}#${Number(flip)}#${Number(
-            realization
-        )}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
-
-    client.sender.sendServer(serverMessage);
+  if (extrafeatures.includes("cccc_ic_support")) {
+    const self_offset = extrafeatures.includes("y_offset")
+      ? `${self_hoffset}<and>${self_yoffset}`
+      : self_hoffset; // HACK: this should be an & but client fucked it up and all the servers adopted it
     if (mode === "replay") {
-        (<HTMLInputElement>(
-            document.getElementById("client_ooclog")
-        )).value += `wait#${(<HTMLInputElement>document.getElementById("client_replaytimer")).value
-        }#%\r\n`;
+      other_emote = "##";
+      other_offset = "#0#0";
     }
-}
+    extra_cccc = `${escapeChat(
+      showname,
+    )}#${other_charid}${other_emote}#${self_offset}${other_offset}#${Number(
+      noninterrupting_preanim,
+    )}#`;
+
+    if (extrafeatures.includes("looping_sfx")) {
+      extra_27 = `${Number(looping_sfx)}#${Number(
+        screenshake,
+      )}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
+      if (extrafeatures.includes("effects")) {
+        extra_28 = `${Number(additive)}#${escapeChat(effect)}#`;
+      }
+    }
+  }
+
+  const serverMessage =
+    `MS#${deskmod}#${escapeChat(preanim)}#${escapeChat(name)}#${escapeChat(
+      emote,
+    )}` +
+    `#${escapeChat(message)}#${escapeChat(side)}#${escapeChat(
+      sfx_name,
+    )}#${emote_modifier}` +
+    `#${client.charID}#${sfx_delay}#${Number(objection_modifier)}#${Number(
+      evidence,
+    )}#${Number(flip)}#${Number(
+      realization,
+    )}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
+
+  client.sender.sendServer(serverMessage);
+  if (mode === "replay") {
+    (<HTMLInputElement>document.getElementById("client_ooclog")).value +=
+      `wait#${
+        (<HTMLInputElement>document.getElementById("client_replaytimer")).value
+      }#%\r\n`;
+  }
+};

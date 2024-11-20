@@ -1,15 +1,15 @@
-import { client } from '../../client'
-import { createArea } from '../../client/createArea';
-import { safeTags } from '../../encoding';
+import { client } from "../../client";
+import { createArea } from "../../client/createArea";
+import { safeTags } from "../../encoding";
 
 /**
  * Handles updated area list
  * @param {Array} args packet arguments
  */
 export const handleFA = (args: string[]) => {
-    client.resetAreaList();
+  client.resetAreaList();
 
-    for (let i = 1; i < args.length; i++) {
-        createArea(i - 1, safeTags(args[i]));
-    }
-}
+  for (let i = 1; i < args.length; i++) {
+    createArea(i - 1, safeTags(args[i]));
+  }
+};

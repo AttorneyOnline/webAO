@@ -3,11 +3,11 @@
  * @param {string} estring the string to be escaped
  */
 export function escapeChat(estring: string): string {
-    return estring
-        .replaceAll('#', '<num>')
-        .replaceAll('&', '<and>')
-        .replaceAll('%', '<percent>')
-        .replaceAll('$', '<dollar>');
+  return estring
+    .replaceAll("#", "<num>")
+    .replaceAll("&", "<and>")
+    .replaceAll("%", "<percent>")
+    .replaceAll("$", "<dollar>");
 }
 
 /**
@@ -15,11 +15,11 @@ export function escapeChat(estring: string): string {
  * @param {string} estring the string to be unescaped
  */
 export function unescapeChat(estring: string): string {
-    return estring
-        .replaceAll('<num>', '#')
-        .replaceAll('<and>', '&')
-        .replaceAll('<percent>', '%')
-        .replaceAll('<dollar>', '$');
+  return estring
+    .replaceAll("<num>", "#")
+    .replaceAll("<and>", "&")
+    .replaceAll("<percent>", "%")
+    .replaceAll("<dollar>", "$");
 }
 
 /**
@@ -29,12 +29,10 @@ export function unescapeChat(estring: string): string {
  * @param {string} unsafe an unsanitized string
  */
 export function safeTags(unsafe: string): string {
-    if (unsafe) {
-        return unsafe
-            .replaceAll('>', '＞')
-            .replaceAll('<', '＜');
-    }
-    return '';
+  if (unsafe) {
+    return unsafe.replaceAll(">", "＞").replaceAll("<", "＜");
+  }
+  return "";
 }
 
 /**
@@ -42,8 +40,10 @@ export function safeTags(unsafe: string): string {
  * @param {string} estring the string to be decoded
  */
 export function decodeChat(estring: string): string {
-    // Source: https://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode
-    return estring.replace(/\\u([\d\w]{1,})/gi, (match, group) => String.fromCharCode(parseInt(group, 16)));
+  // Source: https://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode
+  return estring.replace(/\\u([\d\w]{1,})/gi, (match, group) =>
+    String.fromCharCode(parseInt(group, 16)),
+  );
 }
 
 /**
@@ -51,6 +51,6 @@ export function decodeChat(estring: string): string {
  * @param {string} msg chat message to prepare for display
  */
 export function prepChat(msg: string): string {
-    // TODO: make this less awful
-    return safeTags(unescapeChat(decodeChat(msg)));
+  // TODO: make this less awful
+  return safeTags(unescapeChat(decodeChat(msg)));
 }

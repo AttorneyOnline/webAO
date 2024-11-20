@@ -7,5 +7,5 @@ import { client } from "../../client";
  * @param {string} reason player message
  */
 export const sendMA = (id: number, length: number, reason: string) => {
-    client.sender.sendServer(`MA#${id}#${length}#${reason}#%`);
-}
+  client.sender.sendServer(`MA#${id}#${length}#${reason}#%`);
+};

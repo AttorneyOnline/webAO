@@ -1,7 +1,7 @@
-import { Desk } from './Desk'
+import { Desk } from "./Desk";
 
 export interface Position {
-    bg?: string;
-    desk?: Desk;
-    speedLines: string;
+  bg?: string;
+  desk?: Desk;
+  speedLines: string;
 }

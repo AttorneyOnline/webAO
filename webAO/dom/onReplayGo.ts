@@ -5,6 +5,6 @@ import { client } from "../client";
  * @param {KeyboardEvent} event
  */
 export function onReplayGo(_event: Event) {
-    client.handleReplay();
+  client.handleReplay();
 }
 window.onReplayGo = onReplayGo;

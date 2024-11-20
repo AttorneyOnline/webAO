@@ -4,12 +4,12 @@ import { client } from "../client";
  * @param {KeyboardEvent} event
  */
 export function onOOCEnter(event: KeyboardEvent) {
-    if (event.keyCode === 13) {
-        client.sender.sendOOC(
-            (<HTMLInputElement>document.getElementById("client_oocinputbox")).value
-        );
-        (<HTMLInputElement>document.getElementById("client_oocinputbox")).value =
-            "";
-    }
+  if (event.keyCode === 13) {
+    client.sender.sendOOC(
+      (<HTMLInputElement>document.getElementById("client_oocinputbox")).value,
+    );
+    (<HTMLInputElement>document.getElementById("client_oocinputbox")).value =
+      "";
+  }
 }
 window.onOOCEnter = onOOCEnter;

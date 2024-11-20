@@ -5,5 +5,5 @@ import { client } from "../../client";
  * @param {number} evidence id
  */
 export const sendDE = (id: number) => {
-    client.sender.sendServer(`DE#${id}#%`);
-}
+  client.sender.sendServer(`DE#${id}#%`);
+};

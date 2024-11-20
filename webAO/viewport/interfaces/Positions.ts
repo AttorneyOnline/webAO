@@ -1,5 +1,5 @@
-import { Position } from './Position'
+import { Position } from "./Position";
 
 export interface Positions {
-    [key: string]: Position;
+  [key: string]: Position;
 }

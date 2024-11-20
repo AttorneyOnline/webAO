@@ -5,5 +5,5 @@ import { client } from "../../client";
  * @param {Array} args packet arguments
  */
 export const handleCC = (args: string[]) => {
-    client.sender.sendSelf(`PV#1#CID#${args[2]}#%`);
-}
+  client.sender.sendSelf(`PV#1#CID#${args[2]}#%`);
+};

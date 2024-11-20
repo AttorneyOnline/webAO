@@ -1,5 +1,5 @@
 import filesExist from "./filesExist";
-import transparentPng from '../constants/transparentPng'
+import transparentPng from "../constants/transparentPng";
 
 /**
  * This function takes a list of urls and returns the first one that exists.
@@ -9,11 +9,11 @@ import transparentPng from '../constants/transparentPng'
  * @returns The image source of the first url that exists, or a transparent png if none exist
  */
 export default async function findImgSrc(urls: string[]): Promise<string> {
-    return filesExist(urls).then((url) => {
-        if (url !== null) {
-            return url;
-        }
-        // If none of the images exist, return a transparent png
-        return transparentPng;
-    });
+  return filesExist(urls).then((url) => {
+    if (url !== null) {
+      return url;
+    }
+    // If none of the images exist, return a transparent png
+    return transparentPng;
+  });
 }

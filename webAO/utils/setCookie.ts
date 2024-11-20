@@ -7,6 +7,6 @@
  * @param {any} value The value of that cookie option
  */
 const setCookie = (cname: string, value: any) => {
-    document.cookie = `${cname}=${value};SameSite=Strict`;
+  document.cookie = `${cname}=${value};SameSite=Strict`;
 };
 export default setCookie;

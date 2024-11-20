@@ -6,5 +6,5 @@ import { client } from "../../client";
  * @param {number} hp the health point
  */
 export const sendHP = (side: number, hp: number) => {
-    client.sender.sendServer(`HP#${side}#${hp}#%`);
-}
+  client.sender.sendServer(`HP#${side}#${hp}#%`);
+};

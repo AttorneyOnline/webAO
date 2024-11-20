@@ -5,5 +5,5 @@ import { client } from "../../client";
  * @param {string} testimony type
  */
 export const sendRT = (testimony: string) => {
-    client.sender.sendServer(`RT#${testimony}#%`);
-}
+  client.sender.sendServer(`RT#${testimony}#%`);
+};

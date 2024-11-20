@@ -8,7 +8,7 @@ import { escapeChat } from "../../encoding";
  * @param {string} evidence image filename
  */
 export const sendPE = (name: string, desc: string, img: string) => {
-    client.sender.sendServer(
-        `PE#${escapeChat(name)}#${escapeChat(desc)}#${escapeChat(img)}#%`
-    );
-}
+  client.sender.sendServer(
+    `PE#${escapeChat(name)}#${escapeChat(desc)}#${escapeChat(img)}#%`,
+  );
+};

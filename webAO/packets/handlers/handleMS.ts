@@ -23,7 +23,7 @@ export const handleMS = (args: string[]) => {
     if (char_id < client.char_list_length && char_id >= 0) {
       if (client.chars[char_id].name !== char_name) {
         console.info(
-          `${client.chars[char_id].name} is iniediting to ${char_name}`
+          `${client.chars[char_id].name} is iniediting to ${char_name}`,
         );
         const chargs = (`${char_name}&` + "iniediter").split("&");
         handleCharacterInfo(chargs, char_id);
@@ -38,7 +38,7 @@ export const handleMS = (args: string[]) => {
 
     try {
       msg_blips = client.chars[char_id].blips;
-    } catch (e) { }
+    } catch (e) {}
 
     try {
       char_chatbox = client.chars[char_id].chat;
@@ -169,4 +169,4 @@ export const handleMS = (args: string[]) => {
       handle_ic_speaking(chatmsg); // no await
     }
   }
-}
+};

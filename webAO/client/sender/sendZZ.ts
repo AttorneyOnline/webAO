@@ -5,9 +5,9 @@ import { client, extrafeatures } from "../../client";
  * @param {string} message to mod
  */
 export const sendZZ = (msg: string) => {
-    if (extrafeatures.includes("modcall_reason")) {
-        client.sender.sendServer(`ZZ#${msg}#%`);
-    } else {
-        client.sender.sendServer("ZZ#%");
-    }
-}
+  if (extrafeatures.includes("modcall_reason")) {
+    client.sender.sendServer(`ZZ#${msg}#%`);
+  } else {
+    client.sender.sendServer("ZZ#%");
+  }
+};

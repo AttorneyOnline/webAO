@@ -5,18 +5,23 @@ import { UPDATE_INTERVAL } from "../client";
 import setEmote from "../client/setEmote";
 import { safeTags } from "../encoding";
 import { AO_HOST } from "../client/aoHost";
-import { Viewport } from './interfaces/Viewport'
-import { createBlipsChannels } from './utils/createBlipChannels'
-import { defaultChatMsg } from './constants/defaultChatMsg'
-import { createMusic } from './utils/createMusic'
-import { createSfxAudio } from './utils/createSfxAudio'
-import { createShoutAudio } from './utils/createShoutAudio'
-import { createTestimonyAudio } from './utils/createTestimonyAudio'
-import { Testimony } from './interfaces/Testimony'
-import { COLORS } from './constants/colors'
-import { set_side } from './utils/setSide'
+import { Viewport } from "./interfaces/Viewport";
+import { createBlipsChannels } from "./utils/createBlipChannels";
+import { defaultChatMsg } from "./constants/defaultChatMsg";
+import { createMusic } from "./utils/createMusic";
+import { createSfxAudio } from "./utils/createSfxAudio";
+import { createShoutAudio } from "./utils/createShoutAudio";
+import { createTestimonyAudio } from "./utils/createTestimonyAudio";
+import { Testimony } from "./interfaces/Testimony";
+import { COLORS } from "./constants/colors";
+import { set_side } from "./utils/setSide";
 import { ChatMsg } from "./interfaces/ChatMsg";
-import { setStartFirstTickCheck, setStartSecondTickCheck, startFirstTickCheck, startSecondTickCheck } from "./utils/handleICSpeaking";
+import {
+  setStartFirstTickCheck,
+  setStartSecondTickCheck,
+  startFirstTickCheck,
+  startSecondTickCheck,
+} from "./utils/handleICSpeaking";
 
 const viewport = (): Viewport => {
   let animating = false;
@@ -39,33 +44,63 @@ const viewport = (): Viewport => {
   let updater: any;
   let backgroundName = "";
   const getSfxAudio = () => sfxAudio;
-  const setSfxAudio = (value: HTMLAudioElement) => { sfxAudio = value };
+  const setSfxAudio = (value: HTMLAudioElement) => {
+    sfxAudio = value;
+  };
   const getBackgroundName = () => backgroundName;
-  const setBackgroundName = (value: string) => { backgroundName = value };
+  const setBackgroundName = (value: string) => {
+    backgroundName = value;
+  };
   const getBackgroundFolder = () =>
     `${AO_HOST}background/${encodeURI(backgroundName.toLowerCase())}/`;
-  const getTextNow = () => {return textnow}
-  const setTextNow = (val: string) => {textnow = val}
-  const getChatmsg = () => {return chatmsg}
-  const setChatmsg = (val: ChatMsg) => {chatmsg = val}
-  const getSfxPlayed = () => sfxplayed
-  const setSfxPlayed = (val: number) => {sfxplayed = val}
-  const getTickTimer = () => tickTimer
-  const setTickTimer = (val: number) => {tickTimer = val}
-  const getAnimating = () => animating
-  const setAnimating = (val: boolean) => {animating = val}
-  const getLastEvidence = () => lastEvi
-  const setLastEvidence = (val: number) => {lastEvi = val}
-  const setLastCharacter = (val: string) => {lastChar = val}
-  const getLastCharacter = () => lastChar
-  const getShoutTimer = () => shoutTimer
-  const setShoutTimer = (val: number) => {shoutTimer = val}
-  const getTheme = () => theme
-  const setTheme = (val: string) => {theme = val}
+  const getTextNow = () => {
+    return textnow;
+  };
+  const setTextNow = (val: string) => {
+    textnow = val;
+  };
+  const getChatmsg = () => {
+    return chatmsg;
+  };
+  const setChatmsg = (val: ChatMsg) => {
+    chatmsg = val;
+  };
+  const getSfxPlayed = () => sfxplayed;
+  const setSfxPlayed = (val: number) => {
+    sfxplayed = val;
+  };
+  const getTickTimer = () => tickTimer;
+  const setTickTimer = (val: number) => {
+    tickTimer = val;
+  };
+  const getAnimating = () => animating;
+  const setAnimating = (val: boolean) => {
+    animating = val;
+  };
+  const getLastEvidence = () => lastEvi;
+  const setLastEvidence = (val: number) => {
+    lastEvi = val;
+  };
+  const setLastCharacter = (val: string) => {
+    lastChar = val;
+  };
+  const getLastCharacter = () => lastChar;
+  const getShoutTimer = () => shoutTimer;
+  const setShoutTimer = (val: number) => {
+    shoutTimer = val;
+  };
+  const getTheme = () => theme;
+  const setTheme = (val: string) => {
+    theme = val;
+  };
   const getTestimonyTimer = () => testimonyTimer;
-  const setTestimonyTimer = (val: number) => {testimonyTimer = val}
-  const setTestimonyUpdater = (val: any) => {testimonyUpdater = val}
-  const getTestimonyUpdater = () => testimonyUpdater 
+  const setTestimonyTimer = (val: number) => {
+    testimonyTimer = val;
+  };
+  const setTestimonyUpdater = (val: any) => {
+    testimonyUpdater = val;
+  };
+  const getTestimonyUpdater = () => testimonyUpdater;
   const playSFX = async (sfxname: string, looping: boolean) => {
     sfxAudio.pause();
     sfxAudio.loop = looping;
@@ -146,7 +181,7 @@ const viewport = (): Viewport => {
         Object.entries({
           s: shake,
           f: flash,
-        })
+        }),
       );
       const textSpeeds = new Set(["{", "}"]);
 
@@ -194,7 +229,7 @@ const viewport = (): Viewport => {
         charEmote,
         "(a)",
         false,
-        chatmsg.side
+        chatmsg.side,
       );
       charLayers.style.opacity = "1";
       waitingBox.style.opacity = "1";
@@ -296,13 +331,13 @@ const viewport = (): Viewport => {
       }
 
       // Done with first check, move to second
-      setStartFirstTickCheck(false)
-      setStartSecondTickCheck(true)
+      setStartFirstTickCheck(false);
+      setStartSecondTickCheck(true);
 
       chatmsg.startpreanim = false;
       chatmsg.startspeaking = true;
     }
-    
+
     const hasNonInterruptingPreAnim = chatmsg.noninterrupting_preanim === 1;
     if (textnow !== chatmsg.content && hasNonInterruptingPreAnim) {
       const chatContainerBox = document.getElementById("client_chatcontainer");
@@ -315,9 +350,7 @@ const viewport = (): Viewport => {
         // Evidence Bullshit
         if (chatmsg.evidence > 0) {
           // Prepare evidence
-          eviBox.src = safeTags(
-            client.evidences[chatmsg.evidence - 1].icon
-          );
+          eviBox.src = safeTags(client.evidences[chatmsg.evidence - 1].icon);
 
           eviBox.style.width = "auto";
           eviBox.style.height = "36.5%";
@@ -381,7 +414,7 @@ const viewport = (): Viewport => {
             pairEmote,
             "(a)",
             true,
-            chatmsg.side
+            chatmsg.side,
           );
           pairLayers.style.opacity = "1";
         } else {
@@ -395,7 +428,7 @@ const viewport = (): Viewport => {
           charEmote,
           "(b)",
           false,
-          chatmsg.side
+          chatmsg.side,
         );
         charLayers.style.opacity = "1";
 
@@ -407,7 +440,7 @@ const viewport = (): Viewport => {
             charEmote,
             "(a)",
             false,
-            chatmsg.side
+            chatmsg.side,
           );
           charLayers.style.opacity = "1";
           waitingBox.style.opacity = "1";
@@ -417,7 +450,7 @@ const viewport = (): Viewport => {
         }
       } else if (textnow !== chatmsg.content) {
         const chatContainerBox = document.getElementById(
-          "client_chatcontainer"
+          "client_chatcontainer",
         );
         chatContainerBox.style.opacity = "1";
         await handleTextTick(charLayers);
@@ -435,9 +468,9 @@ const viewport = (): Viewport => {
       ) {
         playSFX(
           `${AO_HOST}sounds/general/${encodeURI(
-            chatmsg.sound.toLowerCase()
+            chatmsg.sound.toLowerCase(),
           )}.opus`,
-          chatmsg.looping_sfx
+          chatmsg.looping_sfx,
         );
       }
     }

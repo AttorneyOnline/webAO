@@ -1,9 +1,8 @@
-/** 
-* i am mod now
-* @param {Array} args packet arguments
-*/
+/**
+ * i am mod now
+ * @param {Array} args packet arguments
+ */
 export const handleAUTH = (args: string[]) => {
-    (<HTMLAnchorElement>(
-        document.getElementById("mod_ui")
-    )).href = `styles/mod.css`;
-}
+  (<HTMLAnchorElement>document.getElementById("mod_ui")).href =
+    `styles/mod.css`;
+};

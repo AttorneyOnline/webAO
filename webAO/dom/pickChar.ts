@@ -6,11 +6,11 @@ import { client } from "../client";
  * then spectator is chosen instead.
  */
 export function pickChar(ccharacter: number) {
-    if (ccharacter === -1) {
-        // Spectator
-        document.getElementById("client_waiting")!.style.display = "none";
-        document.getElementById("client_charselect")!.style.display = "none";
-    }
-    client.sender.sendCharacter(ccharacter);
+  if (ccharacter === -1) {
+    // Spectator
+    document.getElementById("client_waiting")!.style.display = "none";
+    document.getElementById("client_charselect")!.style.display = "none";
+  }
+  client.sender.sendCharacter(ccharacter);
 }
 window.pickChar = pickChar;

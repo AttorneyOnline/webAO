@@ -7,10 +7,10 @@ import { safeTags } from "../../encoding";
  * @param {Array} args packet arguments
  */
 export const handleFM = (args: string[]) => {
-    client.resetMusicList();
+  client.resetMusicList();
 
-    for (let i = 1; i < args.length - 1; i++) {
-        // Check when found the song for the first time
-        addTrack(args[i]);
-    }
-}
+  for (let i = 1; i < args.length - 1; i++) {
+    // Check when found the song for the first time
+    addTrack(args[i]);
+  }
+};
