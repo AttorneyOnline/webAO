@@ -20,4 +20,4 @@ jobs:
       uses: creyD/prettier_action@v4.3
       with:
         same_commit: false
-        prettier_options: --write **/*.js **/*.ts **/*.html **/*.css **/*.md
+        prettier_options: --write **/*.json **/*.js **/*.ts **/*.html **/*.css **/*.md
