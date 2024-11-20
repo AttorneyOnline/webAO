@@ -1,123 +1,127 @@
 .text_white {
-	color: #fff;
+  color: #fff;
 }
 
 .text_blue {
-	color: #93bbe6;
+  color: #93bbe6;
 }
 
 .text_green {
-	color: #6ab057;
+  color: #6ab057;
 }
 
 .text_red {
-	color: #e1522a;
+  color: #e1522a;
 }
 
 .text_orange {
-	color: #cf714c;
+  color: #cf714c;
 }
 
 .text_yellow {
-	color: #fef9ad;
+  color: #fef9ad;
 }
 
 .text_pink {
-	color: #ffc0cb;
+  color: #ffc0cb;
 }
 
 .text_cyan {
-	color: #0ff;
+  color: #0ff;
 }
 
 .text_grey {
-	color: #bbb;
+  color: #bbb;
 }
 
 #client_chatcontainer {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	height: 41%;
-	width: 100%;
-	filter: none;
-	font-family: "DejaVu Sans Mono", "BIZ UDGothic", "Consolas", sans-serif;
-	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 41%;
+  width: 100%;
+  filter: none;
+  font-family: "DejaVu Sans Mono", "BIZ UDGothic", "Consolas", sans-serif;
+  text-shadow:
+    -1px 0 black,
+    0 1px black,
+    1px 0 black,
+    0 -1px black;
 }
 
 #client_name {
-	display: block;
-	position: absolute;
-	top: 0;
-	left: 0;	
-	height: 30%;
-	min-width: 10%;
-	background-color: rgba(0, 0, 0, 0.6);	
-	border-image-source: url("yttd.png");
-    border-image-slice: 20;
-	border-image-width: 20px;
-	border-width: 20px;
-	padding: 0 2%;
-	z-index: 1;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 30%;
+  min-width: 10%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-image-source: url("yttd.png");
+  border-image-slice: 20;
+  border-image-width: 20px;
+  border-width: 20px;
+  padding: 0 2%;
+  z-index: 1;
 }
 
 #client_inner_name {
-	line-height: 0.6em;
-	color: #fef9ad;
+  line-height: 0.6em;
+  color: #fef9ad;
 }
 
 #client_chat {
-	display: block;
-	position: absolute;
-	bottom: 0;
-	width: 99.9%;
-	margin: auto;
-	height: 70%;
-	border-image-source: url("yttd.png");
-    border-image-slice: 20;
-	border-image-width: 20px;
-	border-width: 20px;
-	background-color: rgba(0, 0, 0, 0.6);
-	overflow-wrap: break-word;
-	text-align: left;
-	overflow: hidden;
-	scroll-behavior: smooth;
+  display: block;
+  position: absolute;
+  bottom: 0;
+  width: 99.9%;
+  margin: auto;
+  height: 70%;
+  border-image-source: url("yttd.png");
+  border-image-slice: 20;
+  border-image-width: 20px;
+  border-width: 20px;
+  background-color: rgba(0, 0, 0, 0.6);
+  overflow-wrap: break-word;
+  text-align: left;
+  overflow: hidden;
+  scroll-behavior: smooth;
 }
 
 #client_inner_chat {
-	padding: 1% 3.13%;
-	margin: 1px;
-	font-size: 1.3em;
+  padding: 1% 3.13%;
+  margin: 1px;
+  font-size: 1.3em;
 }
 
 #client_chatwaiting {
-	display: block;
-	position: absolute;
-	transform: rotate(90deg) scale(1, 2);
-	left: 50%;
-	bottom: 0px;	
-	line-height: 0.5;
-	animation: idling 1s linear infinite;
+  display: block;
+  position: absolute;
+  transform: rotate(90deg) scale(1, 2);
+  left: 50%;
+  bottom: 0px;
+  line-height: 0.5;
+  animation: idling 1s linear infinite;
 }
 
 @keyframes idling {
-	0% {
-		bottom: 2px;
-	}
+  0% {
+    bottom: 2px;
+  }
 
-	50% {
-		bottom: 0px;
-	}
+  50% {
+    bottom: 0px;
+  }
 
-	100% {
-		bottom: 2px;
-	}
+  100% {
+    bottom: 2px;
+  }
 }
 
 #client_trackstatus {
-	display: none;
+  display: none;
 }
 
 #client_clock {
-	display: none;
+  display: none;
 }

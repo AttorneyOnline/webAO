@@ -1,3 +1,4 @@
-table#client_playerlist td:nth-child(5), td:nth-child(6) {
+table#client_playerlist td:nth-child(5),
+td:nth-child(6) {
   display: inherit;
 }

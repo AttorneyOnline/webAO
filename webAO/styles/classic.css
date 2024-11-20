@@ -1,206 +1,231 @@
 body {
-	font-family: "Igiari Cyrillic", "Ace Attorney", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
+  font-family: "Igiari Cyrillic", "Ace Attorney", "MS PGothic", "MS UI Gothic",
+    "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow",
+    "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 /* Webfont CSS setup for Igiari by Caveras */
 @font-face {
-	font-family: 'Igiari Cyrillic';
-	src: url('./igiari/igiari-cyrillic.ttf');
-	font-weight: normal;
-	font-style: normal;
+  font-family: "Igiari Cyrillic";
+  src: url("./igiari/igiari-cyrillic.ttf");
+  font-weight: normal;
+  font-style: normal;
 }
 
 img {
-	image-rendering: crisp-edges;
-	image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
 }
 
 hr {
-	height: 6px;
-	width: 100%;
-	background-color: #c6c6c6;
-	background: repeating-linear-gradient(to right, #f7f7f7, #f7f7f7 1px, #8c8c8c 1px, #8c8c8c 2px, #c6c6c6 2px, #c6c6c6 16px);
-	margin: 0;
+  height: 6px;
+  width: 100%;
+  background-color: #c6c6c6;
+  background: repeating-linear-gradient(
+    to right,
+    #f7f7f7,
+    #f7f7f7 1px,
+    #8c8c8c 1px,
+    #8c8c8c 2px,
+    #c6c6c6 2px,
+    #c6c6c6 16px
+  );
+  margin: 0;
 }
 
 #evi_name {
-	background-color: #393939;
-	color: #ffad18;
-	border: none;
+  background-color: #393939;
+  color: #ffad18;
+  border: none;
 }
 
 #evi_desc {
-	flex: 1 auto;
-	border-top: 1px solid #6b946b;
-	border-left: 1px solid #6b946b;
-	border-right: none;
-	border-bottom: none;
-	background-color: #9cc694;
+  flex: 1 auto;
+  border-top: 1px solid #6b946b;
+  border-left: 1px solid #6b946b;
+  border-right: none;
+  border-bottom: none;
+  background-color: #9cc694;
 }
 
 .evi_icon {
-	width: 70px;
-	min-width: 70px;
-	height: 70px;
-	background-color: #7b7b7b;
-	outline: 2px ridge #fff;
-	outline-offset: -2px;
-	margin-right: 2px;
+  width: 70px;
+  min-width: 70px;
+  height: 70px;
+  background-color: #7b7b7b;
+  outline: 2px ridge #fff;
+  outline-offset: -2px;
+  margin-right: 2px;
 }
 
 #client_menu {
-	background-color: #5a5a5a;
-	overflow-y: auto;
-	height: 100%;
+  background-color: #5a5a5a;
+  overflow-y: auto;
+  height: 100%;
 }
 
 @keyframes shutter-effect {
-	0% {
-		background-position: 0 0;
-	}
+  0% {
+    background-position: 0 0;
+  }
 
-	100% {
-		background-position: 0 4px;
-	}
+  100% {
+    background-position: 0 4px;
+  }
 }
 
 #client_menu:after {
-	position: absolute;
-	content: "";
-	pointer-events: none;
-	background: repeating-linear-gradient(transparent, transparent 3px, rgba(255, 255, 255, 0.2) 3px, rgba(255, 255, 255, 0.2) 4px);
-	animation: shutter-effect 0.15s linear infinite;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	opacity: 0.5;
+  position: absolute;
+  content: "";
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 3px,
+    rgba(255, 255, 255, 0.2) 3px,
+    rgba(255, 255, 255, 0.2) 4px
+  );
+  animation: shutter-effect 0.15s linear infinite;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
 }
 
 #client_iccontrols {
-	width: 100%;
-	background: repeating-linear-gradient(transparent, transparent 3px, rgba(255, 255, 255, 0.2) 3px, rgba(255, 255, 255, 0.2) 4px);
-	animation: shutter-effect 0.15s linear infinite;
+  width: 100%;
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 3px,
+    rgba(255, 255, 255, 0.2) 3px,
+    rgba(255, 255, 255, 0.2) 4px
+  );
+  animation: shutter-effect 0.15s linear infinite;
 }
 
 .menu_content {
-	background-color: #847342;
-	border: #735a42 solid 1px;
+  background-color: #847342;
+  border: #735a42 solid 1px;
 }
 
 .menu_text {
-	color: #7b2900;
-	background-color: #f7f7f7;
-	border: 1px solid #bd9484;
-	border-radius: 3px;
-	padding: 0 4px;
+  color: #7b2900;
+  background-color: #f7f7f7;
+  border: 1px solid #bd9484;
+  border-radius: 3px;
+  padding: 0 4px;
 }
 
 .menu_icon {
-	display: inline-block;
-	width: 1.5em;
-	height: 1.5em;
-	background-color: #631818;
-	border: 2px ridge #dec6bd;
-	border-radius: 2px;
-	margin-bottom: 2px;
-	line-height: 1.5;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  background-color: #631818;
+  border: 2px ridge #dec6bd;
+  border-radius: 2px;
+  margin-bottom: 2px;
+  line-height: 1.5;
 }
 
 .client_button {
-	min-width: 2.5em;
-	margin: 1px;
-	padding: 6px 2px;
-	cursor: pointer;
-	text-align: center;
-	color: #000;
-	background-color: #c0c0c0;
-	text-shadow: 0 0 1px #000;
-	border: #909090 solid 1px;
-	border-radius: 4px;
+  min-width: 2.5em;
+  margin: 1px;
+  padding: 6px 2px;
+  cursor: pointer;
+  text-align: center;
+  color: #000;
+  background-color: #c0c0c0;
+  text-shadow: 0 0 1px #000;
+  border: #909090 solid 1px;
+  border-radius: 4px;
 }
 
 #button_2 {
-	text-transform: capitalize;
+  text-transform: capitalize;
 }
 
 #client_log {
-	color: white;
-	background: repeating-linear-gradient(black, black 3px, #181818 3px, #181818 4px);
-	animation: shutter-effect 0.15s linear infinite;
+  color: white;
+  background: repeating-linear-gradient(
+    black,
+    black 3px,
+    #181818 3px,
+    #181818 4px
+  );
+  animation: shutter-effect 0.15s linear infinite;
 }
 
 .lm_tab {
-	color: white;
-	background-color: #7b3100;
-	text-shadow: 0 0 1px #632100;
-	border-color: #424242;
+  color: white;
+  background-color: #7b3100;
+  text-shadow: 0 0 1px #632100;
+  border-color: #424242;
 }
 
 .lm_tab.lm_active {
-	color: white;
-	background-color: #efa521;
-	text-shadow: 0 0 1px #ce8421;
-	border-color: #b5b5b5;
+  color: white;
+  background-color: #efa521;
+  text-shadow: 0 0 1px #ce8421;
+  border-color: #b5b5b5;
 }
 
 #client_defense_hp {
-	text-align: left;
+  text-align: left;
 }
 
-#client_defense_hp>.health-bar {
-	background-color: #0000bd;
-	border-color: #8484ff transparent #00009c transparent;
+#client_defense_hp > .health-bar {
+  background-color: #0000bd;
+  border-color: #8484ff transparent #00009c transparent;
 }
 
 #client_prosecutor_hp {
-	text-align: right;
+  text-align: right;
 }
 
-#client_prosecutor_hp>.health-bar {
-	background-color: #bd0000;
-	border-color: #ff8484 transparent #9c0000 transparent;
+#client_prosecutor_hp > .health-bar {
+  background-color: #bd0000;
+  border-color: #ff8484 transparent #9c0000 transparent;
 }
 
 .health-box {
-	background-color: #292929;
-	height: 18px;
-	width: 50%;
-	margin: 0 auto;
-	border: ridge 2px #dedede;
-	border-radius: 2px;
-	box-sizing: border-box;
-	display: block;
+  background-color: #292929;
+  height: 18px;
+  width: 50%;
+  margin: 0 auto;
+  border: ridge 2px #dedede;
+  border-radius: 2px;
+  box-sizing: border-box;
+  display: block;
 }
 
 .health-bar {
-	width: 100%;
-	height: 60%;
-	height: calc(100% - 4px);
-	bottom: 1px;
-	border-width: 2px;
-	border-style: groove none ridge none;
-	position: relative;
-	display: inline-block;
-	transition: 1s linear;
-	transition-property: width;
+  width: 100%;
+  height: 60%;
+  height: calc(100% - 4px);
+  bottom: 1px;
+  border-width: 2px;
+  border-style: groove none ridge none;
+  position: relative;
+  display: inline-block;
+  transition: 1s linear;
+  transition-property: width;
 }
 
 #client_ooclog {
-	background-color: #8b8b8b;
-	color: #000;
+  background-color: #8b8b8b;
+  color: #000;
 }
 
 #client_inputbox {
-	background-color: #6d6d6d;
-	color: #000;
+  background-color: #6d6d6d;
+  color: #000;
 }
 
 #client_iccontrols {
-	background-color: #595959;
+  background-color: #595959;
 }
 
 #client_oocinput {
-	background-color: #575757;
-	color: #000;
+  background-color: #575757;
+  color: #000;
 }

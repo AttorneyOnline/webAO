@@ -1,225 +1,229 @@
 .text_white {
-	color: #000;
+  color: #000;
 }
 
 .text_green {
-	color: #009600;
+  color: #009600;
 }
 
 .text_red {
-	color: #ff0859;
+  color: #ff0859;
 }
 
 .text_orange {
-	color: #610000;
+  color: #610000;
 }
 
 .text_blue {
-	color: #7900ff;
+  color: #7900ff;
 }
 
 .text_yellow {
-	color: #ff0;
+  color: #ff0;
 }
 
 .text_pink {
-	color: #ff51ff;
+  color: #ff51ff;
 }
 
-.text_cyan {	
-	color: #0038ff;
+.text_cyan {
+  color: #0038ff;
 }
 
 .text_grey {
-	color: #bbb;
+  color: #bbb;
 }
 
 /* Webfont CSS setup for Igiari by Caveras */
 
 @font-face {
-	font-family:'Igiari Cyrillic';
-		src: url('../igiari/igiari-cyrillic.ttf');
-	font-weight:normal;
-	font-style:normal;
+  font-family: "Igiari Cyrillic";
+  src: url("../igiari/igiari-cyrillic.ttf");
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-	font-family:'Ace Name';
-		src: url('./ace-name.ttf');
-	font-weight:normal;
-	font-style:normal;
+  font-family: "Ace Name";
+  src: url("./ace-name.ttf");
+  font-weight: normal;
+  font-style: normal;
 }
 
 #client_chatcontainer {
-	display: block;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	height: 42%;
-	width: 100%;
-    filter: none;
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 42%;
+  width: 100%;
+  filter: none;
 }
 
 #client_name {
-	display: block;
-	position: absolute;
-	left: 11%;
-	top: 0;
-	height: 12%;
-	min-width: 11%;	
-	font-size: 0.8em;
-    background: #d8f8a0;
-    color: #040;
-	margin: 0;
-	padding-top: 0.4%;
-	padding-left: 1.955%;
-	padding-right: 1.955%;
-	border-color: #b0f818;
-	border-style: solid;
-	border-width: 0.3em 0.6em;
-    border-radius: 15%/50%;	
-    box-shadow: 0 0.3em #70c020;
-    line-height: 100%;
-	z-index: 1;
-	font-family: "Ace Name", "Igiari Cyrillic", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
+  display: block;
+  position: absolute;
+  left: 11%;
+  top: 0;
+  height: 12%;
+  min-width: 11%;
+  font-size: 0.8em;
+  background: #d8f8a0;
+  color: #040;
+  margin: 0;
+  padding-top: 0.4%;
+  padding-left: 1.955%;
+  padding-right: 1.955%;
+  border-color: #b0f818;
+  border-style: solid;
+  border-width: 0.3em 0.6em;
+  border-radius: 15%/50%;
+  box-shadow: 0 0.3em #70c020;
+  line-height: 100%;
+  z-index: 1;
+  font-family: "Ace Name", "Igiari Cyrillic", "MS PGothic", "MS UI Gothic",
+    "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow",
+    "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 #client_inner_name {
-	text-justify: distribute;
-	line-height: 100%;
-	margin: 0;
-	margin-top: 2.75%;
+  text-justify: distribute;
+  line-height: 100%;
+  margin: 0;
+  margin-top: 2.75%;
 }
 
 #client_chat {
-	display: block;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	height: 87%;
-	margin: auto;
-    background-image: url("acww.svg");
-    background-size: cover;
-    background-repeat: no-repeat;
-	word-break: keep-all;
-	overflow-wrap: break-word;
-	text-align: left;
-	overflow: hidden;
-	scroll-behavior: smooth;
-	font-family: "Igiari Cyrillic", "MS PGothic", "MS UI Gothic", "MS Sans Serif", "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera", "Khmer OS", "FreeSans", "Gargi", sans-serif;
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 87%;
+  margin: auto;
+  background-image: url("acww.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  text-align: left;
+  overflow: hidden;
+  scroll-behavior: smooth;
+  font-family: "Igiari Cyrillic", "MS PGothic", "MS UI Gothic", "MS Sans Serif",
+    "Hiragino Maru Gothic Pro", "Mitra Mono", "Mukti Narrow", "Meera",
+    "Khmer OS", "FreeSans", "Gargi", sans-serif;
 }
 
 #client_inner_chat {
-	padding: 5% 16%;
-	margin: 0;
-	line-height: 100%;
+  padding: 5% 16%;
+  margin: 0;
+  line-height: 100%;
 }
 
 #client_chatwaiting {
-	display: block;
-	position: absolute;
-	color: transparent;
-	text-shadow: none;
-	right: 12%;
-	bottom: 15%;
-    width: 1.4em;
-    height: 1.5em;
-    background-image: url("chatwaiting_acww.svg");
-	background-size: contain;
-	animation: idling 0.4s steps(1) infinite;
+  display: block;
+  position: absolute;
+  color: transparent;
+  text-shadow: none;
+  right: 12%;
+  bottom: 15%;
+  width: 1.4em;
+  height: 1.5em;
+  background-image: url("chatwaiting_acww.svg");
+  background-size: contain;
+  animation: idling 0.4s steps(1) infinite;
 }
 
 @keyframes idling {
-	0% {
-		bottom: 12%;
-	}
+  0% {
+    bottom: 12%;
+  }
 
-	50% {
-		bottom: 15%;
-	}
+  50% {
+    bottom: 15%;
+  }
 
-	100% {
-		bottom: 12%;
-	}
+  100% {
+    bottom: 12%;
+  }
 }
 
 #client_trackstatus {
-	display: none;
+  display: none;
 }
 
 #client_clock_date {
-	position: absolute;
-	width: 13%;
-	height: 4%;
-	right: 0;
-	top: 1%;
-	text-align: left;
-	color: #7d5500;
-	background: linear-gradient(
-  		to bottom,
-  		#ffef55,
-		#ffef55 20%,
-  		#ffcf3c 20%,
-  		#ffcf3c 40%,
-		#ffef55 40%,
-		#ffef55 60%,
-		#ffcf3c 60%,
-  		#ffcf3c 80%,
-		#ffef55 80%,
-		#ffef55 100%
-	);
-	border: 0.1em solid #ae4500;
-	border-radius: 50%;
-	border-bottom: none;
-	font-weight: bold;
-	padding-left: 1.5em;
-	padding-top: 0.5em;
-	font-size: 0.5em;
+  position: absolute;
+  width: 13%;
+  height: 4%;
+  right: 0;
+  top: 1%;
+  text-align: left;
+  color: #7d5500;
+  background: linear-gradient(
+    to bottom,
+    #ffef55,
+    #ffef55 20%,
+    #ffcf3c 20%,
+    #ffcf3c 40%,
+    #ffef55 40%,
+    #ffef55 60%,
+    #ffcf3c 60%,
+    #ffcf3c 80%,
+    #ffef55 80%,
+    #ffef55 100%
+  );
+  border: 0.1em solid #ae4500;
+  border-radius: 50%;
+  border-bottom: none;
+  font-weight: bold;
+  padding-left: 1.5em;
+  padding-top: 0.5em;
+  font-size: 0.5em;
 }
 
 #client_clock_month {
-	display: none;
+  display: none;
 }
 
 #client_clock_weekday {
-	position: absolute;
-	width: 2.5%;
-	height: 3%;
-	right: 1%;
-	top: 2%;
-	color: white;
-	background: #00b63c;
-	background-size: 100% 40%;
-	border: 0.1em solid #00b63c;
-	border-radius: 100%;
-	font-size: 0.6em;
+  position: absolute;
+  width: 2.5%;
+  height: 3%;
+  right: 1%;
+  top: 2%;
+  color: white;
+  background: #00b63c;
+  background-size: 100% 40%;
+  border: 0.1em solid #00b63c;
+  border-radius: 100%;
+  font-size: 0.6em;
 }
 
 #client_clock_time {
-	position: absolute;
-	width: 16%;
-	height: 4%;
-	right: 2%;
-	top: 4%;
-	text-align: center;
-	color: #5d5500;
-	background: linear-gradient(
-  		to bottom,
-  		rgba(255,255,0,0),
- 		rgba(255,255,0,0) 20%,
-  		#ffcf3c 20%,
-  		#ffcf3c 40%,
-		#ffef55 40%,
-		#ffef55 60%,
-		#ffcf3c 60%,
-  		#ffcf3c 80%,
-		#ffef55 80%,
-		#ffef55 100%
-	);
-	border: 0.1em solid #ae4500;
-	border-radius: 50%;
-	border-top: none;
-	padding-top: 0.5em;
-	font-size: 0.5em;
+  position: absolute;
+  width: 16%;
+  height: 4%;
+  right: 2%;
+  top: 4%;
+  text-align: center;
+  color: #5d5500;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 0, 0),
+    rgba(255, 255, 0, 0) 20%,
+    #ffcf3c 20%,
+    #ffcf3c 40%,
+    #ffef55 40%,
+    #ffef55 60%,
+    #ffcf3c 60%,
+    #ffcf3c 80%,
+    #ffef55 80%,
+    #ffef55 100%
+  );
+  border: 0.1em solid #ae4500;
+  border-radius: 50%;
+  border-top: none;
+  padding-top: 0.5em;
+  font-size: 0.5em;
 }
