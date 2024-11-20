@@ -1,11 +1,11 @@
-import setCookie from '../utils/setCookie.ts';
+import setCookie from "../utils/setCookie.ts";
 
 /**
  * Triggered by the sound effect volume slider.
  */
 
 export function changeSFXVolume() {
-    setCookie('sfxVolume', document.getElementById('client_sfxaudio').volume);
+  setCookie("sfxVolume", document.getElementById("client_sfxaudio").volume);
 }
 window.changeSFXVolume = changeSFXVolume;
 
@@ -13,7 +13,10 @@ window.changeSFXVolume = changeSFXVolume;
  * Triggered by the testimony volume slider.
  */
 export function changeTestimonyVolume() {
-    setCookie('testimonyVolume', document.getElementById('client_testimonyaudio').volume);
+  setCookie(
+    "testimonyVolume",
+    document.getElementById("client_testimonyaudio").volume,
+  );
 }
 window.changeTestimonyVolume = changeTestimonyVolume;
 
@@ -22,6 +25,6 @@ window.changeTestimonyVolume = changeTestimonyVolume;
  */
 
 export function changeShoutVolume() {
-    setCookie('shoutVolume', document.getElementById('client_shoutaudio').volume);
+  setCookie("shoutVolume", document.getElementById("client_shoutaudio").volume);
 }
 window.changeShoutVolume = changeShoutVolume;
