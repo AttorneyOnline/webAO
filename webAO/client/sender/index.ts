@@ -49,7 +49,7 @@ export interface ISender {
   sendCharacter: (character: number) => void;
   sendRT: (testimony: string) => void;
   sendMusicChange: (track: string) => void;
-  sendZZ: (msg: string) => void;
+  sendZZ: (msg: string, target: number) => void;
   sendEE: (id: number, name: string, desc: string, img: string) => void;
   sendDE: (id: number) => void;
   sendPE: (name: string, desc: string, img: string) => void;
