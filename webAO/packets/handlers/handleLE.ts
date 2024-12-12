@@ -16,7 +16,7 @@ export const handleLE = (args: string[]) => {
     client.evidences[i - 1] = {
       name: prepChat(arg[0]),
       desc: prepChat(arg[1]),
-      filename: safeTags(arg[2]),
+      filename: arg[2],
       icon: `${AO_HOST}evidence/${encodeURI(arg[2].toLowerCase())}`,
     };
   }

@@ -3,7 +3,6 @@
 import { client, delay } from "../client";
 import { UPDATE_INTERVAL } from "../client";
 import setEmote from "../client/setEmote";
-import { safeTags } from "../encoding";
 import { AO_HOST } from "../client/aoHost";
 import { Viewport } from "./interfaces/Viewport";
 import { createBlipsChannels } from "./utils/createBlipChannels";
@@ -350,7 +349,7 @@ const viewport = (): Viewport => {
         // Evidence Bullshit
         if (chatmsg.evidence > 0) {
           // Prepare evidence
-          eviBox.src = safeTags(client.evidences[chatmsg.evidence - 1].icon);
+          eviBox.src = client.evidences[chatmsg.evidence - 1].icon;
 
           eviBox.style.width = "auto";
           eviBox.style.height = "36.5%";

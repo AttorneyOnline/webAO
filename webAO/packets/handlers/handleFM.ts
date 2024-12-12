@@ -1,6 +1,5 @@
 import { client } from "../../client";
 import { addTrack } from "../../client/addTrack";
-import { safeTags } from "../../encoding";
 
 /**
  * Handles updated music list

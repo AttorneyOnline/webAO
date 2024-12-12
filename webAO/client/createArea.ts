@@ -1,7 +1,9 @@
 import { client } from "../client";
 import { area_click } from "../dom/areaClick";
+import { safeTags } from "../encoding";
 
-export const createArea = (id: number, name: string) => {
+export const createArea = (id: number, aname: string) => {
+  const name = safeTags(aname);
   const thisarea = {
     name,
     players: 0,

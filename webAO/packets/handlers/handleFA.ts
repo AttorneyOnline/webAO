@@ -1,6 +1,5 @@
 import { client } from "../../client";
 import { createArea } from "../../client/createArea";
-import { safeTags } from "../../encoding";
 
 /**
  * Handles updated area list
@@ -10,6 +9,6 @@ export const handleFA = (args: string[]) => {
   client.resetAreaList();
 
   for (let i = 1; i < args.length; i++) {
-    createArea(i - 1, safeTags(args[i]));
+    createArea(i - 1, args[i]);
   }
 };

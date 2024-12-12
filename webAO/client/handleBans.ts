@@ -1,3 +1,5 @@
+import { safeTags } from "../encoding";
+
 /**
  * Handles the kicked packet
  * @param {string} type is it a kick or a ban
@@ -6,7 +8,7 @@
 export const handleBans = (type: string, reason: string) => {
   document.getElementById("client_error")!.style.display = "flex";
   document.getElementById("client_errortext")!.innerHTML =
-    `${type}:<br>${reason.replace(/\n/g, "<br />")}`;
+    `${type}:<br>${safeTags(reason).replace(/\n/g, "<br />")}`;
   (<HTMLElement>document.getElementById("client_reconnect")).style.display =
     "none";
   alert(type + ":\r" + reason);

@@ -1,6 +1,6 @@
 import { client } from "../../client";
 import { AO_HOST } from "../../client/aoHost";
-import { prepChat, safeTags } from "../../encoding";
+import { prepChat } from "../../encoding";
 
 /**
  * Handles incoming evidence information, containing only one evidence
@@ -18,7 +18,7 @@ export const handleEI = (args: string[]) => {
   client.evidences[evidenceID] = {
     name: prepChat(arg[0]),
     desc: prepChat(arg[1]),
-    filename: safeTags(arg[3]),
+    filename: arg[3],
     icon: `${AO_HOST}evidence/${encodeURI(arg[3].toLowerCase())}`,
   };
 
