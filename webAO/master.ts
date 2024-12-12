@@ -64,7 +64,9 @@ export function setServ(ID: number) {
   const onlineStr = server.online;
   document.getElementById("serverdescription_content").innerHTML =
     `<b>${onlineStr}</b><br>`;
-  document.getElementById("serverdescription_content").appendChild(document.createTextNode(server.description));
+  document
+    .getElementById("serverdescription_content")
+    .appendChild(document.createTextNode(server.description));
 }
 window.setServ = setServ;
 
