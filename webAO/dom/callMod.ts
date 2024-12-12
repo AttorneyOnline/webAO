@@ -10,7 +10,7 @@ export function callMod() {
   if (modcall == null || modcall === "") {
     // cancel
   } else {
-    client.sender.sendZZ(modcall,-1);
+    client.sender.sendZZ(modcall, -1);
   }
 }
 window.callMod = callMod;
