@@ -8,7 +8,8 @@ import { prepChat } from "../../encoding";
  */
 export const handleZZ = (args: string[]) => {
   const oocLog = document.getElementById("client_ooclog")!;
-  oocLog.innerHTML += `$Alert: ${prepChat(args[1])}\r\n`;
+  const message = args[1].replace(/\n/g, "<br>");
+  oocLog.innerHTML += `$Alert: ${prepChat(message)}<br>`;
   if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
     oocLog.scrollTop = oocLog.scrollHeight;
   }
