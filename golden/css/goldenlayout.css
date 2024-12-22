@@ -44,7 +44,6 @@ body {
   float: left;
 }
 .lm_content {
-  overflow: hidden;
   position: relative;
 }
 .lm_dragging,
