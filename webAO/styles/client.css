@@ -575,10 +575,6 @@
   color: #fff;
 }
 
-#client_playerlist {
-  width: 100%;
-}
-
 #client_menu {
   overflow-y: auto;
   height: 100%;
