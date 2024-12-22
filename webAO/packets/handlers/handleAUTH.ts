@@ -3,6 +3,8 @@
  * @param {Array} args packet arguments
  */
 export const handleAUTH = (args: string[]) => {
-  (<HTMLAnchorElement>document.getElementById("mod_ui")).href =
-    `styles/mod.css`;
+  if (args[1] === "1") {
+    (<HTMLAnchorElement>document.getElementById("mod_ui")).href =
+      `styles/mod.css`;
+  }
 };
