@@ -273,8 +273,6 @@ class Client extends EventEmitter {
   onClose(e: CloseEvent) {
     client.state = clientState.NotConnected;
     console.error(`The connection was closed: ${e.reason} (${e.code})`);
-    console.log(this.areas.length);
-    console.log(this.banned);
     if (this.banned === false) {
       if (this.areas.length > 0) {
         document.getElementById("client_errortext").textContent =
