@@ -1,4 +1,4 @@
-import { setBanned } from "../../client";
+import { client } from "../../client";
 import { handleBans } from "../../client/handleBans";
 
 /**
@@ -7,6 +7,6 @@ import { handleBans } from "../../client/handleBans";
  * @param {Array} args ban reason
  */
 export const handleBD = (args: string[]) => {
+  client.banned = true;
   handleBans("Banned", args[1]);
-  setBanned(true);
 };
