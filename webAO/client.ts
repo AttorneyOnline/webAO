@@ -62,7 +62,6 @@ export const setExtraFeatures = (val: any) => {
   extrafeatures = val;
 };
 
-
 let hdid: string;
 
 const fpPromise = FingerprintJS.load();
@@ -278,16 +277,16 @@ class Client extends EventEmitter {
     console.log(this.banned);
     if (this.banned === false) {
       if (this.areas.length > 0) {
-      document.getElementById("client_errortext").textContent =
-        "You were disconnected from the server.";
+        document.getElementById("client_errortext").textContent =
+          "You were disconnected from the server.";
       } else {
-      document.getElementById("client_errortext").textContent =
-        "Could not connect to the server.";
+        document.getElementById("client_errortext").textContent =
+          "Could not connect to the server.";
       }
     }
     document.getElementById("client_waiting").style.display = "block";
     document.getElementById("client_error").style.display = "flex";
-    document.getElementById("client_loading").style.display = "none";    
+    document.getElementById("client_loading").style.display = "none";
     document.getElementById("error_id").textContent = String(e.code);
     this.cleanup();
   }
