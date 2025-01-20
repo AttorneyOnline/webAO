@@ -13,5 +13,5 @@ export const setAOhost = (val: string) => {
   }
   if (AO_HOST.length < 5) {
     AO_HOST = val;
-  }  
+  }
 };
