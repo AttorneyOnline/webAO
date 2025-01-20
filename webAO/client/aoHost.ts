@@ -11,6 +11,7 @@ export const setAOhost = (val: string) => {
     console.log("Upgrading asset link to https");
     val = val.replace("http:", "https:");
   }
-
-  AO_HOST = val;
+  if (AO_HOST.length < 5) {
+    AO_HOST = val;
+  }  
 };
