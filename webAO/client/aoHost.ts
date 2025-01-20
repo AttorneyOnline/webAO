@@ -13,6 +13,6 @@ export const setAOhost = (val: string) => {
   }
   if (AO_HOST.length < 5 || !AO_HOST) {
     AO_HOST = val;
-  }  
+  }
   console.log("Asset URL ist now " + AO_HOST);
 };
