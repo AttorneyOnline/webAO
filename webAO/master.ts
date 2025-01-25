@@ -15,7 +15,7 @@ interface AOServer {
   port?: number;
   ws_port?: number;
   wss_port?: number;
-  assets?: string;
+  asset?: string;
 }
 
 const clientVersion = process.env.npm_package_version;
