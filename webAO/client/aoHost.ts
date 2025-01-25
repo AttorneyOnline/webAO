@@ -11,7 +11,11 @@ export const setAOhost = (val: string) => {
     console.log("Upgrading asset link to https");
     val = val.replace("http:", "https:");
   }
-  if (AO_HOST.length < 5 || !AO_HOST || AO_HOST.includes(`//attorneyoffline.de/`)) {
+  if (
+    AO_HOST.length < 5 ||
+    !AO_HOST ||
+    AO_HOST.includes(`//attorneyoffline.de/`)
+  ) {
     AO_HOST = val;
   }
   console.log("Asset URL ist now " + AO_HOST);
