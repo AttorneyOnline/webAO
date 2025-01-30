@@ -1,11 +1,5 @@
 import { safeTags } from "./encoding";
 
-declare global {
-  interface Window {
-    setServ: (ID: number) => void;
-  }
-}
-
 interface AOServer {
   name: string;
   description: string;
@@ -27,28 +21,21 @@ const protocol = window.location.protocol;
 const serverlist_cache_key = "masterlist";
 
 const servers: AOServer[] = [];
-servers[-2] = {
-  name: "Singleplayer",
-  description: "Build cases, try out new things",
-  ip: "127.0.0.1",
-  players: 0,
-  online: "Singleplayer",
-  port: 50001,
-} as AOServer;
-
 servers[-1] = {
   name: "Localhost",
   description: "This is your computer on port 50001",
   ip: "127.0.0.1",
   players: 0,
   online: "Localhost",
-  port: 50001,
+  ws_port: 50001,
 } as AOServer;
 
 function main() {
   getServerlist().then((serverlist) => {
     processServerlist(serverlist);
   });
+
+  addServer(servers[-1]);
 
   processClientVersion(clientVersion);
 
@@ -58,17 +45,6 @@ function main() {
 }
 
 main();
-
-export function setServ(ID: number) {
-  const server = servers[ID];
-  const onlineStr = server.online;
-  document.getElementById("serverdescription_content").innerHTML =
-    `<b>${onlineStr}</b><br>`;
-  document
-    .getElementById("serverdescription_content")
-    .appendChild(document.createTextNode(server.description));
-}
-window.setServ = setServ;
 
 // Fetches the serverlist from the masterserver
 // Returns a properly typed list of servers
@@ -164,41 +140,48 @@ function constructClientURL(protocol: string): string {
   return clientURL.href;
 }
 
+function addServer(server: AOServer) {
+  let ws_port = 0;
+  let ws_protocol = "";
+  let http_protocol = "";
+
+  if (server.ws_port) {
+    ws_port = server.ws_port;
+    ws_protocol = "ws";
+    http_protocol = "http";
+  }
+  if (server.wss_port && !window.navigator.userAgent.includes("Nintendo")) {
+    ws_port = server.wss_port;
+    ws_protocol = "wss";
+    http_protocol = "https";
+  }
+
+  if (ws_port === 0 || ws_protocol === "" || http_protocol === "") {
+    console.warn(`Server ${server.name} has no websocket port, skipping`);
+    return;
+  }
+
+  const clientURL = constructClientURL(http_protocol);
+  const connect = `${ws_protocol}://${server.ip}:${ws_port}`;
+  const serverName = server.name;
+  const fullClientWatchURL = `${clientURL}?mode=watch&connect=${connect}&serverName=${serverName}`;
+  const fullClientJoinURL = `${clientURL}?mode=join&connect=${connect}&serverName=${serverName}`;
+
+  servers.push(server);
+
+  document.getElementById("masterlist").innerHTML +=
+    `<details name="servers">` +
+    `<summary><p>${safeTags(server.name)} (${server.players})</p>` +
+    `<a class="button" href="${fullClientJoinURL}" target="_blank">Join</a>` +
+    `<a class="button" href="${fullClientWatchURL}" target="_blank">Watch</a></summary>` +
+    `<p>${safeTags(server.description)}</p>` +
+    `</details>`
+
+}
+
 function processServerlist(serverlist: AOServer[]) {
   for (let i = 0; i < serverlist.length; i++) {
-    const server = serverlist[i];
-    let ws_port = 0;
-    let ws_protocol = "";
-    let http_protocol = "";
-
-    if (server.ws_port) {
-      ws_port = server.ws_port;
-      ws_protocol = "ws";
-      http_protocol = "http";
-    }
-    if (server.wss_port && !window.navigator.userAgent.includes("Nintendo")) {
-      ws_port = server.wss_port;
-      ws_protocol = "wss";
-      http_protocol = "https";
-    }
-
-    if (ws_port === 0 || ws_protocol === "" || http_protocol === "") {
-      console.warn(`Server ${server.name} has no websocket port, skipping`);
-      continue;
-    }
-
-    const clientURL = constructClientURL(http_protocol);
-    const connect = `${ws_protocol}://${server.ip}:${ws_port}`;
-    const serverName = server.name;
-    const fullClientWatchURL = `${clientURL}?mode=watch&connect=${connect}&serverName=${serverName}`;
-    const fullClientJoinURL = `${clientURL}?mode=join&connect=${connect}&serverName=${serverName}`;
-
-    servers.push(server);
-
-    document.getElementById("masterlist").innerHTML +=
-      `<li id="server${i}" onmouseover="setServ(${i})"><p>${safeTags(server.name)} (${server.players})</p>` +
-      `<a class="button" href="${fullClientWatchURL}" target="_blank">Watch</a>` +
-      `<a class="button" href="${fullClientJoinURL}" target="_blank">Join</a></li>`;
+    addServer(serverlist[i]);
   }
 }
 

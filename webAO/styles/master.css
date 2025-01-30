@@ -92,7 +92,7 @@
   margin: auto;
 }
 
-.serverlist li {
+.serverlist details {
   position: relative;
   right: 0;
   background-color: #fff;
@@ -110,16 +110,16 @@
   cursor: default;
 }
 
-.serverlist li:hover {
+.serverlist details:hover {
   background-color: #ffff6b;
   border-color: #efad21;
 }
 
-.serverlist li p {
+.serverlist details p {
   display: inline-block !important;
 }
 
-.serverlist li a {
+.serverlist details a {
   float: right;
 }
 
