@@ -57,32 +57,6 @@
   color: black;
 }
 
-#serverdescription_container {
-  display: block;
-  top: 100px;
-  position: fixed;
-  right: 0;
-  width: 185px;
-  height: 276px;
-  padding: 0px;
-  background: url("../desc.png") no-repeat;
-  border: 2px solid #888;
-  border-radius: 5px;
-}
-
-#serverdescription_content {
-  width: 180px;
-  height: 270px;
-  position: relative;
-  color: white;
-  white-space: pre-line;
-  word-wrap: break-word;
-  text-align: center;
-  margin: 2px;
-  overflow-x: visible;
-  overflow-y: auto;
-}
-
 #serverlist_container {
   margin-right: 200px;
 }
@@ -95,14 +69,14 @@
 .serverlist details {
   position: relative;
   right: 0;
-  background-color: #fff;
+  background-color: #333;
+  color: #fff;
   border: 2px solid #bbb;
   border-radius: 5px;
   padding: 0px;
   padding-left: 10px;
   display: block;
   min-width: 400px;
-  height: 50px;
   margin: 10px;
   margin-left: auto;
   margin-right: auto;
@@ -110,17 +84,28 @@
   cursor: default;
 }
 
-.serverlist details:hover {
+.serverlist summary {
+  height: 50px;
+  background-color: #fff;
+  color: #000;
+}
+
+.serverlist summary:hover {
   background-color: #ffff6b;
   border-color: #efad21;
 }
 
-.serverlist details p {
+.serverlist summary p {
   display: inline-block !important;
 }
 
-.serverlist details a {
+.serverlist summary a {
   float: right;
+}
+
+details[open] {
+  background: url("../desc.png");
+  color: #fff;
 }
 
 #serverlist_container h2 {
@@ -374,10 +359,6 @@ a:hover {
 
 a.nav-link {
   text-decoration: none !important;
-}
-
-ul.serverlist p {
-  color: black;
 }
 
 a.nav-link {
