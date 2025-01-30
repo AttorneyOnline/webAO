@@ -175,8 +175,7 @@ function addServer(server: AOServer) {
     `<a class="button" href="${fullClientJoinURL}" target="_blank">Join</a>` +
     `<a class="button" href="${fullClientWatchURL}" target="_blank">Watch</a></summary>` +
     `<p>${safeTags(server.description)}</p>` +
-    `</details>`
-
+    `</details>`;
 }
 
 function processServerlist(serverlist: AOServer[]) {
