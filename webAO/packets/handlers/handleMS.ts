@@ -10,8 +10,8 @@ import { handle_ic_speaking } from "../../viewport/utils/handleICSpeaking";
  * @param {*} args packet arguments
  */
 export const handleMS = (args: string[]) => {
-  // TODO: this if-statement might be a bug.
-  if (args[4] !== client.viewport.getChatmsg().content) {
+  // duplicate message
+  if (args[5] !== client.viewport.getChatmsg().content) {
     const char_id = Number(args[9]);
     const char_name = safeTags(args[3]);
 
