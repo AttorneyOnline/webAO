@@ -88,6 +88,8 @@
   height: 50px;
   background-color: #fff;
   color: #000;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .serverlist summary:hover {
