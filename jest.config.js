@@ -29,9 +29,10 @@ module.exports = {
   coveragePathIgnorePatterns: [
     "<rootDir>/build/",
     "<rootDir>/node_modules/",
+    "<rootDir>/webAO/client/sender/",
     "<rootDir>/webAO/dom/",
-    "<rootDir>/webAO/viewport/utils/",
-    "<rootDir>/webAO/packets/handlers/"
+    "<rootDir>/webAO/packets/handlers/",
+    "<rootDir>/webAO/viewport/utils/"    
   ],
 
   // Indicates which provider should be used to instrument code for coverage
