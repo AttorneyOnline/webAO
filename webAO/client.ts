@@ -134,6 +134,7 @@ class Client extends EventEmitter {
   musics: any;
   musics_time: boolean;
   callwords: string[];
+  enableCaptcha: boolean;
   banned: boolean;
   hdid: string;
   resources: any;
@@ -179,6 +180,7 @@ class Client extends EventEmitter {
       }
     };
 
+    this.enableCaptcha = false;
     this.banned = false;
     this.hp = [0, 0];
     this.playerID = 1;
@@ -247,7 +249,7 @@ class Client extends EventEmitter {
    */
   joinServer() {
     this.sender.sendServer(`HI#${hdid}#%`);
-    if (getCookie("hdid") !== hdid) {
+    if (this.enableCaptcha && getCookie("hdid") !== hdid) {
       this.sender.sendServer(getCookie("hdid"));
       document.getElementById("client_secondfactor").style.display = "block";
       document.getElementById("client_charselect").remove();
