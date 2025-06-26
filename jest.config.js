@@ -30,7 +30,8 @@ module.exports = {
     "<rootDir>/build/",
     "<rootDir>/node_modules/",
     "<rootDir>/webAO/dom/",
-    "<rootDir>/webAO/viewport/utils/"
+    "<rootDir>/webAO/viewport/utils/",
+    "<rootDir>/webAO/packets/handlers/"
   ],
 
   // Indicates which provider should be used to instrument code for coverage
