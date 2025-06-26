@@ -29,9 +29,11 @@ module.exports = {
   coveragePathIgnorePatterns: [
     "<rootDir>/build/",
     "<rootDir>/node_modules/",
+    "<rootDir>/webAO/constants/",
     "<rootDir>/webAO/client/sender/",
     "<rootDir>/webAO/dom/",
     "<rootDir>/webAO/packets/handlers/",
+    "<rootDir>/webAO/styles/",
     "<rootDir>/webAO/viewport/utils/"    
   ],
 
