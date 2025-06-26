@@ -1,4 +1,4 @@
-import downloadFile from "../downloadFile";
+import downloadFile from "../services/downloadFile";
 jest.useFakeTimers().setSystemTime(new Date("2020-01-01").getTime());
 
 global.URL.createObjectURL = jest.fn();

@@ -1,7 +1,7 @@
-import request from "../../services/request";
-import mlConfig from "../aoml";
+import request from "../services/request";
+import mlConfig from "../utils/aoml";
 
-jest.mock("../../services/request");
+jest.mock("../services/request");
 const networkRequest = `
 c0 = 247, 247, 247
 c0_name = White

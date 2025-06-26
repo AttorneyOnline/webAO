@@ -1,7 +1,7 @@
-import fileExists from "../fileExists";
-import tryUrls from "../tryUrls";
-import transparentPng from "../../constants/transparentPng";
-jest.mock("../fileExists");
+import fileExists from "../utils/fileExists";
+import tryUrls from "../utils/tryUrls";
+import transparentPng from "../constants/transparentPng";
+jest.mock("../utils/fileExists");
 
 const mockFileExists = fileExists as jest.MockedFunction<typeof fileExists>;
 
