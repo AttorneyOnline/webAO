@@ -215,10 +215,10 @@ class Client extends EventEmitter {
     this.temp_packet = "";
     loadResources;
     isLowMemory;
-    this.charicon_extensions = [];
-    this.emote_extensions = [];
-    this.emotions_extensions = [];
-    this.background_extensions = [];
+    this.charicon_extensions = [".png", ".webp"];
+    this.emote_extensions = [".gif", ".png", ".apng", ".webp", ".webp.static"];
+    this.emotions_extensions = [".png", ".webp"];
+    this.background_extensions = [".png", ".gif"];;
   }
 
   /**
