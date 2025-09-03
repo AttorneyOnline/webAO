@@ -78,6 +78,7 @@ export const fetchExtensions = async () => {
     console.log("charicons "+client.charicon_extensions)
     console.log("emotes "+client.emote_extensions)
     console.log("emotions "+client.emotions_extensions)
+    console.log("backgrounds "+client.background_extensions)
   } catch (err) {
     console.warn("there was no extensions.json file");
   }

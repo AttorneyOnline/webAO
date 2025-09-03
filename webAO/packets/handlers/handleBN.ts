@@ -5,7 +5,29 @@ import { updateBackgroundPreview } from "../../dom/updateBackgroundPreview";
 import { getIndexFromSelect } from "../../dom/getIndexFromSelect";
 import { switchPanTilt } from "../../dom/switchPanTilt";
 import transparentPng from "../../constants/transparentPng";
-import tryBackgroundUrls from "../../utils/tryBackgroundUrls";
+import fileExists from "../../utils/fileExists";
+
+function setBackgroundImage(elementid: string, bgname: string, bgpart: string): boolean {
+
+  let url;
+  let success = false;
+  for (const extension of client.background_extensions) {
+    url = `${AO_HOST}background/${encodeURI(bgname.toLowerCase())}/${bgpart}${extension}`;
+
+    const exists = fileExists(url);
+
+    if (exists) {
+      success = true;
+      break;
+    }
+  }
+  if (success)
+    (<HTMLImageElement>document.getElementById(elementid)).src = url;
+  else
+    (<HTMLImageElement>document.getElementById(elementid)).src = transparentPng;
+  return success;
+}
+
 
 /**
  * Handles a background change.
@@ -28,43 +50,25 @@ export const handleBN = (args: string[]) => {
       client.viewport.getBackgroundName();
   }
 
-  tryBackgroundUrls(
-    `${AO_HOST}background/${encodeURI(args[1].toLowerCase())}/defenseempty`,
-  ).then((resp) => {
-    (<HTMLImageElement>document.getElementById("bg_preview")).src = resp;
-  });
-  tryBackgroundUrls(`${bgfolder}defensedesk`).then((resp) => {
-    (<HTMLImageElement>document.getElementById("client_def_bench")).src = resp;
-  });
-  tryBackgroundUrls(`${bgfolder}stand`).then((resp) => {
-    (<HTMLImageElement>document.getElementById("client_wit_bench")).src = resp;
-  });
-  tryBackgroundUrls(`${bgfolder}prosecutiondesk`).then((resp) => {
-    (<HTMLImageElement>document.getElementById("client_pro_bench")).src = resp;
-  });
-  tryBackgroundUrls(`${bgfolder}court`).then((resp) => {
-    (<HTMLImageElement>document.getElementById("client_court")).src = resp;
-    if (resp !== transparentPng) {
-      (<HTMLInputElement>document.getElementById("client_pantilt")).checked =
+
+  setBackgroundImage("bg_preview",args[1],"defenseempty")
+
+  setBackgroundImage("client_def_bench",args[1],"defensedesk")
+  setBackgroundImage("client_wit_bench",args[1],"stand")
+  setBackgroundImage("client_pro_bench",args[1],"prosecutiondesk")
+
+  setBackgroundImage("client_court_def",args[1],"defenseempty")
+  setBackgroundImage("client_court_wit",args[1],"witnessempty")
+  setBackgroundImage("client_court_pro",args[1],"prosecutorempty")
+
+  setBackgroundImage("client_court_deft",args[1],"transition_def")
+  setBackgroundImage("client_court_prot",args[1],"transition_pro")
+  
+  if(setBackgroundImage("client_court",args[1],"court")) {
+    (<HTMLInputElement>document.getElementById("client_pantilt")).checked =
         true;
       switchPanTilt();
-    }
-  });
-  tryBackgroundUrls(`${bgfolder}defenseempty`).then((resp) => {
-    (<HTMLImageElement>document.getElementById("client_court_def")).src = resp;
-  });
-  tryBackgroundUrls(`${bgfolder}transition_def`).then((resp) => {
-    (<HTMLImageElement>document.getElementById("client_court_deft")).src = resp;
-  });
-  tryBackgroundUrls(`${bgfolder}witnessempty`).then((resp) => {
-    (<HTMLImageElement>document.getElementById("client_court_wit")).src = resp;
-  });
-  tryBackgroundUrls(`${bgfolder}transition_pro`).then((resp) => {
-    (<HTMLImageElement>document.getElementById("client_court_prot")).src = resp;
-  });
-  tryBackgroundUrls(`${bgfolder}prosecutorempty`).then((resp) => {
-    (<HTMLImageElement>document.getElementById("client_court_pro")).src = resp;
-  });
+  }
 
   if (client.charID === -1) {
     client.viewport.set_side({
