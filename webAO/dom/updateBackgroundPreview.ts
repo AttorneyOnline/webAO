@@ -1,5 +1,5 @@
 import { AO_HOST } from "../client/aoHost";
-import tryUrls from "../utils/tryUrls";
+import tryBackgroundUrls from "../utils/tryBackgroundUrls";
 
 /**
  * Update background preview.
@@ -20,7 +20,7 @@ export function updateBackgroundPreview() {
   } else {
     background_filename.style.display = "none";
   }
-  tryUrls(
+  tryBackgroundUrls(
     `${AO_HOST}background/${encodeURI(
       background_select.value.toLowerCase(),
     )}/defenseempty`,
