@@ -19,6 +19,7 @@ import {
   fetchBackgroundList,
   fetchEvidenceList,
   fetchCharacterList,
+  fetchExtensions,
 } from "./client/fetchLists";
 import getCookie from "./utils/getCookie";
 import setCookie from "./utils/setCookie";
@@ -408,7 +409,7 @@ class Client extends EventEmitter {
   resetAreaList() {
     this.areas = [];
     document.getElementById("areas").innerHTML = "";
-
+    fetchExtensions();
     fetchBackgroundList();
     fetchEvidenceList();
     fetchCharacterList();
