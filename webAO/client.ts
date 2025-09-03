@@ -98,11 +98,11 @@ fpPromise
     }
 
     client = new Client(connectionString);
+    fetchExtensions();
     client.connect();
     client.hdid = hdid;
     isLowMemory();
     loadResources();
-    fetchExtensions();
   });
 
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
