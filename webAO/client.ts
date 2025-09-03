@@ -154,6 +154,7 @@ class Client extends EventEmitter {
   isLowMemory: () => void;
   charicon_extensions: string[];
   emote_extensions: string[];
+  emotions_extensions: string[];
   constructor(connectionString: string) {
     super();
 
@@ -214,6 +215,7 @@ class Client extends EventEmitter {
     isLowMemory;
     this.charicon_extensions = [".png", ".webp"];
     this.emote_extensions = [".gif", ".png", ".apng", ".webp", ".webp.static"];
+    this.emotions_extensions = [".png", ".webp"];
   }
 
   /**

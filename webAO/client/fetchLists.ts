@@ -73,8 +73,10 @@ export const fetchExtensions = async () => {
     const allextensions = JSON.parse(extensiondata);
     client.charicon_extensions = allextensions.charicon_extensions || [".png", ".webp"];
     client.emote_extensions = allextensions.emote_extensions || [".gif", ".png", ".apng", ".webp", ".webp.static"];
+    client.emotions_extensions = allextensions.emotions_extensions || [".png", ".webp"];
     console.log("charicons "+client.charicon_extensions)
     console.log("emotes "+client.emote_extensions)
+    console.log("emotions "+client.emotions_extensions)
   } catch (err) {
     console.warn("there was no extensions.json file");
   }
