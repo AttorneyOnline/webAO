@@ -71,8 +71,10 @@ export const fetchExtensions = async () => {
   try {
     const extensiondata = await request(`${AO_HOST}extensions.json`);
     const allextensions = JSON.parse(extensiondata);
-    client.charicon_extensions = allextensions.charicon_extensions|| [".png", ".webp"];
+    client.charicon_extensions = allextensions.charicon_extensions || [".png", ".webp"];
     client.emote_extensions = allextensions.emote_extensions || [".gif", ".png", ".apng", ".webp", ".webp.static"];
+    console.log("charicons "+client.charicon_extensions)
+    console.log("emotes "+client.emote_extensions)
   } catch (err) {
     console.warn("there was no extensions.json file");
   }
