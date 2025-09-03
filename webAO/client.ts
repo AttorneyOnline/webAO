@@ -102,6 +102,7 @@ fpPromise
     client.hdid = hdid;
     isLowMemory();
     loadResources();
+    fetchExtensions();
   });
 
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -155,6 +156,7 @@ class Client extends EventEmitter {
   charicon_extensions: string[];
   emote_extensions: string[];
   emotions_extensions: string[];
+  background_extensions: string[];
   constructor(connectionString: string) {
     super();
 
@@ -213,9 +215,10 @@ class Client extends EventEmitter {
     this.temp_packet = "";
     loadResources;
     isLowMemory;
-    this.charicon_extensions = [".png", ".webp"];
-    this.emote_extensions = [".gif", ".png", ".apng", ".webp", ".webp.static"];
-    this.emotions_extensions = [".png", ".webp"];
+    this.charicon_extensions = [];
+    this.emote_extensions = [];
+    this.emotions_extensions = [];
+    this.background_extensions = [];
   }
 
   /**
@@ -411,7 +414,6 @@ class Client extends EventEmitter {
   resetAreaList() {
     this.areas = [];
     document.getElementById("areas").innerHTML = "";
-    fetchExtensions();
     fetchBackgroundList();
     fetchEvidenceList();
     fetchCharacterList();
