@@ -1,5 +1,20 @@
 import { AO_HOST } from "../client/aoHost";
-import tryUrls from "../utils/tryUrls";
+import fileExists from "../utils/fileExists";
+import transparentPng from "../constants/transparentPng";
+
+const urlExtensionsToTry = [".png", ".gif", ".webp", ".apng"];
+const tryBackgroundUrls = async (url: string) => {
+  for (let i = 0; i < urlExtensionsToTry.length; i++) {
+    const extension = urlExtensionsToTry[i];
+    const fullFileUrl = url + extension;
+    const exists = await fileExists(fullFileUrl);
+    if (exists) {
+      return fullFileUrl;
+    }
+  }
+  return transparentPng;
+};
+export default tryBackgroundUrls;
 
 /**
  * Update background preview.
@@ -20,7 +35,7 @@ export function updateBackgroundPreview() {
   } else {
     background_filename.style.display = "none";
   }
-  tryUrls(
+  tryBackgroundUrls(
     `${AO_HOST}background/${encodeURI(
       background_select.value.toLowerCase(),
     )}/defenseempty`,

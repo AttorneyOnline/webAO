@@ -19,6 +19,7 @@ import {
   fetchBackgroundList,
   fetchEvidenceList,
   fetchCharacterList,
+  fetchExtensions,
 } from "./client/fetchLists";
 import getCookie from "./utils/getCookie";
 import setCookie from "./utils/setCookie";
@@ -97,6 +98,7 @@ fpPromise
     }
 
     client = new Client(connectionString);
+    fetchExtensions();
     client.connect();
     client.hdid = hdid;
     isLowMemory();
@@ -143,7 +145,6 @@ class Client extends EventEmitter {
   sender: ISender;
   checkUpdater: any;
   _lastTimeICReceived: any;
-  manifest: string[];
   viewport: Viewport;
   partial_packet: boolean;
   temp_packet: string;
@@ -151,6 +152,10 @@ class Client extends EventEmitter {
   connect: () => void;
   loadResources: () => void;
   isLowMemory: () => void;
+  charicon_extensions: string[];
+  emote_extensions: string[];
+  emotions_extensions: string[];
+  background_extensions: string[];
   constructor(connectionString: string) {
     super();
 
@@ -197,7 +202,6 @@ class Client extends EventEmitter {
     this.musics = [];
     this.musics_time = false;
     this.callwords = [];
-    this.manifest = [];
     this.resources = getResources(AO_HOST, theme);
     this.selectedEmote = -1;
     this.selectedEvidence = -1;
@@ -209,6 +213,10 @@ class Client extends EventEmitter {
     this.temp_packet = "";
     loadResources;
     isLowMemory;
+    this.charicon_extensions = [".png", ".webp"];
+    this.emote_extensions = [".gif", ".png", ".apng", ".webp", ".webp.static"];
+    this.emotions_extensions = [".png", ".webp"];
+    this.background_extensions = [".png", ".gif"];;
   }
 
   /**
@@ -404,7 +412,6 @@ class Client extends EventEmitter {
   resetAreaList() {
     this.areas = [];
     document.getElementById("areas").innerHTML = "";
-
     fetchBackgroundList();
     fetchEvidenceList();
     fetchCharacterList();

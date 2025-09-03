@@ -1,7 +1,6 @@
 import { positions } from "../constants/positions";
 import { AO_HOST } from "../../client/aoHost";
 import { client } from "../../client";
-import tryUrls from "../../utils/tryUrls";
 import findImgSrc from "../../utils/findImgSrc";
 
 /**
@@ -55,7 +54,7 @@ export const set_side = async ({
   if (showSpeedLines === true) {
     court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
   } else {
-    court.src = await tryUrls(client.viewport.getBackgroundFolder() + bg);
+    //court.src = await tryBackgroundUrls(client.viewport.getBackgroundFolder() + bg);
   }
 
   if (showDesk === true && desk) {

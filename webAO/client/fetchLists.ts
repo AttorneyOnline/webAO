@@ -50,8 +50,6 @@ export const fetchEvidenceList = async () => {
   try {
     const evidata = await request(`${AO_HOST}evidence.json`);
     const evi_array = JSON.parse(evidata);
-    // the try catch will fail before here when there is no file
-
     evi_array.forEach((evi: string) => {
       evi_select.add(new Option(evi));
     });
@@ -60,12 +58,19 @@ export const fetchEvidenceList = async () => {
   }
 };
 
-export const fetchManifest = async () => {
+export const fetchExtensions = async () => {
   try {
-    const manifestdata = await request(`${AO_HOST}manifest.txt`);
-    client.manifest = manifestdata.split(/\r\n|\n\r|\n|\r/);
-    // the try catch will fail before here when there is no file
+    const extensiondata = await request(`${AO_HOST}extensions.json`);
+    const allextensions = JSON.parse(extensiondata);
+    client.charicon_extensions = allextensions.charicon_extensions || [".png", ".webp"];
+    client.emote_extensions = allextensions.emote_extensions || [".gif", ".png", ".apng", ".webp", ".webp.static"];
+    client.emotions_extensions = allextensions.emotions_extensions || [".png", ".webp"];
+    client.background_extensions = allextensions.background_extensions || [".png", ".gif", ".webp", ".apng"];
+    console.log("charicons "+client.charicon_extensions)
+    console.log("emotes "+client.emote_extensions)
+    console.log("emotions "+client.emotions_extensions)
+    console.log("backgrounds "+client.background_extensions)
   } catch (err) {
-    console.warn("there was no manifest.txt file");
+    console.warn("there was no extensions.json file");
   }
 };

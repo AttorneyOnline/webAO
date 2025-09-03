@@ -23,9 +23,8 @@ const setEmote = async (
   const emoteSelector = document.getElementById(
     `client_${position}${pairID}_img`,
   ) as HTMLImageElement;
-  const extensionsMap = [".gif", ".png", ".apng", ".webp", ".webp.static"];
 
-  for (const extension of extensionsMap) {
+  for (const extension of client.emote_extensions) {
     // Hides all sprites before creating a new sprite
 
     if (

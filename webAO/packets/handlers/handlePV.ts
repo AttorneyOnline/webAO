@@ -58,9 +58,8 @@ export const handlePV = async (args: string[]) => {
         }
         // Make sure the asset server is case insensitive, or that everything on it is lowercase
 
-        const extensionsMap = [".png", ".webp"];
         let url;
-        for (const extension of extensionsMap) {
+        for (const extension of client.emotions_extensions) {
           url = `${AO_HOST}characters/${encodeURI(
             me.name.toLowerCase(),
           )}/emotions/button${i}_off${extension}`;

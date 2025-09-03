@@ -6,13 +6,13 @@ import fileExists from "../utils/fileExists";
 import { AO_HOST } from "./aoHost";
 
 export const getCharIcon = async (img: HTMLImageElement, charname: string) => {
-  const extensions = [".png", ".webp"];
+  const charicon_extensions = [".png", ".webp"];
   img.alt = charname;
   const charIconBaseUrl = `${AO_HOST}characters/${encodeURI(
     charname.toLowerCase(),
   )}/char_icon`;
-  for (let i = 0; i < extensions.length; i++) {
-    const fileUrl = charIconBaseUrl + extensions[i];
+  for (let i = 0; i < charicon_extensions.length; i++) {
+    const fileUrl = charIconBaseUrl + charicon_extensions[i];
     const exists = await fileExists(fileUrl);
     if (exists) {
       img.alt = charname;
