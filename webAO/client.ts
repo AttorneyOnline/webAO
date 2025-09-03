@@ -145,7 +145,6 @@ class Client extends EventEmitter {
   sender: ISender;
   checkUpdater: any;
   _lastTimeICReceived: any;
-  manifest: string[];
   viewport: Viewport;
   partial_packet: boolean;
   temp_packet: string;
@@ -203,7 +202,6 @@ class Client extends EventEmitter {
     this.musics = [];
     this.musics_time = false;
     this.callwords = [];
-    this.manifest = [];
     this.resources = getResources(AO_HOST, theme);
     this.selectedEmote = -1;
     this.selectedEvidence = -1;

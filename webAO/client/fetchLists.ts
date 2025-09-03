@@ -58,15 +58,6 @@ export const fetchEvidenceList = async () => {
   }
 };
 
-export const fetchManifest = async () => {
-  try {
-    const manifestdata = await request(`${AO_HOST}manifest.txt`);
-    client.manifest = manifestdata.split(/\r\n|\n\r|\n|\r/);
-  } catch (err) {
-    console.warn("there was no manifest.txt file");
-  }
-};
-
 export const fetchExtensions = async () => {
   try {
     const extensiondata = await request(`${AO_HOST}extensions.json`);
