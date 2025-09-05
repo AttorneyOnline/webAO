@@ -54,6 +54,7 @@ declare global {
     onOOCEnter: (_event: any) => void;
     kickPlayer: (id: number) => void;
     banPlayer: (id: number) => void;
+    mutePlayer: (id: number) => void;
     hcallback: (_event: any) => void;
   }
 }

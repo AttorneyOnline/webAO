@@ -1,5 +1,5 @@
 import { client } from "../../client";
-import { kickPlayer, banPlayer } from "../../dom/banPlayer";
+import { kickPlayer, banPlayer, mutePlayer } from "../../dom/banPlayer";
 
 function addPlayer(playerID: number) {
   const list = <HTMLTableElement>document.getElementById("client_playerlist");
@@ -38,6 +38,15 @@ function addPlayer(playerID: number) {
     window.banPlayer(playerID);
   };
   banCell.appendChild(ban);
+
+  const muteCell = playerRow.insertCell(6);
+  muteCell.style.width = "64px";
+  const mute = <HTMLButtonElement>document.createElement("button");
+  mute.innerText = "Mute";
+  mute.onclick = () => {
+    window.mutePlayer(playerID);
+  };
+  muteCell.appendChild(mute);
 }
 
 function removePlayer(playerID: number) {
