@@ -34,18 +34,17 @@ export function mutePlayer(id: number) {
   const playerRow = <HTMLTableElement>(
     document.getElementById(`client_playerlist_entry${id}`)
   );
-  const charName = <HTMLElement>playerRow.childNodes[1].innerText;
+  const charNameNode = <HTMLElement>playerRow.childNodes[1];
+  const charName = charNameNode.innerText
 
   const mutelist = <HTMLSelectElement>document.getElementById("mute_select");
 
   let selected_character = mutelist.options[id];
 
-  mutelist.forEach((mutechar: HTMLOptionElement) => {
+  Array.from(mutelist.options).forEach((mutechar: HTMLOptionElement) => {
     if (mutechar.innerText == charName || mutechar.innerText == `${charName} (muted)`)
       selected_character = mutechar;
   });
-
-  
 
   if (client.chars[selected_character.value].muted === false) {
     client.chars[selected_character.value].muted = true;
@@ -56,4 +55,4 @@ export function mutePlayer(id: number) {
     selected_character.text = client.chars[selected_character.value].name;
   }
 }
-window.kickPlayer = kickPlayer;
+window.mutePlayer = mutePlayer;
