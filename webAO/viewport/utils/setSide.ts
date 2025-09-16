@@ -54,7 +54,7 @@ export const set_side = async ({
   if (showSpeedLines === true) {
     court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
   } else {
-    //court.src = await tryBackgroundUrls(client.viewport.getBackgroundFolder() + bg);
+    court.src = await client.viewport.getBackgroundFolder() + bg + ".png"; //TODO broken
   }
 
   if (showDesk === true && desk) {
