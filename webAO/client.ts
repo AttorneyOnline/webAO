@@ -19,7 +19,6 @@ import {
   fetchBackgroundList,
   fetchEvidenceList,
   fetchCharacterList,
-  fetchExtensions,
 } from "./client/fetchLists";
 import getCookie from "./utils/getCookie";
 import setCookie from "./utils/setCookie";
@@ -98,7 +97,6 @@ fpPromise
     }
 
     client = new Client(connectionString);
-    fetchExtensions();
     client.connect();
     client.hdid = hdid;
     isLowMemory();

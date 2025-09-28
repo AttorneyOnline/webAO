@@ -1,4 +1,5 @@
 import { client, extrafeatures, oldLoading } from "../../client";
+import { fetchExtensions } from "../../client/fetchLists";
 
 /**
  * Received when the server announces its server info,
@@ -9,6 +10,8 @@ export const handleSI = (args: string[]) => {
   client.char_list_length = Number(args[1]);
   client.evidence_list_length = Number(args[2]);
   client.music_list_length = Number(args[3]);
+
+  fetchExtensions();
 
   // create the charselect grid, to be filled by the character loader
   document.getElementById("client_chartable")!.innerHTML = "";
