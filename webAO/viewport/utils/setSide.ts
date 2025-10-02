@@ -53,7 +53,7 @@ export const set_side = async ({
 
   if (showSpeedLines === true) {
     court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
-  } else {
+  } else if (court.src == `${AO_HOST}themes/default/${encodeURI(speedLines)}`) {
     court.src = await client.viewport.getBackgroundFolder() + bg + ".png"; //TODO broken
   }
 
