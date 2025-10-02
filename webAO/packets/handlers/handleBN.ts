@@ -7,14 +7,13 @@ import { switchPanTilt } from "../../dom/switchPanTilt";
 import transparentPng from "../../constants/transparentPng";
 import fileExists from "../../utils/fileExists";
 
-function setBackgroundImage(elementid: string, bgname: string, bgpart: string): boolean {
+async function setBackgroundImage(elementid: string, bgname: string, bgpart: string) {
 
   let url;
   let success = false;
   for (const extension of client.background_extensions) {
     url = `${AO_HOST}background/${encodeURI(bgname.toLowerCase())}/${bgpart}${extension}`;
-
-    const exists = fileExists(url);
+    const exists = await fileExists(url);
 
     if (exists) {
       success = true;
