@@ -62,8 +62,10 @@ export const handleBN = (args: string[]) => {
 
   setBackgroundImage("client_court_deft",args[1],"transition_def")
   setBackgroundImage("client_court_prot",args[1],"transition_pro")
+
+  setBackgroundImage("client_court",args[1],"court")
   
-  if(setBackgroundImage("client_court",args[1],"court")) {
+  if((<HTMLImageElement>document.getElementById("client_court")).src !== transparentPng) {
     (<HTMLInputElement>document.getElementById("client_pantilt")).checked =
         true;
       switchPanTilt();
