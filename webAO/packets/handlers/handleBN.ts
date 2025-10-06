@@ -5,28 +5,7 @@ import { updateBackgroundPreview } from "../../dom/updateBackgroundPreview";
 import { getIndexFromSelect } from "../../dom/getIndexFromSelect";
 import { switchPanTilt } from "../../dom/switchPanTilt";
 import transparentPng from "../../constants/transparentPng";
-import fileExists from "../../utils/fileExists";
-
-async function setBackgroundImage(elementid: string, bgname: string, bgpart: string) {
-
-  let url;
-  let success = false;
-  for (const extension of client.background_extensions) {
-    url = `${AO_HOST}background/${encodeURI(bgname.toLowerCase())}/${bgpart}${extension}`;
-    const exists = await fileExists(url);
-
-    if (exists) {
-      success = true;
-      break;
-    }
-  }
-  if (success)
-    (<HTMLImageElement>document.getElementById(elementid)).src = url;
-  else
-    (<HTMLImageElement>document.getElementById(elementid)).src = transparentPng;
-  return success;
-}
-
+import { setBackgroundImage } from "../../viewport/utils/setSide"
 
 /**
  * Handles a background change.

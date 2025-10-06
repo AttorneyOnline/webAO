@@ -2,6 +2,29 @@ import { positions } from "../constants/positions";
 import { AO_HOST } from "../../client/aoHost";
 import { client } from "../../client";
 import findImgSrc from "../../utils/findImgSrc";
+import transparentPng from "../../constants/transparentPng";
+import fileExists from "../../utils/fileExists";
+
+export async function setBackgroundImage(elementid: string, bgname: string, bgpart: string) {
+
+  let url;
+  let success = false;
+  for (const extension of client.background_extensions) {
+    url = `${AO_HOST}background/${encodeURI(bgname.toLowerCase())}/${bgpart}${extension}`;
+    const exists = await fileExists(url);
+
+    if (exists) {
+      success = true;
+      break;
+    }
+  }
+  if (success)
+    (<HTMLImageElement>document.getElementById(elementid)).src = url;
+  else
+    (<HTMLImageElement>document.getElementById(elementid)).src = transparentPng;
+  return success;
+}
+
 
 /**
  * Changes the viewport background based on a given position.
@@ -53,8 +76,8 @@ export const set_side = async ({
 
   if (showSpeedLines === true) {
     court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
-  } else if (court.src == `${AO_HOST}themes/default/${encodeURI(speedLines)}`) {
-    court.src = await client.viewport.getBackgroundFolder() + bg + ".png"; //TODO broken
+  } else {
+    setBackgroundImage("client_court_classic",client.viewport.getBackgroundName(),bg);
   }
 
   if (showDesk === true && desk) {
