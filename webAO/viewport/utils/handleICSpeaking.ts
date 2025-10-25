@@ -168,7 +168,8 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
 
   if (
     client.viewport.getChatmsg().type === 1 &&
-    client.viewport.getChatmsg().preanim !== "-"
+    client.viewport.getChatmsg().preanim !== "-" &&
+    client.viewport.getChatmsg().preanim !== ""
   ) {
     //we have a preanim
     chatContainerBox.style.opacity = "0";
