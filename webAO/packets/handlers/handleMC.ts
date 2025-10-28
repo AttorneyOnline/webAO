@@ -11,7 +11,7 @@ export const handleMC = (args: string[]) => {
   const track = prepChat(args[1]);
   let charID = Number(args[2]);
   const showname = args[3] || "";
-  const looping = Boolean(args[4]);
+  const looping = Boolean(Number(args[4])) || false;
   const channel = Number(args[5]) || 0;
   // const fading = Number(args[6]) || 0; // unused in web
 
@@ -32,11 +32,16 @@ export const handleMC = (args: string[]) => {
     charID = -1;
   }
 
+  let looptext = "";
+
+  if (looping)
+      looptext = "(looping)";
+
   if (charID >= 0) {
     musicname = client.chars[charID].name;
-    appendICLog(`${musicname} changed music to ${track}`);
+    appendICLog(`${musicname} changed music to ${track} ${looptext}`,showname);
   } else {
-    appendICLog(`The music was changed to ${track}`);
+    appendICLog(`The music was changed to ${track} ${looptext}`,showname);
   }
 
   document.getElementById("client_trackstatustext")!.innerText = track;
