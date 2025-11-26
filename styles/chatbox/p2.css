@@ -1,0 +1,135 @@
+.text_white {
+  color: #fff;
+}
+
+.text_blue {
+  color: #18d7ff;
+}
+
+.text_green {
+  color: #7fde7f;
+}
+
+.text_red {
+  color: #e1522a;
+}
+
+.text_orange {
+  color: #ff7118;
+}
+
+.text_yellow {
+  color: #e5e54a;
+}
+
+.text_pink {
+  color: #ffc0cb;
+}
+
+.text_cyan {
+  color: #0ff;
+}
+
+.text_grey {
+  color: #bbb;
+}
+
+@font-face {
+  font-family: "RevelationsPersonaDialogue";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local("RevelationsPersonaDialogue"),
+    local("RevelationsPersonaDialogueMono"),
+    url("./RevelationsPersonaDialogueMono.woff2")
+      format("woff2");
+}
+
+#client_chatcontainer {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 35%;
+  width: 100%;
+  transition-property: height, width;
+  transition-duration: 0.2s;
+}
+
+#client_name {
+  display: block;
+  position: absolute;
+  left: 6%;
+  top: 1%;
+  height: 13%;
+  color: #e5e54a;
+  font-family: "RevelationsPersonaDialogue", sans-serif;
+  z-index: 1;
+}
+
+#client_inner_name {
+  margin: 1px;
+}
+
+#client_chat {
+  font-size: 1.1em;
+  display: block;
+  width: 90%;
+  margin: auto;
+  height: 85%;
+  border-style: ridge;
+  border-width: 0.2em;
+  border-color: #181818;
+  background-image: linear-gradient(rgba(0,16,0,0.56), rgba(0,0,239,0.56));
+  top: 0;
+  left: 5%;
+  position: absolute;
+  word-break: keep-all;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  text-align: left;
+  overflow: hidden;
+  scroll-behavior: smooth;
+  font-family: "RevelationsPersonaDialogue", sans-serif;
+}
+
+#client_inner_chat {
+  display: block;
+  position: absolute;
+  margin: 0.8em;
+  padding: 0.1em 0.1em;
+  text-shadow: 4px 2px black;
+}
+
+#client_chatwaiting {
+  display: block;
+  transform: rotate(90deg) scaleY(1.25) scaleX(0.5);
+  position: absolute;
+  color: #d58300;
+  font-size: 1.3em;
+  right: 0.4em;
+  bottom: -0.1em;
+}
+
+@keyframes idling {
+  0% {
+    right: 0.6em;
+  }
+
+  25% {
+    right: 0.7em;
+  }
+
+  100% {
+    right: 0.6em;
+  }
+}
+
+#client_trackstatus {
+  display: none;
+}
+
+#client_clock {
+  display: none;
+}
