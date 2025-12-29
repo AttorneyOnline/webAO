@@ -12,7 +12,7 @@ function addPlayer(playerID: number) {
   const img = document.createElement("img");
   imgCell.appendChild(img);
 
-  const name = document.createTextNode("Unknown");
+  const name = document.createTextNode("No Data");
 
   const charNameCell = playerRow.insertCell(1);
   charNameCell.appendChild(name);
