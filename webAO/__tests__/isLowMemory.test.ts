@@ -1,5 +1,6 @@
 import { isLowMemory } from '../client/isLowMemory';
 import { setOldLoading } from '../client';
+import { AO_HOST, setAOhost } from '../client/aoHost';
 
 // Mock the setOldLoading function and prevent any network requests
 jest.mock('../client', () => ({
@@ -8,9 +9,16 @@ jest.mock('../client', () => ({
 
 // Mock any potential network requests
 jest.mock('../services/request', () => ({
+  __esModule: true,
+  default: jest.fn().mockResolvedValue(''),
   request: jest.fn().mockResolvedValue(''),
   requestBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
 }));
+
+// Set AO_HOST to a valid URL before tests run
+beforeAll(() => {
+  setAOhost('https://example.com/');
+});
 
 describe('isLowMemory', () => {
   beforeEach(() => {
