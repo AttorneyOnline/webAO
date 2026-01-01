@@ -1,7 +1,6 @@
 import request from "../services/request";
 import mlConfig from "../utils/aoml";
 
-jest.mock("../services/request", () => ({}));
 const networkRequest = `
 c0 = 247, 247, 247
 c0_name = White
@@ -36,26 +35,30 @@ c6_remove = 0
 c6_talking = 0
 `;
 
-const mockRequest = request as jest.MockedFunction<typeof request>;
-mockRequest.mockReturnValue(Promise.resolve(networkRequest));
+// Mock the request module properly
+jest.mock("../services/request", () => ({
+  __esModule: true,
+  default: jest.fn().mockResolvedValue(networkRequest),
+  request: jest.fn().mockResolvedValue(networkRequest)
+}));
 
 describe("mlConfig", () => {
   beforeEach(() => {
     // Clear all instances and calls to constructor and all methods:
-    mockRequest.mockClear();
+    jest.clearAllMocks();
   });
 
   it("Should make a network request", () => {
-    mlConfig("localhost");
-    expect(mockRequest).toHaveBeenCalledTimes(1);
+    mlConfig("/");
+    expect(request).toHaveBeenCalledTimes(1);
   });
 });
 describe("applyMarkdown", () => {
-  const config = mlConfig("localhost");
+  const config = mlConfig("/");
 
   beforeEach(() => {
     // Clear all instances and calls to constructor and all methods:
-    mockRequest.mockClear();
+    jest.clearAllMocks();
   });
 
   it("Should create an array of spans containing letters", async () => {
@@ -68,40 +71,40 @@ describe("applyMarkdown", () => {
     }
   });
   it("Should add colors based on settings", async () => {
-    const config = mlConfig("localhost");
+    const config = mlConfig("/");
     const actual = await config.applyMarkdown(`(heya)`, `blue`);
     expect(actual[0].getAttribute("style")).toBe("color: rgb(107, 198, 247);");
   });
   it("Should keep a letter if remove = 0", async () => {
-    const config = mlConfig("localhost");
+    const config = mlConfig("/");
 
     const actual = await config.applyMarkdown(`(What())Hey!`, `white`);
     const expected = `(`;
     expect(actual[5].innerHTML).toBe(expected);
   });
   it("Should remove a letter if remove = 1", async () => {
-    const config = mlConfig("localhost");
+    const config = mlConfig("/");
 
     const actual = await config.applyMarkdown(`~What~()Hey!`, `white`);
     const expected = ``;
     expect(actual[0].innerHTML).toBe(expected);
   });
   it("Should remove a letter if remove = 1", async () => {
-    const config = mlConfig("localhost");
+    const config = mlConfig("/");
 
     const actual = await config.applyMarkdown(`~What~()Hey!`, `white`);
     const expected = ``;
     expect(actual[0].innerHTML).toBe(expected);
   });
   it("Should keep a closing letter if remove = 0", async () => {
-    const config = mlConfig("localhost");
+    const config = mlConfig("/");
 
     const actual = await config.applyMarkdown(`~NO[]~!`, `white`);
     const expected = ``;
     expect(actual[4].innerHTML).toBe(expected);
   });
   it("Should remove a closing letter if remove = 1", async () => {
-    const config = mlConfig("localhost");
+    const config = mlConfig("/");
     const actual = await config.applyMarkdown(`~NO||~!`, `white`);
     const expected = ``;
     expect(actual[5].innerHTML).toBe(expected);
