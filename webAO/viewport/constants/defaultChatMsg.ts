@@ -1,5 +1,7 @@
-import { UPDATE_INTERVAL } from "../../client";
 import { ChatMsg } from "../interfaces/ChatMsg";
+
+// Define UPDATE_INTERVAL locally to avoid circular dependency
+const UPDATE_INTERVAL = 60;
 
 export const defaultChatMsg = {
   content: "",
