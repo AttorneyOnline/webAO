@@ -203,8 +203,6 @@ if (isMobileDevice) {
   golden.loadLayout(config);
 }
 
-console.log(golden.root.contentItems[0].contentItems[0].contentItems[0]);
-
 function adjustSplitter() {
   if (isMobileDevice) return; // Skip for mobile layout
   const column = golden.root.contentItems[0].contentItems[0];
@@ -222,17 +220,9 @@ function adjustSplitter() {
   const percentage = Math.min(90, Math.max(10, (totalHeight / columnHeight) * 100));
   icItem.element.style.height = `${totalHeight}px`;
   icOptionsItem.element.style.height = `calc(100% - ${totalHeight}px)`;
-  
-  // Safely access nested child elements with proper checks
-  if (icOptionsItem && icOptionsItem.child && icOptionsItem.child[1]) {
-    icOptionsItem.child[1].element.style.height = `100%`;
-    if (icOptionsItem.child[1].child && icOptionsItem.child[1].child[0]) {
-      icOptionsItem.child[1].child[0].element.style.height = `100%`;
-      if (icOptionsItem.child[1].child[0].child && icOptionsItem.child[1].child[0].child[0]) {
-        icOptionsItem.child[1].child[0].child[0].element.style.height = `100%`;
-      }
-    }
-  }
+  icOptionsItem.element.children[1].style.height = `100%`;
+  icOptionsItem.element.children[1].children[0].style.height = `100%`;
+  icOptionsItem.element.children[1].children[0].children[0].style.height = `100%`;
 }
 
 window.addEventListener('resize', () => setTimeout(adjustSplitter, 100));
