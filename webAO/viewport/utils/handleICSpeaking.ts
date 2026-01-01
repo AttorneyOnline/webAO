@@ -161,11 +161,16 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
       shoutSprite.src = client.resources[shout].src;
       shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
     }
-    shoutSprite.style.opacity = "1";
+    shoutSprite.style.display = "block";
 
-    client.viewport.shoutaudio.src = `${AO_HOST}characters/${encodeURI(
+    const perCharPath = `${AO_HOST}characters/${encodeURI(
       client.viewport.getChatmsg().name.toLowerCase(),
     )}/${shout}.opus`;
+    client.viewport.shoutaudio.src = perCharPath;
+    client.viewport.shoutaudio.onerror = () => {
+      client.viewport.shoutaudio.src = client.resources[shout].sfx;
+      client.viewport.shoutaudio.play();
+    };
     client.viewport.shoutaudio.play();
     client.viewport.setShoutTimer(client.resources[shout].duration);
   } else {
