@@ -1,9 +1,15 @@
 import { isLowMemory } from '../client/isLowMemory';
 import { setOldLoading } from '../client';
 
-// Mock the setOldLoading function
+// Mock the setOldLoading function and prevent any network requests
 jest.mock('../client', () => ({
   setOldLoading: jest.fn(),
+}));
+
+// Mock any potential network requests
+jest.mock('../services/request', () => ({
+  request: jest.fn().mockResolvedValue(''),
+  requestBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
 }));
 
 describe('isLowMemory', () => {
