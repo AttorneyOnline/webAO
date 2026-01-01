@@ -43,6 +43,12 @@ jest.mock("../services/request", () => ({
   requestBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0))
 }));
 
+// Ensure the mock is applied before any imports
+beforeAll(() => {
+  jest.clearAllMocks();
+  console.log("Mock applied:", request);
+});
+
 describe("mlConfig", () => {
   beforeEach(() => {
     // Clear all instances and calls to constructor and all methods:
