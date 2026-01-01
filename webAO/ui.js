@@ -3,7 +3,7 @@
 { "props": true, "ignorePropertyModificationsFor": ["container"] }] */
 import { GoldenLayout } from "golden-layout";
 
-const config = {
+window.config = {
   settings: {
     showPopoutIcon: false,
     showCloseIcon: false,
@@ -205,10 +205,38 @@ if (isMobileDevice) {
 
 console.log(golden.root.contentItems[0].contentItems[0].contentItems[0]);
 
-golden.root.contentItems[0].contentItems[0].contentItems[0].on(
-  "resize",
-  function () {
-    console.log("IC pane resized"); //TEMP
-    console.log(golden.root.contentItems[0].contentItems[0]);
-  },
-);
+function adjustSplitter() {
+  if (isMobileDevice) return; // Skip for mobile layout
+  const column = golden.root.contentItems[0].contentItems[0];
+  const icItem = column.contentItems[0];
+  const icOptionsItem = column.contentItems[1];
+  const paneWidth = icItem.element.clientWidth;
+  const gamewindowHeight = 0.75 * paneWidth;
+  const inputEl = document.getElementById('client_inputbox');
+  const barsEl = document.getElementById('client_bars');
+  const inputHeight = inputEl ? inputEl.offsetHeight : 30; // fallback
+  const barsHeight = barsEl ? barsEl.offsetHeight : 20; // fallback
+  const totalHeight = Math.ceil(gamewindowHeight + inputHeight + barsHeight + 45); // Add 45px offset
+  const columnHeight = column.element.clientHeight;
+  if (columnHeight === 0) return;
+  const percentage = Math.min(90, Math.max(10, (totalHeight / columnHeight) * 100));
+  icItem.element.style.height = `${totalHeight}px`;
+  icOptionsItem.element.style.height = `calc(100% - ${totalHeight}px)`;
+  
+  // Safely access nested child elements with proper checks
+  if (icOptionsItem && icOptionsItem.child && icOptionsItem.child[1]) {
+    icOptionsItem.child[1].element.style.height = `100%`;
+    if (icOptionsItem.child[1].child && icOptionsItem.child[1].child[0]) {
+      icOptionsItem.child[1].child[0].element.style.height = `100%`;
+      if (icOptionsItem.child[1].child[0].child && icOptionsItem.child[1].child[0].child[0]) {
+        icOptionsItem.child[1].child[0].child[0].element.style.height = `100%`;
+      }
+    }
+  }
+}
+
+window.addEventListener('resize', () => setTimeout(adjustSplitter, 100));
+setTimeout(adjustSplitter, 100); // Initial call
+
+// Also adjust on item resize
+golden.root.contentItems[0].contentItems[0].contentItems[0].on("resize", () => setTimeout(adjustSplitter, 50));
