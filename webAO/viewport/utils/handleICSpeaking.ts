@@ -12,6 +12,7 @@ import transparentPng from "../../constants/transparentPng";
 import { COLORS } from "../constants/colors";
 import mlConfig from "../../utils/aoml";
 import request from "../../services/request";
+import fileExists from "../../utils/fileExists";
 
 let attorneyMarkdown: ReturnType<typeof mlConfig> | null = null;
 
@@ -161,11 +162,13 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
       shoutSprite.src = client.resources[shout].src;
       shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
     }
-    shoutSprite.style.opacity = "1";
+    shoutSprite.style.display = "block";
 
-    client.viewport.shoutaudio.src = `${AO_HOST}characters/${encodeURI(
+    const perCharPath = `${AO_HOST}characters/${encodeURI(
       client.viewport.getChatmsg().name.toLowerCase(),
     )}/${shout}.opus`;
+    const exists = await fileExists(perCharPath);
+    client.viewport.shoutaudio.src = exists ? perCharPath : client.resources[shout].sfx;
     client.viewport.shoutaudio.play();
     client.viewport.setShoutTimer(client.resources[shout].duration);
   } else {

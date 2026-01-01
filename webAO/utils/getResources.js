@@ -2,18 +2,22 @@ const getResources = (AO_HOST, THEME) => ({
   holdit: {
     src: `${AO_HOST}misc/default/holdit_bubble.png`,
     duration: 720,
+    sfx: `${AO_HOST}misc/default/holdit.opus`,
   },
   objection: {
     src: `${AO_HOST}misc/default/objection_bubble.png`,
     duration: 720,
+    sfx: `${AO_HOST}misc/default/objection.opus`,
   },
   takethat: {
     src: `${AO_HOST}misc/default/takethat_bubble.png`,
     duration: 840,
+    sfx: `${AO_HOST}misc/default/takethat.opus`,
   },
   custom: {
     src: "",
     duration: 840,
+    sfx: "",
   },
   witnesstestimony: {
     src: `${AO_HOST}themes/${THEME}/witnesstestimony_bubble.gif`,

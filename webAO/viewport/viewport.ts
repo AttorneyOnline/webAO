@@ -317,7 +317,7 @@ const viewport = (): Viewport => {
 
       // Pre-animation stuff
       if (chatmsg.preanimdelay > 0) {
-        shoutSprite.style.opacity = "0";
+        shoutSprite.style.display = "none";
         shoutSprite.style.animation = "";
         const preanim = chatmsg.preanim.toLowerCase();
         setEmote(AO_HOST, client, charName, preanim, "", false, chatmsg.side);
@@ -370,7 +370,7 @@ const viewport = (): Viewport => {
         chatBoxInner.className = `text_${COLORS[chatmsg.color]}`;
 
         if (chatmsg.preanimdelay === 0) {
-          shoutSprite.style.opacity = "0";
+          shoutSprite.style.display = "none";
           shoutSprite.style.animation = "";
         }
 
