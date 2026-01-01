@@ -21,7 +21,7 @@ export const handlePU = (args: string[]) => {
       const playerImg = <HTMLImageElement>playerRow.childNodes[0].firstChild;
       getCharIcon(playerImg, data);
       const charName = <HTMLElement>playerRow.childNodes[1];
-      charName.innerText = data;
+      charName.innerText = `[${args[1]}] ${data}`;
       break;
     case 2:
       const showName = <HTMLElement>playerRow.childNodes[2];
