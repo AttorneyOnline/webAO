@@ -1,6 +1,3 @@
-import request from "../services/request";
-import mlConfig from "../utils/aoml";
-
 const networkRequest = `
 c0 = 247, 247, 247
 c0_name = White
@@ -42,6 +39,9 @@ jest.mock("../services/request", () => ({
   request: jest.fn().mockResolvedValue(networkRequest),
   requestBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0))
 }));
+
+import request from "../services/request";
+import mlConfig from "../utils/aoml";
 
 // Ensure the mock is applied before any imports
 beforeAll(() => {
