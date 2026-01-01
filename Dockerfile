@@ -1,8 +1,14 @@
-FROM node:14
+FROM oven/bun:1
 WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install
+
+RUN bun install
 COPY . .
-CMD ["npm", "start"]
 
+ENV NODE_ENV=production
+RUN bun test
+RUN bun run build
 
+# run the app
+USER bun
+EXPOSE 8080/tcp
+ENTRYPOINT [ "bun", "run", "start" ]
