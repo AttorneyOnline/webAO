@@ -15,6 +15,12 @@ jest.mock('../services/request', () => ({
   requestBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
 }));
 
+// Mock the fileExists function to prevent network requests
+jest.mock('../utils/fileExists', () => ({
+  __esModule: true,
+  default: jest.fn().mockResolvedValue(false),
+}));
+
 // Set AO_HOST to a valid URL before tests run
 beforeAll(() => {
   setAOhost('https://example.com/');

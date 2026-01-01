@@ -39,7 +39,8 @@ c6_talking = 0
 jest.mock("../services/request", () => ({
   __esModule: true,
   default: jest.fn().mockResolvedValue(networkRequest),
-  request: jest.fn().mockResolvedValue(networkRequest)
+  request: jest.fn().mockResolvedValue(networkRequest),
+  requestBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0))
 }));
 
 describe("mlConfig", () => {
