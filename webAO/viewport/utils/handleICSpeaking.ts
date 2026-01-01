@@ -11,8 +11,17 @@ import { resizeChatbox } from "../../dom/resizeChatbox";
 import transparentPng from "../../constants/transparentPng";
 import { COLORS } from "../constants/colors";
 import mlConfig from "../../utils/aoml";
+import request from "../../services/request";
 
-const attorneyMarkdown = mlConfig(AO_HOST);
+let attorneyMarkdown: ReturnType<typeof mlConfig> | null = null;
+
+const initAttorneyMarkdown = async () => {
+  if (!attorneyMarkdown) {
+    const iniContent = await request(`${AO_HOST}themes/default/chat_config.ini`);
+    attorneyMarkdown = mlConfig(iniContent);
+  }
+  return attorneyMarkdown;
+};
 
 export let startFirstTickCheck: boolean;
 export const setStartFirstTickCheck = (val: boolean) => {
@@ -337,9 +346,9 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
   }
 
   try {
-    client.viewport.getChatmsg().parsed = await attorneyMarkdown.applyMarkdown(
+    const markdown = await initAttorneyMarkdown();
+    client.viewport.getChatmsg().parsed = markdown.applyMarkdown(
       client.viewport.getChatmsg().content,
-
       COLORS[client.viewport.getChatmsg().color],
     );
   } catch (error) {

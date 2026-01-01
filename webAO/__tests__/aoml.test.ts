@@ -1,4 +1,4 @@
-const networkRequest = `
+const configIni = `
 c0 = 247, 247, 247
 c0_name = White
 c0_talking = 1
@@ -32,87 +32,56 @@ c6_remove = 0
 c6_talking = 0
 `;
 
-// Mock the request module properly
-jest.mock("../services/request", () => ({
-  __esModule: true,
-  default: jest.fn().mockResolvedValue(networkRequest),
-  request: jest.fn().mockResolvedValue(networkRequest),
-  requestBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0))
-}));
-
-import request from "../services/request";
 import mlConfig from "../utils/aoml";
 
-// Ensure the mock is applied before any imports
-beforeAll(() => {
-  jest.clearAllMocks();
-  console.log("Mock applied:", request);
-});
-
-describe("mlConfig", () => {
-  beforeEach(() => {
-    // Clear all instances and calls to constructor and all methods:
-    jest.clearAllMocks();
-  });
-
-  it("Should make a network request", () => {
-    mlConfig("/");
-    expect(request).toHaveBeenCalledTimes(1);
-  });
-});
 describe("applyMarkdown", () => {
-  const config = mlConfig("/");
+  const config = mlConfig(configIni);
 
-  beforeEach(() => {
-    // Clear all instances and calls to constructor and all methods:
-    jest.clearAllMocks();
-  });
-
-  it("Should create an array of spans containing letters", async () => {
+  it("Should create an array of spans containing letters", () => {
     const word = `hello`;
-    const actual = await config.applyMarkdown(`hello`, `blue`);
+    const actual = config.applyMarkdown(`hello`, `blue`);
     let index = 0;
     for (const element of actual) {
       expect(element.innerHTML).toBe(word[index]);
       index++;
     }
   });
-  it("Should add colors based on settings", async () => {
-    const config = mlConfig("/");
-    const actual = await config.applyMarkdown(`(heya)`, `blue`);
+  it("Should add colors based on settings", () => {
+    const config = mlConfig(configIni);
+    const actual = config.applyMarkdown(`(heya)`, `blue`);
     expect(actual[0].getAttribute("style")).toBe("color: rgb(107, 198, 247);");
   });
-  it("Should keep a letter if remove = 0", async () => {
-    const config = mlConfig("/");
+  it("Should keep a letter if remove = 0", () => {
+    const config = mlConfig(configIni);
 
-    const actual = await config.applyMarkdown(`(What())Hey!`, `white`);
+    const actual = config.applyMarkdown(`(What())Hey!`, `white`);
     const expected = `(`;
     expect(actual[5].innerHTML).toBe(expected);
   });
-  it("Should remove a letter if remove = 1", async () => {
-    const config = mlConfig("/");
+  it("Should remove a letter if remove = 1", () => {
+    const config = mlConfig(configIni);
 
-    const actual = await config.applyMarkdown(`~What~()Hey!`, `white`);
+    const actual = config.applyMarkdown(`~What~()Hey!`, `white`);
     const expected = ``;
     expect(actual[0].innerHTML).toBe(expected);
   });
-  it("Should remove a letter if remove = 1", async () => {
-    const config = mlConfig("/");
+  it("Should remove a letter if remove = 1", () => {
+    const config = mlConfig(configIni);
 
-    const actual = await config.applyMarkdown(`~What~()Hey!`, `white`);
+    const actual = config.applyMarkdown(`~What~()Hey!`, `white`);
     const expected = ``;
     expect(actual[0].innerHTML).toBe(expected);
   });
-  it("Should keep a closing letter if remove = 0", async () => {
-    const config = mlConfig("/");
+  it("Should keep a closing letter if remove = 0", () => {
+    const config = mlConfig(configIni);
 
-    const actual = await config.applyMarkdown(`~NO[]~!`, `white`);
+    const actual = config.applyMarkdown(`~NO[]~!`, `white`);
     const expected = ``;
     expect(actual[4].innerHTML).toBe(expected);
   });
-  it("Should remove a closing letter if remove = 1", async () => {
-    const config = mlConfig("/");
-    const actual = await config.applyMarkdown(`~NO||~!`, `white`);
+  it("Should remove a closing letter if remove = 1", () => {
+    const config = mlConfig(configIni);
+    const actual = config.applyMarkdown(`~NO||~!`, `white`);
     const expected = ``;
     expect(actual[5].innerHTML).toBe(expected);
   });

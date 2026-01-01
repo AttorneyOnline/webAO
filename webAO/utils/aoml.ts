@@ -1,4 +1,3 @@
-import request from "../services/request";
 
 interface Aoml {
   [key: string]: string | number;
@@ -33,15 +32,12 @@ const aomlParser = (text: string) => {
   return parsed;
 };
 
-const mlConfig = (AO_HOST: string) => {
-  const defaultUrl = `${AO_HOST}themes/default/chat_config.ini`;
-  const aomlParsed: Promise<{ [key: string]: Aoml }> = request(defaultUrl).then(
-    (data) => aomlParser(data),
-  );
+const mlConfig = (iniContent: string) => {
+  const aomlParsed: { [key: string]: Aoml } = aomlParser(iniContent);
 
-  const createIdentifiers = async () => {
+  const createIdentifiers = () => {
     const identifiers = new Map<string, Aoml>();
-    for (const [ruleName, value] of Object.entries(await aomlParsed)) {
+    for (const [ruleName, value] of Object.entries(aomlParsed)) {
       if (value.start && value.end) {
         identifiers.set(value.start, value);
         identifiers.set(value.end, value);
@@ -49,18 +45,18 @@ const mlConfig = (AO_HOST: string) => {
     }
     return identifiers;
   };
-  const createStartIdentifiers = async () => {
+  const createStartIdentifiers = () => {
     const startingIdentifiers = new Set<string>();
-    for (const [ruleName, value] of Object.entries(await aomlParsed)) {
+    for (const [ruleName, value] of Object.entries(aomlParsed)) {
       if (value?.start && value?.end) {
         startingIdentifiers.add(value.start);
       }
     }
     return startingIdentifiers;
   };
-  const applyMarkdown = async (text: string, defaultColor: string) => {
-    const identifiers = await createIdentifiers();
-    const startIdentifiers = await createStartIdentifiers();
+  const applyMarkdown = (text: string, defaultColor: string) => {
+    const identifiers = createIdentifiers();
+    const startIdentifiers = createStartIdentifiers();
     const closingStack = [];
     const colorStack = [];
     // each value in output will be an html element
