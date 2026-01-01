@@ -3,11 +3,11 @@ import Client from "../client.ts";
 import fileExists from "../utils/fileExists.ts";
 import transparentPng from "../constants/transparentPng.js";
 
-jest.mock("../viewport/utils/createMusic");
-jest.mock("../utils/fileExists");
-jest.mock("../viewport/utils/createSfxAudio");
-jest.mock("../viewport/utils/createShoutAudio");
-jest.mock("../viewport/utils/createTestimonyAudio");
+jest.mock("../viewport/utils/createMusic", () => ({}));
+jest.mock("../utils/fileExists", () => ({}));
+jest.mock("../viewport/utils/createSfxAudio", () => ({}));
+jest.mock("../viewport/utils/createShoutAudio", () => ({}));
+jest.mock("../viewport/utils/createTestimonyAudio", () => ({}));
 describe("setEmote", () => {
   const AO_HOST = "";
 
