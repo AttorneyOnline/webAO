@@ -12,6 +12,7 @@ import transparentPng from "../../constants/transparentPng";
 import { COLORS } from "../constants/colors";
 import mlConfig from "../../utils/aoml";
 import request from "../../services/request";
+import fileExists from "../../utils/fileExists";
 
 let attorneyMarkdown: ReturnType<typeof mlConfig> | null = null;
 
@@ -166,11 +167,8 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
     const perCharPath = `${AO_HOST}characters/${encodeURI(
       client.viewport.getChatmsg().name.toLowerCase(),
     )}/${shout}.opus`;
-    client.viewport.shoutaudio.src = perCharPath;
-    client.viewport.shoutaudio.onerror = () => {
-      client.viewport.shoutaudio.src = client.resources[shout].sfx;
-      client.viewport.shoutaudio.play();
-    };
+    const exists = await fileExists(perCharPath);
+    client.viewport.shoutaudio.src = exists ? perCharPath : client.resources[shout].sfx;
     client.viewport.shoutaudio.play();
     client.viewport.setShoutTimer(client.resources[shout].duration);
   } else {
