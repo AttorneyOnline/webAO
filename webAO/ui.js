@@ -218,7 +218,12 @@ function adjustSplitter() {
   const columnHeight = column.element.clientHeight;
   if (columnHeight === 0) return;
   const percentage = Math.min(90, Math.max(10, (totalHeight / columnHeight) * 100));
+
   icItem.element.style.height = `${totalHeight}px`;
+  icItem.element.children[1].style.height = `100%`;
+  icItem.element.children[1].children[0].style.height = `100%`;
+  icItem.element.children[1].children[0].children[0].style.height = `100%`;
+
   icOptionsItem.element.style.height = `calc(100% - ${totalHeight}px)`;
   icOptionsItem.element.children[1].style.height = `100%`;
   icOptionsItem.element.children[1].children[0].style.height = `100%`;
