@@ -21,8 +21,8 @@ jobs:
       run: bun run build
     - name: Run Tests
       run: bun test
-    - name: Deploy 🚀
-      uses: JamesIves/github-pages-deploy-action@v4.7.6
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
-        branch: gh-pages # The branch the action should deploy to.
-        folder: dist # The folder the action should deploy.
+        branch: gh-pages
+        folder: dist
