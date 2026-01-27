@@ -6,7 +6,9 @@
     "lib": ["DOM", "DOM.Iterable", "ES2021.String"],
     "strict": true,
     "strictNullChecks": false, //document.getElementBy
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   },
   "include": ["./webAO/*", "./webAO/viewport/viewport.ts"]
 }
