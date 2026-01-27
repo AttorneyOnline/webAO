@@ -55,6 +55,7 @@
     "@fingerprintjs/fingerprintjs": "^3.4.2",
     "@types/websocket": "^1.0.10",
     "core-js": "^3.47.0",
+    "esbuild-loader": "^4.4.2",
     "golden-layout": "^2.6.0",
     "jest-environment-jsdom": "^29.7.0",
     "regenerator-runtime": "^0.13.11",
