@@ -63,7 +63,11 @@ module.exports = {
           },
         },
       },
-      { test: /\.ts?$/, loader: "ts-loader" },
+      {
+        test: /\.ts$/,
+        loader: "esbuild-loader",
+        options: { loader: "ts" }
+      },
       // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
       { test: /\.js$/, loader: "source-map-loader" },
     ],

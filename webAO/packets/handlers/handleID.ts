@@ -1,5 +1,7 @@
 import { client, setOldLoading } from "../../client";
-const version = process.env.npm_package_version;
+import pkg from "../../../package.json";
+
+const version = pkg.version;
 
 /**
  * Identifies the server and issues a playerID
