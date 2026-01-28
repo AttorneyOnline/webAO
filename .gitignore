@@ -52,12 +52,13 @@ Temporary Items
 # Node module directory
 node_modules
 
-# webpack shit
+# built webpack files
 *.b.js
 *.b.js.*
 
 # Jetbrains
 .idea/
 
-# Ignore lockfile to always get newest versions and keep dependabot away
+# lockfiles
 bun.lock
+package-lock.json
