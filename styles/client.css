@@ -153,7 +153,6 @@
 #client_iccontrols {
   background: inherit;
   height: 100%;
-  overflow-y: auto;
 }
 
 @keyframes shake {
@@ -513,7 +512,6 @@
   word-break: keep-all;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  overflow-y: auto;
   font-size: medium;
   background-color: #242424;
   text-align: start;
@@ -542,7 +540,6 @@
   font-family: "Source Code Pro", "Consolas", monospace;
   font-size: small;
   overflow-wrap: break-word;
-  overflow-y: auto;
   text-rendering: optimizelegibility;
   resize: none;
   flex: 1 1 auto;
