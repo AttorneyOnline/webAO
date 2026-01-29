@@ -3,7 +3,7 @@
 }
 
 .lm_content {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 @keyframes error_blink {
