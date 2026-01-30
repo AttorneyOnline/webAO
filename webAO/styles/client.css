@@ -3,7 +3,7 @@
 }
 
 .lm_content {
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 @keyframes error_blink {
