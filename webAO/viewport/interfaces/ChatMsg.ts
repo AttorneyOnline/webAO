@@ -1,3 +1,5 @@
+import { PreloadManifest } from "../../cache/types";
+
 export interface ChatMsg {
   content: string;
   objection: number;
@@ -31,4 +33,5 @@ export interface ChatMsg {
   evidence?: number;
   looping_sfx?: boolean;
   noninterrupting_preanim?: number;
+  preloadManifest?: PreloadManifest;
 }

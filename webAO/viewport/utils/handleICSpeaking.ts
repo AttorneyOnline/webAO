@@ -5,14 +5,12 @@ import { checkCallword } from "../../client/checkCallword";
 import setEmote from "../../client/setEmote";
 import { AO_HOST } from "../../client/aoHost";
 import { SHOUTS } from "../constants/shouts";
-import getAnimLength from "../../utils/getAnimLength";
 import { setChatbox } from "../../dom/setChatbox";
 import { resizeChatbox } from "../../dom/resizeChatbox";
 import transparentPng from "../../constants/transparentPng";
 import { COLORS } from "../constants/colors";
 import mlConfig from "../../utils/aoml";
 import request from "../../services/request";
-import fileExists from "../../utils/fileExists";
 
 let attorneyMarkdown: ReturnType<typeof mlConfig> | null = null;
 
@@ -125,26 +123,47 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
     client.viewport.getSfxAudio(),
   );
 
-  setEmote(
-    AO_HOST,
-    client,
-    client.viewport.getChatmsg().name!.toLowerCase(),
-    client.viewport.getChatmsg().sprite!,
-    "(a)",
-    false,
-    client.viewport.getChatmsg().side,
-  );
+  // Use preloaded URLs from manifest when available
+  const manifest = client.viewport.getChatmsg().preloadManifest;
+  const validSidesForEmote: string[] = ["def", "pro", "wit"];
+  const positionPrefix = validSidesForEmote.includes(client.viewport.getChatmsg().side)
+    ? `${client.viewport.getChatmsg().side}_`
+    : "";
+  const mainEmoteSelector = document.getElementById(
+    `client_${positionPrefix}char_img`,
+  ) as HTMLImageElement;
+  const pairEmoteSelector = document.getElementById(
+    `client_${positionPrefix}pair_img`,
+  ) as HTMLImageElement;
 
-  if (client.viewport.getChatmsg().other_name) {
+  if (manifest?.mainCharIdleUrl) {
+    mainEmoteSelector.src = manifest.mainCharIdleUrl;
+  } else {
     setEmote(
       AO_HOST,
       client,
-      client.viewport.getChatmsg().other_name.toLowerCase(),
-      client.viewport.getChatmsg().other_emote!,
+      client.viewport.getChatmsg().name!.toLowerCase(),
+      client.viewport.getChatmsg().sprite!,
       "(a)",
       false,
       client.viewport.getChatmsg().side,
     );
+  }
+
+  if (client.viewport.getChatmsg().other_name) {
+    if (manifest?.pairCharIdleUrl) {
+      pairEmoteSelector.src = manifest.pairCharIdleUrl;
+    } else {
+      setEmote(
+        AO_HOST,
+        client,
+        client.viewport.getChatmsg().other_name.toLowerCase(),
+        client.viewport.getChatmsg().other_emote!,
+        "(a)",
+        false,
+        client.viewport.getChatmsg().side,
+      );
+    }
   }
 
   // gets which shout shall played
@@ -155,20 +174,26 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
     // Hide message box
     chatContainerBox.style.opacity = "0";
     if (client.viewport.getChatmsg().objection === 4) {
-      shoutSprite.src = `${AO_HOST}characters/${encodeURI(
-        client.viewport.getChatmsg().name!.toLowerCase(),
-      )}/custom.gif`;
+      // Use manifest URL for custom shout if available
+      if (manifest?.shoutImageUrl) {
+        shoutSprite.src = manifest.shoutImageUrl;
+      } else {
+        shoutSprite.src = `${AO_HOST}characters/${encodeURI(
+          client.viewport.getChatmsg().name!.toLowerCase(),
+        )}/custom.gif`;
+      }
     } else {
       shoutSprite.src = client.resources[shout].src;
       shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
     }
     shoutSprite.style.display = "block";
 
-    const perCharPath = `${AO_HOST}characters/${encodeURI(
-      client.viewport.getChatmsg().name.toLowerCase(),
-    )}/${shout}.opus`;
-    const exists = await fileExists(perCharPath);
-    client.viewport.shoutaudio.src = exists ? perCharPath : client.resources[shout].sfx;
+    // Use preloaded shout sound URL from manifest if available
+    if (manifest?.shoutSoundUrl) {
+      client.viewport.shoutaudio.src = manifest.shoutSoundUrl;
+    } else {
+      client.viewport.shoutaudio.src = client.resources[shout].sfx;
+    }
     client.viewport.shoutaudio.play();
     client.viewport.setShoutTimer(client.resources[shout].duration);
   } else {
@@ -176,7 +201,8 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
   }
 
   client.viewport.getChatmsg().startpreanim = true;
-  let gifLength = 0;
+  // Use preanimdelay from manifest (already set in handleMS) or default to 0
+  let gifLength = client.viewport.getChatmsg().preanimdelay ?? 0;
 
   if (
     client.viewport.getChatmsg().type === 1 &&
@@ -185,15 +211,11 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
   ) {
     //we have a preanim
     chatContainerBox.style.opacity = "0";
-
-    gifLength = await getAnimLength(
-      `${AO_HOST}characters/${encodeURI(
-        client.viewport.getChatmsg().name!.toLowerCase(),
-      )}/${encodeURI(client.viewport.getChatmsg().preanim)}`,
-    );
+    // gifLength is already set from manifest.preanimDuration in handleMS
     client.viewport.getChatmsg().startspeaking = false;
   } else {
     client.viewport.getChatmsg().startspeaking = true;
+    gifLength = 0;
     if (client.viewport.getChatmsg().content.trim() !== "")
       chatContainerBox.style.opacity = "1";
   }
@@ -331,8 +353,13 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
   ) {
     (<HTMLLinkElement>document.getElementById("effect_css")).href = "";
     fg.innerHTML = "";
-    const baseEffectUrl = `${AO_HOST}themes/default/effects/`;
-    fg.src = `${baseEffectUrl}${encodeURI(effectName)}.webp`;
+    // Use manifest URL for effect if available
+    if (manifest?.effectUrl) {
+      fg.src = manifest.effectUrl;
+    } else {
+      const baseEffectUrl = `${AO_HOST}themes/default/effects/`;
+      fg.src = `${baseEffectUrl}${encodeURI(effectName)}.webp`;
+    }
   } else {
     fg.innerHTML = "";
     fg.src = transparentPng;

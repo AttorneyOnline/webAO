@@ -221,15 +221,25 @@ const viewport = (): Viewport => {
 
     if (textnow === chatmsg.content) {
       animating = false;
-      setEmote(
-        AO_HOST,
-        client,
-        charName,
-        charEmote,
-        "(a)",
-        false,
-        chatmsg.side,
-      );
+      // Use manifest URL for idle sprite if available
+      const manifest = chatmsg.preloadManifest;
+      const positionPrefix = ["def", "pro", "wit"].includes(chatmsg.side) ? `${chatmsg.side}_` : "";
+      const charImgSelector = document.getElementById(
+        `client_${positionPrefix}char_img`,
+      ) as HTMLImageElement;
+      if (manifest?.mainCharIdleUrl) {
+        charImgSelector.src = manifest.mainCharIdleUrl;
+      } else {
+        setEmote(
+          AO_HOST,
+          client,
+          charName,
+          charEmote,
+          "(a)",
+          false,
+          chatmsg.side,
+        );
+      }
       charLayers.style.opacity = "1";
       waitingBox.style.opacity = "1";
       clearTimeout(updater);
@@ -298,6 +308,16 @@ const viewport = (): Viewport => {
     const pairName = chatmsg.other_name.toLowerCase();
     const pairEmote = chatmsg.other_emote.toLowerCase();
 
+    // Get preload manifest and image selectors for direct URL setting
+    const manifest = chatmsg.preloadManifest;
+    const positionPrefix = validSides.includes(chatmsg.side) ? `${chatmsg.side}_` : "";
+    const charImgSelector = document.getElementById(
+      `client_${positionPrefix}char_img`,
+    ) as HTMLImageElement;
+    const pairImgSelector = document.getElementById(
+      `client_${positionPrefix}pair_img`,
+    ) as HTMLImageElement;
+
     // TODO: preanims sometimes play when they're not supposed to
     const isShoutOver = tickTimer >= shoutTimer;
     const isShoutAndPreanimOver =
@@ -319,8 +339,13 @@ const viewport = (): Viewport => {
       if (chatmsg.preanimdelay > 0) {
         shoutSprite.style.display = "none";
         shoutSprite.style.animation = "";
-        const preanim = chatmsg.preanim.toLowerCase();
-        setEmote(AO_HOST, client, charName, preanim, "", false, chatmsg.side);
+        // Use manifest URL if available, otherwise fallback to setEmote
+        if (manifest?.mainCharPreanimUrl) {
+          charImgSelector.src = manifest.mainCharPreanimUrl;
+        } else {
+          const preanim = chatmsg.preanim.toLowerCase();
+          setEmote(AO_HOST, client, charName, preanim, "", false, chatmsg.side);
+        }
       }
 
       if (chatmsg.other_name) {
@@ -406,41 +431,56 @@ const viewport = (): Viewport => {
         }
 
         if (chatmsg.other_name) {
-          setEmote(
-            AO_HOST,
-            client,
-            pairName,
-            pairEmote,
-            "(a)",
-            true,
-            chatmsg.side,
-          );
+          // Use manifest URL if available, otherwise fallback to setEmote
+          if (manifest?.pairCharIdleUrl) {
+            pairImgSelector.src = manifest.pairCharIdleUrl;
+          } else {
+            setEmote(
+              AO_HOST,
+              client,
+              pairName,
+              pairEmote,
+              "(a)",
+              true,
+              chatmsg.side,
+            );
+          }
           pairLayers.style.opacity = "1";
         } else {
           pairLayers.style.opacity = "0";
         }
 
-        setEmote(
-          AO_HOST,
-          client,
-          charName,
-          charEmote,
-          "(b)",
-          false,
-          chatmsg.side,
-        );
-        charLayers.style.opacity = "1";
-
-        if (textnow === chatmsg.content) {
+        // Use manifest URL for talking sprite if available
+        if (manifest?.mainCharTalkingUrl) {
+          charImgSelector.src = manifest.mainCharTalkingUrl;
+        } else {
           setEmote(
             AO_HOST,
             client,
             charName,
             charEmote,
-            "(a)",
+            "(b)",
             false,
             chatmsg.side,
           );
+        }
+        charLayers.style.opacity = "1";
+
+        if (textnow === chatmsg.content) {
+          // Use manifest URL for idle sprite if available
+          if (manifest?.mainCharIdleUrl) {
+            charImgSelector.src = manifest.mainCharIdleUrl;
+          } else {
+            setEmote(
+              AO_HOST,
+              client,
+              charName,
+              charEmote,
+              "(a)",
+              false,
+              chatmsg.side,
+            );
+          }
           charLayers.style.opacity = "1";
           waitingBox.style.opacity = "1";
           animating = false;
@@ -465,12 +505,10 @@ const viewport = (): Viewport => {
         chatmsg.sound !== undefined &&
         (chatmsg.type == 1 || chatmsg.type == 2 || chatmsg.type == 6)
       ) {
-        playSFX(
-          `${AO_HOST}sounds/general/${encodeURI(
-            chatmsg.sound.toLowerCase(),
-          )}.opus`,
-          chatmsg.looping_sfx,
-        );
+        // Use manifest URL if available, otherwise construct URL
+        const sfxUrl = manifest?.sfxUrl ??
+          `${AO_HOST}sounds/general/${encodeURI(chatmsg.sound.toLowerCase())}.opus`;
+        playSFX(sfxUrl, chatmsg.looping_sfx);
       }
     }
     if (textnow === chatmsg.content) {

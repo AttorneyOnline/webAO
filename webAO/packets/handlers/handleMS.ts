@@ -5,11 +5,12 @@ import { handleCharacterInfo } from "../../client/handleCharacterInfo";
 import { resetICParams } from "../../client/resetICParams";
 import { prepChat, safeTags } from "../../encoding";
 import { handle_ic_speaking } from "../../viewport/utils/handleICSpeaking";
+import { getAssetPreloader } from "../../cache";
 /**
  * Handles an in-character chat message.
  * @param {*} args packet arguments
  */
-export const handleMS = (args: string[]) => {
+export const handleMS = async (args: string[]) => {
   // duplicate message
   if (args[5] !== client.viewport.getChatmsg().content) {
     const char_id = Number(args[9]);
@@ -166,7 +167,17 @@ export const handleMS = (args: string[]) => {
         resetICParams();
       }
 
-      handle_ic_speaking(chatmsg); // no await
+      // Preload all assets before rendering
+      const preloader = getAssetPreloader(client.emote_extensions);
+      const manifest = await preloader.preloadForMessage(chatmsg);
+      chatmsg.preloadManifest = manifest;
+      chatmsg.preanimdelay = manifest.preanimDuration;
+
+      if (manifest.failedAssets.length > 0) {
+        console.warn("Failed to preload some assets:", manifest.failedAssets);
+      }
+
+      handle_ic_speaking(chatmsg);
     }
   }
 };
