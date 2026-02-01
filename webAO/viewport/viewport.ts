@@ -432,8 +432,11 @@ const viewport = (): Viewport => {
 
         if (chatmsg.other_name) {
           // Use manifest URL if available, otherwise fallback to setEmote
+          // Only set src if different to avoid restarting animation
           if (manifest?.pairCharIdleUrl) {
-            pairImgSelector.src = manifest.pairCharIdleUrl;
+            if (pairImgSelector.src !== manifest.pairCharIdleUrl) {
+              pairImgSelector.src = manifest.pairCharIdleUrl;
+            }
           } else {
             setEmote(
               AO_HOST,

@@ -151,8 +151,11 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
   }
 
   if (client.viewport.getChatmsg().other_name) {
+    // Only set src if different to avoid restarting animation
     if (manifest?.pairCharIdleUrl) {
-      pairEmoteSelector.src = manifest.pairCharIdleUrl;
+      if (pairEmoteSelector.src !== manifest.pairCharIdleUrl) {
+        pairEmoteSelector.src = manifest.pairCharIdleUrl;
+      }
     } else {
       setEmote(
         AO_HOST,
