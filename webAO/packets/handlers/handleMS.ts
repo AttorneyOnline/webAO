@@ -6,6 +6,11 @@ import { resetICParams } from "../../client/resetICParams";
 import { prepChat, safeTags } from "../../encoding";
 import { handle_ic_speaking } from "../../viewport/utils/handleICSpeaking";
 import { getAssetPreloader } from "../../cache";
+import { appendICLog } from "../../client/appendICLog";
+import { checkCallword } from "../../client/checkCallword";
+
+// Message sequence counter to track which message should be rendered
+let currentMessageSequence = 0;
 /**
  * Handles an in-character chat message.
  * @param {*} args packet arguments
@@ -167,9 +172,30 @@ export const handleMS = async (args: string[]) => {
         resetICParams();
       }
 
+      // Increment sequence and capture it for this message
+      currentMessageSequence++;
+      const thisMessageSequence = currentMessageSequence;
+
+      // Log message immediately to preserve order (before async preload)
+      appendICLog(
+        chatmsg.content,
+        chatmsg.showname,
+        chatmsg.nameplate,
+      );
+
+      // Check callword immediately as well
+      checkCallword(chatmsg.content, client.viewport.getSfxAudio());
+
       // Preload all assets before rendering
       const preloader = getAssetPreloader(client.emote_extensions);
       const manifest = await preloader.preloadForMessage(chatmsg);
+
+      // Check if a newer message arrived during preload - if so, skip rendering this one
+      if (thisMessageSequence !== currentMessageSequence) {
+        console.debug("Skipping render for superseded message");
+        return;
+      }
+
       chatmsg.preloadManifest = manifest;
       chatmsg.preanimdelay = manifest.preanimDuration;
 

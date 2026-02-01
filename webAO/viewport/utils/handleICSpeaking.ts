@@ -1,7 +1,5 @@
 import { ChatMsg } from "../interfaces/ChatMsg";
 import { client } from "../../client";
-import { appendICLog } from "../../client/appendICLog";
-import { checkCallword } from "../../client/checkCallword";
 import setEmote from "../../client/setEmote";
 import { AO_HOST } from "../../client/aoHost";
 import { SHOUTS } from "../constants/shouts";
@@ -112,16 +110,8 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
 
   client.viewport.setLastCharacter(client.viewport.getChatmsg().name);
 
-  appendICLog(
-    client.viewport.getChatmsg().content,
-    client.viewport.getChatmsg().showname,
-    client.viewport.getChatmsg().nameplate,
-  );
-
-  checkCallword(
-    client.viewport.getChatmsg().content,
-    client.viewport.getSfxAudio(),
-  );
+  // Note: appendICLog and checkCallword are now called in handleMS before preloading
+  // to ensure messages are logged in order of arrival
 
   // Use preloaded URLs from manifest when available
   const manifest = client.viewport.getChatmsg().preloadManifest;
