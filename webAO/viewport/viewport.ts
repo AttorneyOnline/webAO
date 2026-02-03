@@ -176,10 +176,17 @@ const viewport = (): Viewport => {
         gamewindow.style.removeProperty("animation");
       };
 
+      const pause = async (digits?: string) => {
+        // Default to 100ms if no number specified
+        const multiplier = !digits || digits === "" ? 1 : parseInt(digits, 10) || 1;
+        await delay(multiplier * 100);
+      };
+
       const commands = new Map(
         Object.entries({
           s: shake,
           f: flash,
+          p: pause,
         }),
       );
       const textSpeeds = new Set(["{", "}"]);
@@ -208,10 +215,29 @@ const viewport = (): Viewport => {
 
       if (
         characterElement.innerHTML === COMMAND_IDENTIFIER &&
-        commands.has(nextCharacterElement?.innerHTML)
+        (commands.has(nextCharacterElement?.innerHTML) ||
+          nextCharacterElement?.innerHTML === "p")
       ) {
         textnow = chatmsg.content.substring(0, textnow.length + 1);
-        await commands.get(nextCharacterElement.innerHTML)();
+        const commandChar = nextCharacterElement.innerHTML;
+
+        if (commandChar === "p") {
+          // Collect digits after \p for pause duration
+          const startPos = textnow.length;
+          let digits = "";
+          let offset = 1;
+          while (
+            startPos + offset <= chatmsg.content.length &&
+            /\d/.test(chatmsg.parsed[startPos + offset - 1]?.innerHTML || "")
+          ) {
+            digits += chatmsg.parsed[startPos + offset - 1].innerHTML;
+            textnow = chatmsg.content.substring(0, startPos + offset);
+            offset++;
+          }
+          await pause(digits);
+        } else {
+          await commands.get(commandChar)();
+        }
       } else {
         chatBoxInner.appendChild(chatmsg.parsed[textnow.length - 1]);
       }
