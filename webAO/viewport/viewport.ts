@@ -223,14 +223,15 @@ const viewport = (): Viewport => {
 
         if (commandChar === "p") {
           // Collect digits after \p for pause duration
+          const startPos = textnow.length;
           let digits = "";
           let offset = 1;
           while (
-            textnow.length + offset <= chatmsg.content.length &&
-            /\d/.test(chatmsg.parsed[textnow.length + offset - 1]?.innerHTML || "")
+            startPos + offset <= chatmsg.content.length &&
+            /\d/.test(chatmsg.parsed[startPos + offset - 1]?.innerHTML || "")
           ) {
-            digits += chatmsg.parsed[textnow.length + offset - 1].innerHTML;
-            textnow = chatmsg.content.substring(0, textnow.length + 1);
+            digits += chatmsg.parsed[startPos + offset - 1].innerHTML;
+            textnow = chatmsg.content.substring(0, startPos + offset);
             offset++;
           }
           await pause(digits);
