@@ -14,9 +14,10 @@ export const setupCharacterBasic = (chargs: string[], charid: number) => {
   if (chargs[0]) {
     img.alt = chargs[0];
     img.title = chargs[0];
+    const iconExt = client.charicon_extensions[0] || ".png";
     img.src = `${AO_HOST}characters/${encodeURI(
       chargs[0].toLowerCase(),
-    )}/char_icon.png`;
+    )}/char_icon${iconExt}`;
 
     const mute_select = <HTMLSelectElement>(
       document.getElementById("mute_select")
@@ -116,9 +117,10 @@ export const handleCharacterInfo = async (chargs: string[], charid: number) => {
   if (chargs[0]) {
     img.alt = chargs[0];
     img.title = chargs[0];
+    const iconExt = client.charicon_extensions[0] || ".png";
     img.src = `${AO_HOST}characters/${encodeURI(
       chargs[0].toLowerCase(),
-    )}/char_icon.png`;
+    )}/char_icon${iconExt}`;
 
     // Reset inifile so ensureCharIni will re-fetch
     if (client.chars[charid]) {

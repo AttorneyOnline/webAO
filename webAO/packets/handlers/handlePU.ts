@@ -21,7 +21,8 @@ export const handlePU = (args: string[]) => {
       const playerImg = <HTMLImageElement>playerRow.childNodes[0].firstChild;
       playerImg.alt = data;
       playerImg.title = data;
-      playerImg.src = `${AO_HOST}characters/${encodeURI(data.toLowerCase())}/char_icon.png`;
+      const iconExt = client.charicon_extensions[0] || ".png";
+      playerImg.src = `${AO_HOST}characters/${encodeURI(data.toLowerCase())}/char_icon${iconExt}`;
       const charName = <HTMLElement>playerRow.childNodes[1];
       charName.innerText = `[${args[1]}] ${data}`;
       break;
