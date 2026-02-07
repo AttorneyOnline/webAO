@@ -18,7 +18,7 @@ export const initTestimonyUpdater = () => {
   }
 
   client.viewport.testimonyAudio.src = client.resources[testimony].sfx;
-  client.viewport.testimonyAudio.play();
+  client.viewport.testimonyAudio.play().catch(() => {});
 
   const testimonyOverlay = <HTMLImageElement>(
     document.getElementById("client_testimony")

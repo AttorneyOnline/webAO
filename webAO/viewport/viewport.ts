@@ -104,7 +104,7 @@ const viewport = (): Viewport => {
     sfxAudio.pause();
     sfxAudio.loop = looping;
     sfxAudio.src = sfxname;
-    sfxAudio.play();
+    sfxAudio.play().catch(() => {});
   };
   /**
    * Updates the testimony overaly
@@ -150,7 +150,7 @@ const viewport = (): Viewport => {
     const charEmote = chatmsg.sprite.toLowerCase();
 
     if (chatmsg.content.charAt(textnow.length) !== " ") {
-      blipChannels[currentBlipChannel].play();
+      blipChannels[currentBlipChannel].play().catch(() => {});
       currentBlipChannel++;
       currentBlipChannel %= blipChannels.length;
     }
@@ -356,7 +356,7 @@ const viewport = (): Viewport => {
           eviBox.style.opacity = "1";
 
           testimonyAudio.src = `${AO_HOST}sounds/general/sfx-evidenceshoop.opus`;
-          testimonyAudio.play();
+          testimonyAudio.play().catch(() => {});
 
           if (chatmsg.side === "def") {
             // Only def show evidence on right
