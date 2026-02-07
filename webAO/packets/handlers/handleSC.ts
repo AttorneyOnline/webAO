@@ -1,7 +1,7 @@
 import queryParser from "../../utils/queryParser";
 
 import { client } from "../../client";
-import { handleCharacterInfo } from "../../client/handleCharacterInfo";
+import { setupCharacterBasic } from "../../client/handleCharacterInfo";
 const { mode } = queryParser();
 
 /**
@@ -17,13 +17,10 @@ export const handleSC = async (args: string[]) => {
     document.getElementById("client_charselect")!.style.display = "block";
   }
 
-  document.getElementById("client_loadingtext")!.innerHTML =
-    "Loading Characters";
   for (let i = 1; i < args.length; i++) {
     const chargs = args[i].split("&");
     const charid = i - 1;
-
-    setTimeout(() => handleCharacterInfo(chargs, charid), charid * 6);
+    setupCharacterBasic(chargs, charid);
   }
   // We're done with the characters, request the music
   client.sender.sendServer("RM#%");

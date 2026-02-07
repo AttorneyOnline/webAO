@@ -1,6 +1,6 @@
 import { client } from "../../client";
-import { getCharIcon } from "../../client/handleCharacterInfo";
 import { updatePlayerAreas } from "../../dom/updatePlayerAreas";
+import { AO_HOST } from "../../client/aoHost";
 
 /**
  * Handles a playerlist update
@@ -19,7 +19,9 @@ export const handlePU = (args: string[]) => {
       break;
     case 1:
       const playerImg = <HTMLImageElement>playerRow.childNodes[0].firstChild;
-      getCharIcon(playerImg, data);
+      playerImg.alt = data;
+      playerImg.title = data;
+      playerImg.src = `${AO_HOST}characters/${encodeURI(data.toLowerCase())}/char_icon.png`;
       const charName = <HTMLElement>playerRow.childNodes[1];
       charName.innerText = `[${args[1]}] ${data}`;
       break;

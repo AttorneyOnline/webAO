@@ -2,50 +2,21 @@ import { client } from "../client";
 import { safeTags } from "../encoding";
 import iniParse from "../iniParse";
 import request from "../services/request";
-import fileExists from "../utils/fileExists";
 import { AO_HOST } from "./aoHost";
 
-export const getCharIcon = async (img: HTMLImageElement, charname: string) => {
-  img.alt = charname;
-  const charIconBaseUrl = `${AO_HOST}characters/${encodeURI(
-    charname.toLowerCase(),
-  )}/char_icon`;
-  for (let i = 0; i < client.charicon_extensions.length; i++) {
-    const fileUrl = charIconBaseUrl + client.charicon_extensions[i];
-    const exists = await fileExists(fileUrl);
-    if (exists) {
-      img.alt = charname;
-      img.title = charname;
-      img.src = fileUrl;
-      return;
-    }
-  }
-};
-
 /**
- * Handles the incoming character information, and downloads the sprite + ini for it
- * @param {Array} chargs packet arguments
- * @param {Number} charid character ID
+ * Lightweight character setup that runs on join. Sets the icon src directly
+ * (letting the browser handle loading) and stores default character data.
+ * Does NOT fetch char.ini — that is deferred until needed via ensureCharIni.
  */
-export const handleCharacterInfo = async (chargs: string[], charid: number) => {
+export const setupCharacterBasic = (chargs: string[], charid: number) => {
   const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
   if (chargs[0]) {
-    let cini: any = {};
-
-    getCharIcon(img, chargs[0]);
-
-    // If the ini doesn't exist on the server this will throw an error
-    try {
-      const cinidata = await request(
-        `${AO_HOST}characters/${encodeURI(chargs[0].toLowerCase())}/char.ini`,
-      );
-      cini = iniParse(cinidata);
-    } catch (err) {
-      cini = {};
-      img.classList.add("noini");
-      console.warn(`character ${chargs[0]} is missing from webAO`);
-      // If it does, give the user a visual indication that the character is unusable
-    }
+    img.alt = chargs[0];
+    img.title = chargs[0];
+    img.src = `${AO_HOST}characters/${encodeURI(
+      chargs[0].toLowerCase(),
+    )}/char_icon.png`;
 
     const mute_select = <HTMLSelectElement>(
       document.getElementById("mute_select")
@@ -56,47 +27,108 @@ export const handleCharacterInfo = async (chargs: string[], charid: number) => {
     );
     pair_select.add(new Option(safeTags(chargs[0]), String(charid)));
 
-    // sometimes ini files lack important settings
-    const default_options = {
-      name: chargs[0],
-      showname: chargs[0],
-      side: "def",
-      blips: "male",
-      chat: "",
-      category: "",
-    };
-    cini.options = Object.assign(default_options, cini.options);
-
-    // sometimes ini files lack important settings
-    const default_emotions = {
-      number: 0,
-    };
-    cini.emotions = Object.assign(default_emotions, cini.emotions);
-
+    // Store defaults — these get replaced with actual ini values by ensureCharIni
     client.chars[charid] = {
       name: safeTags(chargs[0]),
-      showname: safeTags(cini.options.showname),
+      showname: safeTags(chargs[0]),
       desc: safeTags(chargs[1]),
-      blips: safeTags(cini.options.blips).toLowerCase(),
-      gender: safeTags(cini.options.gender).toLowerCase(),
-      side: safeTags(cini.options.side).toLowerCase(),
-      chat:
-        cini.options.chat === ""
-          ? safeTags(cini.options.category).toLowerCase()
-          : safeTags(cini.options.chat).toLowerCase(),
+      blips: "male",
+      gender: "",
+      side: "def",
+      chat: "",
       evidence: chargs[3],
-      icon: img.src,
-      inifile: cini,
+      icon: "",
       muted: false,
     };
+  } else {
+    console.warn(`missing charid ${charid}`);
+    img.style.display = "none";
+  }
+};
 
-    if (
-      client.chars[charid].blips === "male" &&
-      client.chars[charid].gender !== "male" &&
-      client.chars[charid].gender !== ""
-    ) {
-      client.chars[charid].blips = client.chars[charid].gender;
+/**
+ * Fetches and parses char.ini for a character if not already loaded.
+ * Replaces default values in client.chars[charid] with actual ini values.
+ */
+export const ensureCharIni = async (charid: number): Promise<any> => {
+  const char = client.chars[charid];
+  if (!char) return {};
+  if (char.inifile) return char.inifile;
+
+  const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
+  let cini: any = {};
+
+  try {
+    const cinidata = await request(
+      `${AO_HOST}characters/${encodeURI(char.name.toLowerCase())}/char.ini`,
+    );
+    cini = iniParse(cinidata);
+  } catch (err) {
+    cini = {};
+    if (img) img.classList.add("noini");
+    console.warn(`character ${char.name} is missing from webAO`);
+  }
+
+  const default_options = {
+    name: char.name,
+    showname: char.name,
+    side: "def",
+    blips: "male",
+    chat: "",
+    category: "",
+  };
+  cini.options = Object.assign(default_options, cini.options);
+
+  const default_emotions = {
+    number: 0,
+  };
+  cini.emotions = Object.assign(default_emotions, cini.emotions);
+
+  // Replace defaults with actual ini values
+  char.showname = safeTags(cini.options.showname);
+  char.blips = safeTags(cini.options.blips).toLowerCase();
+  char.gender = safeTags(cini.options.gender).toLowerCase();
+  char.side = safeTags(cini.options.side).toLowerCase();
+  char.chat =
+    cini.options.chat === ""
+      ? safeTags(cini.options.category).toLowerCase()
+      : safeTags(cini.options.chat).toLowerCase();
+  char.icon = img ? img.src : "";
+  char.inifile = cini;
+
+  if (
+    char.blips === "male" &&
+    char.gender !== "male" &&
+    char.gender !== ""
+  ) {
+    char.blips = char.gender;
+  }
+
+  return cini;
+};
+
+/**
+ * Full character info load (used by iniEdit and handleMS ini-edit path).
+ * Fetches icon + ini for a single character, replacing any existing data.
+ */
+export const handleCharacterInfo = async (chargs: string[], charid: number) => {
+  const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
+  if (chargs[0]) {
+    img.alt = chargs[0];
+    img.title = chargs[0];
+    img.src = `${AO_HOST}characters/${encodeURI(
+      chargs[0].toLowerCase(),
+    )}/char_icon.png`;
+
+    // Reset inifile so ensureCharIni will re-fetch
+    if (client.chars[charid]) {
+      client.chars[charid].name = safeTags(chargs[0]);
+      client.chars[charid].inifile = null;
+    } else {
+      setupCharacterBasic(chargs, charid);
     }
+
+    await ensureCharIni(charid);
   } else {
     console.warn(`missing charid ${charid}`);
     img.style.display = "none";
