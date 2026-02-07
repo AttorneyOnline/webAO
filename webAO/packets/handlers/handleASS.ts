@@ -1,4 +1,4 @@
-import { setAOhost, AO_HOST } from "../../client/aoHost";
+import { setAOhost } from "../../client/aoHost";
 import { client } from "../../client";
 
 /**
@@ -6,7 +6,7 @@ import { client } from "../../client";
  * @param {Array} args packet arguments
  */
 export const handleASS = (args: string[]) => {
-  if (args[1] !== "None") setAOhost(args[1]);
+  const host = args[1] !== "None" ? setAOhost(args[1]) : args[1];
 
   // Re-apply playerlist icon srcs that were set before AO_HOST was known
   const iconExt = client.charicon_extensions[0] || ".png";
@@ -18,7 +18,7 @@ export const handleASS = (args: string[]) => {
           `#client_playerlist_entry${playerID} img`
         );
         if (img) {
-          img.src = `${AO_HOST}characters/${encodeURI(char.name.toLowerCase())}/char_icon${iconExt}`;
+          img.src = `${host}characters/${encodeURI(char.name.toLowerCase())}/char_icon${iconExt}`;
         }
       }
     }
