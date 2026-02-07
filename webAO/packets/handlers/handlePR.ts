@@ -53,6 +53,11 @@ function removePlayer(playerID: number) {
  */
 export const handlePR = (args: string[]) => {
   const playerID = Number(args[1]);
-  if (Number(args[2]) === 0) addPlayer(playerID);
-  else if (Number(args[2]) === 1) removePlayer(playerID);
+  if (Number(args[2]) === 0) {
+    addPlayer(playerID);
+    client.players.set(playerID, { charId: -1, area: 0 });
+  } else if (Number(args[2]) === 1) {
+    removePlayer(playerID);
+    client.players.delete(playerID);
+  }
 };

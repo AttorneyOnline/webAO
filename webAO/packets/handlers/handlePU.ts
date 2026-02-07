@@ -1,6 +1,7 @@
 import { client } from "../../client";
 import { updatePlayerAreas } from "../../dom/updatePlayerAreas";
 import { AO_HOST } from "../../client/aoHost";
+import { ensureCharIni } from "../../client/handleCharacterInfo";
 
 /**
  * Handles a playerlist update
@@ -25,6 +26,18 @@ export const handlePU = (args: string[]) => {
       playerImg.src = `${AO_HOST}characters/${encodeURI(data.toLowerCase())}/char_icon${iconExt}`;
       const charName = <HTMLElement>playerRow.childNodes[1];
       charName.innerText = `[${args[1]}] ${data}`;
+      const charId = client.chars.findIndex(
+        (c: any) => c && c.name.toLowerCase() === data.toLowerCase()
+      );
+      if (charId >= 0) {
+        const player = client.players.get(Number(args[1]));
+        if (player) {
+          player.charId = charId;
+          if (player.area === client.area) {
+            ensureCharIni(charId);
+          }
+        }
+      }
       break;
     case 2:
       const showName = <HTMLElement>playerRow.childNodes[2];
@@ -33,6 +46,13 @@ export const handlePU = (args: string[]) => {
     case 3:
       playerRow.className = `area${data}`;
       updatePlayerAreas(client.area);
+      const puPlayer = client.players.get(Number(args[1]));
+      if (puPlayer) {
+        puPlayer.area = Number(data);
+        if (puPlayer.area === client.area && puPlayer.charId >= 0) {
+          ensureCharIni(puPlayer.charId);
+        }
+      }
     default:
       break;
   }

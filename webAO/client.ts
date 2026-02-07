@@ -150,6 +150,7 @@ class Client extends EventEmitter {
   connect: () => void;
   loadResources: () => void;
   isLowMemory: () => void;
+  players: Map<number, { charId: number; area: number }>;
   charicon_extensions: string[];
   emote_extensions: string[];
   emotions_extensions: string[];
@@ -211,6 +212,7 @@ class Client extends EventEmitter {
     this.temp_packet = "";
     loadResources;
     isLowMemory;
+    this.players = new Map();
     this.charicon_extensions = [".png", ".webp"];
     this.emote_extensions = [".gif", ".png", ".apng", ".webp", ".webp.static"];
     this.emotions_extensions = [".png", ".webp"];
