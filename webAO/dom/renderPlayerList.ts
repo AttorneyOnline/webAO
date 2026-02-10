@@ -21,6 +21,8 @@ export function renderPlayerList() {
     const imgCell = playerRow.insertCell(0);
     imgCell.style.width = "64px";
     const img = document.createElement("img");
+    img.style.maxWidth = "60px";
+    img.style.maxHeight = "60px";
     if (player.charName) {
       const iconExt = client.charicon_extensions[0] || ".png";
       img.src = `${AO_HOST}characters/${encodeURI(player.charName.toLowerCase())}/char_icon${iconExt}`;
