@@ -5,27 +5,32 @@ export function renderPlayerList() {
   const list = document.getElementById("client_playerlist") as HTMLTableElement;
   list.innerHTML = "";
 
+  const header = list.createTHead().insertRow();
+  for (const label of ["Icon", "Character", "Showname", "OOC Name"]) {
+    const th = document.createElement("th");
+    th.textContent = label;
+    header.appendChild(th);
+  }
+
+  const body = list.createTBody();
   for (const [playerID, player] of client.playerlist) {
-    const playerRow = list.insertRow();
+    const playerRow = body.insertRow();
     playerRow.id = `client_playerlist_entry${playerID}`;
 
     const imgCell = playerRow.insertCell(0);
     imgCell.style.width = "64px";
     const img = document.createElement("img");
-    if (player.charId >= 0) {
-      const char = client.chars[player.charId];
-      if (char) {
-        const iconExt = client.charicon_extensions[0] || ".png";
-        img.src = `${AO_HOST}characters/${encodeURI(char.name.toLowerCase())}/char_icon${iconExt}`;
-        img.alt = char.name;
-        img.title = char.name;
-      }
+    if (player.charName) {
+      const iconExt = client.charicon_extensions[0] || ".png";
+      img.src = `${AO_HOST}characters/${encodeURI(player.charName.toLowerCase())}/char_icon${iconExt}`;
+      img.alt = player.charName;
+      img.title = player.charName;
     }
     imgCell.appendChild(img);
 
     const charNameCell = playerRow.insertCell(1);
     charNameCell.textContent =
-      player.charId >= 0 ? `[${playerID}] ${player.charName}` : "";
+      player.charName ? `[${playerID}] ${player.charName}` : "";
 
     const showNameCell = playerRow.insertCell(2);
     showNameCell.textContent = player.showName;
