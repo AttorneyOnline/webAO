@@ -6,7 +6,7 @@ export function renderPlayerList() {
   list.innerHTML = "";
 
   const header = list.createTHead().insertRow();
-  for (const label of ["Icon", "Character", "Showname", "OOC Name", "Area"]) {
+  for (const label of ["Icon", "Character", "Showname", "OOC Name"]) {
     const th = document.createElement("th");
     th.textContent = label;
     header.appendChild(th);
@@ -16,6 +16,7 @@ export function renderPlayerList() {
   for (const [playerID, player] of client.playerlist) {
     const playerRow = body.insertRow();
     playerRow.id = `client_playerlist_entry${playerID}`;
+    playerRow.style.display = player.area === client.area ? "" : "none";
 
     const imgCell = playerRow.insertCell(0);
     imgCell.style.width = "64px";
@@ -38,17 +39,14 @@ export function renderPlayerList() {
     const oocNameCell = playerRow.insertCell(3);
     oocNameCell.textContent = player.name;
 
-    const areaCell = playerRow.insertCell(4);
-    areaCell.textContent = String(player.area);
-
-    const kickCell = playerRow.insertCell(5);
+    const kickCell = playerRow.insertCell(4);
     kickCell.style.width = "64px";
     const kick = document.createElement("button");
     kick.innerText = "Kick";
     kick.onclick = () => window.kickPlayer(playerID);
     kickCell.appendChild(kick);
 
-    const banCell = playerRow.insertCell(6);
+    const banCell = playerRow.insertCell(5);
     banCell.style.width = "64px";
     const ban = document.createElement("button");
     ban.innerText = "Ban";
