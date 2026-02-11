@@ -1,7 +1,7 @@
 /* eslint indent: ["error", 2, { "SwitchCase": 1 }] */
 
 import { client, extrafeatures, UPDATE_INTERVAL } from "../../client";
-import { handleCharacterInfo } from "../../client/handleCharacterInfo";
+import { handleCharacterInfo, ensureCharIni } from "../../client/handleCharacterInfo";
 import { resetICParams } from "../../client/resetICParams";
 import { prepChat, safeTags } from "../../encoding";
 import { handle_ic_speaking } from "../../viewport/utils/handleICSpeaking";
@@ -33,6 +33,9 @@ export const handleMS = async (args: string[]) => {
         );
         const chargs = (`${char_name}&` + "iniediter").split("&");
         handleCharacterInfo(chargs, char_id);
+      } else if (!client.chars[char_id].inifile) {
+        // Lazily load char.ini in background so future messages have proper data
+        ensureCharIni(char_id);
       }
     }
 

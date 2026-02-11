@@ -187,7 +187,7 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
     } else {
       client.viewport.shoutaudio.src = client.resources[shout].sfx;
     }
-    client.viewport.shoutaudio.play();
+    client.viewport.shoutaudio.play().catch(() => {});
     client.viewport.setShoutTimer(client.resources[shout].duration);
   } else {
     client.viewport.setShoutTimer(0);

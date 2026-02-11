@@ -3,6 +3,7 @@ import fileExists from "../../utils/fileExists";
 import { updateActionCommands } from "../../dom/updateActionCommands";
 import { pickEmotion } from "../../dom/pickEmotion";
 import { AO_HOST } from "../../client/aoHost";
+import { ensureCharIni } from "../../client/handleCharacterInfo";
 
 function addEmoteButton(i: number, imgurl: string, desc: string) {
   const emotesList = document.getElementById("client_emo");
@@ -34,7 +35,7 @@ export const handlePV = async (args: string[]) => {
   const emotesList = document.getElementById("client_emo");
   emotesList.style.display = "";
   emotesList.innerHTML = ""; // Clear emote box
-  const ini = me.inifile;
+  const ini = await ensureCharIni(client.charID);
   me.side = ini.options.side;
   updateActionCommands(me.side);
   if (ini.emotions.number === 0) {
@@ -43,6 +44,16 @@ export const handlePV = async (args: string[]) => {
 					alt="unavailable"
 					class="emote_button">No emotes available</span>`;
   } else {
+    // Probe extensions once using button1_off, then reuse for all emotes
+    const charPath = `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/emotions/`;
+    let emoteExtension = client.emotions_extensions[0];
+    for (const extension of client.emotions_extensions) {
+      if (await fileExists(`${charPath}button1_off${extension}`)) {
+        emoteExtension = extension;
+        break;
+      }
+    }
+
     for (let i = 1; i <= ini.emotions.number; i++) {
       try {
         const emoteinfo = ini.emotions[i].split("#");
@@ -56,20 +67,8 @@ export const handlePV = async (args: string[]) => {
           esfx = "0";
           esfxd = 0;
         }
-        // Make sure the asset server is case insensitive, or that everything on it is lowercase
 
-        let url;
-        for (const extension of client.emotions_extensions) {
-          url = `${AO_HOST}characters/${encodeURI(
-            me.name.toLowerCase(),
-          )}/emotions/button${i}_off${extension}`;
-
-          const exists = await fileExists(url);
-
-          if (exists) {
-            break;
-          }
-        }
+        const url = `${charPath}button${i}_off${emoteExtension}`;
 
         emotes[i] = {
           desc: emoteinfo[0].toLowerCase(),

@@ -24,7 +24,7 @@ export const handleMC = (args: string[]) => {
     music.src = `${AO_HOST}sounds/music/${encodeURI(track.toLowerCase())}`;
   }
   music.loop = looping;
-  music.play();
+  music.play().catch(() => {});
 
   try {
     musicname = client.chars[charID].name;
