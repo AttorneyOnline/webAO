@@ -3,6 +3,7 @@ import fileExists from "../../utils/fileExists";
 import { updateActionCommands } from "../../dom/updateActionCommands";
 import { pickEmotion } from "../../dom/pickEmotion";
 import { AO_HOST } from "../../client/aoHost";
+import { ensureCharIni } from "../../client/handleCharacterInfo";
 
 function addEmoteButton(i: number, imgurl: string, desc: string) {
   const emotesList = document.getElementById("client_emo");
@@ -34,7 +35,7 @@ export const handlePV = async (args: string[]) => {
   const emotesList = document.getElementById("client_emo");
   emotesList.style.display = "";
   emotesList.innerHTML = ""; // Clear emote box
-  const ini = me.inifile;
+  const ini = await ensureCharIni(client.charID);
   me.side = ini.options.side;
   updateActionCommands(me.side);
   if (ini.emotions.number === 0) {

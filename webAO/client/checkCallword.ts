@@ -11,7 +11,7 @@ export function checkCallword(message: string, sfxAudio: HTMLAudioElement) {
     if (item !== "" && message.toLowerCase().includes(item.toLowerCase())) {
       sfxAudio.pause();
       sfxAudio.src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
-      sfxAudio.play();
+      sfxAudio.play().catch(() => {});
     }
   }
 }

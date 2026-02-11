@@ -18,6 +18,6 @@ export const handleZZ = (args: string[]) => {
   const oldvolume = client.viewport.getSfxAudio().volume;
   client.viewport.getSfxAudio().volume = 1;
   client.viewport.getSfxAudio().src = `${AO_HOST}sounds/general/sfx-gallery.opus`;
-  client.viewport.getSfxAudio().play();
+  client.viewport.getSfxAudio().play().catch(() => {});
   client.viewport.getSfxAudio().volume = oldvolume;
 };

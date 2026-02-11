@@ -20,6 +20,7 @@ export const handleSI = (args: string[]) => {
     const demothing = document.createElement("img");
 
     demothing.className = "demothing";
+    demothing.loading = "lazy";
     demothing.id = `demo_${i}`;
     const demoonclick = document.createAttribute("onclick");
     demoonclick.value = `pickChar(${i})`;

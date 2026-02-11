@@ -17,7 +17,7 @@ export const handleRMC = (args: string[]) => {
       music.currentTime += parseFloat(
         music.totime + (new Date().getTime() / 1000 - music.offset),
       ).toFixed(3);
-      music.play();
+      music.play().catch(() => {});
     },
     false,
   );

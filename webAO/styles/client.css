@@ -714,6 +714,23 @@
   opacity: 0.5;
 }
 
+#client_playerlist {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#client_playerlist th,
+#client_playerlist td {
+  border-bottom: 1px solid #555;
+  padding: 4px 6px;
+  text-align: left;
+}
+
+#client_playerlist th {
+  font-weight: bold;
+  border-bottom: 2px solid #888;
+}
+
 .hrtext {
   overflow: hidden;
   text-align: center;
