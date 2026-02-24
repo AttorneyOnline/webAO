@@ -61,16 +61,6 @@ export interface CharacterOffset {
   readonly y: number;
 }
 
-/** Character INI-derived data, resolved from char.ini lookup. Immutable. */
-export interface CharacterIniData {
-  /** Display name from char.ini [Options] nameplate */
-  readonly nameplate: string;
-  /** Custom chatbox asset name */
-  readonly chatbox: string;
-  /** Blip sound name for this character */
-  readonly blips: string;
-}
-
 // ─── MSPacket Interface ──────────────────────────────
 
 /**

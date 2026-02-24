@@ -2,7 +2,8 @@ import { AssetCache } from "./AssetCache";
 import { UrlResolver } from "./UrlResolver";
 import { CharacterSpriteUrls, PreloadManifest } from "./types";
 import { EmoteModifier, ShoutModifier } from "../packets/parseMSPacket";
-import type { MSPacket, CharacterIniData } from "../packets/parseMSPacket";
+import type { MSPacket } from "../packets/parseMSPacket";
+import type { CharIni } from "../client/CharIni";
 import { getShoutConfig } from "../viewport/constants/shouts";
 import calculatorHandler from "../utils/calculatorHandler";
 
@@ -33,7 +34,7 @@ export class AssetPreloader {
     return { idleUrl: null, talkingUrl: null, preanimUrl: null, preanimDuration: 0 };
   }
 
-  async preloadForMessage(packet: MSPacket, charIni: CharacterIniData): Promise<PreloadManifest> {
+  async preloadForMessage(packet: MSPacket, charIni: CharIni): Promise<PreloadManifest> {
     const speakerSprites = this.makeCharSpriteUrls();
     const manifest: PreloadManifest = {
       characters: [speakerSprites],

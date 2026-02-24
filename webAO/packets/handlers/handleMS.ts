@@ -11,7 +11,7 @@ import type { AomlRules } from "../../viewport/buildRenderSequence";
 import { executeRenderSequence } from "../../viewport/executeRenderSequence";
 import type { RenderHandle } from "../../viewport/executeRenderSequence";
 import { parseMSPacket } from "../parseMSPacket";
-import type { CharacterIniData } from "../parseMSPacket";
+import type { CharIni } from "../../client/CharIni";
 import request from "../../services/request.js";
 
 // Message sequence counter to track which message should be rendered
@@ -68,27 +68,18 @@ export const handleMS = async (args: string[]) => {
     }
   }
 
-  let nameplate = charName;
-  let blips = "male";
-  let chatbox = "default";
-  let muted = false;
+  const char = client.chars[charId];
+  if (char?.muted) return;
 
-  try { nameplate = client.chars[charId].showname; } catch (e) { /* keep default */ }
-  try { blips = client.chars[charId].blips; } catch (e) { /* keep default */ }
-  try { chatbox = client.chars[charId].chat; } catch (e) { /* keep default */ }
-  try { muted = client.chars[charId].muted; } catch (e) { /* keep default */ }
-
-  if (muted) return;
-
-  // Override blips with packet blips if provided
-  if (packet.packetBlips) {
-    blips = safeTags(packet.packetBlips);
-  }
-
-  const charIni: CharacterIniData = {
-    nameplate,
-    chatbox: packet.content.trim() === "" ? "" : chatbox,
-    blips,
+  // Per-message CharIni with packet-level overrides
+  const charIni: CharIni = {
+    ...(char ?? {
+      name: charName, showname: charName, desc: "", blips: "male",
+      gender: "", side: "def", chat: "default", evidence: "",
+      icon: "", muted: false,
+    }),
+    blips: packet.packetBlips ? safeTags(packet.packetBlips) : (char?.blips ?? "male"),
+    chat: packet.content.trim() === "" ? "" : (char?.chat ?? "default"),
   };
 
   // Our own message appeared, reset the buttons
@@ -104,7 +95,7 @@ export const handleMS = async (args: string[]) => {
   appendICLog(
     packet.content,
     packet.showname,
-    charIni.nameplate,
+    charIni.showname,
   );
 
   // Check callword immediately as well

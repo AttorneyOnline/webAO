@@ -1,5 +1,6 @@
 import { DeskMod, EmoteModifier, ShoutModifier, TextColor, textColorName } from "../packets/parseMSPacket";
-import type { MSPacket, CharacterIniData, CharacterOffset, TextColorName } from "../packets/parseMSPacket";
+import type { MSPacket, CharacterOffset, TextColorName } from "../packets/parseMSPacket";
+import type { CharIni } from "../client/CharIni";
 import type { PreloadManifest } from "../cache/types";
 import type {
   RenderSequence,
@@ -449,18 +450,17 @@ function buildPositionLayout(packet: MSPacket): PositionLayout {
   };
 }
 
-function buildChatboxDisplay(packet: MSPacket, charIni: CharacterIniData): ChatboxDisplay {
+function buildChatboxDisplay(packet: MSPacket, charIni: CharIni): ChatboxDisplay {
   const content = packet.content;
-  const chatbox = charIni.chatbox;
-  const visible = content.trim() !== "" && chatbox !== "";
+  const chat = charIni.chat;
+  const visible = content.trim() !== "" && chat !== "";
   const showname = packet.showname;
-  const nameplate = charIni.nameplate;
 
   return {
     visible,
-    nameplate: showname !== "" ? showname : nameplate,
+    nameplate: showname !== "" ? showname : charIni.showname,
     showname,
-    chatboxAsset: chatbox !== "default" && chatbox !== "" ? chatbox : null,
+    chatboxAsset: chat !== "default" && chat !== "" ? chat : null,
   };
 }
 
@@ -534,7 +534,7 @@ function buildSlidePhase(
 
 export function buildRenderSequence(
   packet: MSPacket,
-  charIni: CharacterIniData,
+  charIni: CharIni,
   manifest: PreloadManifest,
   evidences: { icon: string }[],
   aomlRules: AomlRules,

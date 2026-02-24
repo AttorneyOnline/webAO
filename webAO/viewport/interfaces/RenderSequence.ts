@@ -2,12 +2,12 @@ import type {
   Position,
   TextColorName,
   CharacterOffset,
-  CharacterIniData,
 } from "../../packets/parseMSPacket";
 import { textColorName } from "../../packets/parseMSPacket";
+export type { CharIni } from "../../client/CharIni";
 
 // Re-export MS packet types used by the render pipeline
-export type { Position, TextColorName, CharacterOffset, CharacterIniData };
+export type { Position, TextColorName, CharacterOffset };
 export { textColorName };
 
 // ─── Pre-Parsed Text ─────────────────────────────────
