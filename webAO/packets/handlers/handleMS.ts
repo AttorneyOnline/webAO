@@ -1,11 +1,8 @@
-/* eslint indent: ["error", 2, { "SwitchCase": 1 }] */
-
-import { client, extrafeatures, UPDATE_INTERVAL } from "../../client";
+import { client, UPDATE_INTERVAL } from "../../client";
 import { handleCharacterInfo, ensureCharIni } from "../../client/handleCharacterInfo";
 import { resetICParams } from "../../client/resetICParams";
-import { prepChat, safeTags } from "../../encoding";
+import { safeTags } from "../../encoding";
 import { getAssetPreloader } from "../../cache";
-import type { PreloadManifest } from "../../cache/types";
 import { appendICLog } from "../../client/appendICLog";
 import { checkCallword } from "../../client/checkCallword";
 import { AO_HOST } from "../../client/aoHost";
@@ -13,6 +10,8 @@ import { buildRenderSequence, parseAomlRules } from "../../viewport/buildRenderS
 import type { AomlRules } from "../../viewport/buildRenderSequence";
 import { executeRenderSequence } from "../../viewport/executeRenderSequence";
 import type { RenderHandle } from "../../viewport/executeRenderSequence";
+import { parseMSPacket } from "../parseMSPacket";
+import type { CharacterIniData } from "../parseMSPacket";
 import request from "../../services/request.js";
 
 // Message sequence counter to track which message should be rendered
@@ -20,6 +19,9 @@ let currentMessageSequence = 0;
 
 // Track the previous message's courtroom side for slide transitions
 let previousSide = "";
+
+// Dedup: track content of the last message processed
+let lastContent = "";
 
 // Cached AOML rules (loaded once)
 let cachedAomlRules: AomlRules | null = null;
@@ -44,234 +46,107 @@ let currentRender: RenderHandle | null = null;
  * @param {*} args packet arguments
  */
 export const handleMS = async (args: string[]) => {
-  // duplicate message
-  if (args[5] !== client.viewport.getChatmsg().content) {
-    const char_id = Number(args[9]);
-    const char_name = safeTags(args[3]);
+  const packet = parseMSPacket(args);
 
-    let msg_nameplate = args[3];
-    let msg_blips = "male";
-    let char_chatbox = "default";
-    let char_muted = false;
+  // Duplicate message check
+  if (packet.content === lastContent) return;
+  lastContent = packet.content;
 
-    if (char_id < client.char_list_length && char_id >= 0) {
-      if (client.chars[char_id].name !== char_name) {
-        console.info(
-          `${client.chars[char_id].name} is iniediting to ${char_name}`,
-        );
-        const chargs = (`${char_name}&` + "iniediter").split("&");
-        handleCharacterInfo(chargs, char_id);
-      } else if (!client.chars[char_id].inifile) {
-        // Lazily load char.ini in background so future messages have proper data
-        ensureCharIni(char_id);
-      }
-    }
+  const charId = packet.charId;
+  const charName = packet.charName;
 
-    try {
-      msg_nameplate = client.chars[char_id].showname;
-    } catch (e) {
-      msg_nameplate = args[3];
-    }
-
-    try {
-      msg_blips = client.chars[char_id].blips;
-    } catch (e) {}
-
-    try {
-      char_chatbox = client.chars[char_id].chat;
-    } catch (e) {
-      char_chatbox = "default";
-    }
-
-    try {
-      char_muted = client.chars[char_id].muted;
-    } catch (e) {
-      char_muted = false;
-      console.error("we're still missing some character data");
-    }
-
-    if (char_muted === false) {
-      let chatmsg = {
-        deskmod: Number(safeTags(args[1]).toLowerCase()),
-        preanim: safeTags(args[2]).toLowerCase(), // get preanim
-        nameplate: msg_nameplate,
-        chatbox: char_chatbox,
-        name: char_name,
-        sprite: safeTags(args[4]).toLowerCase(),
-        content: prepChat(args[5]), // Escape HTML tags
-        side: args[6].toLowerCase(),
-        sound: safeTags(args[7]).toLowerCase(),
-        blips: safeTags(msg_blips),
-        type: Number(args[8]),
-        charid: char_id,
-        snddelay: Number(args[10]),
-        objection: Number(args[11]),
-        evidence: Number(safeTags(args[12])),
-        flip: Number(args[13]),
-        flash: Number(args[14]),
-        color: Number(args[15]),
-        speed: UPDATE_INTERVAL,
-        showname: "" as string,
-        preanimdelay: 0,
-        preloadManifest: undefined as PreloadManifest | undefined,
-      };
-
-      if (args.length > 16) {
-        const extra_cccc = {
-          showname: prepChat(args[16]),
-          other_charid: Number(args[17]),
-          other_name: safeTags(args[18]),
-          other_emote: safeTags(args[19]),
-          self_offset: args[20].split("<and>"), // HACK: here as well, client is fucked and uses this instead of &
-          other_offset: args[21].split("<and>"),
-          other_flip: Number(args[22]),
-          noninterrupting_preanim: Number(args[23]),
-        };
-        chatmsg = Object.assign(extra_cccc, chatmsg);
-
-        if (args.length > 24) {
-          const extra_27 = {
-            looping_sfx: Number(args[24]),
-            screenshake: Number(args[25]),
-            frame_screenshake: safeTags(args[26]),
-            frame_realization: safeTags(args[27]),
-            frame_sfx: safeTags(args[28]),
-          };
-          chatmsg = Object.assign(extra_27, chatmsg);
-
-          if (args.length > 29) {
-            const extra_28 = {
-              additive: Number(args[29]),
-              effects: args[30].split("|"),
-            };
-            chatmsg = Object.assign(extra_28, chatmsg);
-
-            if (args.length > 31) {
-              const extra_blips_slide = {
-                blips: safeTags(args[31]) || chatmsg.blips,
-                slide: Number(args[32] ?? 0),
-              };
-              chatmsg = Object.assign(extra_blips_slide, chatmsg);
-            }
-          } else {
-            const extra_28 = {
-              additive: 0,
-              effects: ["", "", ""],
-            };
-            chatmsg = Object.assign(extra_28, chatmsg);
-          }
-        } else {
-          const extra_27 = {
-            looping_sfx: 0,
-            screenshake: 0,
-            frame_screenshake: "",
-            frame_realization: "",
-            frame_sfx: "",
-          };
-          chatmsg = Object.assign(extra_27, chatmsg);
-          const extra_28 = {
-            additive: 0,
-            effects: ["", "", ""],
-          };
-          chatmsg = Object.assign(extra_28, chatmsg);
-        }
-      } else {
-        const extra_cccc = {
-          showname: "",
-          other_charid: 0,
-          other_name: "",
-          other_emote: "",
-          self_offset: [0, 0],
-          other_offset: [0, 0],
-          other_flip: 0,
-          noninterrupting_preanim: 0,
-        };
-        chatmsg = Object.assign(extra_cccc, chatmsg);
-        const extra_27 = {
-          looping_sfx: 0,
-          screenshake: 0,
-          frame_screenshake: "",
-          frame_realization: "",
-          frame_sfx: "",
-        };
-        chatmsg = Object.assign(extra_27, chatmsg);
-        const extra_28 = {
-          additive: 0,
-          effects: ["", "", ""],
-        };
-        chatmsg = Object.assign(extra_28, chatmsg);
-      }
-
-      if (chatmsg.content.trim() === "") {
-        //blankpost
-        chatmsg.content = "";
-        // empty string as chatbox means hide it
-        chatmsg.chatbox = "";
-      }
-
-      // our own message appeared, reset the buttons
-      if (chatmsg.charid === client.charID) {
-        resetICParams();
-      }
-
-      // Increment sequence and capture it for this message
-      currentMessageSequence++;
-      const thisMessageSequence = currentMessageSequence;
-
-      // Log message immediately to preserve order (before async preload)
-      appendICLog(
-        chatmsg.content,
-        chatmsg.showname,
-        chatmsg.nameplate,
+  // Char.ini resolution
+  if (charId < client.char_list_length && charId >= 0) {
+    if (client.chars[charId].name !== charName) {
+      console.info(
+        `${client.chars[charId].name} is iniediting to ${charName}`,
       );
-
-      // Check callword immediately as well
-      checkCallword(chatmsg.content, client.viewport.getSfxAudio());
-
-      // Preload all assets before rendering
-      const preloader = getAssetPreloader(client.emote_extensions);
-      const manifest = await preloader.preloadForMessage(chatmsg);
-
-      // Check if a newer message arrived during preload - if so, skip rendering this one
-      if (thisMessageSequence !== currentMessageSequence) {
-        console.debug("Skipping render for superseded message");
-        return;
-      }
-
-      chatmsg.preloadManifest = manifest;
-      chatmsg.preanimdelay = manifest.characters[0]?.preanimDuration ?? 0;
-
-      if (manifest.failedAssets.length > 0) {
-        console.warn("Failed to preload some assets:", manifest.failedAssets);
-      }
-
-      // Store chatmsg for dedup check
-      client.viewport.setChatmsg(chatmsg);
-
-      // Load AOML rules (cached after first load)
-      const aomlRules = await getAomlRules();
-
-      // Build the render sequence
-      const sequence = buildRenderSequence(
-        chatmsg,
-        manifest,
-        client.resources,
-        client.evidences,
-        aomlRules,
-        AO_HOST,
-        UPDATE_INTERVAL,
-        previousSide,
-      );
-
-      // Track side for next message's slide transition
-      previousSide = chatmsg.side;
-
-      // Cancel previous render if still running
-      currentRender?.cancel();
-
-      // Execute the new render sequence
-      const renderContext = client.viewport.getRenderContext();
-      currentRender = executeRenderSequence(sequence, renderContext);
+      const chargs = (`${charName}&` + "iniediter").split("&");
+      handleCharacterInfo(chargs, charId);
+    } else if (!client.chars[charId].inifile) {
+      ensureCharIni(charId);
     }
   }
+
+  let nameplate = charName;
+  let blips = "male";
+  let chatbox = "default";
+  let muted = false;
+
+  try { nameplate = client.chars[charId].showname; } catch (e) { /* keep default */ }
+  try { blips = client.chars[charId].blips; } catch (e) { /* keep default */ }
+  try { chatbox = client.chars[charId].chat; } catch (e) { /* keep default */ }
+  try { muted = client.chars[charId].muted; } catch (e) { /* keep default */ }
+
+  if (muted) return;
+
+  // Override blips with packet blips if provided
+  if (packet.packetBlips) {
+    blips = safeTags(packet.packetBlips);
+  }
+
+  const charIni: CharacterIniData = {
+    nameplate,
+    chatbox: packet.content.trim() === "" ? "" : chatbox,
+    blips,
+  };
+
+  // Our own message appeared, reset the buttons
+  if (charId === client.charID) {
+    resetICParams();
+  }
+
+  // Increment sequence and capture it for this message
+  currentMessageSequence++;
+  const thisMessageSequence = currentMessageSequence;
+
+  // Log message immediately to preserve order (before async preload)
+  appendICLog(
+    packet.content,
+    packet.showname,
+    charIni.nameplate,
+  );
+
+  // Check callword immediately as well
+  checkCallword(packet.content, client.viewport.getSfxAudio());
+
+  // Preload all assets before rendering
+  const preloader = getAssetPreloader(client.emote_extensions);
+  const manifest = await preloader.preloadForMessage(packet, charIni);
+
+  // Check if a newer message arrived during preload - if so, skip rendering this one
+  if (thisMessageSequence !== currentMessageSequence) {
+    console.debug("Skipping render for superseded message");
+    return;
+  }
+
+  if (manifest.failedAssets.length > 0) {
+    console.warn("Failed to preload some assets:", manifest.failedAssets);
+  }
+
+  // Load AOML rules (cached after first load)
+  const aomlRules = await getAomlRules();
+
+  // Build the render sequence
+  const sequence = buildRenderSequence(
+    packet,
+    charIni,
+    manifest,
+    client.resources,
+    client.evidences,
+    aomlRules,
+    AO_HOST,
+    UPDATE_INTERVAL,
+    previousSide,
+  );
+
+  // Track side for next message's slide transition
+  previousSide = packet.side;
+
+  // Cancel previous render if still running
+  currentRender?.cancel();
+
+  // Execute the new render sequence
+  const renderContext = client.viewport.getRenderContext();
+  currentRender = executeRenderSequence(sequence, renderContext);
 };

@@ -1,4 +1,5 @@
-import type { ChatMsg } from "./interfaces/ChatMsg";
+import type { MSPacket, CharacterIniData, CharacterOffset, TextColorName } from "../packets/parseMSPacket";
+import { TEXT_COLOR_NAMES } from "../packets/parseMSPacket";
 import type { PreloadManifest } from "../cache/types";
 import type {
   RenderSequence,
@@ -18,10 +19,7 @@ import type {
   OverlayEffect,
   SfxConfig,
   ParsedFrameEffects,
-  CharacterOffset,
-  TextColorName,
 } from "./interfaces/RenderSequence";
-import { TEXT_COLOR_NAMES } from "./interfaces/RenderSequence";
 import { SHOUTS } from "./constants/shouts";
 
 // ─── AOML Rules ──────────────────────────────────────
@@ -127,24 +125,25 @@ function parseFrameEffects(
   };
 }
 
-function parseOffset(offset: string[] | number[] | undefined): CharacterOffset {
+function parseOffset(offset: readonly number[] | undefined): CharacterOffset {
   if (!offset || offset.length < 2) return { x: 0, y: 0 };
   return { x: Number(offset[0]) || 0, y: Number(offset[1]) || 0 };
 }
 
 function buildCharacterTimelines(
-  chatmsg: ChatMsg,
+  packet: MSPacket,
   manifest: PreloadManifest,
+  resolvedSfx: string,
 ): CharacterTimeline[] {
   const timelines: CharacterTimeline[] = [];
 
   // Main character
   const mainSprites = manifest.characters[0];
   const hasPreanim =
-    chatmsg.type === 1 &&
-    chatmsg.preanim &&
-    chatmsg.preanim !== "-" &&
-    chatmsg.preanim !== "";
+    packet.emoteModifier === 1 &&
+    packet.preanim &&
+    packet.preanim !== "-" &&
+    packet.preanim !== "";
 
   const mainSteps: RenderStep[] = [];
 
@@ -152,16 +151,15 @@ function buildCharacterTimelines(
   let sfxConfig: SfxConfig | null = null;
   if (
     manifest.sfxUrl &&
-    chatmsg.sound !== "0" &&
-    chatmsg.sound !== "1" &&
-    chatmsg.sound !== "" &&
-    chatmsg.sound !== undefined &&
-    (chatmsg.type === 1 || chatmsg.type === 2 || chatmsg.type === 6)
+    resolvedSfx !== "0" &&
+    resolvedSfx !== "1" &&
+    resolvedSfx !== "" &&
+    (packet.emoteModifier === 1 || packet.emoteModifier === 2 || packet.emoteModifier === 6)
   ) {
     sfxConfig = {
       path: manifest.sfxUrl,
-      delayMs: chatmsg.snddelay || 0,
-      loop: !!chatmsg.looping_sfx,
+      delayMs: packet.sfxDelay || 0,
+      loop: packet.sfxLooping,
     };
   }
 
@@ -171,7 +169,7 @@ function buildCharacterTimelines(
       sprite: mainSprites.preanimUrl,
       talking: null,
       durationMs: mainSprites.preanimDuration || 0,
-      nonInterrupting: chatmsg.noninterrupting_preanim === 1,
+      nonInterrupting: packet.nonInterruptingPreanim,
       sfx: null,
     });
   }
@@ -185,20 +183,19 @@ function buildCharacterTimelines(
     sfx: sfxConfig,
   });
 
-  const frameEffectsData = (chatmsg as any);
   timelines.push({
     steps: mainSteps,
-    flip: chatmsg.flip === 1,
-    offset: parseOffset(chatmsg.self_offset),
+    flip: packet.flip,
+    offset: parseOffset(packet.selfOffset),
     frameEffects: parseFrameEffects(
-      frameEffectsData.frame_screenshake ?? "",
-      frameEffectsData.frame_realization ?? "",
-      frameEffectsData.frame_sfx ?? "",
+      packet.frameScreenshake,
+      packet.frameRealization,
+      packet.frameSfx,
     ),
   });
 
   // Pair character
-  if (chatmsg.other_name) {
+  if (packet.otherName) {
     const pairSprites = manifest.characters[1];
     timelines.push({
       steps: [
@@ -210,8 +207,8 @@ function buildCharacterTimelines(
           sfx: null,
         },
       ],
-      flip: chatmsg.other_flip === 1,
-      offset: parseOffset(chatmsg.other_offset),
+      flip: packet.otherFlip,
+      offset: parseOffset(packet.otherOffset),
       frameEffects: { screenshakeFrames: [], realizationFrames: [], sfxFrames: [] },
     });
   }
@@ -363,20 +360,20 @@ function colorsEqual(a: SegmentColor, b: SegmentColor): boolean {
 }
 
 function buildShoutPhase(
-  chatmsg: ChatMsg,
+  packet: MSPacket,
   manifest: PreloadManifest,
   resources: ShoutResources,
 ): ShoutPhase | null {
-  const objection = chatmsg.objection;
-  if (!objection || objection === 0) return null;
+  const shoutMod = packet.shoutModifier;
+  if (shoutMod === 0) return null;
 
-  const shoutName = SHOUTS[objection];
+  const shoutName = SHOUTS[shoutMod];
   if (!shoutName) return null;
 
-  if (objection === 4) {
+  if (shoutMod === 4) {
     // Custom shout
     const image = manifest.shoutImageUrl ??
-      `characters/${encodeURI(chatmsg.name!.toLowerCase())}/custom.gif`;
+      `characters/${encodeURI(packet.charName.toLowerCase())}/custom.gif`;
     const sound = manifest.shoutSoundUrl ?? "";
     return {
       image,
@@ -397,13 +394,13 @@ function buildShoutPhase(
   };
 }
 
-function buildPositionLayout(chatmsg: ChatMsg): PositionLayout {
-  const side = chatmsg.side;
-  const deskmod = Number(chatmsg.deskmod ?? 1);
-  const type = chatmsg.type ?? 0;
+function buildPositionLayout(packet: MSPacket): PositionLayout {
+  const side = packet.side;
+  const deskmod = packet.deskMod;
+  const emoteModifier = packet.emoteModifier;
 
   const useFullView = ["def", "pro", "wit"].includes(side);
-  const showSpeedlines = type === 5 || type === 6;
+  const showSpeedlines = emoteModifier === 5 || emoteModifier === 6;
 
   let deskDuringPreanim: boolean;
   let deskDuringSpeaking: boolean;
@@ -457,12 +454,12 @@ function buildPositionLayout(chatmsg: ChatMsg): PositionLayout {
   };
 }
 
-function buildChatboxDisplay(chatmsg: ChatMsg): ChatboxDisplay {
-  const content = chatmsg.content ?? "";
-  const chatbox = chatmsg.chatbox ?? "";
+function buildChatboxDisplay(packet: MSPacket, charIni: CharacterIniData): ChatboxDisplay {
+  const content = packet.content;
+  const chatbox = charIni.chatbox;
   const visible = content.trim() !== "" && chatbox !== "";
-  const showname = chatmsg.showname ?? "";
-  const nameplate = chatmsg.nameplate ?? "";
+  const showname = packet.showname;
+  const nameplate = charIni.nameplate;
 
   return {
     visible,
@@ -473,31 +470,31 @@ function buildChatboxDisplay(chatmsg: ChatMsg): ChatboxDisplay {
 }
 
 function buildEvidenceDisplay(
-  chatmsg: ChatMsg,
+  packet: MSPacket,
   evidences: { icon: string }[],
 ): EvidenceDisplay | null {
-  const evidence = chatmsg.evidence ?? 0;
+  const evidence = packet.evidence;
   if (evidence <= 0 || evidence > evidences.length) return null;
 
   return {
     iconPath: evidences[evidence - 1].icon,
-    position: chatmsg.side === "def" ? "right" : "left",
+    position: packet.side === "def" ? "right" : "left",
   };
 }
 
-function buildInitialEffects(chatmsg: ChatMsg): InitialEffects {
+function buildInitialEffects(packet: MSPacket): InitialEffects {
   return {
-    screenshake: chatmsg.screenshake === 1,
-    realization: chatmsg.flash === 1,
+    screenshake: packet.screenshake,
+    realization: packet.realization,
   };
 }
 
 function buildOverlayEffect(
-  chatmsg: ChatMsg,
+  packet: MSPacket,
   manifest: PreloadManifest,
 ): OverlayEffect | null {
-  const effects = chatmsg.effects;
-  if (!effects || !effects[0]) return null;
+  const effects = packet.effects;
+  if (!effects[0]) return null;
 
   const effectName = effects[0].toLowerCase();
   const badEffects = ["", "-", "none"];
@@ -521,18 +518,18 @@ function buildOverlayEffect(
 const PANORAMIC_SIDES = ["def", "pro", "wit"];
 
 function buildSlidePhase(
-  chatmsg: ChatMsg,
+  packet: MSPacket,
   previousSide: string,
 ): SlidePhase | null {
-  if (chatmsg.slide !== 1) return null;
-  if (previousSide === chatmsg.side) return null;
-  if (!PANORAMIC_SIDES.includes(previousSide) || !PANORAMIC_SIDES.includes(chatmsg.side)) return null;
+  if (packet.slide !== 1) return null;
+  if (previousSide === packet.side) return null;
+  if (!PANORAMIC_SIDES.includes(previousSide) || !PANORAMIC_SIDES.includes(packet.side)) return null;
   // Zoom emotes (5/6) never trigger slide
-  if (chatmsg.type === 5 || chatmsg.type === 6) return null;
+  if (packet.emoteModifier === 5 || packet.emoteModifier === 6) return null;
 
   return {
     fromSide: previousSide,
-    toSide: chatmsg.side,
+    toSide: packet.side,
     durationMs: 500,
     bookendDelayMs: 300,
   };
@@ -541,7 +538,8 @@ function buildSlidePhase(
 // ─── Main Builder ────────────────────────────────────
 
 export function buildRenderSequence(
-  chatmsg: ChatMsg,
+  packet: MSPacket,
+  charIni: CharacterIniData,
   manifest: PreloadManifest,
   resources: ShoutResources,
   evidences: { icon: string }[],
@@ -552,34 +550,33 @@ export function buildRenderSequence(
 ): RenderSequence {
   // Resolve blip URL from manifest or construct it
   const blipUrl = manifest.blipUrl ??
-    `${aoHost}sounds/blips/${encodeURI((chatmsg.blips ?? "male").toLowerCase())}.opus`;
+    `${aoHost}sounds/blips/${encodeURI((charIni.blips || "male").toLowerCase())}.opus`;
 
-  // Handle sound fallback from effects[2] (same as handleICSpeaking)
-  const soundChecks = ["0", "1", "", undefined];
-  if (soundChecks.some((check) => chatmsg.sound === check)) {
-    if (chatmsg.effects && chatmsg.effects[2]) {
-      chatmsg.sound = chatmsg.effects[2];
+  // Handle sound fallback from effects[2]
+  let resolvedSfx = packet.sfx;
+  const soundChecks = ["0", "1", ""];
+  if (soundChecks.includes(resolvedSfx)) {
+    if (packet.effects[2]) {
+      resolvedSfx = packet.effects[2];
     }
   }
 
-  const additive = !!(chatmsg as any).additive;
-
   return {
-    characters: buildCharacterTimelines(chatmsg, manifest),
-    layout: buildPositionLayout(chatmsg),
-    chatbox: buildChatboxDisplay(chatmsg),
+    characters: buildCharacterTimelines(packet, manifest, resolvedSfx),
+    layout: buildPositionLayout(packet),
+    chatbox: buildChatboxDisplay(packet, charIni),
     text: buildTextDisplay(
-      chatmsg.content,
-      chatmsg.color,
+      packet.content,
+      packet.textColor,
       aomlRules,
       baseTickMs,
       blipUrl,
-      additive,
+      packet.additive,
     ),
-    shout: buildShoutPhase(chatmsg, manifest, resources),
-    slide: buildSlidePhase(chatmsg, previousSide),
-    evidence: buildEvidenceDisplay(chatmsg, evidences),
-    initialEffects: buildInitialEffects(chatmsg),
-    overlay: buildOverlayEffect(chatmsg, manifest),
+    shout: buildShoutPhase(packet, manifest, resources),
+    slide: buildSlidePhase(packet, previousSide),
+    evidence: buildEvidenceDisplay(packet, evidences),
+    initialEffects: buildInitialEffects(packet),
+    overlay: buildOverlayEffect(packet, manifest),
   };
 }

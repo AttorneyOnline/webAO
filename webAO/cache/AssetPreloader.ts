@@ -1,7 +1,7 @@
 import { AssetCache } from "./AssetCache";
 import { UrlResolver } from "./UrlResolver";
 import { CharacterSpriteUrls, PreloadManifest } from "./types";
-import { ChatMsg } from "../viewport/interfaces/ChatMsg";
+import type { MSPacket, CharacterIniData } from "../packets/parseMSPacket";
 import calculatorHandler from "../utils/calculatorHandler";
 
 export interface AssetPreloaderConfig {
@@ -33,7 +33,7 @@ export class AssetPreloader {
     return { idleUrl: null, talkingUrl: null, preanimUrl: null, preanimDuration: 0 };
   }
 
-  async preloadForMessage(chatmsg: ChatMsg): Promise<PreloadManifest> {
+  async preloadForMessage(packet: MSPacket, charIni: CharacterIniData): Promise<PreloadManifest> {
     const speakerSprites = this.makeCharSpriteUrls();
     const manifest: PreloadManifest = {
       characters: [speakerSprites],
@@ -47,10 +47,9 @@ export class AssetPreloader {
     };
 
     const charFolder = `${this.aoHost}characters/`;
-    const charName = chatmsg.name?.toLowerCase() ?? "";
-    const emoteName = chatmsg.sprite?.toLowerCase() ?? "";
-    const preanim = chatmsg.preanim?.toLowerCase() ?? "";
-    const side = chatmsg.side ?? "";
+    const charName = packet.charName.toLowerCase();
+    const emoteName = packet.emote.toLowerCase();
+    const preanim = packet.preanim.toLowerCase();
 
     const resolutionPromises: Promise<void>[] = [];
 
@@ -62,43 +61,43 @@ export class AssetPreloader {
       this.resolveCharTalking(charFolder, charName, emoteName, speakerSprites),
     );
 
-    if (chatmsg.type === 1 && preanim && preanim !== "-") {
+    if (packet.emoteModifier === 1 && preanim && preanim !== "-") {
       resolutionPromises.push(
         this.resolveCharPreanim(charFolder, charName, preanim, speakerSprites),
       );
     }
 
-    if (chatmsg.other_name) {
+    if (packet.otherName) {
       const pairedSprites = this.makeCharSpriteUrls();
       manifest.characters.push(pairedSprites);
       resolutionPromises.push(
         this.resolveCharIdle(
           charFolder,
-          chatmsg.other_name.toLowerCase(),
-          chatmsg.other_emote?.toLowerCase() ?? "",
+          packet.otherName.toLowerCase(),
+          packet.otherEmote.toLowerCase(),
           pairedSprites,
         ),
       );
     }
 
-    if (chatmsg.objection && chatmsg.objection > 0 && chatmsg.objection <= 4) {
+    if (packet.shoutModifier > 0 && packet.shoutModifier <= 4) {
       resolutionPromises.push(
-        this.resolveShout(charName, chatmsg.objection, manifest),
+        this.resolveShout(charName, packet.shoutModifier, manifest),
       );
     }
 
-    resolutionPromises.push(this.resolveBlip(chatmsg.blips, manifest));
+    resolutionPromises.push(this.resolveBlip(charIni.blips, manifest));
 
     if (
-      chatmsg.sound &&
-      chatmsg.sound !== "0" &&
-      chatmsg.sound !== "1" &&
-      chatmsg.sound !== ""
+      packet.sfx &&
+      packet.sfx !== "0" &&
+      packet.sfx !== "1" &&
+      packet.sfx !== ""
     ) {
-      resolutionPromises.push(this.resolveSfx(chatmsg.sound, manifest));
+      resolutionPromises.push(this.resolveSfx(packet.sfx, manifest));
     }
 
-    const effectName = chatmsg.effects?.[0]?.toLowerCase() ?? "";
+    const effectName = packet.effects[0]?.toLowerCase() ?? "";
     const badEffects = ["", "-", "none"];
     if (effectName && !badEffects.includes(effectName) && !effectName.startsWith("rain")) {
       resolutionPromises.push(this.resolveEffect(effectName, manifest));

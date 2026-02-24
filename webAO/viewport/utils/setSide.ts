@@ -1,4 +1,4 @@
-import { positions } from "../constants/positions";
+import { positions, type Position } from "../positions";
 import { AO_HOST } from "../../client/aoHost";
 import { client } from "../../client";
 import findImgSrc from "../../utils/findImgSrc";
@@ -64,10 +64,11 @@ export const set_side = async ({
   let desk;
   let speedLines;
 
-  if ("def,pro,hld,hlp,wit,jud,jur,sea".includes(position)) {
-    bg = positions[position].bg;
-    desk = positions[position].desk;
-    speedLines = positions[position].speedLines;
+  if (position in positions) {
+    const pos = positions[position as Position];
+    bg = pos.bg;
+    desk = pos.desk;
+    speedLines = pos.speedLines;
   } else {
     bg = `${position}`;
     desk = { ao2: `${position}_overlay.png`, ao1: "_overlay.png" };
