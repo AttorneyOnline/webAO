@@ -137,6 +137,12 @@ export interface PositionLayout {
   readonly deskDuringSpeaking: boolean;
   /** True for desk modifier 4/5 (ignore offset) */
   readonly skipOffset: boolean;
+  /** Background image URL for classic view, or null if not resolved */
+  readonly backgroundUrl: string | null;
+  /** Resolved desk overlay image URL, or null if position has no desk */
+  readonly deskUrl: string | null;
+  /** Speed-lines animation URL when showSpeedlines is true */
+  readonly speedLinesUrl: string | null;
 }
 
 // ─── Chatbox Display ─────────────────────────────────

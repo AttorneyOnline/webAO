@@ -102,8 +102,9 @@ export const handleMS = async (args: string[]) => {
   checkCallword(packet.content, client.viewport.getSfxAudio());
 
   // Preload all assets before rendering
-  const preloader = getAssetPreloader(client.emote_extensions);
-  const manifest = await preloader.preloadForMessage(packet, charIni);
+  const bgName = client.viewport.getBackgroundName();
+  const preloader = getAssetPreloader(client.emote_extensions, undefined, client.background_extensions);
+  const manifest = await preloader.preloadForMessage(packet, charIni, bgName);
 
   // Check if a newer message arrived during preload - if so, skip rendering this one
   if (thisMessageSequence !== currentMessageSequence) {

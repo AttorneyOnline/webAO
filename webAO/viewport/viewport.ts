@@ -98,7 +98,6 @@ const viewport = (): Viewport => {
     shoutAudio: shoutaudio,
     testimonyAudio,
     playSFX,
-    setSide: set_side,
     getLastCharacter,
     setLastCharacter,
     getLastEvidence,

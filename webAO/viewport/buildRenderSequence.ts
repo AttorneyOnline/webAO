@@ -389,7 +389,7 @@ function buildShoutPhase(
   };
 }
 
-function buildPositionLayout(packet: MSPacket): PositionLayout {
+function buildPositionLayout(packet: MSPacket, manifest: PreloadManifest): PositionLayout {
   const side = packet.side;
   const deskmod = packet.deskMod;
   const emoteModifier = packet.emoteModifier;
@@ -447,6 +447,9 @@ function buildPositionLayout(packet: MSPacket): PositionLayout {
     deskDuringPreanim,
     deskDuringSpeaking,
     skipOffset,
+    backgroundUrl: manifest.backgroundUrl,
+    deskUrl: manifest.deskUrl,
+    speedLinesUrl: manifest.speedLinesUrl,
   };
 }
 
@@ -557,7 +560,7 @@ export function buildRenderSequence(
 
   return {
     characters: buildCharacterTimelines(packet, manifest, resolvedSfx),
-    layout: buildPositionLayout(packet),
+    layout: buildPositionLayout(packet, manifest),
     chatbox: buildChatboxDisplay(packet, charIni),
     text: buildTextDisplay(
       packet.content,

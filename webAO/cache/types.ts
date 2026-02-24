@@ -25,6 +25,9 @@ export interface PreloadManifest {
   sfxUrl: string | null;
   blipUrl: string | null;
   effectUrl: string | null;
+  backgroundUrl: string | null;
+  deskUrl: string | null;
+  speedLinesUrl: string | null;
   allResolved: boolean;
   failedAssets: string[];
 }

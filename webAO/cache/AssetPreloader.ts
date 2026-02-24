@@ -5,6 +5,7 @@ import { EmoteModifier, ShoutModifier } from "../packets/parseMSPacket";
 import type { MSPacket } from "../packets/parseMSPacket";
 import type { CharIni } from "../client/CharIni";
 import { getShoutConfig } from "../viewport/constants/shouts";
+import { positions, type Position } from "../viewport/positions";
 import calculatorHandler from "../utils/calculatorHandler";
 
 export interface AssetPreloaderConfig {
@@ -13,6 +14,7 @@ export interface AssetPreloaderConfig {
   aoHost: string;
   emoteExtensions: string[];
   animationExtensions: string[];
+  backgroundExtensions: string[];
 }
 
 export class AssetPreloader {
@@ -21,6 +23,7 @@ export class AssetPreloader {
   private aoHost: string;
   private emoteExtensions: string[];
   private animationExtensions: string[];
+  private backgroundExtensions: string[];
 
   constructor(config: AssetPreloaderConfig) {
     this.cache = config.cache;
@@ -28,13 +31,14 @@ export class AssetPreloader {
     this.aoHost = config.aoHost;
     this.emoteExtensions = config.emoteExtensions;
     this.animationExtensions = config.animationExtensions;
+    this.backgroundExtensions = config.backgroundExtensions;
   }
 
   private makeCharSpriteUrls(): CharacterSpriteUrls {
     return { idleUrl: null, talkingUrl: null, preanimUrl: null, preanimDuration: 0 };
   }
 
-  async preloadForMessage(packet: MSPacket, charIni: CharIni): Promise<PreloadManifest> {
+  async preloadForMessage(packet: MSPacket, charIni: CharIni, bgName: string): Promise<PreloadManifest> {
     const speakerSprites = this.makeCharSpriteUrls();
     const manifest: PreloadManifest = {
       characters: [speakerSprites],
@@ -43,6 +47,9 @@ export class AssetPreloader {
       sfxUrl: null,
       blipUrl: null,
       effectUrl: null,
+      backgroundUrl: null,
+      deskUrl: null,
+      speedLinesUrl: null,
       allResolved: true,
       failedAssets: [],
     };
@@ -104,6 +111,10 @@ export class AssetPreloader {
       resolutionPromises.push(this.resolveEffect(effectName, manifest));
     }
 
+    resolutionPromises.push(
+      this.resolveBackgroundAssets(packet.side, bgName, manifest),
+    );
+
     await Promise.all(resolutionPromises);
 
     manifest.allResolved = manifest.failedAssets.length === 0;
@@ -145,6 +156,16 @@ export class AssetPreloader {
     if (manifest.blipUrl) {
       preloadPromises.push(
         this.cache.preloadAudio(manifest.blipUrl).then(() => {}),
+      );
+    }
+    if (manifest.backgroundUrl) {
+      preloadPromises.push(
+        this.cache.preloadImage(manifest.backgroundUrl).then(() => {}),
+      );
+    }
+    if (manifest.deskUrl) {
+      preloadPromises.push(
+        this.cache.preloadImage(manifest.deskUrl).then(() => {}),
       );
     }
 
@@ -285,6 +306,79 @@ export class AssetPreloader {
 
     if (exists) {
       manifest.effectUrl = effectUrl;
+    }
+  }
+
+  private async resolveBackgroundAssets(
+    side: string,
+    bgName: string,
+    manifest: PreloadManifest,
+  ): Promise<void> {
+    let bg: string;
+    let desk: { ao2?: string; ao1?: string } | undefined;
+    let speedLines: string;
+
+    if (side in positions) {
+      const pos = positions[side as Position];
+      bg = pos.bg ?? side;
+      desk = pos.desk;
+      speedLines = pos.speedLines;
+    } else {
+      bg = side;
+      desk = { ao2: `${side}_overlay.png`, ao1: "_overlay.png" };
+      speedLines = "defense_speedlines.gif";
+    }
+
+    manifest.speedLinesUrl = `${this.aoHost}themes/default/${encodeURI(speedLines)}`;
+
+    await Promise.all([
+      this.resolveBackground(bgName, bg, manifest),
+      this.resolveDesk(bgName, desk, manifest),
+    ]);
+  }
+
+  private async resolveBackground(
+    bgName: string,
+    positionBg: string,
+    manifest: PreloadManifest,
+  ): Promise<void> {
+    const bgFolder = `${this.aoHost}background/${encodeURI(bgName.toLowerCase())}/`;
+
+    for (const ext of this.backgroundExtensions) {
+      const url = `${bgFolder}${positionBg}${ext}`;
+      const exists = await this.cache.checkExists(url);
+      if (exists) {
+        manifest.backgroundUrl = url;
+        return;
+      }
+    }
+  }
+
+  private async resolveDesk(
+    bgName: string,
+    desk: { ao2?: string; ao1?: string } | undefined,
+    manifest: PreloadManifest,
+  ): Promise<void> {
+    if (!desk) return;
+
+    const bgFolder = `${this.aoHost}background/${encodeURI(bgName.toLowerCase())}/`;
+
+    if (desk.ao2) {
+      const url = `${bgFolder}${desk.ao2}`;
+      const exists = await this.cache.checkExists(url);
+      if (exists) {
+        manifest.deskUrl = url;
+        return;
+      }
+    }
+
+    if (desk.ao1) {
+      const url = `${bgFolder}${desk.ao1}`;
+      const exists = await this.cache.checkExists(url);
+      if (exists) {
+        manifest.deskUrl = url;
+        return;
+      }
     }
   }
 }

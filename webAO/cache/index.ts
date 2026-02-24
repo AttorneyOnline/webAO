@@ -23,6 +23,7 @@ let assetPreloaderInstance: AssetPreloader | null = null;
 export const getAssetPreloader = (
   emoteExtensions: string[],
   animationExtensions: string[] = [".gif", ".webp", ".apng"],
+  backgroundExtensions: string[] = [".png", ".gif"],
 ): AssetPreloader => {
   if (!assetPreloaderInstance) {
     assetPreloaderInstance = new AssetPreloader({
@@ -31,6 +32,7 @@ export const getAssetPreloader = (
       aoHost: AO_HOST,
       emoteExtensions,
       animationExtensions,
+      backgroundExtensions,
     });
   }
   return assetPreloaderInstance;

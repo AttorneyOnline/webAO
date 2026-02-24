@@ -17,7 +17,6 @@ export interface RenderContext {
   shoutAudio: HTMLAudioElement;
   testimonyAudio: HTMLAudioElement;
   playSFX(url: string, loop: boolean): void;
-  setSide(opts: { position: string; showSpeedLines: boolean; showDesk: boolean }): void;
   getLastCharacter(): string;
   setLastCharacter(name: string): void;
   getLastEvidence(): number;
@@ -53,6 +52,20 @@ function getCharImg(side: string): HTMLImageElement {
 function getPairImg(side: string): HTMLImageElement {
   const prefix = ["def", "pro", "wit"].includes(side) ? `${side}_` : "";
   return document.getElementById(`client_${prefix}pair_img`) as HTMLImageElement;
+}
+
+function getBench(side: string): HTMLImageElement {
+  if (["def", "pro", "wit"].includes(side)) {
+    return document.getElementById(`client_${side}_bench`) as HTMLImageElement;
+  }
+  return document.getElementById("client_bench_classic") as HTMLImageElement;
+}
+
+function getCourt(side: string): HTMLImageElement {
+  if (["def", "pro", "wit"].includes(side)) {
+    return document.getElementById(`client_court_${side}`) as HTMLImageElement;
+  }
+  return document.getElementById("client_court_classic") as HTMLImageElement;
 }
 
 // ─── Executor ────────────────────────────────────────
@@ -111,12 +124,36 @@ export function executeRenderSequence(
     ctx.setLastEvidence(seq.evidence ? 1 : 0);
 
     // ── Phase 2: Layout ─────────────────────────────
-    // Set side/desk/speedlines for initial state
-    ctx.setSide({
-      position: side,
-      showSpeedLines: seq.layout.showSpeedlines,
-      showDesk: seq.layout.deskDuringPreanim,
-    });
+    const fullview = document.getElementById("client_fullview")!;
+    const classicview = document.getElementById("client_classicview")!;
+    const bench = getBench(side);
+    const court = getCourt(side);
+
+    // View switching
+    if (seq.layout.useFullView) {
+      fullview.style.display = "";
+      classicview.style.display = "none";
+      const panOffsets: Record<string, string> = { def: "0", wit: "-200%", pro: "-400%" };
+      fullview.style.left = panOffsets[side] ?? "0";
+    } else {
+      fullview.style.display = "none";
+      classicview.style.display = "";
+    }
+
+    // Background
+    if (seq.layout.showSpeedlines && seq.layout.speedLinesUrl) {
+      court.src = seq.layout.speedLinesUrl;
+    } else if (seq.layout.backgroundUrl) {
+      court.src = seq.layout.backgroundUrl;
+    }
+
+    // Desk (preanim phase)
+    if (seq.layout.deskDuringPreanim && seq.layout.deskUrl) {
+      bench.src = seq.layout.deskUrl;
+      bench.style.opacity = "1";
+    } else {
+      bench.style.opacity = "0";
+    }
 
     // Character name change detection
     const mainTimeline = seq.characters[0];
@@ -333,14 +370,19 @@ export function executeRenderSequence(
     }
 
     // ── Phase 8: Speaking ───────────────────────────
-    // Switch to speaking desk mode
-    ctx.setSide({
-      position: side,
-      showSpeedLines: false,
-      showDesk: seq.layout.deskDuringSpeaking,
-    });
+    // Speed lines off for speaking
+    if (!seq.layout.showSpeedlines && seq.layout.backgroundUrl) {
+      court.src = seq.layout.backgroundUrl;
+    }
 
-    // Transition desk for deskmod 2/3
+    // Desk (speaking phase)
+    if (seq.layout.deskDuringSpeaking && seq.layout.deskUrl) {
+      bench.src = seq.layout.deskUrl;
+      bench.style.opacity = "1";
+    } else {
+      bench.style.opacity = "0";
+    }
+
     shoutSprite.style.display = "none";
     shoutSprite.style.animation = "";
 
