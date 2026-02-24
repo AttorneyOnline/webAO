@@ -1,5 +1,5 @@
 import { DeskMod, EmoteModifier, ShoutModifier, TextColor, textColorName } from "../packets/parseMSPacket";
-import type { MSPacket, CharacterOffset, TextColorName } from "../packets/parseMSPacket";
+import type { MSPacket, TextColorName } from "../packets/parseMSPacket";
 import type { CharIni } from "../client/CharIni";
 import type { PreloadManifest } from "../cache/types";
 import type {
@@ -120,11 +120,6 @@ function parseFrameEffects(
   };
 }
 
-function parseOffset(offset: readonly number[] | undefined): CharacterOffset {
-  if (!offset || offset.length < 2) return { x: 0, y: 0 };
-  return { x: Number(offset[0]) || 0, y: Number(offset[1]) || 0 };
-}
-
 function buildCharacterTimelines(
   packet: MSPacket,
   manifest: PreloadManifest,
@@ -188,7 +183,7 @@ function buildCharacterTimelines(
   timelines.push({
     steps: mainSteps,
     flip: packet.flip,
-    offset: parseOffset(packet.selfOffset),
+    offset: packet.selfOffset,
     frameEffects: parseFrameEffects(
       packet.frameScreenshake,
       packet.frameRealization,
@@ -210,7 +205,7 @@ function buildCharacterTimelines(
         },
       ],
       flip: packet.otherFlip,
-      offset: parseOffset(packet.otherOffset),
+      offset: packet.otherOffset,
       frameEffects: { screenshakeFrames: [], realizationFrames: [], sfxFrames: [] },
     });
   }

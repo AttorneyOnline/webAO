@@ -61,6 +61,11 @@ export interface CharacterOffset {
   readonly y: number;
 }
 
+function parseOffset(raw: string): CharacterOffset {
+  const parts = raw.split("<and>");
+  return { x: Number(parts[0]) || 0, y: Number(parts[1]) || 0 };
+}
+
 // ─── MSPacket Interface ──────────────────────────────
 
 /**
@@ -88,8 +93,8 @@ export interface MSPacket {
   readonly otherCharId: number;
   readonly otherName: string;
   readonly otherEmote: string;
-  readonly selfOffset: readonly number[];
-  readonly otherOffset: readonly number[];
+  readonly selfOffset: CharacterOffset;
+  readonly otherOffset: CharacterOffset;
   readonly otherFlip: boolean;
   readonly nonInterruptingPreanim: boolean;
   readonly sfxLooping: boolean;
@@ -134,8 +139,8 @@ export function parseMSPacket(args: readonly string[]): MSPacket {
       otherCharId: 0,
       otherName: "",
       otherEmote: "",
-      selfOffset: [0, 0],
-      otherOffset: [0, 0],
+      selfOffset: { x: 0, y: 0 },
+      otherOffset: { x: 0, y: 0 },
       otherFlip: false,
       nonInterruptingPreanim: false,
       sfxLooping: false,
@@ -155,8 +160,8 @@ export function parseMSPacket(args: readonly string[]): MSPacket {
     otherCharId: Number(args[17]),
     otherName: safeTags(args[18]),
     otherEmote: safeTags(args[19]),
-    selfOffset: args[20].split("<and>").map(Number),
-    otherOffset: args[21].split("<and>").map(Number),
+    selfOffset: parseOffset(args[20]),
+    otherOffset: parseOffset(args[21]),
     otherFlip: Number(args[22]) !== 0,
     nonInterruptingPreanim: Number(args[23]) !== 0,
   };
