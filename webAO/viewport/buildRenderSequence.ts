@@ -451,7 +451,7 @@ function buildPositionLayout(packet: MSPacket, manifest: PreloadManifest): Posit
 function buildChatboxDisplay(packet: MSPacket, charIni: CharIni): ChatboxDisplay {
   const content = packet.content;
   const chat = charIni.chat;
-  const visible = content.trim() !== "" && chat !== "";
+  const visible = content.trim() !== "";
   const showname = packet.showname;
 
   return {

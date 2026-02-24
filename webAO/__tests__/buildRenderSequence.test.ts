@@ -222,6 +222,34 @@ describe("buildRenderSequence", () => {
     });
   });
 
+  describe("chatbox", () => {
+    it("is visible when content is non-empty", () => {
+      const seq = build(makeArgs({ 5: "Hello world" }));
+      expect(seq.chatbox.visible).toBe(true);
+    });
+
+    it("is visible even when charIni has empty chat field", () => {
+      // char.ini with no chat/category resolves to chat: ""
+      // Chatbox should still show — chat field is about the skin, not visibility
+      const packet = parseMSPacket(makeArgs({ 5: "Hello world" }));
+      const charIni = { ...defaultCharIni("Test"), chat: "" };
+      const seq = buildRenderSequence(
+        packet, charIni, makeManifest(), [], EMPTY_AOML, AO_HOST, TICK_MS, "",
+      );
+      expect(seq.chatbox.visible).toBe(true);
+    });
+
+    it("is hidden for blank posts", () => {
+      const seq = build(makeArgs({ 5: "" }));
+      expect(seq.chatbox.visible).toBe(false);
+    });
+
+    it("is hidden for whitespace-only posts", () => {
+      const seq = build(makeArgs({ 5: "   " }));
+      expect(seq.chatbox.visible).toBe(false);
+    });
+  });
+
   describe("text", () => {
     it("parses text content into segments", () => {
       const seq = build(makeArgs({ 5: "Hello" }));
