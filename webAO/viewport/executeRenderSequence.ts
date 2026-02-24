@@ -74,6 +74,7 @@ export function executeRenderSequence(
   seq: RenderSequence,
   ctx: RenderContext,
 ): RenderHandle {
+  console.log("[RenderSequence]", seq);
   let cancelled = false;
   let resolvePromise: () => void;
   const done = new Promise<void>((resolve) => {
