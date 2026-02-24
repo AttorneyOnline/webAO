@@ -4,11 +4,11 @@ import type {
   CharacterOffset,
   CharacterIniData,
 } from "../../packets/parseMSPacket";
-import { TEXT_COLOR_NAMES } from "../../packets/parseMSPacket";
+import { textColorName } from "../../packets/parseMSPacket";
 
 // Re-export MS packet types used by the render pipeline
 export type { Position, TextColorName, CharacterOffset, CharacterIniData };
-export { TEXT_COLOR_NAMES };
+export { textColorName };
 
 // ─── Pre-Parsed Text ─────────────────────────────────
 

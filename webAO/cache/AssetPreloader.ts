@@ -1,7 +1,9 @@
 import { AssetCache } from "./AssetCache";
 import { UrlResolver } from "./UrlResolver";
 import { CharacterSpriteUrls, PreloadManifest } from "./types";
+import { EmoteModifier, ShoutModifier } from "../packets/parseMSPacket";
 import type { MSPacket, CharacterIniData } from "../packets/parseMSPacket";
+import { getShoutConfig } from "../viewport/constants/shouts";
 import calculatorHandler from "../utils/calculatorHandler";
 
 export interface AssetPreloaderConfig {
@@ -11,8 +13,6 @@ export interface AssetPreloaderConfig {
   emoteExtensions: string[];
   animationExtensions: string[];
 }
-
-const SHOUTS: readonly [undefined, "holdit", "objection", "takethat", "custom"] = [undefined, "holdit", "objection", "takethat", "custom"] as const;
 
 export class AssetPreloader {
   private cache: AssetCache;
@@ -61,7 +61,7 @@ export class AssetPreloader {
       this.resolveCharTalking(charFolder, charName, emoteName, speakerSprites),
     );
 
-    if (packet.emoteModifier === 1 && preanim && preanim !== "-") {
+    if (packet.emoteModifier === EmoteModifier.PreanimWithSfx && preanim && preanim !== "-") {
       resolutionPromises.push(
         this.resolveCharPreanim(charFolder, charName, preanim, speakerSprites),
       );
@@ -80,7 +80,7 @@ export class AssetPreloader {
       );
     }
 
-    if (packet.shoutModifier > 0 && packet.shoutModifier <= 4) {
+    if (packet.shoutModifier !== ShoutModifier.None && packet.shoutModifier <= ShoutModifier.Custom) {
       resolutionPromises.push(
         this.resolveShout(charName, packet.shoutModifier, manifest),
       );
@@ -229,17 +229,17 @@ export class AssetPreloader {
 
   private async resolveShout(
     charName: string,
-    objection: number,
+    modifier: ShoutModifier,
     manifest: PreloadManifest,
   ): Promise<void> {
-    const shout = SHOUTS[objection];
-    if (!shout) return;
+    const result = getShoutConfig(modifier);
+    if (!result) return;
 
-    if (objection === 4) {
+    if (modifier === ShoutModifier.Custom) {
       manifest.shoutImageUrl = `${this.aoHost}characters/${encodeURI(charName)}/custom.gif`;
     }
 
-    const perCharPath = `${this.aoHost}characters/${encodeURI(charName)}/${shout}.opus`;
+    const perCharPath = `${this.aoHost}characters/${encodeURI(charName)}/${result.name}.opus`;
     const exists = await this.cache.checkExists(perCharPath);
 
     if (exists) {

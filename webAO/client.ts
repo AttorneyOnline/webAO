@@ -7,11 +7,11 @@ import { isLowMemory } from "./client/isLowMemory";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { sender, ISender } from "./client/sender/index";
 import queryParser from "./utils/queryParser";
-import getResources from "./utils/getResources.js";
 import masterViewport from "./viewport/viewport";
 import { Viewport } from "./viewport/interfaces/Viewport";
 import { EventEmitter } from "events";
 import { onReplayGo } from "./dom/onReplayGo";
+import type { Testimony } from "./viewport/constants/testimony";
 import { packetHandler } from "./packets/packetHandler";
 import { loadResources } from "./client/loadResources";
 import { AO_HOST } from "./client/aoHost";
@@ -125,7 +125,7 @@ class Client extends EventEmitter {
   char_list_length: number;
   evidence_list_length: number;
   music_list_length: number;
-  testimonyID: number;
+  testimony: Testimony | null;
   chars: any;
   emotes: any;
   evidences: any;
@@ -137,7 +137,6 @@ class Client extends EventEmitter {
   enableCaptcha: boolean;
   banned: boolean;
   hdid: string;
-  resources: any;
   selectedEmote: number;
   selectedEvidence: number;
   sender: ISender;
@@ -193,7 +192,7 @@ class Client extends EventEmitter {
     this.char_list_length = 0;
     this.evidence_list_length = 0;
     this.music_list_length = 0;
-    this.testimonyID = 0;
+    this.testimony = null;
     this.chars = [];
     this.emotes = [];
     this.evidences = [];
@@ -202,7 +201,7 @@ class Client extends EventEmitter {
     this.musics = [];
     this.musics_time = false;
     this.callwords = [];
-    this.resources = getResources(AO_HOST, theme);
+
     this.selectedEmote = -1;
     this.selectedEvidence = -1;
     this.checkUpdater = null;

@@ -7,7 +7,7 @@ import { createMusic } from "./utils/createMusic";
 import { createSfxAudio } from "./utils/createSfxAudio";
 import { createShoutAudio } from "./utils/createShoutAudio";
 import { createTestimonyAudio } from "./utils/createTestimonyAudio";
-import { Testimony } from "./interfaces/Testimony";
+import { testimonies } from "./constants/testimony";
 import { set_side } from "./utils/setSide";
 import type { RenderContext } from "./executeRenderSequence";
 
@@ -65,24 +65,16 @@ const viewport = (): Viewport => {
    * Updates the testimony overlay
    */
   const updateTestimony = () => {
-    const testimonyFilenames: Testimony = {
-      1: "witnesstestimony",
-      2: "crossexamination",
-      3: "notguilty",
-      4: "guilty",
-    };
-
     // Update timer
     testimonyTimer += UPDATE_INTERVAL;
 
-    const testimony = testimonyFilenames[client.testimonyID];
-    const resource = client.resources[testimony];
-    if (!resource) {
+    if (!client.testimony) {
       disposeTestimony();
       return;
     }
 
-    if (testimonyTimer >= resource.duration) {
+    const config = testimonies[client.testimony];
+    if (testimonyTimer >= config.duration) {
       disposeTestimony();
     } else {
       testimonyUpdater = setTimeout(() => updateTestimony(), UPDATE_INTERVAL);
@@ -93,7 +85,7 @@ const viewport = (): Viewport => {
    * Dispose the testimony overlay
    */
   const disposeTestimony = () => {
-    client.testimonyID = 0;
+    client.testimony = null;
     testimonyTimer = 0;
     document.getElementById("client_testimony").style.opacity = "0";
     clearTimeout(testimonyUpdater);

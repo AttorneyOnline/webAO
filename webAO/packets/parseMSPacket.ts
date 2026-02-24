@@ -32,7 +32,7 @@ export const enum ShoutModifier {
 }
 
 /** MS field 14: Text color index. Blue (4) disables talking animation. */
-export const enum TextColor {
+export enum TextColor {
   White = 0,
   Green = 1,
   Red = 2,
@@ -45,23 +45,13 @@ export const enum TextColor {
   Rainbow = 9,
 }
 
-// ─── Text Color Names ────────────────────────────────
+export type TextColorName = Lowercase<keyof typeof TextColor>;
 
-/** Text color names matching the existing COLORS constant array */
-export const TEXT_COLOR_NAMES = [
-  "white",
-  "green",
-  "red",
-  "orange",
-  "blue",
-  "yellow",
-  "pink",
-  "cyan",
-  "grey",
-  "rainbow",
-] as const;
-
-export type TextColorName = (typeof TEXT_COLOR_NAMES)[number];
+/** Look up the CSS color name for a TextColor index. Returns "white" for unknown values. */
+export function textColorName(color: TextColor): TextColorName {
+  const name = TextColor[color];
+  return (name ? name.toLowerCase() : "white") as TextColorName;
+}
 
 // ─── Character Data ──────────────────────────────────
 

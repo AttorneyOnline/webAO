@@ -1,29 +1,25 @@
-import { Testimony } from "../interfaces/Testimony";
 import { client, UPDATE_INTERVAL } from "../../client";
+import { AO_HOST } from "../../client/aoHost";
+import { testimonies } from "../constants/testimony";
 /**
- * Intialize testimony updater
+ * Initialize testimony updater
  */
 export const initTestimonyUpdater = () => {
-  const testimonyFilenames: Testimony = {
-    1: "witnesstestimony",
-    2: "crossexamination",
-    3: "notguilty",
-    4: "guilty",
-  };
-
-  const testimony = testimonyFilenames[client.testimonyID];
-  if (!testimony) {
-    console.warn(`Invalid testimony ID ${client.testimonyID}`);
+  if (!client.testimony) {
+    console.warn("No active testimony to initialize");
     return;
   }
 
-  client.viewport.testimonyAudio.src = client.resources[testimony].sfx;
+  const config = testimonies[client.testimony];
+  const theme = client.viewport.getTheme();
+
+  client.viewport.testimonyAudio.src = `${AO_HOST}${config.sfx}`;
   client.viewport.testimonyAudio.play().catch(() => {});
 
   const testimonyOverlay = <HTMLImageElement>(
     document.getElementById("client_testimony")
   );
-  testimonyOverlay.src = client.resources[testimony].src;
+  testimonyOverlay.src = `${AO_HOST}themes/${theme}/${config.image}`;
   testimonyOverlay.style.opacity = "1";
 
   client.viewport.setTestimonyTimer(0);

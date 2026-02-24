@@ -1,5 +1,5 @@
+import { DeskMod, EmoteModifier, ShoutModifier, TextColor, textColorName } from "../packets/parseMSPacket";
 import type { MSPacket, CharacterIniData, CharacterOffset, TextColorName } from "../packets/parseMSPacket";
-import { TEXT_COLOR_NAMES } from "../packets/parseMSPacket";
 import type { PreloadManifest } from "../cache/types";
 import type {
   RenderSequence,
@@ -20,7 +20,7 @@ import type {
   SfxConfig,
   ParsedFrameEffects,
 } from "./interfaces/RenderSequence";
-import { SHOUTS } from "./constants/shouts";
+import { getShoutConfig } from "./constants/shouts";
 
 // ─── AOML Rules ──────────────────────────────────────
 
@@ -101,12 +101,6 @@ export function parseAomlRules(iniContent: string): AomlRules {
   return { byStart, byEnd };
 }
 
-// ─── Shout Resources (type for the resources object) ─
-
-export interface ShoutResources {
-  [key: string]: { src: string; duration: number; sfx: string } | undefined;
-}
-
 // ─── Sub-builders ────────────────────────────────────
 
 function parseFrameEffects(
@@ -140,7 +134,7 @@ function buildCharacterTimelines(
   // Main character
   const mainSprites = manifest.characters[0];
   const hasPreanim =
-    packet.emoteModifier === 1 &&
+    packet.emoteModifier === EmoteModifier.PreanimWithSfx &&
     packet.preanim &&
     packet.preanim !== "-" &&
     packet.preanim !== "";
@@ -154,7 +148,9 @@ function buildCharacterTimelines(
     resolvedSfx !== "0" &&
     resolvedSfx !== "1" &&
     resolvedSfx !== "" &&
-    (packet.emoteModifier === 1 || packet.emoteModifier === 2 || packet.emoteModifier === 6)
+    (packet.emoteModifier === EmoteModifier.PreanimWithSfx ||
+     packet.emoteModifier === EmoteModifier.PreanimWithObjection ||
+     packet.emoteModifier === EmoteModifier.PreanimZoom)
   ) {
     sfxConfig = {
       path: manifest.sfxUrl,
@@ -175,9 +171,14 @@ function buildCharacterTimelines(
   }
 
   // Final step (idle/talking)
+  // Blue text disables talking animation — character stays on idle sprite
+  const talkingSprite = packet.textColor === TextColor.Blue
+    ? null
+    : mainSprites?.talkingUrl ?? null;
+
   mainSteps.push({
     sprite: mainSprites?.idleUrl ?? "",
-    talking: mainSprites?.talkingUrl ?? null,
+    talking: talkingSprite,
     durationMs: null,
     nonInterrupting: false,
     sfx: sfxConfig,
@@ -218,7 +219,7 @@ function buildCharacterTimelines(
 
 function buildTextDisplay(
   content: string,
-  colorIndex: number,
+  colorIndex: TextColor,
   aomlRules: AomlRules,
   baseTickMs: number,
   blipUrl: string,
@@ -233,7 +234,7 @@ function buildTextDisplay(
     text = text.substring(2);
   }
 
-  const defaultColorName = (TEXT_COLOR_NAMES[colorIndex] ?? "white") as TextColorName;
+  const defaultColorName = textColorName(colorIndex);
   const defaultColor: SegmentColor = { kind: "named", name: defaultColorName };
 
   const segments: TextSegment[] = [];
@@ -362,34 +363,27 @@ function colorsEqual(a: SegmentColor, b: SegmentColor): boolean {
 function buildShoutPhase(
   packet: MSPacket,
   manifest: PreloadManifest,
-  resources: ShoutResources,
+  aoHost: string,
 ): ShoutPhase | null {
-  const shoutMod = packet.shoutModifier;
-  if (shoutMod === 0) return null;
+  const result = getShoutConfig(packet.shoutModifier);
+  if (!result) return null;
 
-  const shoutName = SHOUTS[shoutMod];
-  if (!shoutName) return null;
+  const { config } = result;
 
-  if (shoutMod === 4) {
-    // Custom shout
-    const image = manifest.shoutImageUrl ??
-      `characters/${encodeURI(packet.charName.toLowerCase())}/custom.gif`;
-    const sound = manifest.shoutSoundUrl ?? "";
+  if (packet.shoutModifier === ShoutModifier.Custom) {
     return {
-      image,
-      sound,
-      durationMs: resources.custom?.duration ?? 840,
+      image: manifest.shoutImageUrl ??
+        `${aoHost}characters/${encodeURI(packet.charName.toLowerCase())}/custom.gif`,
+      sound: manifest.shoutSoundUrl ?? "",
+      durationMs: config.duration,
       isCustom: true,
     };
   }
 
-  const resource = resources[shoutName];
-  if (!resource) return null;
-
   return {
-    image: manifest.shoutImageUrl ?? resource.src,
-    sound: manifest.shoutSoundUrl ?? resource.sfx,
-    durationMs: resource.duration,
+    image: manifest.shoutImageUrl ?? `${aoHost}${config.image}`,
+    sound: manifest.shoutSoundUrl ?? `${aoHost}${config.sfx}`,
+    durationMs: config.duration,
     isCustom: false,
   };
 }
@@ -400,7 +394,8 @@ function buildPositionLayout(packet: MSPacket): PositionLayout {
   const emoteModifier = packet.emoteModifier;
 
   const useFullView = ["def", "pro", "wit"].includes(side);
-  const showSpeedlines = emoteModifier === 5 || emoteModifier === 6;
+  const showSpeedlines =
+    emoteModifier === EmoteModifier.Zoom || emoteModifier === EmoteModifier.PreanimZoom;
 
   let deskDuringPreanim: boolean;
   let deskDuringSpeaking: boolean;
@@ -411,28 +406,28 @@ function buildPositionLayout(packet: MSPacket): PositionLayout {
     deskDuringSpeaking = false;
   } else {
     switch (deskmod) {
-      case 0:
+      case DeskMod.Hidden:
         deskDuringPreanim = false;
         deskDuringSpeaking = false;
         break;
-      case 1:
+      case DeskMod.Shown:
         deskDuringPreanim = true;
         deskDuringSpeaking = true;
         break;
-      case 2:
+      case DeskMod.HiddenDuringPreanim:
         deskDuringPreanim = false;
         deskDuringSpeaking = true;
         break;
-      case 3:
+      case DeskMod.ShownDuringPreanim:
         deskDuringPreanim = true;
         deskDuringSpeaking = false;
         break;
-      case 4:
+      case DeskMod.HiddenIgnoreOffset:
         deskDuringPreanim = false;
         deskDuringSpeaking = true;
         skipOffset = true;
         break;
-      case 5:
+      case DeskMod.ShownIgnoreOffset:
         deskDuringPreanim = true;
         deskDuringSpeaking = false;
         skipOffset = true;
@@ -524,8 +519,8 @@ function buildSlidePhase(
   if (packet.slide !== 1) return null;
   if (previousSide === packet.side) return null;
   if (!PANORAMIC_SIDES.includes(previousSide) || !PANORAMIC_SIDES.includes(packet.side)) return null;
-  // Zoom emotes (5/6) never trigger slide
-  if (packet.emoteModifier === 5 || packet.emoteModifier === 6) return null;
+  // Zoom emotes never trigger slide
+  if (packet.emoteModifier === EmoteModifier.Zoom || packet.emoteModifier === EmoteModifier.PreanimZoom) return null;
 
   return {
     fromSide: previousSide,
@@ -541,7 +536,6 @@ export function buildRenderSequence(
   packet: MSPacket,
   charIni: CharacterIniData,
   manifest: PreloadManifest,
-  resources: ShoutResources,
   evidences: { icon: string }[],
   aomlRules: AomlRules,
   aoHost: string,
@@ -573,7 +567,7 @@ export function buildRenderSequence(
       blipUrl,
       packet.additive,
     ),
-    shout: buildShoutPhase(packet, manifest, resources),
+    shout: buildShoutPhase(packet, manifest, aoHost),
     slide: buildSlidePhase(packet, previousSide),
     evidence: buildEvidenceDisplay(packet, evidences),
     initialEffects: buildInitialEffects(packet),

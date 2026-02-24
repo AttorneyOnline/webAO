@@ -132,7 +132,6 @@ export const handleMS = async (args: string[]) => {
     packet,
     charIni,
     manifest,
-    client.resources,
     client.evidences,
     aomlRules,
     AO_HOST,
