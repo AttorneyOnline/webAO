@@ -21,7 +21,7 @@ export const handlePU = (args: string[]) => {
     case 1:
       player.charName = data;
       const charId = client.chars.findIndex(
-        (c: any) => c && c.name.toLowerCase() === data.toLowerCase()
+        (c) => c && c.name.toLowerCase() === data.toLowerCase()
       );
       if (charId >= 0) {
         player.charId = charId;

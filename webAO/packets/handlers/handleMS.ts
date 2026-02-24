@@ -63,7 +63,7 @@ export const handleMS = async (args: string[]) => {
       );
       const chargs = (`${charName}&` + "iniediter").split("&");
       handleCharacterInfo(chargs, charId);
-    } else if (!client.chars[charId].inifile) {
+    } else if (!client.chars[charId].options) {
       ensureCharIni(charId);
     }
   }

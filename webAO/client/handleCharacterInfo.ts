@@ -1,8 +1,9 @@
 import { client } from "../client";
 import { safeTags } from "../encoding";
-import iniParse from "../iniParse";
 import request from "../services/request";
 import { AO_HOST } from "./aoHost";
+import { parseCharIni } from "./CharIni";
+import type { CharIni, IniSection } from "./CharIni";
 
 /**
  * Lightweight character setup that runs on join. Sets the icon src directly
@@ -29,7 +30,7 @@ export const setupCharacterBasic = (chargs: string[], charid: number) => {
     pair_select.add(new Option(safeTags(chargs[0]), String(charid)));
 
     // Store defaults — these get replaced with actual ini values by ensureCharIni
-    client.chars[charid] = {
+    const char: CharIni = {
       name: safeTags(chargs[0]),
       showname: safeTags(chargs[0]),
       desc: safeTags(chargs[1]),
@@ -41,6 +42,7 @@ export const setupCharacterBasic = (chargs: string[], charid: number) => {
       icon: "",
       muted: false,
     };
+    client.chars[charid] = char;
   } else {
     console.warn(`missing charid ${charid}`);
     img.style.display = "none";
@@ -50,52 +52,55 @@ export const setupCharacterBasic = (chargs: string[], charid: number) => {
 /**
  * Fetches and parses char.ini for a character if not already loaded.
  * Replaces default values in client.chars[charid] with actual ini values.
+ * Returns the CharIni entry, or null if the character doesn't exist.
  */
-export const ensureCharIni = async (charid: number): Promise<any> => {
+export const ensureCharIni = async (charid: number): Promise<CharIni | null> => {
   const char = client.chars[charid];
-  if (!char) return {};
-  if (char.inifile) return char.inifile;
+  if (!char) return null;
+  if (char.options) return char;
 
   const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
-  let cini: any = {};
+  let sections: Record<string, IniSection> = {};
 
   try {
     const cinidata = await request(
       `${AO_HOST}characters/${encodeURI(char.name.toLowerCase())}/char.ini`,
     );
-    cini = iniParse(cinidata);
+    sections = parseCharIni(cinidata);
   } catch (err) {
-    cini = {};
     if (img) img.classList.add("noini");
     console.warn(`character ${char.name} is missing from webAO`);
   }
 
-  const default_options = {
+  // Apply defaults and store ini sections on char
+  char.options = {
     name: char.name,
     showname: char.name,
     side: "def",
     blips: "male",
     chat: "",
     category: "",
+    ...sections.options,
   };
-  cini.options = Object.assign(default_options, cini.options);
 
-  const default_emotions = {
-    number: 0,
+  char.emotions = {
+    number: "0",
+    ...sections.emotions,
   };
-  cini.emotions = Object.assign(default_emotions, cini.emotions);
 
-  // Replace defaults with actual ini values
-  char.showname = safeTags(cini.options.showname);
-  char.blips = safeTags(cini.options.blips).toLowerCase();
-  char.gender = safeTags(cini.options.gender).toLowerCase();
-  char.side = safeTags(cini.options.side).toLowerCase();
+  if (sections.soundn) char.soundn = sections.soundn;
+  if (sections.soundt) char.soundt = sections.soundt;
+
+  // Replace resolved fields with actual ini values
+  char.showname = safeTags(char.options.showname);
+  char.blips = safeTags(char.options.blips).toLowerCase();
+  char.gender = safeTags(char.options.gender ?? "").toLowerCase();
+  char.side = safeTags(char.options.side).toLowerCase();
   char.chat =
-    cini.options.chat === ""
-      ? safeTags(cini.options.category).toLowerCase()
-      : safeTags(cini.options.chat).toLowerCase();
+    char.options.chat === ""
+      ? safeTags(char.options.category).toLowerCase()
+      : safeTags(char.options.chat).toLowerCase();
   char.icon = img ? img.src : "";
-  char.inifile = cini;
 
   if (
     char.blips === "male" &&
@@ -105,7 +110,7 @@ export const ensureCharIni = async (charid: number): Promise<any> => {
     char.blips = char.gender;
   }
 
-  return cini;
+  return char;
 };
 
 /**
@@ -122,10 +127,13 @@ export const handleCharacterInfo = async (chargs: string[], charid: number) => {
       chargs[0].toLowerCase(),
     )}/char_icon${iconExt}`;
 
-    // Reset inifile so ensureCharIni will re-fetch
+    // Reset ini sections so ensureCharIni will re-fetch
     if (client.chars[charid]) {
       client.chars[charid].name = safeTags(chargs[0]);
-      client.chars[charid].inifile = null;
+      delete client.chars[charid].options;
+      delete client.chars[charid].emotions;
+      delete client.chars[charid].soundn;
+      delete client.chars[charid].soundt;
     } else {
       setupCharacterBasic(chargs, charid);
     }

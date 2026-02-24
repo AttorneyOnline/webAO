@@ -35,10 +35,11 @@ export const handlePV = async (args: string[]) => {
   const emotesList = document.getElementById("client_emo");
   emotesList.style.display = "";
   emotesList.innerHTML = ""; // Clear emote box
-  const ini = await ensureCharIni(client.charID);
-  me.side = ini.options.side;
+  await ensureCharIni(client.charID);
+  me.side = me.options?.side ?? "def";
   updateActionCommands(me.side);
-  if (ini.emotions.number === 0) {
+  const emoteCount = Number(me.emotions?.number ?? 0);
+  if (emoteCount === 0) {
     emotesList.innerHTML = `<span
 					id="emo_0"
 					alt="unavailable"
@@ -54,14 +55,15 @@ export const handlePV = async (args: string[]) => {
       }
     }
 
-    for (let i = 1; i <= ini.emotions.number; i++) {
+    for (let i = 1; i <= emoteCount; i++) {
       try {
-        const emoteinfo = ini.emotions[i].split("#");
-        let esfx;
-        let esfxd;
+        const emoteinfo = me.emotions?.[i]?.split("#");
+        if (!emoteinfo) continue;
+        let esfx: string;
+        let esfxd: number;
         try {
-          esfx = ini.soundn[i] || "0";
-          esfxd = Number(ini.soundt[i]) || 0;
+          esfx = me.soundn?.[i] || "0";
+          esfxd = Number(me.soundt?.[i]) || 0;
         } catch (e) {
           console.warn("ini sound is completly missing");
           esfx = "0";

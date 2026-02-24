@@ -12,6 +12,7 @@ import { Viewport } from "./viewport/interfaces/Viewport";
 import { EventEmitter } from "events";
 import { onReplayGo } from "./dom/onReplayGo";
 import type { Testimony } from "./viewport/constants/testimony";
+import type { CharIni } from "./client/CharIni";
 import { packetHandler } from "./packets/packetHandler";
 import { loadResources } from "./client/loadResources";
 import { AO_HOST } from "./client/aoHost";
@@ -126,7 +127,7 @@ class Client extends EventEmitter {
   evidence_list_length: number;
   music_list_length: number;
   testimony: Testimony | null;
-  chars: any;
+  chars: CharIni[];
   emotes: any;
   evidences: any;
   area: number;
