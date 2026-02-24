@@ -2,7 +2,7 @@ import { client } from "../client";
 import { safeTags } from "../encoding";
 import request from "../services/request";
 import { AO_HOST } from "./aoHost";
-import { parseCharIni } from "./CharIni";
+import { parseCharIni, defaultCharIni } from "./CharIni";
 import type { CharIni, IniSection } from "./CharIni";
 
 /**
@@ -31,16 +31,8 @@ export const setupCharacterBasic = (chargs: string[], charid: number) => {
 
     // Store defaults — these get replaced with actual ini values by ensureCharIni
     const char: CharIni = {
-      name: safeTags(chargs[0]),
-      showname: safeTags(chargs[0]),
-      desc: safeTags(chargs[1]),
-      blips: "male",
-      gender: "",
-      side: "def",
-      chat: "",
+      ...defaultCharIni(safeTags(chargs[0]), safeTags(chargs[1])),
       evidence: chargs[3],
-      icon: "",
-      muted: false,
     };
     client.chars[charid] = char;
   } else {
@@ -73,12 +65,13 @@ export const ensureCharIni = async (charid: number): Promise<CharIni | null> => 
   }
 
   // Apply defaults and store ini sections on char
+  const defaults = defaultCharIni(char.name);
   char.options = {
-    name: char.name,
-    showname: char.name,
-    side: "def",
-    blips: "male",
-    chat: "",
+    name: defaults.name,
+    showname: defaults.showname,
+    side: defaults.side,
+    blips: defaults.blips,
+    chat: defaults.chat,
     category: "",
     ...sections.options,
   };

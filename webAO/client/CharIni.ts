@@ -71,3 +71,19 @@ export interface CharIni {
   /** char.ini [SoundT] section — sound effect delays per emote */
   soundt?: IniSection;
 }
+
+/** Returns a CharIni with all default values. Pass name/desc to override the identity fields. */
+export function defaultCharIni(name: string = "", desc: string = ""): CharIni {
+  return {
+    name,
+    showname: name,
+    desc,
+    blips: "male",
+    gender: "",
+    side: "def",
+    chat: "",
+    evidence: "",
+    icon: "",
+    muted: false,
+  };
+}

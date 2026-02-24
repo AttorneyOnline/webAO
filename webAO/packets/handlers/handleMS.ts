@@ -11,6 +11,7 @@ import type { AomlRules } from "../../viewport/buildRenderSequence";
 import { executeRenderSequence } from "../../viewport/executeRenderSequence";
 import type { RenderHandle } from "../../viewport/executeRenderSequence";
 import { parseMSPacket } from "../parseMSPacket";
+import { defaultCharIni } from "../../client/CharIni";
 import type { CharIni } from "../../client/CharIni";
 import request from "../../services/request.js";
 
@@ -72,13 +73,10 @@ export const handleMS = async (args: string[]) => {
   if (char?.muted) return;
 
   // Per-message CharIni with packet-level overrides
+  const defaults = defaultCharIni(charName);
   const charIni: CharIni = {
-    ...(char ?? {
-      name: charName, showname: charName, desc: "", blips: "male",
-      gender: "", side: "def", chat: "default", evidence: "",
-      icon: "", muted: false,
-    }),
-    blips: packet.packetBlips ? safeTags(packet.packetBlips) : (char?.blips ?? "male"),
+    ...(char ?? { ...defaults, chat: "default" }),
+    blips: packet.packetBlips ? safeTags(packet.packetBlips) : (char?.blips ?? defaults.blips),
     chat: packet.content.trim() === "" ? "" : (char?.chat ?? "default"),
   };
 
