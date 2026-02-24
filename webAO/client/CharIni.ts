@@ -4,12 +4,22 @@ import { parse } from "ini";
 export type IniSection = Record<string, string>;
 
 /**
+ * Escape # in ini values so the ini package doesn't treat them as comments.
+ * char.ini uses # as a data delimiter (e.g. emote entries: normal#-#normal#0#1).
+ */
+function escapeHashInValues(data: string): string {
+  return data.replace(/^([^[;=\r\n][^=\r\n]*=)(.*)/gm, (_match, prefix, value) =>
+    prefix + value.split("#").join("\\#"),
+  );
+}
+
+/**
  * Parse raw ini text into lowercase-normalized sections.
  * All section names and keys are lowercased. All values are lowercased
  * except "showname" which preserves case (display name).
  */
 export function parseCharIni(data: string): Record<string, IniSection> {
-  const raw = parse(data);
+  const raw = parse(escapeHashInValues(data));
   const result: Record<string, IniSection> = {};
 
   for (const section of Object.keys(raw)) {
