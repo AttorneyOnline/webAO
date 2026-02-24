@@ -227,8 +227,8 @@ const viewport = (): Viewport => {
       const charImgSelector = document.getElementById(
         `client_${positionPrefix}char_img`,
       ) as HTMLImageElement;
-      if (manifest?.mainCharIdleUrl) {
-        charImgSelector.src = manifest.mainCharIdleUrl;
+      if (manifest?.characters[0]?.idleUrl) {
+        charImgSelector.src = manifest.characters[0].idleUrl;
       } else {
         setEmote(
           AO_HOST,
@@ -340,8 +340,8 @@ const viewport = (): Viewport => {
         shoutSprite.style.display = "none";
         shoutSprite.style.animation = "";
         // Use manifest URL if available, otherwise fallback to setEmote
-        if (manifest?.mainCharPreanimUrl) {
-          charImgSelector.src = manifest.mainCharPreanimUrl;
+        if (manifest?.characters[0]?.preanimUrl) {
+          charImgSelector.src = manifest.characters[0].preanimUrl;
         } else {
           const preanim = chatmsg.preanim.toLowerCase();
           setEmote(AO_HOST, client, charName, preanim, "", false, chatmsg.side);
@@ -433,9 +433,9 @@ const viewport = (): Viewport => {
         if (chatmsg.other_name) {
           // Use manifest URL if available, otherwise fallback to setEmote
           // Only set src if different to avoid restarting animation
-          if (manifest?.pairCharIdleUrl) {
-            if (pairImgSelector.src !== manifest.pairCharIdleUrl) {
-              pairImgSelector.src = manifest.pairCharIdleUrl;
+          if (manifest?.characters[1]?.idleUrl) {
+            if (pairImgSelector.src !== manifest.characters[1].idleUrl) {
+              pairImgSelector.src = manifest.characters[1].idleUrl;
             }
           } else {
             setEmote(
@@ -454,8 +454,8 @@ const viewport = (): Viewport => {
         }
 
         // Use manifest URL for talking sprite if available
-        if (manifest?.mainCharTalkingUrl) {
-          charImgSelector.src = manifest.mainCharTalkingUrl;
+        if (manifest?.characters[0]?.talkingUrl) {
+          charImgSelector.src = manifest.characters[0].talkingUrl;
         } else {
           setEmote(
             AO_HOST,
@@ -471,8 +471,8 @@ const viewport = (): Viewport => {
 
         if (textnow === chatmsg.content) {
           // Use manifest URL for idle sprite if available
-          if (manifest?.mainCharIdleUrl) {
-            charImgSelector.src = manifest.mainCharIdleUrl;
+          if (manifest?.characters[0]?.idleUrl) {
+            charImgSelector.src = manifest.characters[0].idleUrl;
           } else {
             setEmote(
               AO_HOST,

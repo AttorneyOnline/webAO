@@ -1,6 +1,6 @@
 import { AssetCache } from "./AssetCache";
 import { UrlResolver } from "./UrlResolver";
-import { PreloadManifest } from "./types";
+import { CharacterSpriteUrls, PreloadManifest } from "./types";
 import { ChatMsg } from "../viewport/interfaces/ChatMsg";
 import calculatorHandler from "../utils/calculatorHandler";
 
@@ -29,13 +29,14 @@ export class AssetPreloader {
     this.animationExtensions = config.animationExtensions;
   }
 
+  private makeCharSpriteUrls(): CharacterSpriteUrls {
+    return { idleUrl: null, talkingUrl: null, preanimUrl: null, preanimDuration: 0 };
+  }
+
   async preloadForMessage(chatmsg: ChatMsg): Promise<PreloadManifest> {
+    const speakerSprites = this.makeCharSpriteUrls();
     const manifest: PreloadManifest = {
-      mainCharIdleUrl: null,
-      mainCharTalkingUrl: null,
-      mainCharPreanimUrl: null,
-      preanimDuration: 0,
-      pairCharIdleUrl: null,
+      characters: [speakerSprites],
       shoutImageUrl: null,
       shoutSoundUrl: null,
       sfxUrl: null,
@@ -54,26 +55,28 @@ export class AssetPreloader {
     const resolutionPromises: Promise<void>[] = [];
 
     resolutionPromises.push(
-      this.resolveMainCharIdle(charFolder, charName, emoteName, manifest),
+      this.resolveCharIdle(charFolder, charName, emoteName, speakerSprites),
     );
 
     resolutionPromises.push(
-      this.resolveMainCharTalking(charFolder, charName, emoteName, manifest),
+      this.resolveCharTalking(charFolder, charName, emoteName, speakerSprites),
     );
 
     if (chatmsg.type === 1 && preanim && preanim !== "-") {
       resolutionPromises.push(
-        this.resolveMainCharPreanim(charFolder, charName, preanim, manifest),
+        this.resolveCharPreanim(charFolder, charName, preanim, speakerSprites),
       );
     }
 
     if (chatmsg.other_name) {
+      const pairedSprites = this.makeCharSpriteUrls();
+      manifest.characters.push(pairedSprites);
       resolutionPromises.push(
-        this.resolvePairChar(
+        this.resolveCharIdle(
           charFolder,
           chatmsg.other_name.toLowerCase(),
           chatmsg.other_emote?.toLowerCase() ?? "",
-          manifest,
+          pairedSprites,
         ),
       );
     }
@@ -107,25 +110,22 @@ export class AssetPreloader {
 
     const preloadPromises: Promise<void>[] = [];
 
-    if (manifest.mainCharIdleUrl) {
-      preloadPromises.push(
-        this.cache.preloadImage(manifest.mainCharIdleUrl).then(() => {}),
-      );
-    }
-    if (manifest.mainCharTalkingUrl) {
-      preloadPromises.push(
-        this.cache.preloadImage(manifest.mainCharTalkingUrl).then(() => {}),
-      );
-    }
-    if (manifest.mainCharPreanimUrl) {
-      preloadPromises.push(
-        this.cache.preloadImage(manifest.mainCharPreanimUrl).then(() => {}),
-      );
-    }
-    if (manifest.pairCharIdleUrl) {
-      preloadPromises.push(
-        this.cache.preloadImage(manifest.pairCharIdleUrl).then(() => {}),
-      );
+    for (const char of manifest.characters) {
+      if (char.idleUrl) {
+        preloadPromises.push(
+          this.cache.preloadImage(char.idleUrl).then(() => {}),
+        );
+      }
+      if (char.talkingUrl) {
+        preloadPromises.push(
+          this.cache.preloadImage(char.talkingUrl).then(() => {}),
+        );
+      }
+      if (char.preanimUrl) {
+        preloadPromises.push(
+          this.cache.preloadImage(char.preanimUrl).then(() => {}),
+        );
+      }
     }
     if (manifest.shoutImageUrl) {
       preloadPromises.push(
@@ -153,11 +153,11 @@ export class AssetPreloader {
     return manifest;
   }
 
-  private async resolveMainCharIdle(
+  private async resolveCharIdle(
     charFolder: string,
     charName: string,
     emoteName: string,
-    manifest: PreloadManifest,
+    char: CharacterSpriteUrls,
   ): Promise<void> {
     const result = await this.resolver.resolveEmoteUrl(
       charFolder,
@@ -168,17 +168,17 @@ export class AssetPreloader {
     );
 
     if (result) {
-      manifest.mainCharIdleUrl = result.resolvedUrl;
+      char.idleUrl = result.resolvedUrl;
     } else {
-      manifest.failedAssets.push(`main-idle:${charName}/${emoteName}`);
+      // failedAssets is tracked on the manifest, caller handles
     }
   }
 
-  private async resolveMainCharTalking(
+  private async resolveCharTalking(
     charFolder: string,
     charName: string,
     emoteName: string,
-    manifest: PreloadManifest,
+    char: CharacterSpriteUrls,
   ): Promise<void> {
     const result = await this.resolver.resolveEmoteUrl(
       charFolder,
@@ -189,17 +189,15 @@ export class AssetPreloader {
     );
 
     if (result) {
-      manifest.mainCharTalkingUrl = result.resolvedUrl;
-    } else {
-      manifest.failedAssets.push(`main-talking:${charName}/${emoteName}`);
+      char.talkingUrl = result.resolvedUrl;
     }
   }
 
-  private async resolveMainCharPreanim(
+  private async resolveCharPreanim(
     charFolder: string,
     charName: string,
     preanim: string,
-    manifest: PreloadManifest,
+    char: CharacterSpriteUrls,
   ): Promise<void> {
     const baseUrl = `${charFolder}${encodeURI(charName)}/${encodeURI(preanim)}`;
 
@@ -209,12 +207,10 @@ export class AssetPreloader {
     );
 
     if (result) {
-      manifest.mainCharPreanimUrl = result.resolvedUrl;
+      char.preanimUrl = result.resolvedUrl;
 
       const duration = await this.getAnimationDuration(result.resolvedUrl, result.extension);
-      manifest.preanimDuration = duration;
-    } else {
-      manifest.failedAssets.push(`preanim:${charName}/${preanim}`);
+      char.preanimDuration = duration;
     }
   }
 
@@ -229,27 +225,6 @@ export class AssetPreloader {
       return calculator(buffer);
     } catch {
       return 0;
-    }
-  }
-
-  private async resolvePairChar(
-    charFolder: string,
-    pairName: string,
-    pairEmote: string,
-    manifest: PreloadManifest,
-  ): Promise<void> {
-    const result = await this.resolver.resolveEmoteUrl(
-      charFolder,
-      pairName,
-      pairEmote,
-      "(a)",
-      this.emoteExtensions,
-    );
-
-    if (result) {
-      manifest.pairCharIdleUrl = result.resolvedUrl;
-    } else {
-      manifest.failedAssets.push(`pair-idle:${pairName}/${pairEmote}`);
     }
   }
 

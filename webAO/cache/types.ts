@@ -11,12 +11,15 @@ export interface ResolvedUrl {
   extension: string;
 }
 
-export interface PreloadManifest {
-  mainCharIdleUrl: string | null;
-  mainCharTalkingUrl: string | null;
-  mainCharPreanimUrl: string | null;
+export interface CharacterSpriteUrls {
+  idleUrl: string | null;
+  talkingUrl: string | null;
+  preanimUrl: string | null;
   preanimDuration: number;
-  pairCharIdleUrl: string | null;
+}
+
+export interface PreloadManifest {
+  characters: CharacterSpriteUrls[];
   shoutImageUrl: string | null;
   shoutSoundUrl: string | null;
   sfxUrl: string | null;

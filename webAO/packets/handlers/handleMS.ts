@@ -204,7 +204,7 @@ export const handleMS = async (args: string[]) => {
       }
 
       chatmsg.preloadManifest = manifest;
-      chatmsg.preanimdelay = manifest.preanimDuration;
+      chatmsg.preanimdelay = manifest.characters[0]?.preanimDuration ?? 0;
 
       if (manifest.failedAssets.length > 0) {
         console.warn("Failed to preload some assets:", manifest.failedAssets);

@@ -126,8 +126,8 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
     `client_${positionPrefix}pair_img`,
   ) as HTMLImageElement;
 
-  if (manifest?.mainCharIdleUrl) {
-    mainEmoteSelector.src = manifest.mainCharIdleUrl;
+  if (manifest?.characters[0]?.idleUrl) {
+    mainEmoteSelector.src = manifest.characters[0].idleUrl;
   } else {
     setEmote(
       AO_HOST,
@@ -142,9 +142,9 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
 
   if (client.viewport.getChatmsg().other_name) {
     // Only set src if different to avoid restarting animation
-    if (manifest?.pairCharIdleUrl) {
-      if (pairEmoteSelector.src !== manifest.pairCharIdleUrl) {
-        pairEmoteSelector.src = manifest.pairCharIdleUrl;
+    if (manifest?.characters[1]?.idleUrl) {
+      if (pairEmoteSelector.src !== manifest.characters[1].idleUrl) {
+        pairEmoteSelector.src = manifest.characters[1].idleUrl;
       }
     } else {
       setEmote(
