@@ -6,6 +6,7 @@ import { resetICParams } from "../../client/resetICParams";
 import { prepChat, safeTags } from "../../encoding";
 import { handle_ic_speaking } from "../../viewport/utils/handleICSpeaking";
 import { getAssetPreloader } from "../../cache";
+import type { PreloadManifest } from "../../cache/types";
 import { appendICLog } from "../../client/appendICLog";
 import { checkCallword } from "../../client/checkCallword";
 
@@ -83,6 +84,9 @@ export const handleMS = async (args: string[]) => {
         flash: Number(args[14]),
         color: Number(args[15]),
         speed: UPDATE_INTERVAL,
+        showname: "" as string,
+        preanimdelay: 0,
+        preloadManifest: undefined as PreloadManifest | undefined,
       };
 
       if (args.length > 16) {

@@ -90,34 +90,15 @@ export interface CharacterOffset {
   readonly y: number;
 }
 
-/** MS fields 1-3, 8, 12, 19: Main (speaking) character data */
-export interface MainCharacterData {
-  /** MS field 2: Character folder name */
+/** Decoded character data from an MS packet */
+export interface CharacterData {
+  readonly id: number;
   readonly folder: string;
-  /** MS field 3: Emote sprite name */
   readonly emote: string;
-  /** MS field 1: Pre-animation name */
+  /** Pre-animation name (empty string when not applicable) */
   readonly preanim: string;
-  /** MS field 8: Character ID */
-  readonly id: number;
-  /** MS field 12: Whether sprite is horizontally flipped */
   readonly flip: boolean;
-  /** MS field 19: Character position offset, parsed from "x&y" */
   readonly offset: CharacterOffset;
-}
-
-/** MS fields 16-18, 20-21: Paired character data. Null when no pairing. */
-export interface PairCharacterData {
-  /** MS field 16: Paired character ID */
-  readonly id: number;
-  /** MS field 17: Paired character folder name */
-  readonly folder: string;
-  /** MS field 18: Paired character emote sprite name */
-  readonly emote: string;
-  /** MS field 20: Paired character position offset */
-  readonly offset: CharacterOffset;
-  /** MS field 21: Whether paired sprite is horizontally flipped */
-  readonly flip: boolean;
 }
 
 /** Parsed from pipe-separated MS field 29 */
@@ -167,8 +148,8 @@ export interface TextConfig {
 export interface MSPacketData {
   /** MS field 0: Desk visibility modifier */
   readonly deskMod: DeskMod;
-  /** MS fields 1-3, 8, 12, 19: Main character data */
-  readonly character: MainCharacterData;
+  /** Decoded character data (main + any paired characters) */
+  readonly characters: readonly CharacterData[];
   /** MS fields 4, 14, 15, 28: Text configuration */
   readonly text: TextConfig;
   /** MS field 5: Courtroom position. Allows custom/unknown positions from servers. */
@@ -185,8 +166,6 @@ export interface MSPacketData {
   readonly evidence: number;
   /** MS field 13: Whether realization flash plays */
   readonly realization: boolean;
-  /** MS fields 16-18, 20-21: Paired character data, or null when not paired */
-  readonly pair: PairCharacterData | null;
   /** MS field 22: Whether to play full preanim without interruption */
   readonly nonInterruptingPreanim: boolean;
   /** MS field 24: Whether screenshake plays */
@@ -237,26 +216,34 @@ export interface TextDisplay {
   readonly segments: readonly TextSegment[];
   readonly centered: boolean;
   readonly additive: boolean;
+  /** Relative path to blip audio file (moved from top-level RenderSequence) */
+  readonly blipSound: string;
 }
 
-// ─── Resolved Character Sprites ──────────────────────
+// ─── Character Timelines ─────────────────────────────
 
-/** Main character sprite display data with resolved asset paths */
-export interface CharacterDisplay {
-  /** Relative path to idle sprite, verified to exist */
-  readonly idle: string;
-  /** Relative path to talking sprite, or null when blue text / sprite missing */
+/** A single step in a character's render sequence */
+export interface RenderStep {
+  /** Resolved relative path to sprite */
+  readonly sprite: string;
+  /** Alternate sprite shown during text crawl, or null to not animate with text */
   readonly talking: string | null;
-  readonly flip: boolean;
-  readonly offset: CharacterOffset;
+  /** How long to show this step, or null for the final step (stays indefinitely) */
+  readonly durationMs: number | null;
+  /** When true, user input cannot skip past this step */
+  readonly nonInterrupting: boolean;
+  /** Optional sound effect triggered at step start */
+  readonly sfx: SfxConfig | null;
 }
 
-/** Paired character sprite display data (always idle) */
-export interface PairDisplay {
-  /** Relative path to idle sprite, verified to exist */
-  readonly idle: string;
+/** One character's complete independent rendering timeline */
+export interface CharacterTimeline {
+  /** Render steps; must be non-empty. Last step has durationMs: null. */
+  readonly steps: readonly RenderStep[];
   readonly flip: boolean;
   readonly offset: CharacterOffset;
+  readonly frameEffects: ParsedFrameEffects;
+  readonly slide: number;
 }
 
 // ─── Phase Configurations ────────────────────────────
@@ -269,14 +256,6 @@ export interface ShoutPhase {
   readonly sound: string;
   readonly durationMs: number;
   readonly isCustom: boolean;
-}
-
-/** Pre-computed pre-animation phase configuration */
-export interface PreanimPhase {
-  /** Relative path to preanim sprite */
-  readonly sprite: string;
-  readonly durationMs: number;
-  readonly nonInterrupting: boolean;
 }
 
 // ─── Sound & Effects ─────────────────────────────────
@@ -357,21 +336,14 @@ export interface ChatboxDisplay {
  * Pure data. JSON-serializable. No DOM types. All fields readonly.
  */
 export interface RenderSequence {
-  readonly character: CharacterDisplay;
-  readonly pair: PairDisplay | null;
+  readonly characters: readonly CharacterTimeline[];
   readonly layout: PositionLayout;
   readonly chatbox: ChatboxDisplay;
   readonly text: TextDisplay;
   readonly shout: ShoutPhase | null;
-  readonly preanim: PreanimPhase | null;
-  readonly sfx: SfxConfig | null;
-  /** Relative path to blip audio file */
-  readonly blipSound: string;
   readonly evidence: EvidenceDisplay | null;
   readonly initialEffects: InitialEffects;
-  readonly frameEffects: ParsedFrameEffects;
   readonly overlay: OverlayEffect | null;
-  readonly slide: number;
 }
 
 // ─── Helper Types ────────────────────────────────────

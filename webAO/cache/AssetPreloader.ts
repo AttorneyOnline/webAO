@@ -12,7 +12,7 @@ export interface AssetPreloaderConfig {
   animationExtensions: string[];
 }
 
-const SHOUTS = [undefined, "holdit", "objection", "takethat", "custom"] as const;
+const SHOUTS: readonly [undefined, "holdit", "objection", "takethat", "custom"] = [undefined, "holdit", "objection", "takethat", "custom"] as const;
 
 export class AssetPreloader {
   private cache: AssetCache;
