@@ -1,5 +1,3 @@
-import { PreloadManifest } from "../../cache/types";
-
 // ─── Enums (const enums for zero-cost numeric protocol values) ───
 
 /** MS field 0: Desk visibility modifier */
@@ -84,7 +82,7 @@ export const TEXT_COLOR_NAMES = [
 
 export type TextColorName = (typeof TEXT_COLOR_NAMES)[number];
 
-// ─── Sub-interfaces ──────────────────────────────────
+// ─── Protocol Sub-interfaces (MS packet field groupings) ─────────
 
 /** Parsed character offset from "x&y" wire format. Range: -100 to 100. */
 export interface CharacterOffset {
@@ -163,7 +161,7 @@ export interface TextConfig {
   readonly additive: boolean;
 }
 
-// ─── Core Types ──────────────────────────────────────
+// ─── Core Input Types ────────────────────────────────
 
 /** Complete decoded MS packet data (all 32 fields, indices 0-31). Immutable after parsing. */
 export interface MSPacketData {
@@ -211,36 +209,169 @@ export interface CharacterIniData {
   readonly blips: string;
 }
 
-/** Mutable renderer working state, updated during render phases. */
-export interface RenderRuntimeState {
-  /** Parsed HTML spans from IC message text */
-  parsed: HTMLSpanElement[];
-  /** Resolved asset URLs for preloading */
-  preloadManifest: PreloadManifest | null;
-  /** Pre-animation duration in milliseconds */
-  preanimDuration: number;
-  /** Shout animation duration in milliseconds */
-  shoutDuration: number;
-  /** Text tick speed in milliseconds per character */
-  tickSpeed: number;
-  /** Resolved blip sound name (from packet override or character INI) */
-  resolvedBlips: string;
-  /** Whether the character is currently in a talking animation */
-  isTalking: boolean;
-  /** Whether any animation is currently playing */
-  isAnimating: boolean;
-  /** Current render phase */
-  phase: RenderPhase;
+// ─── Pre-Parsed Text ─────────────────────────────────
+
+/** Color for a text segment: either a named protocol color or an RGB override from AOML */
+export type SegmentColor =
+  | { readonly kind: "named"; readonly name: TextColorName }
+  | { readonly kind: "rgb"; readonly r: number; readonly g: number; readonly b: number };
+
+/** A run of visible text with color and tick speed */
+export interface TextRun {
+  readonly kind: "text";
+  readonly content: string;
+  readonly color: SegmentColor;
+  readonly tickMs: number;
 }
 
-/** A single IC message render event. Top-level type combining packet, INI, and runtime data. */
+/** An inline effect triggered at a specific point in the text stream */
+export interface InlineEffect {
+  readonly kind: "screenshake" | "realization";
+}
+
+/** A single segment in the pre-parsed text display sequence */
+export type TextSegment = TextRun | InlineEffect;
+
+/** Fully pre-parsed IC text display data */
+export interface TextDisplay {
+  readonly segments: readonly TextSegment[];
+  readonly centered: boolean;
+  readonly additive: boolean;
+}
+
+// ─── Resolved Character Sprites ──────────────────────
+
+/** Main character sprite display data with resolved asset paths */
+export interface CharacterDisplay {
+  /** Relative path to idle sprite, verified to exist */
+  readonly idle: string;
+  /** Relative path to talking sprite, or null when blue text / sprite missing */
+  readonly talking: string | null;
+  readonly flip: boolean;
+  readonly offset: CharacterOffset;
+}
+
+/** Paired character sprite display data (always idle) */
+export interface PairDisplay {
+  /** Relative path to idle sprite, verified to exist */
+  readonly idle: string;
+  readonly flip: boolean;
+  readonly offset: CharacterOffset;
+}
+
+// ─── Phase Configurations ────────────────────────────
+
+/** Pre-computed shout (interjection) phase configuration */
+export interface ShoutPhase {
+  /** Relative path to shout image asset */
+  readonly image: string;
+  /** Relative path to shout sound asset */
+  readonly sound: string;
+  readonly durationMs: number;
+  readonly isCustom: boolean;
+}
+
+/** Pre-computed pre-animation phase configuration */
+export interface PreanimPhase {
+  /** Relative path to preanim sprite */
+  readonly sprite: string;
+  readonly durationMs: number;
+  readonly nonInterrupting: boolean;
+}
+
+// ─── Sound & Effects ─────────────────────────────────
+
+/** Resolved sound effect configuration */
+export interface SfxConfig {
+  /** Relative path to sound file */
+  readonly path: string;
+  readonly delayMs: number;
+  readonly loop: boolean;
+}
+
+/** Pre-computed evidence display configuration */
+export interface EvidenceDisplay {
+  /** Relative path to evidence icon */
+  readonly iconPath: string;
+  readonly position: "left" | "right";
+}
+
+/** Initial (non-frame-specific) effects triggered at render start */
+export interface InitialEffects {
+  readonly screenshake: boolean;
+  readonly realization: boolean;
+}
+
+/** Frame effect strings pre-parsed into number arrays */
+export interface ParsedFrameEffects {
+  readonly screenshakeFrames: readonly number[];
+  readonly realizationFrames: readonly number[];
+  readonly sfxFrames: readonly number[];
+}
+
+/** Overlay effect: rain with intensity or custom image */
+export type OverlayEffect =
+  | { readonly kind: "rain"; readonly intensity: number }
+  | { readonly kind: "image"; readonly path: string };
+
+// ─── Layout ──────────────────────────────────────────
+
+/** Pre-computed position and layout configuration */
+export interface PositionLayout {
+  readonly side: Position | string;
+  /** True for def/pro/wit (panoramic view positions) */
+  readonly useFullView: boolean;
+  /** True when emoteModifier is Zoom or PreanimZoom */
+  readonly showSpeedlines: boolean;
+  /** Pre-computed from DeskMod enum */
+  readonly deskDuringPreanim: boolean;
+  /** Pre-computed from DeskMod enum */
+  readonly deskDuringSpeaking: boolean;
+  /** True for DeskMod 4/5 (ignore offset) */
+  readonly skipOffset: boolean;
+}
+
+// ─── Chatbox Display ─────────────────────────────────
+
+/** Pre-computed chatbox display configuration */
+export interface ChatboxDisplay {
+  /** False for blank posts */
+  readonly visible: boolean;
+  /** Resolved from showname checkbox + INI nameplate */
+  readonly nameplate: string;
+  /** Raw showname from packet */
+  readonly showname: string;
+  /** Relative path to chatbox asset, or null for default theme chatbox */
+  readonly chatboxAsset: string | null;
+}
+
+// ─── Top-Level Render Plan ───────────────────────────
+
+/**
+ * A fully pre-computed, self-contained render plan for a single IC message.
+ *
+ * All asset resolution, existence checking, text parsing, and layout decisions
+ * happen BEFORE this is created. The renderer is a dumb executor that follows
+ * this plan mechanically.
+ *
+ * Pure data. JSON-serializable. No DOM types. All fields readonly.
+ */
 export interface RenderSequence {
-  /** Immutable decoded MS packet data */
-  readonly packet: MSPacketData;
-  /** Immutable character INI-derived data */
-  readonly characterIni: CharacterIniData;
-  /** Mutable renderer working state */
-  runtime: RenderRuntimeState;
+  readonly character: CharacterDisplay;
+  readonly pair: PairDisplay | null;
+  readonly layout: PositionLayout;
+  readonly chatbox: ChatboxDisplay;
+  readonly text: TextDisplay;
+  readonly shout: ShoutPhase | null;
+  readonly preanim: PreanimPhase | null;
+  readonly sfx: SfxConfig | null;
+  /** Relative path to blip audio file */
+  readonly blipSound: string;
+  readonly evidence: EvidenceDisplay | null;
+  readonly initialEffects: InitialEffects;
+  readonly frameEffects: ParsedFrameEffects;
+  readonly overlay: OverlayEffect | null;
+  readonly slide: number;
 }
 
 // ─── Helper Types ────────────────────────────────────
@@ -276,16 +407,3 @@ export const MS_PACKET_DEFAULTS = {
   sfxLooping: false,
   slide: 0,
 } as const;
-
-/** Starting runtime state for a new render sequence */
-export const INITIAL_RUNTIME_STATE: Readonly<RenderRuntimeState> = {
-  parsed: [],
-  preloadManifest: null,
-  preanimDuration: 0,
-  shoutDuration: 0,
-  tickSpeed: 0,
-  resolvedBlips: "",
-  isTalking: false,
-  isAnimating: false,
-  phase: RenderPhase.Shout,
-};
