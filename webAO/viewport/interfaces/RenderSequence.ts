@@ -174,8 +174,6 @@ export interface MSPacketData {
   readonly frameEffects: FrameEffects;
   /** MS field 29: Effect overlay data, parsed from pipe-separated string */
   readonly effect: EffectData | null;
-  /** MS field 31: Slide direction for character entry */
-  readonly slide: number;
 }
 
 /** Character INI-derived data, resolved from char.ini lookup. Immutable. */
@@ -243,10 +241,17 @@ export interface CharacterTimeline {
   readonly flip: boolean;
   readonly offset: CharacterOffset;
   readonly frameEffects: ParsedFrameEffects;
-  readonly slide: number;
 }
 
 // ─── Phase Configurations ────────────────────────────
+
+/** Pre-computed panoramic slide transition between courtroom positions */
+export interface SlidePhase {
+  readonly fromSide: string;
+  readonly toSide: string;
+  readonly durationMs: number;
+  readonly bookendDelayMs: number;
+}
 
 /** Pre-computed shout (interjection) phase configuration */
 export interface ShoutPhase {
@@ -341,6 +346,7 @@ export interface RenderSequence {
   readonly chatbox: ChatboxDisplay;
   readonly text: TextDisplay;
   readonly shout: ShoutPhase | null;
+  readonly slide: SlidePhase | null;
   readonly evidence: EvidenceDisplay | null;
   readonly initialEffects: InitialEffects;
   readonly overlay: OverlayEffect | null;
@@ -377,5 +383,4 @@ export const MS_PACKET_DEFAULTS = {
   additive: false,
   sfxDelay: 0,
   sfxLooping: false,
-  slide: 0,
 } as const;

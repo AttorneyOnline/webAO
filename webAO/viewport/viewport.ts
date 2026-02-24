@@ -15,6 +15,7 @@ import { Testimony } from "./interfaces/Testimony";
 import { COLORS } from "./constants/colors";
 import { set_side } from "./utils/setSide";
 import { ChatMsg } from "./interfaces/ChatMsg";
+import type { RenderContext } from "./executeRenderSequence";
 import {
   setStartFirstTickCheck,
   setStartSecondTickCheck,
@@ -523,6 +524,20 @@ const viewport = (): Viewport => {
     tickTimer += UPDATE_INTERVAL;
   };
 
+  const getRenderContext = (): RenderContext => ({
+    aoHost: AO_HOST,
+    blipChannels,
+    sfxAudio,
+    shoutAudio: shoutaudio,
+    testimonyAudio,
+    playSFX,
+    setSide: set_side,
+    getLastCharacter,
+    setLastCharacter,
+    getLastEvidence,
+    setLastEvidence,
+  });
+
   return {
     getTextNow,
     setTextNow,
@@ -562,6 +577,7 @@ const viewport = (): Viewport => {
     music,
     shoutaudio,
     updater,
+    getRenderContext,
   };
 };
 

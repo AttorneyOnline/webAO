@@ -4,14 +4,41 @@ import { client, extrafeatures, UPDATE_INTERVAL } from "../../client";
 import { handleCharacterInfo, ensureCharIni } from "../../client/handleCharacterInfo";
 import { resetICParams } from "../../client/resetICParams";
 import { prepChat, safeTags } from "../../encoding";
-import { handle_ic_speaking } from "../../viewport/utils/handleICSpeaking";
 import { getAssetPreloader } from "../../cache";
 import type { PreloadManifest } from "../../cache/types";
 import { appendICLog } from "../../client/appendICLog";
 import { checkCallword } from "../../client/checkCallword";
+import { AO_HOST } from "../../client/aoHost";
+import { buildRenderSequence, parseAomlRules } from "../../viewport/buildRenderSequence";
+import type { AomlRules } from "../../viewport/buildRenderSequence";
+import { executeRenderSequence } from "../../viewport/executeRenderSequence";
+import type { RenderHandle } from "../../viewport/executeRenderSequence";
+import request from "../../services/request.js";
 
 // Message sequence counter to track which message should be rendered
 let currentMessageSequence = 0;
+
+// Track the previous message's courtroom side for slide transitions
+let previousSide = "";
+
+// Cached AOML rules (loaded once)
+let cachedAomlRules: AomlRules | null = null;
+async function getAomlRules(): Promise<AomlRules> {
+  if (!cachedAomlRules) {
+    try {
+      const iniContent = await request(`${AO_HOST}themes/default/chat_config.ini`);
+      cachedAomlRules = parseAomlRules(iniContent as string);
+    } catch {
+      // Fallback to empty rules if config can't be loaded
+      cachedAomlRules = { byStart: new Map(), byEnd: new Map() };
+    }
+  }
+  return cachedAomlRules;
+}
+
+// Current render handle for cancellation
+let currentRender: RenderHandle | null = null;
+
 /**
  * Handles an in-character chat message.
  * @param {*} args packet arguments
@@ -118,6 +145,14 @@ export const handleMS = async (args: string[]) => {
               effects: args[30].split("|"),
             };
             chatmsg = Object.assign(extra_28, chatmsg);
+
+            if (args.length > 31) {
+              const extra_blips_slide = {
+                blips: safeTags(args[31]) || chatmsg.blips,
+                slide: Number(args[32] ?? 0),
+              };
+              chatmsg = Object.assign(extra_blips_slide, chatmsg);
+            }
           } else {
             const extra_28 = {
               additive: 0,
@@ -210,7 +245,33 @@ export const handleMS = async (args: string[]) => {
         console.warn("Failed to preload some assets:", manifest.failedAssets);
       }
 
-      handle_ic_speaking(chatmsg);
+      // Store chatmsg for dedup check
+      client.viewport.setChatmsg(chatmsg);
+
+      // Load AOML rules (cached after first load)
+      const aomlRules = await getAomlRules();
+
+      // Build the render sequence
+      const sequence = buildRenderSequence(
+        chatmsg,
+        manifest,
+        client.resources,
+        client.evidences,
+        aomlRules,
+        AO_HOST,
+        UPDATE_INTERVAL,
+        previousSide,
+      );
+
+      // Track side for next message's slide transition
+      previousSide = chatmsg.side;
+
+      // Cancel previous render if still running
+      currentRender?.cancel();
+
+      // Execute the new render sequence
+      const renderContext = client.viewport.getRenderContext();
+      currentRender = executeRenderSequence(sequence, renderContext);
     }
   }
 };

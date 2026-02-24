@@ -1,5 +1,6 @@
 /* eslint @typescript-eslint/ban-types: "off" */
 import { ChatMsg } from "./ChatMsg";
+import type { RenderContext } from "../executeRenderSequence";
 
 export interface Viewport {
   getTextNow: Function;
@@ -40,4 +41,5 @@ export interface Viewport {
   getBackgroundName: Function;
   shoutaudio: HTMLAudioElement;
   updater: any;
+  getRenderContext: () => RenderContext;
 }
