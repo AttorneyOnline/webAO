@@ -97,6 +97,12 @@ describe("buildRenderSequence", () => {
       expect(seq.characters).toHaveLength(1);
     });
 
+    it("has 1 character when otherCharId is -1 (no pair)", () => {
+      // Server sends -1 for otherCharId but leaves garbage in otherName/otherEmote fields
+      const seq = build(makeArgsWithPair({ 17: "-1", 18: "0<and>0", 19: "0" }));
+      expect(seq.characters).toHaveLength(1);
+    });
+
     it("has 2 character timelines when paired", () => {
       const manifest = makeManifest({
         characters: [

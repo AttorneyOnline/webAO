@@ -48,6 +48,7 @@ let currentRender: RenderHandle | null = null;
  */
 export const handleMS = async (args: string[]) => {
   const packet = parseMSPacket(args);
+  console.log("[MSPacket]", packet);
 
   // Duplicate message check
   if (packet.content === lastContent) return;

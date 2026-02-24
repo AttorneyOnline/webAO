@@ -155,11 +155,13 @@ export function parseMSPacket(args: readonly string[]): MSPacket {
     };
   }
 
+  const otherCharId = Number(args[17]);
+  const hasPair = otherCharId >= 0;
   const pairing = {
     showname: prepChat(args[16]),
-    otherCharId: Number(args[17]),
-    otherName: safeTags(args[18]),
-    otherEmote: safeTags(args[19]),
+    otherCharId,
+    otherName: hasPair ? safeTags(args[18]) : "",
+    otherEmote: hasPair ? safeTags(args[19]) : "",
     selfOffset: parseOffset(args[20]),
     otherOffset: parseOffset(args[21]),
     otherFlip: Number(args[22]) !== 0,
