@@ -1,0 +1,304 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "RenderSequence",
+  "title": "RenderSequence",
+  "description": "A fully pre-computed, self-contained render plan for a single IC message.",
+  "type": "object",
+  "properties": {
+    "characters": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/CharacterTimeline" }
+    },
+    "layout": { "$ref": "#/definitions/PositionLayout" },
+    "chatbox": { "$ref": "#/definitions/ChatboxDisplay" },
+    "text": { "$ref": "#/definitions/TextDisplay" },
+    "shout": {
+      "oneOf": [
+        { "$ref": "#/definitions/ShoutPhase" },
+        { "type": "null" }
+      ]
+    },
+    "slide": {
+      "oneOf": [
+        { "$ref": "#/definitions/SlidePhase" },
+        { "type": "null" }
+      ]
+    },
+    "initialEffects": { "$ref": "#/definitions/InitialEffects" },
+    "overlay": {
+      "oneOf": [
+        { "$ref": "#/definitions/OverlayEffect" },
+        { "type": "null" }
+      ]
+    }
+  },
+  "required": ["characters", "layout", "chatbox", "text", "shout", "slide", "initialEffects", "overlay"],
+  "additionalProperties": false,
+
+  "definitions": {
+    "CharacterTimeline": {
+      "type": "object",
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/RenderStep" },
+          "minItems": 1
+        },
+        "flip": { "type": "boolean" },
+        "offset": { "$ref": "#/definitions/CharacterOffset" },
+        "frameEffects": { "$ref": "#/definitions/ParsedFrameEffects" }
+      },
+      "required": ["steps", "flip", "offset", "frameEffects"],
+      "additionalProperties": false
+    },
+
+    "RenderStep": {
+      "type": "object",
+      "properties": {
+        "sprite": { "type": "string" },
+        "talking": { "type": ["string", "null"] },
+        "durationMs": { "type": ["number", "null"] },
+        "nonInterrupting": { "type": "boolean" },
+        "sfx": {
+          "oneOf": [
+            { "$ref": "#/definitions/SfxConfig" },
+            { "type": "null" }
+          ]
+        },
+        "scene": { "$ref": "#/definitions/StepScene" },
+        "textCrawl": { "$ref": "#/definitions/TextCrawlMode" }
+      },
+      "required": ["sprite", "talking", "durationMs", "nonInterrupting", "sfx", "scene", "textCrawl"],
+      "additionalProperties": false
+    },
+
+    "StepScene": {
+      "type": "object",
+      "properties": {
+        "deskVisible": { "type": "boolean" },
+        "chatboxVisible": { "type": "boolean" },
+        "backgroundUrl": { "type": ["string", "null"] },
+        "evidence": {
+          "oneOf": [
+            { "$ref": "#/definitions/EvidenceDisplay" },
+            { "type": "null" }
+          ]
+        }
+      },
+      "required": ["deskVisible", "chatboxVisible", "backgroundUrl", "evidence"],
+      "additionalProperties": false
+    },
+
+    "SfxConfig": {
+      "type": "object",
+      "properties": {
+        "path": { "type": "string" },
+        "delayMs": { "type": "number" },
+        "loop": { "type": "boolean" }
+      },
+      "required": ["path", "delayMs", "loop"],
+      "additionalProperties": false
+    },
+
+    "EvidenceDisplay": {
+      "type": "object",
+      "properties": {
+        "iconPath": { "type": "string" },
+        "position": { "type": "string", "enum": ["left", "right"] }
+      },
+      "required": ["iconPath", "position"],
+      "additionalProperties": false
+    },
+
+    "TextDisplay": {
+      "type": "object",
+      "properties": {
+        "segments": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/TextSegment" }
+        },
+        "centered": { "type": "boolean" },
+        "additive": { "type": "boolean" },
+        "blipSound": { "type": "string" }
+      },
+      "required": ["segments", "centered", "additive", "blipSound"],
+      "additionalProperties": false
+    },
+
+    "TextSegment": {
+      "oneOf": [
+        { "$ref": "#/definitions/TextRun" },
+        { "$ref": "#/definitions/InlineEffect" }
+      ]
+    },
+
+    "TextRun": {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "text" },
+        "content": { "type": "string" },
+        "color": { "$ref": "#/definitions/SegmentColor" },
+        "tickMs": { "type": "number" }
+      },
+      "required": ["kind", "content", "color", "tickMs"],
+      "additionalProperties": false
+    },
+
+    "InlineEffect": {
+      "type": "object",
+      "properties": {
+        "kind": { "type": "string", "enum": ["screenshake", "realization"] }
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    },
+
+    "SegmentColor": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": { "const": "named" },
+            "name": { "$ref": "#/definitions/TextColorName" }
+          },
+          "required": ["kind", "name"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": { "const": "rgb" },
+            "r": { "type": "number" },
+            "g": { "type": "number" },
+            "b": { "type": "number" }
+          },
+          "required": ["kind", "r", "g", "b"],
+          "additionalProperties": false
+        }
+      ]
+    },
+
+    "TextColorName": {
+      "type": "string",
+      "enum": ["white", "green", "red", "orange", "blue", "yellow", "pink", "cyan", "grey", "rainbow"]
+    },
+
+    "TextCrawlMode": {
+      "type": "string",
+      "enum": ["none", "concurrent", "await"]
+    },
+
+    "ShoutPhase": {
+      "type": "object",
+      "properties": {
+        "image": { "type": "string" },
+        "sound": { "type": "string" },
+        "durationMs": { "type": "number" },
+        "isCustom": { "type": "boolean" }
+      },
+      "required": ["image", "sound", "durationMs", "isCustom"],
+      "additionalProperties": false
+    },
+
+    "SlidePhase": {
+      "type": "object",
+      "properties": {
+        "fromSide": { "type": "string" },
+        "toSide": { "type": "string" },
+        "durationMs": { "type": "number" },
+        "bookendDelayMs": { "type": "number" }
+      },
+      "required": ["fromSide", "toSide", "durationMs", "bookendDelayMs"],
+      "additionalProperties": false
+    },
+
+    "InitialEffects": {
+      "type": "object",
+      "properties": {
+        "screenshake": { "type": "boolean" },
+        "realization": { "type": "boolean" }
+      },
+      "required": ["screenshake", "realization"],
+      "additionalProperties": false
+    },
+
+    "ParsedFrameEffects": {
+      "type": "object",
+      "properties": {
+        "screenshakeFrames": {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "realizationFrames": {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "sfxFrames": {
+          "type": "array",
+          "items": { "type": "number" }
+        }
+      },
+      "required": ["screenshakeFrames", "realizationFrames", "sfxFrames"],
+      "additionalProperties": false
+    },
+
+    "OverlayEffect": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": { "const": "rain" },
+            "intensity": { "type": "number" }
+          },
+          "required": ["kind", "intensity"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": { "const": "image" },
+            "path": { "type": "string" }
+          },
+          "required": ["kind", "path"],
+          "additionalProperties": false
+        }
+      ]
+    },
+
+    "PositionLayout": {
+      "type": "object",
+      "properties": {
+        "side": { "type": "string" },
+        "useFullView": { "type": "boolean" },
+        "skipOffset": { "type": "boolean" },
+        "backgroundUrl": { "type": ["string", "null"] },
+        "deskUrl": { "type": ["string", "null"] },
+        "speedLinesUrl": { "type": ["string", "null"] }
+      },
+      "required": ["side", "useFullView", "skipOffset", "backgroundUrl", "deskUrl", "speedLinesUrl"],
+      "additionalProperties": false
+    },
+
+    "ChatboxDisplay": {
+      "type": "object",
+      "properties": {
+        "visible": { "type": "boolean" },
+        "nameplate": { "type": "string" },
+        "showname": { "type": "string" },
+        "chatboxAsset": { "type": ["string", "null"] }
+      },
+      "required": ["visible", "nameplate", "showname", "chatboxAsset"],
+      "additionalProperties": false
+    },
+
+    "CharacterOffset": {
+      "type": "object",
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      },
+      "required": ["x", "y"],
+      "additionalProperties": false
+    }
+  }
+}
