@@ -161,15 +161,10 @@ describe("buildRenderSequence", () => {
       }
     });
 
-    it("shows speedlines for zoom emotes", () => {
+    it("hides desk during speedlines (zoom emote)", () => {
       const seq = build(makeArgs({ 8: "5" })); // EmoteModifier.Zoom
-      expect(seq.layout.showSpeedlines).toBe(true);
-    });
-
-    it("hides desk during speedlines", () => {
-      const seq = build(makeArgs({ 8: "5" })); // Zoom
-      expect(seq.layout.deskDuringPreanim).toBe(false);
-      expect(seq.layout.deskDuringSpeaking).toBe(false);
+      const finalStep = seq.characters[0].steps[seq.characters[0].steps.length - 1];
+      expect(finalStep.scene.deskVisible).toBe(false);
     });
 
     it("includes pre-resolved background URL", () => {
@@ -196,29 +191,39 @@ describe("buildRenderSequence", () => {
     });
   });
 
-  describe("desk modifiers", () => {
-    it("deskmod 0 hides desk in both phases", () => {
-      const seq = build(makeArgs({ 1: "0" }));
-      expect(seq.layout.deskDuringPreanim).toBe(false);
-      expect(seq.layout.deskDuringSpeaking).toBe(false);
+  describe("desk modifiers (per-step scene)", () => {
+    // Helper: build with preanim so we get 2 steps to check both phases
+    function buildWithPreanim(deskmod: string) {
+      const manifest = makeManifest({
+        characters: [
+          { idleUrl: "char/idle.webp", talkingUrl: "char/talk.webp", preanimUrl: "char/preanim.webp", preanimDuration: 500 },
+        ],
+      });
+      return build(makeArgs({ 1: deskmod, 2: "zoom", 8: "1" }), manifest); // PreanimWithSfx
+    }
+
+    it("deskmod 0 hides desk in both steps", () => {
+      const seq = buildWithPreanim("0");
+      expect(seq.characters[0].steps[0].scene.deskVisible).toBe(false);
+      expect(seq.characters[0].steps[1].scene.deskVisible).toBe(false);
     });
 
-    it("deskmod 1 shows desk in both phases", () => {
-      const seq = build(makeArgs({ 1: "1" }));
-      expect(seq.layout.deskDuringPreanim).toBe(true);
-      expect(seq.layout.deskDuringSpeaking).toBe(true);
+    it("deskmod 1 shows desk in both steps", () => {
+      const seq = buildWithPreanim("1");
+      expect(seq.characters[0].steps[0].scene.deskVisible).toBe(true);
+      expect(seq.characters[0].steps[1].scene.deskVisible).toBe(true);
     });
 
-    it("deskmod 2 hides desk during preanim only", () => {
-      const seq = build(makeArgs({ 1: "2" }));
-      expect(seq.layout.deskDuringPreanim).toBe(false);
-      expect(seq.layout.deskDuringSpeaking).toBe(true);
+    it("deskmod 2 hides desk during preanim step only", () => {
+      const seq = buildWithPreanim("2");
+      expect(seq.characters[0].steps[0].scene.deskVisible).toBe(false);
+      expect(seq.characters[0].steps[1].scene.deskVisible).toBe(true);
     });
 
-    it("deskmod 3 shows desk during preanim only", () => {
-      const seq = build(makeArgs({ 1: "3" }));
-      expect(seq.layout.deskDuringPreanim).toBe(true);
-      expect(seq.layout.deskDuringSpeaking).toBe(false);
+    it("deskmod 3 shows desk during preanim step only", () => {
+      const seq = buildWithPreanim("3");
+      expect(seq.characters[0].steps[0].scene.deskVisible).toBe(true);
+      expect(seq.characters[0].steps[1].scene.deskVisible).toBe(false);
     });
   });
 
@@ -293,21 +298,28 @@ describe("buildRenderSequence", () => {
     });
   });
 
-  describe("evidence", () => {
-    it("is null when evidence index is 0", () => {
+  describe("evidence (per-step scene)", () => {
+    it("final step has no evidence when evidence index is 0", () => {
       const seq = build(makeArgs({ 12: "0" }));
-      expect(seq.evidence).toBeNull();
+      const finalStep = seq.characters[0].steps[seq.characters[0].steps.length - 1];
+      expect(finalStep.scene.evidence).toBeNull();
     });
 
-    it("includes evidence when index is valid", () => {
+    it("final step includes evidence when index is valid", () => {
       const packet = parseMSPacket(makeArgs({ 12: "1" }));
       const charIni = defaultCharIni("Phoenix");
       const evidences = [{ icon: "evidence/badge.png" }];
       const seq = buildRenderSequence(
         packet, charIni, makeManifest(), evidences, EMPTY_AOML, AO_HOST, TICK_MS, "",
       );
-      expect(seq.evidence).not.toBeNull();
-      expect(seq.evidence!.iconPath).toBe("evidence/badge.png");
+      const finalStep = seq.characters[0].steps[seq.characters[0].steps.length - 1];
+      expect(finalStep.scene.evidence).not.toBeNull();
+      expect(finalStep.scene.evidence!.iconPath).toBe("evidence/badge.png");
+    });
+
+    it("evidence is not a top-level field on RenderSequence", () => {
+      const seq = build(makeArgs());
+      expect("evidence" in seq).toBe(false);
     });
   });
 
@@ -321,6 +333,115 @@ describe("buildRenderSequence", () => {
     it("sets realization from packet", () => {
       const seq = build(makeArgs({ 14: "1" }));
       expect(seq.initialEffects.realization).toBe(true);
+    });
+  });
+
+  describe("textCrawl mode", () => {
+    it("final step has 'await' when chatbox is visible and has text", () => {
+      const seq = build(makeArgs({ 5: "Hello world" }));
+      const finalStep = seq.characters[0].steps[seq.characters[0].steps.length - 1];
+      expect(finalStep.textCrawl).toBe("await");
+    });
+
+    it("final step has 'none' when content is empty", () => {
+      const seq = build(makeArgs({ 5: "" }));
+      const finalStep = seq.characters[0].steps[seq.characters[0].steps.length - 1];
+      expect(finalStep.textCrawl).toBe("none");
+    });
+
+    it("preanim step has 'concurrent' when nonInterrupting", () => {
+      const manifest = makeManifest({
+        characters: [
+          { idleUrl: "char/idle.webp", talkingUrl: "char/talk.webp", preanimUrl: "char/preanim.webp", preanimDuration: 500 },
+        ],
+      });
+      // emotemod 1 = PreanimWithSfx, nonInterruptingPreanim = 1
+      const seq = build(makeArgs({ 2: "zoom", 8: "1", 23: "1" }), manifest);
+      // Need extended args for nonInterruptingPreanim at field 23
+      const args = makeArgs({
+        2: "zoom", 8: "1",
+        16: "", 17: "0", 18: "", 19: "", 20: "0<and>0", 21: "0<and>0",
+        22: "0", 23: "1",
+      });
+      const seq2 = build(args, manifest);
+      expect(seq2.characters[0].steps[0].textCrawl).toBe("concurrent");
+    });
+
+    it("preanim step has 'none' when not nonInterrupting", () => {
+      const manifest = makeManifest({
+        characters: [
+          { idleUrl: "char/idle.webp", talkingUrl: "char/talk.webp", preanimUrl: "char/preanim.webp", preanimDuration: 500 },
+        ],
+      });
+      const args = makeArgs({
+        2: "zoom", 8: "1",
+        16: "", 17: "0", 18: "", 19: "", 20: "0<and>0", 21: "0<and>0",
+        22: "0", 23: "0",
+      });
+      const seq = build(args, manifest);
+      expect(seq.characters[0].steps[0].textCrawl).toBe("none");
+    });
+  });
+
+  describe("per-step chatbox visibility", () => {
+    it("preanim step hides chatbox when not nonInterrupting", () => {
+      const manifest = makeManifest({
+        characters: [
+          { idleUrl: "char/idle.webp", talkingUrl: "char/talk.webp", preanimUrl: "char/preanim.webp", preanimDuration: 500 },
+        ],
+      });
+      const args = makeArgs({
+        2: "zoom", 8: "1", 5: "Hello",
+        16: "", 17: "0", 18: "", 19: "", 20: "0<and>0", 21: "0<and>0",
+        22: "0", 23: "0",
+      });
+      const seq = build(args, manifest);
+      expect(seq.characters[0].steps[0].scene.chatboxVisible).toBe(false);
+    });
+
+    it("preanim step shows chatbox when nonInterrupting", () => {
+      const manifest = makeManifest({
+        characters: [
+          { idleUrl: "char/idle.webp", talkingUrl: "char/talk.webp", preanimUrl: "char/preanim.webp", preanimDuration: 500 },
+        ],
+      });
+      const args = makeArgs({
+        2: "zoom", 8: "1", 5: "Hello",
+        16: "", 17: "0", 18: "", 19: "", 20: "0<and>0", 21: "0<and>0",
+        22: "0", 23: "1",
+      });
+      const seq = build(args, manifest);
+      expect(seq.characters[0].steps[0].scene.chatboxVisible).toBe(true);
+    });
+
+    it("final step shows chatbox when content is non-empty", () => {
+      const seq = build(makeArgs({ 5: "Hello" }));
+      const finalStep = seq.characters[0].steps[seq.characters[0].steps.length - 1];
+      expect(finalStep.scene.chatboxVisible).toBe(true);
+    });
+
+    it("final step hides chatbox when content is empty", () => {
+      const seq = build(makeArgs({ 5: "" }));
+      const finalStep = seq.characters[0].steps[seq.characters[0].steps.length - 1];
+      expect(finalStep.scene.chatboxVisible).toBe(false);
+    });
+  });
+
+  describe("pair character scene", () => {
+    it("pair character steps have neutral scene values", () => {
+      const manifest = makeManifest({
+        characters: [
+          { idleUrl: "char/idle.webp", talkingUrl: "char/talk.webp", preanimUrl: null, preanimDuration: 0 },
+          { idleUrl: "pair/idle.webp", talkingUrl: null, preanimUrl: null, preanimDuration: 0 },
+        ],
+      });
+      const seq = build(makeArgsWithPair(), manifest);
+      const pairStep = seq.characters[1].steps[0];
+      expect(pairStep.scene.deskVisible).toBe(false);
+      expect(pairStep.scene.chatboxVisible).toBe(false);
+      expect(pairStep.scene.backgroundUrl).toBeNull();
+      expect(pairStep.scene.evidence).toBeNull();
+      expect(pairStep.textCrawl).toBe("none");
     });
   });
 });

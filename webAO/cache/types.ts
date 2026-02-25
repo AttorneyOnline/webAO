@@ -1,16 +1,3 @@
-export interface CachedAssetMetadata {
-  exists: boolean;
-  resolvedUrl: string | null;
-  animationDuration?: number;
-  cachedAt: number;
-}
-
-export interface ResolvedUrl {
-  baseUrl: string;
-  resolvedUrl: string;
-  extension: string;
-}
-
 export interface CharacterSpriteUrls {
   idleUrl: string | null;
   talkingUrl: string | null;

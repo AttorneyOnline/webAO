@@ -1,6 +1,9 @@
 import type {
   RenderSequence,
-  CharacterTimeline,
+  RenderStep,
+  StepScene,
+  PositionLayout,
+  EvidenceDisplay,
   TextRun,
   SegmentColor,
 } from "./interfaces/RenderSequence";
@@ -117,12 +120,16 @@ export function executeRenderSequence(
     gamewindow.style.animation = "";
     waitingBox.style.opacity = "0";
 
+    // Check if any step has evidence (for reset tracking)
+    const mainTimeline = seq.characters[0];
+    const hasEvidence = mainTimeline?.steps.some(s => s.scene.evidence !== null) ?? false;
+
     // Evidence reset if changed
-    if (ctx.getLastEvidence() !== (seq.evidence ? 1 : 0) || seq.evidence) {
+    if (ctx.getLastEvidence() !== (hasEvidence ? 1 : 0) || hasEvidence) {
       eviBox.style.opacity = "0";
       eviBox.style.height = "0%";
     }
-    ctx.setLastEvidence(seq.evidence ? 1 : 0);
+    ctx.setLastEvidence(hasEvidence ? 1 : 0);
 
     // ── Phase 2: Layout ─────────────────────────────
     const fullview = document.getElementById("client_fullview")!;
@@ -141,23 +148,7 @@ export function executeRenderSequence(
       classicview.style.display = "";
     }
 
-    // Background
-    if (seq.layout.showSpeedlines && seq.layout.speedLinesUrl) {
-      court.src = seq.layout.speedLinesUrl;
-    } else if (seq.layout.backgroundUrl) {
-      court.src = seq.layout.backgroundUrl;
-    }
-
-    // Desk (preanim phase)
-    if (seq.layout.deskDuringPreanim && seq.layout.deskUrl) {
-      bench.src = seq.layout.deskUrl;
-      bench.style.opacity = "1";
-    } else {
-      bench.style.opacity = "0";
-    }
-
     // Character name change detection
-    const mainTimeline = seq.characters[0];
     // We use chatbox nameplate as a proxy for char name tracking
     const charName = seq.chatbox.nameplate;
     if (ctx.getLastCharacter() !== charName) {
@@ -339,129 +330,62 @@ export function executeRenderSequence(
 
     if (cancelled) return;
 
-    // ── Phase 7: Character timed steps (preanim) ────
-    if (mainTimeline && mainTimeline.steps.length > 1) {
-      // Has preanim steps before the final step
-      const hasPreanim = true;
-
-      if (!seq.chatbox.visible) {
-        chatContainerBox.style.opacity = "0";
-      } else {
-        chatContainerBox.style.opacity = "0";
-      }
-
-      for (let stepIdx = 0; stepIdx < mainTimeline.steps.length - 1; stepIdx++) {
-        const step = mainTimeline.steps[stepIdx];
-
-        // Set preanim sprite
-        if (step.sprite) {
-          charImg.src = step.sprite;
-        }
-
-        // Start non-interrupting text crawl in parallel if applicable
-        if (step.nonInterrupting && seq.chatbox.visible) {
-          chatContainerBox.style.opacity = "1";
-          // Run text crawl concurrently during this step
-          runTextCrawl(seq, ctx, chatBoxInner, charLayers, charImg, mainTimeline, waitingBox, () => cancelled);
-        }
-
-        await delay(step.durationMs ?? 0);
-        if (cancelled) return;
-      }
-    }
-
-    // ── Phase 8: Speaking ───────────────────────────
-    // Speed lines off for speaking
-    if (!seq.layout.showSpeedlines && seq.layout.backgroundUrl) {
-      court.src = seq.layout.backgroundUrl;
-    }
-
-    // Desk (speaking phase)
-    if (seq.layout.deskDuringSpeaking && seq.layout.deskUrl) {
-      bench.src = seq.layout.deskUrl;
-      bench.style.opacity = "1";
-    } else {
-      bench.style.opacity = "0";
-    }
-
+    // ── Step loop: preanim + speaking ─────────────────
     shoutSprite.style.display = "none";
     shoutSprite.style.animation = "";
 
-    // Evidence popup
-    if (seq.evidence) {
-      eviBox.src = seq.evidence.iconPath;
-      eviBox.style.width = "auto";
-      eviBox.style.height = "36.5%";
-      eviBox.style.opacity = "1";
-      ctx.testimonyAudio.src = `${ctx.aoHost}sounds/general/sfx-evidenceshoop.opus`;
-      ctx.testimonyAudio.play().catch(() => {});
+    let textCrawlPromise: Promise<void> | null = null;
 
-      if (seq.evidence.position === "right") {
-        eviBox.style.right = "1em";
-        eviBox.style.left = "initial";
-      } else {
-        eviBox.style.right = "initial";
-        eviBox.style.left = "1em";
-      }
-    }
+    if (mainTimeline) {
+      for (const step of mainTimeline.steps) {
+        if (cancelled) return;
 
-    // Pair character in speaking phase
-    if (seq.characters.length > 1) {
-      const pairTimeline = seq.characters[1];
-      const pairFinalStep = pairTimeline.steps[pairTimeline.steps.length - 1];
-      if (pairFinalStep.sprite && pairImg.src !== pairFinalStep.sprite) {
-        pairImg.src = pairFinalStep.sprite;
-      }
-      pairLayers.style.opacity = "1";
-    } else {
-      pairLayers.style.opacity = "0";
-    }
+        // Apply scene state
+        applyScene(step.scene, seq.layout, bench, court, chatContainerBox, eviBox, ctx);
 
-    // Main character talking sprite
-    const finalStep = mainTimeline?.steps[mainTimeline.steps.length - 1];
-    if (finalStep?.talking) {
-      charImg.src = finalStep.talking;
-    }
-    charLayers.style.opacity = "1";
+        // Set sprite: use talking sprite if this step will crawl text
+        if (step.talking && step.textCrawl !== "none") {
+          charImg.src = step.talking;
+        } else if (step.sprite) {
+          charImg.src = step.sprite;
+        }
 
-    // Play SFX from final step
-    if (finalStep?.sfx) {
-      // SFX with delay
-      if (finalStep.sfx.delayMs > 0) {
-        setTimeout(() => {
-          if (!cancelled && finalStep.sfx) {
-            ctx.playSFX(finalStep.sfx.path, finalStep.sfx.loop);
+        // Play SFX
+        if (step.sfx) {
+          if (step.sfx.delayMs > 0) {
+            const sfx = step.sfx;
+            setTimeout(() => {
+              if (!cancelled) {
+                ctx.playSFX(sfx.path, sfx.loop);
+              }
+            }, sfx.delayMs);
+          } else {
+            ctx.playSFX(step.sfx.path, step.sfx.loop);
           }
-        }, finalStep.sfx.delayMs);
-      } else {
-        ctx.playSFX(finalStep.sfx.path, finalStep.sfx.loop);
+        }
+
+        // Text crawl
+        if (step.textCrawl === "await") {
+          await (textCrawlPromise ?? runTextCrawl(seq, ctx, chatBoxInner, waitingBox, () => cancelled));
+          textCrawlPromise = null;
+        } else if (step.textCrawl === "concurrent") {
+          textCrawlPromise = runTextCrawl(seq, ctx, chatBoxInner, waitingBox, () => cancelled);
+        }
+
+        // Wait for step duration
+        if (step.durationMs !== null) {
+          await delay(step.durationMs);
+        }
       }
     }
 
-    if (seq.chatbox.visible) {
-      chatContainerBox.style.opacity = "1";
-    }
-
-    // Check if text is empty
-    if (seq.text.segments.length === 0 || !seq.chatbox.visible) {
-      // No text to crawl - go straight to idle
-      if (finalStep?.sprite) {
-        charImg.src = finalStep.sprite;
-      }
-      charLayers.style.opacity = "1";
-      waitingBox.style.opacity = "1";
-      resolvePromise();
-      return;
-    }
+    // Catch-all: if concurrent crawl outlasts all steps
+    if (textCrawlPromise) await textCrawlPromise;
 
     if (cancelled) return;
 
-    // ── Phase 9: Text crawl ─────────────────────────
-    await runTextCrawl(seq, ctx, chatBoxInner, charLayers, charImg, mainTimeline!, waitingBox, () => cancelled);
-
-    if (cancelled) return;
-
-    // ── Phase 10: Idle ──────────────────────────────
+    // ── Idle ──────────────────────────────────────────
+    const finalStep = mainTimeline?.steps[mainTimeline.steps.length - 1];
     if (finalStep?.sprite) {
       charImg.src = finalStep.sprite;
     }
@@ -479,21 +403,60 @@ export function executeRenderSequence(
   return { cancel, done };
 }
 
+// ─── Scene Apply ─────────────────────────────────────
+
+function showEvidence(
+  evidence: EvidenceDisplay,
+  eviBox: HTMLImageElement,
+  ctx: RenderContext,
+): void {
+  eviBox.src = evidence.iconPath;
+  eviBox.style.width = "auto";
+  eviBox.style.height = "36.5%";
+  eviBox.style.opacity = "1";
+  ctx.testimonyAudio.src = `${ctx.aoHost}sounds/general/sfx-evidenceshoop.opus`;
+  ctx.testimonyAudio.play().catch(() => {});
+
+  if (evidence.position === "right") {
+    eviBox.style.right = "1em";
+    eviBox.style.left = "initial";
+  } else {
+    eviBox.style.right = "initial";
+    eviBox.style.left = "1em";
+  }
+}
+
+function applyScene(
+  scene: StepScene,
+  layout: PositionLayout,
+  bench: HTMLImageElement,
+  court: HTMLImageElement,
+  chatContainer: HTMLElement,
+  eviBox: HTMLImageElement,
+  ctx: RenderContext,
+): void {
+  if (scene.backgroundUrl) court.src = scene.backgroundUrl;
+  if (scene.deskVisible && layout.deskUrl) {
+    bench.src = layout.deskUrl;
+    bench.style.opacity = "1";
+  } else {
+    bench.style.opacity = "0";
+  }
+  chatContainer.style.opacity = scene.chatboxVisible ? "1" : "0";
+  if (scene.evidence) showEvidence(scene.evidence, eviBox, ctx);
+}
+
 // ─── Text Crawl ──────────────────────────────────────
 
 async function runTextCrawl(
   seq: RenderSequence,
   ctx: RenderContext,
   chatBoxInner: HTMLElement,
-  charLayers: HTMLElement,
-  charImg: HTMLImageElement,
-  mainTimeline: CharacterTimeline,
   waitingBox: HTMLElement,
   isCancelled: () => boolean,
 ): Promise<void> {
   const chatBox = document.getElementById("client_chat");
   let currentBlipChannel = 0;
-  const finalStep = mainTimeline.steps[mainTimeline.steps.length - 1];
 
   for (const segment of seq.text.segments) {
     if (isCancelled()) return;

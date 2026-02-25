@@ -6,6 +6,8 @@ import type {
   RenderSequence,
   CharacterTimeline,
   RenderStep,
+  StepScene,
+  TextCrawlMode,
   TextDisplay,
   TextSegment,
   TextRun,
@@ -124,6 +126,9 @@ function buildCharacterTimelines(
   packet: MSPacket,
   manifest: PreloadManifest,
   resolvedSfx: string,
+  layout: PositionLayout,
+  chatboxVisible: boolean,
+  evidence: EvidenceDisplay | null,
 ): CharacterTimeline[] {
   const timelines: CharacterTimeline[] = [];
 
@@ -136,6 +141,53 @@ function buildCharacterTimelines(
     packet.preanim !== "";
 
   const mainSteps: RenderStep[] = [];
+
+  // Compute desk phase visibility (same logic as old buildPositionLayout)
+  const showSpeedlines =
+    packet.emoteModifier === EmoteModifier.Zoom ||
+    packet.emoteModifier === EmoteModifier.PreanimZoom;
+
+  let deskDuringPreanim: boolean;
+  let deskDuringSpeaking: boolean;
+
+  if (showSpeedlines) {
+    deskDuringPreanim = false;
+    deskDuringSpeaking = false;
+  } else {
+    switch (packet.deskMod) {
+      case DeskMod.Hidden:
+        deskDuringPreanim = false;
+        deskDuringSpeaking = false;
+        break;
+      case DeskMod.Shown:
+        deskDuringPreanim = true;
+        deskDuringSpeaking = true;
+        break;
+      case DeskMod.HiddenDuringPreanim:
+        deskDuringPreanim = false;
+        deskDuringSpeaking = true;
+        break;
+      case DeskMod.ShownDuringPreanim:
+        deskDuringPreanim = true;
+        deskDuringSpeaking = false;
+        break;
+      case DeskMod.HiddenIgnoreOffset:
+        deskDuringPreanim = false;
+        deskDuringSpeaking = true;
+        break;
+      case DeskMod.ShownIgnoreOffset:
+        deskDuringPreanim = true;
+        deskDuringSpeaking = false;
+        break;
+      default:
+        deskDuringPreanim = true;
+        deskDuringSpeaking = true;
+        break;
+    }
+  }
+
+  const { backgroundUrl, deskUrl, speedLinesUrl } = layout;
+  const hasText = packet.content.trim() !== "";
 
   // Build SFX config for the final step
   let sfxConfig: SfxConfig | null = null;
@@ -156,13 +208,23 @@ function buildCharacterTimelines(
   }
 
   if (hasPreanim && mainSprites?.preanimUrl) {
-    // Preanim step
+    const preanimScene: StepScene = {
+      deskVisible: deskDuringPreanim && !!deskUrl,
+      chatboxVisible: chatboxVisible && packet.nonInterruptingPreanim,
+      backgroundUrl: showSpeedlines ? speedLinesUrl : backgroundUrl,
+      evidence: null,
+    };
+    const preanimTextCrawl: TextCrawlMode =
+      packet.nonInterruptingPreanim ? "concurrent" : "none";
+
     mainSteps.push({
       sprite: mainSprites.preanimUrl,
       talking: null,
       durationMs: mainSprites.preanimDuration || 0,
       nonInterrupting: packet.nonInterruptingPreanim,
       sfx: null,
+      scene: preanimScene,
+      textCrawl: preanimTextCrawl,
     });
   }
 
@@ -172,12 +234,23 @@ function buildCharacterTimelines(
     ? null
     : mainSprites?.talkingUrl ?? null;
 
+  const finalScene: StepScene = {
+    deskVisible: deskDuringSpeaking && !!deskUrl,
+    chatboxVisible,
+    backgroundUrl,
+    evidence,
+  };
+  const finalTextCrawl: TextCrawlMode =
+    (chatboxVisible && hasText) ? "await" : "none";
+
   mainSteps.push({
     sprite: mainSprites?.idleUrl ?? "",
     talking: talkingSprite,
     durationMs: null,
     nonInterrupting: false,
     sfx: sfxConfig,
+    scene: finalScene,
+    textCrawl: finalTextCrawl,
   });
 
   timelines.push({
@@ -194,6 +267,12 @@ function buildCharacterTimelines(
   // Pair character
   if (packet.otherName) {
     const pairSprites = manifest.characters[1];
+    const neutralScene: StepScene = {
+      deskVisible: false,
+      chatboxVisible: false,
+      backgroundUrl: null,
+      evidence: null,
+    };
     timelines.push({
       steps: [
         {
@@ -202,6 +281,8 @@ function buildCharacterTimelines(
           durationMs: null,
           nonInterrupting: false,
           sfx: null,
+          scene: neutralScene,
+          textCrawl: "none",
         },
       ],
       flip: packet.otherFlip,
@@ -387,60 +468,17 @@ function buildShoutPhase(
 function buildPositionLayout(packet: MSPacket, manifest: PreloadManifest): PositionLayout {
   const side = packet.side;
   const deskmod = packet.deskMod;
-  const emoteModifier = packet.emoteModifier;
 
   const useFullView = ["def", "pro", "wit"].includes(side);
-  const showSpeedlines =
-    emoteModifier === EmoteModifier.Zoom || emoteModifier === EmoteModifier.PreanimZoom;
 
-  let deskDuringPreanim: boolean;
-  let deskDuringSpeaking: boolean;
   let skipOffset = false;
-
-  if (showSpeedlines) {
-    deskDuringPreanim = false;
-    deskDuringSpeaking = false;
-  } else {
-    switch (deskmod) {
-      case DeskMod.Hidden:
-        deskDuringPreanim = false;
-        deskDuringSpeaking = false;
-        break;
-      case DeskMod.Shown:
-        deskDuringPreanim = true;
-        deskDuringSpeaking = true;
-        break;
-      case DeskMod.HiddenDuringPreanim:
-        deskDuringPreanim = false;
-        deskDuringSpeaking = true;
-        break;
-      case DeskMod.ShownDuringPreanim:
-        deskDuringPreanim = true;
-        deskDuringSpeaking = false;
-        break;
-      case DeskMod.HiddenIgnoreOffset:
-        deskDuringPreanim = false;
-        deskDuringSpeaking = true;
-        skipOffset = true;
-        break;
-      case DeskMod.ShownIgnoreOffset:
-        deskDuringPreanim = true;
-        deskDuringSpeaking = false;
-        skipOffset = true;
-        break;
-      default:
-        deskDuringPreanim = true;
-        deskDuringSpeaking = true;
-        break;
-    }
+  if (deskmod === DeskMod.HiddenIgnoreOffset || deskmod === DeskMod.ShownIgnoreOffset) {
+    skipOffset = true;
   }
 
   return {
     side,
     useFullView,
-    showSpeedlines,
-    deskDuringPreanim,
-    deskDuringSpeaking,
     skipOffset,
     backgroundUrl: manifest.backgroundUrl,
     deskUrl: manifest.deskUrl,
@@ -553,10 +591,16 @@ export function buildRenderSequence(
     }
   }
 
+  const layout = buildPositionLayout(packet, manifest);
+  const chatbox = buildChatboxDisplay(packet, charIni);
+  const evidence = buildEvidenceDisplay(packet, evidences);
+
   return {
-    characters: buildCharacterTimelines(packet, manifest, resolvedSfx),
-    layout: buildPositionLayout(packet, manifest),
-    chatbox: buildChatboxDisplay(packet, charIni),
+    characters: buildCharacterTimelines(
+      packet, manifest, resolvedSfx, layout, chatbox.visible, evidence,
+    ),
+    layout,
+    chatbox,
     text: buildTextDisplay(
       packet.content,
       packet.textColor,
@@ -567,7 +611,6 @@ export function buildRenderSequence(
     ),
     shout: buildShoutPhase(packet, manifest, aoHost),
     slide: buildSlidePhase(packet, previousSide),
-    evidence: buildEvidenceDisplay(packet, evidences),
     initialEffects: buildInitialEffects(packet),
     overlay: buildOverlayEffect(packet, manifest),
   };

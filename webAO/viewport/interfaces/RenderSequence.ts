@@ -44,6 +44,19 @@ export interface TextDisplay {
 
 // ─── Character Timelines ─────────────────────────────
 
+/** How text crawl behaves during this step */
+export type TextCrawlMode = "none" | "concurrent" | "await";
+
+/** Per-step scene state applied by the executor at the START of a step */
+export interface StepScene {
+  readonly deskVisible: boolean;
+  readonly chatboxVisible: boolean;
+  /** Speed-lines URL or normal background URL — executor sets court.src to this */
+  readonly backgroundUrl: string | null;
+  /** Evidence to show at step start, or null */
+  readonly evidence: EvidenceDisplay | null;
+}
+
 /** A single step in a character's render sequence */
 export interface RenderStep {
   /** Resolved relative path to sprite */
@@ -56,6 +69,10 @@ export interface RenderStep {
   readonly nonInterrupting: boolean;
   /** Optional sound effect triggered at step start */
   readonly sfx: SfxConfig | null;
+  /** Per-step scene state applied by the executor */
+  readonly scene: StepScene;
+  /** How text crawl behaves during this step */
+  readonly textCrawl: TextCrawlMode;
 }
 
 /** One character's complete independent rendering timeline */
@@ -129,19 +146,13 @@ export interface PositionLayout {
   readonly side: Position | string;
   /** True for def/pro/wit (panoramic view positions) */
   readonly useFullView: boolean;
-  /** True when emoteModifier is Zoom or PreanimZoom */
-  readonly showSpeedlines: boolean;
-  /** Pre-computed from desk modifier */
-  readonly deskDuringPreanim: boolean;
-  /** Pre-computed from desk modifier */
-  readonly deskDuringSpeaking: boolean;
   /** True for desk modifier 4/5 (ignore offset) */
   readonly skipOffset: boolean;
   /** Background image URL for classic view, or null if not resolved */
   readonly backgroundUrl: string | null;
   /** Resolved desk overlay image URL, or null if position has no desk */
   readonly deskUrl: string | null;
-  /** Speed-lines animation URL when showSpeedlines is true */
+  /** Speed-lines animation URL — builder uses internally, executor reads for deskVisible */
   readonly speedLinesUrl: string | null;
 }
 
@@ -177,7 +188,6 @@ export interface RenderSequence {
   readonly text: TextDisplay;
   readonly shout: ShoutPhase | null;
   readonly slide: SlidePhase | null;
-  readonly evidence: EvidenceDisplay | null;
   readonly initialEffects: InitialEffects;
   readonly overlay: OverlayEffect | null;
 }

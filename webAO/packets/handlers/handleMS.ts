@@ -2,7 +2,7 @@ import { client, UPDATE_INTERVAL } from "../../client";
 import { handleCharacterInfo, ensureCharIni } from "../../client/handleCharacterInfo";
 import { resetICParams } from "../../client/resetICParams";
 import { safeTags } from "../../encoding";
-import { getAssetPreloader } from "../../cache";
+import { resolveManifest } from "../../cache";
 import { appendICLog } from "../../client/appendICLog";
 import { checkCallword } from "../../client/checkCallword";
 import { AO_HOST } from "../../client/aoHost";
@@ -102,8 +102,7 @@ export const handleMS = async (args: string[]) => {
 
   // Preload all assets before rendering
   const bgName = client.viewport.getBackgroundName();
-  const preloader = getAssetPreloader(client.emote_extensions, undefined, client.background_extensions);
-  const manifest = await preloader.preloadForMessage(packet, charIni, bgName);
+  const manifest = await resolveManifest(packet, charIni, bgName, client.emote_extensions, client.background_extensions);
 
   // Check if a newer message arrived during preload - if so, skip rendering this one
   if (thisMessageSequence !== currentMessageSequence) {
