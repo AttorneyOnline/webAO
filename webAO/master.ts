@@ -74,8 +74,7 @@ async function getServerlist(): Promise<AOServer[]> {
       continue;
     }
     if (!item.description) {
-      console.warn(`Server ${item.name} has no description, skipping`);
-      continue;
+      console.warn(`Server ${item.name} has no description`);
     }
 
     const newServer: AOServer = {
@@ -94,9 +93,8 @@ async function getServerlist(): Promise<AOServer[]> {
     }
 
     // if none of ws_port or wss_port are defined, skip
-    // Note that this is not an error condition, as many servers only has port (TCP) enabled
-    // Which means they don't support webAO
     if (!newServer.ws_port && !newServer.wss_port) {
+      console.warn(`Server ${item.name} has no websocket port, skipping`);
       continue;
     }
 
