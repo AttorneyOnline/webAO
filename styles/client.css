@@ -58,25 +58,75 @@
   }
 }
 
-#client_error {
-  position: absolute;
+#client_error_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  flex-direction: column;
-  padding: 10px;
-  top: 50%;
-  left: 50%;
-  margin-right: -50%;
-  transform: translate(-50%, -50%);
   justify-content: center;
   align-items: center;
-  background: #a00;
+  z-index: 200;
+}
+
+#client_error {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 36px;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #c00;
+  border-radius: 8px;
   color: #fff;
   font-size: large;
-  z-index: 100;
+  min-width: 280px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+#client_error_icon {
+  font-size: 48px;
+  color: #f44;
+  margin-bottom: 4px;
 }
 
 #client_errortext {
-  animation: error_blink 3s ease-in-out infinite;
+  margin: 4px 0 8px;
+  text-align: center;
+}
+
+#client_error_code {
+  color: #999;
+  font-size: 12px;
+  margin: 0 0 16px;
+}
+
+#client_reconnect {
+  background: #c00;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 32px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 0.2s;
+}
+
+#client_reconnect:hover {
+  background: #e22;
+}
+
+#client_error_help {
+  color: #aaa;
+  font-size: 12px;
+  margin: 0;
+}
+
+#client_error_help a {
+  color: #6af;
 }
 
 #client_secondfactor {
