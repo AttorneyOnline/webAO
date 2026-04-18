@@ -98,6 +98,7 @@
 }
 
 #client_error_code {
+  display: none;
   color: #999;
   font-size: 12px;
   margin: 0 0 16px;
