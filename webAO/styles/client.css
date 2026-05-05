@@ -567,16 +567,14 @@
   flex-direction: column;
   align-items: center;
   background: rgba(0, 0, 0, 0.85);
-  border: 1px solid #000;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  padding: 4px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  padding: 6px;
 }
 
 #sprite_preview .sprite_preview_img {
   max-width: 256px;
   max-height: 256px;
-  image-rendering: pixelated;
 }
 
 #sprite_preview .sprite_preview_label {
