@@ -559,6 +559,36 @@
   opacity: 0.5;
 }
 
+#sprite_preview {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid #000;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  padding: 4px;
+}
+
+#sprite_preview .sprite_preview_img {
+  max-width: 256px;
+  max-height: 256px;
+  image-rendering: pixelated;
+}
+
+#sprite_preview .sprite_preview_label {
+  margin-top: 4px;
+  color: #fff;
+  font-size: 12px;
+  font-family: sans-serif;
+  text-align: center;
+  max-width: 256px;
+  word-break: break-word;
+}
+
 #client_emo {
   position: relative;
   top: 10px;

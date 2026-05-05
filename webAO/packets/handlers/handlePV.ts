@@ -4,19 +4,26 @@ import { updateActionCommands } from "../../dom/updateActionCommands";
 import { pickEmotion } from "../../dom/pickEmotion";
 import { AO_HOST } from "../../client/aoHost";
 import { ensureCharIni } from "../../client/handleCharacterInfo";
+import { attachSpritePreview } from "../../dom/spritePreview";
 
-function addEmoteButton(i: number, imgurl: string, desc: string) {
+function addEmoteButton(
+  i: number,
+  imgurl: string,
+  desc: string,
+  charactername: string,
+  emotename: string,
+) {
   const emotesList = document.getElementById("client_emo");
   const emote_item = new Image();
   emote_item.id = "emo_" + i;
   emote_item.className = "emote_button";
   emote_item.src = imgurl;
   emote_item.alt = desc;
-  emote_item.title = desc;
   emote_item.onclick = () => {
     window.pickEmotion(i);
   };
   emotesList.appendChild(emote_item);
+  attachSpritePreview(emote_item, charactername, emotename, desc);
 }
 
 /**
@@ -83,7 +90,7 @@ export const handlePV = async (args: string[]) => {
           button: url,
         };
 
-        addEmoteButton(i, url, emotes[i].desc);
+        addEmoteButton(i, url, emotes[i].desc, me.name.toLowerCase(), emotes[i].emote);
 
         if (i === 1) pickEmotion(1);
       } catch (e) {
