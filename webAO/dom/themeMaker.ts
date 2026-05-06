@@ -63,6 +63,18 @@ export interface ThemeConfig {
   playerlistBorder: string;
   playerlistBgImage: string;  // data-URL or ""
 
+  // Opacity (0–100) for background colours; 100 = fully opaque
+  bodyBgOpacity: number;
+  menuBgOpacity: number;
+  logBgOpacity: number;
+  oocBgOpacity: number;
+  inputBgOpacity: number;
+  layoutBgOpacity: number;
+  icControlsBgOpacity: number;
+  tabBgOpacity: number;
+  tabActiveBgOpacity: number;
+  playerlistBgOpacity: number;
+
   // Extra raw CSS appended at the end
   extraCSS: string;
 }
@@ -110,6 +122,17 @@ const DEFAULT_CONFIG: ThemeConfig = {
   playerlistColor: "#000000",
   playerlistBorder: "#cccccc",
   playerlistBgImage: "",
+
+  bodyBgOpacity: 100,
+  menuBgOpacity: 100,
+  logBgOpacity: 100,
+  oocBgOpacity: 100,
+  inputBgOpacity: 100,
+  layoutBgOpacity: 100,
+  icControlsBgOpacity: 100,
+  tabBgOpacity: 100,
+  tabActiveBgOpacity: 100,
+  playerlistBgOpacity: 100,
 
   extraCSS: "",
 };
@@ -283,6 +306,18 @@ body {
   },
 };
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Converts a #rrggbb hex colour + an opacity (0–100) to a CSS rgba() string. */
+function hexToRgba(hex: string, opacity: number): string {
+  if (opacity >= 100) return hex;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const a = Math.max(0, Math.min(1, opacity / 100)).toFixed(2);
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
 // ─── CSS Generation ───────────────────────────────────────────────────────────
 
 function buildBgImageCSS(config: ThemeConfig): string {
@@ -298,9 +333,19 @@ function buildBgImageCSS(config: ThemeConfig): string {
 }
 
 export function generateCSS(config: ThemeConfig): string {
+  const bodyBgColor = hexToRgba(config.bodyBg, Number(config.bodyBgOpacity ?? 100));
+  const menuBgColor = hexToRgba(config.menuBg, Number(config.menuBgOpacity ?? 100));
+  const logBgColor = hexToRgba(config.logBg, Number(config.logBgOpacity ?? 100));
+  const oocBgColor = hexToRgba(config.oocBg, Number(config.oocBgOpacity ?? 100));
+  const inputBgColor = hexToRgba(config.inputBg, Number(config.inputBgOpacity ?? 100));
+  const layoutBgColor = hexToRgba(config.layoutBg, Number(config.layoutBgOpacity ?? 100));
+  const icControlsBgColor = hexToRgba(config.icControlsBg, Number(config.icControlsBgOpacity ?? 100));
+  const tabBgColor = hexToRgba(config.tabBg, Number(config.tabBgOpacity ?? 100));
+  const tabActiveBgColor = hexToRgba(config.tabActiveBg, Number(config.tabActiveBgOpacity ?? 100));
+  const playerlistBgColor = hexToRgba(config.playerlistBg, Number(config.playerlistBgOpacity ?? 100));
   return `/* LemmyAO Theme Maker — generated theme */
 body {
-  background-color: ${config.bodyBg};
+  background-color: ${bodyBgColor};
   color: ${config.bodyColor};
   font-family: ${config.bodyFontFamily};
   font-size: ${config.bodyFontSize}px;${buildBgImageCSS(config)}
@@ -322,71 +367,71 @@ body {
 }
 
 #client_menu {
-  background-color: ${config.menuBg};
+  background-color: ${menuBgColor};
   color: ${config.menuColor};
   overflow-y: auto;
   height: 100%;
 }
 
 .menu_content {
-  background-color: ${config.menuBg};
+  background-color: ${menuBgColor};
   color: ${config.menuColor};
 }
 
 .menu_text {
   color: ${config.menuColor};
-  background-color: ${config.menuBg};
+  background-color: ${menuBgColor};
 }
 
 #client_log {
-  background-color: ${config.logBg};
+  background-color: ${logBgColor};
   color: ${config.logColor};
 }
 
 #client_ooclog {
-  background-color: ${config.oocBg};
+  background-color: ${oocBgColor};
   color: ${config.oocColor};
 }
 
 #client_inputbox {
-  background-color: ${config.inputBg};
+  background-color: ${inputBgColor};
   color: ${config.inputColor};
   border: 1px solid ${config.inputBorder};
 }
 
 #client_oocinput {
-  background-color: ${config.inputBg};
+  background-color: ${inputBgColor};
   color: ${config.inputColor};
 }
 
 #client_iccontrols {
-  background-color: ${config.icControlsBg};
+  background-color: ${icControlsBgColor};
 }
 
 .lm_goldenlayout,
 .lm_content {
-  background-color: ${config.layoutBg} !important;
+  background-color: ${layoutBgColor} !important;
 }
 
 .lm_tab {
   color: ${config.tabColor};
-  background-color: ${config.tabBg};
+  background-color: ${tabBgColor};
 }
 
 .lm_tab.lm_active {
   color: ${config.tabActiveColor};
-  background-color: ${config.tabActiveBg};
+  background-color: ${tabActiveBgColor};
 }
 
 #evi_name {
-  background-color: ${config.inputBg};
+  background-color: ${inputBgColor};
   color: ${config.inputColor};
   border: 1px solid ${config.inputBorder};
 }
 
 #evi_desc {
   flex: 1 auto;
-  background-color: ${config.inputBg};
+  background-color: ${inputBgColor};
   color: ${config.inputColor};
   border: 1px solid ${config.inputBorder};
 }
@@ -400,7 +445,7 @@ body {
 }
 
 #client_playerlist {
-  background-color: ${config.playerlistBg};
+  background-color: ${playerlistBgColor};
   color: ${config.playerlistColor};${config.playerlistBgImage ? `
   background-image: url('${config.playerlistBgImage}');
   background-size: cover;
@@ -515,6 +560,13 @@ function injectModalHTML(): void {
               </div>
             </div>
             <div class="tm_row">
+              <label class="tm_label" for="tm_bodyBgOpacity">Page bg opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_bodyBgOpacity" data-prop="bodyBgOpacity" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_bodyBgOpacity">100</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
               <label class="tm_label" for="tm_bodyColor">Page text color</label>
               <div class="tm_ctrl">
                 <input type="color" id="tm_bodyColor" data-prop="bodyColor" class="tm_color" />
@@ -530,6 +582,13 @@ function injectModalHTML(): void {
               <div class="tm_ctrl">
                 <input type="color" id="tm_menuBg" data-prop="menuBg" class="tm_color" />
                 <input type="text" class="tm_hex" data-for="tm_menuBg" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_menuBgOpacity">Menu bg opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_menuBgOpacity" data-prop="menuBgOpacity" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_menuBgOpacity">100</span><span>%</span>
               </div>
             </div>
             <div class="tm_row">
@@ -583,6 +642,13 @@ function injectModalHTML(): void {
               </div>
             </div>
             <div class="tm_row">
+              <label class="tm_label" for="tm_logBgOpacity">IC log bg opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_logBgOpacity" data-prop="logBgOpacity" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_logBgOpacity">100</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
               <label class="tm_label" for="tm_logColor">IC log text</label>
               <div class="tm_ctrl">
                 <input type="color" id="tm_logColor" data-prop="logColor" class="tm_color" />
@@ -594,6 +660,13 @@ function injectModalHTML(): void {
               <div class="tm_ctrl">
                 <input type="color" id="tm_oocBg" data-prop="oocBg" class="tm_color" />
                 <input type="text" class="tm_hex" data-for="tm_oocBg" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_oocBgOpacity">OOC log bg opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_oocBgOpacity" data-prop="oocBgOpacity" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_oocBgOpacity">100</span><span>%</span>
               </div>
             </div>
             <div class="tm_row">
@@ -612,6 +685,13 @@ function injectModalHTML(): void {
               <div class="tm_ctrl">
                 <input type="color" id="tm_inputBg" data-prop="inputBg" class="tm_color" />
                 <input type="text" class="tm_hex" data-for="tm_inputBg" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_inputBgOpacity">Input bg opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_inputBgOpacity" data-prop="inputBgOpacity" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_inputBgOpacity">100</span><span>%</span>
               </div>
             </div>
             <div class="tm_row">
@@ -640,10 +720,24 @@ function injectModalHTML(): void {
               </div>
             </div>
             <div class="tm_row">
+              <label class="tm_label" for="tm_layoutBgOpacity">Layout bg opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_layoutBgOpacity" data-prop="layoutBgOpacity" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_layoutBgOpacity">100</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
               <label class="tm_label" for="tm_icControlsBg">IC controls background</label>
               <div class="tm_ctrl">
                 <input type="color" id="tm_icControlsBg" data-prop="icControlsBg" class="tm_color" />
                 <input type="text" class="tm_hex" data-for="tm_icControlsBg" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_icControlsBgOpacity">IC controls bg opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_icControlsBgOpacity" data-prop="icControlsBgOpacity" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_icControlsBgOpacity">100</span><span>%</span>
               </div>
             </div>
           </div>
@@ -658,10 +752,24 @@ function injectModalHTML(): void {
               </div>
             </div>
             <div class="tm_row">
+              <label class="tm_label" for="tm_tabBgOpacity">Tab bg opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_tabBgOpacity" data-prop="tabBgOpacity" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_tabBgOpacity">100</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
               <label class="tm_label" for="tm_tabActiveBg">Active tab background</label>
               <div class="tm_ctrl">
                 <input type="color" id="tm_tabActiveBg" data-prop="tabActiveBg" class="tm_color" />
                 <input type="text" class="tm_hex" data-for="tm_tabActiveBg" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_tabActiveBgOpacity">Active tab bg opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_tabActiveBgOpacity" data-prop="tabActiveBgOpacity" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_tabActiveBgOpacity">100</span><span>%</span>
               </div>
             </div>
             <div class="tm_row">
@@ -705,6 +813,13 @@ function injectModalHTML(): void {
               <div class="tm_ctrl">
                 <input type="color" id="tm_playerlistBg" data-prop="playerlistBg" class="tm_color" />
                 <input type="text" class="tm_hex" data-for="tm_playerlistBg" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_playerlistBgOpacity">Player list bg opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_playerlistBgOpacity" data-prop="playerlistBgOpacity" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_playerlistBgOpacity">100</span><span>%</span>
               </div>
             </div>
             <div class="tm_row">
@@ -869,6 +984,8 @@ function injectModalHTML(): void {
     <div id="tm_footer">
       <div id="tm_footer_left">
         <button class="tm_btn tm_btn_danger" id="tm_reset_btn" title="Reset all theme maker settings to defaults">🗑 Reset to Default</button>
+        <button class="tm_btn tm_btn_secondary" id="tm_undo_btn" title="Undo last change" disabled>↩ Undo</button>
+        <button class="tm_btn tm_btn_secondary" id="tm_randomize_btn" title="Generate a random harmonious colour scheme">🎲 Randomize</button>
       </div>
       <div id="tm_footer_right">
         <span id="tm_saved_badge" style="display:none">✅ Saved!</span>
@@ -896,6 +1013,136 @@ function getConfig(): ThemeConfig {
 
 function setConfig(config: ThemeConfig): void {
   currentConfig = config;
+}
+
+// ─── Undo History ─────────────────────────────────────────────────────────────
+
+const MAX_HISTORY = 10;
+const undoStack: ThemeConfig[] = [];
+/** True while the user is still holding down / interacting — avoid flooding the stack. */
+let isInteracting = false;
+
+function pushToHistory(config: ThemeConfig): void {
+  undoStack.push(JSON.parse(JSON.stringify(config)));
+  if (undoStack.length > MAX_HISTORY) undoStack.shift();
+  const undoBtn = document.getElementById("tm_undo_btn") as HTMLButtonElement | null;
+  if (undoBtn) undoBtn.disabled = false;
+}
+
+function undoLastChange(): void {
+  if (undoStack.length === 0) return;
+  setConfig(undoStack.pop()!);
+  syncUIFromConfig(currentConfig);
+  liveUpdate();
+  const undoBtn = document.getElementById("tm_undo_btn") as HTMLButtonElement | null;
+  if (undoBtn) undoBtn.disabled = undoStack.length === 0;
+}
+
+function captureHistory(): void {
+  if (!isInteracting) {
+    pushToHistory(currentConfig);
+    isInteracting = true;
+  }
+}
+
+// ─── Random Palette Generator ─────────────────────────────────────────────────
+
+/** Converts HSL (h: 0–360, s: 0–100, l: 0–100) to a #rrggbb hex string. */
+function hslToHex(h: number, s: number, l: number): string {
+  s /= 100;
+  l /= 100;
+  const k = (n: number) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => {
+    const val = l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return Math.round(val * 255).toString(16).padStart(2, "0");
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+/** Generates a random but visually harmonious ThemeConfig derived from HSL math. */
+function generateRandomPalette(): ThemeConfig {
+  const hue = Math.floor(Math.random() * 360);
+  const sat = 20 + Math.floor(Math.random() * 50); // 20–70 %
+  const isDark = Math.random() < 0.65;              // 65 % dark, 35 % light
+  const accentHue = (hue + 150 + Math.floor(Math.random() * 60)) % 360;
+  const accentSat = 55 + Math.floor(Math.random() * 35);
+  const radius = String(Math.floor(Math.random() * 10));
+
+  if (isDark) {
+    const bgL = 5 + Math.floor(Math.random() * 10);   // 5–15 %
+    const textL = 80 + Math.floor(Math.random() * 15); // 80–95 %
+    const clamp = (v: number, mn: number, mx: number) => Math.max(mn, Math.min(mx, v));
+    return {
+      ...DEFAULT_CONFIG,
+      bodyBg: hslToHex(hue, Math.round(sat * 0.35), bgL),
+      bodyColor: hslToHex(hue, 15, textL),
+      menuBg: hslToHex(hue, Math.round(sat * 0.30), clamp(bgL + 4, 3, 25)),
+      menuColor: hslToHex(hue, 10, textL),
+      buttonBg: hslToHex(accentHue, accentSat, 35),
+      buttonColor: hslToHex(hue, 5, 95),
+      buttonBorder: hslToHex(accentHue, accentSat, 55),
+      buttonRadius: radius,
+      logBg: hslToHex(hue, Math.round(sat * 0.25), clamp(bgL - 2, 3, 20)),
+      logColor: hslToHex(hue, 10, textL),
+      oocBg: hslToHex(hue, Math.round(sat * 0.25), clamp(bgL + 3, 3, 25)),
+      oocColor: hslToHex(hue, 10, clamp(textL - 5, 60, 95)),
+      inputBg: hslToHex(hue, Math.round(sat * 0.30), clamp(bgL + 6, 3, 30)),
+      inputColor: hslToHex(hue, 10, textL),
+      inputBorder: hslToHex(hue, Math.round(sat * 0.35), clamp(bgL + 20, 10, 45)),
+      layoutBg: hslToHex(hue, Math.round(sat * 0.25), bgL),
+      icControlsBg: hslToHex(hue, Math.round(sat * 0.30), clamp(bgL + 3, 3, 25)),
+      tabBg: hslToHex(hue, Math.round(sat * 0.30), clamp(bgL + 6, 3, 30)),
+      tabActiveBg: hslToHex(hue, Math.round(sat * 0.35), clamp(bgL + 16, 10, 45)),
+      tabColor: hslToHex(hue, 10, clamp(textL - 10, 60, 90)),
+      tabActiveColor: hslToHex(hue, 5, textL),
+      defHpColor: hslToHex((hue + 120) % 360, 65, 40),
+      proHpColor: hslToHex((hue + 240) % 360, 70, 40),
+      playerlistBg: hslToHex(hue, Math.round(sat * 0.30), clamp(bgL + 4, 3, 25)),
+      playerlistColor: hslToHex(hue, 10, textL),
+      playerlistBorder: hslToHex(hue, Math.round(sat * 0.35), clamp(bgL + 20, 10, 45)),
+      extraCSS: currentConfig.extraCSS,
+      bodyBgImage: currentConfig.bodyBgImage,
+      playerlistBgImage: currentConfig.playerlistBgImage,
+    };
+  } else {
+    // Light palette
+    const bgL = 90 + Math.floor(Math.random() * 8);   // 90–98 %
+    const textL = 5 + Math.floor(Math.random() * 15);  // 5–20 %
+    const clamp = (v: number, mn: number, mx: number) => Math.max(mn, Math.min(mx, v));
+    return {
+      ...DEFAULT_CONFIG,
+      bodyBg: hslToHex(hue, Math.round(sat * 0.20), bgL),
+      bodyColor: hslToHex(hue, Math.round(sat * 0.40), textL),
+      menuBg: hslToHex(hue, Math.round(sat * 0.20), clamp(bgL - 6, 70, 96)),
+      menuColor: hslToHex(hue, Math.round(sat * 0.40), textL),
+      buttonBg: hslToHex(accentHue, accentSat, 45),
+      buttonColor: hslToHex(hue, 5, 98),
+      buttonBorder: hslToHex(accentHue, accentSat, 35),
+      buttonRadius: radius,
+      logBg: hslToHex(hue, Math.round(sat * 0.10), clamp(bgL + 4, 92, 100)),
+      logColor: hslToHex(hue, Math.round(sat * 0.40), textL),
+      oocBg: hslToHex(hue, Math.round(sat * 0.15), clamp(bgL - 4, 70, 96)),
+      oocColor: hslToHex(hue, Math.round(sat * 0.35), clamp(textL + 5, 5, 30)),
+      inputBg: hslToHex(hue, 5, clamp(bgL + 2, 90, 100)),
+      inputColor: hslToHex(hue, Math.round(sat * 0.40), textL),
+      inputBorder: hslToHex(hue, Math.round(sat * 0.25), clamp(bgL - 25, 50, 80)),
+      layoutBg: hslToHex(hue, Math.round(sat * 0.10), bgL),
+      icControlsBg: hslToHex(hue, Math.round(sat * 0.15), clamp(bgL - 3, 70, 97)),
+      tabBg: hslToHex(hue, Math.round(sat * 0.20), clamp(bgL - 10, 65, 92)),
+      tabActiveBg: hslToHex(hue, Math.round(sat * 0.25), clamp(bgL - 20, 55, 85)),
+      tabColor: hslToHex(hue, Math.round(sat * 0.30), clamp(textL + 15, 15, 50)),
+      tabActiveColor: hslToHex(hue, Math.round(sat * 0.40), textL),
+      defHpColor: hslToHex((hue + 120) % 360, 65, 40),
+      proHpColor: hslToHex((hue + 240) % 360, 70, 40),
+      playerlistBg: hslToHex(hue, Math.round(sat * 0.15), clamp(bgL - 5, 70, 96)),
+      playerlistColor: hslToHex(hue, Math.round(sat * 0.40), textL),
+      playerlistBorder: hslToHex(hue, Math.round(sat * 0.25), clamp(bgL - 25, 50, 80)),
+      extraCSS: currentConfig.extraCSS,
+      bodyBgImage: currentConfig.bodyBgImage,
+      playerlistBgImage: currentConfig.playerlistBgImage,
+    };
+  }
 }
 
 // ─── UI ───────────────────────────────────────────────────────────────────────
@@ -1009,6 +1256,9 @@ function liveUpdate(): void {
 // ─── Event wiring ─────────────────────────────────────────────────────────────
 
 function wireEvents(): void {
+  // ── Reset the "interacting" flag whenever the pointer is released globally ──
+  document.addEventListener("pointerup", () => { isInteracting = false; }, true);
+
   // Tab switching
   document.querySelectorAll<HTMLButtonElement>(".tm_tab").forEach((tab) => {
     tab.addEventListener("click", () => {
@@ -1024,8 +1274,9 @@ function wireEvents(): void {
     });
   });
 
-  // Color inputs — sync hex box + update live
+  // Color inputs — capture history on pointerdown, sync hex box + update live
   document.querySelectorAll<HTMLInputElement>(".tm_color[data-prop]").forEach((input) => {
+    input.addEventListener("pointerdown", captureHistory);
     input.addEventListener("input", () => {
       const prop = input.dataset.prop as keyof ThemeConfig;
       (currentConfig as any)[prop] = input.value;
@@ -1035,8 +1286,10 @@ function wireEvents(): void {
     });
   });
 
-  // Hex text inputs — sync color picker + update live
+  // Hex text inputs — capture history on focus, sync color picker + update live
   document.querySelectorAll<HTMLInputElement>(".tm_hex[data-for]").forEach((hexInput) => {
+    hexInput.addEventListener("focus", captureHistory);
+    hexInput.addEventListener("blur", () => { isInteracting = false; });
     hexInput.addEventListener("input", () => {
       const colorId = hexInput.dataset.for!;
       const colorInput = document.getElementById(colorId) as HTMLInputElement | null;
@@ -1051,8 +1304,9 @@ function wireEvents(): void {
     });
   });
 
-  // Range inputs
+  // Range inputs — capture history on pointerdown
   document.querySelectorAll<HTMLInputElement>(".tm_range[data-prop]").forEach((input) => {
+    input.addEventListener("pointerdown", captureHistory);
     input.addEventListener("input", () => {
       const prop = input.dataset.prop as keyof ThemeConfig;
       (currentConfig as any)[prop] = input.value;
@@ -1062,8 +1316,10 @@ function wireEvents(): void {
     });
   });
 
-  // Select dropdowns
+  // Select dropdowns — capture history before change
   document.querySelectorAll<HTMLSelectElement>(".tm_select[data-prop]").forEach((sel) => {
+    sel.addEventListener("focus", captureHistory);
+    sel.addEventListener("blur", () => { isInteracting = false; });
     sel.addEventListener("change", () => {
       const prop = sel.dataset.prop as keyof ThemeConfig;
       if (prop === "bodyFontFamily") {
@@ -1082,15 +1338,19 @@ function wireEvents(): void {
   // Custom font input
   const customFontInput = document.getElementById("tm_customFontInput") as HTMLInputElement | null;
   if (customFontInput) {
+    customFontInput.addEventListener("focus", captureHistory);
+    customFontInput.addEventListener("blur", () => { isInteracting = false; });
     customFontInput.addEventListener("input", () => {
       currentConfig.bodyFontFamily = customFontInput.value || "sans-serif";
       liveUpdate();
     });
   }
 
-  // Extra CSS textarea
+  // Extra CSS textarea — capture history on focus
   const extraTA = document.getElementById("tm_extraCSS") as HTMLTextAreaElement | null;
   if (extraTA) {
+    extraTA.addEventListener("focus", captureHistory);
+    extraTA.addEventListener("blur", () => { isInteracting = false; });
     extraTA.addEventListener("input", () => {
       currentConfig.extraCSS = extraTA.value;
       liveUpdate();
@@ -1103,6 +1363,7 @@ function wireEvents(): void {
     bgFile.addEventListener("change", () => {
       const file = bgFile.files?.[0];
       if (!file) return;
+      pushToHistory(currentConfig);
       const reader = new FileReader();
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string;
@@ -1118,6 +1379,7 @@ function wireEvents(): void {
   const bgClearBtn = document.getElementById("tm_bg_clear_btn");
   if (bgClearBtn) {
     bgClearBtn.addEventListener("click", () => {
+      pushToHistory(currentConfig);
       currentConfig.bodyBgImage = "";
       const bgFile2 = document.getElementById("tm_bg_file") as HTMLInputElement | null;
       if (bgFile2) bgFile2.value = "";
@@ -1132,6 +1394,7 @@ function wireEvents(): void {
     playerlistBgFile.addEventListener("change", () => {
       const file = playerlistBgFile.files?.[0];
       if (!file) return;
+      pushToHistory(currentConfig);
       const reader = new FileReader();
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string;
@@ -1147,6 +1410,7 @@ function wireEvents(): void {
   const playerlistBgClearBtn = document.getElementById("tm_playerlist_bg_clear_btn");
   if (playerlistBgClearBtn) {
     playerlistBgClearBtn.addEventListener("click", () => {
+      pushToHistory(currentConfig);
       currentConfig.playerlistBgImage = "";
       const plFile = document.getElementById("tm_playerlist_bg_file") as HTMLInputElement | null;
       if (plFile) plFile.value = "";
@@ -1158,6 +1422,7 @@ function wireEvents(): void {
   // Presets
   document.querySelectorAll<HTMLButtonElement>(".tm_preset_btn").forEach((btn) => {
     btn.addEventListener("click", () => {
+      pushToHistory(currentConfig);
       const presetName = btn.dataset.preset!;
       const preset = PRESETS[presetName] ?? {};
       setConfig({ ...DEFAULT_CONFIG, ...preset, extraCSS: currentConfig.extraCSS, bodyBgImage: currentConfig.bodyBgImage, playerlistBgImage: currentConfig.playerlistBgImage });
@@ -1165,6 +1430,26 @@ function wireEvents(): void {
       liveUpdate();
     });
   });
+
+  // Undo
+  const undoBtn = document.getElementById("tm_undo_btn") as HTMLButtonElement | null;
+  if (undoBtn) {
+    undoBtn.addEventListener("click", () => {
+      isInteracting = false;
+      undoLastChange();
+    });
+  }
+
+  // Randomize
+  const randomizeBtn = document.getElementById("tm_randomize_btn");
+  if (randomizeBtn) {
+    randomizeBtn.addEventListener("click", () => {
+      pushToHistory(currentConfig);
+      setConfig(generateRandomPalette());
+      syncUIFromConfig(currentConfig);
+      liveUpdate();
+    });
+  }
 
   // Save
   const saveBtn = document.getElementById("tm_save_btn");
@@ -1220,6 +1505,7 @@ function wireEvents(): void {
         if (file.name.endsWith(".json")) {
           try {
             const parsed = JSON.parse(text) as Partial<ThemeConfig>;
+            pushToHistory(currentConfig);
             setConfig({ ...DEFAULT_CONFIG, ...parsed });
             syncUIFromConfig(currentConfig);
             liveUpdate();
@@ -1230,6 +1516,7 @@ function wireEvents(): void {
         } else {
           // Raw CSS import — put it in extraCSS
           if (confirm("Import as raw CSS? It will be placed in the Extra CSS field (Advanced tab). This will override any extra CSS you had.")) {
+            pushToHistory(currentConfig);
             currentConfig.extraCSS = text;
             const extraTA2 = document.getElementById("tm_extraCSS") as HTMLTextAreaElement | null;
             if (extraTA2) extraTA2.value = text;
@@ -1248,6 +1535,7 @@ function wireEvents(): void {
   if (resetBtn) {
     resetBtn.addEventListener("click", () => {
       if (!confirm("Reset ALL theme maker settings to defaults? This will remove your saved theme.")) return;
+      pushToHistory(currentConfig);
       setConfig({ ...DEFAULT_CONFIG });
       saveThemeMakerConfig(currentConfig);
       syncUIFromConfig(currentConfig);
@@ -1310,6 +1598,12 @@ export function openThemeMaker(): void {
     wireEvents();
     overlay.dataset.wired = "1";
   }
+
+  // Clear undo stack each time the modal opens and reset button state
+  undoStack.length = 0;
+  isInteracting = false;
+  const undoBtnEl = document.getElementById("tm_undo_btn") as HTMLButtonElement | null;
+  if (undoBtnEl) undoBtnEl.disabled = true;
 
   syncUIFromConfig(currentConfig);
   if (saved) {
