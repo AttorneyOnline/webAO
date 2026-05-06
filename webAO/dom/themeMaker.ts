@@ -41,6 +41,9 @@ export interface ThemeConfig {
   inputColor: string;
   inputBorder: string;
 
+  // Layout (GoldenLayout panels)
+  layoutBg: string;
+
   // IC controls bar
   icControlsBg: string;
 
@@ -91,6 +94,8 @@ const DEFAULT_CONFIG: ThemeConfig = {
   inputColor: "#000000",
   inputBorder: "#cccccc",
 
+  layoutBg: "#ffffff",
+
   icControlsBg: "#f8f8f8",
 
   tabBg: "#dddddd",
@@ -126,6 +131,7 @@ const PRESETS: Record<string, Partial<ThemeConfig>> = {
     inputBg: "#222222",
     inputColor: "#e0e0e0",
     inputBorder: "#444444",
+    layoutBg: "#121212",
     icControlsBg: "#1e1e1e",
     tabBg: "#222222",
     tabActiveBg: "#333333",
@@ -152,6 +158,7 @@ const PRESETS: Record<string, Partial<ThemeConfig>> = {
     inputBg: "#2a1550",
     inputColor: "#f5e6ff",
     inputBorder: "#7b1fa2",
+    layoutBg: "#1a0a2e",
     icControlsBg: "#200f38",
     tabBg: "#2d1b4e",
     tabActiveBg: "#5b2685",
@@ -178,6 +185,7 @@ const PRESETS: Record<string, Partial<ThemeConfig>> = {
     inputBg: "#0d2040",
     inputColor: "#b3d9ff",
     inputBorder: "#1565c0",
+    layoutBg: "#0a1628",
     icControlsBg: "#0b1a30",
     tabBg: "#112244",
     tabActiveBg: "#1565c0",
@@ -204,6 +212,7 @@ const PRESETS: Record<string, Partial<ThemeConfig>> = {
     inputBg: "#1b3a1b",
     inputColor: "#c8e6c9",
     inputBorder: "#388e3c",
+    layoutBg: "#0d1f0d",
     icControlsBg: "#122012",
     tabBg: "#1b3a1b",
     tabActiveBg: "#2e7d32",
@@ -235,6 +244,7 @@ const PRESETS: Record<string, Partial<ThemeConfig>> = {
     inputBg: "#141008",
     inputColor: "#c9b882",
     inputBorder: "#3d2e10",
+    layoutBg: "#0c0a06",
     icControlsBg: "#100e08",
     tabBg: "#1a1507",
     tabActiveBg: "#3d0a0a",
@@ -351,6 +361,11 @@ body {
 
 #client_iccontrols {
   background-color: ${config.icControlsBg};
+}
+
+.lm_goldenlayout,
+.lm_content {
+  background-color: ${config.layoutBg} !important;
 }
 
 .lm_tab {
@@ -616,7 +631,14 @@ function injectModalHTML(): void {
           </div>
 
           <div class="tm_group">
-            <h4 class="tm_group_title">🗒 IC Controls Bar</h4>
+            <h4 class="tm_group_title">🗒 Layout &amp; IC Controls</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_layoutBg">Layout panel background</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_layoutBg" data-prop="layoutBg" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_layoutBg" maxlength="7" />
+              </div>
+            </div>
             <div class="tm_row">
               <label class="tm_label" for="tm_icControlsBg">IC controls background</label>
               <div class="tm_ctrl">
