@@ -192,6 +192,59 @@ const PRESETS: Record<string, Partial<ThemeConfig>> = {
     defHpColor: "#388e3c",
     proHpColor: "#f9a825",
   },
+  haschenLemmy: {
+    // "Haschen & Lemmy" — inspired by The Coffin of Andy and Leyley.
+    // Palette: coffin-dark near-blacks with a rotting brownish-green undertone,
+    // sickly parchment/bone text, dried-blood crimson accents.
+    bodyBg: "#0c0a06",
+    bodyColor: "#c9b882",
+    bodyFontFamily: "Georgia, serif",
+    menuBg: "#0f0d08",
+    menuColor: "#b8a870",
+    buttonBg: "#3d0a0a",
+    buttonColor: "#e8d5a3",
+    buttonBorder: "#7a1515",
+    buttonRadius: "1",
+    logBg: "#080602",
+    logColor: "#c2ab72",
+    oocBg: "#0d0b06",
+    oocColor: "#a89a60",
+    inputBg: "#141008",
+    inputColor: "#c9b882",
+    inputBorder: "#3d2e10",
+    icControlsBg: "#100e08",
+    tabBg: "#1a1507",
+    tabActiveBg: "#3d0a0a",
+    tabColor: "#8a7a45",
+    tabActiveColor: "#e8d5a3",
+    defHpColor: "#6b3a1f",
+    proHpColor: "#8b1a1a",
+    extraCSS: `/* Haschen & Lemmy — extra decay touches */
+body {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.18) 2px,
+    rgba(0,0,0,0.18) 3px
+  );
+}
+.client_button {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.client_button:hover {
+  background-color: #5a1010;
+  border-color: #a02020;
+}
+#client_log, #client_ooclog {
+  border-left: 2px solid #3d0a0a;
+}
+.lm_tab.lm_active {
+  border-bottom: 2px solid #8b1a1a;
+}`,
+  },
 };
 
 // ─── CSS Generation ───────────────────────────────────────────────────────────
@@ -381,6 +434,7 @@ function injectModalHTML(): void {
           <button class="tm_preset_btn" data-preset="sunset">🌅 Sunset</button>
           <button class="tm_preset_btn" data-preset="ocean">🌊 Ocean</button>
           <button class="tm_preset_btn" data-preset="forest">🌿 Forest</button>
+          <button class="tm_preset_btn" data-preset="haschenLemmy">🪦 Haschen &amp; Lemmy</button>
         </div>
       </nav>
 
