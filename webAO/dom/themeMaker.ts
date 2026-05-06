@@ -54,6 +54,12 @@ export interface ThemeConfig {
   defHpColor: string;
   proHpColor: string;
 
+  // Player list
+  playerlistBg: string;
+  playerlistColor: string;
+  playerlistBorder: string;
+  playerlistBgImage: string;  // data-URL or ""
+
   // Extra raw CSS appended at the end
   extraCSS: string;
 }
@@ -95,6 +101,11 @@ const DEFAULT_CONFIG: ThemeConfig = {
   defHpColor: "#169de0",
   proHpColor: "#e01f5f",
 
+  playerlistBg: "#f0f0f0",
+  playerlistColor: "#000000",
+  playerlistBorder: "#cccccc",
+  playerlistBgImage: "",
+
   extraCSS: "",
 };
 
@@ -122,6 +133,9 @@ const PRESETS: Record<string, Partial<ThemeConfig>> = {
     tabActiveColor: "#ffffff",
     defHpColor: "#1565c0",
     proHpColor: "#b71c1c",
+    playerlistBg: "#1a1a1a",
+    playerlistColor: "#e0e0e0",
+    playerlistBorder: "#444444",
   },
   sunset: {
     bodyBg: "#1a0a2e",
@@ -145,6 +159,9 @@ const PRESETS: Record<string, Partial<ThemeConfig>> = {
     tabActiveColor: "#ffffff",
     defHpColor: "#7b1fa2",
     proHpColor: "#c2185b",
+    playerlistBg: "#2d1b4e",
+    playerlistColor: "#f5e6ff",
+    playerlistBorder: "#7b1fa2",
   },
   ocean: {
     bodyBg: "#0a1628",
@@ -168,6 +185,9 @@ const PRESETS: Record<string, Partial<ThemeConfig>> = {
     tabActiveColor: "#ffffff",
     defHpColor: "#0288d1",
     proHpColor: "#00838f",
+    playerlistBg: "#0d1f3c",
+    playerlistColor: "#b3d9ff",
+    playerlistBorder: "#1565c0",
   },
   forest: {
     bodyBg: "#0d1f0d",
@@ -191,6 +211,9 @@ const PRESETS: Record<string, Partial<ThemeConfig>> = {
     tabActiveColor: "#ffffff",
     defHpColor: "#388e3c",
     proHpColor: "#f9a825",
+    playerlistBg: "#1b3a1b",
+    playerlistColor: "#c8e6c9",
+    playerlistBorder: "#388e3c",
   },
   haschenLemmy: {
     // "Haschen & Lemmy" — inspired by The Coffin of Andy and Leyley.
@@ -219,6 +242,9 @@ const PRESETS: Record<string, Partial<ThemeConfig>> = {
     tabActiveColor: "#e8d5a3",
     defHpColor: "#6b3a1f",
     proHpColor: "#8b1a1a",
+    playerlistBg: "#0f0d08",
+    playerlistColor: "#b8a870",
+    playerlistBorder: "#3d2e10",
     extraCSS: `/* Haschen & Lemmy — extra decay touches */
 body {
   background-image: repeating-linear-gradient(
@@ -359,18 +385,22 @@ body {
 }
 
 #client_playerlist {
-  background-color: ${config.menuBg};
-  color: ${config.menuColor};
+  background-color: ${config.playerlistBg};
+  color: ${config.playerlistColor};${config.playerlistBgImage ? `
+  background-image: url('${config.playerlistBgImage}');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;` : ""}
 }
 
 #client_playerlist th,
 #client_playerlist td {
-  border-bottom: 1px solid ${config.inputBorder};
-  color: ${config.menuColor};
+  border-bottom: 1px solid ${config.playerlistBorder};
+  color: ${config.playerlistColor};
 }
 
 #client_playerlist th {
-  border-bottom: 2px solid ${config.buttonBorder};
+  border-bottom: 2px solid ${config.playerlistBorder};
 }
 
 ${config.extraCSS}`;
@@ -645,6 +675,31 @@ function injectModalHTML(): void {
               </div>
             </div>
           </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">👥 Player List</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_playerlistBg">Background</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_playerlistBg" data-prop="playerlistBg" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_playerlistBg" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_playerlistColor">Text color</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_playerlistColor" data-prop="playerlistColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_playerlistColor" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_playerlistBorder">Row divider color</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_playerlistBorder" data-prop="playerlistBorder" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_playerlistBorder" maxlength="7" />
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Background -->
@@ -683,6 +738,22 @@ function injectModalHTML(): void {
                 <option value="top left">Top left</option>
                 <option value="top right">Top right</option>
               </select>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">👥 Player List Image</h4>
+            <div class="tm_row tm_row_vert">
+              <label class="tm_label">Upload image</label>
+              <input type="file" id="tm_playerlist_bg_file" accept="image/*" />
+              <p class="tm_hint">Optional background image for the player list. Stored locally — never leaves your browser.</p>
+            </div>
+            <div class="tm_row" id="tm_playerlist_bg_preview_wrap" style="display:none">
+              <label class="tm_label">Current image</label>
+              <div class="tm_ctrl">
+                <img id="tm_playerlist_bg_preview" alt="Player list background preview" style="max-height:60px;border-radius:4px;" />
+                <button class="tm_btn tm_btn_danger tm_btn_sm" id="tm_playerlist_bg_clear_btn">Remove image</button>
+              </div>
             </div>
           </div>
 
@@ -851,6 +922,7 @@ function syncUIFromConfig(config: ThemeConfig): void {
 
   // Background preview
   updateBgPreview(config);
+  updatePlayerlistBgPreview(config);
 
   // Font preview
   updateFontPreview(config);
@@ -870,6 +942,19 @@ function updateBgPreview(config: ThemeConfig): void {
   } else {
     img.src = "";
     img.style.display = "none";
+    wrap.style.display = "none";
+  }
+}
+
+function updatePlayerlistBgPreview(config: ThemeConfig): void {
+  const img = document.getElementById("tm_playerlist_bg_preview") as HTMLImageElement | null;
+  const wrap = document.getElementById("tm_playerlist_bg_preview_wrap");
+  if (!img || !wrap) return;
+  if (config.playerlistBgImage) {
+    img.src = config.playerlistBgImage;
+    wrap.style.display = "flex";
+  } else {
+    img.src = "";
     wrap.style.display = "none";
   }
 }
@@ -1019,12 +1104,41 @@ function wireEvents(): void {
     });
   }
 
+  // Player list image upload
+  const playerlistBgFile = document.getElementById("tm_playerlist_bg_file") as HTMLInputElement | null;
+  if (playerlistBgFile) {
+    playerlistBgFile.addEventListener("change", () => {
+      const file = playerlistBgFile.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        currentConfig.playerlistBgImage = dataUrl;
+        updatePlayerlistBgPreview(currentConfig);
+        liveUpdate();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Player list image clear
+  const playerlistBgClearBtn = document.getElementById("tm_playerlist_bg_clear_btn");
+  if (playerlistBgClearBtn) {
+    playerlistBgClearBtn.addEventListener("click", () => {
+      currentConfig.playerlistBgImage = "";
+      const plFile = document.getElementById("tm_playerlist_bg_file") as HTMLInputElement | null;
+      if (plFile) plFile.value = "";
+      updatePlayerlistBgPreview(currentConfig);
+      liveUpdate();
+    });
+  }
+
   // Presets
   document.querySelectorAll<HTMLButtonElement>(".tm_preset_btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const presetName = btn.dataset.preset!;
       const preset = PRESETS[presetName] ?? {};
-      setConfig({ ...DEFAULT_CONFIG, ...preset, extraCSS: currentConfig.extraCSS, bodyBgImage: currentConfig.bodyBgImage });
+      setConfig({ ...DEFAULT_CONFIG, ...preset, extraCSS: currentConfig.extraCSS, bodyBgImage: currentConfig.bodyBgImage, playerlistBgImage: currentConfig.playerlistBgImage });
       syncUIFromConfig(currentConfig);
       liveUpdate();
     });
