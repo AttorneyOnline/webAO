@@ -439,8 +439,8 @@ function applyThemeMakerCSS(css: string): void {
     document.head.appendChild(el);
   }
   el.textContent = css;
-  const themeLink = document.getElementById("client_theme") as HTMLAnchorElement | null;
-  if (themeLink) themeLink.href = "";
+  const themeLink = document.getElementById("client_theme") as HTMLLinkElement | null;
+  if (themeLink) themeLink.disabled = true;
 }
 
 export function applyThemeMakerConfig(config: ThemeConfig): void {
@@ -1290,7 +1290,13 @@ export function openThemeMaker(): void {
   }
 
   syncUIFromConfig(currentConfig);
-  liveUpdate();
+  if (saved) {
+    // Re-apply saved theme and update all previews
+    liveUpdate();
+  } else {
+    // No saved config — only update the CSS preview without touching page styles
+    updateCSSPreview(currentConfig);
+  }
   overlay.style.display = "flex";
 
   // Trap focus inside modal
