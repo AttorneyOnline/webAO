@@ -1064,7 +1064,7 @@ function hslToHex(h: number, s: number, l: number): string {
 function generateRandomPalette(): ThemeConfig {
   const hue = Math.floor(Math.random() * 360);
   const sat = 20 + Math.floor(Math.random() * 50); // 20–70 %
-  const isDark = Math.random() > 0.35;              // 65 % dark, 35 % light
+  const isDark = Math.random() < 0.65;              // 65 % dark, 35 % light
   const accentHue = (hue + 150 + Math.floor(Math.random() * 60)) % 360;
   const accentSat = 55 + Math.floor(Math.random() * 35);
   const radius = String(Math.floor(Math.random() * 10));
@@ -1318,7 +1318,8 @@ function wireEvents(): void {
 
   // Select dropdowns — capture history before change
   document.querySelectorAll<HTMLSelectElement>(".tm_select[data-prop]").forEach((sel) => {
-    sel.addEventListener("mousedown", captureHistory);
+    sel.addEventListener("focus", captureHistory);
+    sel.addEventListener("blur", () => { isInteracting = false; });
     sel.addEventListener("change", () => {
       const prop = sel.dataset.prop as keyof ThemeConfig;
       if (prop === "bodyFontFamily") {
