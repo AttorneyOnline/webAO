@@ -11,6 +11,7 @@ import { showname_click } from "../dom/showNameClick";
 import { changeBlipVolume } from "../dom/changeBlipVolume";
 import { reloadTheme } from "../dom/reloadTheme";
 import { setFont } from "../dom/setFont";
+import { restoreThemeMaker } from "../dom/themeMaker";
 const version = process.env.npm_package_version;
 
 /**
@@ -42,6 +43,9 @@ export const loadResources = () => {
     `web${String(Math.round(Math.random() * 100 + 10))}`;
 
   const storedTheme = localStorage.getItem("theme") || "default";
+
+  // Restore theme maker before theme link so custom style takes precedence
+  restoreThemeMaker();
 
   const themeOption = <HTMLOptionElement>(
     document.querySelector(`#client_themeselect [value="${storedTheme}"]`)

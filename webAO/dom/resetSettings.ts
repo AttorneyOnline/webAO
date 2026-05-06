@@ -11,6 +11,7 @@ import { setFont } from "./setFont";
 import { switchPanTilt } from "./switchPanTilt";
 import { switchAspectRatio } from "./switchAspectRatio";
 import { switchChatOffset } from "./switchChatOffset";
+import { resetThemeMaker } from "./themeMaker";
 
 const SETTINGS_KEYS = [
   "theme",
@@ -26,6 +27,7 @@ const SETTINGS_KEYS = [
   "showname",
   "selectedFont",
   "customFont",
+  "themeMakerConfig",
 ];
 
 /**
@@ -36,6 +38,9 @@ export function resetSettings() {
 
   // Clear all stored settings
   SETTINGS_KEYS.forEach((key) => localStorage.removeItem(key));
+
+  // --- Theme Maker ---
+  resetThemeMaker();
 
   // --- Theme ---
   const themeSelect = <HTMLSelectElement>document.getElementById("client_themeselect");

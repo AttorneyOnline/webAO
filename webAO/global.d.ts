@@ -23,5 +23,8 @@ declare global {
     switchPanTilt: () => Promise<void>;
     updateActionCommands: (side: string) => void;
     updateBackgroundPreview: () => void;
+    openThemeMaker: () => void;
+    restoreThemeMaker: () => void;
+    resetThemeMaker: () => void;
   }
 }
