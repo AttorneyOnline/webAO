@@ -358,6 +358,21 @@ body {
   background-color: ${config.proHpColor};
 }
 
+#client_playerlist {
+  background-color: ${config.menuBg};
+  color: ${config.menuColor};
+}
+
+#client_playerlist th,
+#client_playerlist td {
+  border-bottom: 1px solid ${config.inputBorder};
+  color: ${config.menuColor};
+}
+
+#client_playerlist th {
+  border-bottom: 2px solid ${config.buttonBorder};
+}
+
 ${config.extraCSS}`;
 }
 
