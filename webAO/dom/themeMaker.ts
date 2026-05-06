@@ -356,7 +356,7 @@ function injectModalHTML(): void {
 
   const html = `
 <div id="tm_overlay" role="dialog" aria-modal="true" aria-label="Theme Maker" style="display:none">
-  <div id="tm_modal">
+  <div id="tm_modal" tabindex="-1">
     <div id="tm_header">
       <span id="tm_title">🎨 Theme Maker</span>
       <div id="tm_header_actions">
@@ -808,9 +808,9 @@ function updateBgPreview(config: ThemeConfig): void {
 function updateFontPreview(config: ThemeConfig): void {
   const preview = document.getElementById("tm_font_preview_text");
   if (!preview) return;
-  const font = config.bodyFontFamily === "custom"
-    ? (document.getElementById("tm_customFontInput") as HTMLInputElement | null)?.value ?? "sans-serif"
-    : config.bodyFontFamily;
+  // The stored config always holds the actual font value; the "custom" entry only
+  // exists as a UI-level sentinel in the <select>. Use the config value directly.
+  const font = config.bodyFontFamily || "sans-serif";
   preview.style.fontFamily = font;
   preview.style.fontSize = config.bodyFontSize + "px";
   preview.style.color = config.bodyColor;
@@ -955,7 +955,7 @@ function wireEvents(): void {
     btn.addEventListener("click", () => {
       const presetName = btn.dataset.preset!;
       const preset = PRESETS[presetName] ?? {};
-      setConfig({ ...DEFAULT_CONFIG, ...preset, extraCSS: currentConfig.extraCSS });
+      setConfig({ ...DEFAULT_CONFIG, ...preset, extraCSS: currentConfig.extraCSS, bodyBgImage: currentConfig.bodyBgImage });
       syncUIFromConfig(currentConfig);
       liveUpdate();
     });
