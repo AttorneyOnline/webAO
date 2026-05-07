@@ -1,7 +1,6 @@
 import { positions } from "../constants/positions";
 import { AO_HOST } from "../../client/aoHost";
 import { client } from "../../client";
-import findImgSrc from "../../utils/findImgSrc";
 import transparentPng from "../../constants/transparentPng";
 import fileExists from "../../utils/fileExists";
 
@@ -70,7 +69,7 @@ export const set_side = async ({
     speedLines = positions[position].speedLines;
   } else {
     bg = `${position}`;
-    desk = { ao2: `${position}_overlay.png`, ao1: "_overlay.png" };
+    desk = { ao2: `${position}_overlay`, ao1: "_overlay" };
     speedLines = "defense_speedlines.gif";
   }
 
@@ -82,9 +81,23 @@ export const set_side = async ({
 
   if (showDesk === true && desk) {
     const bg_folder = client.viewport.getBackgroundFolder();
-    const urls_to_try = [bg_folder + desk.ao2, bg_folder + desk.ao1];
-    bench.src = await findImgSrc(urls_to_try);
-    bench.style.opacity = "1";
+    const stems = [desk.ao2, desk.ao1].filter((s): s is string => typeof s === "string");
+    let found = false;
+    outer:
+    for (const stem of stems) {
+      for (const ext of client.background_extensions) {
+        const url = `${bg_folder}${stem}${ext}`;
+        if (await fileExists(url)) {
+          bench.src = url;
+          bench.style.opacity = "1";
+          found = true;
+          break outer;
+        }
+      }
+    }
+    if (!found) {
+      bench.src = transparentPng;
+    }
   } else {
     bench.style.opacity = "0";
   }
