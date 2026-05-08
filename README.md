@@ -7,6 +7,7 @@ This is a client for the Attorney Online roleplaying chatroom written in HTML an
 ## Project Setup
 
 ### Prerequisites
+
 - [Bun](https://bun.sh) (JavaScript runtime)
 - Git
 - Node.js (optional, for Docker)
@@ -20,6 +21,9 @@ cd webAO
 
 # Install dependencies
 bun install
+
+# Build the project
+bun run build
 
 # Start the development server
 bun run start
