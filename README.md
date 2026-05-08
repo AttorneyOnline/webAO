@@ -1,6 +1,6 @@
-# webAO
+# LemmyAO
 
-This is a client for the Attorney Online roleplaying chatroom written in HTML and JavaScript. It works with any AO server if it has WebSocket support.
+This is a forked client of WebAO for the Attorney Online roleplaying chatroom written in HTML and JavaScript. It works with any AO server if it has WebSocket support.
 
 **Live Client:** [https://webao.miku.pizza/](https://webao.miku.pizza/)
 
