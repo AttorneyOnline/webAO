@@ -78,9 +78,8 @@ export const loadResources = () => {
 
   (<HTMLInputElement>document.getElementById("ic_chat_name")).value =
     localStorage.getItem("ic_chat_name");
-  (<HTMLInputElement>document.getElementById("showname")).checked = Boolean(
-    localStorage.getItem("showname"),
-  );
+  (<HTMLInputElement>document.getElementById("showname")).checked =
+    localStorage.getItem("showname") !== "false";
   showname_click(null);
 
   (<HTMLInputElement>document.getElementById("client_callwords")).value =

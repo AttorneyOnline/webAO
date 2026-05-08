@@ -12,6 +12,7 @@ import { switchPanTilt } from "./switchPanTilt";
 import { switchAspectRatio } from "./switchAspectRatio";
 import { switchChatOffset } from "./switchChatOffset";
 import { resetThemeMaker } from "./themeMaker";
+import { showname_click } from "./showNameClick";
 
 const SETTINGS_KEYS = [
   "theme",
@@ -113,6 +114,11 @@ export function resetSettings() {
   // --- Custom showname ---
   const icChatName = <HTMLInputElement>document.getElementById("ic_chat_name");
   if (icChatName) icChatName.value = "";
+  const shownameCheckbox = <HTMLInputElement>document.getElementById("showname");
+  if (shownameCheckbox) {
+    shownameCheckbox.checked = true;
+    showname_click(null);
+  }
 
   // --- Pan-tilt ---
   const pantilt = <HTMLInputElement>document.getElementById("client_pantilt");
