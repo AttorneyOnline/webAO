@@ -12,7 +12,7 @@ This is a client for the Attorney Online roleplaying chatroom written in HTML an
 - Git
 - Node.js (optional, for Docker)
 
-### Running Locally with Bun
+### Running Locally with Bun or deploying a Docker.
 
 ```bash
 # Clone the repository
@@ -28,7 +28,6 @@ bun run build
 # Start the development server
 bun run start
 
-[Docker.txt](https://github.com/user-attachments/files/27514882/Docker.txt)
 ### Running with Docker
 
 `docker build -t webao .`
