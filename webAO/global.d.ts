@@ -26,5 +26,7 @@ declare global {
     openThemeMaker: () => void;
     restoreThemeMaker: () => void;
     resetThemeMaker: () => void;
+    applyBlipPitch: (pitch: number) => void;
+    restoreBlipPitch: () => void;
   }
 }

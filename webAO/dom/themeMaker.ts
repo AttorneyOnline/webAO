@@ -75,8 +75,29 @@ export interface ThemeConfig {
   tabActiveBgOpacity: number;
   playerlistBgOpacity: number;
 
+  // Accent colour — when useAccent is true, derives button/tab/HP highlights
+  accentColor: string;
+  useAccent: boolean;
+
+  // Chatbox geometry
+  chatboxPadding: number;       // px applied to #client_inner_chat
+  chatboxRadius: number;        // px applied to #client_chat
+  chatboxBorderWidth: number;   // px applied to #client_chat
+
+  // Typography extras
+  fontWeight: string;            // 100 | 300 | 400 | 500 | 700 | 900
+  lineHeight: string;            // unitless, e.g. "1.4"
+
+  // Audio — blip pitch (playbackRate). 1.0 = normal, range 0.5–2.0
+  blipPitch: number;
+
   // Extra raw CSS appended at the end
   extraCSS: string;
+  // Trust level for extraCSS: "strict" filters @import and remote url(),
+  // "trusted" allows everything (user explicitly opted in)
+  customCSSTrust: "strict" | "trusted";
+  // Whether the user has acknowledged the custom-CSS warning at least once.
+  customCSSAcknowledged: boolean;
 }
 
 const DEFAULT_CONFIG: ThemeConfig = {
@@ -134,7 +155,21 @@ const DEFAULT_CONFIG: ThemeConfig = {
   tabActiveBgOpacity: 100,
   playerlistBgOpacity: 100,
 
+  accentColor: "#7b2900",
+  useAccent: false,
+
+  chatboxPadding: 6,
+  chatboxRadius: 4,
+  chatboxBorderWidth: 2,
+
+  fontWeight: "400",
+  lineHeight: "1.4",
+
+  blipPitch: 1.0,
+
   extraCSS: "",
+  customCSSTrust: "strict",
+  customCSSAcknowledged: false,
 };
 
 const PRESETS: Record<string, Partial<ThemeConfig>> = {
@@ -318,6 +353,77 @@ function hexToRgba(hex: string, opacity: number): string {
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 }
 
+/** Lighten / darken a #rrggbb colour by `amount` (–100..100). */
+function shadeHex(hex: string, amount: number): string {
+  if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return hex;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const adj = (c: number) => {
+    const v = amount >= 0
+      ? c + (255 - c) * (amount / 100)
+      : c + c * (amount / 100);
+    return Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0");
+  };
+  return `#${adj(r)}${adj(g)}${adj(b)}`;
+}
+
+// ─── Custom CSS sanitizer ────────────────────────────────────────────────────
+
+export interface SanitizeResult {
+  css: string;
+  removed: string[];
+}
+
+/**
+ * Strict-mode sanitizer for user-supplied "extra" CSS.
+ *
+ * CSS is generally safe to inject (the browser will not execute scripts inside
+ * a stylesheet) but a malicious snippet can still:
+ *   • beacon back to a tracker via @import url(http://evil.example/)
+ *   • beacon back via background-image: url(http://evil.example/pixel.png)
+ *   • abuse legacy IE expression() / behavior:url() syntax
+ *   • inject javascript: pseudo-URLs into cursor / list-style-image
+ *
+ * In strict mode we strip every one of those patterns and return a list of
+ * removals so the UI can show them to the user.
+ */
+export function sanitizeCustomCSS(css: string, strict: boolean): SanitizeResult {
+  if (!strict) return { css, removed: [] };
+  const removed: string[] = [];
+
+  // Strip @import statements (any form: url(...), "...", '...')
+  let out = css.replace(/@import\s+[^;]+;?/gi, (m) => {
+    removed.push(`@import: ${m.trim().slice(0, 80)}`);
+    return "/* import-rule blocked */";
+  });
+
+  // Strip remote url(http(s)://) and url(//) — keep data:, blob:, and same-origin
+  // relative paths (no scheme).
+  out = out.replace(/url\(\s*(['"]?)(\s*(?:https?:|\/\/)[^'")]+)\1\s*\)/gi, (m) => {
+    removed.push(`remote url(): ${m.slice(0, 80)}`);
+    return "url('about:blank')";
+  });
+
+  // Strip javascript: / vbscript: / data:text/html pseudo-URLs anywhere
+  out = out.replace(/\b(?:javascript|vbscript|livescript)\s*:[^;}'")\s]*/gi, (m) => {
+    removed.push(`script URL: ${m.slice(0, 80)}`);
+    return "about:blank";
+  });
+
+  // Strip legacy IE expression() and behavior: url()
+  out = out.replace(/\bexpression\s*\([^)]*\)/gi, (m) => {
+    removed.push(`expression(): ${m.slice(0, 80)}`);
+    return "/* expression blocked */";
+  });
+  out = out.replace(/\bbehavior\s*:[^;}]+/gi, (m) => {
+    removed.push(`behavior: ${m.slice(0, 80)}`);
+    return "/* behavior blocked */";
+  });
+
+  return { css: out, removed };
+}
+
 // ─── CSS Generation ───────────────────────────────────────────────────────────
 
 function buildBgImageCSS(config: ThemeConfig): string {
@@ -343,12 +449,37 @@ export function generateCSS(config: ThemeConfig): string {
   const tabBgColor = hexToRgba(config.tabBg, Number(config.tabBgOpacity ?? 100));
   const tabActiveBgColor = hexToRgba(config.tabActiveBg, Number(config.tabActiveBgOpacity ?? 100));
   const playerlistBgColor = hexToRgba(config.playerlistBg, Number(config.playerlistBgOpacity ?? 100));
+
+  // Accent override — recolour buttons, active tab and HP bars when enabled.
+  const useAccent = !!config.useAccent;
+  const accent = config.accentColor || "#7b2900";
+  const accentHover = shadeHex(accent, 12);
+  const accentDark = shadeHex(accent, -25);
+  const buttonBgEff = useAccent ? accent : config.buttonBg;
+  const buttonBorderEff = useAccent ? accentDark : config.buttonBorder;
+  const tabActiveBgEff = useAccent ? hexToRgba(accent, Number(config.tabActiveBgOpacity ?? 100)) : tabActiveBgColor;
+  const defHpEff = useAccent ? accent : config.defHpColor;
+  const proHpEff = useAccent ? accentDark : config.proHpColor;
+
+  // Numeric defaults for newly-added fields (so older saved configs don't break).
+  const chatPad = Number.isFinite(Number(config.chatboxPadding)) ? Number(config.chatboxPadding) : 6;
+  const chatRadius = Number.isFinite(Number(config.chatboxRadius)) ? Number(config.chatboxRadius) : 4;
+  const chatBorder = Number.isFinite(Number(config.chatboxBorderWidth)) ? Number(config.chatboxBorderWidth) : 2;
+  const fontWeight = config.fontWeight || "400";
+  const lineHeight = config.lineHeight || "1.4";
+
+  // Sanitize user-supplied "extra" CSS unless they explicitly trust it.
+  const trust = config.customCSSTrust ?? "strict";
+  const { css: safeExtraCSS } = sanitizeCustomCSS(config.extraCSS ?? "", trust === "strict");
+
   return `/* LemmyAO Theme Maker — generated theme */
 body {
   background-color: ${bodyBgColor};
   color: ${config.bodyColor};
   font-family: ${config.bodyFontFamily};
-  font-size: ${config.bodyFontSize}px;${buildBgImageCSS(config)}
+  font-size: ${config.bodyFontSize}px;
+  font-weight: ${fontWeight};
+  line-height: ${lineHeight};${buildBgImageCSS(config)}
 }
 
 .client_button {
@@ -358,12 +489,16 @@ body {
   text-align: center;
   font-weight: bold;
   color: ${config.buttonColor};
-  background-color: ${config.buttonBg};
+  background-color: ${buttonBgEff};
   border-radius: ${config.buttonRadius}px;
   border-style: solid;
   border-width: 1px;
-  border-color: ${config.buttonBorder};
+  border-color: ${buttonBorderEff};
   box-shadow: 1px 1px inset;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.client_button:hover {
+  background-color: ${useAccent ? accentHover : shadeHex(config.buttonBg, 12)};
 }
 
 #client_menu {
@@ -420,7 +555,7 @@ body {
 
 .lm_tab.lm_active {
   color: ${config.tabActiveColor};
-  background-color: ${tabActiveBgColor};
+  background-color: ${tabActiveBgEff};
 }
 
 #evi_name {
@@ -437,11 +572,20 @@ body {
 }
 
 #client_defense_hp > .health-bar {
-  background-color: ${config.defHpColor};
+  background-color: ${defHpEff};
 }
 
 #client_prosecutor_hp > .health-bar {
-  background-color: ${config.proHpColor};
+  background-color: ${proHpEff};
+}
+
+/* Chatbox geometry */
+#client_chat {
+  border-radius: ${chatRadius}px;
+  border-width: ${chatBorder}px;
+}
+#client_inner_chat {
+  padding: ${chatPad}px ${chatPad * 2}px;
 }
 
 #client_playerlist {
@@ -463,7 +607,7 @@ body {
   border-bottom: 2px solid ${config.playerlistBorder};
 }
 
-${config.extraCSS}`;
+${safeExtraCSS}`;
 }
 
 // ─── Persistence ──────────────────────────────────────────────────────────────
@@ -503,8 +647,40 @@ function applyThemeMakerCSS(css: string): void {
   if (themeLink) themeLink.disabled = true;
 }
 
+const LS_KEY_BLIP_PITCH = "blipPitch";
+
+/** Apply a blip playbackRate to every <audio class="blipSound"> element on the page. */
+export function applyBlipPitch(pitch: number): void {
+  const clamped = Math.max(0.5, Math.min(2, Number(pitch) || 1));
+  const channels = document.getElementsByClassName("blipSound") as HTMLCollectionOf<HTMLAudioElement>;
+  for (const ch of Array.from(channels)) {
+    try {
+      // preservesPitch=false means the pitch shifts with rate (the desired behaviour).
+      (ch as any).preservesPitch = false;
+      (ch as any).mozPreservesPitch = false;
+      (ch as any).webkitPreservesPitch = false;
+      ch.playbackRate = clamped;
+    } catch {
+      /* ignore — some browsers block playbackRate before user gesture */
+    }
+  }
+  localStorage.setItem(LS_KEY_BLIP_PITCH, String(clamped));
+}
+
+/** Restore blip pitch from localStorage; safe to call before audio elements exist. */
+export function restoreBlipPitch(): void {
+  const raw = localStorage.getItem(LS_KEY_BLIP_PITCH);
+  if (raw == null) return;
+  const v = Number(raw);
+  if (Number.isFinite(v)) applyBlipPitch(v);
+}
+
+window.applyBlipPitch = applyBlipPitch;
+window.restoreBlipPitch = restoreBlipPitch;
+
 export function applyThemeMakerConfig(config: ThemeConfig): void {
   applyThemeMakerCSS(generateCSS(config));
+  applyBlipPitch(Number(config.blipPitch ?? 1));
 }
 
 // ─── Modal HTML ───────────────────────────────────────────────────────────────
@@ -529,6 +705,8 @@ function injectModalHTML(): void {
       <!-- Sidebar / tab list -->
       <nav id="tm_tabs" role="tablist">
         <button class="tm_tab tm_tab_active" data-tab="colors" role="tab" aria-selected="true">🎨 Colors</button>
+        <button class="tm_tab" data-tab="chatbox" role="tab" aria-selected="false">💬 Chatbox</button>
+        <button class="tm_tab" data-tab="audio" role="tab" aria-selected="false">🔊 Audio</button>
         <button class="tm_tab" data-tab="background" role="tab" aria-selected="false">🖼 Background</button>
         <button class="tm_tab" data-tab="typography" role="tab" aria-selected="false">✏️ Typography</button>
         <button class="tm_tab" data-tab="advanced" role="tab" aria-selected="false">⚙️ Advanced</button>
@@ -541,6 +719,23 @@ function injectModalHTML(): void {
           <button class="tm_preset_btn" data-preset="forest">🌿 Forest</button>
           <button class="tm_preset_btn" data-preset="haschenLemmy">🪦 Haschen &amp; Lemmy</button>
         </div>
+        <!-- Mock live preview pane (always visible) -->
+        <div id="tm_live_preview_box" aria-label="Live preview">
+          <p class="tm_section_label">Live Preview</p>
+          <div id="tm_preview_chatbox">
+            <div id="tm_preview_name">Phoenix</div>
+            <div id="tm_preview_chat">
+              <div id="tm_preview_inner_chat">The quick brown fox jumps over the lazy dog!</div>
+            </div>
+          </div>
+          <div id="tm_preview_buttonrow">
+            <button class="tm_preview_btn">Send</button>
+            <button class="tm_preview_btn tm_preview_btn_alt">Cancel</button>
+          </div>
+          <div id="tm_preview_blip_row">
+            <button class="tm_btn tm_btn_secondary tm_btn_sm" id="tm_preview_blip_btn">▶ Test blip</button>
+          </div>
+        </div>
       </nav>
 
       <!-- Tab panels -->
@@ -549,6 +744,24 @@ function injectModalHTML(): void {
         <!-- Colors -->
         <div class="tm_panel tm_panel_active" data-panel="colors">
           <h3 class="tm_panel_title">Color Settings</h3>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🌟 Accent</h4>
+            <p class="tm_hint">A single accent colour overrides buttons, the active tab and HP bars. Toggle off for full per-element control below.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_useAccent">Use accent colour</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_useAccent" data-prop="useAccent" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_accentColor">Accent</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_accentColor" data-prop="accentColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_accentColor" maxlength="7" />
+              </div>
+            </div>
+          </div>
 
           <div class="tm_group">
             <h4 class="tm_group_title">🖥 Page</h4>
@@ -839,6 +1052,52 @@ function injectModalHTML(): void {
           </div>
         </div>
 
+        <!-- Chatbox -->
+        <div class="tm_panel" data-panel="chatbox">
+          <h3 class="tm_panel_title">Chatbox Geometry</h3>
+          <div class="tm_group">
+            <h4 class="tm_group_title">📐 Padding &amp; shape</h4>
+            <p class="tm_hint">These values override the inner padding and rounded corners of the IC chatbox at runtime. They do not modify your selected chatbox theme's other styling.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_chatboxPadding">Inner padding (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_chatboxPadding" data-prop="chatboxPadding" min="0" max="32" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_chatboxPadding">6</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_chatboxRadius">Border radius (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_chatboxRadius" data-prop="chatboxRadius" min="0" max="40" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_chatboxRadius">4</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_chatboxBorderWidth">Border width (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_chatboxBorderWidth" data-prop="chatboxBorderWidth" min="0" max="10" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_chatboxBorderWidth">2</span><span>px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audio -->
+        <div class="tm_panel" data-panel="audio">
+          <h3 class="tm_panel_title">Audio Settings</h3>
+          <div class="tm_group">
+            <h4 class="tm_group_title">🔉 Blip pitch</h4>
+            <p class="tm_hint">Adjust the playback rate of character blip sounds — under 1.0 is deeper, over 1.0 is higher. Press "Test blip" in the live preview to hear it.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_blipPitch">Pitch</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_blipPitch" data-prop="blipPitch" min="0.5" max="2" step="0.05" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_blipPitch">1.00</span><span>×</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Background -->
         <div class="tm_panel" data-panel="background">
           <h3 class="tm_panel_title">Background Settings</h3>
@@ -947,6 +1206,24 @@ function injectModalHTML(): void {
                 <span class="tm_range_val" data-for="tm_bodyFontSize">14</span>
               </div>
             </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_fontWeight">Font weight</label>
+              <select id="tm_fontWeight" data-prop="fontWeight" class="tm_select">
+                <option value="100">Thin (100)</option>
+                <option value="300">Light (300)</option>
+                <option value="400">Regular (400)</option>
+                <option value="500">Medium (500)</option>
+                <option value="700">Bold (700)</option>
+                <option value="900">Black (900)</option>
+              </select>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_lineHeight">Line height</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_lineHeight" data-prop="lineHeight" min="1" max="2.5" step="0.05" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_lineHeight">1.40</span>
+              </div>
+            </div>
           </div>
 
           <div id="tm_font_preview" class="tm_group">
@@ -958,6 +1235,42 @@ function injectModalHTML(): void {
         <!-- Advanced -->
         <div class="tm_panel" data-panel="advanced">
           <h3 class="tm_panel_title">Advanced CSS</h3>
+
+          <div class="tm_group tm_warn_banner" id="tm_css_warn_banner">
+            <h4 class="tm_group_title">⚠️ Custom CSS — read me first</h4>
+            <p>
+              Custom CSS is injected directly into the page. CSS itself can't run scripts,
+              but a malicious snippet can still leak data via <code>@import</code>,
+              <code>url(http://…)</code> or <code>javascript:</code> pseudo-URLs (used for
+              tracking pixels and beacons).
+            </p>
+            <p>
+              By default we run in <strong>Strict</strong> mode and remove any
+              <code>@import</code>, remote <code>url()</code>, <code>expression()</code>,
+              <code>behavior:</code> and <code>javascript:</code> references before applying
+              your CSS. Switch to <strong>Trusted</strong> only if you understand the snippet
+              and explicitly want it to load remote resources.
+            </p>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🛡 CSS Trust Level</h4>
+            <div class="tm_row">
+              <label class="tm_label">Mode</label>
+              <div class="tm_ctrl">
+                <label class="tm_radio_label">
+                  <input type="radio" name="tm_customCSSTrust" value="strict" checked />
+                  Strict (recommended)
+                </label>
+                <label class="tm_radio_label">
+                  <input type="radio" name="tm_customCSSTrust" value="trusted" />
+                  Trusted (allow remote URLs)
+                </label>
+              </div>
+            </div>
+            <p id="tm_css_removed" class="tm_hint" style="display:none"></p>
+          </div>
+
           <div class="tm_group">
             <h4 class="tm_group_title">🧪 Extra CSS Rules</h4>
             <p class="tm_hint">Add any custom CSS you like. It will be appended after all other theme rules. Changes are applied live!</p>
@@ -967,13 +1280,13 @@ function injectModalHTML(): void {
               placeholder="/* Your custom CSS here */
 #client_log { border: 2px solid gold; }
 .client_button:hover { opacity: 0.8; }"
-              rows="18"
+              rows="14"
               spellcheck="false"
             ></textarea>
           </div>
           <div class="tm_group">
             <h4 class="tm_group_title">📄 Generated CSS Preview</h4>
-            <p class="tm_hint">This is the full CSS that will be saved and exported.</p>
+            <p class="tm_hint">This is the full CSS that will be saved and exported (after sanitization, if Strict).</p>
             <textarea id="tm_css_preview" class="tm_css_editor tm_css_readonly" rows="12" readonly spellcheck="false"></textarea>
           </div>
         </div>
@@ -1147,6 +1460,17 @@ function generateRandomPalette(): ThemeConfig {
 
 // ─── UI ───────────────────────────────────────────────────────────────────────
 
+function formatRangeVal(input: HTMLInputElement, raw: string): string {
+  const v = Number(raw);
+  if (!Number.isFinite(v)) return raw;
+  const step = Number(input.step);
+  if (Number.isFinite(step) && step > 0 && step < 1) {
+    // Show 2 decimals for fine sliders (line-height, blip pitch).
+    return v.toFixed(2);
+  }
+  return String(Math.round(v));
+}
+
 function syncUIFromConfig(config: ThemeConfig): void {
   // Color inputs
   document.querySelectorAll<HTMLInputElement>(".tm_color[data-prop]").forEach((input) => {
@@ -1161,9 +1485,21 @@ function syncUIFromConfig(config: ThemeConfig): void {
   // Range inputs
   document.querySelectorAll<HTMLInputElement>(".tm_range[data-prop]").forEach((input) => {
     const prop = input.dataset.prop as keyof ThemeConfig;
-    input.value = String(config[prop] ?? "");
+    const v = config[prop];
+    if (v != null) input.value = String(v);
     const valSpan = document.querySelector<HTMLElement>(`.tm_range_val[data-for="${input.id}"]`);
-    if (valSpan) valSpan.textContent = String(config[prop] ?? "");
+    if (valSpan) valSpan.textContent = formatRangeVal(input, input.value);
+  });
+
+  // Checkboxes
+  document.querySelectorAll<HTMLInputElement>("input[type=checkbox][data-prop]").forEach((input) => {
+    const prop = input.dataset.prop as keyof ThemeConfig;
+    input.checked = !!config[prop];
+  });
+
+  // Radio: customCSSTrust
+  document.querySelectorAll<HTMLInputElement>('input[name="tm_customCSSTrust"]').forEach((r) => {
+    r.checked = r.value === (config.customCSSTrust ?? "strict");
   });
 
   // Selects
@@ -1246,11 +1582,72 @@ function updateCSSPreview(config: ThemeConfig): void {
   ta.value = generateCSS(config);
 }
 
+/** Update the in-modal mock chatbox / button preview + the "removed CSS" banner. */
+function updateMockPreview(config: ThemeConfig): void {
+  const accent = config.useAccent ? config.accentColor : config.buttonBg;
+  const accentDark = shadeHex(accent, -25);
+  const chatPad = Number(config.chatboxPadding) || 6;
+  const chatRadius = Number(config.chatboxRadius) || 4;
+  const chatBorder = Number(config.chatboxBorderWidth) || 2;
+
+  const chatbox = document.getElementById("tm_preview_chatbox") as HTMLElement | null;
+  const chatInner = document.getElementById("tm_preview_inner_chat") as HTMLElement | null;
+  const chatChat = document.getElementById("tm_preview_chat") as HTMLElement | null;
+  const name = document.getElementById("tm_preview_name") as HTMLElement | null;
+  if (chatbox && chatInner && chatChat && name) {
+    chatbox.style.background = config.logBg;
+    chatbox.style.color = config.logColor;
+    chatbox.style.fontFamily = config.bodyFontFamily || "sans-serif";
+    chatbox.style.fontSize = config.bodyFontSize + "px";
+    chatbox.style.fontWeight = config.fontWeight || "400";
+    chatbox.style.lineHeight = config.lineHeight || "1.4";
+    chatChat.style.borderRadius = chatRadius + "px";
+    chatChat.style.borderWidth = chatBorder + "px";
+    chatChat.style.borderStyle = "solid";
+    chatChat.style.borderColor = config.inputBorder;
+    chatInner.style.padding = `${chatPad}px ${chatPad * 2}px`;
+    name.style.background = accent;
+    name.style.color = config.buttonColor;
+    name.style.borderColor = accentDark;
+  }
+
+  const previewBtns = document.querySelectorAll<HTMLButtonElement>(".tm_preview_btn");
+  previewBtns.forEach((btn, idx) => {
+    btn.style.background = idx === 1 ? shadeHex(accent, -10) : accent;
+    btn.style.color = config.buttonColor;
+    btn.style.borderColor = accentDark;
+    btn.style.borderRadius = (Number(config.buttonRadius) || 3) + "px";
+    btn.style.fontFamily = config.bodyFontFamily || "sans-serif";
+  });
+
+  // Surface what the strict sanitizer would remove from the user's extra CSS.
+  const removedEl = document.getElementById("tm_css_removed");
+  if (removedEl) {
+    const trust = config.customCSSTrust ?? "strict";
+    if (trust === "strict" && (config.extraCSS ?? "").trim()) {
+      const { removed } = sanitizeCustomCSS(config.extraCSS, true);
+      if (removed.length) {
+        removedEl.style.display = "block";
+        removedEl.textContent = `🛡 Strict mode removed ${removed.length} item(s): ` + removed.join(" · ");
+      } else {
+        removedEl.style.display = "block";
+        removedEl.textContent = "🛡 Strict mode active — no risky patterns found in your CSS.";
+      }
+    } else if (trust === "trusted" && (config.extraCSS ?? "").trim()) {
+      removedEl.style.display = "block";
+      removedEl.textContent = "⚠️ Trusted mode — your CSS is being injected unmodified.";
+    } else {
+      removedEl.style.display = "none";
+    }
+  }
+}
+
 function liveUpdate(): void {
   const config = getConfig();
   applyThemeMakerConfig(config);
   updateFontPreview(config);
   updateCSSPreview(config);
+  updateMockPreview(config);
 }
 
 // ─── Event wiring ─────────────────────────────────────────────────────────────
@@ -1309,12 +1706,79 @@ function wireEvents(): void {
     input.addEventListener("pointerdown", captureHistory);
     input.addEventListener("input", () => {
       const prop = input.dataset.prop as keyof ThemeConfig;
-      (currentConfig as any)[prop] = input.value;
+      // Numeric props are stored as numbers; string props keep .value verbatim.
+      const numericProps = new Set([
+        "bodyBgOpacity", "menuBgOpacity", "logBgOpacity", "oocBgOpacity",
+        "inputBgOpacity", "layoutBgOpacity", "icControlsBgOpacity",
+        "tabBgOpacity", "tabActiveBgOpacity", "playerlistBgOpacity",
+        "chatboxPadding", "chatboxRadius", "chatboxBorderWidth", "blipPitch",
+      ]);
+      (currentConfig as any)[prop] = numericProps.has(prop as string)
+        ? Number(input.value)
+        : input.value;
       const valSpan = document.querySelector<HTMLElement>(`.tm_range_val[data-for="${input.id}"]`);
-      if (valSpan) valSpan.textContent = input.value;
+      if (valSpan) valSpan.textContent = formatRangeVal(input, input.value);
       liveUpdate();
     });
   });
+
+  // Checkbox inputs (e.g. useAccent)
+  document.querySelectorAll<HTMLInputElement>("input[type=checkbox][data-prop]").forEach((input) => {
+    input.addEventListener("change", () => {
+      pushToHistory(currentConfig);
+      const prop = input.dataset.prop as keyof ThemeConfig;
+      (currentConfig as any)[prop] = input.checked;
+      liveUpdate();
+    });
+  });
+
+  // CSS trust radio
+  document.querySelectorAll<HTMLInputElement>('input[name="tm_customCSSTrust"]').forEach((r) => {
+    r.addEventListener("change", () => {
+      if (!r.checked) return;
+      // Hopping into Trusted mode: warn the user once per session.
+      if (r.value === "trusted" && !currentConfig.customCSSAcknowledged) {
+        const ok = confirm(
+          "⚠️ Trusted mode injects your custom CSS unmodified.\n\n" +
+          "This means @import and remote url() references will fire network " +
+          "requests to whatever server you point them at, which can be used " +
+          "to track you or fingerprint your browser.\n\n" +
+          "Only enable this if you wrote the CSS yourself or fully trust its source.\n\n" +
+          "Continue?",
+        );
+        if (!ok) {
+          // Revert UI
+          const strictRadio = document.querySelector<HTMLInputElement>('input[name="tm_customCSSTrust"][value="strict"]');
+          if (strictRadio) strictRadio.checked = true;
+          return;
+        }
+        currentConfig.customCSSAcknowledged = true;
+      }
+      pushToHistory(currentConfig);
+      currentConfig.customCSSTrust = r.value as "strict" | "trusted";
+      liveUpdate();
+    });
+  });
+
+  // Test-blip button (uses an existing blipSound channel if available)
+  const testBlipBtn = document.getElementById("tm_preview_blip_btn");
+  if (testBlipBtn) {
+    testBlipBtn.addEventListener("click", () => {
+      const blip = document.querySelector(".blipSound") as HTMLAudioElement | null;
+      if (!blip) {
+        alert("No blip channels initialized yet — join a server first.");
+        return;
+      }
+      try {
+        (blip as any).preservesPitch = false;
+        blip.playbackRate = Math.max(0.5, Math.min(2, Number(currentConfig.blipPitch) || 1));
+        blip.currentTime = 0;
+        blip.play().catch(() => {});
+      } catch {
+        /* ignore */
+      }
+    });
+  }
 
   // Select dropdowns — capture history before change
   document.querySelectorAll<HTMLSelectElement>(".tm_select[data-prop]").forEach((sel) => {
@@ -1629,6 +2093,10 @@ export function restoreThemeMaker(): void {
   const saved = loadThemeMakerConfig();
   if (saved && localStorage.getItem(LS_KEY_THEME) === "custom") {
     applyThemeMakerConfig(saved);
+  } else {
+    // Even if there's no saved theme, the blip pitch may have been adjusted
+    // independently — restore it so audio plays with the correct rate.
+    restoreBlipPitch();
   }
 }
 
