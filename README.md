@@ -1,4 +1,3 @@
-[Docker.txt](https://github.com/user-attachments/files/27514804/Docker.txt)
 # webAO
 
 This is a client for the Attorney Online roleplaying chatroom written in HTML and JavaScript. It works with any AO server if it has WebSocket support.
@@ -7,7 +6,7 @@ This is a client for the Attorney Online roleplaying chatroom written in HTML an
 
 ## Project Setup
 
-### Prerequisites
+## Prerequisites
 
 - [Bun](https://bun.sh) (JavaScript runtime)
 - Git
@@ -29,7 +28,3 @@ bun run build
 # Start the development server
 bun run start
 
-#### Running with Docker
-
-`docker build -t webao .`
-`docker run -d -it -p 8080:8080 webao`
