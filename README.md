@@ -28,3 +28,8 @@ bun run build
 # Start the development server
 bun run start
 
+[Docker.txt](https://github.com/user-attachments/files/27514882/Docker.txt)
+### Running with Docker
+
+`docker build -t webao .`
+`docker run -d -it -p 8080:8080 webao`
