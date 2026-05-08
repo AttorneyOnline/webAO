@@ -10,9 +10,9 @@ Link to the client in this repo: <http://webao.miku.pizza/>
 - Install [Bun](https://bun.com/)
 
 ## Running Locally
-
-1. `bun install`
-2. `bun run start`
+1. `git clone https://github.com/YOUR_USERNAME/webAO.git cd webAO`
+2. `bun install`
+3. `bun run start`
 
 ## Running with Docker
 
