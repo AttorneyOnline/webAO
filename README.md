@@ -28,7 +28,3 @@ bun run build
 # Start the development server
 bun run start
 
-### Running with Docker
-
-`docker build -t webao .`
-`docker run -d -it -p 8080:8080 webao`
