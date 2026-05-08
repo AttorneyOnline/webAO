@@ -99,14 +99,11 @@ export const handlePV = async (args: string[]) => {
     }
   }
 
-  if (
-    await fileExists(
-      `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/custom.gif`,
-    )
-  ) {
-    document.getElementById("button_4")!.style.display = "";
-  } else {
-    document.getElementById("button_4")!.style.display = "none";
-  }
+  const customCharPath = `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/custom`;
+  const customExtensions = [".gif", ".webp", ".apng", ".png"];
+  const customExists = (
+    await Promise.all(customExtensions.map((ext) => fileExists(`${customCharPath}${ext}`)))
+  ).some(Boolean);
+  document.getElementById("button_4")!.style.display = customExists ? "" : "none";
 
 };

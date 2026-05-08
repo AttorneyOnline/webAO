@@ -45,10 +45,38 @@ const DEFAULT_ASSETS: PreloadedAssets = {
   preanimDuration: 0,
   pairIdleUrl: transparentPng,
   shoutSfxUrl: null,
+  shoutBubbleUrl: null,
   emoteSfxUrl: null,
   realizationSfxUrl: null,
   stabSfxUrl: null,
 };
+
+const SHOUT_BUBBLE_EXTENSIONS = [".webp", ".gif", ".apng", ".png"];
+
+/**
+ * Builds candidate URLs for a shout bubble, trying the per-character
+ * override first (in multiple extensions) then the default in misc/default/.
+ *
+ * For custom shouts (objection === 4), only the per-character `custom.<ext>`
+ * paths are tried — there is no default custom bubble.
+ */
+function buildShoutBubbleUrls(
+  AO_HOST: string,
+  charName: string,
+  shoutName: string,
+  isCustom: boolean,
+): string[] {
+  const urls: string[] = [];
+  const baseName = isCustom ? "custom" : `${shoutName}_bubble`;
+  const charPath = `${AO_HOST}characters/${encodeURI(charName)}/`;
+  for (const ext of SHOUT_BUBBLE_EXTENSIONS) {
+    urls.push(`${charPath}${baseName}${ext}`);
+  }
+  if (!isCustom) {
+    urls.push(`${AO_HOST}misc/default/${baseName}.png`);
+  }
+  return urls;
+}
 
 /**
  * Preloads all assets referenced in an IC message before the animation timeline starts.
@@ -91,6 +119,13 @@ export default async function preloadMessageAssets(
       ? `${AO_HOST}characters/${encodeURI(charName)}/${shoutName}.opus`
       : null;
 
+    // Shout bubble: try per-character override first (multiple extensions),
+    // then fall back to misc/default/<name>_bubble.png. Custom shouts have
+    // no default — only per-character custom.<ext>.
+    const shoutBubbleUrls = (chatmsg.objection > 0 && chatmsg.objection <= 4 && shoutName)
+      ? buildShoutBubbleUrls(AO_HOST, charName, shoutName, chatmsg.objection === 4)
+      : null;
+
     // Emote SFX
     const invalidSounds = ["0", "1", "", undefined];
     const emoteSfxPath = (
@@ -106,7 +141,7 @@ export default async function preloadMessageAssets(
     // Launch everything in parallel - assetCache handles per-URL dedup and caching
     const [
       idleUrl, talkingUrl, preanimUrl, preanimDuration, pairIdleUrl,
-      shoutSfxUrl, emoteSfxUrl, realizationSfxUrl, stabSfxUrl,
+      shoutSfxUrl, shoutBubbleResolved, emoteSfxUrl, realizationSfxUrl, stabSfxUrl,
     ] = await Promise.all([
       resolveAndPreloadImage(idleUrls),
       resolveAndPreloadImage(talkingUrls),
@@ -116,10 +151,17 @@ export default async function preloadMessageAssets(
         : Promise.resolve(0),
       pairIdleUrls ? resolveAndPreloadImage(pairIdleUrls) : Promise.resolve(transparentPng),
       shoutSfxPath ? resolveAndPreloadAudio(shoutSfxPath) : Promise.resolve(null),
+      shoutBubbleUrls ? resolveAndPreloadImage(shoutBubbleUrls) : Promise.resolve(null),
       emoteSfxPath ? resolveAndPreloadAudio(emoteSfxPath) : Promise.resolve(null),
       resolveAndPreloadAudio(realizationPath),
       resolveAndPreloadAudio(stabPath),
     ]);
+
+    // resolveAndPreloadImage falls back to transparentPng when nothing exists;
+    // treat that as "no bubble found" so the caller can decide what to do.
+    const shoutBubbleUrl = shoutBubbleResolved && shoutBubbleResolved !== transparentPng
+      ? shoutBubbleResolved
+      : null;
 
     return {
       idleUrl,
@@ -128,6 +170,7 @@ export default async function preloadMessageAssets(
       preanimDuration,
       pairIdleUrl,
       shoutSfxUrl,
+      shoutBubbleUrl,
       emoteSfxUrl,
       realizationSfxUrl,
       stabSfxUrl,

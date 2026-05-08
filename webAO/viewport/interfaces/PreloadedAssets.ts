@@ -11,6 +11,8 @@ export interface PreloadedAssets {
   pairIdleUrl: string;
   /** Resolved per-character shout SFX URL, or null to use default */
   shoutSfxUrl: string | null;
+  /** Resolved shout bubble image URL (per-character override or default), or null if no shout */
+  shoutBubbleUrl: string | null;
   /** Resolved emote SFX URL, or null if no sound */
   emoteSfxUrl: string | null;
   /** Resolved realization (flash) SFX URL */

@@ -146,14 +146,24 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
   if (shout) {
     // Hide message box
     chatContainerBox.style.opacity = "0";
+    // Prefer the preloaded per-character bubble (resolved across extensions),
+    // and fall back to the default URL only when no per-character override
+    // was found. For custom shouts there is no default fallback, so we use
+    // the legacy character/<name>/custom.gif path which will be hidden by
+    // the onerror handler below if missing.
     if (client.viewport.getChatmsg().objection === 4) {
-      shoutSprite.src = `${AO_HOST}characters/${encodeURI(
-        client.viewport.getChatmsg().name!.toLowerCase(),
-      )}/custom.gif`;
+      shoutSprite.src = preloaded.shoutBubbleUrl
+        ?? `${AO_HOST}characters/${encodeURI(
+          client.viewport.getChatmsg().name!.toLowerCase(),
+        )}/custom.gif`;
     } else {
-      shoutSprite.src = client.resources[shout].src;
+      shoutSprite.src = preloaded.shoutBubbleUrl ?? client.resources[shout].src;
       shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
     }
+    // Hide the broken-image alt text if the bubble fails to load.
+    shoutSprite.onerror = () => {
+      shoutSprite.style.display = "none";
+    };
     shoutSprite.style.display = "block";
 
     // Use preloaded shout SFX URL (already resolved in parallel)
