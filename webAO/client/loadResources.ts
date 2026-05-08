@@ -11,7 +11,7 @@ import { showname_click } from "../dom/showNameClick";
 import { changeBlipVolume } from "../dom/changeBlipVolume";
 import { reloadTheme } from "../dom/reloadTheme";
 import { setFont } from "../dom/setFont";
-import { restoreThemeMaker } from "../dom/themeMaker";
+import { restoreThemeMaker, restoreBlipPitch } from "../dom/themeMaker";
 const version = process.env.npm_package_version;
 
 /**
@@ -75,6 +75,7 @@ export const loadResources = () => {
   (<HTMLInputElement>document.getElementById("client_bvolume")).value =
     localStorage.getItem("blipVolume") || "1";
   changeBlipVolume();
+  restoreBlipPitch();
 
   (<HTMLInputElement>document.getElementById("ic_chat_name")).value =
     localStorage.getItem("ic_chat_name");

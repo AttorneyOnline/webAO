@@ -1401,3 +1401,85 @@
   padding: 4px 10px;
   font-size: 11px;
 }
+
+/* ─── Live preview pane (sidebar) ─────────────────────────────────────── */
+#tm_live_preview_box {
+  margin-top: 14px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+}
+
+#tm_preview_chatbox {
+  position: relative;
+  min-height: 70px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+#tm_preview_name {
+  display: inline-block;
+  padding: 2px 10px;
+  border: 1px solid;
+  border-radius: 3px;
+  font-weight: 700;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+#tm_preview_chat {
+  background: rgba(0, 0, 0, 0.3);
+  border-style: solid;
+  min-height: 40px;
+}
+
+#tm_preview_inner_chat {
+  padding: 6px 12px;
+}
+
+#tm_preview_buttonrow {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.tm_preview_btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  border-style: solid;
+  border-width: 1px;
+  cursor: pointer;
+}
+
+.tm_preview_btn_alt {
+  opacity: 0.85;
+}
+
+#tm_preview_blip_row {
+  display: flex;
+  justify-content: center;
+}
+
+/* ─── Custom CSS warning banner / radios ──────────────────────────────── */
+.tm_warn_banner {
+  border-left: 4px solid #f9a825 !important;
+  background: rgba(249, 168, 37, 0.08) !important;
+}
+.tm_warn_banner code {
+  background: rgba(0, 0, 0, 0.25);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+.tm_radio_label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 14px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.tm_radio_label input[type="radio"] {
+  margin: 0;
+}
