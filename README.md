@@ -3,7 +3,7 @@
 This is a client for the Attorney Online roleplaying chatroom written in HTML and JavaScript.
 It works with any AO server if it has WebSocket support.
 
-Link to the client in this repo: <http://web.aceattorneyonline.com/>
+Link to the client in this repo: <http://webao.miku.pizza/>
 
 ## Project Setup
 
