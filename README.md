@@ -1,20 +1,25 @@
 # webAO
 
-This is a client for the Attorney Online roleplaying chatroom written in HTML and JavaScript.
-It works with any AO server if it has WebSocket support.
+This is a client for the Attorney Online roleplaying chatroom written in HTML and JavaScript. It works with any AO server if it has WebSocket support.
 
-Link to the client in this repo: <http://webao.miku.pizza/>
+**Live Client:** [https://webao.miku.pizza/](https://webao.miku.pizza/)
 
 ## Project Setup
 
-- Install [Bun](https://bun.com/)
+### Prerequisites
+- [Bun](https://bun.sh) (JavaScript runtime)
+- Git
+- Node.js (optional, for Docker)
 
-## Running Locally
-1. `git clone https://github.com/SyntaxNyah/webAO.git cd webAO`
-2. `bun install`
-3. `bun run start`
+### Running Locally with Bun
 
-## Running with Docker
+```bash
+# Clone the repository
+git clone https://github.com/SyntaxNyah/webAO.git
+cd webAO
 
-`docker build -t webao .`
-`docker run -d -it -p 8080:8080 webao`
+# Install dependencies
+bun install
+
+# Start the development server
+bun run start
