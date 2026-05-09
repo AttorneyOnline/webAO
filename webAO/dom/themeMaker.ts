@@ -91,6 +91,39 @@ export interface ThemeConfig {
   // Audio — blip pitch (playbackRate). 1.0 = normal, range 0.5–2.0
   blipPitch: number;
 
+  // ─── Extra colors (selection, scrollbar, links, focus, mentions, quotes) ──
+  selectionBg: string;
+  selectionFg: string;
+  scrollbarTrack: string;
+  scrollbarThumb: string;
+  scrollbarThumbHover: string;
+  linkColor: string;
+  linkHoverColor: string;
+  linkVisitedColor: string;
+  focusRingColor: string;
+  mentionColor: string;
+  quoteBg: string;
+  quoteColor: string;
+
+  // ─── Visual effects (filters / overlays) ──────────────────────────────────
+  // All 0–100 unless noted; 0 = effect off.
+  effectVignette: number;          // 0–100 strength of dark vignette overlay
+  effectScanlines: number;         // 0–100 opacity of CRT scanlines
+  effectScanlineSpacing: number;   // 1–10 px between scanlines
+  effectGrain: number;             // 0–100 film-grain noise opacity
+  effectChromaticAb: number;       // 0–10 px text chromatic aberration shift
+  effectBlur: number;              // 0–20 px backdrop-blur on chat/menu panels
+  effectBloom: number;             // 0–100 text-glow strength
+  effectSaturation: number;        // 0–200 (100 = unfiltered)
+  effectContrast: number;          // 50–200 (100 = unfiltered)
+
+  // ─── Animations / motion ───────────────────────────────────────────────────
+  animSpeed: number;               // 0–300 % multiplier (100 = default)
+  animEasing: string;              // linear | ease | ease-in | ease-out | ease-in-out | spring | bounce
+  animReducedMotion: boolean;      // force all transitions/animations off
+  animRespectPrefers: boolean;     // also obey prefers-reduced-motion media query
+  animHoverDuration: number;       // 0–500 ms hover transition base
+
   // Extra raw CSS appended at the end
   extraCSS: string;
   // Trust level for extraCSS: "strict" filters @import and remote url(),
@@ -166,6 +199,38 @@ const DEFAULT_CONFIG: ThemeConfig = {
   lineHeight: "1.4",
 
   blipPitch: 1.0,
+
+  // Extras
+  selectionBg: "#7b2900",
+  selectionFg: "#ffffff",
+  scrollbarTrack: "#1a1a1a",
+  scrollbarThumb: "#555555",
+  scrollbarThumbHover: "#777777",
+  linkColor: "#4a90e2",
+  linkHoverColor: "#74b3ff",
+  linkVisitedColor: "#a070d0",
+  focusRingColor: "#ffd081",
+  mentionColor: "#ffe234",
+  quoteBg: "#2a2a2a",
+  quoteColor: "#bbbbbb",
+
+  // Effects (default = none)
+  effectVignette: 0,
+  effectScanlines: 0,
+  effectScanlineSpacing: 3,
+  effectGrain: 0,
+  effectChromaticAb: 0,
+  effectBlur: 0,
+  effectBloom: 0,
+  effectSaturation: 100,
+  effectContrast: 100,
+
+  // Animations
+  animSpeed: 100,
+  animEasing: "ease",
+  animReducedMotion: false,
+  animRespectPrefers: true,
+  animHoverDuration: 120,
 
   extraCSS: "",
   customCSSTrust: "strict",
@@ -472,6 +537,168 @@ export function generateCSS(config: ThemeConfig): string {
   const trust = config.customCSSTrust ?? "strict";
   const { css: safeExtraCSS } = sanitizeCustomCSS(config.extraCSS ?? "", trust === "strict");
 
+  // Numeric defaults for extras / effects / animation (older configs may lack them).
+  const num = (v: unknown, fallback: number): number =>
+    Number.isFinite(Number(v)) ? Number(v) : fallback;
+
+  const fxVignette = num(config.effectVignette, 0);
+  const fxVignetteRadius = 75; // fixed for now; sliderless to avoid bloat
+  const fxScanlines = num(config.effectScanlines, 0);
+  const fxScanSpacing = Math.max(1, num(config.effectScanlineSpacing, 3));
+  const fxGrain = num(config.effectGrain, 0);
+  const fxChromaticAb = num(config.effectChromaticAb, 0);
+  const fxBlur = num(config.effectBlur, 0);
+  const fxBloom = num(config.effectBloom, 0);
+  const fxSat = num(config.effectSaturation, 100);
+  const fxCon = num(config.effectContrast, 100);
+
+  const animPct = num(config.animSpeed, 100);
+  const animMul = animPct === 0 ? 0 : animPct / 100;
+  const animEasing = (config.animEasing && /^[\w\-(),. \d]+$/.test(config.animEasing))
+    ? config.animEasing
+    : "ease";
+  const animHoverMs = Math.round(num(config.animHoverDuration, 120) * (animMul || 1));
+  const reducedMotion = !!config.animReducedMotion;
+  const respectPrefers = config.animRespectPrefers !== false;
+
+  // ── Built filter string for body (saturation + contrast) ──
+  const bodyFilter = (fxSat !== 100 || fxCon !== 100)
+    ? `filter: saturate(${fxSat}%) contrast(${fxCon}%);`
+    : "";
+
+  // ── Vignette + scanlines + grain rendered as ::after pseudo-overlay ──
+  const overlayLayers: string[] = [];
+  if (fxVignette > 0) {
+    const v = (fxVignette / 100).toFixed(2);
+    overlayLayers.push(
+      `radial-gradient(ellipse at center, transparent ${fxVignetteRadius}%, rgba(0,0,0,${v}) 100%)`,
+    );
+  }
+  if (fxScanlines > 0) {
+    const s = (fxScanlines / 100).toFixed(2);
+    overlayLayers.push(
+      `repeating-linear-gradient(0deg, rgba(0,0,0,${s}) 0 1px, transparent 1px ${fxScanSpacing}px)`,
+    );
+  }
+  if (fxGrain > 0) {
+    const g = (fxGrain / 100).toFixed(2);
+    // Cheap CSS-only grain approximation using a finely-stepped repeating gradient.
+    overlayLayers.push(
+      `repeating-conic-gradient(rgba(255,255,255,${g}) 0 0.0009%, transparent 0 0.002%)`,
+    );
+  }
+  const overlayCSS = overlayLayers.length
+    ? `
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: ${overlayLayers.join(", ")};
+}`
+    : "";
+
+  // ── Chromatic aberration via duplicated text-shadow on chat / log ──
+  const chromaticCSS = fxChromaticAb > 0
+    ? `
+#client_log, #client_ooclog, #tm_preview_inner_chat {
+  text-shadow: ${fxChromaticAb}px 0 0 rgba(255,0,80,0.55), -${fxChromaticAb}px 0 0 rgba(0,200,255,0.55);
+}`
+    : "";
+
+  // ── Bloom (text glow) ──
+  const bloomCSS = fxBloom > 0
+    ? `
+#client_log, .iclog_name, .menu_text, .lm_tab.lm_active, .client_button {
+  text-shadow: 0 0 ${(fxBloom / 8).toFixed(1)}px ${config.buttonBg}, 0 0 ${(fxBloom / 4).toFixed(1)}px ${config.buttonBg};
+}`
+    : "";
+
+  // ── Backdrop blur on transparent panels ──
+  const blurCSS = fxBlur > 0
+    ? `
+#client_log, #client_ooclog, #client_menu, #client_iccontrols, #client_playerlist, .lm_content {
+  backdrop-filter: blur(${fxBlur}px);
+  -webkit-backdrop-filter: blur(${fxBlur}px);
+}`
+    : "";
+
+  // ── Selection / scrollbar / link / focus / mention / quote ──
+  const extrasCSS = `
+::selection {
+  background: ${config.selectionBg};
+  color: ${config.selectionFg};
+}
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: ${config.scrollbarTrack};
+}
+::-webkit-scrollbar-thumb {
+  background: ${config.scrollbarThumb};
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: ${config.scrollbarThumbHover};
+}
+* {
+  scrollbar-color: ${config.scrollbarThumb} ${config.scrollbarTrack};
+}
+a {
+  color: ${config.linkColor};
+}
+a:hover {
+  color: ${config.linkHoverColor};
+}
+a:visited {
+  color: ${config.linkVisitedColor};
+}
+:focus-visible {
+  outline: 2px solid ${config.focusRingColor};
+  outline-offset: 2px;
+}
+.iclog_mention, .mention {
+  color: ${config.mentionColor};
+  font-weight: bold;
+}
+blockquote, .iclog_quote, q {
+  background: ${config.quoteBg};
+  color: ${config.quoteColor};
+  border-left: 3px solid ${config.scrollbarThumb};
+  padding: 4px 8px;
+  margin: 4px 0;
+}`;
+
+  // ── Animation speed / easing — applied through CSS variables every existing
+  //    transition can reference, plus a global override scaling every transition.
+  const animationCSS = reducedMotion
+    ? `
+*, *::before, *::after {
+  transition-duration: 0s !important;
+  animation-duration: 0s !important;
+  animation-iteration-count: 1 !important;
+}`
+    : `
+:root {
+  --tm-anim-speed: ${animMul};
+  --tm-anim-easing: ${animEasing};
+  --tm-hover-ms: ${animHoverMs}ms;
+}
+.client_button, .menu_button, .area-button, .judge_button, .tm_preset_btn,
+.tm_btn, .lm_tab, a, button {
+  transition-duration: var(--tm-hover-ms);
+  transition-timing-function: var(--tm-anim-easing);
+}${respectPrefers ? `
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+}` : ""}`;
+
   return `/* LemmyAO Theme Maker — generated theme */
 body {
   background-color: ${bodyBgColor};
@@ -480,6 +707,7 @@ body {
   font-size: ${config.bodyFontSize}px;
   font-weight: ${fontWeight};
   line-height: ${lineHeight};${buildBgImageCSS(config)}
+  ${bodyFilter}
 }
 
 .client_button {
@@ -607,6 +835,13 @@ body {
   border-bottom: 2px solid ${config.playerlistBorder};
 }
 
+${extrasCSS}
+${animationCSS}
+${blurCSS}
+${bloomCSS}
+${chromaticCSS}
+${overlayCSS}
+
 ${safeExtraCSS}`;
 }
 
@@ -709,6 +944,8 @@ function injectModalHTML(): void {
         <button class="tm_tab" data-tab="audio" role="tab" aria-selected="false">🔊 Audio</button>
         <button class="tm_tab" data-tab="background" role="tab" aria-selected="false">🖼 Background</button>
         <button class="tm_tab" data-tab="typography" role="tab" aria-selected="false">✏️ Typography</button>
+        <button class="tm_tab" data-tab="effects" role="tab" aria-selected="false">✨ Effects</button>
+        <button class="tm_tab" data-tab="animations" role="tab" aria-selected="false">🎬 Animations</button>
         <button class="tm_tab" data-tab="advanced" role="tab" aria-selected="false">⚙️ Advanced</button>
         <div id="tm_presets_section">
           <p class="tm_section_label">Quick Presets</p>
@@ -1050,6 +1287,95 @@ function injectModalHTML(): void {
               </div>
             </div>
           </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">✨ Extras (selection · scrollbar · links · focus · mentions · quotes)</h4>
+            <p class="tm_hint">Fine-tune the small surfaces most clients ignore.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_selectionBg">Selection background</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_selectionBg" data-prop="selectionBg" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_selectionBg" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_selectionFg">Selection text</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_selectionFg" data-prop="selectionFg" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_selectionFg" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_scrollbarTrack">Scrollbar track</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_scrollbarTrack" data-prop="scrollbarTrack" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_scrollbarTrack" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_scrollbarThumb">Scrollbar thumb</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_scrollbarThumb" data-prop="scrollbarThumb" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_scrollbarThumb" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_scrollbarThumbHover">Scrollbar thumb hover</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_scrollbarThumbHover" data-prop="scrollbarThumbHover" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_scrollbarThumbHover" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_linkColor">Link</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_linkColor" data-prop="linkColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_linkColor" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_linkHoverColor">Link hover</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_linkHoverColor" data-prop="linkHoverColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_linkHoverColor" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_linkVisitedColor">Link visited</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_linkVisitedColor" data-prop="linkVisitedColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_linkVisitedColor" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_focusRingColor">Focus ring</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_focusRingColor" data-prop="focusRingColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_focusRingColor" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_mentionColor">@-Mention highlight</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_mentionColor" data-prop="mentionColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_mentionColor" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_quoteBg">Quote background</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_quoteBg" data-prop="quoteBg" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_quoteBg" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_quoteColor">Quote text</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_quoteColor" data-prop="quoteColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_quoteColor" maxlength="7" />
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Chatbox -->
@@ -1229,6 +1555,147 @@ function injectModalHTML(): void {
           <div id="tm_font_preview" class="tm_group">
             <h4 class="tm_group_title">👁 Preview</h4>
             <p id="tm_font_preview_text" class="tm_font_preview_text">The quick brown fox jumps over the lazy dog. 1234567890 !@#$%^&*</p>
+          </div>
+        </div>
+
+        <!-- Effects -->
+        <div class="tm_panel" data-panel="effects">
+          <h3 class="tm_panel_title">Visual Effects</h3>
+          <p class="tm_hint">Stack overlays and filters for stylised looks. Set everything to 0 for a clean theme.</p>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">📺 CRT / Scanlines</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_effectScanlines">Scanline opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_effectScanlines" data-prop="effectScanlines" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_effectScanlines">0</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_effectScanlineSpacing">Scanline spacing (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_effectScanlineSpacing" data-prop="effectScanlineSpacing" min="1" max="10" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_effectScanlineSpacing">3</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_effectChromaticAb">Chromatic aberration</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_effectChromaticAb" data-prop="effectChromaticAb" min="0" max="10" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_effectChromaticAb">0</span><span>px</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🌫 Vignette &amp; grain</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_effectVignette">Vignette strength</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_effectVignette" data-prop="effectVignette" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_effectVignette">0</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_effectGrain">Film grain</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_effectGrain" data-prop="effectGrain" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_effectGrain">0</span><span>%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">💡 Bloom &amp; blur</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_effectBloom">Text bloom (glow)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_effectBloom" data-prop="effectBloom" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_effectBloom">0</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_effectBlur">Backdrop blur (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_effectBlur" data-prop="effectBlur" min="0" max="20" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_effectBlur">0</span><span>px</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🎚 Color filters</h4>
+            <p class="tm_hint">Applied to the whole document. 100% = unchanged.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_effectSaturation">Saturation</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_effectSaturation" data-prop="effectSaturation" min="0" max="200" step="5" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_effectSaturation">100</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_effectContrast">Contrast</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_effectContrast" data-prop="effectContrast" min="50" max="200" step="5" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_effectContrast">100</span><span>%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Animations -->
+        <div class="tm_panel" data-panel="animations">
+          <h3 class="tm_panel_title">Animations &amp; Motion</h3>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">⏩ Speed</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_animSpeed">Animation speed</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_animSpeed" data-prop="animSpeed" min="0" max="300" step="5" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_animSpeed">100</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_animHoverDuration">Hover transition (ms)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_animHoverDuration" data-prop="animHoverDuration" min="0" max="500" step="10" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_animHoverDuration">120</span><span>ms</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_animEasing">Easing curve</label>
+              <select id="tm_animEasing" data-prop="animEasing" class="tm_select">
+                <option value="linear">Linear</option>
+                <option value="ease">Ease (default)</option>
+                <option value="ease-in">Ease-in</option>
+                <option value="ease-out">Ease-out</option>
+                <option value="ease-in-out">Ease-in-out</option>
+                <option value="cubic-bezier(0.34, 1.56, 0.64, 1)">Spring (overshoot)</option>
+                <option value="cubic-bezier(0.68, -0.55, 0.27, 1.55)">Bounce</option>
+                <option value="cubic-bezier(0.4, 0, 0.2, 1)">Material standard</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">♿ Accessibility</h4>
+            <p class="tm_hint">Respects users sensitive to motion.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_animReducedMotion">Force reduced motion</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_animReducedMotion" data-prop="animReducedMotion" />
+                <span class="tm_hint" style="margin:0">Disables every transition + animation immediately.</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_animRespectPrefers">Respect prefers-reduced-motion</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_animRespectPrefers" data-prop="animRespectPrefers" />
+                <span class="tm_hint" style="margin:0">Honors the OS-level "reduce motion" setting.</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1712,6 +2179,10 @@ function wireEvents(): void {
         "inputBgOpacity", "layoutBgOpacity", "icControlsBgOpacity",
         "tabBgOpacity", "tabActiveBgOpacity", "playerlistBgOpacity",
         "chatboxPadding", "chatboxRadius", "chatboxBorderWidth", "blipPitch",
+        "effectVignette", "effectScanlines", "effectScanlineSpacing",
+        "effectGrain", "effectChromaticAb", "effectBlur", "effectBloom",
+        "effectSaturation", "effectContrast",
+        "animSpeed", "animHoverDuration",
       ]);
       (currentConfig as any)[prop] = numericProps.has(prop as string)
         ? Number(input.value)
