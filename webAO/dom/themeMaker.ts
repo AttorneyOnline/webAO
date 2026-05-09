@@ -133,22 +133,34 @@ export interface ThemeConfig {
   panelRadius: number;             // 0–40 px (log/ooc/menu/playerlist)
   inputRadius: number;             // 0–20 px
   tabRadius: number;               // 0–20 px
-  // Optional: outline width/offset for focusable elements (separate from focus ring color)
   outlineWidth: number;            // 0–6 px
   outlineOffset: number;           // 0–10 px
 
   // ─── Shadows & Depth ───────────────────────────────────────────────────────
-  // Drop shadow applied to elevated surfaces (modals, panels, buttons).
   shadowStrength: number;          // 0–100 (0 = no shadow)
   shadowBlur: number;              // 0–40 px blur radius
   shadowOffsetY: number;           // 0–20 px vertical offset
-  shadowColor: string;             // base color (alpha derived from strength)
-  // Inner shadow on inputs / pressed states.
+  shadowColor: string;
   innerShadowStrength: number;     // 0–100
   innerShadowBlur: number;         // 0–20 px
-  // Element glow (separate from text bloom — affects borders/edges).
   glowColor: string;
   glowStrength: number;            // 0–100
+
+  // ─── Typography expansions ────────────────────────────────────────────────
+  headingFontFamily: string;
+  monoFontFamily: string;
+  displayFontFamily: string;
+  letterSpacing: number;           // -2 to 8 px
+  textTransform: "none" | "uppercase" | "lowercase" | "capitalize";
+  textShadowStrength: number;      // 0–100
+  textShadowColor: string;
+  textShadowOffsetX: number;       // -10 to 10 px
+  textShadowOffsetY: number;       // -10 to 10 px
+  textShadowBlur: number;          // 0–20 px
+  customFontDataUrl: string;
+  customFontFamilyName: string;
+  enableLigatures: boolean;
+  enableSmallCaps: boolean;
 
   // Extra raw CSS appended at the end
   extraCSS: string;
@@ -278,6 +290,22 @@ const DEFAULT_CONFIG: ThemeConfig = {
   innerShadowBlur: 6,
   glowColor: "#7b2900",
   glowStrength: 0,
+
+  // Typography expansions
+  headingFontFamily: "",
+  monoFontFamily: "Source Code Pro, Consolas, monospace",
+  displayFontFamily: "",
+  letterSpacing: 0,
+  textTransform: "none",
+  textShadowStrength: 0,
+  textShadowColor: "#000000",
+  textShadowOffsetX: 0,
+  textShadowOffsetY: 1,
+  textShadowBlur: 2,
+  customFontDataUrl: "",
+  customFontFamilyName: "TmCustomFont",
+  enableLigatures: true,
+  enableSmallCaps: false,
 
   extraCSS: "",
   customCSSTrust: "strict",
@@ -671,6 +699,77 @@ body::after {
 }`
     : "";
 
+  // ── Typography expansions ──────────────────────────────────────────────────
+  // Validate font-family strings against a permissive whitelist to avoid CSS
+  // injection through the data-prop pathway. Anything containing < > or { is
+  // rejected and falls back to the default. Single quotes are allowed because
+  // CSS font-family values often use them.
+  const safeFontFamily = (raw: string, fallback: string): string => {
+    if (!raw) return fallback;
+    if (/[<>{};]/.test(raw)) return fallback;
+    return raw;
+  };
+  const headingFont = safeFontFamily(config.headingFontFamily ?? "", "");
+  const monoFont = safeFontFamily(
+    config.monoFontFamily ?? "",
+    "Source Code Pro, Consolas, monospace",
+  );
+  const displayFont = safeFontFamily(config.displayFontFamily ?? "", "");
+
+  const letterSp = num(config.letterSpacing, 0);
+  const allowedTransforms = ["none","uppercase","lowercase","capitalize"];
+  const textTransform = allowedTransforms.includes(config.textTransform as string)
+    ? config.textTransform
+    : "none";
+
+  const tsStrength = Math.max(0, Math.min(100, num(config.textShadowStrength, 0)));
+  const tsX = Math.max(-10, Math.min(10, num(config.textShadowOffsetX, 0)));
+  const tsY = Math.max(-10, Math.min(10, num(config.textShadowOffsetY, 1)));
+  const tsBlur = Math.max(0, Math.min(20, num(config.textShadowBlur, 2)));
+  const tsColor = hexToRgba(config.textShadowColor || "#000000", tsStrength);
+
+  // Validate font-family identifier for the @font-face name; default if odd chars.
+  const customFontName = (config.customFontFamilyName && /^[A-Za-z][A-Za-z0-9 _-]{0,31}$/.test(config.customFontFamilyName))
+    ? config.customFontFamilyName
+    : "TmCustomFont";
+
+  // @font-face block — only emitted when an uploaded data: URL exists. We
+  // accept woff/woff2/ttf/otf data URLs; reject anything that's not a data:
+  // URL outright (no remote tracking pixels through font requests).
+  const fontFaceCSS = (config.customFontDataUrl && config.customFontDataUrl.startsWith("data:"))
+    ? `
+@font-face {
+  font-family: "${customFontName}";
+  src: url("${config.customFontDataUrl}");
+  font-display: swap;
+}`
+    : "";
+
+  const ligaturesValue = config.enableLigatures === false
+    ? '"liga" 0, "dlig" 0'
+    : '"liga" 1, "dlig" 1';
+  const smallCapsValue = config.enableSmallCaps ? '"smcp" 1' : '"smcp" 0';
+
+  const typographyCSS = `${fontFaceCSS}
+body {
+  letter-spacing: ${letterSp}px;
+  text-transform: ${textTransform};
+  font-feature-settings: ${ligaturesValue}, ${smallCapsValue};
+}
+${tsStrength > 0 ? `body, .iclog_name, #client_log, .menu_text, .lm_tab {
+  text-shadow: ${tsX}px ${tsY}px ${tsBlur}px ${tsColor};
+}` : ""}
+${headingFont ? `h1, h2, h3, h4, h5, h6, .tm_panel_title, .tm_group_title, .iclog_name, #client_charselect h2, #info_container h1 {
+  font-family: ${headingFont};
+}` : ""}
+${monoFont ? `#client_ooclog, code, pre, kbd, samp, .tm_css_editor, .tm_hex {
+  font-family: ${monoFont};
+}` : ""}
+${displayFont ? `#tm_title, #about-logo + h1, .page-heading, .button-carousel p {
+  font-family: ${displayFont};
+}` : ""}
+`;
+
   // ── Selection / scrollbar / link / focus / mention / quote ──
   const extrasCSS = `
 ::selection {
@@ -945,6 +1044,7 @@ body {
   border-bottom: 2px solid ${config.playerlistBorder};
 }
 
+${typographyCSS}
 ${extrasCSS}
 ${bordersCSS}
 ${shadowsCSS}
@@ -1666,6 +1766,122 @@ function injectModalHTML(): void {
             </div>
           </div>
 
+          <div class="tm_group">
+            <h4 class="tm_group_title">🅰️ Heading / mono / display fonts</h4>
+            <p class="tm_hint">Optional separate fonts. Leave a slot blank to inherit the body font. Accepts the same values as the body font (CSS font-family list).</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_headingFontFamily">Heading font</label>
+              <input type="text" id="tm_headingFontFamily" data-prop="headingFontFamily" class="tm_text_input" placeholder="e.g. Georgia, serif (blank = inherit)" />
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_monoFontFamily">Mono font (OOC log, code)</label>
+              <input type="text" id="tm_monoFontFamily" data-prop="monoFontFamily" class="tm_text_input" placeholder="e.g. JetBrains Mono, monospace" />
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_displayFontFamily">Display font (titles)</label>
+              <input type="text" id="tm_displayFontFamily" data-prop="displayFontFamily" class="tm_text_input" placeholder="e.g. Poiret One, cursive (blank = inherit)" />
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">📤 Upload custom font</h4>
+            <p class="tm_hint">Drop in a .woff2/.woff/.ttf/.otf file. Stored locally as a data URL — never leaves your browser. Once uploaded, reference it by the family name below in the body / heading / mono / display slots above.</p>
+            <div class="tm_row tm_row_vert">
+              <label class="tm_label">Font file</label>
+              <input type="file" id="tm_customFontFile" accept=".woff2,.woff,.ttf,.otf,font/*" />
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_customFontFamilyName">Family name</label>
+              <input type="text" id="tm_customFontFamilyName" data-prop="customFontFamilyName" class="tm_text_input" placeholder="e.g. MyCustomFont" />
+            </div>
+            <div class="tm_row" id="tm_customFont_status_row" style="display:none">
+              <label class="tm_label">Status</label>
+              <div class="tm_ctrl">
+                <span id="tm_customFont_status" class="tm_hint" style="margin:0">No font uploaded.</span>
+                <button class="tm_btn tm_btn_danger tm_btn_sm" id="tm_customFont_clear_btn">Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">✏️ Spacing &amp; case</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_letterSpacing">Letter spacing (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_letterSpacing" data-prop="letterSpacing" min="-2" max="8" step="0.5" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_letterSpacing">0</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_textTransform">Text transform</label>
+              <select id="tm_textTransform" data-prop="textTransform" class="tm_select">
+                <option value="none">None</option>
+                <option value="uppercase">UPPERCASE</option>
+                <option value="lowercase">lowercase</option>
+                <option value="capitalize">Capitalize</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🔠 OpenType features</h4>
+            <p class="tm_hint">Whether the font's optional ligatures and small-caps glyphs are enabled. Has no effect with fonts that don't ship those features.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_enableLigatures">Ligatures</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_enableLigatures" data-prop="enableLigatures" />
+                <span class="tm_hint" style="margin:0">Enables liga + dlig (default on).</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_enableSmallCaps">Small caps</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_enableSmallCaps" data-prop="enableSmallCaps" />
+                <span class="tm_hint" style="margin:0">Enables smcp (default off).</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🌫 Text shadow</h4>
+            <p class="tm_hint">Subtle drop shadow on body text. Strength = alpha; 0 disables it.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_textShadowStrength">Strength</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_textShadowStrength" data-prop="textShadowStrength" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_textShadowStrength">0</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_textShadowColor">Color</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_textShadowColor" data-prop="textShadowColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_textShadowColor" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_textShadowOffsetX">X offset (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_textShadowOffsetX" data-prop="textShadowOffsetX" min="-10" max="10" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_textShadowOffsetX">0</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_textShadowOffsetY">Y offset (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_textShadowOffsetY" data-prop="textShadowOffsetY" min="-10" max="10" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_textShadowOffsetY">1</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_textShadowBlur">Blur (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_textShadowBlur" data-prop="textShadowBlur" min="0" max="20" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_textShadowBlur">2</span><span>px</span>
+              </div>
+            </div>
+          </div>
+
           <div id="tm_font_preview" class="tm_group">
             <h4 class="tm_group_title">👁 Preview</h4>
             <p id="tm_font_preview_text" class="tm_font_preview_text">The quick brown fox jumps over the lazy dog. 1234567890 !@#$%^&*</p>
@@ -2273,9 +2489,19 @@ function syncUIFromConfig(config: ThemeConfig): void {
   const extraTA = document.getElementById("tm_extraCSS") as HTMLTextAreaElement | null;
   if (extraTA) extraTA.value = config.extraCSS ?? "";
 
+  // Generic text inputs that bind via data-prop (skip legacy custom-font sentinel).
+  document.querySelectorAll<HTMLInputElement>("input[type=text].tm_text_input[data-prop]").forEach((input) => {
+    if (input.id === "tm_customFontInput") return;
+    const prop = input.dataset.prop as keyof ThemeConfig;
+    input.value = String(config[prop] ?? "");
+  });
+
   // Background preview
   updateBgPreview(config);
   updatePlayerlistBgPreview(config);
+
+  // Custom font upload status
+  updateCustomFontStatus(config);
 
   // Font preview
   updateFontPreview(config);
@@ -2296,6 +2522,20 @@ function updateBgPreview(config: ThemeConfig): void {
     img.src = "";
     img.style.display = "none";
     wrap.style.display = "none";
+  }
+}
+
+function updateCustomFontStatus(config: ThemeConfig): void {
+  const row = document.getElementById("tm_customFont_status_row") as HTMLElement | null;
+  const status = document.getElementById("tm_customFont_status") as HTMLElement | null;
+  if (!row || !status) return;
+  if (config.customFontDataUrl) {
+    row.style.display = "flex";
+    const sizeKB = Math.round(config.customFontDataUrl.length / 1024);
+    status.textContent = `✅ Loaded as "${config.customFontFamilyName || "TmCustomFont"}" (~${sizeKB} KB).`;
+  } else {
+    row.style.display = "none";
+    status.textContent = "No font uploaded.";
   }
 }
 
@@ -2470,6 +2710,8 @@ function wireEvents(): void {
         "shadowStrength", "shadowBlur", "shadowOffsetY",
         "innerShadowStrength", "innerShadowBlur",
         "glowStrength",
+        "letterSpacing", "textShadowStrength",
+        "textShadowOffsetX", "textShadowOffsetY", "textShadowBlur",
       ]);
       (currentConfig as any)[prop] = numericProps.has(prop as string)
         ? Number(input.value)
@@ -2575,6 +2817,58 @@ function wireEvents(): void {
     extraTA.addEventListener("blur", () => { isInteracting = false; });
     extraTA.addEventListener("input", () => {
       currentConfig.extraCSS = extraTA.value;
+      liveUpdate();
+    });
+  }
+
+  // Generic text inputs that bind to ThemeConfig via data-prop. The existing
+  // tm_customFontInput is handled separately (legacy "custom" sentinel for
+  // bodyFontFamily) so we explicitly skip it here.
+  document.querySelectorAll<HTMLInputElement>("input[type=text].tm_text_input[data-prop]").forEach((input) => {
+    if (input.id === "tm_customFontInput") return;
+    input.addEventListener("focus", captureHistory);
+    input.addEventListener("blur", () => { isInteracting = false; });
+    input.addEventListener("input", () => {
+      const prop = input.dataset.prop as keyof ThemeConfig;
+      (currentConfig as any)[prop] = input.value;
+      liveUpdate();
+    });
+  });
+
+  // Custom-font upload — read file as data URL, store on config, refresh status.
+  const fontFile = document.getElementById("tm_customFontFile") as HTMLInputElement | null;
+  if (fontFile) {
+    fontFile.addEventListener("change", () => {
+      const file = fontFile.files?.[0];
+      if (!file) return;
+      // Cap at ~4 MB so a runaway upload can't stuff localStorage.
+      const MAX_BYTES = 4 * 1024 * 1024;
+      if (file.size > MAX_BYTES) {
+        alert(`Font is ${(file.size / 1024 / 1024).toFixed(1)} MB — please use a file under 4 MB.`);
+        fontFile.value = "";
+        return;
+      }
+      pushToHistory(currentConfig);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        currentConfig.customFontDataUrl = dataUrl;
+        updateCustomFontStatus(currentConfig);
+        liveUpdate();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Custom-font clear
+  const fontClearBtn = document.getElementById("tm_customFont_clear_btn");
+  if (fontClearBtn) {
+    fontClearBtn.addEventListener("click", () => {
+      pushToHistory(currentConfig);
+      currentConfig.customFontDataUrl = "";
+      const ff = document.getElementById("tm_customFontFile") as HTMLInputElement | null;
+      if (ff) ff.value = "";
+      updateCustomFontStatus(currentConfig);
       liveUpdate();
     });
   }
