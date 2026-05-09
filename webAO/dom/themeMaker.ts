@@ -162,6 +162,18 @@ export interface ThemeConfig {
   enableLigatures: boolean;
   enableSmallCaps: boolean;
 
+  // ─── Audio expansions (UI sounds via Web Audio) ──────────────────────────
+  uiSoundsEnabled: boolean;
+  uiHoverEnabled: boolean;
+  uiClickEnabled: boolean;
+  uiErrorEnabled: boolean;
+  uiNotifEnabled: boolean;
+  uiHoverVolume: number;           // 0–100
+  uiClickVolume: number;           // 0–100
+  uiErrorVolume: number;           // 0–100
+  uiNotifVolume: number;           // 0–100
+  uiSoundPack: "soft" | "retro" | "mechanical" | "vocal-blip";
+
   // ─── Cursor customization ─────────────────────────────────────────────────
   cursorStyle: "default" | "pointer" | "crosshair" | "text" | "help" | "wait" | "progress" | "grab" | "custom";
   cursorCustomDataUrl: string;     // uploaded PNG/SVG (data: URL) or ""
@@ -323,6 +335,18 @@ const DEFAULT_CONFIG: ThemeConfig = {
   customFontFamilyName: "TmCustomFont",
   enableLigatures: true,
   enableSmallCaps: false,
+
+  // Audio (UI sounds)
+  uiSoundsEnabled: false,
+  uiHoverEnabled: true,
+  uiClickEnabled: true,
+  uiErrorEnabled: true,
+  uiNotifEnabled: true,
+  uiHoverVolume: 15,
+  uiClickVolume: 30,
+  uiErrorVolume: 40,
+  uiNotifVolume: 50,
+  uiSoundPack: "soft",
 
   // Cursor
   cursorStyle: "default",
@@ -1230,9 +1254,137 @@ export function restoreBlipPitch(): void {
 window.applyBlipPitch = applyBlipPitch;
 window.restoreBlipPitch = restoreBlipPitch;
 
+// ─── UI sound synthesis (Web Audio) ──────────────────────────────────────────
+// One shared AudioContext is created lazily on the first user gesture so
+// browsers don't block playback. Sounds are short oscillator beeps shaped by
+// envelopes — no asset files, ~120 lines total.
+
+let uiAudioCtx: AudioContext | null = null;
+let uiSoundConfig: ThemeConfig | null = null;
+let uiListenersWired = false;
+
+function ensureUiAudioCtx(): AudioContext | null {
+  if (uiAudioCtx) return uiAudioCtx;
+  try {
+    const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
+    if (!Ctx) return null;
+    uiAudioCtx = new Ctx();
+    return uiAudioCtx;
+  } catch {
+    return null;
+  }
+}
+
+interface UiBeep { freq: number; type: OscillatorType; dur: number; }
+
+function packBeep(pack: ThemeConfig["uiSoundPack"], event: "hover"|"click"|"error"|"notif"): UiBeep {
+  // (frequency Hz, oscillator type, duration s) — simple synthesised palette.
+  const table: Record<string, Record<string, UiBeep>> = {
+    soft: {
+      hover: { freq: 880, type: "sine", dur: 0.06 },
+      click: { freq: 660, type: "sine", dur: 0.09 },
+      error: { freq: 220, type: "sine", dur: 0.18 },
+      notif: { freq: 1320, type: "sine", dur: 0.14 },
+    },
+    retro: {
+      hover: { freq: 1200, type: "square", dur: 0.04 },
+      click: { freq: 800, type: "square", dur: 0.07 },
+      error: { freq: 200, type: "sawtooth", dur: 0.20 },
+      notif: { freq: 1600, type: "square", dur: 0.10 },
+    },
+    mechanical: {
+      hover: { freq: 600, type: "triangle", dur: 0.03 },
+      click: { freq: 380, type: "triangle", dur: 0.06 },
+      error: { freq: 140, type: "sawtooth", dur: 0.22 },
+      notif: { freq: 980, type: "triangle", dur: 0.13 },
+    },
+    "vocal-blip": {
+      hover: { freq: 1480, type: "triangle", dur: 0.05 },
+      click: { freq: 1100, type: "triangle", dur: 0.08 },
+      error: { freq: 300, type: "sine", dur: 0.18 },
+      notif: { freq: 1760, type: "sine", dur: 0.12 },
+    },
+  };
+  return table[pack]?.[event] ?? { freq: 800, type: "sine", dur: 0.08 };
+}
+
+function playUiBeep(event: "hover"|"click"|"error"|"notif"): void {
+  if (!uiSoundConfig?.uiSoundsEnabled) return;
+  const enabledMap: Record<string, boolean | undefined> = {
+    hover: uiSoundConfig.uiHoverEnabled,
+    click: uiSoundConfig.uiClickEnabled,
+    error: uiSoundConfig.uiErrorEnabled,
+    notif: uiSoundConfig.uiNotifEnabled,
+  };
+  if (!enabledMap[event]) return;
+  const volMap: Record<string, number | undefined> = {
+    hover: uiSoundConfig.uiHoverVolume,
+    click: uiSoundConfig.uiClickVolume,
+    error: uiSoundConfig.uiErrorVolume,
+    notif: uiSoundConfig.uiNotifVolume,
+  };
+  const vol = Math.max(0, Math.min(100, Number(volMap[event] ?? 30))) / 100;
+  if (vol === 0) return;
+
+  const ctx = ensureUiAudioCtx();
+  if (!ctx) return;
+  const beep = packBeep(uiSoundConfig.uiSoundPack, event);
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = beep.type;
+  osc.frequency.value = beep.freq;
+  // Quick attack/release envelope to avoid clicks. Peak gain is the user volume.
+  const t0 = ctx.currentTime;
+  gain.gain.setValueAtTime(0, t0);
+  gain.gain.linearRampToValueAtTime(vol * 0.25, t0 + 0.005);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + beep.dur);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(t0);
+  osc.stop(t0 + beep.dur + 0.02);
+}
+
+/** Throttle hover events so a fast mousemove doesn't fire 60 beeps/sec. */
+let lastHoverBeepAt = 0;
+function maybeHoverBeep(): void {
+  const now = performance.now();
+  if (now - lastHoverBeepAt < 90) return;
+  lastHoverBeepAt = now;
+  playUiBeep("hover");
+}
+
+function ensureUiListeners(): void {
+  if (uiListenersWired) return;
+  uiListenersWired = true;
+  // Hover: triggered when entering anything that "looks clickable".
+  document.addEventListener("pointerenter", (e) => {
+    const t = e.target as HTMLElement | null;
+    if (!t || !t.matches) return;
+    if (t.matches('button, a, [role="button"], .client_button, .menu_button, .area-button, .judge_button, .tm_btn, .tm_preset_btn, .tm_tab')) {
+      maybeHoverBeep();
+    }
+  }, true);
+  // Click: any pointer-down counts (synth happens on user gesture so audio context can start).
+  document.addEventListener("pointerdown", (e) => {
+    const t = e.target as HTMLElement | null;
+    if (!t || !t.matches) return;
+    if (t.matches('button, a, [role="button"], .client_button, .menu_button, .area-button, .judge_button, .tm_btn, .tm_preset_btn, .tm_tab, input[type=checkbox], input[type=radio], select')) {
+      playUiBeep("click");
+    }
+  }, true);
+}
+
+export function applyUiSoundConfig(config: ThemeConfig): void {
+  uiSoundConfig = config;
+  if (config.uiSoundsEnabled) ensureUiListeners();
+}
+
+/** Public hook so other modules can fire UI sounds (e.g. error toast handler). */
+(window as any).__tmPlayUi = playUiBeep;
+
 export function applyThemeMakerConfig(config: ThemeConfig): void {
   applyThemeMakerCSS(generateCSS(config));
   applyBlipPitch(Number(config.blipPitch ?? 1));
+  applyUiSoundConfig(config);
 }
 
 // ─── Modal HTML ───────────────────────────────────────────────────────────────
@@ -1259,6 +1411,7 @@ function injectModalHTML(): void {
         <button class="tm_tab tm_tab_active" data-tab="colors" role="tab" aria-selected="true">🎨 Colors</button>
         <button class="tm_tab" data-tab="chatbox" role="tab" aria-selected="false">💬 Chatbox</button>
         <button class="tm_tab" data-tab="audio" role="tab" aria-selected="false">🔊 Audio</button>
+        <button class="tm_tab" data-tab="uisounds" role="tab" aria-selected="false">🔔 UI Sounds</button>
         <button class="tm_tab" data-tab="background" role="tab" aria-selected="false">🖼 Background</button>
         <button class="tm_tab" data-tab="typography" role="tab" aria-selected="false">✏️ Typography</button>
         <button class="tm_tab" data-tab="effects" role="tab" aria-selected="false">✨ Effects</button>
@@ -1740,6 +1893,109 @@ function injectModalHTML(): void {
               <div class="tm_ctrl">
                 <input type="range" id="tm_blipPitch" data-prop="blipPitch" min="0.5" max="2" step="0.05" class="tm_range" />
                 <span class="tm_range_val" data-for="tm_blipPitch">1.00</span><span>×</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- UI Sounds -->
+        <div class="tm_panel" data-panel="uisounds">
+          <h3 class="tm_panel_title">UI Sounds</h3>
+          <p class="tm_hint">Plays a synthesised beep on hover and click. Generated live from Web Audio — no asset files. Disabled by default; enable to opt in.</p>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🎚 Master &amp; pack</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiSoundsEnabled">Enable UI sounds</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_uiSoundsEnabled" data-prop="uiSoundsEnabled" />
+                <span class="tm_hint" style="margin:0">Master switch.</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiSoundPack">Sound pack</label>
+              <select id="tm_uiSoundPack" data-prop="uiSoundPack" class="tm_select">
+                <option value="soft">Soft (sine waves)</option>
+                <option value="retro">Retro (square / saw)</option>
+                <option value="mechanical">Mechanical (triangle)</option>
+                <option value="vocal-blip">Vocal-blip (high triangle)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🪶 Hover</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiHoverEnabled">Play on hover</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_uiHoverEnabled" data-prop="uiHoverEnabled" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiHoverVolume">Volume</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_uiHoverVolume" data-prop="uiHoverVolume" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_uiHoverVolume">15</span><span>%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🖱 Click</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiClickEnabled">Play on click</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_uiClickEnabled" data-prop="uiClickEnabled" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiClickVolume">Volume</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_uiClickVolume" data-prop="uiClickVolume" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_uiClickVolume">30</span><span>%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🚨 Error / 🔔 Notification</h4>
+            <p class="tm_hint">Volume only — these don't auto-play; other modules can fire them via <code>window.__tmPlayUi("error")</code> / <code>("notif")</code>.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiErrorEnabled">Errors enabled</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_uiErrorEnabled" data-prop="uiErrorEnabled" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiErrorVolume">Error volume</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_uiErrorVolume" data-prop="uiErrorVolume" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_uiErrorVolume">40</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiNotifEnabled">Notifications enabled</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_uiNotifEnabled" data-prop="uiNotifEnabled" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiNotifVolume">Notification volume</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_uiNotifVolume" data-prop="uiNotifVolume" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_uiNotifVolume">50</span><span>%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🎧 Test</h4>
+            <div class="tm_row">
+              <div class="tm_ctrl">
+                <button class="tm_btn tm_btn_secondary tm_btn_sm" id="tm_test_hover">▶ Hover</button>
+                <button class="tm_btn tm_btn_secondary tm_btn_sm" id="tm_test_click">▶ Click</button>
+                <button class="tm_btn tm_btn_secondary tm_btn_sm" id="tm_test_error">▶ Error</button>
+                <button class="tm_btn tm_btn_secondary tm_btn_sm" id="tm_test_notif">▶ Notify</button>
               </div>
             </div>
           </div>
@@ -2986,6 +3242,7 @@ function wireEvents(): void {
         "playerlistPanelPadding", "sidebarWidth", "headerBarHeight",
         "buttonGap",
         "cursorMagnetismStrength",
+        "uiHoverVolume", "uiClickVolume", "uiErrorVolume", "uiNotifVolume",
       ]);
       (currentConfig as any)[prop] = numericProps.has(prop as string)
         ? Number(input.value)
@@ -3216,6 +3473,20 @@ function wireEvents(): void {
       liveUpdate();
     });
   }
+
+  // UI sound test buttons — fire the synth directly so users can audition.
+  const wireTest = (id: string, ev: "hover"|"click"|"error"|"notif") => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener("click", () => {
+      // Make sure the synth has a fresh config snapshot before testing.
+      uiSoundConfig = currentConfig;
+      playUiBeep(ev);
+    });
+  };
+  wireTest("tm_test_hover", "hover");
+  wireTest("tm_test_click", "click");
+  wireTest("tm_test_error", "error");
+  wireTest("tm_test_notif", "notif");
 
   // Background file upload
   const bgFile = document.getElementById("tm_bg_file") as HTMLInputElement | null;
