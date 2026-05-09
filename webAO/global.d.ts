@@ -21,6 +21,7 @@ declare global {
     exportLog: (format: string) => void;
     showname_click: (_event: Event | null) => void;
     switchPanTilt: () => Promise<void>;
+    switchHideDesks: () => Promise<void>;
     updateActionCommands: (side: string) => void;
     updateBackgroundPreview: () => void;
     openThemeMaker: () => void;

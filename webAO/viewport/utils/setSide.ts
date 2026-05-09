@@ -3,6 +3,7 @@ import { AO_HOST } from "../../client/aoHost";
 import { client } from "../../client";
 import transparentPng from "../../constants/transparentPng";
 import fileExists from "../../utils/fileExists";
+import { isHideDesksEnabled } from "../../dom/switchHideDesks";
 
 export async function setBackgroundImage(elementid: string, bgname: string, bgpart: string) {
 
@@ -77,6 +78,10 @@ export const set_side = async ({
     court.src = `${AO_HOST}themes/default/${encodeURI(speedLines)}`;
   } else {
     setBackgroundImage(court.id, client.viewport.getBackgroundName(), bg);
+  }
+
+  if (isHideDesksEnabled()) {
+    showDesk = false;
   }
 
   if (showDesk === true && desk) {
