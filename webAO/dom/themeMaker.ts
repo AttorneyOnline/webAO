@@ -162,6 +162,16 @@ export interface ThemeConfig {
   enableLigatures: boolean;
   enableSmallCaps: boolean;
 
+  // ─── Background+ (video bg, per-panel images, parallax) ──────────────────
+  bodyBgVideo: string;             // uploaded video data URL or ""
+  bodyBgVideoMuted: boolean;
+  bodyBgVideoLoop: boolean;
+  bodyBgParallax: boolean;         // background-attachment: fixed
+  bodyBgDimOnIdle: boolean;        // CSS-only dim via :hover on body container
+  chatBgImage: string;             // per-panel uploads
+  menuBgImage: string;
+  panelBgOpacity: number;          // 0–100 — overlay alpha behind per-panel images
+
   // ─── Audio expansions (UI sounds via Web Audio) ──────────────────────────
   uiSoundsEnabled: boolean;
   uiHoverEnabled: boolean;
@@ -335,6 +345,16 @@ const DEFAULT_CONFIG: ThemeConfig = {
   customFontFamilyName: "TmCustomFont",
   enableLigatures: true,
   enableSmallCaps: false,
+
+  // Background+
+  bodyBgVideo: "",
+  bodyBgVideoMuted: true,
+  bodyBgVideoLoop: true,
+  bodyBgParallax: false,
+  bodyBgDimOnIdle: false,
+  chatBgImage: "",
+  menuBgImage: "",
+  panelBgOpacity: 80,
 
   // Audio (UI sounds)
   uiSoundsEnabled: false,
@@ -828,6 +848,29 @@ ${displayFont ? `#tm_title, #about-logo + h1, .page-heading, .button-carousel p 
 }` : ""}
 `;
 
+  // ── Background+ — per-panel images + parallax + dim-on-idle ──────────────
+  const panelBgAlpha = Math.max(0, Math.min(100, num(config.panelBgOpacity, 80))) / 100;
+  const parallaxRule = config.bodyBgParallax ? "background-attachment: fixed;" : "";
+  const dimOnIdleRule = config.bodyBgDimOnIdle ? `
+body { transition: filter 1.5s ease; filter: brightness(0.7); }
+body:hover, body:focus-within, body:active { filter: brightness(1); }` : "";
+
+  const panelBgCSS = `
+${parallaxRule ? `body { ${parallaxRule} }` : ""}
+${dimOnIdleRule}
+${config.chatBgImage ? `
+#client_log, #client_ooclog {
+  background-image: linear-gradient(rgba(0,0,0,${1 - panelBgAlpha}), rgba(0,0,0,${1 - panelBgAlpha})), url('${config.chatBgImage}');
+  background-size: cover;
+  background-position: center;
+}` : ""}
+${config.menuBgImage ? `
+#client_menu, .menu_content {
+  background-image: linear-gradient(rgba(0,0,0,${1 - panelBgAlpha}), rgba(0,0,0,${1 - panelBgAlpha})), url('${config.menuBgImage}');
+  background-size: cover;
+  background-position: center;
+}` : ""}`;
+
   // ── Cursor customization ──────────────────────────────────────────────────
   const allowedCursorStyles = ["default","pointer","crosshair","text","help","wait","progress","grab","custom"];
   const cursorStyle = allowedCursorStyles.includes(config.cursorStyle as string)
@@ -1174,6 +1217,7 @@ body {
 ${typographyCSS}
 ${cursorCSS}
 ${spacingCSS}
+${panelBgCSS}
 ${extrasCSS}
 ${bordersCSS}
 ${shadowsCSS}
@@ -1253,6 +1297,36 @@ export function restoreBlipPitch(): void {
 
 window.applyBlipPitch = applyBlipPitch;
 window.restoreBlipPitch = restoreBlipPitch;
+
+// ─── Background video ────────────────────────────────────────────────────────
+// When config.bodyBgVideo is a data: URL, mount a <video> behind everything;
+// otherwise tear it down.
+function applyBgVideo(config: ThemeConfig): void {
+  const existing = document.getElementById("tm_bg_video") as HTMLVideoElement | null;
+  if (!config.bodyBgVideo || !config.bodyBgVideo.startsWith("data:video/")) {
+    if (existing) existing.remove();
+    return;
+  }
+  const v = existing ?? document.createElement("video");
+  v.id = "tm_bg_video";
+  v.muted = !!config.bodyBgVideoMuted;
+  v.loop = !!config.bodyBgVideoLoop;
+  v.autoplay = true;
+  v.playsInline = true;
+  v.setAttribute("aria-hidden", "true");
+  Object.assign(v.style, {
+    position: "fixed",
+    inset: "0",
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    zIndex: "-1",
+    pointerEvents: "none",
+  } as Partial<CSSStyleDeclaration>);
+  if (v.src !== config.bodyBgVideo) v.src = config.bodyBgVideo;
+  if (!existing) document.body.appendChild(v);
+  v.play().catch(() => { /* autoplay blocked until user gesture — fine */ });
+}
 
 // ─── UI sound synthesis (Web Audio) ──────────────────────────────────────────
 // One shared AudioContext is created lazily on the first user gesture so
@@ -1385,6 +1459,7 @@ export function applyThemeMakerConfig(config: ThemeConfig): void {
   applyThemeMakerCSS(generateCSS(config));
   applyBlipPitch(Number(config.blipPitch ?? 1));
   applyUiSoundConfig(config);
+  applyBgVideo(config);
 }
 
 // ─── Modal HTML ───────────────────────────────────────────────────────────────
@@ -2071,6 +2146,87 @@ function injectModalHTML(): void {
               <div class="tm_ctrl">
                 <input type="color" id="tm_bodyColor2" data-prop="bodyColor" class="tm_color" />
                 <input type="text" class="tm_hex" data-for="tm_bodyColor2" maxlength="7" />
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🎬 Background video</h4>
+            <p class="tm_hint">Mounts a looping video behind everything. Capped at 16 MB; stored locally as a data URL. Browsers block autoplay until you interact with the page once.</p>
+            <div class="tm_row tm_row_vert">
+              <label class="tm_label">Video file</label>
+              <input type="file" id="tm_bgVideoFile" accept="video/mp4,video/webm,video/quicktime" />
+            </div>
+            <div class="tm_row" id="tm_bgVideo_status_row" style="display:none">
+              <label class="tm_label">Status</label>
+              <div class="tm_ctrl">
+                <span id="tm_bgVideo_status" class="tm_hint" style="margin:0">No video uploaded.</span>
+                <button class="tm_btn tm_btn_danger tm_btn_sm" id="tm_bgVideo_clear_btn">Remove</button>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_bodyBgVideoMuted">Muted</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_bodyBgVideoMuted" data-prop="bodyBgVideoMuted" />
+                <span class="tm_hint" style="margin:0">Required for autoplay in most browsers.</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_bodyBgVideoLoop">Loop</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_bodyBgVideoLoop" data-prop="bodyBgVideoLoop" />
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🪟 Per-panel backgrounds</h4>
+            <p class="tm_hint">Optional images that show behind specific panels. Combined with a darkening overlay so text stays readable.</p>
+            <div class="tm_row tm_row_vert">
+              <label class="tm_label">Chat / OOC log image</label>
+              <input type="file" id="tm_chatBgFile" accept="image/*" />
+            </div>
+            <div class="tm_row" id="tm_chatBg_status_row" style="display:none">
+              <label class="tm_label">Status</label>
+              <div class="tm_ctrl">
+                <span id="tm_chatBg_status" class="tm_hint" style="margin:0">No image.</span>
+                <button class="tm_btn tm_btn_danger tm_btn_sm" id="tm_chatBg_clear_btn">Remove</button>
+              </div>
+            </div>
+            <div class="tm_row tm_row_vert">
+              <label class="tm_label">Menu image</label>
+              <input type="file" id="tm_menuBgFile" accept="image/*" />
+            </div>
+            <div class="tm_row" id="tm_menuBg_status_row" style="display:none">
+              <label class="tm_label">Status</label>
+              <div class="tm_ctrl">
+                <span id="tm_menuBg_status" class="tm_hint" style="margin:0">No image.</span>
+                <button class="tm_btn tm_btn_danger tm_btn_sm" id="tm_menuBg_clear_btn">Remove</button>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_panelBgOpacity">Panel image opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_panelBgOpacity" data-prop="panelBgOpacity" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_panelBgOpacity">80</span><span>%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">✨ Effects</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_bodyBgParallax">Parallax</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_bodyBgParallax" data-prop="bodyBgParallax" />
+                <span class="tm_hint" style="margin:0">Background stays put when the page scrolls.</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_bodyBgDimOnIdle">Dim on idle</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_bodyBgDimOnIdle" data-prop="bodyBgDimOnIdle" />
+                <span class="tm_hint" style="margin:0">Page dims when you're not interacting; restores on hover/click.</span>
               </div>
             </div>
           </div>
@@ -3015,6 +3171,11 @@ function syncUIFromConfig(config: ThemeConfig): void {
   // Custom cursor upload status
   updateCursorStatus(config);
 
+  // Background+ upload statuses
+  updateUploadStatus("tm_bgVideo_status_row", "tm_bgVideo_status", config.bodyBgVideo, "Background video");
+  updateUploadStatus("tm_chatBg_status_row", "tm_chatBg_status", config.chatBgImage, "Chat image");
+  updateUploadStatus("tm_menuBg_status_row", "tm_menuBg_status", config.menuBgImage, "Menu image");
+
   // Font preview
   updateFontPreview(config);
 
@@ -3034,6 +3195,20 @@ function updateBgPreview(config: ThemeConfig): void {
     img.src = "";
     img.style.display = "none";
     wrap.style.display = "none";
+  }
+}
+
+function updateUploadStatus(rowId: string, statusId: string, dataUrl: string, label: string): void {
+  const row = document.getElementById(rowId) as HTMLElement | null;
+  const status = document.getElementById(statusId) as HTMLElement | null;
+  if (!row || !status) return;
+  if (dataUrl) {
+    row.style.display = "flex";
+    const sizeKB = Math.round(dataUrl.length / 1024);
+    status.textContent = `✅ ${label} loaded (~${sizeKB} KB).`;
+  } else {
+    row.style.display = "none";
+    status.textContent = `No ${label.toLowerCase()}.`;
   }
 }
 
@@ -3243,6 +3418,7 @@ function wireEvents(): void {
         "buttonGap",
         "cursorMagnetismStrength",
         "uiHoverVolume", "uiClickVolume", "uiErrorVolume", "uiNotifVolume",
+        "panelBgOpacity",
       ]);
       (currentConfig as any)[prop] = numericProps.has(prop as string)
         ? Number(input.value)
@@ -3473,6 +3649,83 @@ function wireEvents(): void {
       liveUpdate();
     });
   }
+
+  // Background-video upload — capped at 16 MB so localStorage doesn't choke.
+  const bgVideoFile = document.getElementById("tm_bgVideoFile") as HTMLInputElement | null;
+  if (bgVideoFile) {
+    bgVideoFile.addEventListener("change", () => {
+      const file = bgVideoFile.files?.[0];
+      if (!file) return;
+      const MAX = 16 * 1024 * 1024;
+      if (file.size > MAX) {
+        alert(`Video is ${(file.size / 1024 / 1024).toFixed(1)} MB — please use one under 16 MB.`);
+        bgVideoFile.value = "";
+        return;
+      }
+      pushToHistory(currentConfig);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        currentConfig.bodyBgVideo = e.target?.result as string;
+        updateUploadStatus("tm_bgVideo_status_row", "tm_bgVideo_status", currentConfig.bodyBgVideo, "Background video");
+        liveUpdate();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  const bgVideoClear = document.getElementById("tm_bgVideo_clear_btn");
+  if (bgVideoClear) {
+    bgVideoClear.addEventListener("click", () => {
+      pushToHistory(currentConfig);
+      currentConfig.bodyBgVideo = "";
+      const f = document.getElementById("tm_bgVideoFile") as HTMLInputElement | null;
+      if (f) f.value = "";
+      updateUploadStatus("tm_bgVideo_status_row", "tm_bgVideo_status", "", "Background video");
+      liveUpdate();
+    });
+  }
+
+  // Generic per-panel image uploaders for chatBg + menuBg.
+  const wirePanelImage = (
+    fileId: string,
+    clearId: string,
+    rowId: string,
+    statusId: string,
+    label: string,
+    configKey: "chatBgImage" | "menuBgImage",
+  ) => {
+    const fileEl = document.getElementById(fileId) as HTMLInputElement | null;
+    if (fileEl) {
+      fileEl.addEventListener("change", () => {
+        const file = fileEl.files?.[0];
+        if (!file) return;
+        if (file.size > 4 * 1024 * 1024) {
+          alert(`Image is ${(file.size / 1024 / 1024).toFixed(1)} MB — please use one under 4 MB.`);
+          fileEl.value = "";
+          return;
+        }
+        pushToHistory(currentConfig);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          currentConfig[configKey] = e.target?.result as string;
+          updateUploadStatus(rowId, statusId, currentConfig[configKey], label);
+          liveUpdate();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    const clearEl = document.getElementById(clearId);
+    if (clearEl) {
+      clearEl.addEventListener("click", () => {
+        pushToHistory(currentConfig);
+        currentConfig[configKey] = "";
+        if (fileEl) fileEl.value = "";
+        updateUploadStatus(rowId, statusId, "", label);
+        liveUpdate();
+      });
+    }
+  };
+  wirePanelImage("tm_chatBgFile", "tm_chatBg_clear_btn", "tm_chatBg_status_row", "tm_chatBg_status", "Chat image", "chatBgImage");
+  wirePanelImage("tm_menuBgFile", "tm_menuBg_clear_btn", "tm_menuBg_status_row", "tm_menuBg_status", "Menu image", "menuBgImage");
 
   // UI sound test buttons — fire the synth directly so users can audition.
   const wireTest = (id: string, ev: "hover"|"click"|"error"|"notif") => {
