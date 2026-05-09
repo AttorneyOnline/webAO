@@ -124,6 +124,32 @@ export interface ThemeConfig {
   animRespectPrefers: boolean;     // also obey prefers-reduced-motion media query
   animHoverDuration: number;       // 0–500 ms hover transition base
 
+  // ─── Borders & Shape ───────────────────────────────────────────────────────
+  // Style applied across button/panel/input borders.
+  borderStyle: "solid" | "dashed" | "dotted" | "double" | "groove" | "ridge";
+  buttonBorderWidth: number;       // 0–8 px
+  panelBorderWidth: number;        // 0–8 px (log/ooc/menu/playerlist)
+  inputBorderWidth: number;        // 0–8 px
+  panelRadius: number;             // 0–40 px (log/ooc/menu/playerlist)
+  inputRadius: number;             // 0–20 px
+  tabRadius: number;               // 0–20 px
+  // Optional: outline width/offset for focusable elements (separate from focus ring color)
+  outlineWidth: number;            // 0–6 px
+  outlineOffset: number;           // 0–10 px
+
+  // ─── Shadows & Depth ───────────────────────────────────────────────────────
+  // Drop shadow applied to elevated surfaces (modals, panels, buttons).
+  shadowStrength: number;          // 0–100 (0 = no shadow)
+  shadowBlur: number;              // 0–40 px blur radius
+  shadowOffsetY: number;           // 0–20 px vertical offset
+  shadowColor: string;             // base color (alpha derived from strength)
+  // Inner shadow on inputs / pressed states.
+  innerShadowStrength: number;     // 0–100
+  innerShadowBlur: number;         // 0–20 px
+  // Element glow (separate from text bloom — affects borders/edges).
+  glowColor: string;
+  glowStrength: number;            // 0–100
+
   // Extra raw CSS appended at the end
   extraCSS: string;
   // Trust level for extraCSS: "strict" filters @import and remote url(),
@@ -231,6 +257,27 @@ const DEFAULT_CONFIG: ThemeConfig = {
   animReducedMotion: false,
   animRespectPrefers: true,
   animHoverDuration: 120,
+
+  // Borders & Shape
+  borderStyle: "solid",
+  buttonBorderWidth: 1,
+  panelBorderWidth: 1,
+  inputBorderWidth: 1,
+  panelRadius: 4,
+  inputRadius: 4,
+  tabRadius: 4,
+  outlineWidth: 2,
+  outlineOffset: 2,
+
+  // Shadows & Depth
+  shadowStrength: 0,
+  shadowBlur: 12,
+  shadowOffsetY: 4,
+  shadowColor: "#000000",
+  innerShadowStrength: 0,
+  innerShadowBlur: 6,
+  glowColor: "#7b2900",
+  glowStrength: 0,
 
   extraCSS: "",
   customCSSTrust: "strict",
@@ -672,6 +719,69 @@ blockquote, .iclog_quote, q {
   margin: 4px 0;
 }`;
 
+  // ── Borders / shape — derived shared values + element-scoped overrides ────
+  const borderStyle = ["solid","dashed","dotted","double","groove","ridge"].includes(config.borderStyle)
+    ? config.borderStyle
+    : "solid";
+  const btnBW = Math.max(0, num(config.buttonBorderWidth, 1));
+  const panelBW = Math.max(0, num(config.panelBorderWidth, 1));
+  const inputBW = Math.max(0, num(config.inputBorderWidth, 1));
+  const panelR = Math.max(0, num(config.panelRadius, 4));
+  const inputR = Math.max(0, num(config.inputRadius, 4));
+  const tabR = Math.max(0, num(config.tabRadius, 4));
+  const outlineW = Math.max(0, num(config.outlineWidth, 2));
+  const outlineO = Math.max(0, num(config.outlineOffset, 2));
+
+  const bordersCSS = `
+.client_button, .judge_button, .area-button, .menu_button {
+  border-style: ${borderStyle};
+  border-width: ${btnBW}px;
+}
+#client_log, #client_ooclog, #client_menu, #client_iccontrols, #client_playerlist, .lm_content {
+  border-style: ${borderStyle};
+  border-width: ${panelBW}px;
+  border-radius: ${panelR}px;
+}
+#client_inputbox, #client_oocinputbox, #evi_name, #evi_desc, #OOC_name {
+  border-style: ${borderStyle};
+  border-width: ${inputBW}px;
+  border-radius: ${inputR}px;
+}
+.lm_tab {
+  border-radius: ${tabR}px ${tabR}px 0 0;
+}
+:focus-visible {
+  outline-width: ${outlineW}px;
+  outline-offset: ${outlineO}px;
+}`;
+
+  // ── Shadows / depth — drop, inner, glow ────────────────────────────────────
+  const shadowStr = Math.max(0, Math.min(100, num(config.shadowStrength, 0)));
+  const shadowBlur = Math.max(0, num(config.shadowBlur, 12));
+  const shadowOffY = Math.max(0, num(config.shadowOffsetY, 4));
+  const innerStr = Math.max(0, Math.min(100, num(config.innerShadowStrength, 0)));
+  const innerBlur = Math.max(0, num(config.innerShadowBlur, 6));
+  const glowStr = Math.max(0, Math.min(100, num(config.glowStrength, 0)));
+
+  const dropShadowCSS = shadowStr > 0
+    ? `0 ${shadowOffY}px ${shadowBlur}px ${hexToRgba(config.shadowColor || "#000000", shadowStr)}`
+    : "";
+  const innerShadowCSS = innerStr > 0
+    ? `inset 0 0 ${innerBlur}px ${hexToRgba("#000000", innerStr)}`
+    : "";
+  const glowCSS = glowStr > 0
+    ? `0 0 ${(glowStr / 4).toFixed(1)}px ${hexToRgba(config.glowColor || "#7b2900", Math.min(100, glowStr * 1.2))}, 0 0 ${(glowStr / 2).toFixed(1)}px ${hexToRgba(config.glowColor || "#7b2900", glowStr)}`
+    : "";
+
+  const composedShadow = [dropShadowCSS, glowCSS].filter(Boolean).join(", ");
+  const shadowsCSS = (dropShadowCSS || glowCSS || innerShadowCSS) ? `
+${composedShadow ? `.client_button, .judge_button, .area-button, #client_menu, #client_log, #client_ooclog, #client_playerlist, .lm_content {
+  box-shadow: ${composedShadow};
+}` : ""}
+${innerShadowCSS ? `#client_inputbox, #client_oocinputbox, #evi_name, #evi_desc, #OOC_name {
+  box-shadow: ${innerShadowCSS};
+}` : ""}` : "";
+
   // ── Animation speed / easing — applied through CSS variables every existing
   //    transition can reference, plus a global override scaling every transition.
   const animationCSS = reducedMotion
@@ -836,6 +946,8 @@ body {
 }
 
 ${extrasCSS}
+${bordersCSS}
+${shadowsCSS}
 ${animationCSS}
 ${blurCSS}
 ${bloomCSS}
@@ -946,6 +1058,8 @@ function injectModalHTML(): void {
         <button class="tm_tab" data-tab="typography" role="tab" aria-selected="false">✏️ Typography</button>
         <button class="tm_tab" data-tab="effects" role="tab" aria-selected="false">✨ Effects</button>
         <button class="tm_tab" data-tab="animations" role="tab" aria-selected="false">🎬 Animations</button>
+        <button class="tm_tab" data-tab="borders" role="tab" aria-selected="false">🔲 Borders</button>
+        <button class="tm_tab" data-tab="shadows" role="tab" aria-selected="false">🌑 Shadows</button>
         <button class="tm_tab" data-tab="advanced" role="tab" aria-selected="false">⚙️ Advanced</button>
         <div id="tm_presets_section">
           <p class="tm_section_label">Quick Presets</p>
@@ -1699,6 +1813,173 @@ function injectModalHTML(): void {
           </div>
         </div>
 
+        <!-- Borders -->
+        <div class="tm_panel" data-panel="borders">
+          <h3 class="tm_panel_title">Borders &amp; Shape</h3>
+          <p class="tm_hint">Per-element border width, style, and corner radius. Style is shared globally; widths and radii are scoped.</p>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">✏️ Border style</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_borderStyle">Style</label>
+              <select id="tm_borderStyle" data-prop="borderStyle" class="tm_select">
+                <option value="solid">Solid</option>
+                <option value="dashed">Dashed</option>
+                <option value="dotted">Dotted</option>
+                <option value="double">Double</option>
+                <option value="groove">Groove</option>
+                <option value="ridge">Ridge</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">📏 Widths (px)</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_buttonBorderWidth">Buttons</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_buttonBorderWidth" data-prop="buttonBorderWidth" min="0" max="8" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_buttonBorderWidth">1</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_panelBorderWidth">Panels (log/menu/playerlist)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_panelBorderWidth" data-prop="panelBorderWidth" min="0" max="8" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_panelBorderWidth">1</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_inputBorderWidth">Inputs</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_inputBorderWidth" data-prop="inputBorderWidth" min="0" max="8" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_inputBorderWidth">1</span><span>px</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🟦 Corner radius (px)</h4>
+            <p class="tm_hint">Buttons have their own slider in the Colors tab. Sliders below cover everything else.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_panelRadius">Panels</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_panelRadius" data-prop="panelRadius" min="0" max="40" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_panelRadius">4</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_inputRadius">Inputs</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_inputRadius" data-prop="inputRadius" min="0" max="20" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_inputRadius">4</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_tabRadius">Tab tops</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_tabRadius" data-prop="tabRadius" min="0" max="20" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_tabRadius">4</span><span>px</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🎯 Focus outline</h4>
+            <p class="tm_hint">Keyboard-focus indicator on buttons / inputs / links.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_outlineWidth">Outline width</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_outlineWidth" data-prop="outlineWidth" min="0" max="6" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_outlineWidth">2</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_outlineOffset">Outline offset</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_outlineOffset" data-prop="outlineOffset" min="0" max="10" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_outlineOffset">2</span><span>px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shadows -->
+        <div class="tm_panel" data-panel="shadows">
+          <h3 class="tm_panel_title">Shadows &amp; Depth</h3>
+          <p class="tm_hint">Drop shadows for elevated surfaces, inner shadows for inputs, and a separate glow that hugs the edges.</p>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🪟 Drop shadow</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_shadowStrength">Strength</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_shadowStrength" data-prop="shadowStrength" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_shadowStrength">0</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_shadowBlur">Blur radius</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_shadowBlur" data-prop="shadowBlur" min="0" max="40" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_shadowBlur">12</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_shadowOffsetY">Vertical offset</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_shadowOffsetY" data-prop="shadowOffsetY" min="0" max="20" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_shadowOffsetY">4</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_shadowColor">Shadow color</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_shadowColor" data-prop="shadowColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_shadowColor" maxlength="7" />
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🕳 Inner shadow</h4>
+            <p class="tm_hint">Subtle inset shadow on inputs and OOC name field for a "pressed" look.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_innerShadowStrength">Strength</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_innerShadowStrength" data-prop="innerShadowStrength" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_innerShadowStrength">0</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_innerShadowBlur">Blur radius</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_innerShadowBlur" data-prop="innerShadowBlur" min="0" max="20" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_innerShadowBlur">6</span><span>px</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🌟 Edge glow</h4>
+            <p class="tm_hint">Different from "Text bloom" in Effects — this glows the outline of buttons and panels.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_glowStrength">Strength</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_glowStrength" data-prop="glowStrength" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_glowStrength">0</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_glowColor">Glow color</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_glowColor" data-prop="glowColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_glowColor" maxlength="7" />
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Advanced -->
         <div class="tm_panel" data-panel="advanced">
           <h3 class="tm_panel_title">Advanced CSS</h3>
@@ -2183,6 +2464,12 @@ function wireEvents(): void {
         "effectGrain", "effectChromaticAb", "effectBlur", "effectBloom",
         "effectSaturation", "effectContrast",
         "animSpeed", "animHoverDuration",
+        "buttonBorderWidth", "panelBorderWidth", "inputBorderWidth",
+        "panelRadius", "inputRadius", "tabRadius",
+        "outlineWidth", "outlineOffset",
+        "shadowStrength", "shadowBlur", "shadowOffsetY",
+        "innerShadowStrength", "innerShadowBlur",
+        "glowStrength",
       ]);
       (currentConfig as any)[prop] = numericProps.has(prop as string)
         ? Number(input.value)
