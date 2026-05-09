@@ -162,6 +162,16 @@ export interface ThemeConfig {
   enableLigatures: boolean;
   enableSmallCaps: boolean;
 
+  // ─── Spacing & Density ────────────────────────────────────────────────────
+  densityPreset: "compact" | "cozy" | "comfortable" | "custom";
+  spacingScale: number;            // 0.5–2.0 multiplier (1.0 = default)
+  chatPanelPadding: number;        // 0–40 px
+  menuPanelPadding: number;        // 0–40 px
+  playerlistPanelPadding: number;  // 0–40 px
+  sidebarWidth: number;            // 120–400 px (Theme Maker tabs sidebar)
+  headerBarHeight: number;         // 40–120 px
+  buttonGap: number;               // 0–24 px between adjacent buttons
+
   // Extra raw CSS appended at the end
   extraCSS: string;
   // Trust level for extraCSS: "strict" filters @import and remote url(),
@@ -306,6 +316,16 @@ const DEFAULT_CONFIG: ThemeConfig = {
   customFontFamilyName: "TmCustomFont",
   enableLigatures: true,
   enableSmallCaps: false,
+
+  // Spacing & Density
+  densityPreset: "cozy",
+  spacingScale: 1.0,
+  chatPanelPadding: 6,
+  menuPanelPadding: 15,
+  playerlistPanelPadding: 6,
+  sidebarWidth: 160,
+  headerBarHeight: 56,
+  buttonGap: 6,
 
   extraCSS: "",
   customCSSTrust: "strict",
@@ -770,6 +790,46 @@ ${displayFont ? `#tm_title, #about-logo + h1, .page-heading, .button-carousel p 
 }` : ""}
 `;
 
+  // ── Spacing & Density — exposed as CSS vars + scoped overrides ───────────
+  const spacingScale = Math.max(0.5, Math.min(2, num(config.spacingScale, 1)));
+  const chatPanelPad = Math.max(0, num(config.chatPanelPadding, 6));
+  const menuPad = Math.max(0, num(config.menuPanelPadding, 15));
+  const plPad = Math.max(0, num(config.playerlistPanelPadding, 6));
+  const sidebarW = Math.max(120, Math.min(400, num(config.sidebarWidth, 160)));
+  const headerH = Math.max(40, Math.min(120, num(config.headerBarHeight, 56)));
+  const btnGap = Math.max(0, num(config.buttonGap, 6));
+
+  const spacingCSS = `
+:root {
+  --tm-spacing-scale: ${spacingScale};
+  --tm-chat-pad: ${chatPanelPad}px;
+  --tm-menu-pad: ${menuPad}px;
+  --tm-pl-pad: ${plPad}px;
+  --tm-sidebar-w: ${sidebarW}px;
+  --tm-header-h: ${headerH}px;
+  --tm-btn-gap: ${btnGap}px;
+}
+#client_log, #client_ooclog {
+  padding: ${chatPanelPad}px ${chatPanelPad * 2}px;
+}
+.menu_content {
+  padding: ${menuPad}px;
+  margin: ${menuPad}px;
+}
+#client_playerlist th, #client_playerlist td {
+  padding: ${plPad}px ${plPad * 1.5}px;
+}
+#tm_tabs {
+  width: ${sidebarW}px;
+  min-width: ${Math.max(120, sidebarW - 20)}px;
+}
+#tm_header {
+  height: ${headerH}px;
+}
+.menu_button, .judge_button, .area-button {
+  margin: calc(${btnGap}px * 0.5);
+}`;
+
   // ── Selection / scrollbar / link / focus / mention / quote ──
   const extrasCSS = `
 ::selection {
@@ -1045,6 +1105,7 @@ body {
 }
 
 ${typographyCSS}
+${spacingCSS}
 ${extrasCSS}
 ${bordersCSS}
 ${shadowsCSS}
@@ -1160,6 +1221,7 @@ function injectModalHTML(): void {
         <button class="tm_tab" data-tab="animations" role="tab" aria-selected="false">🎬 Animations</button>
         <button class="tm_tab" data-tab="borders" role="tab" aria-selected="false">🔲 Borders</button>
         <button class="tm_tab" data-tab="shadows" role="tab" aria-selected="false">🌑 Shadows</button>
+        <button class="tm_tab" data-tab="spacing" role="tab" aria-selected="false">📏 Spacing</button>
         <button class="tm_tab" data-tab="advanced" role="tab" aria-selected="false">⚙️ Advanced</button>
         <div id="tm_presets_section">
           <p class="tm_section_label">Quick Presets</p>
@@ -2196,6 +2258,83 @@ function injectModalHTML(): void {
           </div>
         </div>
 
+        <!-- Spacing -->
+        <div class="tm_panel" data-panel="spacing">
+          <h3 class="tm_panel_title">Spacing &amp; Density</h3>
+          <p class="tm_hint">Tune how tight or roomy the layout feels. The "scale" affects all derived spacing through the <code>--tm-spacing-scale</code> variable.</p>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">📐 Density preset</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_densityPreset">Preset</label>
+              <select id="tm_densityPreset" data-prop="densityPreset" class="tm_select">
+                <option value="compact">Compact</option>
+                <option value="cozy">Cozy (default)</option>
+                <option value="comfortable">Comfortable</option>
+                <option value="custom">Custom (sliders below)</option>
+              </select>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_spacingScale">Spacing scale</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_spacingScale" data-prop="spacingScale" min="0.5" max="2" step="0.05" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_spacingScale">1.00</span><span>×</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🪟 Per-panel padding (px)</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_chatPanelPadding">Chat / OOC log</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_chatPanelPadding" data-prop="chatPanelPadding" min="0" max="40" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_chatPanelPadding">6</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_menuPanelPadding">Menu</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_menuPanelPadding" data-prop="menuPanelPadding" min="0" max="40" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_menuPanelPadding">15</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_playerlistPanelPadding">Player list</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_playerlistPanelPadding" data-prop="playerlistPanelPadding" min="0" max="40" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_playerlistPanelPadding">6</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_buttonGap">Button gap</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_buttonGap" data-prop="buttonGap" min="0" max="24" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_buttonGap">6</span><span>px</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">📐 Theme Maker layout</h4>
+            <p class="tm_hint">Affects this modal — handy if your screen is narrow.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_sidebarWidth">Sidebar width</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_sidebarWidth" data-prop="sidebarWidth" min="120" max="400" step="5" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_sidebarWidth">160</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_headerBarHeight">Header bar height</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_headerBarHeight" data-prop="headerBarHeight" min="40" max="120" step="2" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_headerBarHeight">56</span><span>px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Advanced -->
         <div class="tm_panel" data-panel="advanced">
           <h3 class="tm_panel_title">Advanced CSS</h3>
@@ -2712,6 +2851,9 @@ function wireEvents(): void {
         "glowStrength",
         "letterSpacing", "textShadowStrength",
         "textShadowOffsetX", "textShadowOffsetY", "textShadowBlur",
+        "spacingScale", "chatPanelPadding", "menuPanelPadding",
+        "playerlistPanelPadding", "sidebarWidth", "headerBarHeight",
+        "buttonGap",
       ]);
       (currentConfig as any)[prop] = numericProps.has(prop as string)
         ? Number(input.value)
@@ -2817,6 +2959,35 @@ function wireEvents(): void {
     extraTA.addEventListener("blur", () => { isInteracting = false; });
     extraTA.addEventListener("input", () => {
       currentConfig.extraCSS = extraTA.value;
+      liveUpdate();
+    });
+  }
+
+  // Density preset — overwrites the related sliders when the user picks one.
+  const densitySelect = document.getElementById("tm_densityPreset") as HTMLSelectElement | null;
+  if (densitySelect) {
+    densitySelect.addEventListener("change", () => {
+      pushToHistory(currentConfig);
+      const v = densitySelect.value as ThemeConfig["densityPreset"];
+      currentConfig.densityPreset = v;
+      if (v === "compact") {
+        Object.assign(currentConfig, {
+          spacingScale: 0.8, chatPanelPadding: 4, menuPanelPadding: 8,
+          playerlistPanelPadding: 4, buttonGap: 3,
+        });
+      } else if (v === "comfortable") {
+        Object.assign(currentConfig, {
+          spacingScale: 1.25, chatPanelPadding: 12, menuPanelPadding: 22,
+          playerlistPanelPadding: 10, buttonGap: 10,
+        });
+      } else if (v === "cozy") {
+        Object.assign(currentConfig, {
+          spacingScale: 1.0, chatPanelPadding: 6, menuPanelPadding: 15,
+          playerlistPanelPadding: 6, buttonGap: 6,
+        });
+      }
+      // "custom" leaves the sliders alone.
+      syncUIFromConfig(currentConfig);
       liveUpdate();
     });
   }
