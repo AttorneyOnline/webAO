@@ -12,6 +12,7 @@ import { changeBlipVolume } from "../dom/changeBlipVolume";
 import { reloadTheme } from "../dom/reloadTheme";
 import { setFont } from "../dom/setFont";
 import { restoreThemeMaker, restoreBlipPitch } from "../dom/themeMaker";
+import { isHideDesksEnabled } from "../dom/switchHideDesks";
 const version = process.env.npm_package_version;
 
 /**
@@ -85,6 +86,12 @@ export const loadResources = () => {
 
   (<HTMLInputElement>document.getElementById("client_callwords")).value =
     localStorage.getItem("callwords");
+
+  // Restore hide-desks setting (defaults to off)
+  const hideDesksCheckbox = <HTMLInputElement>document.getElementById("client_hidedesks");
+  if (hideDesksCheckbox) {
+    hideDesksCheckbox.checked = isHideDesksEnabled();
+  }
 
   // Restore font setting
   const storedFont = localStorage.getItem("selectedFont") || "sans-serif";

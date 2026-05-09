@@ -11,6 +11,7 @@ import { setFont } from "./setFont";
 import { switchPanTilt } from "./switchPanTilt";
 import { switchAspectRatio } from "./switchAspectRatio";
 import { switchChatOffset } from "./switchChatOffset";
+import { switchHideDesks } from "./switchHideDesks";
 import { resetThemeMaker } from "./themeMaker";
 import { showname_click } from "./showNameClick";
 
@@ -29,6 +30,7 @@ const SETTINGS_KEYS = [
   "selectedFont",
   "customFont",
   "themeMakerConfig",
+  "hideDesks",
 ];
 
 /**
@@ -137,6 +139,13 @@ export function resetSettings() {
   if (hdOffset) {
     hdOffset.checked = false;
     switchChatOffset();
+  }
+
+  // --- Hide desks ---
+  const hidedesks = <HTMLInputElement>document.getElementById("client_hidedesks");
+  if (hidedesks) {
+    hidedesks.checked = false;
+    switchHideDesks();
   }
 }
 window.resetSettings = resetSettings;
