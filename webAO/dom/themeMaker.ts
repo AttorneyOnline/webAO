@@ -162,6 +162,13 @@ export interface ThemeConfig {
   enableLigatures: boolean;
   enableSmallCaps: boolean;
 
+  // ─── Cursor customization ─────────────────────────────────────────────────
+  cursorStyle: "default" | "pointer" | "crosshair" | "text" | "help" | "wait" | "progress" | "grab" | "custom";
+  cursorCustomDataUrl: string;     // uploaded PNG/SVG (data: URL) or ""
+  cursorButtonStyle: "default" | "pointer" | "grab" | "help" | "crosshair";
+  cursorMagnetism: boolean;        // scale-up on hover for buttons
+  cursorMagnetismStrength: number; // 0–30 % scale boost on hover
+
   // ─── Spacing & Density ────────────────────────────────────────────────────
   densityPreset: "compact" | "cozy" | "comfortable" | "custom";
   spacingScale: number;            // 0.5–2.0 multiplier (1.0 = default)
@@ -316,6 +323,13 @@ const DEFAULT_CONFIG: ThemeConfig = {
   customFontFamilyName: "TmCustomFont",
   enableLigatures: true,
   enableSmallCaps: false,
+
+  // Cursor
+  cursorStyle: "default",
+  cursorCustomDataUrl: "",
+  cursorButtonStyle: "pointer",
+  cursorMagnetism: false,
+  cursorMagnetismStrength: 8,
 
   // Spacing & Density
   densityPreset: "cozy",
@@ -790,6 +804,35 @@ ${displayFont ? `#tm_title, #about-logo + h1, .page-heading, .button-carousel p 
 }` : ""}
 `;
 
+  // ── Cursor customization ──────────────────────────────────────────────────
+  const allowedCursorStyles = ["default","pointer","crosshair","text","help","wait","progress","grab","custom"];
+  const cursorStyle = allowedCursorStyles.includes(config.cursorStyle as string)
+    ? config.cursorStyle
+    : "default";
+  const allowedBtnCursors = ["default","pointer","grab","help","crosshair"];
+  const cursorBtn = allowedBtnCursors.includes(config.cursorButtonStyle as string)
+    ? config.cursorButtonStyle
+    : "pointer";
+  const cursorCustomOK = config.cursorCustomDataUrl
+    && config.cursorCustomDataUrl.startsWith("data:image/");
+  const bodyCursorRule = cursorStyle === "custom" && cursorCustomOK
+    ? `cursor: url('${config.cursorCustomDataUrl}') 0 0, auto;`
+    : `cursor: ${cursorStyle === "custom" ? "default" : cursorStyle};`;
+
+  const magneticOn = !!config.cursorMagnetism;
+  const magneticStr = Math.max(0, Math.min(30, num(config.cursorMagnetismStrength, 8)));
+  const magneticScale = (1 + magneticStr / 100).toFixed(3);
+
+  const cursorCSS = `
+body { ${bodyCursorRule} }
+.client_button, .menu_button, .area-button, .judge_button, .tm_btn,
+.tm_preset_btn, .tm_tab, button, a, [role="button"] {
+  cursor: ${cursorBtn};
+}
+${magneticOn ? `.client_button:hover, .menu_button:hover, .area-button:hover, .judge_button:hover, .tm_btn:hover {
+  transform: scale(${magneticScale});
+}` : ""}`;
+
   // ── Spacing & Density — exposed as CSS vars + scoped overrides ───────────
   const spacingScale = Math.max(0.5, Math.min(2, num(config.spacingScale, 1)));
   const chatPanelPad = Math.max(0, num(config.chatPanelPadding, 6));
@@ -1105,6 +1148,7 @@ body {
 }
 
 ${typographyCSS}
+${cursorCSS}
 ${spacingCSS}
 ${extrasCSS}
 ${bordersCSS}
@@ -1222,6 +1266,7 @@ function injectModalHTML(): void {
         <button class="tm_tab" data-tab="borders" role="tab" aria-selected="false">🔲 Borders</button>
         <button class="tm_tab" data-tab="shadows" role="tab" aria-selected="false">🌑 Shadows</button>
         <button class="tm_tab" data-tab="spacing" role="tab" aria-selected="false">📏 Spacing</button>
+        <button class="tm_tab" data-tab="cursor" role="tab" aria-selected="false">🖱 Cursor</button>
         <button class="tm_tab" data-tab="advanced" role="tab" aria-selected="false">⚙️ Advanced</button>
         <div id="tm_presets_section">
           <p class="tm_section_label">Quick Presets</p>
@@ -2335,6 +2380,75 @@ function injectModalHTML(): void {
           </div>
         </div>
 
+        <!-- Cursor -->
+        <div class="tm_panel" data-panel="cursor">
+          <h3 class="tm_panel_title">Cursor</h3>
+          <p class="tm_hint">Pick a system cursor or upload your own. Buttons can use a different cursor than the page background.</p>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🖱 Page cursor</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_cursorStyle">Style</label>
+              <select id="tm_cursorStyle" data-prop="cursorStyle" class="tm_select">
+                <option value="default">Default arrow</option>
+                <option value="pointer">Pointer (hand)</option>
+                <option value="crosshair">Crosshair</option>
+                <option value="text">Text I-beam</option>
+                <option value="help">Help</option>
+                <option value="wait">Wait</option>
+                <option value="progress">Progress</option>
+                <option value="grab">Grab</option>
+                <option value="custom">Custom (upload below)</option>
+              </select>
+            </div>
+            <div class="tm_row tm_row_vert">
+              <label class="tm_label">Custom cursor image</label>
+              <input type="file" id="tm_cursorCustomFile" accept="image/png,image/svg+xml,image/gif" />
+              <p class="tm_hint">Recommended: 32×32 PNG or SVG. Max 256 KB. Stored locally.</p>
+            </div>
+            <div class="tm_row" id="tm_cursor_status_row" style="display:none">
+              <label class="tm_label">Status</label>
+              <div class="tm_ctrl">
+                <span id="tm_cursor_status" class="tm_hint" style="margin:0">No image uploaded.</span>
+                <button class="tm_btn tm_btn_danger tm_btn_sm" id="tm_cursor_clear_btn">Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🔘 Button cursor</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_cursorButtonStyle">When hovering buttons</label>
+              <select id="tm_cursorButtonStyle" data-prop="cursorButtonStyle" class="tm_select">
+                <option value="pointer">Pointer (hand) — default</option>
+                <option value="default">Default arrow</option>
+                <option value="grab">Grab</option>
+                <option value="help">Help</option>
+                <option value="crosshair">Crosshair</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🧲 Magnetism</h4>
+            <p class="tm_hint">Buttons subtly grow when the cursor is over them.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_cursorMagnetism">Enable</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_cursorMagnetism" data-prop="cursorMagnetism" />
+                <span class="tm_hint" style="margin:0">Adds a hover transform to interactive elements.</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_cursorMagnetismStrength">Strength</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_cursorMagnetismStrength" data-prop="cursorMagnetismStrength" min="0" max="30" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_cursorMagnetismStrength">8</span><span>%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Advanced -->
         <div class="tm_panel" data-panel="advanced">
           <h3 class="tm_panel_title">Advanced CSS</h3>
@@ -2642,6 +2756,9 @@ function syncUIFromConfig(config: ThemeConfig): void {
   // Custom font upload status
   updateCustomFontStatus(config);
 
+  // Custom cursor upload status
+  updateCursorStatus(config);
+
   // Font preview
   updateFontPreview(config);
 
@@ -2661,6 +2778,20 @@ function updateBgPreview(config: ThemeConfig): void {
     img.src = "";
     img.style.display = "none";
     wrap.style.display = "none";
+  }
+}
+
+function updateCursorStatus(config: ThemeConfig): void {
+  const row = document.getElementById("tm_cursor_status_row") as HTMLElement | null;
+  const status = document.getElementById("tm_cursor_status") as HTMLElement | null;
+  if (!row || !status) return;
+  if (config.cursorCustomDataUrl) {
+    row.style.display = "flex";
+    const sizeKB = Math.round(config.cursorCustomDataUrl.length / 1024);
+    status.textContent = `✅ Custom cursor loaded (~${sizeKB} KB).`;
+  } else {
+    row.style.display = "none";
+    status.textContent = "No image uploaded.";
   }
 }
 
@@ -2854,6 +2985,7 @@ function wireEvents(): void {
         "spacingScale", "chatPanelPadding", "menuPanelPadding",
         "playerlistPanelPadding", "sidebarWidth", "headerBarHeight",
         "buttonGap",
+        "cursorMagnetismStrength",
       ]);
       (currentConfig as any)[prop] = numericProps.has(prop as string)
         ? Number(input.value)
@@ -3040,6 +3172,47 @@ function wireEvents(): void {
       const ff = document.getElementById("tm_customFontFile") as HTMLInputElement | null;
       if (ff) ff.value = "";
       updateCustomFontStatus(currentConfig);
+      liveUpdate();
+    });
+  }
+
+  // Custom-cursor upload — PNG/SVG/GIF, capped at 256 KB.
+  const cursorFile = document.getElementById("tm_cursorCustomFile") as HTMLInputElement | null;
+  if (cursorFile) {
+    cursorFile.addEventListener("change", () => {
+      const file = cursorFile.files?.[0];
+      if (!file) return;
+      const MAX = 256 * 1024;
+      if (file.size > MAX) {
+        alert(`Cursor image is ${(file.size / 1024).toFixed(0)} KB — please use one under 256 KB.`);
+        cursorFile.value = "";
+        return;
+      }
+      pushToHistory(currentConfig);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        currentConfig.cursorCustomDataUrl = dataUrl;
+        currentConfig.cursorStyle = "custom";
+        updateCursorStatus(currentConfig);
+        syncUIFromConfig(currentConfig);
+        liveUpdate();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Cursor clear
+  const cursorClearBtn = document.getElementById("tm_cursor_clear_btn");
+  if (cursorClearBtn) {
+    cursorClearBtn.addEventListener("click", () => {
+      pushToHistory(currentConfig);
+      currentConfig.cursorCustomDataUrl = "";
+      currentConfig.cursorStyle = "default";
+      const cf = document.getElementById("tm_cursorCustomFile") as HTMLInputElement | null;
+      if (cf) cf.value = "";
+      updateCursorStatus(currentConfig);
+      syncUIFromConfig(currentConfig);
       liveUpdate();
     });
   }
