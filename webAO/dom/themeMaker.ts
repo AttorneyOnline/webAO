@@ -124,6 +124,83 @@ export interface ThemeConfig {
   animRespectPrefers: boolean;     // also obey prefers-reduced-motion media query
   animHoverDuration: number;       // 0–500 ms hover transition base
 
+  // ─── Borders & Shape ───────────────────────────────────────────────────────
+  // Style applied across button/panel/input borders.
+  borderStyle: "solid" | "dashed" | "dotted" | "double" | "groove" | "ridge";
+  buttonBorderWidth: number;       // 0–8 px
+  panelBorderWidth: number;        // 0–8 px (log/ooc/menu/playerlist)
+  inputBorderWidth: number;        // 0–8 px
+  panelRadius: number;             // 0–40 px (log/ooc/menu/playerlist)
+  inputRadius: number;             // 0–20 px
+  tabRadius: number;               // 0–20 px
+  outlineWidth: number;            // 0–6 px
+  outlineOffset: number;           // 0–10 px
+
+  // ─── Shadows & Depth ───────────────────────────────────────────────────────
+  shadowStrength: number;          // 0–100 (0 = no shadow)
+  shadowBlur: number;              // 0–40 px blur radius
+  shadowOffsetY: number;           // 0–20 px vertical offset
+  shadowColor: string;
+  innerShadowStrength: number;     // 0–100
+  innerShadowBlur: number;         // 0–20 px
+  glowColor: string;
+  glowStrength: number;            // 0–100
+
+  // ─── Typography expansions ────────────────────────────────────────────────
+  headingFontFamily: string;
+  monoFontFamily: string;
+  displayFontFamily: string;
+  letterSpacing: number;           // -2 to 8 px
+  textTransform: "none" | "uppercase" | "lowercase" | "capitalize";
+  textShadowStrength: number;      // 0–100
+  textShadowColor: string;
+  textShadowOffsetX: number;       // -10 to 10 px
+  textShadowOffsetY: number;       // -10 to 10 px
+  textShadowBlur: number;          // 0–20 px
+  customFontDataUrl: string;
+  customFontFamilyName: string;
+  enableLigatures: boolean;
+  enableSmallCaps: boolean;
+
+  // ─── Background+ (video bg, per-panel images, parallax) ──────────────────
+  bodyBgVideo: string;             // uploaded video data URL or ""
+  bodyBgVideoMuted: boolean;
+  bodyBgVideoLoop: boolean;
+  bodyBgParallax: boolean;         // background-attachment: fixed
+  bodyBgDimOnIdle: boolean;        // CSS-only dim via :hover on body container
+  chatBgImage: string;             // per-panel uploads
+  menuBgImage: string;
+  panelBgOpacity: number;          // 0–100 — overlay alpha behind per-panel images
+
+  // ─── Audio expansions (UI sounds via Web Audio) ──────────────────────────
+  uiSoundsEnabled: boolean;
+  uiHoverEnabled: boolean;
+  uiClickEnabled: boolean;
+  uiErrorEnabled: boolean;
+  uiNotifEnabled: boolean;
+  uiHoverVolume: number;           // 0–100
+  uiClickVolume: number;           // 0–100
+  uiErrorVolume: number;           // 0–100
+  uiNotifVolume: number;           // 0–100
+  uiSoundPack: "soft" | "retro" | "mechanical" | "vocal-blip";
+
+  // ─── Cursor customization ─────────────────────────────────────────────────
+  cursorStyle: "default" | "pointer" | "crosshair" | "text" | "help" | "wait" | "progress" | "grab" | "custom";
+  cursorCustomDataUrl: string;     // uploaded PNG/SVG (data: URL) or ""
+  cursorButtonStyle: "default" | "pointer" | "grab" | "help" | "crosshair";
+  cursorMagnetism: boolean;        // scale-up on hover for buttons
+  cursorMagnetismStrength: number; // 0–30 % scale boost on hover
+
+  // ─── Spacing & Density ────────────────────────────────────────────────────
+  densityPreset: "compact" | "cozy" | "comfortable" | "custom";
+  spacingScale: number;            // 0.5–2.0 multiplier (1.0 = default)
+  chatPanelPadding: number;        // 0–40 px
+  menuPanelPadding: number;        // 0–40 px
+  playerlistPanelPadding: number;  // 0–40 px
+  sidebarWidth: number;            // 120–400 px (Theme Maker tabs sidebar)
+  headerBarHeight: number;         // 40–120 px
+  buttonGap: number;               // 0–24 px between adjacent buttons
+
   // Extra raw CSS appended at the end
   extraCSS: string;
   // Trust level for extraCSS: "strict" filters @import and remote url(),
@@ -231,6 +308,82 @@ const DEFAULT_CONFIG: ThemeConfig = {
   animReducedMotion: false,
   animRespectPrefers: true,
   animHoverDuration: 120,
+
+  // Borders & Shape
+  borderStyle: "solid",
+  buttonBorderWidth: 1,
+  panelBorderWidth: 1,
+  inputBorderWidth: 1,
+  panelRadius: 4,
+  inputRadius: 4,
+  tabRadius: 4,
+  outlineWidth: 2,
+  outlineOffset: 2,
+
+  // Shadows & Depth
+  shadowStrength: 0,
+  shadowBlur: 12,
+  shadowOffsetY: 4,
+  shadowColor: "#000000",
+  innerShadowStrength: 0,
+  innerShadowBlur: 6,
+  glowColor: "#7b2900",
+  glowStrength: 0,
+
+  // Typography expansions
+  headingFontFamily: "",
+  monoFontFamily: "Source Code Pro, Consolas, monospace",
+  displayFontFamily: "",
+  letterSpacing: 0,
+  textTransform: "none",
+  textShadowStrength: 0,
+  textShadowColor: "#000000",
+  textShadowOffsetX: 0,
+  textShadowOffsetY: 1,
+  textShadowBlur: 2,
+  customFontDataUrl: "",
+  customFontFamilyName: "TmCustomFont",
+  enableLigatures: true,
+  enableSmallCaps: false,
+
+  // Background+
+  bodyBgVideo: "",
+  bodyBgVideoMuted: true,
+  bodyBgVideoLoop: true,
+  bodyBgParallax: false,
+  bodyBgDimOnIdle: false,
+  chatBgImage: "",
+  menuBgImage: "",
+  panelBgOpacity: 80,
+
+  // Audio (UI sounds)
+  uiSoundsEnabled: false,
+  uiHoverEnabled: true,
+  uiClickEnabled: true,
+  uiErrorEnabled: true,
+  uiNotifEnabled: true,
+  uiHoverVolume: 15,
+  uiClickVolume: 30,
+  uiErrorVolume: 40,
+  uiNotifVolume: 50,
+  uiSoundPack: "soft",
+
+  // Cursor
+  cursorStyle: "default",
+  cursorCustomDataUrl: "",
+  cursorButtonStyle: "pointer",
+  cursorMagnetism: false,
+  cursorMagnetismStrength: 8,
+
+  // Spacing & Density
+  densityPreset: "cozy",
+  spacingScale: 1.0,
+  chatPanelPadding: 6,
+  menuPanelPadding: 15,
+  playerlistPanelPadding: 6,
+  sidebarWidth: 160,
+  headerBarHeight: 56,
+  buttonGap: 6,
 
   extraCSS: "",
   customCSSTrust: "strict",
@@ -403,6 +556,387 @@ body {
 .lm_tab.lm_active {
   border-bottom: 2px solid #8b1a1a;
 }`,
+  },
+
+  // ─── Tasteful classics — popular palettes from the editor world ──────────
+  catppuccinMocha: {
+    bodyBg: "#1e1e2e", bodyColor: "#cdd6f4",
+    menuBg: "#181825", menuColor: "#cdd6f4",
+    buttonBg: "#cba6f7", buttonColor: "#1e1e2e", buttonBorder: "#b4befe",
+    logBg: "#11111b", logColor: "#cdd6f4",
+    oocBg: "#181825", oocColor: "#a6adc8",
+    inputBg: "#313244", inputColor: "#cdd6f4", inputBorder: "#45475a",
+    layoutBg: "#1e1e2e", icControlsBg: "#1e1e2e",
+    tabBg: "#181825", tabActiveBg: "#313244", tabColor: "#9399b2", tabActiveColor: "#cdd6f4",
+    defHpColor: "#89b4fa", proHpColor: "#f38ba8",
+    playerlistBg: "#181825", playerlistColor: "#cdd6f4", playerlistBorder: "#45475a",
+    accentColor: "#cba6f7", useAccent: true,
+  },
+  catppuccinMacchiato: {
+    bodyBg: "#24273a", bodyColor: "#cad3f5",
+    menuBg: "#1e2030", menuColor: "#cad3f5",
+    buttonBg: "#c6a0f6", buttonColor: "#24273a", buttonBorder: "#b7bdf8",
+    logBg: "#181926", logColor: "#cad3f5",
+    oocBg: "#1e2030", oocColor: "#a5adcb",
+    inputBg: "#363a4f", inputColor: "#cad3f5", inputBorder: "#494d64",
+    layoutBg: "#24273a", icControlsBg: "#24273a",
+    tabBg: "#1e2030", tabActiveBg: "#363a4f", tabColor: "#939ab7", tabActiveColor: "#cad3f5",
+    defHpColor: "#8aadf4", proHpColor: "#ed8796",
+    playerlistBg: "#1e2030", playerlistColor: "#cad3f5", playerlistBorder: "#494d64",
+    accentColor: "#c6a0f6", useAccent: true,
+  },
+  catppuccinFrappe: {
+    bodyBg: "#303446", bodyColor: "#c6d0f5",
+    menuBg: "#292c3c", menuColor: "#c6d0f5",
+    buttonBg: "#ca9ee6", buttonColor: "#303446", buttonBorder: "#babbf1",
+    logBg: "#232634", logColor: "#c6d0f5",
+    oocBg: "#292c3c", oocColor: "#a5adce",
+    inputBg: "#414559", inputColor: "#c6d0f5", inputBorder: "#51576d",
+    layoutBg: "#303446", icControlsBg: "#303446",
+    tabBg: "#292c3c", tabActiveBg: "#414559", tabColor: "#949cbb", tabActiveColor: "#c6d0f5",
+    defHpColor: "#8caaee", proHpColor: "#e78284",
+    playerlistBg: "#292c3c", playerlistColor: "#c6d0f5", playerlistBorder: "#51576d",
+    accentColor: "#ca9ee6", useAccent: true,
+  },
+  catppuccinLatte: {
+    bodyBg: "#eff1f5", bodyColor: "#4c4f69",
+    menuBg: "#e6e9ef", menuColor: "#4c4f69",
+    buttonBg: "#8839ef", buttonColor: "#eff1f5", buttonBorder: "#7287fd",
+    logBg: "#dce0e8", logColor: "#4c4f69",
+    oocBg: "#e6e9ef", oocColor: "#6c6f85",
+    inputBg: "#ccd0da", inputColor: "#4c4f69", inputBorder: "#bcc0cc",
+    layoutBg: "#eff1f5", icControlsBg: "#eff1f5",
+    tabBg: "#e6e9ef", tabActiveBg: "#ccd0da", tabColor: "#7c7f93", tabActiveColor: "#4c4f69",
+    defHpColor: "#1e66f5", proHpColor: "#d20f39",
+    playerlistBg: "#e6e9ef", playerlistColor: "#4c4f69", playerlistBorder: "#bcc0cc",
+    accentColor: "#8839ef", useAccent: true,
+  },
+  nord: {
+    bodyBg: "#2e3440", bodyColor: "#d8dee9",
+    menuBg: "#3b4252", menuColor: "#d8dee9",
+    buttonBg: "#5e81ac", buttonColor: "#eceff4", buttonBorder: "#81a1c1",
+    logBg: "#2e3440", logColor: "#e5e9f0",
+    oocBg: "#3b4252", oocColor: "#d8dee9",
+    inputBg: "#434c5e", inputColor: "#eceff4", inputBorder: "#4c566a",
+    layoutBg: "#2e3440", icControlsBg: "#3b4252",
+    tabBg: "#3b4252", tabActiveBg: "#434c5e", tabColor: "#d8dee9", tabActiveColor: "#eceff4",
+    defHpColor: "#88c0d0", proHpColor: "#bf616a",
+    playerlistBg: "#3b4252", playerlistColor: "#d8dee9", playerlistBorder: "#4c566a",
+    accentColor: "#88c0d0", useAccent: true,
+  },
+  dracula: {
+    bodyBg: "#282a36", bodyColor: "#f8f8f2",
+    menuBg: "#21222c", menuColor: "#f8f8f2",
+    buttonBg: "#bd93f9", buttonColor: "#282a36", buttonBorder: "#ff79c6",
+    logBg: "#1e1f29", logColor: "#f8f8f2",
+    oocBg: "#21222c", oocColor: "#bd93f9",
+    inputBg: "#44475a", inputColor: "#f8f8f2", inputBorder: "#6272a4",
+    layoutBg: "#282a36", icControlsBg: "#282a36",
+    tabBg: "#21222c", tabActiveBg: "#44475a", tabColor: "#6272a4", tabActiveColor: "#f8f8f2",
+    defHpColor: "#8be9fd", proHpColor: "#ff5555",
+    playerlistBg: "#21222c", playerlistColor: "#f8f8f2", playerlistBorder: "#6272a4",
+    accentColor: "#bd93f9", useAccent: true,
+  },
+  tokyoNight: {
+    bodyBg: "#1a1b26", bodyColor: "#a9b1d6",
+    menuBg: "#16161e", menuColor: "#a9b1d6",
+    buttonBg: "#7aa2f7", buttonColor: "#1a1b26", buttonBorder: "#bb9af7",
+    logBg: "#16161e", logColor: "#c0caf5",
+    oocBg: "#1a1b26", oocColor: "#9aa5ce",
+    inputBg: "#24283b", inputColor: "#c0caf5", inputBorder: "#414868",
+    layoutBg: "#1a1b26", icControlsBg: "#1a1b26",
+    tabBg: "#16161e", tabActiveBg: "#24283b", tabColor: "#565f89", tabActiveColor: "#c0caf5",
+    defHpColor: "#7dcfff", proHpColor: "#f7768e",
+    playerlistBg: "#16161e", playerlistColor: "#a9b1d6", playerlistBorder: "#414868",
+    accentColor: "#7aa2f7", useAccent: true,
+  },
+  gruvboxDark: {
+    bodyBg: "#282828", bodyColor: "#ebdbb2",
+    menuBg: "#1d2021", menuColor: "#ebdbb2",
+    buttonBg: "#d65d0e", buttonColor: "#fbf1c7", buttonBorder: "#fe8019",
+    logBg: "#1d2021", logColor: "#ebdbb2",
+    oocBg: "#282828", oocColor: "#a89984",
+    inputBg: "#3c3836", inputColor: "#ebdbb2", inputBorder: "#504945",
+    layoutBg: "#282828", icControlsBg: "#282828",
+    tabBg: "#1d2021", tabActiveBg: "#3c3836", tabColor: "#928374", tabActiveColor: "#ebdbb2",
+    defHpColor: "#458588", proHpColor: "#cc241d",
+    playerlistBg: "#1d2021", playerlistColor: "#ebdbb2", playerlistBorder: "#504945",
+    accentColor: "#d79921", useAccent: true,
+  },
+  gruvboxLight: {
+    bodyBg: "#fbf1c7", bodyColor: "#3c3836",
+    menuBg: "#f2e5bc", menuColor: "#3c3836",
+    buttonBg: "#af3a03", buttonColor: "#fbf1c7", buttonBorder: "#d65d0e",
+    logBg: "#f9f5d7", logColor: "#3c3836",
+    oocBg: "#f2e5bc", oocColor: "#7c6f64",
+    inputBg: "#ebdbb2", inputColor: "#3c3836", inputBorder: "#bdae93",
+    layoutBg: "#fbf1c7", icControlsBg: "#fbf1c7",
+    tabBg: "#f2e5bc", tabActiveBg: "#ebdbb2", tabColor: "#7c6f64", tabActiveColor: "#3c3836",
+    defHpColor: "#076678", proHpColor: "#9d0006",
+    playerlistBg: "#f2e5bc", playerlistColor: "#3c3836", playerlistBorder: "#bdae93",
+    accentColor: "#b57614", useAccent: true,
+  },
+  solarizedDark: {
+    bodyBg: "#002b36", bodyColor: "#839496",
+    menuBg: "#073642", menuColor: "#93a1a1",
+    buttonBg: "#268bd2", buttonColor: "#fdf6e3", buttonBorder: "#2aa198",
+    logBg: "#002b36", logColor: "#93a1a1",
+    oocBg: "#073642", oocColor: "#586e75",
+    inputBg: "#073642", inputColor: "#93a1a1", inputBorder: "#586e75",
+    layoutBg: "#002b36", icControlsBg: "#073642",
+    tabBg: "#073642", tabActiveBg: "#586e75", tabColor: "#839496", tabActiveColor: "#fdf6e3",
+    defHpColor: "#268bd2", proHpColor: "#dc322f",
+    playerlistBg: "#073642", playerlistColor: "#93a1a1", playerlistBorder: "#586e75",
+    accentColor: "#268bd2", useAccent: true,
+  },
+  solarizedLight: {
+    bodyBg: "#fdf6e3", bodyColor: "#586e75",
+    menuBg: "#eee8d5", menuColor: "#586e75",
+    buttonBg: "#268bd2", buttonColor: "#fdf6e3", buttonBorder: "#2aa198",
+    logBg: "#fdf6e3", logColor: "#586e75",
+    oocBg: "#eee8d5", oocColor: "#657b83",
+    inputBg: "#eee8d5", inputColor: "#586e75", inputBorder: "#93a1a1",
+    layoutBg: "#fdf6e3", icControlsBg: "#eee8d5",
+    tabBg: "#eee8d5", tabActiveBg: "#93a1a1", tabColor: "#657b83", tabActiveColor: "#073642",
+    defHpColor: "#268bd2", proHpColor: "#dc322f",
+    playerlistBg: "#eee8d5", playerlistColor: "#586e75", playerlistBorder: "#93a1a1",
+    accentColor: "#268bd2", useAccent: true,
+  },
+  rosePine: {
+    bodyBg: "#191724", bodyColor: "#e0def4",
+    menuBg: "#1f1d2e", menuColor: "#e0def4",
+    buttonBg: "#c4a7e7", buttonColor: "#191724", buttonBorder: "#9ccfd8",
+    logBg: "#191724", logColor: "#e0def4",
+    oocBg: "#1f1d2e", oocColor: "#908caa",
+    inputBg: "#26233a", inputColor: "#e0def4", inputBorder: "#403d52",
+    layoutBg: "#191724", icControlsBg: "#1f1d2e",
+    tabBg: "#1f1d2e", tabActiveBg: "#26233a", tabColor: "#6e6a86", tabActiveColor: "#e0def4",
+    defHpColor: "#9ccfd8", proHpColor: "#eb6f92",
+    playerlistBg: "#1f1d2e", playerlistColor: "#e0def4", playerlistBorder: "#403d52",
+    accentColor: "#c4a7e7", useAccent: true,
+  },
+  rosePineDawn: {
+    bodyBg: "#faf4ed", bodyColor: "#575279",
+    menuBg: "#fffaf3", menuColor: "#575279",
+    buttonBg: "#907aa9", buttonColor: "#faf4ed", buttonBorder: "#56949f",
+    logBg: "#faf4ed", logColor: "#575279",
+    oocBg: "#fffaf3", oocColor: "#797593",
+    inputBg: "#f2e9e1", inputColor: "#575279", inputBorder: "#cecacd",
+    layoutBg: "#faf4ed", icControlsBg: "#fffaf3",
+    tabBg: "#fffaf3", tabActiveBg: "#f2e9e1", tabColor: "#797593", tabActiveColor: "#575279",
+    defHpColor: "#56949f", proHpColor: "#b4637a",
+    playerlistBg: "#fffaf3", playerlistColor: "#575279", playerlistBorder: "#cecacd",
+    accentColor: "#907aa9", useAccent: true,
+  },
+  oneDark: {
+    bodyBg: "#282c34", bodyColor: "#abb2bf",
+    menuBg: "#21252b", menuColor: "#abb2bf",
+    buttonBg: "#61afef", buttonColor: "#282c34", buttonBorder: "#56b6c2",
+    logBg: "#1e2127", logColor: "#abb2bf",
+    oocBg: "#282c34", oocColor: "#5c6370",
+    inputBg: "#3e4451", inputColor: "#abb2bf", inputBorder: "#4b5263",
+    layoutBg: "#282c34", icControlsBg: "#282c34",
+    tabBg: "#21252b", tabActiveBg: "#3e4451", tabColor: "#5c6370", tabActiveColor: "#abb2bf",
+    defHpColor: "#61afef", proHpColor: "#e06c75",
+    playerlistBg: "#21252b", playerlistColor: "#abb2bf", playerlistBorder: "#4b5263",
+    accentColor: "#61afef", useAccent: true,
+  },
+  monokai: {
+    bodyBg: "#272822", bodyColor: "#f8f8f2",
+    menuBg: "#1e1f1c", menuColor: "#f8f8f2",
+    buttonBg: "#a6e22e", buttonColor: "#272822", buttonBorder: "#fd971f",
+    logBg: "#1e1f1c", logColor: "#f8f8f2",
+    oocBg: "#272822", oocColor: "#75715e",
+    inputBg: "#3e3d32", inputColor: "#f8f8f2", inputBorder: "#75715e",
+    layoutBg: "#272822", icControlsBg: "#272822",
+    tabBg: "#1e1f1c", tabActiveBg: "#3e3d32", tabColor: "#75715e", tabActiveColor: "#f8f8f2",
+    defHpColor: "#66d9ef", proHpColor: "#f92672",
+    playerlistBg: "#1e1f1c", playerlistColor: "#f8f8f2", playerlistBorder: "#75715e",
+    accentColor: "#a6e22e", useAccent: true,
+  },
+  githubDark: {
+    bodyBg: "#0d1117", bodyColor: "#c9d1d9",
+    menuBg: "#161b22", menuColor: "#c9d1d9",
+    buttonBg: "#238636", buttonColor: "#ffffff", buttonBorder: "#2ea043",
+    logBg: "#0d1117", logColor: "#c9d1d9",
+    oocBg: "#161b22", oocColor: "#8b949e",
+    inputBg: "#0d1117", inputColor: "#c9d1d9", inputBorder: "#30363d",
+    layoutBg: "#0d1117", icControlsBg: "#161b22",
+    tabBg: "#161b22", tabActiveBg: "#21262d", tabColor: "#8b949e", tabActiveColor: "#c9d1d9",
+    defHpColor: "#58a6ff", proHpColor: "#f85149",
+    playerlistBg: "#161b22", playerlistColor: "#c9d1d9", playerlistBorder: "#30363d",
+    accentColor: "#58a6ff", useAccent: true,
+  },
+  githubLight: {
+    bodyBg: "#ffffff", bodyColor: "#1f2328",
+    menuBg: "#f6f8fa", menuColor: "#1f2328",
+    buttonBg: "#1f883d", buttonColor: "#ffffff", buttonBorder: "#2da44e",
+    logBg: "#ffffff", logColor: "#1f2328",
+    oocBg: "#f6f8fa", oocColor: "#656d76",
+    inputBg: "#f6f8fa", inputColor: "#1f2328", inputBorder: "#d0d7de",
+    layoutBg: "#ffffff", icControlsBg: "#f6f8fa",
+    tabBg: "#f6f8fa", tabActiveBg: "#eaeef2", tabColor: "#656d76", tabActiveColor: "#1f2328",
+    defHpColor: "#0969da", proHpColor: "#cf222e",
+    playerlistBg: "#f6f8fa", playerlistColor: "#1f2328", playerlistBorder: "#d0d7de",
+    accentColor: "#0969da", useAccent: true,
+  },
+  vaporwave: {
+    bodyBg: "#1a0033", bodyColor: "#ff71ce",
+    menuBg: "#2d0058", menuColor: "#ff71ce",
+    buttonBg: "#ff71ce", buttonColor: "#1a0033", buttonBorder: "#01cdfe",
+    logBg: "#0a0020", logColor: "#01cdfe",
+    oocBg: "#1a0033", oocColor: "#b967ff",
+    inputBg: "#2d0058", inputColor: "#ff71ce", inputBorder: "#b967ff",
+    layoutBg: "#1a0033", icControlsBg: "#2d0058",
+    tabBg: "#2d0058", tabActiveBg: "#ff71ce", tabColor: "#b967ff", tabActiveColor: "#1a0033",
+    defHpColor: "#01cdfe", proHpColor: "#ff71ce",
+    playerlistBg: "#2d0058", playerlistColor: "#ff71ce", playerlistBorder: "#b967ff",
+    accentColor: "#ff71ce", useAccent: true,
+  },
+  synthwave: {
+    bodyBg: "#241734", bodyColor: "#f9c4d2",
+    menuBg: "#2d1f4a", menuColor: "#f9c4d2",
+    buttonBg: "#ff2a6d", buttonColor: "#ffffff", buttonBorder: "#05d9e8",
+    logBg: "#1a0d2e", logColor: "#f9c4d2",
+    oocBg: "#241734", oocColor: "#a17fb6",
+    inputBg: "#2d1f4a", inputColor: "#f9c4d2", inputBorder: "#ff2a6d",
+    layoutBg: "#241734", icControlsBg: "#2d1f4a",
+    tabBg: "#2d1f4a", tabActiveBg: "#ff2a6d", tabColor: "#a17fb6", tabActiveColor: "#ffffff",
+    defHpColor: "#05d9e8", proHpColor: "#ff2a6d",
+    playerlistBg: "#2d1f4a", playerlistColor: "#f9c4d2", playerlistBorder: "#ff2a6d",
+    accentColor: "#ff2a6d", useAccent: true,
+  },
+  cyberpunk: {
+    bodyBg: "#0a0e27", bodyColor: "#fcee0a",
+    menuBg: "#000000", menuColor: "#fcee0a",
+    buttonBg: "#fcee0a", buttonColor: "#000000", buttonBorder: "#ff003c",
+    logBg: "#0a0e27", logColor: "#fcee0a",
+    oocBg: "#000000", oocColor: "#ff003c",
+    inputBg: "#0a0e27", inputColor: "#fcee0a", inputBorder: "#fcee0a",
+    layoutBg: "#0a0e27", icControlsBg: "#000000",
+    tabBg: "#000000", tabActiveBg: "#fcee0a", tabColor: "#ff003c", tabActiveColor: "#000000",
+    defHpColor: "#00f5ff", proHpColor: "#ff003c",
+    playerlistBg: "#000000", playerlistColor: "#fcee0a", playerlistBorder: "#fcee0a",
+    accentColor: "#fcee0a", useAccent: true,
+  },
+
+  // ─── Ace Attorney character themes ────────────────────────────────────────
+  edgeworth: {
+    bodyBg: "#1a0f2e", bodyColor: "#e0d4f0",
+    menuBg: "#2a1a4a", menuColor: "#e0d4f0",
+    buttonBg: "#6b3fa0", buttonColor: "#ffffff", buttonBorder: "#9b6dd0",
+    logBg: "#0d0820", logColor: "#e0d4f0",
+    oocBg: "#1a0f2e", oocColor: "#a988c4",
+    inputBg: "#2a1a4a", inputColor: "#e0d4f0", inputBorder: "#6b3fa0",
+    layoutBg: "#1a0f2e", icControlsBg: "#1a0f2e",
+    tabBg: "#2a1a4a", tabActiveBg: "#6b3fa0", tabColor: "#a988c4", tabActiveColor: "#ffffff",
+    defHpColor: "#9b6dd0", proHpColor: "#cc4477",
+    playerlistBg: "#2a1a4a", playerlistColor: "#e0d4f0", playerlistBorder: "#6b3fa0",
+    accentColor: "#6b3fa0", useAccent: true,
+  },
+  apolloJustice: {
+    bodyBg: "#2a0a0a", bodyColor: "#ffe5d0",
+    menuBg: "#3d1010", menuColor: "#ffe5d0",
+    buttonBg: "#cc2222", buttonColor: "#ffffff", buttonBorder: "#ff5544",
+    logBg: "#1a0606", logColor: "#ffe5d0",
+    oocBg: "#2a0a0a", oocColor: "#cc8866",
+    inputBg: "#3d1010", inputColor: "#ffe5d0", inputBorder: "#cc2222",
+    layoutBg: "#2a0a0a", icControlsBg: "#2a0a0a",
+    tabBg: "#3d1010", tabActiveBg: "#cc2222", tabColor: "#cc8866", tabActiveColor: "#ffffff",
+    defHpColor: "#ff5544", proHpColor: "#222266",
+    playerlistBg: "#3d1010", playerlistColor: "#ffe5d0", playerlistBorder: "#cc2222",
+    accentColor: "#cc2222", useAccent: true,
+  },
+  athenaCykes: {
+    bodyBg: "#1a1a05", bodyColor: "#fff8c0",
+    menuBg: "#2a2a10", menuColor: "#fff8c0",
+    buttonBg: "#ddaa00", buttonColor: "#1a1a05", buttonBorder: "#ffcc33",
+    logBg: "#0d0d02", logColor: "#fff8c0",
+    oocBg: "#1a1a05", oocColor: "#cccc88",
+    inputBg: "#2a2a10", inputColor: "#fff8c0", inputBorder: "#ddaa00",
+    layoutBg: "#1a1a05", icControlsBg: "#1a1a05",
+    tabBg: "#2a2a10", tabActiveBg: "#ddaa00", tabColor: "#cccc88", tabActiveColor: "#1a1a05",
+    defHpColor: "#ffcc33", proHpColor: "#aa3344",
+    playerlistBg: "#2a2a10", playerlistColor: "#fff8c0", playerlistBorder: "#ddaa00",
+    accentColor: "#ddaa00", useAccent: true,
+  },
+  mayaFey: {
+    bodyBg: "#22112e", bodyColor: "#e8d8f0",
+    menuBg: "#321a44", menuColor: "#e8d8f0",
+    buttonBg: "#8855aa", buttonColor: "#ffffff", buttonBorder: "#aa77cc",
+    logBg: "#15081d", logColor: "#e8d8f0",
+    oocBg: "#22112e", oocColor: "#aa88bb",
+    inputBg: "#321a44", inputColor: "#e8d8f0", inputBorder: "#8855aa",
+    layoutBg: "#22112e", icControlsBg: "#22112e",
+    tabBg: "#321a44", tabActiveBg: "#8855aa", tabColor: "#aa88bb", tabActiveColor: "#ffffff",
+    defHpColor: "#aa77cc", proHpColor: "#cc6655",
+    playerlistBg: "#321a44", playerlistColor: "#e8d8f0", playerlistBorder: "#8855aa",
+    accentColor: "#8855aa", useAccent: true,
+  },
+  godot: {
+    bodyBg: "#0a0a14", bodyColor: "#a0c8e0",
+    menuBg: "#14141e", menuColor: "#a0c8e0",
+    buttonBg: "#3a3a5a", buttonColor: "#a0c8e0", buttonBorder: "#4a6890",
+    logBg: "#050508", logColor: "#a0c8e0",
+    oocBg: "#0a0a14", oocColor: "#7a98b0",
+    inputBg: "#14141e", inputColor: "#a0c8e0", inputBorder: "#3a3a5a",
+    layoutBg: "#0a0a14", icControlsBg: "#14141e",
+    tabBg: "#14141e", tabActiveBg: "#3a3a5a", tabColor: "#7a98b0", tabActiveColor: "#a0c8e0",
+    defHpColor: "#4a6890", proHpColor: "#aa5544",
+    playerlistBg: "#14141e", playerlistColor: "#a0c8e0", playerlistBorder: "#3a3a5a",
+    accentColor: "#4a6890", useAccent: true,
+  },
+  klavierGavin: {
+    bodyBg: "#1a1505", bodyColor: "#f0e0a0",
+    menuBg: "#2a2008", menuColor: "#f0e0a0",
+    buttonBg: "#aa8800", buttonColor: "#1a1505", buttonBorder: "#dab44d",
+    logBg: "#0d0a02", logColor: "#f0e0a0",
+    oocBg: "#1a1505", oocColor: "#bba070",
+    inputBg: "#2a2008", inputColor: "#f0e0a0", inputBorder: "#aa8800",
+    layoutBg: "#1a1505", icControlsBg: "#1a1505",
+    tabBg: "#2a2008", tabActiveBg: "#aa8800", tabColor: "#bba070", tabActiveColor: "#f0e0a0",
+    defHpColor: "#dab44d", proHpColor: "#aa3322",
+    playerlistBg: "#2a2008", playerlistColor: "#f0e0a0", playerlistBorder: "#aa8800",
+    accentColor: "#aa8800", useAccent: true,
+  },
+  trucyWright: {
+    bodyBg: "#16031c", bodyColor: "#ffd0f0",
+    menuBg: "#240630", menuColor: "#ffd0f0",
+    buttonBg: "#cc44aa", buttonColor: "#ffffff", buttonBorder: "#ee66cc",
+    logBg: "#0a0210", logColor: "#ffd0f0",
+    oocBg: "#16031c", oocColor: "#bb88aa",
+    inputBg: "#240630", inputColor: "#ffd0f0", inputBorder: "#cc44aa",
+    layoutBg: "#16031c", icControlsBg: "#16031c",
+    tabBg: "#240630", tabActiveBg: "#cc44aa", tabColor: "#bb88aa", tabActiveColor: "#ffffff",
+    defHpColor: "#ee66cc", proHpColor: "#666633",
+    playerlistBg: "#240630", playerlistColor: "#ffd0f0", playerlistBorder: "#cc44aa",
+    accentColor: "#cc44aa", useAccent: true,
+  },
+  miaFey: {
+    bodyBg: "#180000", bodyColor: "#ffcccc",
+    menuBg: "#280808", menuColor: "#ffcccc",
+    buttonBg: "#aa1818", buttonColor: "#ffffff", buttonBorder: "#dd3333",
+    logBg: "#0a0000", logColor: "#ffcccc",
+    oocBg: "#180000", oocColor: "#aa6666",
+    inputBg: "#280808", inputColor: "#ffcccc", inputBorder: "#aa1818",
+    layoutBg: "#180000", icControlsBg: "#180000",
+    tabBg: "#280808", tabActiveBg: "#aa1818", tabColor: "#aa6666", tabActiveColor: "#ffffff",
+    defHpColor: "#dd3333", proHpColor: "#444466",
+    playerlistBg: "#280808", playerlistColor: "#ffcccc", playerlistBorder: "#aa1818",
+    accentColor: "#aa1818", useAccent: true,
+  },
+  vonKarma: {
+    bodyBg: "#f5f5f5", bodyColor: "#1a1a1a",
+    menuBg: "#ffffff", menuColor: "#1a1a1a",
+    buttonBg: "#1a1a1a", buttonColor: "#ffffff", buttonBorder: "#444444",
+    logBg: "#fafafa", logColor: "#1a1a1a",
+    oocBg: "#f0f0f0", oocColor: "#444444",
+    inputBg: "#ffffff", inputColor: "#1a1a1a", inputBorder: "#888888",
+    layoutBg: "#f5f5f5", icControlsBg: "#fafafa",
+    tabBg: "#ffffff", tabActiveBg: "#1a1a1a", tabColor: "#444444", tabActiveColor: "#ffffff",
+    defHpColor: "#1a1a1a", proHpColor: "#cc2222",
+    playerlistBg: "#fafafa", playerlistColor: "#1a1a1a", playerlistBorder: "#888888",
+    accentColor: "#1a1a1a", useAccent: true,
   },
 };
 
@@ -624,6 +1158,169 @@ body::after {
 }`
     : "";
 
+  // ── Typography expansions ──────────────────────────────────────────────────
+  // Validate font-family strings against a permissive whitelist to avoid CSS
+  // injection through the data-prop pathway. Anything containing < > or { is
+  // rejected and falls back to the default. Single quotes are allowed because
+  // CSS font-family values often use them.
+  const safeFontFamily = (raw: string, fallback: string): string => {
+    if (!raw) return fallback;
+    if (/[<>{};]/.test(raw)) return fallback;
+    return raw;
+  };
+  const headingFont = safeFontFamily(config.headingFontFamily ?? "", "");
+  const monoFont = safeFontFamily(
+    config.monoFontFamily ?? "",
+    "Source Code Pro, Consolas, monospace",
+  );
+  const displayFont = safeFontFamily(config.displayFontFamily ?? "", "");
+
+  const letterSp = num(config.letterSpacing, 0);
+  const allowedTransforms = ["none","uppercase","lowercase","capitalize"];
+  const textTransform = allowedTransforms.includes(config.textTransform as string)
+    ? config.textTransform
+    : "none";
+
+  const tsStrength = Math.max(0, Math.min(100, num(config.textShadowStrength, 0)));
+  const tsX = Math.max(-10, Math.min(10, num(config.textShadowOffsetX, 0)));
+  const tsY = Math.max(-10, Math.min(10, num(config.textShadowOffsetY, 1)));
+  const tsBlur = Math.max(0, Math.min(20, num(config.textShadowBlur, 2)));
+  const tsColor = hexToRgba(config.textShadowColor || "#000000", tsStrength);
+
+  // Validate font-family identifier for the @font-face name; default if odd chars.
+  const customFontName = (config.customFontFamilyName && /^[A-Za-z][A-Za-z0-9 _-]{0,31}$/.test(config.customFontFamilyName))
+    ? config.customFontFamilyName
+    : "TmCustomFont";
+
+  // @font-face block — only emitted when an uploaded data: URL exists. We
+  // accept woff/woff2/ttf/otf data URLs; reject anything that's not a data:
+  // URL outright (no remote tracking pixels through font requests).
+  const fontFaceCSS = (config.customFontDataUrl && config.customFontDataUrl.startsWith("data:"))
+    ? `
+@font-face {
+  font-family: "${customFontName}";
+  src: url("${config.customFontDataUrl}");
+  font-display: swap;
+}`
+    : "";
+
+  const ligaturesValue = config.enableLigatures === false
+    ? '"liga" 0, "dlig" 0'
+    : '"liga" 1, "dlig" 1';
+  const smallCapsValue = config.enableSmallCaps ? '"smcp" 1' : '"smcp" 0';
+
+  const typographyCSS = `${fontFaceCSS}
+body {
+  letter-spacing: ${letterSp}px;
+  text-transform: ${textTransform};
+  font-feature-settings: ${ligaturesValue}, ${smallCapsValue};
+}
+${tsStrength > 0 ? `body, .iclog_name, #client_log, .menu_text, .lm_tab {
+  text-shadow: ${tsX}px ${tsY}px ${tsBlur}px ${tsColor};
+}` : ""}
+${headingFont ? `h1, h2, h3, h4, h5, h6, .tm_panel_title, .tm_group_title, .iclog_name, #client_charselect h2, #info_container h1 {
+  font-family: ${headingFont};
+}` : ""}
+${monoFont ? `#client_ooclog, code, pre, kbd, samp, .tm_css_editor, .tm_hex {
+  font-family: ${monoFont};
+}` : ""}
+${displayFont ? `#tm_title, #about-logo + h1, .page-heading, .button-carousel p {
+  font-family: ${displayFont};
+}` : ""}
+`;
+
+  // ── Background+ — per-panel images + parallax + dim-on-idle ──────────────
+  const panelBgAlpha = Math.max(0, Math.min(100, num(config.panelBgOpacity, 80))) / 100;
+  const parallaxRule = config.bodyBgParallax ? "background-attachment: fixed;" : "";
+  const dimOnIdleRule = config.bodyBgDimOnIdle ? `
+body { transition: filter 1.5s ease; filter: brightness(0.7); }
+body:hover, body:focus-within, body:active { filter: brightness(1); }` : "";
+
+  const panelBgCSS = `
+${parallaxRule ? `body { ${parallaxRule} }` : ""}
+${dimOnIdleRule}
+${config.chatBgImage ? `
+#client_log, #client_ooclog {
+  background-image: linear-gradient(rgba(0,0,0,${1 - panelBgAlpha}), rgba(0,0,0,${1 - panelBgAlpha})), url('${config.chatBgImage}');
+  background-size: cover;
+  background-position: center;
+}` : ""}
+${config.menuBgImage ? `
+#client_menu, .menu_content {
+  background-image: linear-gradient(rgba(0,0,0,${1 - panelBgAlpha}), rgba(0,0,0,${1 - panelBgAlpha})), url('${config.menuBgImage}');
+  background-size: cover;
+  background-position: center;
+}` : ""}`;
+
+  // ── Cursor customization ──────────────────────────────────────────────────
+  const allowedCursorStyles = ["default","pointer","crosshair","text","help","wait","progress","grab","custom"];
+  const cursorStyle = allowedCursorStyles.includes(config.cursorStyle as string)
+    ? config.cursorStyle
+    : "default";
+  const allowedBtnCursors = ["default","pointer","grab","help","crosshair"];
+  const cursorBtn = allowedBtnCursors.includes(config.cursorButtonStyle as string)
+    ? config.cursorButtonStyle
+    : "pointer";
+  const cursorCustomOK = config.cursorCustomDataUrl
+    && config.cursorCustomDataUrl.startsWith("data:image/");
+  const bodyCursorRule = cursorStyle === "custom" && cursorCustomOK
+    ? `cursor: url('${config.cursorCustomDataUrl}') 0 0, auto;`
+    : `cursor: ${cursorStyle === "custom" ? "default" : cursorStyle};`;
+
+  const magneticOn = !!config.cursorMagnetism;
+  const magneticStr = Math.max(0, Math.min(30, num(config.cursorMagnetismStrength, 8)));
+  const magneticScale = (1 + magneticStr / 100).toFixed(3);
+
+  const cursorCSS = `
+body { ${bodyCursorRule} }
+.client_button, .menu_button, .area-button, .judge_button, .tm_btn,
+.tm_preset_btn, .tm_tab, button, a, [role="button"] {
+  cursor: ${cursorBtn};
+}
+${magneticOn ? `.client_button:hover, .menu_button:hover, .area-button:hover, .judge_button:hover, .tm_btn:hover {
+  transform: scale(${magneticScale});
+}` : ""}`;
+
+  // ── Spacing & Density — exposed as CSS vars + scoped overrides ───────────
+  const spacingScale = Math.max(0.5, Math.min(2, num(config.spacingScale, 1)));
+  const chatPanelPad = Math.max(0, num(config.chatPanelPadding, 6));
+  const menuPad = Math.max(0, num(config.menuPanelPadding, 15));
+  const plPad = Math.max(0, num(config.playerlistPanelPadding, 6));
+  const sidebarW = Math.max(120, Math.min(400, num(config.sidebarWidth, 160)));
+  const headerH = Math.max(40, Math.min(120, num(config.headerBarHeight, 56)));
+  const btnGap = Math.max(0, num(config.buttonGap, 6));
+
+  const spacingCSS = `
+:root {
+  --tm-spacing-scale: ${spacingScale};
+  --tm-chat-pad: ${chatPanelPad}px;
+  --tm-menu-pad: ${menuPad}px;
+  --tm-pl-pad: ${plPad}px;
+  --tm-sidebar-w: ${sidebarW}px;
+  --tm-header-h: ${headerH}px;
+  --tm-btn-gap: ${btnGap}px;
+}
+#client_log, #client_ooclog {
+  padding: ${chatPanelPad}px ${chatPanelPad * 2}px;
+}
+.menu_content {
+  padding: ${menuPad}px;
+  margin: ${menuPad}px;
+}
+#client_playerlist th, #client_playerlist td {
+  padding: ${plPad}px ${plPad * 1.5}px;
+}
+#tm_tabs {
+  width: ${sidebarW}px;
+  min-width: ${Math.max(120, sidebarW - 20)}px;
+}
+#tm_header {
+  height: ${headerH}px;
+}
+.menu_button, .judge_button, .area-button {
+  margin: calc(${btnGap}px * 0.5);
+}`;
+
   // ── Selection / scrollbar / link / focus / mention / quote ──
   const extrasCSS = `
 ::selection {
@@ -671,6 +1368,69 @@ blockquote, .iclog_quote, q {
   padding: 4px 8px;
   margin: 4px 0;
 }`;
+
+  // ── Borders / shape — derived shared values + element-scoped overrides ────
+  const borderStyle = ["solid","dashed","dotted","double","groove","ridge"].includes(config.borderStyle)
+    ? config.borderStyle
+    : "solid";
+  const btnBW = Math.max(0, num(config.buttonBorderWidth, 1));
+  const panelBW = Math.max(0, num(config.panelBorderWidth, 1));
+  const inputBW = Math.max(0, num(config.inputBorderWidth, 1));
+  const panelR = Math.max(0, num(config.panelRadius, 4));
+  const inputR = Math.max(0, num(config.inputRadius, 4));
+  const tabR = Math.max(0, num(config.tabRadius, 4));
+  const outlineW = Math.max(0, num(config.outlineWidth, 2));
+  const outlineO = Math.max(0, num(config.outlineOffset, 2));
+
+  const bordersCSS = `
+.client_button, .judge_button, .area-button, .menu_button {
+  border-style: ${borderStyle};
+  border-width: ${btnBW}px;
+}
+#client_log, #client_ooclog, #client_menu, #client_iccontrols, #client_playerlist, .lm_content {
+  border-style: ${borderStyle};
+  border-width: ${panelBW}px;
+  border-radius: ${panelR}px;
+}
+#client_inputbox, #client_oocinputbox, #evi_name, #evi_desc, #OOC_name {
+  border-style: ${borderStyle};
+  border-width: ${inputBW}px;
+  border-radius: ${inputR}px;
+}
+.lm_tab {
+  border-radius: ${tabR}px ${tabR}px 0 0;
+}
+:focus-visible {
+  outline-width: ${outlineW}px;
+  outline-offset: ${outlineO}px;
+}`;
+
+  // ── Shadows / depth — drop, inner, glow ────────────────────────────────────
+  const shadowStr = Math.max(0, Math.min(100, num(config.shadowStrength, 0)));
+  const shadowBlur = Math.max(0, num(config.shadowBlur, 12));
+  const shadowOffY = Math.max(0, num(config.shadowOffsetY, 4));
+  const innerStr = Math.max(0, Math.min(100, num(config.innerShadowStrength, 0)));
+  const innerBlur = Math.max(0, num(config.innerShadowBlur, 6));
+  const glowStr = Math.max(0, Math.min(100, num(config.glowStrength, 0)));
+
+  const dropShadowCSS = shadowStr > 0
+    ? `0 ${shadowOffY}px ${shadowBlur}px ${hexToRgba(config.shadowColor || "#000000", shadowStr)}`
+    : "";
+  const innerShadowCSS = innerStr > 0
+    ? `inset 0 0 ${innerBlur}px ${hexToRgba("#000000", innerStr)}`
+    : "";
+  const glowCSS = glowStr > 0
+    ? `0 0 ${(glowStr / 4).toFixed(1)}px ${hexToRgba(config.glowColor || "#7b2900", Math.min(100, glowStr * 1.2))}, 0 0 ${(glowStr / 2).toFixed(1)}px ${hexToRgba(config.glowColor || "#7b2900", glowStr)}`
+    : "";
+
+  const composedShadow = [dropShadowCSS, glowCSS].filter(Boolean).join(", ");
+  const shadowsCSS = (dropShadowCSS || glowCSS || innerShadowCSS) ? `
+${composedShadow ? `.client_button, .judge_button, .area-button, #client_menu, #client_log, #client_ooclog, #client_playerlist, .lm_content {
+  box-shadow: ${composedShadow};
+}` : ""}
+${innerShadowCSS ? `#client_inputbox, #client_oocinputbox, #evi_name, #evi_desc, #OOC_name {
+  box-shadow: ${innerShadowCSS};
+}` : ""}` : "";
 
   // ── Animation speed / easing — applied through CSS variables every existing
   //    transition can reference, plus a global override scaling every transition.
@@ -835,7 +1595,13 @@ body {
   border-bottom: 2px solid ${config.playerlistBorder};
 }
 
+${typographyCSS}
+${cursorCSS}
+${spacingCSS}
+${panelBgCSS}
 ${extrasCSS}
+${bordersCSS}
+${shadowsCSS}
 ${animationCSS}
 ${blurCSS}
 ${bloomCSS}
@@ -913,9 +1679,168 @@ export function restoreBlipPitch(): void {
 window.applyBlipPitch = applyBlipPitch;
 window.restoreBlipPitch = restoreBlipPitch;
 
+// ─── Background video ────────────────────────────────────────────────────────
+// When config.bodyBgVideo is a data: URL, mount a <video> behind everything;
+// otherwise tear it down.
+function applyBgVideo(config: ThemeConfig): void {
+  const existing = document.getElementById("tm_bg_video") as HTMLVideoElement | null;
+  if (!config.bodyBgVideo || !config.bodyBgVideo.startsWith("data:video/")) {
+    if (existing) existing.remove();
+    return;
+  }
+  const v = existing ?? document.createElement("video");
+  v.id = "tm_bg_video";
+  v.muted = !!config.bodyBgVideoMuted;
+  v.loop = !!config.bodyBgVideoLoop;
+  v.autoplay = true;
+  v.playsInline = true;
+  v.setAttribute("aria-hidden", "true");
+  Object.assign(v.style, {
+    position: "fixed",
+    inset: "0",
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    zIndex: "-1",
+    pointerEvents: "none",
+  } as Partial<CSSStyleDeclaration>);
+  if (v.src !== config.bodyBgVideo) v.src = config.bodyBgVideo;
+  if (!existing) document.body.appendChild(v);
+  v.play().catch(() => { /* autoplay blocked until user gesture — fine */ });
+}
+
+// ─── UI sound synthesis (Web Audio) ──────────────────────────────────────────
+// One shared AudioContext is created lazily on the first user gesture so
+// browsers don't block playback. Sounds are short oscillator beeps shaped by
+// envelopes — no asset files, ~120 lines total.
+
+let uiAudioCtx: AudioContext | null = null;
+let uiSoundConfig: ThemeConfig | null = null;
+let uiListenersWired = false;
+
+function ensureUiAudioCtx(): AudioContext | null {
+  if (uiAudioCtx) return uiAudioCtx;
+  try {
+    const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
+    if (!Ctx) return null;
+    uiAudioCtx = new Ctx();
+    return uiAudioCtx;
+  } catch {
+    return null;
+  }
+}
+
+interface UiBeep { freq: number; type: OscillatorType; dur: number; }
+
+function packBeep(pack: ThemeConfig["uiSoundPack"], event: "hover"|"click"|"error"|"notif"): UiBeep {
+  // (frequency Hz, oscillator type, duration s) — simple synthesised palette.
+  const table: Record<string, Record<string, UiBeep>> = {
+    soft: {
+      hover: { freq: 880, type: "sine", dur: 0.06 },
+      click: { freq: 660, type: "sine", dur: 0.09 },
+      error: { freq: 220, type: "sine", dur: 0.18 },
+      notif: { freq: 1320, type: "sine", dur: 0.14 },
+    },
+    retro: {
+      hover: { freq: 1200, type: "square", dur: 0.04 },
+      click: { freq: 800, type: "square", dur: 0.07 },
+      error: { freq: 200, type: "sawtooth", dur: 0.20 },
+      notif: { freq: 1600, type: "square", dur: 0.10 },
+    },
+    mechanical: {
+      hover: { freq: 600, type: "triangle", dur: 0.03 },
+      click: { freq: 380, type: "triangle", dur: 0.06 },
+      error: { freq: 140, type: "sawtooth", dur: 0.22 },
+      notif: { freq: 980, type: "triangle", dur: 0.13 },
+    },
+    "vocal-blip": {
+      hover: { freq: 1480, type: "triangle", dur: 0.05 },
+      click: { freq: 1100, type: "triangle", dur: 0.08 },
+      error: { freq: 300, type: "sine", dur: 0.18 },
+      notif: { freq: 1760, type: "sine", dur: 0.12 },
+    },
+  };
+  return table[pack]?.[event] ?? { freq: 800, type: "sine", dur: 0.08 };
+}
+
+function playUiBeep(event: "hover"|"click"|"error"|"notif"): void {
+  if (!uiSoundConfig?.uiSoundsEnabled) return;
+  const enabledMap: Record<string, boolean | undefined> = {
+    hover: uiSoundConfig.uiHoverEnabled,
+    click: uiSoundConfig.uiClickEnabled,
+    error: uiSoundConfig.uiErrorEnabled,
+    notif: uiSoundConfig.uiNotifEnabled,
+  };
+  if (!enabledMap[event]) return;
+  const volMap: Record<string, number | undefined> = {
+    hover: uiSoundConfig.uiHoverVolume,
+    click: uiSoundConfig.uiClickVolume,
+    error: uiSoundConfig.uiErrorVolume,
+    notif: uiSoundConfig.uiNotifVolume,
+  };
+  const vol = Math.max(0, Math.min(100, Number(volMap[event] ?? 30))) / 100;
+  if (vol === 0) return;
+
+  const ctx = ensureUiAudioCtx();
+  if (!ctx) return;
+  const beep = packBeep(uiSoundConfig.uiSoundPack, event);
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = beep.type;
+  osc.frequency.value = beep.freq;
+  // Quick attack/release envelope to avoid clicks. Peak gain is the user volume.
+  const t0 = ctx.currentTime;
+  gain.gain.setValueAtTime(0, t0);
+  gain.gain.linearRampToValueAtTime(vol * 0.25, t0 + 0.005);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + beep.dur);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(t0);
+  osc.stop(t0 + beep.dur + 0.02);
+}
+
+/** Throttle hover events so a fast mousemove doesn't fire 60 beeps/sec. */
+let lastHoverBeepAt = 0;
+function maybeHoverBeep(): void {
+  const now = performance.now();
+  if (now - lastHoverBeepAt < 90) return;
+  lastHoverBeepAt = now;
+  playUiBeep("hover");
+}
+
+function ensureUiListeners(): void {
+  if (uiListenersWired) return;
+  uiListenersWired = true;
+  // Hover: triggered when entering anything that "looks clickable".
+  document.addEventListener("pointerenter", (e) => {
+    const t = e.target as HTMLElement | null;
+    if (!t || !t.matches) return;
+    if (t.matches('button, a, [role="button"], .client_button, .menu_button, .area-button, .judge_button, .tm_btn, .tm_preset_btn, .tm_tab')) {
+      maybeHoverBeep();
+    }
+  }, true);
+  // Click: any pointer-down counts (synth happens on user gesture so audio context can start).
+  document.addEventListener("pointerdown", (e) => {
+    const t = e.target as HTMLElement | null;
+    if (!t || !t.matches) return;
+    if (t.matches('button, a, [role="button"], .client_button, .menu_button, .area-button, .judge_button, .tm_btn, .tm_preset_btn, .tm_tab, input[type=checkbox], input[type=radio], select')) {
+      playUiBeep("click");
+    }
+  }, true);
+}
+
+export function applyUiSoundConfig(config: ThemeConfig): void {
+  uiSoundConfig = config;
+  if (config.uiSoundsEnabled) ensureUiListeners();
+}
+
+/** Public hook so other modules can fire UI sounds (e.g. error toast handler). */
+(window as any).__tmPlayUi = playUiBeep;
+
 export function applyThemeMakerConfig(config: ThemeConfig): void {
   applyThemeMakerCSS(generateCSS(config));
   applyBlipPitch(Number(config.blipPitch ?? 1));
+  applyUiSoundConfig(config);
+  applyBgVideo(config);
 }
 
 // ─── Modal HTML ───────────────────────────────────────────────────────────────
@@ -942,10 +1867,15 @@ function injectModalHTML(): void {
         <button class="tm_tab tm_tab_active" data-tab="colors" role="tab" aria-selected="true">🎨 Colors</button>
         <button class="tm_tab" data-tab="chatbox" role="tab" aria-selected="false">💬 Chatbox</button>
         <button class="tm_tab" data-tab="audio" role="tab" aria-selected="false">🔊 Audio</button>
+        <button class="tm_tab" data-tab="uisounds" role="tab" aria-selected="false">🔔 UI Sounds</button>
         <button class="tm_tab" data-tab="background" role="tab" aria-selected="false">🖼 Background</button>
         <button class="tm_tab" data-tab="typography" role="tab" aria-selected="false">✏️ Typography</button>
         <button class="tm_tab" data-tab="effects" role="tab" aria-selected="false">✨ Effects</button>
         <button class="tm_tab" data-tab="animations" role="tab" aria-selected="false">🎬 Animations</button>
+        <button class="tm_tab" data-tab="borders" role="tab" aria-selected="false">🔲 Borders</button>
+        <button class="tm_tab" data-tab="shadows" role="tab" aria-selected="false">🌑 Shadows</button>
+        <button class="tm_tab" data-tab="spacing" role="tab" aria-selected="false">📏 Spacing</button>
+        <button class="tm_tab" data-tab="cursor" role="tab" aria-selected="false">🖱 Cursor</button>
         <button class="tm_tab" data-tab="advanced" role="tab" aria-selected="false">⚙️ Advanced</button>
         <div id="tm_presets_section">
           <p class="tm_section_label">Quick Presets</p>
@@ -955,6 +1885,37 @@ function injectModalHTML(): void {
           <button class="tm_preset_btn" data-preset="ocean">🌊 Ocean</button>
           <button class="tm_preset_btn" data-preset="forest">🌿 Forest</button>
           <button class="tm_preset_btn" data-preset="haschenLemmy">🪦 Haschen &amp; Lemmy</button>
+          <p class="tm_section_label" style="margin-top:8px">Editor Classics</p>
+          <button class="tm_preset_btn" data-preset="catppuccinMocha">🍮 Catppuccin Mocha</button>
+          <button class="tm_preset_btn" data-preset="catppuccinMacchiato">☕ Catppuccin Macchiato</button>
+          <button class="tm_preset_btn" data-preset="catppuccinFrappe">🥤 Catppuccin Frappé</button>
+          <button class="tm_preset_btn" data-preset="catppuccinLatte">🥛 Catppuccin Latte</button>
+          <button class="tm_preset_btn" data-preset="nord">❄️ Nord</button>
+          <button class="tm_preset_btn" data-preset="dracula">🦇 Dracula</button>
+          <button class="tm_preset_btn" data-preset="tokyoNight">🗼 Tokyo Night</button>
+          <button class="tm_preset_btn" data-preset="gruvboxDark">🌰 Gruvbox Dark</button>
+          <button class="tm_preset_btn" data-preset="gruvboxLight">🌅 Gruvbox Light</button>
+          <button class="tm_preset_btn" data-preset="solarizedDark">🌑 Solarized Dark</button>
+          <button class="tm_preset_btn" data-preset="solarizedLight">☀️ Solarized Light</button>
+          <button class="tm_preset_btn" data-preset="rosePine">🌹 Rosé Pine</button>
+          <button class="tm_preset_btn" data-preset="rosePineDawn">🌸 Rosé Pine Dawn</button>
+          <button class="tm_preset_btn" data-preset="oneDark">⚛️ One Dark</button>
+          <button class="tm_preset_btn" data-preset="monokai">🍃 Monokai</button>
+          <button class="tm_preset_btn" data-preset="githubDark">🐙 GitHub Dark</button>
+          <button class="tm_preset_btn" data-preset="githubLight">🐱 GitHub Light</button>
+          <button class="tm_preset_btn" data-preset="vaporwave">🌴 Vaporwave</button>
+          <button class="tm_preset_btn" data-preset="synthwave">🌆 Synthwave</button>
+          <button class="tm_preset_btn" data-preset="cyberpunk">⚡ Cyberpunk</button>
+          <p class="tm_section_label" style="margin-top:8px">Ace Attorney</p>
+          <button class="tm_preset_btn" data-preset="edgeworth">⚔️ Edgeworth</button>
+          <button class="tm_preset_btn" data-preset="apolloJustice">🪨 Apollo Justice</button>
+          <button class="tm_preset_btn" data-preset="athenaCykes">🎧 Athena Cykes</button>
+          <button class="tm_preset_btn" data-preset="mayaFey">🔮 Maya Fey</button>
+          <button class="tm_preset_btn" data-preset="godot">☕ Godot</button>
+          <button class="tm_preset_btn" data-preset="klavierGavin">🎸 Klavier Gavin</button>
+          <button class="tm_preset_btn" data-preset="trucyWright">🎩 Trucy Wright</button>
+          <button class="tm_preset_btn" data-preset="miaFey">⚖️ Mia Fey</button>
+          <button class="tm_preset_btn" data-preset="vonKarma">🥶 Von Karma</button>
         </div>
         <!-- Mock live preview pane (always visible) -->
         <div id="tm_live_preview_box" aria-label="Live preview">
@@ -1424,6 +2385,109 @@ function injectModalHTML(): void {
           </div>
         </div>
 
+        <!-- UI Sounds -->
+        <div class="tm_panel" data-panel="uisounds">
+          <h3 class="tm_panel_title">UI Sounds</h3>
+          <p class="tm_hint">Plays a synthesised beep on hover and click. Generated live from Web Audio — no asset files. Disabled by default; enable to opt in.</p>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🎚 Master &amp; pack</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiSoundsEnabled">Enable UI sounds</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_uiSoundsEnabled" data-prop="uiSoundsEnabled" />
+                <span class="tm_hint" style="margin:0">Master switch.</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiSoundPack">Sound pack</label>
+              <select id="tm_uiSoundPack" data-prop="uiSoundPack" class="tm_select">
+                <option value="soft">Soft (sine waves)</option>
+                <option value="retro">Retro (square / saw)</option>
+                <option value="mechanical">Mechanical (triangle)</option>
+                <option value="vocal-blip">Vocal-blip (high triangle)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🪶 Hover</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiHoverEnabled">Play on hover</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_uiHoverEnabled" data-prop="uiHoverEnabled" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiHoverVolume">Volume</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_uiHoverVolume" data-prop="uiHoverVolume" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_uiHoverVolume">15</span><span>%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🖱 Click</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiClickEnabled">Play on click</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_uiClickEnabled" data-prop="uiClickEnabled" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiClickVolume">Volume</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_uiClickVolume" data-prop="uiClickVolume" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_uiClickVolume">30</span><span>%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🚨 Error / 🔔 Notification</h4>
+            <p class="tm_hint">Volume only — these don't auto-play; other modules can fire them via <code>window.__tmPlayUi("error")</code> / <code>("notif")</code>.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiErrorEnabled">Errors enabled</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_uiErrorEnabled" data-prop="uiErrorEnabled" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiErrorVolume">Error volume</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_uiErrorVolume" data-prop="uiErrorVolume" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_uiErrorVolume">40</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiNotifEnabled">Notifications enabled</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_uiNotifEnabled" data-prop="uiNotifEnabled" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_uiNotifVolume">Notification volume</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_uiNotifVolume" data-prop="uiNotifVolume" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_uiNotifVolume">50</span><span>%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🎧 Test</h4>
+            <div class="tm_row">
+              <div class="tm_ctrl">
+                <button class="tm_btn tm_btn_secondary tm_btn_sm" id="tm_test_hover">▶ Hover</button>
+                <button class="tm_btn tm_btn_secondary tm_btn_sm" id="tm_test_click">▶ Click</button>
+                <button class="tm_btn tm_btn_secondary tm_btn_sm" id="tm_test_error">▶ Error</button>
+                <button class="tm_btn tm_btn_secondary tm_btn_sm" id="tm_test_notif">▶ Notify</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Background -->
         <div class="tm_panel" data-panel="background">
           <h3 class="tm_panel_title">Background Settings</h3>
@@ -1497,6 +2561,87 @@ function injectModalHTML(): void {
               </div>
             </div>
           </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🎬 Background video</h4>
+            <p class="tm_hint">Mounts a looping video behind everything. Capped at 16 MB; stored locally as a data URL. Browsers block autoplay until you interact with the page once.</p>
+            <div class="tm_row tm_row_vert">
+              <label class="tm_label">Video file</label>
+              <input type="file" id="tm_bgVideoFile" accept="video/mp4,video/webm,video/quicktime" />
+            </div>
+            <div class="tm_row" id="tm_bgVideo_status_row" style="display:none">
+              <label class="tm_label">Status</label>
+              <div class="tm_ctrl">
+                <span id="tm_bgVideo_status" class="tm_hint" style="margin:0">No video uploaded.</span>
+                <button class="tm_btn tm_btn_danger tm_btn_sm" id="tm_bgVideo_clear_btn">Remove</button>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_bodyBgVideoMuted">Muted</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_bodyBgVideoMuted" data-prop="bodyBgVideoMuted" />
+                <span class="tm_hint" style="margin:0">Required for autoplay in most browsers.</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_bodyBgVideoLoop">Loop</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_bodyBgVideoLoop" data-prop="bodyBgVideoLoop" />
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🪟 Per-panel backgrounds</h4>
+            <p class="tm_hint">Optional images that show behind specific panels. Combined with a darkening overlay so text stays readable.</p>
+            <div class="tm_row tm_row_vert">
+              <label class="tm_label">Chat / OOC log image</label>
+              <input type="file" id="tm_chatBgFile" accept="image/*" />
+            </div>
+            <div class="tm_row" id="tm_chatBg_status_row" style="display:none">
+              <label class="tm_label">Status</label>
+              <div class="tm_ctrl">
+                <span id="tm_chatBg_status" class="tm_hint" style="margin:0">No image.</span>
+                <button class="tm_btn tm_btn_danger tm_btn_sm" id="tm_chatBg_clear_btn">Remove</button>
+              </div>
+            </div>
+            <div class="tm_row tm_row_vert">
+              <label class="tm_label">Menu image</label>
+              <input type="file" id="tm_menuBgFile" accept="image/*" />
+            </div>
+            <div class="tm_row" id="tm_menuBg_status_row" style="display:none">
+              <label class="tm_label">Status</label>
+              <div class="tm_ctrl">
+                <span id="tm_menuBg_status" class="tm_hint" style="margin:0">No image.</span>
+                <button class="tm_btn tm_btn_danger tm_btn_sm" id="tm_menuBg_clear_btn">Remove</button>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_panelBgOpacity">Panel image opacity</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_panelBgOpacity" data-prop="panelBgOpacity" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_panelBgOpacity">80</span><span>%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">✨ Effects</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_bodyBgParallax">Parallax</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_bodyBgParallax" data-prop="bodyBgParallax" />
+                <span class="tm_hint" style="margin:0">Background stays put when the page scrolls.</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_bodyBgDimOnIdle">Dim on idle</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_bodyBgDimOnIdle" data-prop="bodyBgDimOnIdle" />
+                <span class="tm_hint" style="margin:0">Page dims when you're not interacting; restores on hover/click.</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Typography -->
@@ -1548,6 +2693,122 @@ function injectModalHTML(): void {
               <div class="tm_ctrl">
                 <input type="range" id="tm_lineHeight" data-prop="lineHeight" min="1" max="2.5" step="0.05" class="tm_range" />
                 <span class="tm_range_val" data-for="tm_lineHeight">1.40</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🅰️ Heading / mono / display fonts</h4>
+            <p class="tm_hint">Optional separate fonts. Leave a slot blank to inherit the body font. Accepts the same values as the body font (CSS font-family list).</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_headingFontFamily">Heading font</label>
+              <input type="text" id="tm_headingFontFamily" data-prop="headingFontFamily" class="tm_text_input" placeholder="e.g. Georgia, serif (blank = inherit)" />
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_monoFontFamily">Mono font (OOC log, code)</label>
+              <input type="text" id="tm_monoFontFamily" data-prop="monoFontFamily" class="tm_text_input" placeholder="e.g. JetBrains Mono, monospace" />
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_displayFontFamily">Display font (titles)</label>
+              <input type="text" id="tm_displayFontFamily" data-prop="displayFontFamily" class="tm_text_input" placeholder="e.g. Poiret One, cursive (blank = inherit)" />
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">📤 Upload custom font</h4>
+            <p class="tm_hint">Drop in a .woff2/.woff/.ttf/.otf file. Stored locally as a data URL — never leaves your browser. Once uploaded, reference it by the family name below in the body / heading / mono / display slots above.</p>
+            <div class="tm_row tm_row_vert">
+              <label class="tm_label">Font file</label>
+              <input type="file" id="tm_customFontFile" accept=".woff2,.woff,.ttf,.otf,font/*" />
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_customFontFamilyName">Family name</label>
+              <input type="text" id="tm_customFontFamilyName" data-prop="customFontFamilyName" class="tm_text_input" placeholder="e.g. MyCustomFont" />
+            </div>
+            <div class="tm_row" id="tm_customFont_status_row" style="display:none">
+              <label class="tm_label">Status</label>
+              <div class="tm_ctrl">
+                <span id="tm_customFont_status" class="tm_hint" style="margin:0">No font uploaded.</span>
+                <button class="tm_btn tm_btn_danger tm_btn_sm" id="tm_customFont_clear_btn">Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">✏️ Spacing &amp; case</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_letterSpacing">Letter spacing (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_letterSpacing" data-prop="letterSpacing" min="-2" max="8" step="0.5" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_letterSpacing">0</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_textTransform">Text transform</label>
+              <select id="tm_textTransform" data-prop="textTransform" class="tm_select">
+                <option value="none">None</option>
+                <option value="uppercase">UPPERCASE</option>
+                <option value="lowercase">lowercase</option>
+                <option value="capitalize">Capitalize</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🔠 OpenType features</h4>
+            <p class="tm_hint">Whether the font's optional ligatures and small-caps glyphs are enabled. Has no effect with fonts that don't ship those features.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_enableLigatures">Ligatures</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_enableLigatures" data-prop="enableLigatures" />
+                <span class="tm_hint" style="margin:0">Enables liga + dlig (default on).</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_enableSmallCaps">Small caps</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_enableSmallCaps" data-prop="enableSmallCaps" />
+                <span class="tm_hint" style="margin:0">Enables smcp (default off).</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🌫 Text shadow</h4>
+            <p class="tm_hint">Subtle drop shadow on body text. Strength = alpha; 0 disables it.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_textShadowStrength">Strength</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_textShadowStrength" data-prop="textShadowStrength" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_textShadowStrength">0</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_textShadowColor">Color</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_textShadowColor" data-prop="textShadowColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_textShadowColor" maxlength="7" />
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_textShadowOffsetX">X offset (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_textShadowOffsetX" data-prop="textShadowOffsetX" min="-10" max="10" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_textShadowOffsetX">0</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_textShadowOffsetY">Y offset (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_textShadowOffsetY" data-prop="textShadowOffsetY" min="-10" max="10" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_textShadowOffsetY">1</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_textShadowBlur">Blur (px)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_textShadowBlur" data-prop="textShadowBlur" min="0" max="20" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_textShadowBlur">2</span><span>px</span>
               </div>
             </div>
           </div>
@@ -1694,6 +2955,319 @@ function injectModalHTML(): void {
               <div class="tm_ctrl">
                 <input type="checkbox" id="tm_animRespectPrefers" data-prop="animRespectPrefers" />
                 <span class="tm_hint" style="margin:0">Honors the OS-level "reduce motion" setting.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Borders -->
+        <div class="tm_panel" data-panel="borders">
+          <h3 class="tm_panel_title">Borders &amp; Shape</h3>
+          <p class="tm_hint">Per-element border width, style, and corner radius. Style is shared globally; widths and radii are scoped.</p>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">✏️ Border style</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_borderStyle">Style</label>
+              <select id="tm_borderStyle" data-prop="borderStyle" class="tm_select">
+                <option value="solid">Solid</option>
+                <option value="dashed">Dashed</option>
+                <option value="dotted">Dotted</option>
+                <option value="double">Double</option>
+                <option value="groove">Groove</option>
+                <option value="ridge">Ridge</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">📏 Widths (px)</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_buttonBorderWidth">Buttons</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_buttonBorderWidth" data-prop="buttonBorderWidth" min="0" max="8" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_buttonBorderWidth">1</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_panelBorderWidth">Panels (log/menu/playerlist)</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_panelBorderWidth" data-prop="panelBorderWidth" min="0" max="8" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_panelBorderWidth">1</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_inputBorderWidth">Inputs</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_inputBorderWidth" data-prop="inputBorderWidth" min="0" max="8" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_inputBorderWidth">1</span><span>px</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🟦 Corner radius (px)</h4>
+            <p class="tm_hint">Buttons have their own slider in the Colors tab. Sliders below cover everything else.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_panelRadius">Panels</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_panelRadius" data-prop="panelRadius" min="0" max="40" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_panelRadius">4</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_inputRadius">Inputs</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_inputRadius" data-prop="inputRadius" min="0" max="20" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_inputRadius">4</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_tabRadius">Tab tops</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_tabRadius" data-prop="tabRadius" min="0" max="20" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_tabRadius">4</span><span>px</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🎯 Focus outline</h4>
+            <p class="tm_hint">Keyboard-focus indicator on buttons / inputs / links.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_outlineWidth">Outline width</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_outlineWidth" data-prop="outlineWidth" min="0" max="6" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_outlineWidth">2</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_outlineOffset">Outline offset</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_outlineOffset" data-prop="outlineOffset" min="0" max="10" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_outlineOffset">2</span><span>px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shadows -->
+        <div class="tm_panel" data-panel="shadows">
+          <h3 class="tm_panel_title">Shadows &amp; Depth</h3>
+          <p class="tm_hint">Drop shadows for elevated surfaces, inner shadows for inputs, and a separate glow that hugs the edges.</p>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🪟 Drop shadow</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_shadowStrength">Strength</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_shadowStrength" data-prop="shadowStrength" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_shadowStrength">0</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_shadowBlur">Blur radius</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_shadowBlur" data-prop="shadowBlur" min="0" max="40" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_shadowBlur">12</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_shadowOffsetY">Vertical offset</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_shadowOffsetY" data-prop="shadowOffsetY" min="0" max="20" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_shadowOffsetY">4</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_shadowColor">Shadow color</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_shadowColor" data-prop="shadowColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_shadowColor" maxlength="7" />
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🕳 Inner shadow</h4>
+            <p class="tm_hint">Subtle inset shadow on inputs and OOC name field for a "pressed" look.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_innerShadowStrength">Strength</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_innerShadowStrength" data-prop="innerShadowStrength" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_innerShadowStrength">0</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_innerShadowBlur">Blur radius</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_innerShadowBlur" data-prop="innerShadowBlur" min="0" max="20" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_innerShadowBlur">6</span><span>px</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🌟 Edge glow</h4>
+            <p class="tm_hint">Different from "Text bloom" in Effects — this glows the outline of buttons and panels.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_glowStrength">Strength</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_glowStrength" data-prop="glowStrength" min="0" max="100" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_glowStrength">0</span><span>%</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_glowColor">Glow color</label>
+              <div class="tm_ctrl">
+                <input type="color" id="tm_glowColor" data-prop="glowColor" class="tm_color" />
+                <input type="text" class="tm_hex" data-for="tm_glowColor" maxlength="7" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spacing -->
+        <div class="tm_panel" data-panel="spacing">
+          <h3 class="tm_panel_title">Spacing &amp; Density</h3>
+          <p class="tm_hint">Tune how tight or roomy the layout feels. The "scale" affects all derived spacing through the <code>--tm-spacing-scale</code> variable.</p>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">📐 Density preset</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_densityPreset">Preset</label>
+              <select id="tm_densityPreset" data-prop="densityPreset" class="tm_select">
+                <option value="compact">Compact</option>
+                <option value="cozy">Cozy (default)</option>
+                <option value="comfortable">Comfortable</option>
+                <option value="custom">Custom (sliders below)</option>
+              </select>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_spacingScale">Spacing scale</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_spacingScale" data-prop="spacingScale" min="0.5" max="2" step="0.05" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_spacingScale">1.00</span><span>×</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🪟 Per-panel padding (px)</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_chatPanelPadding">Chat / OOC log</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_chatPanelPadding" data-prop="chatPanelPadding" min="0" max="40" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_chatPanelPadding">6</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_menuPanelPadding">Menu</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_menuPanelPadding" data-prop="menuPanelPadding" min="0" max="40" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_menuPanelPadding">15</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_playerlistPanelPadding">Player list</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_playerlistPanelPadding" data-prop="playerlistPanelPadding" min="0" max="40" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_playerlistPanelPadding">6</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_buttonGap">Button gap</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_buttonGap" data-prop="buttonGap" min="0" max="24" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_buttonGap">6</span><span>px</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">📐 Theme Maker layout</h4>
+            <p class="tm_hint">Affects this modal — handy if your screen is narrow.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_sidebarWidth">Sidebar width</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_sidebarWidth" data-prop="sidebarWidth" min="120" max="400" step="5" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_sidebarWidth">160</span><span>px</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_headerBarHeight">Header bar height</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_headerBarHeight" data-prop="headerBarHeight" min="40" max="120" step="2" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_headerBarHeight">56</span><span>px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cursor -->
+        <div class="tm_panel" data-panel="cursor">
+          <h3 class="tm_panel_title">Cursor</h3>
+          <p class="tm_hint">Pick a system cursor or upload your own. Buttons can use a different cursor than the page background.</p>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🖱 Page cursor</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_cursorStyle">Style</label>
+              <select id="tm_cursorStyle" data-prop="cursorStyle" class="tm_select">
+                <option value="default">Default arrow</option>
+                <option value="pointer">Pointer (hand)</option>
+                <option value="crosshair">Crosshair</option>
+                <option value="text">Text I-beam</option>
+                <option value="help">Help</option>
+                <option value="wait">Wait</option>
+                <option value="progress">Progress</option>
+                <option value="grab">Grab</option>
+                <option value="custom">Custom (upload below)</option>
+              </select>
+            </div>
+            <div class="tm_row tm_row_vert">
+              <label class="tm_label">Custom cursor image</label>
+              <input type="file" id="tm_cursorCustomFile" accept="image/png,image/svg+xml,image/gif" />
+              <p class="tm_hint">Recommended: 32×32 PNG or SVG. Max 256 KB. Stored locally.</p>
+            </div>
+            <div class="tm_row" id="tm_cursor_status_row" style="display:none">
+              <label class="tm_label">Status</label>
+              <div class="tm_ctrl">
+                <span id="tm_cursor_status" class="tm_hint" style="margin:0">No image uploaded.</span>
+                <button class="tm_btn tm_btn_danger tm_btn_sm" id="tm_cursor_clear_btn">Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🔘 Button cursor</h4>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_cursorButtonStyle">When hovering buttons</label>
+              <select id="tm_cursorButtonStyle" data-prop="cursorButtonStyle" class="tm_select">
+                <option value="pointer">Pointer (hand) — default</option>
+                <option value="default">Default arrow</option>
+                <option value="grab">Grab</option>
+                <option value="help">Help</option>
+                <option value="crosshair">Crosshair</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tm_group">
+            <h4 class="tm_group_title">🧲 Magnetism</h4>
+            <p class="tm_hint">Buttons subtly grow when the cursor is over them.</p>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_cursorMagnetism">Enable</label>
+              <div class="tm_ctrl">
+                <input type="checkbox" id="tm_cursorMagnetism" data-prop="cursorMagnetism" />
+                <span class="tm_hint" style="margin:0">Adds a hover transform to interactive elements.</span>
+              </div>
+            </div>
+            <div class="tm_row">
+              <label class="tm_label" for="tm_cursorMagnetismStrength">Strength</label>
+              <div class="tm_ctrl">
+                <input type="range" id="tm_cursorMagnetismStrength" data-prop="cursorMagnetismStrength" min="0" max="30" step="1" class="tm_range" />
+                <span class="tm_range_val" data-for="tm_cursorMagnetismStrength">8</span><span>%</span>
               </div>
             </div>
           </div>
@@ -1992,9 +3566,27 @@ function syncUIFromConfig(config: ThemeConfig): void {
   const extraTA = document.getElementById("tm_extraCSS") as HTMLTextAreaElement | null;
   if (extraTA) extraTA.value = config.extraCSS ?? "";
 
+  // Generic text inputs that bind via data-prop (skip legacy custom-font sentinel).
+  document.querySelectorAll<HTMLInputElement>("input[type=text].tm_text_input[data-prop]").forEach((input) => {
+    if (input.id === "tm_customFontInput") return;
+    const prop = input.dataset.prop as keyof ThemeConfig;
+    input.value = String(config[prop] ?? "");
+  });
+
   // Background preview
   updateBgPreview(config);
   updatePlayerlistBgPreview(config);
+
+  // Custom font upload status
+  updateCustomFontStatus(config);
+
+  // Custom cursor upload status
+  updateCursorStatus(config);
+
+  // Background+ upload statuses
+  updateUploadStatus("tm_bgVideo_status_row", "tm_bgVideo_status", config.bodyBgVideo, "Background video");
+  updateUploadStatus("tm_chatBg_status_row", "tm_chatBg_status", config.chatBgImage, "Chat image");
+  updateUploadStatus("tm_menuBg_status_row", "tm_menuBg_status", config.menuBgImage, "Menu image");
 
   // Font preview
   updateFontPreview(config);
@@ -2015,6 +3607,48 @@ function updateBgPreview(config: ThemeConfig): void {
     img.src = "";
     img.style.display = "none";
     wrap.style.display = "none";
+  }
+}
+
+function updateUploadStatus(rowId: string, statusId: string, dataUrl: string, label: string): void {
+  const row = document.getElementById(rowId) as HTMLElement | null;
+  const status = document.getElementById(statusId) as HTMLElement | null;
+  if (!row || !status) return;
+  if (dataUrl) {
+    row.style.display = "flex";
+    const sizeKB = Math.round(dataUrl.length / 1024);
+    status.textContent = `✅ ${label} loaded (~${sizeKB} KB).`;
+  } else {
+    row.style.display = "none";
+    status.textContent = `No ${label.toLowerCase()}.`;
+  }
+}
+
+function updateCursorStatus(config: ThemeConfig): void {
+  const row = document.getElementById("tm_cursor_status_row") as HTMLElement | null;
+  const status = document.getElementById("tm_cursor_status") as HTMLElement | null;
+  if (!row || !status) return;
+  if (config.cursorCustomDataUrl) {
+    row.style.display = "flex";
+    const sizeKB = Math.round(config.cursorCustomDataUrl.length / 1024);
+    status.textContent = `✅ Custom cursor loaded (~${sizeKB} KB).`;
+  } else {
+    row.style.display = "none";
+    status.textContent = "No image uploaded.";
+  }
+}
+
+function updateCustomFontStatus(config: ThemeConfig): void {
+  const row = document.getElementById("tm_customFont_status_row") as HTMLElement | null;
+  const status = document.getElementById("tm_customFont_status") as HTMLElement | null;
+  if (!row || !status) return;
+  if (config.customFontDataUrl) {
+    row.style.display = "flex";
+    const sizeKB = Math.round(config.customFontDataUrl.length / 1024);
+    status.textContent = `✅ Loaded as "${config.customFontFamilyName || "TmCustomFont"}" (~${sizeKB} KB).`;
+  } else {
+    row.style.display = "none";
+    status.textContent = "No font uploaded.";
   }
 }
 
@@ -2183,6 +3817,20 @@ function wireEvents(): void {
         "effectGrain", "effectChromaticAb", "effectBlur", "effectBloom",
         "effectSaturation", "effectContrast",
         "animSpeed", "animHoverDuration",
+        "buttonBorderWidth", "panelBorderWidth", "inputBorderWidth",
+        "panelRadius", "inputRadius", "tabRadius",
+        "outlineWidth", "outlineOffset",
+        "shadowStrength", "shadowBlur", "shadowOffsetY",
+        "innerShadowStrength", "innerShadowBlur",
+        "glowStrength",
+        "letterSpacing", "textShadowStrength",
+        "textShadowOffsetX", "textShadowOffsetY", "textShadowBlur",
+        "spacingScale", "chatPanelPadding", "menuPanelPadding",
+        "playerlistPanelPadding", "sidebarWidth", "headerBarHeight",
+        "buttonGap",
+        "cursorMagnetismStrength",
+        "uiHoverVolume", "uiClickVolume", "uiErrorVolume", "uiNotifVolume",
+        "panelBgOpacity",
       ]);
       (currentConfig as any)[prop] = numericProps.has(prop as string)
         ? Number(input.value)
@@ -2291,6 +3939,219 @@ function wireEvents(): void {
       liveUpdate();
     });
   }
+
+  // Density preset — overwrites the related sliders when the user picks one.
+  const densitySelect = document.getElementById("tm_densityPreset") as HTMLSelectElement | null;
+  if (densitySelect) {
+    densitySelect.addEventListener("change", () => {
+      pushToHistory(currentConfig);
+      const v = densitySelect.value as ThemeConfig["densityPreset"];
+      currentConfig.densityPreset = v;
+      if (v === "compact") {
+        Object.assign(currentConfig, {
+          spacingScale: 0.8, chatPanelPadding: 4, menuPanelPadding: 8,
+          playerlistPanelPadding: 4, buttonGap: 3,
+        });
+      } else if (v === "comfortable") {
+        Object.assign(currentConfig, {
+          spacingScale: 1.25, chatPanelPadding: 12, menuPanelPadding: 22,
+          playerlistPanelPadding: 10, buttonGap: 10,
+        });
+      } else if (v === "cozy") {
+        Object.assign(currentConfig, {
+          spacingScale: 1.0, chatPanelPadding: 6, menuPanelPadding: 15,
+          playerlistPanelPadding: 6, buttonGap: 6,
+        });
+      }
+      // "custom" leaves the sliders alone.
+      syncUIFromConfig(currentConfig);
+      liveUpdate();
+    });
+  }
+
+  // Generic text inputs that bind to ThemeConfig via data-prop. The existing
+  // tm_customFontInput is handled separately (legacy "custom" sentinel for
+  // bodyFontFamily) so we explicitly skip it here.
+  document.querySelectorAll<HTMLInputElement>("input[type=text].tm_text_input[data-prop]").forEach((input) => {
+    if (input.id === "tm_customFontInput") return;
+    input.addEventListener("focus", captureHistory);
+    input.addEventListener("blur", () => { isInteracting = false; });
+    input.addEventListener("input", () => {
+      const prop = input.dataset.prop as keyof ThemeConfig;
+      (currentConfig as any)[prop] = input.value;
+      liveUpdate();
+    });
+  });
+
+  // Custom-font upload — read file as data URL, store on config, refresh status.
+  const fontFile = document.getElementById("tm_customFontFile") as HTMLInputElement | null;
+  if (fontFile) {
+    fontFile.addEventListener("change", () => {
+      const file = fontFile.files?.[0];
+      if (!file) return;
+      // Cap at ~4 MB so a runaway upload can't stuff localStorage.
+      const MAX_BYTES = 4 * 1024 * 1024;
+      if (file.size > MAX_BYTES) {
+        alert(`Font is ${(file.size / 1024 / 1024).toFixed(1)} MB — please use a file under 4 MB.`);
+        fontFile.value = "";
+        return;
+      }
+      pushToHistory(currentConfig);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        currentConfig.customFontDataUrl = dataUrl;
+        updateCustomFontStatus(currentConfig);
+        liveUpdate();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Custom-font clear
+  const fontClearBtn = document.getElementById("tm_customFont_clear_btn");
+  if (fontClearBtn) {
+    fontClearBtn.addEventListener("click", () => {
+      pushToHistory(currentConfig);
+      currentConfig.customFontDataUrl = "";
+      const ff = document.getElementById("tm_customFontFile") as HTMLInputElement | null;
+      if (ff) ff.value = "";
+      updateCustomFontStatus(currentConfig);
+      liveUpdate();
+    });
+  }
+
+  // Custom-cursor upload — PNG/SVG/GIF, capped at 256 KB.
+  const cursorFile = document.getElementById("tm_cursorCustomFile") as HTMLInputElement | null;
+  if (cursorFile) {
+    cursorFile.addEventListener("change", () => {
+      const file = cursorFile.files?.[0];
+      if (!file) return;
+      const MAX = 256 * 1024;
+      if (file.size > MAX) {
+        alert(`Cursor image is ${(file.size / 1024).toFixed(0)} KB — please use one under 256 KB.`);
+        cursorFile.value = "";
+        return;
+      }
+      pushToHistory(currentConfig);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        currentConfig.cursorCustomDataUrl = dataUrl;
+        currentConfig.cursorStyle = "custom";
+        updateCursorStatus(currentConfig);
+        syncUIFromConfig(currentConfig);
+        liveUpdate();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Cursor clear
+  const cursorClearBtn = document.getElementById("tm_cursor_clear_btn");
+  if (cursorClearBtn) {
+    cursorClearBtn.addEventListener("click", () => {
+      pushToHistory(currentConfig);
+      currentConfig.cursorCustomDataUrl = "";
+      currentConfig.cursorStyle = "default";
+      const cf = document.getElementById("tm_cursorCustomFile") as HTMLInputElement | null;
+      if (cf) cf.value = "";
+      updateCursorStatus(currentConfig);
+      syncUIFromConfig(currentConfig);
+      liveUpdate();
+    });
+  }
+
+  // Background-video upload — capped at 16 MB so localStorage doesn't choke.
+  const bgVideoFile = document.getElementById("tm_bgVideoFile") as HTMLInputElement | null;
+  if (bgVideoFile) {
+    bgVideoFile.addEventListener("change", () => {
+      const file = bgVideoFile.files?.[0];
+      if (!file) return;
+      const MAX = 16 * 1024 * 1024;
+      if (file.size > MAX) {
+        alert(`Video is ${(file.size / 1024 / 1024).toFixed(1)} MB — please use one under 16 MB.`);
+        bgVideoFile.value = "";
+        return;
+      }
+      pushToHistory(currentConfig);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        currentConfig.bodyBgVideo = e.target?.result as string;
+        updateUploadStatus("tm_bgVideo_status_row", "tm_bgVideo_status", currentConfig.bodyBgVideo, "Background video");
+        liveUpdate();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  const bgVideoClear = document.getElementById("tm_bgVideo_clear_btn");
+  if (bgVideoClear) {
+    bgVideoClear.addEventListener("click", () => {
+      pushToHistory(currentConfig);
+      currentConfig.bodyBgVideo = "";
+      const f = document.getElementById("tm_bgVideoFile") as HTMLInputElement | null;
+      if (f) f.value = "";
+      updateUploadStatus("tm_bgVideo_status_row", "tm_bgVideo_status", "", "Background video");
+      liveUpdate();
+    });
+  }
+
+  // Generic per-panel image uploaders for chatBg + menuBg.
+  const wirePanelImage = (
+    fileId: string,
+    clearId: string,
+    rowId: string,
+    statusId: string,
+    label: string,
+    configKey: "chatBgImage" | "menuBgImage",
+  ) => {
+    const fileEl = document.getElementById(fileId) as HTMLInputElement | null;
+    if (fileEl) {
+      fileEl.addEventListener("change", () => {
+        const file = fileEl.files?.[0];
+        if (!file) return;
+        if (file.size > 4 * 1024 * 1024) {
+          alert(`Image is ${(file.size / 1024 / 1024).toFixed(1)} MB — please use one under 4 MB.`);
+          fileEl.value = "";
+          return;
+        }
+        pushToHistory(currentConfig);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          currentConfig[configKey] = e.target?.result as string;
+          updateUploadStatus(rowId, statusId, currentConfig[configKey], label);
+          liveUpdate();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    const clearEl = document.getElementById(clearId);
+    if (clearEl) {
+      clearEl.addEventListener("click", () => {
+        pushToHistory(currentConfig);
+        currentConfig[configKey] = "";
+        if (fileEl) fileEl.value = "";
+        updateUploadStatus(rowId, statusId, "", label);
+        liveUpdate();
+      });
+    }
+  };
+  wirePanelImage("tm_chatBgFile", "tm_chatBg_clear_btn", "tm_chatBg_status_row", "tm_chatBg_status", "Chat image", "chatBgImage");
+  wirePanelImage("tm_menuBgFile", "tm_menuBg_clear_btn", "tm_menuBg_status_row", "tm_menuBg_status", "Menu image", "menuBgImage");
+
+  // UI sound test buttons — fire the synth directly so users can audition.
+  const wireTest = (id: string, ev: "hover"|"click"|"error"|"notif") => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener("click", () => {
+      // Make sure the synth has a fresh config snapshot before testing.
+      uiSoundConfig = currentConfig;
+      playUiBeep(ev);
+    });
+  };
+  wireTest("tm_test_hover", "hover");
+  wireTest("tm_test_click", "click");
+  wireTest("tm_test_error", "error");
+  wireTest("tm_test_notif", "notif");
 
   // Background file upload
   const bgFile = document.getElementById("tm_bg_file") as HTMLInputElement | null;
