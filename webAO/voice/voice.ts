@@ -153,7 +153,7 @@ function b64decode(b64: string): Uint8Array {
 const WORKLET_CODE = `
 class CaptureProcessor extends AudioWorkletProcessor {
   constructor(opts) {
-    super();
+    super(opts);
     const o = (opts && opts.processorOptions) || {};
     this.frameSamples = o.frameSamples | 0 || 960;
     this.buf = new Float32Array(this.frameSamples);
@@ -183,7 +183,7 @@ class CaptureProcessor extends AudioWorkletProcessor {
 }
 class PlaybackProcessor extends AudioWorkletProcessor {
   constructor(opts) {
-    super();
+    super(opts);
     const o = (opts && opts.processorOptions) || {};
     this.targetQueue = o.targetQueueFrames | 0 || 3;
     this.queue = [];
@@ -235,28 +235,33 @@ registerProcessor('playback-processor', PlaybackProcessor);
 `;
 
 async function ensureAudioContext(): Promise<AudioContext> {
-  if (audioCtx && audioCtx.state !== "closed") {
-    if (audioCtx.state === "suspended") {
-      try {
-        await audioCtx.resume();
-      } catch (_e) {
-        // resume may fail if not user-gesture-driven; the caller of this path is
-      }
-    }
-    return audioCtx;
+  if (!audioCtx || audioCtx.state === "closed") {
+    const Ctor: typeof AudioContext =
+      (window as unknown as {
+        AudioContext?: typeof AudioContext;
+        webkitAudioContext?: typeof AudioContext;
+      }).AudioContext ||
+      (window as unknown as {
+        AudioContext?: typeof AudioContext;
+        webkitAudioContext?: typeof AudioContext;
+      }).webkitAudioContext!;
+    audioCtx = new Ctor({ sampleRate: caps.sampleRate });
+    // A freshly-created context needs a fresh worklet registration.
+    workletReady = false;
   }
-  const Ctor: typeof AudioContext =
-    (window as unknown as { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext })
-      .AudioContext ||
-    (window as unknown as { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext })
-      .webkitAudioContext!;
-  audioCtx = new Ctor({ sampleRate: caps.sampleRate });
+  // Worklet readiness is tied to the live AudioContext, not to "did we ever
+  // call addModule" — retry on every call until it actually succeeds, so a
+  // silent failure during the auto-join (non-gesture) path doesn't leave us
+  // with an unusable context after the user clicks.
   if (!workletReady) {
     const blob = new Blob([WORKLET_CODE], { type: "application/javascript" });
     const url = URL.createObjectURL(blob);
     try {
       await audioCtx.audioWorklet.addModule(url);
       workletReady = true;
+    } catch (e) {
+      console.error("voice: AudioWorklet addModule failed", e);
+      throw e;
     } finally {
       URL.revokeObjectURL(url);
     }
@@ -265,7 +270,7 @@ async function ensureAudioContext(): Promise<AudioContext> {
     try {
       await audioCtx.resume();
     } catch (_e) {
-      // ignore
+      // resume may fail if not user-gesture-driven; caller can detect via state
     }
   }
   return audioCtx;
@@ -303,19 +308,55 @@ function buildAudioConstraints(): MediaTrackConstraints {
 async function startCapture(): Promise<void> {
   if (!localStream) return;
   const ctx = await ensureAudioContext();
+  if (ctx.state !== "running") {
+    console.warn(
+      `voice: AudioContext is "${ctx.state}" after resume — audio may not flow until the user interacts again.`,
+    );
+  }
   const frameSamples = Math.max(1, Math.round((caps.sampleRate * caps.frameMs) / 1000));
 
-  captureSourceNode = ctx.createMediaStreamSource(localStream);
-  captureNode = new AudioWorkletNode(ctx, "capture-processor", {
-    numberOfInputs: 1,
-    numberOfOutputs: 1,
-    outputChannelCount: [1],
-    processorOptions: { frameSamples },
-  });
+  try {
+    captureSourceNode = ctx.createMediaStreamSource(localStream);
+  } catch (e) {
+    console.error("voice: createMediaStreamSource failed", e);
+    throw e;
+  }
+  try {
+    captureNode = new AudioWorkletNode(ctx, "capture-processor", {
+      numberOfInputs: 1,
+      numberOfOutputs: 1,
+      outputChannelCount: [1],
+      processorOptions: { frameSamples },
+    });
+  } catch (e) {
+    console.error(
+      "voice: AudioWorkletNode construction failed (worklet may not have loaded)",
+      e,
+    );
+    throw e;
+  }
   // Sink at zero gain — keeps the worklet ticking without monitoring the mic
   // through the local speakers (which would cause feedback).
   captureSink = ctx.createGain();
   captureSink.gain.value = 0;
+
+  const encoderConfig: AudioEncoderConfig = {
+    codec: caps.codec,
+    sampleRate: caps.sampleRate,
+    numberOfChannels: 1,
+    bitrate: 24000,
+  };
+  try {
+    const support = await AudioEncoder.isConfigSupported(encoderConfig);
+    if (!support.supported) {
+      throw new Error(
+        `AudioEncoder config not supported: codec=${caps.codec} sampleRate=${caps.sampleRate}`,
+      );
+    }
+  } catch (e) {
+    console.error("voice: encoder config check failed", e);
+    throw e;
+  }
 
   encoderTimestampUs = 0;
   encoder = new AudioEncoder({
@@ -334,12 +375,12 @@ async function startCapture(): Promise<void> {
       console.error("voice: encoder error", e);
     },
   });
-  encoder.configure({
-    codec: caps.codec,
-    sampleRate: caps.sampleRate,
-    numberOfChannels: 1,
-    bitrate: 24000,
-  });
+  try {
+    encoder.configure(encoderConfig);
+  } catch (e) {
+    console.error("voice: encoder.configure threw", e);
+    throw e;
+  }
 
   captureNode.port.onmessage = (ev: MessageEvent) => {
     if (!encoder || encoder.state !== "configured") return;
@@ -539,6 +580,14 @@ export async function joinVoice(): Promise<void> {
   }
 
   const wasListenOnly = listenOnly;
+  // Resume the AudioContext before getUserMedia so the resume() call lands
+  // within the same transient user-activation window as the click.
+  try {
+    await ensureAudioContext();
+  } catch (e) {
+    console.error("voice: ensureAudioContext failed", e);
+    throw e;
+  }
   let stream: MediaStream;
   try {
     stream = await navigator.mediaDevices.getUserMedia({
