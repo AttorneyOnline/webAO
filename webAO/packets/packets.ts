@@ -41,12 +41,12 @@ import { handleSP } from "./handlers/handleSP";
 import { handleJD } from "./handlers/handleJD";
 import { handlePU } from "./handlers/handlePU";
 import { handlePR } from "./handlers/handlePR";
-import { handleVC_CAPS } from "./handlers/handleVC_CAPS";
-import { handleVC_JOIN } from "./handlers/handleVC_JOIN";
-import { handleVC_LEAVE } from "./handlers/handleVC_LEAVE";
-import { handleVC_PEERS } from "./handlers/handleVC_PEERS";
-import { handleVC_SIG } from "./handlers/handleVC_SIG";
-import { handleVC_SPEAK } from "./handlers/handleVC_SPEAK";
+import { handleVS_CAPS } from "./handlers/handleVS_CAPS";
+import { handleVS_JOIN } from "./handlers/handleVS_JOIN";
+import { handleVS_LEAVE } from "./handlers/handleVS_LEAVE";
+import { handleVS_PEERS } from "./handlers/handleVS_PEERS";
+import { handleVS_SPEAK } from "./handlers/handleVS_SPEAK";
+import { handleVS_AUDIO } from "./handlers/handleVS_AUDIO";
 
 export const packets = {
   MS: handleMS,
@@ -92,12 +92,12 @@ export const packets = {
   JD: handleJD,
   PU: handlePU,
   PR: handlePR,
-  VC_CAPS: handleVC_CAPS,
-  VC_JOIN: handleVC_JOIN,
-  VC_LEAVE: handleVC_LEAVE,
-  VC_PEERS: handleVC_PEERS,
-  VC_SIG: handleVC_SIG,
-  VC_SPEAK: handleVC_SPEAK,
+  VS_CAPS: handleVS_CAPS,
+  VS_JOIN: handleVS_JOIN,
+  VS_LEAVE: handleVS_LEAVE,
+  VS_PEERS: handleVS_PEERS,
+  VS_SPEAK: handleVS_SPEAK,
+  VS_AUDIO: handleVS_AUDIO,
   decryptor: () => {},
   CHECK: () => {},
   CH: () => {},
