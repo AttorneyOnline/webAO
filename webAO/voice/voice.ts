@@ -1,49 +1,93 @@
+// Server-relayed voice transport.
+//
+// Every audio frame travels client → AO2 server → other clients over the
+// existing AO2 WebSocket. There is no WebRTC, no STUN/TURN/ICE, no SDP.
+// Peers never connect to each other, so their IPs cannot leak via packet
+// capture — this is a structural privacy property of the transport.
+//
+// Wire protocol (`#` separator, `%` terminator; base64 needs no escaping):
+//
+//   Server → client
+//     VS_CAPS#<enabled>#<ptt_only>#<max_peers>#<codec>#<sample_rate>#<frame_ms>#<max_frame_bytes>#%
+//     VS_PEERS#<csv_uids>#%
+//     VS_JOIN#<uid>#%
+//     VS_LEAVE#<uid>#%
+//     VS_SPEAK#<uid>#<on_off>#%
+//     VS_AUDIO#<from_uid>#<b64_opus>#%
+//
+//   Client → server
+//     VS_JOIN#%
+//     VS_LEAVE#%
+//     VS_FRAME#<b64_opus>#%
+//     VS_SPEAK#<on_off>#%
+
 import { client } from "../client";
 import { sender } from "../client/sender";
-
-interface IceServerEntry {
-  urls: string | string[];
-  username?: string;
-  credential?: string;
-}
 
 interface VoiceCaps {
   enabled: boolean;
   pttOnly: boolean;
   maxPeers: number;
-  iceServers: IceServerEntry[];
-  forceRelay: boolean;
-}
-
-interface SignalMessage {
-  kind: "offer" | "answer" | "ice";
-  data: any;
+  codec: string;
+  sampleRate: number;
+  frameMs: number;
+  maxFrameBytes: number;
 }
 
 let caps: VoiceCaps = {
   enabled: false,
   pttOnly: true,
   maxPeers: 0,
-  iceServers: [],
-  forceRelay: true,
+  codec: "opus",
+  sampleRate: 48000,
+  frameMs: 20,
+  maxFrameBytes: 4096,
 };
 
+let audioCtx: AudioContext | null = null;
+let workletReady = false;
 let localStream: MediaStream | null = null;
-let inVoice = false;
-let listenOnly = false;
-let vcMuted = false;
-let pttActive = false;
-let localOpenMic = false;
-let currentDeviceId: string | null = null;
-let outputVolume = 1;
+let captureSourceNode: MediaStreamAudioSourceNode | null = null;
+let captureNode: AudioWorkletNode | null = null;
+let captureSink: GainNode | null = null;
+let encoder: AudioEncoder | null = null;
+let encoderTimestampUs = 0;
 
-const peers = new Map<number, RTCPeerConnection>();
-const remoteAudio = new Map<number, HTMLAudioElement>();
+interface RemotePeer {
+  decoder: AudioDecoder;
+  playbackNode: AudioWorkletNode;
+  gain: GainNode;
+}
+
+const remotePeers = new Map<number, RemotePeer>();
 const speakingPeers = new Map<number, string>();
 const speakingListeners: Array<() => void> = [];
 const capsListeners: Array<() => void> = [];
-const restartTimers = new Map<number, ReturnType<typeof setTimeout>>();
-const DISCONNECT_RESTART_DELAY_MS = 4000;
+
+let inVoice = false;
+let listenOnly = false;
+let pttActive = false;
+let localOpenMic = false;
+let lastEmittedSpeak = false;
+let vcMuted = false;
+let outputVolume = 1;
+let currentDeviceId: string | null = null;
+
+function webCodecsSupported(): boolean {
+  if (typeof globalThis === "undefined") return false;
+  const g = globalThis as unknown as {
+    AudioEncoder?: unknown;
+    AudioDecoder?: unknown;
+    AudioData?: unknown;
+    EncodedAudioChunk?: unknown;
+  };
+  return (
+    typeof g.AudioEncoder === "function" &&
+    typeof g.AudioDecoder === "function" &&
+    typeof g.AudioData === "function" &&
+    typeof g.EncodedAudioChunk === "function"
+  );
+}
 
 function notifyCapsUpdated() {
   for (let i = 0; i < capsListeners.length; i++) {
@@ -80,160 +124,172 @@ function notifySpeakingListeners() {
   }
 }
 
-function encodeSignal(msg: SignalMessage): string {
-  return btoa(unescape(encodeURIComponent(JSON.stringify(msg))));
-}
-
-function decodeSignal(b64: string): SignalMessage | null {
-  try {
-    return JSON.parse(decodeURIComponent(escape(atob(b64))));
-  } catch (e) {
-    console.warn("Failed to decode voice signalling blob", e);
-    return null;
+function b64encode(bytes: Uint8Array): string {
+  let s = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    s += String.fromCharCode.apply(
+      null,
+      bytes.subarray(i, Math.min(i + chunk, bytes.length)) as unknown as number[],
+    );
   }
+  return btoa(s);
 }
 
-function sendSignal(toUid: number, msg: SignalMessage) {
-  sender.sendServer(`VC_SIG#${toUid}#${encodeSignal(msg)}#%`);
+function b64decode(b64: string): Uint8Array {
+  const s = atob(b64);
+  const out = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) out[i] = s.charCodeAt(i);
+  return out;
 }
 
-function attachRemoteTrack(uid: number, stream: MediaStream) {
-  let audio = remoteAudio.get(uid);
-  if (!audio) {
-    audio = document.createElement("audio");
-    audio.autoplay = true;
-    audio.setAttribute("playsinline", "true");
-    audio.style.display = "none";
-    document.body.appendChild(audio);
-    remoteAudio.set(uid, audio);
+// Two worklet processors, registered once per AudioContext:
+//   capture-processor  — chunks the mic stream into fixed-size frames and
+//                        posts each frame to the main thread.
+//   playback-processor — pulls decoded PCM frames from a queue fed by the
+//                        main thread; primes with a few frames of buffer
+//                        to absorb network jitter, drops back to silence
+//                        and re-primes on underrun.
+const WORKLET_CODE = `
+class CaptureProcessor extends AudioWorkletProcessor {
+  constructor(opts) {
+    super();
+    const o = (opts && opts.processorOptions) || {};
+    this.frameSamples = o.frameSamples | 0 || 960;
+    this.buf = new Float32Array(this.frameSamples);
+    this.pos = 0;
   }
-  audio.srcObject = stream;
-  audio.volume = vcMuted ? 0 : outputVolume;
-  const playPromise = audio.play();
-  if (playPromise && typeof (playPromise as any).catch === "function") {
-    (playPromise as Promise<void>).catch(() => {
-      // autoplay may be blocked until user gesture; ignore
-    });
-  }
-}
-
-function detachRemoteTrack(uid: number) {
-  const audio = remoteAudio.get(uid);
-  if (audio) {
-    audio.srcObject = null;
-    if (audio.parentNode) audio.parentNode.removeChild(audio);
-    remoteAudio.delete(uid);
-  }
-}
-
-function buildPeerConnection(remoteUid: number): RTCPeerConnection {
-  const pc = new RTCPeerConnection({
-    iceServers: caps.iceServers as RTCIceServer[],
-    iceTransportPolicy: caps.forceRelay ? "relay" : "all",
-  });
-
-  pc.onicecandidate = (ev) => {
-    if (ev.candidate) {
-      sendSignal(remoteUid, { kind: "ice", data: ev.candidate.toJSON() });
+  process(inputs, outputs) {
+    const out = outputs[0];
+    if (out && out[0]) out[0].fill(0);
+    const input = inputs[0];
+    if (!input || !input[0]) return true;
+    const ch = input[0];
+    let i = 0;
+    while (i < ch.length) {
+      const space = this.frameSamples - this.pos;
+      const copy = Math.min(space, ch.length - i);
+      this.buf.set(ch.subarray(i, i + copy), this.pos);
+      this.pos += copy;
+      i += copy;
+      if (this.pos === this.frameSamples) {
+        const frame = this.buf.slice(0);
+        this.port.postMessage(frame, [frame.buffer]);
+        this.pos = 0;
+      }
     }
-  };
-
-  pc.ontrack = (ev) => {
-    const stream = ev.streams && ev.streams[0] ? ev.streams[0] : new MediaStream([ev.track]);
-    attachRemoteTrack(remoteUid, stream);
-  };
-
-  pc.onconnectionstatechange = () => {
-    const state = pc.connectionState;
-    if (state === "connected") {
-      clearRestartTimer(remoteUid);
-      return;
-    }
-    if (state === "closed") {
-      clearRestartTimer(remoteUid);
-      return;
-    }
-    if (state === "disconnected") {
-      // Transient drop — give it a few seconds to recover before forcing a restart.
-      scheduleIceRestart(remoteUid, DISCONNECT_RESTART_DELAY_MS);
-      return;
-    }
-    if (state === "failed") {
-      clearRestartTimer(remoteUid);
-      void attemptIceRestart(remoteUid);
-    }
-  };
-
-  if (localStream) {
-    const tracks = localStream.getAudioTracks();
-    for (let i = 0; i < tracks.length; i++) {
-      pc.addTrack(tracks[i], localStream);
-    }
-  }
-
-  peers.set(remoteUid, pc);
-  return pc;
-}
-
-function getOrCreatePeer(remoteUid: number): RTCPeerConnection {
-  const existing = peers.get(remoteUid);
-  if (existing) return existing;
-  return buildPeerConnection(remoteUid);
-}
-
-function clearRestartTimer(remoteUid: number): void {
-  const timer = restartTimers.get(remoteUid);
-  if (timer) {
-    clearTimeout(timer);
-    restartTimers.delete(remoteUid);
+    return true;
   }
 }
-
-function scheduleIceRestart(remoteUid: number, delayMs: number): void {
-  if (restartTimers.has(remoteUid)) return;
-  const timer = setTimeout(() => {
-    restartTimers.delete(remoteUid);
-    const pc = peers.get(remoteUid);
-    if (!pc) return;
-    const state = pc.connectionState;
-    if (state === "disconnected" || state === "failed") {
-      void attemptIceRestart(remoteUid);
+class PlaybackProcessor extends AudioWorkletProcessor {
+  constructor(opts) {
+    super();
+    const o = (opts && opts.processorOptions) || {};
+    this.targetQueue = o.targetQueueFrames | 0 || 3;
+    this.queue = [];
+    this.cur = null;
+    this.curPos = 0;
+    this.primed = false;
+    this.port.onmessage = (e) => {
+      if (e.data === "reset") {
+        this.queue = []; this.cur = null; this.curPos = 0; this.primed = false;
+        return;
+      }
+      this.queue.push(e.data);
+    };
+  }
+  process(_inputs, outputs) {
+    const out = outputs[0][0];
+    if (!out) return true;
+    if (!this.primed) {
+      if (this.queue.length < this.targetQueue) {
+        out.fill(0);
+        return true;
+      }
+      this.primed = true;
     }
-  }, delayMs);
-  restartTimers.set(remoteUid, timer);
-}
-
-async function attemptIceRestart(remoteUid: number): Promise<void> {
-  if (!inVoice) return;
-  const pc = peers.get(remoteUid);
-  if (!pc) return;
-  if (pc.connectionState === "closed") return;
-  // Only one side initiates the restart to avoid glare. The "impolite" peer
-  // (higher UID) leads, mirroring the polite-peer convention used elsewhere
-  // for SDP collisions.
-  if (client.playerID <= remoteUid) return;
-  if (pc.signalingState !== "stable") return;
-  try {
-    const offer = await pc.createOffer({ iceRestart: true });
-    await pc.setLocalDescription(offer);
-    sendSignal(remoteUid, { kind: "offer", data: offer });
-    console.debug(`voice: ICE restart initiated for peer ${remoteUid}`);
-  } catch (e) {
-    console.error(`ICE restart failed for ${remoteUid}`, e);
+    let outPos = 0;
+    while (outPos < out.length) {
+      if (!this.cur) {
+        if (this.queue.length === 0) {
+          for (; outPos < out.length; outPos++) out[outPos] = 0;
+          this.primed = false;
+          break;
+        }
+        this.cur = this.queue.shift();
+        this.curPos = 0;
+      }
+      const remaining = this.cur.length - this.curPos;
+      const space = out.length - outPos;
+      const copy = Math.min(remaining, space);
+      out.set(this.cur.subarray(this.curPos, this.curPos + copy), outPos);
+      this.curPos += copy;
+      outPos += copy;
+      if (this.curPos >= this.cur.length) this.cur = null;
+    }
+    return true;
   }
 }
+registerProcessor('capture-processor', CaptureProcessor);
+registerProcessor('playback-processor', PlaybackProcessor);
+`;
 
-function applyPTTToTracks() {
-  if (!localStream) return;
-  const enable = localOpenMic || (caps.pttOnly ? pttActive : true);
-  const tracks = localStream.getAudioTracks();
-  for (let i = 0; i < tracks.length; i++) {
-    tracks[i].enabled = enable;
+async function ensureAudioContext(): Promise<AudioContext> {
+  if (audioCtx && audioCtx.state !== "closed") {
+    if (audioCtx.state === "suspended") {
+      try {
+        await audioCtx.resume();
+      } catch (_e) {
+        // resume may fail if not user-gesture-driven; the caller of this path is
+      }
+    }
+    return audioCtx;
   }
+  const Ctor: typeof AudioContext =
+    (window as unknown as { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext })
+      .AudioContext ||
+    (window as unknown as { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext!;
+  audioCtx = new Ctor({ sampleRate: caps.sampleRate });
+  if (!workletReady) {
+    const blob = new Blob([WORKLET_CODE], { type: "application/javascript" });
+    const url = URL.createObjectURL(blob);
+    try {
+      await audioCtx.audioWorklet.addModule(url);
+      workletReady = true;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+  if (audioCtx.state === "suspended") {
+    try {
+      await audioCtx.resume();
+    } catch (_e) {
+      // ignore
+    }
+  }
+  return audioCtx;
+}
+
+function isLocalTransmitting(): boolean {
+  if (!inVoice || listenOnly) return false;
+  return localOpenMic || (caps.pttOnly ? pttActive : true);
+}
+
+function syncSpeakState(): void {
+  const want = isLocalTransmitting();
+  if (want === lastEmittedSpeak) return;
+  lastEmittedSpeak = want;
+  if (inVoice) {
+    sender.sendServer(`VS_SPEAK#${want ? 1 : 0}#%`);
+  }
+  notifySpeakingListeners();
 }
 
 function buildAudioConstraints(): MediaTrackConstraints {
   const constraints: MediaTrackConstraints = {
+    sampleRate: caps.sampleRate,
+    channelCount: 1,
     echoCancellation: true,
     noiseSuppression: true,
     autoGainControl: true,
@@ -244,147 +300,195 @@ function buildAudioConstraints(): MediaTrackConstraints {
   return constraints;
 }
 
-async function ensureLocalStream(): Promise<MediaStream> {
-  if (localStream) return localStream;
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: buildAudioConstraints(),
-  });
-  localStream = stream;
-  applyPTTToTracks();
-  return stream;
-}
-
-export async function setInputDevice(deviceId: string): Promise<void> {
-  const normalized = deviceId || null;
-  if (normalized === currentDeviceId) return;
-  currentDeviceId = normalized;
+async function startCapture(): Promise<void> {
   if (!localStream) return;
-  let newStream: MediaStream;
-  try {
-    newStream = await navigator.mediaDevices.getUserMedia({
-      audio: buildAudioConstraints(),
-    });
-  } catch (e) {
-    console.error("Failed to switch microphone", e);
-    throw e;
-  }
-  const newTrack = newStream.getAudioTracks()[0];
-  if (!newTrack) return;
-  peers.forEach((pc) => {
-    const senders = pc.getSenders();
-    for (let i = 0; i < senders.length; i++) {
-      const s = senders[i];
-      if (s.track && s.track.kind === "audio") {
-        s.replaceTrack(newTrack).catch((err) =>
-          console.warn("replaceTrack failed", err),
-        );
+  const ctx = await ensureAudioContext();
+  const frameSamples = Math.max(1, Math.round((caps.sampleRate * caps.frameMs) / 1000));
+
+  captureSourceNode = ctx.createMediaStreamSource(localStream);
+  captureNode = new AudioWorkletNode(ctx, "capture-processor", {
+    numberOfInputs: 1,
+    numberOfOutputs: 1,
+    outputChannelCount: [1],
+    processorOptions: { frameSamples },
+  });
+  // Sink at zero gain — keeps the worklet ticking without monitoring the mic
+  // through the local speakers (which would cause feedback).
+  captureSink = ctx.createGain();
+  captureSink.gain.value = 0;
+
+  encoderTimestampUs = 0;
+  encoder = new AudioEncoder({
+    output: (chunk: EncodedAudioChunk) => {
+      if (!isLocalTransmitting()) return;
+      const buf = new Uint8Array(chunk.byteLength);
+      chunk.copyTo(buf);
+      const b64 = b64encode(buf);
+      if (caps.maxFrameBytes > 0 && b64.length > caps.maxFrameBytes) {
+        // Server would drop oversize frames anyway
+        return;
       }
-    }
+      sender.sendServer(`VS_FRAME#${b64}#%`);
+    },
+    error: (e: DOMException) => {
+      console.error("voice: encoder error", e);
+    },
   });
-  const oldTracks = localStream.getTracks();
-  for (let i = 0; i < oldTracks.length; i++) {
-    try {
-      oldTracks[i].stop();
-    } catch (_) {
-      // ignore
-    }
-  }
-  localStream = newStream;
-  applyPTTToTracks();
-}
+  encoder.configure({
+    codec: caps.codec,
+    sampleRate: caps.sampleRate,
+    numberOfChannels: 1,
+    bitrate: 24000,
+  });
 
-export function getInputDeviceId(): string | null {
-  return currentDeviceId;
-}
-
-export function setOutputVolume(volume: number): void {
-  const clamped = Math.max(0, Math.min(1, volume));
-  outputVolume = clamped;
-  if (!vcMuted) {
-    remoteAudio.forEach((audio) => {
-      audio.volume = clamped;
+  captureNode.port.onmessage = (ev: MessageEvent) => {
+    if (!encoder || encoder.state !== "configured") return;
+    if (!isLocalTransmitting()) return;
+    const pcm = ev.data as Float32Array;
+    const data = new AudioData({
+      format: "f32-planar",
+      sampleRate: caps.sampleRate,
+      numberOfFrames: pcm.length,
+      numberOfChannels: 1,
+      timestamp: encoderTimestampUs,
+      // Float32Array's generic ArrayBufferLike doesn't satisfy BufferSource in
+      // TS 5.9's stricter lib.dom; the runtime accepts it.
+      data: pcm as unknown as BufferSource,
     });
-  }
-}
-
-export function isVCMuted(): boolean {
-  return vcMuted;
-}
-
-export function setVCMuted(muted: boolean): void {
-  vcMuted = muted;
-  const vol = muted ? 0 : outputVolume;
-  remoteAudio.forEach((audio) => {
-    audio.volume = vol;
-  });
-}
-
-export function getOutputVolume(): number {
-  return outputVolume;
-}
-
-function teardownPeer(uid: number) {
-  clearRestartTimer(uid);
-  const pc = peers.get(uid);
-  if (pc) {
+    encoderTimestampUs += Math.round((pcm.length / caps.sampleRate) * 1_000_000);
     try {
-      pc.close();
-    } catch (_e) {
-      // ignore
+      encoder.encode(data);
+    } finally {
+      data.close();
     }
-    peers.delete(uid);
-  }
-  detachRemoteTrack(uid);
-  if (speakingPeers.delete(uid)) {
-    notifySpeakingListeners();
-  }
+  };
+
+  captureSourceNode.connect(captureNode);
+  captureNode.connect(captureSink);
+  captureSink.connect(ctx.destination);
 }
 
-function teardownAll() {
-  const uids: number[] = [];
-  peers.forEach((_pc, uid) => uids.push(uid));
-  for (let i = 0; i < uids.length; i++) {
-    teardownPeer(uids[i]);
+function stopCapture(): void {
+  if (captureSourceNode) {
+    try { captureSourceNode.disconnect(); } catch (_e) { /* ignore */ }
+    captureSourceNode = null;
+  }
+  if (captureNode) {
+    try { captureNode.port.onmessage = null; } catch (_e) { /* ignore */ }
+    try { captureNode.disconnect(); } catch (_e) { /* ignore */ }
+    captureNode = null;
+  }
+  if (captureSink) {
+    try { captureSink.disconnect(); } catch (_e) { /* ignore */ }
+    captureSink = null;
+  }
+  if (encoder) {
+    try { encoder.close(); } catch (_e) { /* ignore */ }
+    encoder = null;
   }
   if (localStream) {
     const tracks = localStream.getTracks();
     for (let i = 0; i < tracks.length; i++) {
-      try {
-        tracks[i].stop();
-      } catch (_e) {
-        // ignore
-      }
+      try { tracks[i].stop(); } catch (_e) { /* ignore */ }
     }
     localStream = null;
   }
+}
+
+async function createRemotePeer(uid: number): Promise<RemotePeer | null> {
+  if (!webCodecsSupported()) return null;
+  const ctx = await ensureAudioContext();
+  const playbackNode = new AudioWorkletNode(ctx, "playback-processor", {
+    numberOfInputs: 0,
+    numberOfOutputs: 1,
+    outputChannelCount: [1],
+    processorOptions: { targetQueueFrames: 3 },
+  });
+  const gain = ctx.createGain();
+  gain.gain.value = vcMuted ? 0 : outputVolume;
+  playbackNode.connect(gain).connect(ctx.destination);
+
+  const decoder = new AudioDecoder({
+    output: (audioData: AudioData) => {
+      const samples = audioData.numberOfFrames;
+      const pcm = new Float32Array(samples);
+      try {
+        audioData.copyTo(pcm, { planeIndex: 0, format: "f32-planar" });
+      } catch (_e) {
+        try {
+          audioData.copyTo(pcm, { planeIndex: 0 });
+        } catch (e) {
+          console.warn("voice: decoder copyTo failed", e);
+        }
+      }
+      audioData.close();
+      playbackNode.port.postMessage(pcm, [pcm.buffer]);
+    },
+    error: (e: DOMException) => {
+      console.error(`voice: decoder error for peer ${uid}`, e);
+    },
+  });
+  decoder.configure({
+    codec: caps.codec,
+    sampleRate: caps.sampleRate,
+    numberOfChannels: 1,
+  });
+
+  const peer: RemotePeer = { decoder, playbackNode, gain };
+  remotePeers.set(uid, peer);
+  return peer;
+}
+
+function teardownPeer(uid: number): void {
+  const peer = remotePeers.get(uid);
+  if (!peer) return;
+  try {
+    if (peer.decoder.state !== "closed") peer.decoder.close();
+  } catch (_e) { /* ignore */ }
+  try { peer.playbackNode.port.postMessage("reset"); } catch (_e) { /* ignore */ }
+  try { peer.playbackNode.disconnect(); } catch (_e) { /* ignore */ }
+  try { peer.gain.disconnect(); } catch (_e) { /* ignore */ }
+  remotePeers.delete(uid);
+  if (speakingPeers.delete(uid)) notifySpeakingListeners();
+}
+
+function teardownAllPeers(): void {
+  const uids: number[] = [];
+  remotePeers.forEach((_p, uid) => uids.push(uid));
+  for (let i = 0; i < uids.length; i++) teardownPeer(uids[i]);
+}
+
+function teardownAll(): void {
+  stopCapture();
+  teardownAllPeers();
   inVoice = false;
   listenOnly = false;
   pttActive = false;
-  if (speakingPeers.size > 0) {
-    speakingPeers.clear();
-    notifySpeakingListeners();
-  }
+  lastEmittedSpeak = false;
+  speakingPeers.clear();
+  notifySpeakingListeners();
 }
 
 export function applyVoiceCaps(
   enabled: boolean,
   pttOnly: boolean,
   maxPeers: number,
-  iceJson: string,
-  forceRelay = true,
-) {
-  let iceServers: IceServerEntry[] = [];
-  if (iceJson) {
-    try {
-      const parsed = JSON.parse(iceJson);
-      if (Array.isArray(parsed)) iceServers = parsed;
-    } catch (e) {
-      console.warn("Failed to parse VC_CAPS ice_json", e);
-    }
-  }
-  caps = { enabled, pttOnly, maxPeers, iceServers, forceRelay };
+  codec: string,
+  sampleRate: number,
+  frameMs: number,
+  maxFrameBytes: number,
+): void {
+  caps = {
+    enabled,
+    pttOnly,
+    maxPeers,
+    codec: codec || "opus",
+    sampleRate: sampleRate || 48000,
+    frameMs: frameMs || 20,
+    maxFrameBytes: maxFrameBytes || 0,
+  };
   console.debug(
-    `voice: caps applied enabled=${enabled} ptt=${pttOnly} maxPeers=${maxPeers} ice=${iceServers.length} relay=${forceRelay}`,
+    `voice: caps applied enabled=${enabled} ptt=${pttOnly} maxPeers=${maxPeers} codec=${caps.codec} sr=${caps.sampleRate} frame=${caps.frameMs}ms maxBytes=${caps.maxFrameBytes}`,
   );
   if (!enabled && inVoice) {
     teardownAll();
@@ -404,41 +508,69 @@ export function isInVoice(): boolean {
   return inVoice;
 }
 
-export async function joinVoiceListenOnly(): Promise<void> {
-  if (!caps.enabled || inVoice) return;
-  inVoice = true;
-  listenOnly = true;
-  sender.sendServer(`VC_JOIN#${client.playerID}#%`);
-}
-
 export function isListenOnly(): boolean {
   return listenOnly;
+}
+
+export async function joinVoiceListenOnly(): Promise<void> {
+  if (!caps.enabled || inVoice) return;
+  if (!webCodecsSupported()) {
+    alert("Your browser does not support voice chat.");
+    return;
+  }
+  try {
+    await ensureAudioContext();
+  } catch (e) {
+    console.error("voice: failed to create AudioContext", e);
+    return;
+  }
+  inVoice = true;
+  listenOnly = true;
+  sender.sendServer(`VS_JOIN#%`);
+  syncSpeakState();
 }
 
 export async function joinVoice(): Promise<void> {
   if (!caps.enabled) return;
   if (inVoice && !listenOnly) return;
-
-  if (listenOnly) {
-    // Leave listen-only first so we can rejoin with mic
-    sender.sendServer(`VC_LEAVE#${client.playerID}#%`);
-    teardownAll();
+  if (!webCodecsSupported()) {
+    alert("Your browser does not support voice chat.");
+    return;
   }
 
+  const wasListenOnly = listenOnly;
+  let stream: MediaStream;
   try {
-    await ensureLocalStream();
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: buildAudioConstraints(),
+    });
   } catch (e) {
     console.error("Microphone permission denied or unavailable", e);
     throw e;
   }
-  inVoice = true;
+  localStream = stream;
+  try {
+    await startCapture();
+  } catch (e) {
+    console.error("voice: failed to start capture", e);
+    stopCapture();
+    throw e;
+  }
+  if (!wasListenOnly) {
+    inVoice = true;
+    sender.sendServer(`VS_JOIN#%`);
+  }
   listenOnly = false;
-  sender.sendServer(`VC_JOIN#${client.playerID}#%`);
+  syncSpeakState();
 }
 
 export function leaveVoice(): void {
   if (!inVoice) return;
-  sender.sendServer(`VC_LEAVE#${client.playerID}#%`);
+  if (lastEmittedSpeak) {
+    lastEmittedSpeak = false;
+    sender.sendServer(`VS_SPEAK#0#%`);
+  }
+  sender.sendServer(`VS_LEAVE#%`);
   teardownAll();
   notifyCapsUpdated();
 }
@@ -447,26 +579,24 @@ export function setPTT(active: boolean): void {
   if (!inVoice) return;
   if (pttActive === active) return;
   pttActive = active;
-  applyPTTToTracks();
-  sender.sendServer(`VC_SPEAK#${client.playerID}#${active ? 1 : 0}#%`);
-  notifySpeakingListeners();
+  syncSpeakState();
+}
+
+export function isLocalOpenMic(): boolean {
+  return localOpenMic;
+}
+
+export function setLocalOpenMic(enabled: boolean): void {
+  if (localOpenMic === enabled) return;
+  localOpenMic = enabled;
+  syncSpeakState();
 }
 
 export async function handlePeerJoined(uid: number): Promise<void> {
   if (!inVoice || uid === client.playerID) return;
-  const pc = getOrCreatePeer(uid);
-  // Always initiate an offer to the new joiner. This is necessary because the
-  // new joiner's handleInitialPeers may have skipped us due to their maxPeers
-  // cap, leaving no one to initiate SDP negotiation. Glare (both sides offering
-  // simultaneously) is resolved in handleRemoteSignal via perfect negotiation.
-  if (pc.signalingState !== "stable" || pc.connectionState === "connected") return;
-  try {
-    const offer = await pc.createOffer({ offerToReceiveAudio: true });
-    await pc.setLocalDescription(offer);
-    sendSignal(uid, { kind: "offer", data: offer });
-  } catch (e) {
-    console.error(`Failed to create offer for new peer ${uid}`, e);
-  }
+  if (caps.maxPeers > 0 && remotePeers.size >= caps.maxPeers) return;
+  if (remotePeers.has(uid)) return;
+  await createRemotePeer(uid);
 }
 
 export function handlePeerLeft(uid: number): void {
@@ -478,49 +608,47 @@ export async function handleInitialPeers(uids: number[]): Promise<void> {
   for (let i = 0; i < uids.length; i++) {
     const uid = uids[i];
     if (uid === client.playerID) continue;
-    if (caps.maxPeers > 0 && peers.size >= caps.maxPeers) break;
-    const pc = getOrCreatePeer(uid);
-    try {
-      const offer = await pc.createOffer({ offerToReceiveAudio: true });
-      await pc.setLocalDescription(offer);
-      sendSignal(uid, { kind: "offer", data: offer });
-    } catch (e) {
-      console.error(`Failed to create offer for peer ${uid}`, e);
-    }
+    if (caps.maxPeers > 0 && remotePeers.size >= caps.maxPeers) break;
+    if (remotePeers.has(uid)) continue;
+    await createRemotePeer(uid);
   }
 }
 
-export async function handleRemoteSignal(fromUid: number, b64: string): Promise<void> {
+export function handleRemoteAudio(fromUid: number, b64: string): void {
   if (!inVoice) return;
-  const msg = decodeSignal(b64);
-  if (!msg) return;
-  const pc = getOrCreatePeer(fromUid);
+  // Defensive: server should never echo our own audio back, but if it does, drop.
+  if (fromUid === client.playerID) return;
+  let peer = remotePeers.get(fromUid);
+  if (!peer) {
+    // Frame arrived before VS_JOIN — create the peer on demand.
+    if (caps.maxPeers > 0 && remotePeers.size >= caps.maxPeers) return;
+    void createRemotePeer(fromUid).then((p) => {
+      if (p) feedDecoder(p, b64);
+    });
+    return;
+  }
+  feedDecoder(peer, b64);
+}
+
+function feedDecoder(peer: RemotePeer, b64: string): void {
+  let bytes: Uint8Array;
   try {
-    if (msg.kind === "offer") {
-      // Perfect negotiation: resolve glare (both sides offered simultaneously)
-      // by using UID as a tiebreaker. The peer with the lower UID is "polite"
-      // and yields by rolling back its local offer; the higher-UID peer ignores
-      // the incoming offer and waits for the other side's answer.
-      if (pc.signalingState === "have-local-offer") {
-        const isPolite = client.playerID < fromUid;
-        if (!isPolite) return;
-        await pc.setLocalDescription({ type: "rollback" } as RTCSessionDescriptionInit);
-      }
-      await pc.setRemoteDescription(msg.data);
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-      sendSignal(fromUid, { kind: "answer", data: answer });
-    } else if (msg.kind === "answer") {
-      await pc.setRemoteDescription(msg.data);
-    } else if (msg.kind === "ice") {
-      try {
-        await pc.addIceCandidate(msg.data);
-      } catch (e) {
-        console.warn("Failed to add ICE candidate", e);
-      }
-    }
+    bytes = b64decode(b64);
   } catch (e) {
-    console.error(`Failed to process ${msg.kind} from ${fromUid}`, e);
+    console.warn("voice: failed to base64-decode incoming frame", e);
+    return;
+  }
+  if (bytes.byteLength === 0) return;
+  if (peer.decoder.state !== "configured") return;
+  try {
+    const chunk = new EncodedAudioChunk({
+      type: "key",
+      timestamp: 0,
+      data: bytes,
+    });
+    peer.decoder.decode(chunk);
+  } catch (e) {
+    console.warn("voice: decode failed", e);
   }
 }
 
@@ -557,26 +685,11 @@ export function getSpeakingUids(): number[] {
 }
 
 export function isLocalSpeaking(): boolean {
-  if (!inVoice) return false;
-  return localOpenMic || (caps.pttOnly ? pttActive : true);
+  return isLocalTransmitting();
 }
 
 export function getLocalPlayerID(): number {
   return client ? client.playerID : -1;
-}
-
-export function isLocalOpenMic(): boolean {
-  return localOpenMic;
-}
-
-export function setLocalOpenMic(enabled: boolean): void {
-  if (localOpenMic === enabled) return;
-  localOpenMic = enabled;
-  applyPTTToTracks();
-  if (inVoice) {
-    sender.sendServer(`VC_SPEAK#${client.playerID}#${enabled ? 1 : 0}#%`);
-    notifySpeakingListeners();
-  }
 }
 
 function resolveDisplayName(uid: number): string {
@@ -593,124 +706,52 @@ export function getSpeakerDisplayName(uid: number): string {
   return resolveDisplayName(uid);
 }
 
-export interface IceServerCheckResult {
-  url: string;
-  ok: boolean;
-  error?: string;
-}
-
-export interface VoiceConfigReport {
-  voiceEnabled: boolean;
-  pttOnly: boolean;
-  maxPeers: number;
-  forceRelay: boolean;
-  iceServers: IceServerCheckResult[];
-  webrtcSupported: boolean;
-  getUserMediaSupported: boolean;
-}
-
-export async function checkVoiceConfig(timeoutMs = 5000): Promise<VoiceConfigReport> {
-  const webrtcSupported = typeof RTCPeerConnection !== "undefined";
-  const getUserMediaSupported =
-    typeof navigator !== "undefined" &&
-    typeof navigator.mediaDevices !== "undefined" &&
-    typeof navigator.mediaDevices.getUserMedia === "function";
-
-  const iceResults: IceServerCheckResult[] = [];
-
-  for (const server of caps.iceServers) {
-    const urls = Array.isArray(server.urls) ? server.urls : [server.urls];
-    for (const url of urls) {
-      const result = await probeIceServer({ urls: url, username: server.username, credential: server.credential }, timeoutMs);
-      iceResults.push(result);
-    }
+export async function setInputDevice(deviceId: string): Promise<void> {
+  const normalized = deviceId || null;
+  if (normalized === currentDeviceId) return;
+  currentDeviceId = normalized;
+  if (!localStream) return;
+  // Rebuild the capture pipeline on the new device.
+  let newStream: MediaStream;
+  try {
+    newStream = await navigator.mediaDevices.getUserMedia({
+      audio: buildAudioConstraints(),
+    });
+  } catch (e) {
+    console.error("Failed to switch microphone", e);
+    throw e;
   }
-
-  const report: VoiceConfigReport = {
-    voiceEnabled: caps.enabled,
-    pttOnly: caps.pttOnly,
-    maxPeers: caps.maxPeers,
-    forceRelay: caps.forceRelay,
-    iceServers: iceResults,
-    webrtcSupported,
-    getUserMediaSupported,
-  };
-
-  console.group("[webAO] Voice config check");
-  console.log("Voice enabled:", report.voiceEnabled);
-  console.log("PTT only:", report.pttOnly);
-  console.log("Max peers:", report.maxPeers);
-  console.log("Force relay (IP leak prevention):", report.forceRelay);
-  console.log("WebRTC supported:", report.webrtcSupported);
-  console.log("getUserMedia supported:", report.getUserMediaSupported);
-  if (iceResults.length === 0) {
-    console.warn("No ICE servers configured.");
-  } else {
-    for (const r of iceResults) {
-      if (r.ok) {
-        console.log(`  [OK]   ${r.url}`);
-      } else {
-        console.warn(`  [FAIL] ${r.url} — ${r.error}`);
-      }
-    }
-  }
-  console.groupEnd();
-
-  return report;
+  stopCapture();
+  localStream = newStream;
+  await startCapture();
 }
 
-async function probeIceServer(
-  server: RTCIceServer,
-  timeoutMs: number,
-): Promise<IceServerCheckResult> {
-  const url = Array.isArray(server.urls) ? server.urls[0] : server.urls;
-  return new Promise((resolve) => {
-    let done = false;
-    let pc: RTCPeerConnection | null = null;
-    const finish = (ok: boolean, error?: string) => {
-      if (done) return;
-      done = true;
-      try { pc?.close(); } catch (_) { /* ignore */ }
-      resolve({ url, ok, error });
-    };
+export function getInputDeviceId(): string | null {
+  return currentDeviceId;
+}
 
-    const timer = setTimeout(() => finish(false, "timeout"), timeoutMs);
+export function setOutputVolume(volume: number): void {
+  const clamped = Math.max(0, Math.min(1, volume));
+  outputVolume = clamped;
+  if (!vcMuted) {
+    remotePeers.forEach((peer) => {
+      peer.gain.gain.value = clamped;
+    });
+  }
+}
 
-    try {
-      pc = new RTCPeerConnection({ iceServers: [server], iceTransportPolicy: "all" });
-      pc.createDataChannel("probe");
-      pc.createOffer()
-        .then((offer) => pc!.setLocalDescription(offer))
-        .catch((e) => finish(false, String(e)));
+export function getOutputVolume(): number {
+  return outputVolume;
+}
 
-      pc.onicegatheringstatechange = () => {
-        if (pc?.iceGatheringState === "complete") {
-          clearTimeout(timer);
-          finish(true);
-        }
-      };
+export function isVCMuted(): boolean {
+  return vcMuted;
+}
 
-      pc.onicecandidate = (ev) => {
-        if (ev.candidate === null) {
-          clearTimeout(timer);
-          finish(true);
-        }
-      };
-
-      pc.onicecandidateerror = (ev) => {
-        const e = ev as RTCPeerConnectionIceErrorEvent;
-        if (e.errorCode >= 700) {
-          clearTimeout(timer);
-          finish(false, `ICE error ${e.errorCode}: ${e.errorText}`);
-        }
-      };
-    } catch (e) {
-      clearTimeout(timer);
-      finish(false, String(e));
-    }
+export function setVCMuted(muted: boolean): void {
+  vcMuted = muted;
+  const vol = muted ? 0 : outputVolume;
+  remotePeers.forEach((peer) => {
+    peer.gain.gain.value = vol;
   });
-}
-
-if (typeof window !== "undefined") {
-  (window as any).checkVoiceConfig = checkVoiceConfig;
 }
