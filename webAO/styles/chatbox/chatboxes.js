@@ -25,4 +25,5 @@ export default [
   "whentheycry",
   "n64zelda",
   "papermario",
+  "stardew",
 ];

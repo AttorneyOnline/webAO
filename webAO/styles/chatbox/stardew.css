@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+.text_white { color: #fff; }
+.text_blue { color: #05fcf6; }
+.text_green { color: #98f548; }
+.text_red { color: #ff3a3a; }
+.text_orange { color: #fcb405; }
+.text_yellow { color: #eef540; }
+.text_pink { color: #d459c3; }
+.text_cyan { color: #5ce1c2; }
+.text_grey { color: #bbb; }
+
+#client_chatcontainer {
+  position: absolute;
+  width: 100%;
+  height: 35%;
+  bottom: 0;
+  left: 0;
+  font-family: 'VT323', monospace;
+  background-color: #f8d098;
+  border-top: 6px solid #633520;
+  /* El efecto de doble borde característico */
+  outline: 4px solid #e29858;
+  outline-offset: -12px;
+  box-shadow: inset 0 0 0 4px #633520;
+}
+
+#client_name {
+  display: block;
+  position: absolute;
+  top: -15%;
+  left: 5%;
+  padding: 0 15px;
+  height: 25%;
+  width: auto;
+  min-width: 20%;
+  background-color: #925333;
+  border: 4px solid #4a2511;
+  transform: rotate(-2deg);
+  z-index: 10;
+}
+
+#client_inner_name {
+  margin: 0;
+  padding: 2% 0;
+  color: white;
+  font-size: 1.5em;
+  text-shadow: 2px 2px #000;
+  text-align: center;
+}
+
+#client_chat {
+  display: block;
+  width: 60%;
+  height: 70%;
+  left: 5%;
+  bottom: 10%;
+  position: absolute;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  text-align: left;
+  overflow: hidden;
+  font-size: 1.2em;
+}
+
+#client_inner_chat {
+  margin: 0;
+  padding: 1% 2%;
+  color: #4a2511;
+  line-height: 1.2;
+}
+
+#client_trackstatus {
+  display: flex;
+  position: absolute;
+  right: 5%;
+  bottom: 10%;
+  width: 25%;
+  height: 85%;
+  background-color: #a06e30;
+  border: 4px solid #633520;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#client_trackstatus img {
+  max-height: 95%;
+  width: auto;
+  image-rendering: pixelated;
+}
+
+#client_chatwaiting {
+  display: block;
+  right: 2%;
+  bottom: 5%;
+  width: 1em;
+  height: 1em;
+  background-color: #633520;
+  position: absolute;
+  animation: jumping 0.6s steps(2) infinite;
+}
+
+@keyframes jumping {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-10px); }
+}
+
+#client_clock {
+  display: none;
+}
