@@ -56,6 +56,7 @@ declare global {
     onOOCEnter: (_event: any) => void;
     kickPlayer: (id: number) => void;
     banPlayer: (id: number) => void;
+    pairPlayer: (id: number) => void;
     hcallback: (_event: any) => void;
     resetSettings: () => void;
     toggleFavourite: (charid: number, event: Event) => void;

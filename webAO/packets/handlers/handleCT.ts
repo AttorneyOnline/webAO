@@ -1,5 +1,6 @@
 import queryParser from "../../utils/queryParser";
 import { prepChat } from "../../encoding";
+import { flashPairActivity } from "../../dom/pairNotification";
 const { mode } = queryParser();
 
 /**
@@ -10,13 +11,16 @@ export const handleCT = (args: string[]) => {
   if (mode !== "replay") {
     const oocLog = document.getElementById("client_ooclog")!;
     const username = prepChat(args[1]);
-    let message = addLinks(prepChat(args[2]));
+    const rawMessage = prepChat(args[2]);
+    let message = addLinks(rawMessage);
     // Replace newlines with br
     message = message.replace(/\n/g, "<br>");
 
     oocLog.innerHTML += `${username}: ${message}<br>`;
     if (oocLog.scrollTop + oocLog.offsetHeight + 120 > oocLog.scrollHeight)
       oocLog.scrollTo(0, oocLog.scrollHeight);
+
+    flashPairActivity(rawMessage);
   }
 };
 

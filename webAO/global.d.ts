@@ -8,6 +8,7 @@ declare global {
     changeMusicVolume: (volume?: number) => void;
     getIndexFromSelect: (select_box: string, value: string) => number;
     kickPlayer: (id: number) => void;
+    pairPlayer: (id: number) => void;
     onReplayGo: (_event: Event) => void;
     opusCheck: (channel: HTMLAudioElement) => OnErrorEventHandlerNonNull;
     pickEmotion: (emo: number) => void;

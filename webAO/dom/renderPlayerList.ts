@@ -72,5 +72,16 @@ export function renderPlayerList() {
     ban.innerText = "Ban";
     ban.onclick = () => window.banPlayer(playerID);
     banCell.appendChild(ban);
+
+    const pairCell = playerRow.insertCell(6);
+    pairCell.style.width = "32px";
+    pairCell.classList.add("playerlist-pair-cell");
+    const pair = document.createElement("button");
+    pair.classList.add("playerlist-pair-button");
+    pair.innerText = "\u{1F517}";
+    pair.title = `Pair with [${playerID}] ${player.charName || player.showName || player.name || "player"}`;
+    pair.setAttribute("aria-label", pair.title);
+    pair.onclick = () => window.pairPlayer(playerID);
+    pairCell.appendChild(pair);
   }
 }
