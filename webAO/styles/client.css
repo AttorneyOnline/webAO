@@ -868,6 +868,56 @@
   line-height: 1;
 }
 
+.playerlist-pair-cell {
+  text-align: center;
+}
+
+.playerlist-pair-button {
+  background: transparent;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: inherit;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 5px;
+}
+
+.playerlist-pair-button:hover {
+  border-color: #ffd081;
+  background: rgba(255, 208, 129, 0.12);
+}
+
+@keyframes pair-flash-row {
+  0%   { background-color: rgba(255, 208, 129, 0.55); }
+  60%  { background-color: rgba(255, 208, 129, 0.20); }
+  100% { background-color: transparent; }
+}
+
+#client_playerlist tr.pair-flash > td {
+  animation: pair-flash-row 2.2s ease-out;
+}
+
+.pair-indicator {
+  display: inline-block;
+  margin: 2px 0 4px 0;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #2a1a00;
+  background: #ffd081;
+  border-radius: 10px;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity 180ms ease-out, transform 180ms ease-out;
+  pointer-events: none;
+}
+
+.pair-indicator.pair-indicator-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .voice-speaker-overlay {
   position: fixed;
   top: 12px;
