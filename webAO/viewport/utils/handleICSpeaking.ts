@@ -14,13 +14,31 @@ import request from "../../services/request";
 import preloadMessageAssets from "./preloadMessageAssets";
 
 let attorneyMarkdown: ReturnType<typeof mlConfig> | null = null;
+export let markdownDisabled = false;
+let markdownInitPromise: Promise<ReturnType<typeof mlConfig> | null> | null = null;
 
 const initAttorneyMarkdown = async () => {
-  if (!attorneyMarkdown) {
-    const iniContent = await request(`${AO_HOST}themes/default/chat_config.ini`);
-    attorneyMarkdown = mlConfig(iniContent);
+  if (markdownDisabled) {
+    return null;
   }
-  return attorneyMarkdown;
+  if (attorneyMarkdown !== null) {
+    return attorneyMarkdown;
+  }
+  if (markdownInitPromise) {
+    return markdownInitPromise;
+  }
+  markdownInitPromise = (async () => {
+    try {
+      const iniContent = await request(`${AO_HOST}themes/default/chat_config.ini`);
+      attorneyMarkdown = mlConfig(iniContent);
+      return attorneyMarkdown;
+    } catch (error) {
+      console.warn("Failed to load chat_config.ini, disabling markdown system:", error);
+      markdownDisabled = true;
+      return null;
+    }
+  })();
+  return markdownInitPromise;
 };
 
 export let startFirstTickCheck: boolean;
@@ -331,14 +349,7 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
       client.viewport.getChatmsg().effects[2];
   }
 
-  try {
-    const markdown = await initAttorneyMarkdown();
-    client.viewport.getChatmsg().parsed = markdown.applyMarkdown(
-      client.viewport.getChatmsg().content,
-      COLORS[client.viewport.getChatmsg().color],
-    );
-  } catch (error) {
-    console.warn("markdown failed");
+  const processTextOnly = () => {
     const output: HTMLSpanElement[] = [];
     for (const letter of client.viewport.getChatmsg().content) {
       const currentSelector = document.createElement("span");
@@ -347,6 +358,25 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
       output.push(currentSelector);
     }
     client.viewport.getChatmsg().parsed = output;
+  };
+
+  if (!markdownDisabled) {
+    try {
+      const markdown = await initAttorneyMarkdown();
+      if (markdown) {
+        client.viewport.getChatmsg().parsed = markdown.applyMarkdown(
+          client.viewport.getChatmsg().content,
+          COLORS[client.viewport.getChatmsg().color],
+        );
+      } else {
+        processTextOnly();
+      }
+    } catch (error) {
+      console.warn("markdown failed");
+      processTextOnly();
+    }
+  } else {
+    processTextOnly();
   }
 
   client.viewport.chat_tick();
