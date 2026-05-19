@@ -4,16 +4,16 @@
   src: url('Stardew_Valley.ttf') format('truetype');
 }
 
-/* Colores de texto estilo Stardew Valley (Verdes, marrones y amarillos suaves) */
-.text_white { color: #ffffff; }
-.text_blue { color: #4fa1f3; }
-.text_green { color: #73cd4e; }
-.text_red { color: #e74c3c; }
-.text_orange { color: #e67e22; }
-.text_yellow { color: #f39c12; }
-.text_pink { color: #f1948a; }
-.text_cyan { color: #5dede0; }
-.text_grey { color: #95a5a6; }
+/* Colores de texto estilo Stardew Valley (Versión Oscura y Apagada) */
+.text_white { color: #000000; }  /* El blanco ahora es negro puro */
+.text_blue { color: #2a5a8f; }   /* Azul marino oscuro */
+.text_green { color: #3c6e2d; }  /* Verde bosque/pino oscuro */
+.text_red { color: #8e2a1d; }    /* Rojo ladrillo/sangre apagado */
+.text_orange { color: #9c4f23; } /* Marrón arcilla / naranja quemado */
+.text_yellow { color: #b08218; } /* Oro viejo / amarillo mostaza oscuro */
+.text_pink { color: #a65853; }   /* Rosa viejo / terracota apagado */
+.text_cyan { color: #207570; }   /* Aguamarina oscuro / verde azulado */
+.text_grey { color: #4a4a4a; }   /* Gris ceniza oscuro */
 
 /* 2. Contenedor Principal (La pantalla de diálogo entera) */
 #client_chatcontainer {
