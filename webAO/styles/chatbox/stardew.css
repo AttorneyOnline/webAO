@@ -1,111 +1,116 @@
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+/* 1. Importar y configurar la fuente pixelada */
+@font-face {
+  font-family: 'Stardew Valley';
+  src: url('Stardew_Valley.ttf') format('truetype');
+}
 
-.text_white { color: #fff; }
-.text_blue { color: #05fcf6; }
-.text_green { color: #98f548; }
-.text_red { color: #ff3a3a; }
-.text_orange { color: #fcb405; }
-.text_yellow { color: #eef540; }
-.text_pink { color: #d459c3; }
-.text_cyan { color: #5ce1c2; }
-.text_grey { color: #bbb; }
+/* Colores de texto estilo Stardew Valley (Verdes, marrones y amarillos suaves) */
+.text_white { color: #ffffff; }
+.text_blue { color: #4fa1f3; }
+.text_green { color: #73cd4e; }
+.text_red { color: #e74c3c; }
+.text_orange { color: #e67e22; }
+.text_yellow { color: #f39c12; }
+.text_pink { color: #f1948a; }
+.text_cyan { color: #5dede0; }
+.text_grey { color: #95a5a6; }
 
+/* 2. Contenedor Principal (La pantalla de diálogo entera) */
 #client_chatcontainer {
   position: absolute;
   width: 100%;
-  height: 35%;
+  height: 50%; /* Ajustado para mantener proporción */
   bottom: 0;
   left: 0;
-  font-family: 'VT323', monospace;
-  background-color: #f8d098;
-  border-top: 6px solid #633520;
-  /* El efecto de doble borde característico */
-  outline: 4px solid #e29858;
-  outline-offset: -12px;
-  box-shadow: inset 0 0 0 4px #633520;
+  font-family: 'Stardew Valley', sans-serif;
+  image-rendering: pixelated; /* Mantiene los bordes pixelados nítidos */
+  
+  /* Aquí aplicamos tu PNG de fondo que ya incluye el marco marrón */
+  background-image: url("stardew.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  
+  /* IMPORTANTE: Evita que cualquier elemento hijo se desborde hacia arriba */
+  overflow: hidden; 
+  box-sizing: border-box;
 }
 
+/* 3. El cuadro del Nombre (Fondo y bordes ocultos para usar los del PNG) */
 #client_name {
-  display: block;
   position: absolute;
-  top: -15%;
-  left: 5%;
-  padding: 0 15px;
-  height: 25%;
-  width: auto;
-  min-width: 20%;
-  background-color: #925333;
-  border: 4px solid #4a2511;
-  transform: rotate(-2deg);
-  z-index: 10;
+  display: block;
+  top: 77%;
+  left: 66%;
+  height: 20%;
+  min-width: 22%;
+  padding: 0.2em 0.8em;
+  text-align: center;
+  color: #4a2711; /* Mantiene el texto marrón oscuro típico de Stardew */
+  font-size: 0.8em;
+  font-weight: bold;
+  z-index: 2;
+  
+  /* Eliminados: background, border y border-radius para que sea invisible */
 }
 
 #client_inner_name {
   margin: 0;
-  padding: 2% 0;
-  color: white;
-  font-size: 1.5em;
-  text-shadow: 2px 2px #000;
-  text-align: center;
+  padding: 0;
 }
 
+/* 4. El cuadro del Chat (Texto principal) */
 #client_chat {
-  display: block;
-  width: 60%;
-  height: 70%;
-  left: 5%;
-  bottom: 10%;
   position: absolute;
-  word-break: keep-all;
-  overflow-wrap: break-word;
+  display: block;
+  bottom: 35%;
+  left: 3%;
+  width: 55%; /* Reducido para dejarle espacio limpio al menú derecho */
+  height: 60%;
+  background: transparent; /* Transparente porque el fondo ya lo da stardew.png */
+  font-size: 1.1em;
+  color: #4a2711; /* Texto marrón oscuro */
   text-align: left;
   overflow: hidden;
-  font-size: 1.2em;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  scroll-behavior: smooth;
+  z-index: 1;
 }
 
 #client_inner_chat {
-  margin: 0;
-  padding: 1% 2%;
-  color: #4a2511;
-  line-height: 1.2;
+  padding: 2% 4%;
+  line-height: 110%;
+  letter-spacing: 0.03em;
 }
 
+/* 5. El cuadro del Estado / Menú Derecho ("None") */
+/* Solo mantiene la posición y el centrado, el diseño lo da tu PNG */
 #client_trackstatus {
-  display: flex;
   position: absolute;
   right: 5%;
   bottom: 10%;
-  width: 25%;
-  height: 85%;
-  background-color: #a06e30;
-  border: 4px solid #633520;
+  width: 20%;
+  height: 80%; 
+  
+  /* Centra el texto perfectamente dentro de tu dibujo */
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  z-index: 2;
+  
+  /* Eliminados background, border y border-radius */
 }
 
-#client_trackstatus img {
-  max-height: 95%;
-  width: auto;
-  image-rendering: pixelated;
+/* El texto de dentro de ese recuadro (el antiguo trackstatustext) */
+#client_trackstatustext {
+  font-size: 1.2em;
+  color: #6b3e26;
+  text-transform: uppercase;
+  text-align: center;
 }
 
-#client_chatwaiting {
-  display: block;
-  right: 2%;
-  bottom: 5%;
-  width: 1em;
-  height: 1em;
-  background-color: #633520;
-  position: absolute;
-  animation: jumping 0.6s steps(2) infinite;
-}
-
-@keyframes jumping {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-10px); }
-}
-
-#client_clock {
+/* Desactivar elementos innecesarios del viejo CSS */
+#client_chatwaiting, #client_clock {
   display: none;
 }
