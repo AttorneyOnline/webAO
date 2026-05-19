@@ -83,26 +83,6 @@
   letter-spacing: 0.03em;
 }
 
-/* 5. El cuadro del Estado / Menú Derecho ("None") */
-/* Solo mantiene la posición y el centrado, el diseño lo da tu PNG */
-#client_trackstatus {
-  display: none;
-  position: absolute;
-  right: 5%;
-  bottom: 10%;
-  width: 20%;
-  height: 80%; 
-  
-  /* Centra el texto perfectamente dentro de tu dibujo */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 2;
-  
-  /* Eliminados background, border y border-radius */
-}
-
 /* El texto de dentro de ese recuadro (el antiguo trackstatustext) */
 #client_trackstatustext {
   font-size: 1.2em;
