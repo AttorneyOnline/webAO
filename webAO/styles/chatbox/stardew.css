@@ -84,34 +84,15 @@
 }
 
 /* 5. El cuadro del Estado / Menú Derecho ("None") */
-/* Solo mantiene la posición y el centrado, el diseño lo da tu PNG */
+/* Completamente ocultado para que no moleste en pantalla */
 #client_trackstatus {
-  display: none;
-  position: absolute;
-  right: 5%;
-  bottom: 10%;
-  width: 5%;
-  height: 50%; 
-  
-  /* Centra el texto perfectamente dentro de tu dibujo */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 2;
-  
-  /* Eliminados background, border y border-radius */
+  display: none !important; /* Fuerza la desaparición total del contenedor */
 }
 
-
-/* El texto de dentro de ese recuadro (el antiguo trackstatustext) */
+/* El texto de dentro de ese recuadro */
 #client_trackstatustext {
-  font-size: 1.2em;
-  color: #6b3e26;
-  text-transform: uppercase;
-  text-align: center;
+  display: none !important; /* Oculta el texto por si acaso el motor intenta forzarlo */
 }
-
 /* Desactivar elementos innecesarios del viejo CSS */
 #client_chatwaiting, #client_clock {
   display: none;
