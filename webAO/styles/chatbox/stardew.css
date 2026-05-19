@@ -86,6 +86,7 @@
 /* 5. El cuadro del Estado / Menú Derecho ("None") */
 /* Solo mantiene la posición y el centrado, el diseño lo da tu PNG */
 #client_trackstatus {
+  display: none;
   position: absolute;
   right: 5%;
   bottom: 10%;
