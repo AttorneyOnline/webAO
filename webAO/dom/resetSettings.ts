@@ -31,6 +31,7 @@ const SETTINGS_KEYS = [
   "customFont",
   "themeMakerConfig",
   "hideDesks",
+  "panTilt",
 ];
 
 /**

@@ -45,9 +45,10 @@ export const handleBN = (args: string[]) => {
   setBackgroundImage("client_court",args[1],"court")
   
   if((<HTMLImageElement>document.getElementById("client_court")).src !== transparentPng) {
-    (<HTMLInputElement>document.getElementById("client_pantilt")).checked =
-        true;
+    const pantiltCheckbox = <HTMLInputElement>document.getElementById("client_pantilt");
+    if (pantiltCheckbox.checked) {
       switchPanTilt();
+    }
   }
 
   if (client.charID === -1) {

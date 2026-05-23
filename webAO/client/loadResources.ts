@@ -13,6 +13,7 @@ import { reloadTheme } from "../dom/reloadTheme";
 import { setFont } from "../dom/setFont";
 import { restoreThemeMaker, restoreBlipPitch } from "../dom/themeMaker";
 import { isHideDesksEnabled } from "../dom/switchHideDesks";
+import { isPanTiltEnabled, switchPanTilt } from "../dom/switchPanTilt";
 const version = process.env.npm_package_version;
 
 /**
@@ -86,6 +87,13 @@ export const loadResources = () => {
 
   (<HTMLInputElement>document.getElementById("client_callwords")).value =
     localStorage.getItem("callwords");
+
+  // Restore pan-tilt setting (defaults to off)
+  const panTiltCheckbox = <HTMLInputElement>document.getElementById("client_pantilt");
+  if (panTiltCheckbox) {
+    panTiltCheckbox.checked = isPanTiltEnabled();
+    switchPanTilt();
+  }
 
   // Restore hide-desks setting (defaults to off)
   const hideDesksCheckbox = <HTMLInputElement>document.getElementById("client_hidedesks");
