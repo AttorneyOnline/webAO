@@ -30,5 +30,8 @@ declare global {
     resetThemeMaker: () => void;
     applyBlipPitch: (pitch: number) => void;
     restoreBlipPitch: () => void;
+    toggleMuteMusic: () => void;
+    toggleMuteSfx: () => void;
+    toggleMuteBlips: () => void;
   }
 }

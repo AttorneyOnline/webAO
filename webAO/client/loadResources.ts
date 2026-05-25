@@ -14,6 +14,14 @@ import { setFont } from "../dom/setFont";
 import { restoreThemeMaker, restoreBlipPitch } from "../dom/themeMaker";
 import { isHideDesksEnabled } from "../dom/switchHideDesks";
 import { isPanTiltEnabled, switchPanTilt } from "../dom/switchPanTilt";
+import {
+  isMusicMuted,
+  isSfxMuted,
+  isBlipMuted,
+  applyMusicMute,
+  applySfxMute,
+  applyBlipMute,
+} from "../dom/audioMute";
 const version = process.env.npm_package_version;
 
 /**
@@ -78,6 +86,19 @@ export const loadResources = () => {
     localStorage.getItem("blipVolume") || "1";
   changeBlipVolume();
   restoreBlipPitch();
+
+  // Restore mute states
+  const musicMuted = isMusicMuted();
+  (<HTMLInputElement>document.getElementById("client_mute_music")).checked = musicMuted;
+  applyMusicMute(musicMuted);
+
+  const sfxMuted = isSfxMuted();
+  (<HTMLInputElement>document.getElementById("client_mute_sfx")).checked = sfxMuted;
+  applySfxMute(sfxMuted);
+
+  const blipMuted = isBlipMuted();
+  (<HTMLInputElement>document.getElementById("client_mute_blips")).checked = blipMuted;
+  applyBlipMute(blipMuted);
 
   (<HTMLInputElement>document.getElementById("ic_chat_name")).value =
     localStorage.getItem("ic_chat_name");

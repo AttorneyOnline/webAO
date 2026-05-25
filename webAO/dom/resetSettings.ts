@@ -14,6 +14,7 @@ import { switchChatOffset } from "./switchChatOffset";
 import { switchHideDesks } from "./switchHideDesks";
 import { resetThemeMaker } from "./themeMaker";
 import { showname_click } from "./showNameClick";
+import { applyMusicMute, applySfxMute, applyBlipMute } from "./audioMute";
 
 const SETTINGS_KEYS = [
   "theme",
@@ -32,6 +33,9 @@ const SETTINGS_KEYS = [
   "themeMakerConfig",
   "hideDesks",
   "panTilt",
+  "musicMuted",
+  "sfxMuted",
+  "blipMuted",
 ];
 
 /**
@@ -108,6 +112,23 @@ export function resetSettings() {
   if (bvolume) {
     bvolume.value = "1";
     changeBlipVolume();
+  }
+
+  // --- Mute toggles ---
+  const muteMusic = <HTMLInputElement>document.getElementById("client_mute_music");
+  if (muteMusic) {
+    muteMusic.checked = false;
+    applyMusicMute(false);
+  }
+  const muteSfx = <HTMLInputElement>document.getElementById("client_mute_sfx");
+  if (muteSfx) {
+    muteSfx.checked = false;
+    applySfxMute(false);
+  }
+  const muteBlips = <HTMLInputElement>document.getElementById("client_mute_blips");
+  if (muteBlips) {
+    muteBlips.checked = false;
+    applyBlipMute(false);
   }
 
   // --- Callwords ---

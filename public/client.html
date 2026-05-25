@@ -817,7 +817,7 @@
       <span class="menu_content" id="content_3">
         <meta name="frame-title" lang="en" content="Settings" />
         <h2>Volume</h2>
-        <p>Music</p>
+        <p>Music <label><input type="checkbox" id="client_mute_music" onchange="toggleMuteMusic()"> Mute</label></p>
         <input
           id="client_mvolume"
           class="long"
@@ -829,7 +829,7 @@
           onchange="changeMusicVolume()"
         />
 
-        <p>SFX</p>
+        <p>SFX <label><input type="checkbox" id="client_mute_sfx" onchange="toggleMuteSfx()"> Mute</label></p>
         <audio
           id="client_sfxaudio"
           onvolumechange="changeSFXVolume()"
@@ -853,7 +853,7 @@
           controls
         ></audio>
 
-        <p>Blip</p>
+        <p>Blip <label><input type="checkbox" id="client_mute_blips" onchange="toggleMuteBlips()"> Mute</label></p>
         <input
           id="client_bvolume"
           class="long"
