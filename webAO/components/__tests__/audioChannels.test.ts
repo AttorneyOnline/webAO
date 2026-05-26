@@ -1,3 +1,4 @@
+import { describe, test, expect } from "bun:test";
 import createAudioChannels from "../audioChannels";
 
 describe("createAudioChannels", () => {

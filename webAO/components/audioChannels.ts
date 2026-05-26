@@ -1,8 +1,4 @@
-/**
- *
- * @param {number} amountOfChannels Amount of Blips to put on page
- */
-const createAudioChannels = (amountOfChannels) => {
+const createAudioChannels = (amountOfChannels: number): void => {
   for (let i = 0; i < amountOfChannels; i++) {
     const audioChannel = document.createElement("audio");
     audioChannel.setAttribute("class", "audioChannel");

@@ -1,5 +1,5 @@
-import vanilla_evidence_arr from "../constants/evidence.js";
-import vanilla_background_arr from "../constants/backgrounds.js";
+import vanilla_evidence_arr from "../constants/evidence";
+import vanilla_background_arr from "../constants/backgrounds";
 import { changeMusicVolume } from "../dom/changeMusicVolume";
 import { setChatbox } from "../dom/setChatbox";
 import {

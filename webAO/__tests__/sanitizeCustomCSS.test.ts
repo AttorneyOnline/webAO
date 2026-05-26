@@ -1,3 +1,4 @@
+import { describe, it, expect } from "bun:test";
 import { sanitizeCustomCSS } from "../dom/themeMaker";
 
 describe("sanitizeCustomCSS (strict mode)", () => {

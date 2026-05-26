@@ -1,3 +1,4 @@
+import { describe, it, expect } from "bun:test";
 import { escapeChat, unescapeChat, safeTags, decodeChat, prepChat } from '../encoding';
 
 describe('encode/decode', () => {

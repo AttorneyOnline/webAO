@@ -1,3 +1,4 @@
+import { describe, test, expect } from "bun:test";
 import { isCategory } from '../client/isCategory';
 
 describe('isCategory function', () => {

@@ -1,9 +1,6 @@
-/* eslint indent: ["error", 2, { "SwitchCase": 1 }] */
-/* eslint no-param-reassign: ["error",
-{ "props": true, "ignorePropertyModificationsFor": ["container"] }] */
-import { GoldenLayout } from "golden-layout";
+import { GoldenLayout, type LayoutConfig } from "golden-layout";
 
-window.config = {
+const config = {
   settings: {
     showPopoutIcon: false,
     showCloseIcon: false,
@@ -189,45 +186,44 @@ const configMobile = {
 
 const isMobileDevice = window.innerWidth <= window.innerHeight;
 
-const golden = new GoldenLayout();
+const golden: any = new GoldenLayout();
 golden.registerComponentFactoryFunction(
   "template",
-  (container, componentState) => {
+  (container: any, componentState: { id: string }) => {
     const template = document.querySelector(`#${componentState.id}`);
-    container.element.innerHTML = template.innerHTML;
+    if (template) container.element.innerHTML = template.innerHTML;
   },
 );
 if (isMobileDevice) {
-  golden.loadLayout(configMobile);
+  golden.loadLayout(configMobile as LayoutConfig);
 } else {
-  golden.loadLayout(config);
+  golden.loadLayout(config as LayoutConfig);
 }
 
-function adjustSplitter() {
-  if (isMobileDevice) return; // Skip for mobile layout
-  const column = golden.root.contentItems[0].contentItems[0];
-  const icItem = column.contentItems[0];
-  const icOptionsItem = column.contentItems[1];
+function adjustSplitter(): void {
+  if (isMobileDevice) return;
+  const column: any = golden.root.contentItems[0].contentItems[0];
+  const icItem: any = column.contentItems[0];
+  const icOptionsItem: any = column.contentItems[1];
   const paneWidth = icItem.element.clientWidth;
   const gamewindowHeight = 0.75 * paneWidth;
   const inputEl = document.getElementById('client_inputbox');
   const barsEl = document.getElementById('client_bars');
-  const inputHeight = inputEl ? inputEl.offsetHeight : 30; // fallback
-  const barsHeight = barsEl ? barsEl.offsetHeight : 20; // fallback
-  const totalHeight = Math.ceil(gamewindowHeight + inputHeight + barsHeight + 45); // Add 45px offset
+  const inputHeight = inputEl ? inputEl.offsetHeight : 30;
+  const barsHeight = barsEl ? barsEl.offsetHeight : 20;
+  const totalHeight = Math.ceil(gamewindowHeight + inputHeight + barsHeight + 45);
   const columnHeight = column.element.clientHeight;
   if (columnHeight === 0) return;
-  const percentage = Math.min(90, Math.max(10, (totalHeight / columnHeight) * 100));
 
   icItem.element.style.height = `${totalHeight}px`;
-  icItem.element.children[1].style.height = `100%`;
-  icItem.element.children[1].children[0].style.height = `100%`;
-  icItem.element.children[1].children[0].children[0].style.height = `100%`;
+  (icItem.element.children[1] as HTMLElement).style.height = `100%`;
+  (icItem.element.children[1].children[0] as HTMLElement).style.height = `100%`;
+  (icItem.element.children[1].children[0].children[0] as HTMLElement).style.height = `100%`;
 
   icOptionsItem.element.style.height = `calc(100% - ${totalHeight}px)`;
-  icOptionsItem.element.children[1].style.height = `100%`;
-  icOptionsItem.element.children[1].children[0].style.height = `100%`;
-  icOptionsItem.element.children[1].children[0].children[0].style.height = `100%`;
+  (icOptionsItem.element.children[1] as HTMLElement).style.height = `100%`;
+  (icOptionsItem.element.children[1].children[0] as HTMLElement).style.height = `100%`;
+  (icOptionsItem.element.children[1].children[0].children[0] as HTMLElement).style.height = `100%`;
 }
 
 window.addEventListener('resize', () => setTimeout(adjustSplitter, 100));

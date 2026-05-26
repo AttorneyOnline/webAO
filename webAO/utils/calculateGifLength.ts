@@ -1,11 +1,7 @@
-/* eslint no-bitwise: "off" */
-
 /**
  * Adds up the frame delays to find out how long a GIF is
- * I totally didn't steal this
- * @param {data} gifFile the GIF data
  */
-const calculateGifLength = (gifFile) => {
+const calculateGifLength = (gifFile: ArrayBuffer): number => {
   const d = new Uint8Array(gifFile);
   // Thanks to http://justinsomnia.org/2006/10/gif-animation-duration-calculation/
   // And http://www.w3.org/Graphics/GIF/spec-gif89a.txt

@@ -1,5 +1,5 @@
 import { CHATBOX, setCHATBOX } from "../client";
-import chatbox_arr from "../styles/chatbox/chatboxes.js";
+import chatbox_arr from "../styles/chatbox/chatboxes";
 
 /**
  * Set the style of the chatbox

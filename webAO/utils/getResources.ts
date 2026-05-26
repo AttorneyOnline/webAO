@@ -1,4 +1,12 @@
-const getResources = (AO_HOST, THEME) => ({
+export interface ResourceEntry {
+  src: string;
+  duration: number;
+  sfx: string;
+}
+
+export type Resources = Record<string, ResourceEntry>;
+
+const getResources = (AO_HOST: string, THEME: string): Resources => ({
   holdit: {
     src: `${AO_HOST}misc/default/holdit_bubble.png`,
     duration: 720,

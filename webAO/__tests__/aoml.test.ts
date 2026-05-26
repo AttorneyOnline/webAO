@@ -32,6 +32,7 @@ c6_remove = 0
 c6_talking = 0
 `;
 
+import { describe, it, expect } from "bun:test";
 import mlConfig from "../utils/aoml";
 
 describe("applyMarkdown", () => {

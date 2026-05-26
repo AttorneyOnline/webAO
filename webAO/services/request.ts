@@ -1,26 +1,28 @@
+interface RequestError extends Error {
+  code?: number;
+}
+
 /**
  * Make a GET request for a specific URI.
- * @param {string} url the URI to be requested
- * @returns response data
  * @throws {Error} if status code is not 2xx, or a network error occurs
  */
-export async function requestBuffer(url) {
+export async function requestBuffer(url: string): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.responseType = "arraybuffer";
     xhr.addEventListener("error", () => {
-      const err = new Error(`Request for ${url} failed: ${xhr.statusText}`);
+      const err: RequestError = new Error(`Request for ${url} failed: ${xhr.statusText}`);
       err.code = xhr.status;
       reject(err);
     });
     xhr.addEventListener("abort", () => {
-      const err = new Error(`Request for ${url} was aborted!`);
+      const err: RequestError = new Error(`Request for ${url} was aborted!`);
       err.code = xhr.status;
       reject(err);
     });
     xhr.addEventListener("load", () => {
       if (xhr.status < 200 || xhr.status >= 300) {
-        const err = new Error(
+        const err: RequestError = new Error(
           `Request for ${url} failed with status code ${xhr.status}`,
         );
         err.code = xhr.status;
@@ -36,27 +38,25 @@ export async function requestBuffer(url) {
 
 /**
  * Make a GET request for a specific URI.
- * @param {string} url the URI to be requested
- * @returns response data
  * @throws {Error} if status code is not 2xx, or a network error occurs
  */
-export const request = async (url) =>
+export const request = async (url: string): Promise<string> =>
   new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.responseType = "text";
     xhr.addEventListener("error", () => {
-      const err = new Error(`Request for ${url} failed: ${xhr.statusText}`);
+      const err: RequestError = new Error(`Request for ${url} failed: ${xhr.statusText}`);
       err.code = xhr.status;
       reject(err);
     });
     xhr.addEventListener("abort", () => {
-      const err = new Error(`Request for ${url} was aborted!`);
+      const err: RequestError = new Error(`Request for ${url} was aborted!`);
       err.code = xhr.status;
       reject(err);
     });
     xhr.addEventListener("load", () => {
       if (xhr.status < 200 || xhr.status >= 300) {
-        const err = new Error(
+        const err: RequestError = new Error(
           `Request for ${url} failed with status code ${xhr.status}`,
         );
         err.code = xhr.status;

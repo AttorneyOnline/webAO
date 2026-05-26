@@ -2,6 +2,8 @@ export {};
 
 declare global {
   interface Window {
+    toggleEffect: (button: HTMLElement) => void;
+    toggleElement: (elementId: string) => void;
     area_click: (el: HTMLElement) => void;
     banPlayer: (id: number) => void;
     changeBlipVolume: () => void;

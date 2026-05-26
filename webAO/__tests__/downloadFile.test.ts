@@ -1,20 +1,24 @@
+import { describe, it, expect, spyOn, mock, beforeAll } from "bun:test";
 import downloadFile from "../services/downloadFile";
-jest.useFakeTimers().setSystemTime(new Date("2020-01-01").getTime());
 
-global.URL.createObjectURL = jest.fn();
-(window as any).global.Blob = function (content, options) {
-  return { content, options };
-};
+beforeAll(() => {
+  (global as any).URL.createObjectURL = mock(() => "");
+  (global as any).Blob = function (content: BlobPart[], options: BlobPropertyBag) {
+    return { content, options };
+  };
+});
 
 describe("downloadFile", () => {
   it("Creates an <a> tag", () => {
-    const createElementSpy = jest.spyOn(document, "createElement");
+    const createElementSpy = spyOn(document, "createElement");
     downloadFile("hi", "filename");
-    expect(createElementSpy).toBeCalled();
+    expect(createElementSpy).toHaveBeenCalled();
   });
+
   it("Creates the blob with the correct data", () => {
     const data = "writingtestsishard";
-    global.URL.createObjectURL = jest.fn(() => data);
+    const createObjectURL = mock(() => data);
+    (global as any).URL.createObjectURL = createObjectURL;
     downloadFile(data, "filename");
     const expected = {
       content: [data],
@@ -22,6 +26,6 @@ describe("downloadFile", () => {
         type: "text",
       },
     };
-    expect(global.URL.createObjectURL).toBeCalledWith(expected);
+    expect(createObjectURL).toHaveBeenCalledWith(expected);
   });
 });

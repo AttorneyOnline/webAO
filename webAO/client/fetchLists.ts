@@ -1,6 +1,6 @@
 import { client } from "../client";
 import { AO_HOST } from "./aoHost";
-import { request } from "../services/request.js";
+import { request } from "../services/request";
 
 export const fetchBackgroundList = async () => {
   try {

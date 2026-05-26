@@ -7,7 +7,7 @@ import { isLowMemory } from "./client/isLowMemory";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { sender, ISender } from "./client/sender/index";
 import queryParser from "./utils/queryParser";
-import getResources from "./utils/getResources.js";
+import getResources from "./utils/getResources";
 import masterViewport from "./viewport/viewport";
 import { Viewport } from "./viewport/interfaces/Viewport";
 import { EventEmitter } from "events";

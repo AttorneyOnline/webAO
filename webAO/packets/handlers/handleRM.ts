@@ -1,5 +1,5 @@
 import { client } from "../../client";
-import vanilla_music_arr from "../../constants/music.js";
+import vanilla_music_arr from "../../constants/music";
 
 /**
  * we are asking ourselves what characters there are

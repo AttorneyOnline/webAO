@@ -1,5 +1,5 @@
 import { client } from "../../client";
-import vanilla_character_arr from "../../constants/characters.js";
+import vanilla_character_arr from "../../constants/characters";
 
 /**
  * What? you want a character list from me??

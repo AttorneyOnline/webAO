@@ -1,3 +1,4 @@
+import { describe, test, expect } from "bun:test";
 import { isAudio } from '../client/isAudio';
 
 // Test cases
@@ -16,10 +17,10 @@ describe('isAudio', () => {
   });
 
   test('should handle edge cases', () => {
-    expect(isAudio('')).toBe(false); // Empty string
-    expect(isAudio(undefined)).toBe(false); // Undefined input
-    expect(isAudio(null)).toBe(false); // Null input
-    expect(isAudio({})).toBe(false); // Invalid type (object)
+    expect(isAudio('')).toBe(false);
+    expect(isAudio(undefined as any)).toBe(false);
+    expect(isAudio(null as any)).toBe(false);
+    expect(isAudio({} as any)).toBe(false);
   });
 
   test('should return true for files with multiple valid extensions', () => {
