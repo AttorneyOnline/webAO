@@ -6,6 +6,9 @@
  * exported / imported as a plain .css file.
  */
 
+import { playBlip, setBlipPitch, setBlipUrl } from "../viewport/utils/blipAudio";
+import { AO_HOST } from "../client/aoHost";
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface ThemeConfig {
@@ -1650,21 +1653,10 @@ function applyThemeMakerCSS(css: string): void {
 
 const LS_KEY_BLIP_PITCH = "blipPitch";
 
-/** Apply a blip playbackRate to every <audio class="blipSound"> element on the page. */
+/** Apply a blip playbackRate (pitch shifts with rate — preservesPitch is off). */
 export function applyBlipPitch(pitch: number): void {
   const clamped = Math.max(0.5, Math.min(2, Number(pitch) || 1));
-  const channels = document.getElementsByClassName("blipSound") as HTMLCollectionOf<HTMLAudioElement>;
-  for (const ch of Array.from(channels)) {
-    try {
-      // preservesPitch=false means the pitch shifts with rate (the desired behaviour).
-      (ch as any).preservesPitch = false;
-      (ch as any).mozPreservesPitch = false;
-      (ch as any).webkitPreservesPitch = false;
-      ch.playbackRate = clamped;
-    } catch {
-      /* ignore — some browsers block playbackRate before user gesture */
-    }
-  }
+  setBlipPitch(clamped);
   localStorage.setItem(LS_KEY_BLIP_PITCH, String(clamped));
 }
 
@@ -3879,23 +3871,12 @@ function wireEvents(): void {
     });
   });
 
-  // Test-blip button (uses an existing blipSound channel if available)
   const testBlipBtn = document.getElementById("tm_preview_blip_btn");
   if (testBlipBtn) {
     testBlipBtn.addEventListener("click", () => {
-      const blip = document.querySelector(".blipSound") as HTMLAudioElement | null;
-      if (!blip) {
-        alert("No blip channels initialized yet — join a server first.");
-        return;
-      }
-      try {
-        (blip as any).preservesPitch = false;
-        blip.playbackRate = Math.max(0.5, Math.min(2, Number(currentConfig.blipPitch) || 1));
-        blip.currentTime = 0;
-        blip.play().catch(() => {});
-      } catch {
-        /* ignore */
-      }
+      setBlipUrl(`${AO_HOST}sounds/blips/male.opus`);
+      setBlipPitch(Number(currentConfig.blipPitch) || 1);
+      playBlip();
     });
   }
 

@@ -6,7 +6,7 @@ import setEmote from "../client/setEmote";
 import setEmoteFromUrl from "../client/setEmoteFromUrl";
 import { AO_HOST } from "../client/aoHost";
 import { Viewport } from "./interfaces/Viewport";
-import { createBlipsChannels } from "./utils/createBlipChannels";
+import { playBlip } from "./utils/blipAudio";
 import { defaultChatMsg } from "./constants/defaultChatMsg";
 import { createMusic } from "./utils/createMusic";
 import { createSfxAudio } from "./utils/createSfxAudio";
@@ -25,9 +25,7 @@ import {
 
 const viewport = (): Viewport => {
   let animating = false;
-  const blipChannels = createBlipsChannels();
   let chatmsg = defaultChatMsg;
-  let currentBlipChannel = 0;
   let lastChar = "";
   let lastEvi = 0;
   const music = createMusic();
@@ -151,9 +149,7 @@ const viewport = (): Viewport => {
     const charEmote = chatmsg.sprite.toLowerCase();
 
     if (chatmsg.content.charAt(textnow.length) !== " ") {
-      blipChannels[currentBlipChannel].play().catch(() => {});
-      currentBlipChannel++;
-      currentBlipChannel %= blipChannels.length;
+      playBlip();
     }
     textnow = chatmsg.content.substring(0, textnow.length + 1);
     const characterElement = chatmsg.parsed[textnow.length - 1];
@@ -537,7 +533,6 @@ const viewport = (): Viewport => {
     getBackgroundName,
     getSfxAudio,
     setSfxAudio,
-    blipChannels,
     music,
     shoutaudio,
     updater,

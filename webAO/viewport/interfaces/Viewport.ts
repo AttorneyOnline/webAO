@@ -34,7 +34,6 @@ export interface Viewport {
   setSfxAudio: Function;
   getSfxAudio: Function;
   getBackgroundFolder: Function;
-  blipChannels: HTMLAudioElement[];
   music: any;
   setBackgroundName: Function;
   getBackgroundName: Function;
