@@ -4,14 +4,12 @@
   "description": "Web-based Attorney Online client",
   "main": "client.js",
   "scripts": {
-    "babel": "babel ui.js -o ui.b.js",
-    "webpack": "webpack",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test": "bunx --bun jest",
+    "test:coverage": "bunx --bun jest --coverage",
     "build": "bun build.js",
-    "start": "webpack serve --config webpack.config.js --mode development",
-    "lint": "eslint webAO  --ext .js",
-    "lint:fix": "npm run lint -- --fix",
+    "start": "bunx --bun webpack serve --config webpack.config.js --mode development",
+    "lint": "bunx --bun eslint webAO  --ext .js",
+    "lint:fix": "bun run lint -- --fix",
     "prepare": "husky install"
   },
   "repository": {
