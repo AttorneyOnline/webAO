@@ -12,6 +12,7 @@ import { COLORS } from "../constants/colors";
 import mlConfig from "../../utils/aoml";
 import request from "../../services/request";
 import preloadMessageAssets from "./preloadMessageAssets";
+import { setBlipUrl } from "./blipAudio";
 
 let attorneyMarkdown: ReturnType<typeof mlConfig> | null = null;
 export let markdownDisabled = false;
@@ -297,11 +298,10 @@ export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
     charLayers.style.top = `${Number(client.viewport.getChatmsg().self_offset[1])}%`;
   }
 
-  client.viewport.blipChannels.forEach(
-    (channel: HTMLAudioElement) =>
-      (channel.src = `${AO_HOST}sounds/blips/${encodeURI(
-        client.viewport.getChatmsg().blips.toLowerCase(),
-      )}.opus`),
+  setBlipUrl(
+    `${AO_HOST}sounds/blips/${encodeURI(
+      client.viewport.getChatmsg().blips.toLowerCase(),
+    )}.opus`,
   );
 
   // process markup

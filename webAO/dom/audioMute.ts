@@ -4,6 +4,8 @@
  * Uses HTMLAudioElement.muted to silence without changing volume levels.
  */
 
+import { setBlipMuted } from "../viewport/utils/blipAudio";
+
 export function isMusicMuted(): boolean {
   return localStorage.getItem("musicMuted") === "1";
 }
@@ -37,12 +39,7 @@ export function applySfxMute(muted: boolean): void {
 
 export function applyBlipMute(muted: boolean): void {
   localStorage.setItem("blipMuted", muted ? "1" : "0");
-  const channels = document.getElementsByClassName(
-    "blipSound",
-  ) as HTMLCollectionOf<HTMLAudioElement>;
-  for (let i = 0; i < channels.length; i++) {
-    channels[i].muted = muted;
-  }
+  setBlipMuted(muted);
 }
 
 export function toggleMuteMusic(): void {

@@ -9,6 +9,7 @@ import {
 } from "../dom/changeVolume";
 import { showname_click } from "../dom/showNameClick";
 import { changeBlipVolume } from "../dom/changeBlipVolume";
+import { unlockBlipAudio } from "../viewport/utils/blipAudio";
 import { reloadTheme } from "../dom/reloadTheme";
 import { setFont } from "../dom/setFont";
 import { restoreThemeMaker, restoreBlipPitch } from "../dom/themeMaker";
@@ -99,6 +100,16 @@ export const loadResources = () => {
   const blipMuted = isBlipMuted();
   (<HTMLInputElement>document.getElementById("client_mute_blips")).checked = blipMuted;
   applyBlipMute(blipMuted);
+
+  // Resume the blip AudioContext on the first user gesture so blips fire
+  // reliably from the first message (browser autoplay policy).
+  const unlock = () => {
+    unlockBlipAudio();
+    document.removeEventListener("pointerdown", unlock);
+    document.removeEventListener("keydown", unlock);
+  };
+  document.addEventListener("pointerdown", unlock, { once: true });
+  document.addEventListener("keydown", unlock, { once: true });
 
   (<HTMLInputElement>document.getElementById("ic_chat_name")).value =
     localStorage.getItem("ic_chat_name");
