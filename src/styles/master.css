@@ -106,7 +106,7 @@
 }
 
 details[open] {
-  background: url("../desc.png");
+  background: url("./desc.png");
   color: #fff;
 }
 

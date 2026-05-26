@@ -1,3 +1,4 @@
+import "./styles/master.css";
 import { safeTags } from "./encoding";
 
 interface AOServer {

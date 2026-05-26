@@ -30,6 +30,7 @@ const version = process.env.npm_package_version;
  */
 export const loadResources = () => {
   document.getElementById("client_version")!.innerText = `version ${version}`;
+  (document.getElementById("mod_ui") as HTMLLinkElement).href = "styles/nomod.css";
   // Load background array to select
   const background_select = <HTMLSelectElement>(
     document.getElementById("bg_select")

@@ -3,6 +3,8 @@
  * made by sD, refactored by oldmud0 and Qubrick
  * credits to aleks for original idea and source
  */
+import "./styles/client.css";
+import "./styles/goldenlayout.css";
 import { isLowMemory } from "./client/isLowMemory";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { sender, ISender } from "./client/sender/index";
