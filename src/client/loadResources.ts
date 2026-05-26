@@ -23,7 +23,7 @@ import {
   applySfxMute,
   applyBlipMute,
 } from "../dom/audioMute";
-const version = process.env.npm_package_version;
+import { version } from "../version";
 
 /**
  * Load game resources and stored settings.

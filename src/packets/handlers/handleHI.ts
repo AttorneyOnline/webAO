@@ -1,5 +1,5 @@
 import { client } from "../../client";
-const version = process.env.npm_package_version;
+import { version } from "../../version";
 
 /**
  * Handle the player

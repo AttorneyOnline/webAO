@@ -1,5 +1,6 @@
 import "./styles/master.css";
 import { safeTags } from "./encoding";
+import { version as clientVersion } from "./version";
 
 interface AOServer {
   name: string;
@@ -12,8 +13,6 @@ interface AOServer {
   wss_port?: number;
   asset?: string;
 }
-
-const clientVersion = process.env.npm_package_version;
 
 // const MASTERSERVER_IP = 'master.aceattorneyonline.com:27014';
 const serverlist_domain = "servers.aceattorneyonline.com";
