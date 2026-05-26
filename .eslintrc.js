@@ -1,8 +1,7 @@
 module.exports = {
   env: {
     browser: true,
-    es2021: true,
-    jest: true,
+    es2022: true,
   },
   extends: [
     'eslint:recommended',
@@ -16,7 +15,12 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   rules: {
     "indent": ["warn", 2, { "SwitchCase": 1 }],
-    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
     "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": ["error", {
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_",
+      "caughtErrorsIgnorePattern": "^_"
+    }],
+    "no-unused-vars": "off"
   },
 };

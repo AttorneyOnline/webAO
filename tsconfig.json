@@ -1,14 +1,21 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["bun"],
     "allowJs": true,
-    "target": "es5",
-    "lib": ["DOM", "DOM.Iterable", "ES2021.String"],
     "strict": true,
-    "strictNullChecks": false, //document.getElementBy
-    "downlevelIteration": true,
+    "strictNullChecks": false,
+    "noEmit": true,
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "downlevelIteration": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+    "jsx": "preserve"
   },
-  "include": ["./webAO/**/*"]
+  "include": ["src/**/*", "build.ts", "dev.ts", "happydom.ts"]
 }

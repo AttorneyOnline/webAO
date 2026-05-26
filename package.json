@@ -2,15 +2,14 @@
   "name": "webao",
   "version": "2.9.0",
   "description": "Web-based Attorney Online client",
-  "main": "client.js",
+  "main": "src/client.ts",
   "scripts": {
-    "test": "bunx --bun jest",
-    "test:coverage": "bunx --bun jest --coverage",
-    "build": "bun build.js",
-    "start": "bunx --bun webpack serve --config webpack.config.js --mode development",
-    "lint": "bunx --bun eslint webAO  --ext .js",
-    "lint:fix": "bun run lint -- --fix",
-    "prepare": "husky install"
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
+    "build": "bun build.ts",
+    "start": "bun --hot dev.ts",
+    "lint": "bunx --bun eslint src --ext .ts",
+    "lint:fix": "bun run lint -- --fix"
   },
   "repository": {
     "type": "git",
@@ -22,47 +21,15 @@
   },
   "homepage": "https://github.com/AttorneyOnline/webAO#readme",
   "devDependencies": {
-    "@babel/core": "^7.28.5",
-    "@babel/plugin-transform-modules-commonjs": "^7.27.1",
-    "@babel/preset-env": "^7.28.5",
-    "@babel/preset-typescript": "^7.28.5",
     "@happy-dom/global-registrator": "^20.0.11",
-    "@types/jest": "^29.5.14",
-    "@types/node": "^18.19.130",
+    "@types/bun": "latest",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
-    "babel-jest": "^30.2.0",
-    "babel-loader": "^9.2.1",
-    "copy-webpack-plugin": "^11.0.0",
-    "dotenv": "^16.6.1",
     "eslint": "^8.57.1",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.32.0",
-    "glob": "^7.2.3",
-    "html-webpack-plugin": "^5.6.5",
-    "husky": "^8.0.3",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^30.3.0",
-    "typescript": "^5.9.3",
-    "webpack": "^5.104.1",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.2.2",
-    "workbox-webpack-plugin": "^7.4.0"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^3.4.2",
-    "@types/websocket": "^1.0.10",
-    "core-js": "^3.47.0",
-    "esbuild-loader": "^4.4.2",
-    "golden-layout": "^2.6.0",
-    "regenerator-runtime": "^0.13.11",
-    "source-map-loader": "^4.0.2",
-    "ts-loader": "^9.5.4"
-  },
-  "browserslist": [
-    "defaults",
-    "Safari > 3",
-    "Opera > 8",
-    "Android > 3"
-  ]
+    "golden-layout": "^2.6.0"
+  }
 }
