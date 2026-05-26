@@ -23,7 +23,6 @@
   "devDependencies": {
     "@happy-dom/global-registrator": "^20.0.11",
     "@types/bun": "latest",
-    "@types/node": "^18.19.130",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.57.1",
@@ -31,7 +30,6 @@
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^3.4.2",
-    "@types/websocket": "^1.0.10",
     "golden-layout": "^2.6.0"
   }
 }
