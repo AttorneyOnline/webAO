@@ -197,7 +197,6 @@ body {
   z-index: 5;
 }
 .lm_stack.lm_docked > .lm_items {
-  *z-index: 3;
   transition: height 0.4s ease-in;
   border: solid 2px;
   border-image-slice: 1 !important;

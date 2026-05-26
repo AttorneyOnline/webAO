@@ -1,4 +1,3 @@
 node_modules
 dist
-webAO/lib/
-webAO/golden/
+public/

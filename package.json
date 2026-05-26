@@ -2,14 +2,13 @@
   "name": "webao",
   "version": "2.9.0",
   "description": "Web-based Attorney Online client",
-  "main": "webAO/client.ts",
+  "main": "src/client.ts",
   "scripts": {
     "test": "bun test",
     "test:coverage": "bun test --coverage",
     "build": "bun build.ts",
-    "start": "bun dev.ts",
-    "dev": "bun --hot dev.ts",
-    "lint": "bunx --bun eslint webAO --ext .ts",
+    "start": "bun --hot dev.ts",
+    "lint": "bunx --bun eslint src --ext .ts",
     "lint:fix": "bun run lint -- --fix"
   },
   "repository": {
