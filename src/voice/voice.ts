@@ -667,7 +667,7 @@ export function handleRemoteAudio(fromUid: number, b64: string): void {
   if (!inVoice) return;
   // Defensive: server should never echo our own audio back, but if it does, drop.
   if (fromUid === client.playerID) return;
-  let peer = remotePeers.get(fromUid);
+  const peer = remotePeers.get(fromUid);
   if (!peer) {
     // Frame arrived before VS_JOIN — create the peer on demand.
     if (caps.maxPeers > 0 && remotePeers.size >= caps.maxPeers) return;

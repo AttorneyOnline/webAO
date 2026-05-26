@@ -223,7 +223,7 @@ class Client extends EventEmitter {
     this.charicon_extensions = [".png", ".webp"];
     this.emote_extensions = [".gif", ".png", ".apng", ".webp", ".webp.static"];
     this.emotions_extensions = [".png", ".webp"];
-    this.background_extensions = [".png", ".gif"];;
+    this.background_extensions = [".png", ".gif"];
   }
 
   /**

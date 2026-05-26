@@ -1,5 +1,4 @@
 import { client } from "../../client";
-import { AO_HOST } from "../../client/aoHost";
 import { safeTags } from "../../encoding";
 import { updateBackgroundPreview } from "../../dom/updateBackgroundPreview";
 import { getIndexFromSelect } from "../../dom/getIndexFromSelect";
@@ -15,7 +14,6 @@ import { setBackgroundImage } from "../../viewport/utils/setSide"
 export const handleBN = (args: string[]) => {
   const bgFromArgs = safeTags(args[1]);
   client.viewport.setBackgroundName(bgFromArgs);
-  const bgfolder = client.viewport.getBackgroundFolder();
   const bg_index = getIndexFromSelect(
     "bg_select",
     client.viewport.getBackgroundName(),

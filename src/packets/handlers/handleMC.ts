@@ -35,7 +35,7 @@ export const handleMC = (args: string[]) => {
   let looptext = "";
 
   if (looping)
-      looptext = "(looping)";
+    looptext = "(looping)";
 
   if (charID >= 0) {
     musicname = client.chars[charID].name;

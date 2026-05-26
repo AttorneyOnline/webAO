@@ -18,7 +18,7 @@ export const handlePU = (args: string[]) => {
     case 0:
       player.name = data;
       break;
-    case 1:
+    case 1: {
       player.charName = data;
       const charId = client.chars.findIndex(
         (c: any) => c && c.name.toLowerCase() === data.toLowerCase()
@@ -28,6 +28,7 @@ export const handlePU = (args: string[]) => {
         ensureCharIni(charId);
       }
       break;
+    }
     case 2:
       player.showName = data;
       break;

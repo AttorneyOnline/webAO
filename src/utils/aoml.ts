@@ -37,7 +37,7 @@ const mlConfig = (iniContent: string) => {
 
   const createIdentifiers = () => {
     const identifiers = new Map<string, Aoml>();
-    for (const [ruleName, value] of Object.entries(aomlParsed)) {
+    for (const value of Object.values(aomlParsed)) {
       if (value.start && value.end) {
         identifiers.set(value.start, value);
         identifiers.set(value.end, value);
@@ -47,7 +47,7 @@ const mlConfig = (iniContent: string) => {
   };
   const createStartIdentifiers = () => {
     const startingIdentifiers = new Set<string>();
-    for (const [ruleName, value] of Object.entries(aomlParsed)) {
+    for (const value of Object.values(aomlParsed)) {
       if (value?.start && value?.end) {
         startingIdentifiers.add(value.start);
       }

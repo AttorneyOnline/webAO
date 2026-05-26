@@ -1,6 +1,4 @@
-/* eslint indent: ["error", 2, { "SwitchCase": 1 }] */
-
-import { client, extrafeatures, UPDATE_INTERVAL } from "../../client";
+import { client, UPDATE_INTERVAL } from "../../client";
 import { handleCharacterInfo, ensureCharIni } from "../../client/handleCharacterInfo";
 import { resetICParams } from "../../client/resetICParams";
 import { prepChat, safeTags } from "../../encoding";
@@ -41,7 +39,9 @@ export const handleMS = (args: string[]) => {
 
     try {
       msg_blips = client.chars[char_id].blips;
-    } catch (e) {}
+    } catch {
+      // keep default blip
+    }
 
     try {
       char_chatbox = client.chars[char_id].chat;

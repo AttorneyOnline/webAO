@@ -1,6 +1,6 @@
 import { client } from "../../client";
 import { AO_HOST } from "../../client/aoHost";
-import { prepChat, safeTags } from "../../encoding";
+import { prepChat } from "../../encoding";
 
 /**
  * Handles incoming evidence list, all evidences at once

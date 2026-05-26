@@ -1,4 +1,4 @@
-import { client, extrafeatures, oldLoading } from "../../client";
+import { client, oldLoading } from "../../client";
 import { fetchExtensions } from "../../client/fetchLists";
 import { applyFavourites } from "../../dom/toggleFavourite";
 
