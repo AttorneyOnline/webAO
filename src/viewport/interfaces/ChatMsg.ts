@@ -1,6 +1,7 @@
 import type {
   DeskModifier,
   EmoteModifier,
+  Flip,
   ShoutModifier,
   Side,
 } from "../../packets/MS";
@@ -22,8 +23,8 @@ export interface ChatMsg {
   other_offset?: number[];
   showname?: string;
   nameplate?: string;
-  flip?: number;
-  other_flip?: number;
+  flip?: Flip;
+  other_flip?: Flip;
   effects?: string[];
   desk_modifier?: DeskModifier;
   preanim?: string;

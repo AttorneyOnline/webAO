@@ -95,6 +95,24 @@ export const parseShoutModifier = (s: string | undefined): ShoutModifier => {
   return ShoutModifier.NONE;
 };
 
+/**
+ * Sprite mirroring. Spec defines only NONE/HORIZONTAL; VERTICAL and
+ * HORIZONTAL_AND_VERTICAL are non-spec extensions and only fire when a
+ * server explicitly sends 2 or 3.
+ */
+export enum Flip {
+  NONE = 0,
+  HORIZONTAL = 1,
+  VERTICAL = 2,
+  HORIZONTAL_AND_VERTICAL = 3,
+}
+
+export const parseFlip = (s: string | undefined): Flip => {
+  const n = Number(s);
+  if (Number.isInteger(n) && n >= 0 && n <= 3) return n as Flip;
+  return Flip.NONE;
+};
+
 /** Character position. Wire values are the lowercase 3-letter codes. */
 export enum Side {
   DEFENSE = "def",
@@ -127,7 +145,7 @@ export interface MSPacketClient {
   sfx_delay: number;
   shout_modifier: ShoutModifier;
   evidence: string;
-  flip: number;
+  flip: Flip;
   realization: number;
   text_color: number;
   // cccc group
@@ -137,7 +155,7 @@ export interface MSPacketClient {
   other_emote: string;
   self_offset: string;
   other_offset: string;
-  other_flip: number;
+  other_flip: Flip;
   noninterrupting_preanim: number;
   // 2.7 group
   sfx_looping: number;
@@ -174,7 +192,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       sfx_delay: num(args[10]),
       shout_modifier: parseShoutModifier(args[11]),
       evidence: str(args[12]),
-      flip: num(args[13]),
+      flip: parseFlip(args[13]),
       realization: num(args[14]),
       text_color: num(args[15]),
       showname: str(args[16]),
@@ -183,7 +201,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       other_emote: str(args[19]),
       self_offset: args[20] ?? "",
       other_offset: args[21] ?? "",
-      other_flip: num(args[22]),
+      other_flip: parseFlip(args[22]),
       noninterrupting_preanim: num(args[23]),
       sfx_looping: num(args[24]),
       screenshake: num(args[25]),
@@ -251,7 +269,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       sfx_delay: num(args[10]),
       shout_modifier: parseShoutModifier(args[11]),
       evidence: str(args[12]),
-      flip: num(args[13]),
+      flip: parseFlip(args[13]),
       realization: num(args[14]),
       text_color: num(args[15]),
       showname: str(args[16]),
@@ -259,7 +277,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       // Server-receiver form skips other_name (18) and other_emote (19).
       self_offset: args[18] ?? "",
       other_offset: args[19] ?? "",
-      other_flip: num(args[20]),
+      other_flip: parseFlip(args[20]),
       noninterrupting_preanim: num(args[21]),
       sfx_looping: num(args[22]),
       screenshake: num(args[23]),

@@ -1,6 +1,6 @@
 import { client, selectedShout } from "../client";
 import { escapeChat } from "../encoding";
-import { EmoteModifier, parseEmoteModifier } from "../packets/MS";
+import { EmoteModifier, Flip, parseEmoteModifier } from "../packets/MS";
 
 /**
  * Triggered when the Return key is pressed on the in-character chat input box.
@@ -11,9 +11,11 @@ export function onEnter(event: KeyboardEvent) {
     const mychar = client.character;
     const myemo = client.emote;
     const evi = client.evidence + 1;
-    const flip = Boolean(
-      document.getElementById("button_flip")!.classList.contains("dark"),
-    );
+    const flip = document
+      .getElementById("button_flip")!
+      .classList.contains("dark")
+      ? Flip.HORIZONTAL
+      : Flip.NONE;
     const flash = Boolean(
       document.getElementById("button_flash")!.classList.contains("dark"),
     );

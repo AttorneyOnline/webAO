@@ -15,6 +15,7 @@ import { decodeChat, safeTags } from "../../encoding";
 import {
   DeskModifier,
   EmoteModifier,
+  Flip,
   ShoutModifier,
   Side,
   type MSPacketClient,
@@ -62,6 +63,15 @@ export let startThirdTickCheck: boolean;
 export const setStartThirdTickCheck = (val: boolean) => {
   startThirdTickCheck = val;
 };
+/** Per-axis mirroring CSS transform for a Flip value. */
+const flipTransform = (flip: Flip | undefined): string => {
+  const x =
+    flip === Flip.HORIZONTAL || flip === Flip.HORIZONTAL_AND_VERTICAL ? -1 : 1;
+  const y =
+    flip === Flip.VERTICAL || flip === Flip.HORIZONTAL_AND_VERTICAL ? -1 : 1;
+  return `scale(${x}, ${y})`;
+};
+
 /**
  * Builds the viewport's internal rendering state from an incoming MS packet.
  * The state is a `ChatMsg` that downstream tick() / updateTestimony /
@@ -336,13 +346,13 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
   }
 
   if (!skipoffset) {
-    // Flip the character
-    charLayers.style.transform =
-      client.viewport.getChatmsg().flip === 1 ? "scaleX(-1)" : "scaleX(1)";
-    pairLayers.style.transform =
-      client.viewport.getChatmsg().other_flip === 1
-        ? "scaleX(-1)"
-        : "scaleX(1)";
+    // Flip the character. HORIZONTAL_AND_VERTICAL handles both axes.
+    charLayers.style.transform = flipTransform(
+      client.viewport.getChatmsg().flip,
+    );
+    pairLayers.style.transform = flipTransform(
+      client.viewport.getChatmsg().other_flip,
+    );
 
     // Shift by the horizontal offset
     switch (client.viewport.getChatmsg().side) {

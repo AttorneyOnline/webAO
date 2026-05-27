@@ -1,7 +1,7 @@
 import { extrafeatures } from "../../client";
 import { escapeChat } from "../../encoding";
 import { client } from "../../client";
-import type { EmoteModifier, ShoutModifier } from "../../packets/MS";
+import type { EmoteModifier, Flip, ShoutModifier } from "../../packets/MS";
 import queryParser from "../../utils/queryParser";
 const { mode } = queryParser();
 
@@ -38,7 +38,7 @@ export const sendIC = (
   sfx_delay: number,
   shout_modifier: ShoutModifier,
   evidence: number,
-  flip: boolean,
+  flip: Flip,
   realization: boolean,
   text_color: number,
   showname: string,
@@ -91,9 +91,9 @@ export const sendIC = (
     `#${escapeChat(message)}#${escapeChat(side)}#${escapeChat(
       sfx_name,
     )}#${emote_modifier}` +
-    `#${client.charID}#${sfx_delay}#${Number(shout_modifier)}#${Number(
+    `#${client.charID}#${sfx_delay}#${shout_modifier}#${Number(
       evidence,
-    )}#${Number(flip)}#${Number(
+    )}#${flip}#${Number(
       realization,
     )}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
 
