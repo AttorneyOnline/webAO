@@ -7,7 +7,7 @@ import "./styles/client.css";
 import "./styles/goldenlayout.css";
 import { isLowMemory } from "./client/isLowMemory";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { sender, ISender } from "./client/sender/index";
+import { sender, type Sender } from "./client/sender/index";
 import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources";
 import masterViewport from "./viewport/viewport";
@@ -147,7 +147,7 @@ class Client extends EventEmitter {
   resources: any;
   selectedEmote: number;
   selectedEvidence: number;
-  sender: ISender;
+  sender: Sender;
   checkUpdater: any;
   _lastTimeICReceived: any;
   viewport: Viewport;
