@@ -2,6 +2,7 @@ import type {
   DeskModifier,
   EmoteModifier,
   Flip,
+  Offset,
   ShoutModifier,
   Side,
   TextColor,
@@ -20,8 +21,8 @@ export interface ChatMsg {
   preanimdelay?: number;
   speed: number;
   blips: string;
-  self_offset?: number[];
-  other_offset?: number[];
+  self_offset?: Offset;
+  other_offset?: Offset;
   showname?: string;
   nameplate?: string;
   flip?: Flip;

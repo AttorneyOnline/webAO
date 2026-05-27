@@ -85,11 +85,6 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
   const msg_blips = char?.blips ?? "male";
   const char_chatbox = char?.chat ?? "default";
 
-  // x<and>y wire form -> [x, y] with "0"/"0" defaults so missing axes
-  // degrade to 0 rather than NaN.
-  const [self_x = "0", self_y = "0"] = packet.self_offset.split("<and>");
-  const [other_x = "0", other_y = "0"] = packet.other_offset.split("<and>");
-
   let content = safeTags(decodeChat(packet.message));
   let chatbox = char_chatbox;
   if (content.trim() === "") {
@@ -120,8 +115,8 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
     showname: safeTags(decodeChat(packet.showname)),
     other_name: safeTags(packet.other_name),
     other_emote: safeTags(packet.other_emote),
-    self_offset: [Number(self_x), Number(self_y)],
-    other_offset: [Number(other_x), Number(other_y)],
+    self_offset: packet.self_offset,
+    other_offset: packet.other_offset,
     other_flip: packet.other_flip,
     noninterrupting_preanim: packet.noninterrupting_preanim,
     looping_sfx: Boolean(packet.sfx_looping),
@@ -355,24 +350,19 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
     );
 
     // Shift by the horizontal offset
-    switch (client.viewport.getChatmsg().side) {
-      case Side.WITNESS:
-        pairLayers.style.left = `${200 + Number(client.viewport.getChatmsg().other_offset[0])}%`;
-        charLayers.style.left = `${200 + Number(client.viewport.getChatmsg().self_offset[0])}%`;
-        break;
-      case Side.PROSECUTION:
-        pairLayers.style.left = `${400 + Number(client.viewport.getChatmsg().other_offset[0])}%`;
-        charLayers.style.left = `${400 + Number(client.viewport.getChatmsg().self_offset[0])}%`;
-        break;
-      default:
-        pairLayers.style.left = `${Number(client.viewport.getChatmsg().other_offset[0])}%`;
-        charLayers.style.left = `${Number(client.viewport.getChatmsg().self_offset[0])}%`;
-        break;
-    }
+    const chatmsgNow = client.viewport.getChatmsg();
+    const baseLeft =
+      chatmsgNow.side === Side.WITNESS
+        ? 200
+        : chatmsgNow.side === Side.PROSECUTION
+          ? 400
+          : 0;
+    pairLayers.style.left = `${baseLeft + (chatmsgNow.other_offset?.x ?? 0)}%`;
+    charLayers.style.left = `${baseLeft + (chatmsgNow.self_offset?.x ?? 0)}%`;
 
-    // New vertical offsets
-    pairLayers.style.top = `${Number(client.viewport.getChatmsg().other_offset[1])}%`;
-    charLayers.style.top = `${Number(client.viewport.getChatmsg().self_offset[1])}%`;
+    // Vertical offsets
+    pairLayers.style.top = `${chatmsgNow.other_offset?.y ?? 0}%`;
+    charLayers.style.top = `${chatmsgNow.self_offset?.y ?? 0}%`;
   }
 
   setBlipUrl(

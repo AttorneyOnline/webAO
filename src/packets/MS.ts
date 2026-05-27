@@ -21,10 +21,29 @@ import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
  *     `other_name` and `other_emote` are not present on the wire.
  *     Modeled by `MSPacketServer` + the `MSServer` codec.
  *
- * `self_offset` / `other_offset` are intentionally kept as raw strings:
- * AO2-Client serializes them with `<and>` instead of `&` (a historical
- * wart every server adopted), and the handler splits on `<and>` directly.
+ * `self_offset` / `other_offset` are decoded into `{x, y}` here. The wire
+ * format is the spec form `{x}&{y}` -- but `&` is a FantaCode control
+ * character (escape `<and>`), so on the actual bytes you see `{x}<and>{y}`.
+ * That's why every AO server in the wild appears to "use literal `<and>`":
+ * it's just standard FantaCode escape of `&`. The codec runs the regular
+ * unescape (`<and>` → `&`) on decode and re-escapes on encode, so
+ * downstream consumers see logical `{x, y}` and never have to think about
+ * the wire-level dance.
  */
+/** Numeric x/y offset pair parsed from the `{x}&{y}` wire form. */
+export interface Offset {
+  x: number;
+  y: number;
+}
+
+const parseOffset = (s: string | undefined): Offset => {
+  // `str()` already unescaped `<and>` → `&` for us; split on the logical `&`.
+  const [xs = "0", ys = "0"] = (s ?? "").split("&");
+  return { x: Number(xs) || 0, y: Number(ys) || 0 };
+};
+
+const encodeOffset = (o: Offset): string => `${o.x}&${o.y}`;
+
 /** Desk visibility behavior. See spec for behavioral details per value. */
 export enum DeskModifier {
   HIDDEN = 0,
@@ -173,8 +192,8 @@ export interface MSPacketClient {
   other_charid: number;
   other_name: string;
   other_emote: string;
-  self_offset: string;
-  other_offset: string;
+  self_offset: Offset;
+  other_offset: Offset;
   other_flip: Flip;
   noninterrupting_preanim: number;
   // 2.7 group
@@ -219,8 +238,8 @@ export const MS: PacketCodec<MSPacketClient> = {
       other_charid: num(args[17]),
       other_name: str(args[18]),
       other_emote: str(args[19]),
-      self_offset: args[20] ?? "",
-      other_offset: args[21] ?? "",
+      self_offset: parseOffset(str(args[20])),
+      other_offset: parseOffset(str(args[21])),
       other_flip: parseFlip(args[22]),
       noninterrupting_preanim: num(args[23]),
       sfx_looping: num(args[24]),
@@ -256,8 +275,8 @@ export const MS: PacketCodec<MSPacketClient> = {
       p.other_charid,
       escapeChat(p.other_name),
       escapeChat(p.other_emote),
-      p.self_offset,
-      p.other_offset,
+      escapeChat(encodeOffset(p.self_offset)),
+      escapeChat(encodeOffset(p.other_offset)),
       p.other_flip,
       p.noninterrupting_preanim,
       p.sfx_looping,
@@ -295,8 +314,8 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       showname: str(args[16]),
       other_charid: num(args[17]),
       // Server-receiver form skips other_name (18) and other_emote (19).
-      self_offset: args[18] ?? "",
-      other_offset: args[19] ?? "",
+      self_offset: parseOffset(str(args[18])),
+      other_offset: parseOffset(str(args[19])),
       other_flip: parseFlip(args[20]),
       noninterrupting_preanim: num(args[21]),
       sfx_looping: num(args[22]),
@@ -330,8 +349,8 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       p.text_color,
       escapeChat(p.showname),
       p.other_charid,
-      p.self_offset,
-      p.other_offset,
+      escapeChat(encodeOffset(p.self_offset)),
+      escapeChat(encodeOffset(p.other_offset)),
       p.other_flip,
       p.noninterrupting_preanim,
       p.sfx_looping,
