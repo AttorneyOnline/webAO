@@ -31,6 +31,7 @@ export const handleFL = (packet: FLPacket) => {
     colorselect.options[colorselect.options.length] = new Option("Pink", "6");
     colorselect.options[colorselect.options.length] = new Option("Cyan", "7");
     colorselect.options[colorselect.options.length] = new Option("Grey", "8");
+    colorselect.options[colorselect.options.length] = new Option("Rainbow", "9");
   }
 
   if (features.includes("cccc_ic_support")) {
