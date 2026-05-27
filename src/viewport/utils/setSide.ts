@@ -1,16 +1,10 @@
 import { positions } from "../constants/positions";
 import { AO_HOST } from "../../client/aoHost";
 import { client } from "../../client";
-import { Side } from "../../packets/MS";
+import { isFullView, Side } from "../../packets/MS";
 import transparentPng from "../../constants/transparentPng";
 import fileExists from "../../utils/fileExists";
 import { isHideDesksEnabled } from "../../dom/switchHideDesks";
-
-// Function-based checks rather than module-level arrays: enum members
-// are accessed only at call time, avoiding "Side is undefined" during
-// circular-import init (BN.ts -> setSide.ts -> MS.ts -> setSide.ts).
-const isFullView = (s: Side): boolean =>
-  s === Side.DEFENSE || s === Side.PROSECUTION || s === Side.WITNESS;
 
 export async function setBackgroundImage(elementid: string, bgname: string, bgpart: string) {
 

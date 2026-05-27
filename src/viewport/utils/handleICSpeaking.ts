@@ -16,12 +16,16 @@ import {
   DeskModifier,
   EmoteModifier,
   Flip,
+  isFullView,
   ShoutModifier,
   Side,
   type MSPacketClient,
 } from "../../packets/MS";
 import preloadMessageAssets from "./preloadMessageAssets";
 import { setBlipUrl } from "./blipAudio";
+
+const SOUND_SENTINELS = new Set(["", "0", "1"]);
+const BAD_EFFECTS = new Set(["", "-", "none"]);
 
 let attorneyMarkdown: ReturnType<typeof mlConfig> | null = null;
 export let markdownDisabled = false;
@@ -178,8 +182,7 @@ const prepareICMessage = async (packet: MSPacketClient): Promise<ChatMsg> => {
 
   // Sentinel sounds ("", "0", "1") fall back to the effect's per-character
   // sound name (third slot of the `|`-separated effects string).
-  const soundSentinels = ["", "0", "1", undefined];
-  if (soundSentinels.includes(chatmsg.sound)) {
+  if (SOUND_SENTINELS.has(chatmsg.sound)) {
     chatmsg.sound = chatmsg.effects[2] ?? "";
   }
 
@@ -188,6 +191,81 @@ const prepareICMessage = async (packet: MSPacketClient): Promise<ChatMsg> => {
   chatmsg.parsed = await parseContent(chatmsg);
 
   return chatmsg;
+};
+
+/**
+ * Plays the shout bubble + sfx for the message, or clears the shout
+ * timer if the message has no shout. The chat container is hidden
+ * during the shout so it doesn't show through the bubble animation.
+ */
+const applyShout = (chatmsg: ChatMsg, chatContainerBox: HTMLElement) => {
+  const shout = SHOUTS[chatmsg.shout_modifier];
+  if (!shout) {
+    client.viewport.setShoutTimer(0);
+    return;
+  }
+
+  const preloaded = chatmsg.preloadedAssets!;
+  const shoutSprite = <HTMLImageElement>document.getElementById("client_shout");
+  chatContainerBox.style.opacity = "0";
+
+  // Prefer the preloaded per-character bubble; fall back to the default
+  // URL otherwise. Custom shouts have no default -- use the legacy
+  // character/<name>/custom.gif path which the onerror handler hides
+  // if it's missing.
+  if (chatmsg.shout_modifier === ShoutModifier.CUSTOM) {
+    shoutSprite.src =
+      preloaded.shoutBubbleUrl ??
+      `${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/custom.gif`;
+  } else {
+    shoutSprite.src = preloaded.shoutBubbleUrl ?? client.resources[shout].src;
+    shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
+  }
+  shoutSprite.onerror = () => {
+    shoutSprite.style.display = "none";
+  };
+  shoutSprite.style.display = "block";
+
+  client.viewport.shoutaudio.src = preloaded.shoutSfxUrl ?? client.resources[shout].sfx;
+  client.viewport.shoutaudio.play().catch(() => {});
+  client.viewport.setShoutTimer(client.resources[shout].duration);
+};
+
+/** Spawns the rain-drop DOM into the foreground layer. */
+const applyRainEffect = (fg: HTMLImageElement, effectName: string) => {
+  (<HTMLLinkElement>document.getElementById("effect_css")).href =
+    "styles/effects/rain.css";
+  let intensity = 200;
+  if (effectName.endsWith("weak")) intensity = 100;
+  else if (effectName.endsWith("strong")) intensity = 400;
+  if (intensity < fg.childElementCount) fg.innerHTML = "";
+  else intensity -= fg.childElementCount;
+  for (let i = 0; i < intensity; i++) {
+    const drop = document.createElement("p");
+    drop.style.left = Math.random() * 100 + "%";
+    drop.style.animationDelay = String(Math.random()) + "s";
+    fg.appendChild(drop);
+  }
+};
+
+/**
+ * Applies the foreground effects overlay: rain spawns drops, named
+ * effects load a webp into `client_fg`, and absent/sentinel effects
+ * clear the layer.
+ */
+const applyEffectsOverlay = (fg: HTMLImageElement, effects: string[]) => {
+  fg.style.animation = "";
+  const effectName = effects[0].toLowerCase();
+  if (effectName.startsWith("rain")) {
+    applyRainEffect(fg, effectName);
+  } else if (effects[0] && !BAD_EFFECTS.has(effectName)) {
+    (<HTMLLinkElement>document.getElementById("effect_css")).href = "";
+    fg.innerHTML = "";
+    fg.src = `${AO_HOST}themes/default/effects/${encodeURI(effectName)}.webp`;
+  } else {
+    fg.innerHTML = "";
+    fg.src = transparentPng;
+  }
 };
 
 // ---------------------------------------------------------------------------
@@ -205,8 +283,6 @@ const renderICMessage = (chatmsg: ChatMsg) => {
   startFirstTickCheck = true;
   startSecondTickCheck = false;
   startThirdTickCheck = false;
-  let charLayers = document.getElementById("client_char")!;
-  let pairLayers = document.getElementById("client_pair_char")!;
   clearTimeout(client.viewport.updater);
 
   // stop last sfx from looping any longer
@@ -225,13 +301,15 @@ const renderICMessage = (chatmsg: ChatMsg) => {
   }
   client.viewport.setLastEvidence(chatmsg.evidence_id);
 
-  // Full-view sides get the pan-camera layers; everything else uses the
-  // single `client_char` layer.
-  const FULL_VIEW: Side[] = [Side.DEFENSE, Side.PROSECUTION, Side.WITNESS];
-  if (FULL_VIEW.includes(chatmsg.side)) {
-    charLayers = document.getElementById(`client_${chatmsg.side}_char`);
-    pairLayers = document.getElementById(`client_${chatmsg.side}_pair_char`);
-  }
+  // Full-view sides get the pan-camera layers (`client_<side>_char`);
+  // everything else uses the single shared `client_char` layer.
+  const fullView = isFullView(chatmsg.side);
+  const charLayers = document.getElementById(
+    fullView ? `client_${chatmsg.side}_char` : "client_char",
+  )!;
+  const pairLayers = document.getElementById(
+    fullView ? `client_${chatmsg.side}_pair_char` : "client_pair_char",
+  )!;
 
   const chatContainerBox = document.getElementById("client_chatcontainer")!;
   const nameBoxInner = document.getElementById("client_inner_name")!;
@@ -263,34 +341,7 @@ const renderICMessage = (chatmsg: ChatMsg) => {
     setEmoteFromUrl(preloaded.pairIdleUrl, true, chatmsg.side);
   }
 
-  // Shout
-  const shoutSprite = <HTMLImageElement>document.getElementById("client_shout");
-  const shout = SHOUTS[chatmsg.shout_modifier];
-  if (shout) {
-    chatContainerBox.style.opacity = "0";
-    // Prefer the preloaded per-character bubble; fall back to the default
-    // URL otherwise. Custom shouts have no default -- use the legacy
-    // character/<name>/custom.gif path which the onerror handler hides
-    // if it's missing.
-    if (chatmsg.shout_modifier === ShoutModifier.CUSTOM) {
-      shoutSprite.src =
-        preloaded.shoutBubbleUrl ??
-        `${AO_HOST}characters/${encodeURI(chatmsg.name.toLowerCase())}/custom.gif`;
-    } else {
-      shoutSprite.src = preloaded.shoutBubbleUrl ?? client.resources[shout].src;
-      shoutSprite.style.animation = "bubble 700ms steps(10, jump-both)";
-    }
-    shoutSprite.onerror = () => {
-      shoutSprite.style.display = "none";
-    };
-    shoutSprite.style.display = "block";
-
-    client.viewport.shoutaudio.src = preloaded.shoutSfxUrl ?? client.resources[shout].sfx;
-    client.viewport.shoutaudio.play().catch(() => {});
-    client.viewport.setShoutTimer(client.resources[shout].duration);
-  } else {
-    client.viewport.setShoutTimer(0);
-  }
+  applyShout(chatmsg, chatContainerBox);
 
   // Desk visibility / speed-lines per emote_modifier + desk_modifier.
   const hasPreanim = !chatmsg.startspeaking;
@@ -360,32 +411,7 @@ const renderICMessage = (chatmsg: ChatMsg) => {
     ? "center"
     : "inherit";
 
-  // Effects overlay.
-  fg.style.animation = "";
-  const effectName = chatmsg.effects[0].toLowerCase();
-  const badEffects = ["", "-", "none"];
-  if (effectName.startsWith("rain")) {
-    (<HTMLLinkElement>document.getElementById("effect_css")).href =
-      "styles/effects/rain.css";
-    let intensity = 200;
-    if (effectName.endsWith("weak")) intensity = 100;
-    else if (effectName.endsWith("strong")) intensity = 400;
-    if (intensity < fg.childElementCount) fg.innerHTML = "";
-    else intensity = intensity - fg.childElementCount;
-    for (let i = 0; i < intensity; i++) {
-      const drop = document.createElement("p");
-      drop.style.left = Math.random() * 100 + "%";
-      drop.style.animationDelay = String(Math.random()) + "s";
-      fg.appendChild(drop);
-    }
-  } else if (chatmsg.effects[0] && !badEffects.includes(effectName)) {
-    (<HTMLLinkElement>document.getElementById("effect_css")).href = "";
-    fg.innerHTML = "";
-    fg.src = `${AO_HOST}themes/default/effects/${encodeURI(effectName)}.webp`;
-  } else {
-    fg.innerHTML = "";
-    fg.src = transparentPng;
-  }
+  applyEffectsOverlay(fg, chatmsg.effects);
 
   charLayers.style.opacity = "1";
 

@@ -171,6 +171,14 @@ export const parseSide = (s: string | undefined): Side => {
   return KNOWN_SIDES.has(lower) ? (lower as Side) : Side.WITNESS;
 };
 
+/**
+ * True for sides that use the full-view pan-camera layout
+ * (`client_<side>_char` + `client_<side>_pair_char`). Other sides fall
+ * back to the single shared `client_char` layer.
+ */
+export const isFullView = (s: Side): boolean =>
+  s === Side.DEFENSE || s === Side.PROSECUTION || s === Side.WITNESS;
+
 export interface MSPacketClient {
   desk_modifier: DeskModifier;
   preanim: string;
