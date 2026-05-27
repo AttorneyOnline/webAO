@@ -1,5 +1,5 @@
 import { ChatMsg } from "../interfaces/ChatMsg";
-import { client } from "../../client";
+import { client, UPDATE_INTERVAL } from "../../client";
 import { appendICLog } from "../../client/appendICLog";
 import { checkCallword } from "../../client/checkCallword";
 import setEmoteFromUrl from "../../client/setEmoteFromUrl";
@@ -11,6 +11,8 @@ import transparentPng from "../../constants/transparentPng";
 import { COLORS } from "../constants/colors";
 import mlConfig from "../../utils/aoml";
 import request from "../../services/request";
+import { decodeChat, safeTags } from "../../encoding";
+import type { MSPacketClient } from "../../packets/MS";
 import preloadMessageAssets from "./preloadMessageAssets";
 import { setBlipUrl } from "./blipAudio";
 
@@ -55,14 +57,72 @@ export const setStartThirdTickCheck = (val: boolean) => {
   startThirdTickCheck = val;
 };
 /**
+ * Builds the viewport's internal rendering state from an incoming MS packet.
+ * The state is a `ChatMsg` that downstream tick() / updateTestimony /
+ * preloader code reads back via `viewport.getChatmsg()`. Character-derived
+ * fields (nameplate, chatbox, blips sound) come from `client.chars`;
+ * everything else is mapped/transformed from the packet itself.
+ */
+const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
+  const char = client.chars[packet.char_id];
+  const msg_nameplate = char?.showname ?? packet.character;
+  const msg_blips = char?.blips ?? "male";
+  const char_chatbox = char?.chat ?? "default";
+
+  // x<and>y wire form -> [x, y] with "0"/"0" defaults so missing axes
+  // degrade to 0 rather than NaN.
+  const [self_x = "0", self_y = "0"] = packet.self_offset.split("<and>");
+  const [other_x = "0", other_y = "0"] = packet.other_offset.split("<and>");
+
+  let content = safeTags(decodeChat(packet.message));
+  let chatbox = char_chatbox;
+  if (content.trim() === "") {
+    // blankpost: empty chatbox means hide it
+    content = "";
+    chatbox = "";
+  }
+
+  return {
+    deskmod: Number(safeTags(packet.desk_mod).toLowerCase()),
+    preanim: safeTags(packet.preanim).toLowerCase(),
+    nameplate: msg_nameplate,
+    chatbox,
+    name: safeTags(packet.character),
+    sprite: safeTags(packet.emote).toLowerCase(),
+    content,
+    side: packet.side.toLowerCase(),
+    sound: safeTags(packet.sfx_name).toLowerCase(),
+    blips: safeTags(msg_blips),
+    type: packet.emote_modifier,
+    snddelay: packet.sfx_delay,
+    objection: packet.shout_modifier,
+    evidence: Number(safeTags(packet.evidence)),
+    flip: packet.flip,
+    flash: packet.realization,
+    color: packet.text_color,
+    speed: UPDATE_INTERVAL,
+    showname: safeTags(decodeChat(packet.showname)),
+    other_name: safeTags(packet.other_name),
+    other_emote: safeTags(packet.other_emote),
+    self_offset: [Number(self_x), Number(self_y)],
+    other_offset: [Number(other_x), Number(other_y)],
+    other_flip: packet.other_flip,
+    noninterrupting_preanim: packet.noninterrupting_preanim,
+    looping_sfx: Boolean(packet.sfx_looping),
+    screenshake: packet.screenshake,
+    additive: Boolean(packet.additive),
+    effects: packet.effect.split("|"),
+  };
+};
+
+/**
  * Sets a new emote.
  * This sets up everything before the tick() loops starts
  * a lot of things can probably be moved here, like starting the shout animation if there is one
  * TODO: the preanim logic, on the other hand, should probably be moved to tick()
- * @param playerChatMsg the new chat message
  */
-export const handle_ic_speaking = async (playerChatMsg: ChatMsg) => {
-  client.viewport.setChatmsg(playerChatMsg);
+export const handle_ic_speaking = async (packet: MSPacketClient) => {
+  client.viewport.setChatmsg(buildChatMsg(packet));
   client.viewport.setTextNow("");
   client.viewport.setSfxPlayed(0);
   client.viewport.setTickTimer(0);

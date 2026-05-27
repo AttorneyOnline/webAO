@@ -33,5 +33,6 @@ export interface ChatMsg {
   evidence?: number;
   looping_sfx?: boolean;
   noninterrupting_preanim?: number;
+  additive?: boolean;
   preloadedAssets?: PreloadedAssets;
 }

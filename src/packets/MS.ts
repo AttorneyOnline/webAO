@@ -1,7 +1,7 @@
-import { client, UPDATE_INTERVAL } from "../client";
+import { client } from "../client";
 import { handleCharacterInfo, ensureCharIni } from "../client/handleCharacterInfo";
 import { resetICParams } from "../client/resetICParams";
-import { decodeChat, escapeChat, safeTags, unescapeChat } from "../encoding";
+import { escapeChat, safeTags, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
 import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
 
@@ -15,7 +15,7 @@ import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
  * short wire forms get filled with the documented defaults.
  *
  *   Client-as-receiver (Server → Client): all 32 fields. Modeled by
- *     `MSPacket` + the `MS` codec (used by the dispatcher).
+ *     `MSPacketClient` + the `MS` codec (used by the dispatcher).
  *
  *   Server-as-receiver (Client → Server): same fields *except*
  *     `other_name` and `other_emote` are not present on the wire.
@@ -25,7 +25,7 @@ import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
  * AO2-Client serializes them with `<and>` instead of `&` (a historical
  * wart every server adopted), and the handler splits on `<and>` directly.
  */
-export interface MSPacket {
+export interface MSPacketClient {
   desk_mod: string;
   preanim: string;
   character: string;
@@ -65,12 +65,12 @@ export interface MSPacket {
 }
 
 /** Server-as-receiver form: omits `other_name` and `other_emote`. */
-export type MSPacketServer = Omit<MSPacket, "other_name" | "other_emote">;
+export type MSPacketServer = Omit<MSPacketClient, "other_name" | "other_emote">;
 
 const str = (v: string | undefined) => unescapeChat(v ?? "");
 const num = (v: string | undefined) => Number(v) || 0;
 
-export const MS: PacketCodec<MSPacket> = {
+export const MS: PacketCodec<MSPacketClient> = {
   decode(args) {
     return {
       desk_mod: str(args[1]),
@@ -222,9 +222,11 @@ export const MSServer: PacketCodec<MSPacketServer> = {
 };
 
 /**
- * Handles an in-character chat message.
+ * Handles an in-character chat message. Gatekeeps (duplicate / iniedit /
+ * muted) and then delegates rendering to `handle_ic_speaking`, which owns
+ * the viewport state construction from the packet.
  */
-export const handleMS = (packet: MSPacket) => {
+export const handleMS = (packet: MSPacketClient) => {
   // duplicate message
   if (packet.message === client.viewport.getChatmsg().content) return;
 
@@ -248,65 +250,12 @@ export const handleMS = (packet: MSPacket) => {
   if (!char) {
     console.error("we're still missing some character data");
   }
-  const msg_nameplate = char?.showname ?? packet.character;
-  const msg_blips = char?.blips ?? "male";
-  const char_chatbox = char?.chat ?? "default";
-  const char_muted = char?.muted ?? false;
-
-  if (char_muted) return;
-
-  // self_offset/other_offset wire format is `x<and>y`; destructure with
-  // defaults so missing/empty offsets degrade to "0"/"0" rather than NaN.
-  const [self_x = "0", self_y = "0"] = packet.self_offset.split("<and>");
-  const [other_x = "0", other_y = "0"] = packet.other_offset.split("<and>");
-
-  const chatmsg = {
-    deskmod: Number(safeTags(packet.desk_mod).toLowerCase()),
-    preanim: safeTags(packet.preanim).toLowerCase(),
-    nameplate: msg_nameplate,
-    chatbox: char_chatbox,
-    name: char_name,
-    sprite: safeTags(packet.emote).toLowerCase(),
-    content: safeTags(decodeChat(packet.message)),
-    side: packet.side.toLowerCase(),
-    sound: safeTags(packet.sfx_name).toLowerCase(),
-    blips: safeTags(msg_blips),
-    type: packet.emote_modifier,
-    charid: char_id,
-    snddelay: packet.sfx_delay,
-    objection: packet.shout_modifier,
-    evidence: Number(safeTags(packet.evidence)),
-    flip: packet.flip,
-    flash: packet.realization,
-    color: packet.text_color,
-    speed: UPDATE_INTERVAL,
-    showname: safeTags(decodeChat(packet.showname)),
-    other_charid: packet.other_charid,
-    other_name: safeTags(packet.other_name),
-    other_emote: safeTags(packet.other_emote),
-    self_offset: [Number(self_x), Number(self_y)],
-    other_offset: [Number(other_x), Number(other_y)],
-    other_flip: packet.other_flip,
-    noninterrupting_preanim: packet.noninterrupting_preanim,
-    looping_sfx: Boolean(packet.sfx_looping),
-    screenshake: packet.screenshake,
-    frame_screenshake: safeTags(packet.frames_shake),
-    frame_realization: safeTags(packet.frames_realization),
-    frame_sfx: safeTags(packet.frames_sfx),
-    additive: packet.additive,
-    effects: packet.effect.split("|"),
-  };
-
-  if (chatmsg.content.trim() === "") {
-    // blankpost: empty chatbox means hide it
-    chatmsg.content = "";
-    chatmsg.chatbox = "";
-  }
+  if (char?.muted) return;
 
   // our own message appeared, reset the buttons
-  if (chatmsg.charid === client.charID) {
+  if (char_id === client.charID) {
     resetICParams();
   }
 
-  handle_ic_speaking(chatmsg); // no await
+  handle_ic_speaking(packet); // no await
 };
