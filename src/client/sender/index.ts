@@ -1,10 +1,4 @@
-import type {
-  DeskModifier,
-  EmoteModifier,
-  Flip,
-  ShoutModifier,
-  TextColor,
-} from "../../packets/MS";
+import type { MSPacketServer } from "../../packets/MS";
 import { sendIC } from "./sendIC";
 import { sendSelf } from "./sendSelf";
 import { sendServer } from "./sendServer";
@@ -20,34 +14,7 @@ import { sendDE } from "./sendDE";
 import { sendPE } from "./sendPE";
 import { sendMA } from "./sendMA";
 export interface ISender {
-  sendIC: (
-    desk_modifier: DeskModifier,
-    preanim: string,
-    name: string,
-    emote: string,
-    message: string,
-    side: string,
-    sfx_name: string,
-    emote_modifier: EmoteModifier,
-    sfx_delay: number,
-    shout_modifier: ShoutModifier,
-    evidence_id: number,
-    flip: Flip,
-    realization: boolean,
-    text_color: TextColor,
-    showname: string,
-    paired_charid: string,
-    self_hoffset: number,
-    self_yoffset: number,
-    noninterrupting_preanim: boolean,
-    sfx_looping: boolean,
-    screenshake: boolean,
-    frames_shake: string,
-    frames_realization: string,
-    frames_sfx: string,
-    additive: boolean,
-    effect: string,
-  ) => void;
+  sendIC: (packet: MSPacketServer) => void;
   sendSelf: (message: string) => void;
   sendServer: (message: string) => void;
   sendCheck: () => void;

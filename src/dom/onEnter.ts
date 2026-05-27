@@ -4,107 +4,67 @@ import {
   EmoteModifier,
   Flip,
   parseEmoteModifier,
+  parseSide,
   parseTextColor,
 } from "../packets/MS";
 
+const input = (id: string) =>
+  document.getElementById(id) as HTMLInputElement;
+const isToggled = (id: string) =>
+  document.getElementById(id)!.classList.contains("dark");
+
 /**
  * Triggered when the Return key is pressed on the in-character chat input box.
- * @param {KeyboardEvent} event
  */
 export function onEnter(event: KeyboardEvent) {
-  if (event.keyCode === 13) {
-    const mychar = client.character;
-    const myemo = client.emote;
-    const evi = client.evidence + 1;
-    const flip = document
-      .getElementById("button_flip")!
-      .classList.contains("dark")
-      ? Flip.HORIZONTAL
-      : Flip.NONE;
-    const flash = Boolean(
-      document.getElementById("button_flash")!.classList.contains("dark"),
-    );
-    const screenshake = Boolean(
-      document.getElementById("button_shake")!.classList.contains("dark"),
-    );
-    const noninterrupting_preanim = Boolean(
-      (<HTMLInputElement>document.getElementById("check_nonint")).checked,
-    );
-    const sfx_looping = Boolean(
-      (<HTMLInputElement>document.getElementById("check_loopsfx")).checked,
-    );
-    const color = parseTextColor(
-      (<HTMLInputElement>document.getElementById("textcolor")).value,
-    );
-    const showname = escapeChat(
-      (<HTMLInputElement>document.getElementById("ic_chat_name")).value,
-    );
-    const text = (<HTMLInputElement>document.getElementById("client_inputbox"))
-      .value;
-    const pairchar = (<HTMLInputElement>document.getElementById("pair_select"))
-      .value;
-    const pairoffset = Number(
-      (<HTMLInputElement>document.getElementById("pair_offset")).value,
-    );
-    const pairyoffset = Number(
-      (<HTMLInputElement>document.getElementById("pair_y_offset")).value,
-    );
-    const myrole = (<HTMLInputElement>document.getElementById("role_select"))
-      .value
-      ? (<HTMLInputElement>document.getElementById("role_select")).value
-      : mychar.side;
-    const additive = Boolean(
-      (<HTMLInputElement>document.getElementById("check_additive")).checked,
-    );
-    const effect = (<HTMLInputElement>document.getElementById("effect_select"))
-      .value;
+  if (event.keyCode !== 13) return false;
 
-    let sfxname = "0";
-    let sfxdelay = 0;
-    let emote_mod: EmoteModifier = parseEmoteModifier(String(myemo.zoom));
-    if ((<HTMLInputElement>document.getElementById("sendsfx")).checked) {
-      sfxname = myemo.sfx;
-      sfxdelay = myemo.sfxdelay;
-    }
+  const mychar = client.character;
+  const myemo = client.emote;
+  const sendSfx = input("sendsfx").checked;
+  const sendPreanim = input("sendpreanim").checked;
 
-    // not to overwrite a 5/6 from the ini or anything else
-    if ((<HTMLInputElement>document.getElementById("sendpreanim")).checked) {
-      if (emote_mod === EmoteModifier.NO_PREANIM) {
-        emote_mod = EmoteModifier.PREANIM;
-      }
-    } else if (emote_mod === EmoteModifier.PREANIM) {
-      emote_mod = EmoteModifier.NO_PREANIM;
-    }
-
-    client.sender.sendIC(
-      myemo.desk_modifier,
-      myemo.preanim,
-      mychar.name,
-      myemo.emote,
-      text,
-      myrole,
-      sfxname,
-      emote_mod,
-      sfxdelay,
-      selectedShout,
-      evi,
-      flip,
-      flash,
-      color,
-      showname,
-      pairchar,
-      pairoffset,
-      pairyoffset,
-      noninterrupting_preanim,
-      sfx_looping,
-      screenshake,
-      "-",
-      "-",
-      "-",
-      additive,
-      effect,
-    );
+  // sendpreanim toggle only flips between PREANIM and NO_PREANIM; don't
+  // clobber zoom/objection variants from the ini.
+  let emote_modifier = parseEmoteModifier(String(myemo.zoom));
+  if (sendPreanim && emote_modifier === EmoteModifier.NO_PREANIM) {
+    emote_modifier = EmoteModifier.PREANIM;
+  } else if (!sendPreanim && emote_modifier === EmoteModifier.PREANIM) {
+    emote_modifier = EmoteModifier.NO_PREANIM;
   }
+
+  client.sender.sendIC({
+    desk_modifier: myemo.desk_modifier,
+    preanim: myemo.preanim,
+    character: mychar.name,
+    emote: myemo.emote,
+    message: input("client_inputbox").value,
+    side: parseSide(input("role_select").value || mychar.side),
+    sfx_name: sendSfx ? myemo.sfx : "0",
+    emote_modifier,
+    char_id: client.charID,
+    sfx_delay: sendSfx ? myemo.sfxdelay : 0,
+    shout_modifier: selectedShout,
+    evidence_id: client.evidence + 1,
+    flip: isToggled("button_flip") ? Flip.HORIZONTAL : Flip.NONE,
+    realization: isToggled("button_flash"),
+    text_color: parseTextColor(input("textcolor").value),
+    showname: escapeChat(input("ic_chat_name").value),
+    paired_charid: Number(input("pair_select").value) || -1,
+    self_offset: {
+      x: Number(input("pair_offset").value) || 0,
+      y: Number(input("pair_y_offset").value) || 0,
+    },
+    noninterrupting_preanim: input("check_nonint").checked,
+    sfx_looping: input("check_loopsfx").checked,
+    screenshake: isToggled("button_shake"),
+    frames_shake: "-",
+    frames_realization: "-",
+    frames_sfx: "-",
+    additive: input("check_additive").checked,
+    effect: input("effect_select").value,
+  });
+
   return false;
 }
 window.onEnter = onEnter;
