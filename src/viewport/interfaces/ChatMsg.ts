@@ -1,4 +1,4 @@
-import type { DeskModifier, Side } from "../../packets/MS";
+import type { DeskModifier, EmoteModifier, Side } from "../../packets/MS";
 import { PreloadedAssets } from "./PreloadedAssets";
 
 export interface ChatMsg {
@@ -30,7 +30,7 @@ export interface ChatMsg {
   parsed?: HTMLSpanElement[];
   screenshake?: number;
   flash?: number;
-  type?: number;
+  emote_modifier?: EmoteModifier;
   evidence?: number;
   looping_sfx?: boolean;
   noninterrupting_preanim?: number;

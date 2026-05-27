@@ -1,3 +1,4 @@
+import type { EmoteModifier } from "../../packets/MS";
 import { sendIC } from "./sendIC";
 import { sendSelf } from "./sendSelf";
 import { sendServer } from "./sendServer";
@@ -21,7 +22,7 @@ export interface ISender {
     message: string,
     side: string,
     sfx_name: string,
-    emote_modifier: number,
+    emote_modifier: EmoteModifier,
     sfx_delay: number,
     objection_modifier: number,
     evidence: number,

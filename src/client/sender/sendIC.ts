@@ -1,6 +1,7 @@
 import { extrafeatures } from "../../client";
 import { escapeChat } from "../../encoding";
 import { client } from "../../client";
+import type { EmoteModifier } from "../../packets/MS";
 import queryParser from "../../utils/queryParser";
 const { mode } = queryParser();
 
@@ -33,7 +34,7 @@ export const sendIC = (
   message: string,
   side: string,
   sfx_name: string,
-  emote_modifier: number,
+  emote_modifier: EmoteModifier,
   sfx_delay: number,
   objection_modifier: number,
   evidence: number,

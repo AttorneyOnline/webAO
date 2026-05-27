@@ -1,3 +1,4 @@
+import { EmoteModifier } from "../../packets/MS";
 import { ChatMsg } from "../interfaces/ChatMsg";
 import { PreloadedAssets } from "../interfaces/PreloadedAssets";
 import {
@@ -98,7 +99,7 @@ export default async function preloadMessageAssets(
     const talkingUrls = buildEmoteUrls(AO_HOST, emoteExtensions, charName, charEmote, "(b)");
 
     const hasPreanim =
-      chatmsg.type === 1 &&
+      chatmsg.emote_modifier === EmoteModifier.PREANIM &&
       chatmsg.preanim &&
       chatmsg.preanim !== "-" &&
       chatmsg.preanim !== "";
@@ -130,7 +131,9 @@ export default async function preloadMessageAssets(
     const invalidSounds = ["0", "1", "", undefined];
     const emoteSfxPath = (
       !invalidSounds.includes(chatmsg.sound) &&
-      (chatmsg.type == 1 || chatmsg.type == 2 || chatmsg.type == 6)
+      (chatmsg.emote_modifier === EmoteModifier.PREANIM ||
+        chatmsg.emote_modifier === EmoteModifier.PREANIM_AND_OBJECTION ||
+        chatmsg.emote_modifier === EmoteModifier.OBJECTION_ZOOM)
     ) ? `${AO_HOST}sounds/general/${encodeURI(chatmsg.sound.toLowerCase())}.opus`
       : null;
 

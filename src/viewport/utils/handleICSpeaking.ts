@@ -12,7 +12,12 @@ import { COLORS } from "../constants/colors";
 import mlConfig from "../../utils/aoml";
 import request from "../../services/request";
 import { decodeChat, safeTags } from "../../encoding";
-import { DeskModifier, Side, type MSPacketClient } from "../../packets/MS";
+import {
+  DeskModifier,
+  EmoteModifier,
+  Side,
+  type MSPacketClient,
+} from "../../packets/MS";
 import preloadMessageAssets from "./preloadMessageAssets";
 import { setBlipUrl } from "./blipAudio";
 
@@ -93,7 +98,7 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
     side: packet.side,
     sound: safeTags(packet.sfx_name).toLowerCase(),
     blips: safeTags(msg_blips),
-    type: packet.emote_modifier,
+    emote_modifier: packet.emote_modifier,
     snddelay: packet.sfx_delay,
     objection: packet.shout_modifier,
     evidence: Number(safeTags(packet.evidence)),
@@ -258,7 +263,7 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
 
   // Use preloaded preanim duration (already computed in parallel by preloader)
   const hasPreanim =
-    client.viewport.getChatmsg().type === 1 &&
+    client.viewport.getChatmsg().emote_modifier === EmoteModifier.PREANIM &&
     client.viewport.getChatmsg().preanim !== "-" &&
     client.viewport.getChatmsg().preanim !== "";
 
@@ -277,7 +282,7 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
     showDesk: false,
   };
   let skipoffset: boolean = false;
-  if (client.viewport.getChatmsg().type === 5) {
+  if (client.viewport.getChatmsg().emote_modifier === EmoteModifier.ZOOM) {
     setAside.showSpeedLines = true;
     setAside.showDesk = false;
     client.viewport.set_side(setAside);

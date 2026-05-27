@@ -15,7 +15,7 @@ import { createTestimonyAudio } from "./utils/createTestimonyAudio";
 import { Testimony } from "./interfaces/Testimony";
 import { COLORS } from "./constants/colors";
 import { set_side } from "./utils/setSide";
-import { DeskModifier, Side } from "../packets/MS";
+import { DeskModifier, EmoteModifier, Side } from "../packets/MS";
 import { ChatMsg } from "./interfaces/ChatMsg";
 import {
   setStartFirstTickCheck,
@@ -484,7 +484,9 @@ const viewport = (): Viewport => {
         chatmsg.sound !== "1" &&
         chatmsg.sound !== "" &&
         chatmsg.sound !== undefined &&
-        (chatmsg.type == 1 || chatmsg.type == 2 || chatmsg.type == 6)
+        (chatmsg.emote_modifier === EmoteModifier.PREANIM ||
+          chatmsg.emote_modifier === EmoteModifier.PREANIM_AND_OBJECTION ||
+          chatmsg.emote_modifier === EmoteModifier.OBJECTION_ZOOM)
       ) {
         const sfxUrl = chatmsg.preloadedAssets?.emoteSfxUrl
           ?? `${AO_HOST}sounds/general/${encodeURI(chatmsg.sound.toLowerCase())}.opus`;

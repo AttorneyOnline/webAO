@@ -47,6 +47,32 @@ const parseDeskModifier = (s: string | undefined): DeskModifier => {
   return DeskModifier.SHOWN;
 };
 
+/**
+ * Emote behavior selector. Spec values 3 and 4 are documented as
+ * unused; any non-recognized wire value falls back to `NO_PREANIM`.
+ */
+export enum EmoteModifier {
+  NO_PREANIM = 0,
+  PREANIM = 1,
+  PREANIM_AND_OBJECTION = 2,
+  ZOOM = 5,
+  OBJECTION_ZOOM = 6,
+}
+
+export const parseEmoteModifier = (s: string | undefined): EmoteModifier => {
+  const n = Number(s);
+  switch (n) {
+    case 0:
+    case 1:
+    case 2:
+    case 5:
+    case 6:
+      return n as EmoteModifier;
+    default:
+      return EmoteModifier.NO_PREANIM;
+  }
+};
+
 /** Character position. Wire values are the lowercase 3-letter codes. */
 export enum Side {
   DEFENSE = "def",
@@ -74,7 +100,7 @@ export interface MSPacketClient {
   message: string;
   side: Side;
   sfx_name: string;
-  emote_modifier: number;
+  emote_modifier: EmoteModifier;
   char_id: number;
   sfx_delay: number;
   shout_modifier: number;
@@ -121,7 +147,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       message: str(args[5]),
       side: parseSide(args[6]),
       sfx_name: str(args[7]),
-      emote_modifier: num(args[8]),
+      emote_modifier: parseEmoteModifier(args[8]),
       char_id: num(args[9]),
       sfx_delay: num(args[10]),
       shout_modifier: num(args[11]),
@@ -198,7 +224,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       message: str(args[5]),
       side: parseSide(args[6]),
       sfx_name: str(args[7]),
-      emote_modifier: num(args[8]),
+      emote_modifier: parseEmoteModifier(args[8]),
       char_id: num(args[9]),
       sfx_delay: num(args[10]),
       shout_modifier: num(args[11]),

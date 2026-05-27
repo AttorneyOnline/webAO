@@ -1,5 +1,6 @@
 import { client, selectedShout } from "../client";
 import { escapeChat } from "../encoding";
+import { EmoteModifier, parseEmoteModifier } from "../packets/MS";
 
 /**
  * Triggered when the Return key is pressed on the in-character chat input box.
@@ -53,19 +54,19 @@ export function onEnter(event: KeyboardEvent) {
 
     let sfxname = "0";
     let sfxdelay = 0;
-    let emote_mod = myemo.zoom;
+    let emote_mod: EmoteModifier = parseEmoteModifier(String(myemo.zoom));
     if ((<HTMLInputElement>document.getElementById("sendsfx")).checked) {
       sfxname = myemo.sfx;
       sfxdelay = myemo.sfxdelay;
     }
 
-    // not to overwrite a 5 from the ini or anything else
+    // not to overwrite a 5/6 from the ini or anything else
     if ((<HTMLInputElement>document.getElementById("sendpreanim")).checked) {
-      if (emote_mod === 0) {
-        emote_mod = 1;
+      if (emote_mod === EmoteModifier.NO_PREANIM) {
+        emote_mod = EmoteModifier.PREANIM;
       }
-    } else if (emote_mod === 1) {
-      emote_mod = 0;
+    } else if (emote_mod === EmoteModifier.PREANIM) {
+      emote_mod = EmoteModifier.NO_PREANIM;
     }
 
     client.sender.sendIC(
