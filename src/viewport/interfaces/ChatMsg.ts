@@ -36,7 +36,7 @@ export interface ChatMsg {
   chatbox?: string;
   other_emote?: string;
   parsed?: HTMLSpanElement[];
-  screenshake?: number;
+  screenshake?: boolean;
   realization?: boolean;
   emote_modifier?: EmoteModifier;
   evidence_id?: number;

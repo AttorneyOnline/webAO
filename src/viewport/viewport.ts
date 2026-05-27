@@ -329,7 +329,7 @@ const viewport = (): Viewport => {
       tickTimer >= shoutTimer + chatmsg.preanimdelay;
     if (isShoutOver && startFirstTickCheck) {
       // Effect stuff
-      if (chatmsg.screenshake === 1) {
+      if (chatmsg.screenshake) {
         // Shake screen
         const stabUrl = chatmsg.preloadedAssets?.stabSfxUrl
           ?? `${AO_HOST}sounds/general/sfx-stab.opus`;
