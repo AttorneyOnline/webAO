@@ -388,29 +388,24 @@ export const receiveMS = (packet: MSPacketClient) => {
   const char_id = packet.char_id;
   const char_name = safeTags(packet.character);
 
-  if (char_id < client.char_list_length && char_id >= 0) {
+  if (char_id >= 0 && char_id < client.char_list_length) {
     if (client.chars[char_id].name !== char_name) {
       console.info(
         `${client.chars[char_id].name} is iniediting to ${char_name}`,
       );
-      const chargs = (`${char_name}&` + "iniediter").split("&");
-      handleCharacterInfo(chargs, char_id);
+      handleCharacterInfo([char_name, "iniediter"], char_id);
     } else if (!client.chars[char_id].inifile) {
       // Lazily load char.ini in background so future messages have proper data
       ensureCharIni(char_id);
     }
   }
 
-  const char = client.chars[char_id];
-  if (!char) {
-    console.error("we're still missing some character data");
-  }
-  if (char?.muted) return;
+  if (client.chars[char_id]?.muted) return;
 
   // our own message appeared, reset the buttons
   if (char_id === client.charID) {
     resetICParams();
   }
 
-  handle_ic_speaking(packet); // no await
+  handle_ic_speaking(packet);
 };
