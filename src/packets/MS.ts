@@ -214,12 +214,11 @@ export interface MSPacketClient {
 export type MSPacketServer = Omit<MSPacketClient, "other_name" | "other_emote">;
 
 const str = (v: string | undefined) => unescapeChat(v ?? "");
-const num = (v: string | undefined) => Number(v) || 0;
 
 /**
- * Parse a wire integer with a custom default for missing/empty/non-numeric
- * input. Unlike `num`, this preserves `0` as a valid value (so callers can
- * use `-1` as a "not set" sentinel without colliding with character id 0).
+ * Parse a wire integer with a custom default for missing/empty/non-integer
+ * input. Preserves `0` as a valid value, so callers can use `-1` as a
+ * "not set" sentinel without colliding with id 0.
  */
 const intOr = (v: string | undefined, def: number): number => {
   if (v === undefined || v === "") return def;
@@ -241,7 +240,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       char_id: intOr(args[9], -1),
       sfx_delay: intOr(args[10], 0),
       shout_modifier: parseShoutModifier(args[11]),
-      evidence_id: num(args[12]),
+      evidence_id: intOr(args[12], 0),
       flip: parseFlip(args[13]),
       realization: args[14] === "1",
       text_color: parseTextColor(args[15]),
@@ -318,7 +317,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       char_id: intOr(args[9], -1),
       sfx_delay: intOr(args[10], 0),
       shout_modifier: parseShoutModifier(args[11]),
-      evidence_id: num(args[12]),
+      evidence_id: intOr(args[12], 0),
       flip: parseFlip(args[13]),
       realization: args[14] === "1",
       text_color: parseTextColor(args[15]),
