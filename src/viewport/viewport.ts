@@ -400,7 +400,7 @@ const viewport = (): Viewport => {
             eviBox.style.left = "1em";
           }
         }
-        chatBoxInner.className = `text_${COLORS[chatmsg.color]}`;
+        chatBoxInner.className = `text_${COLORS[chatmsg.text_color]}`;
 
         if (chatmsg.preanimdelay === 0) {
           shoutSprite.style.display = "none";

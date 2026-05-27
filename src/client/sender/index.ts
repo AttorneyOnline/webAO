@@ -1,4 +1,9 @@
-import type { EmoteModifier, Flip, ShoutModifier } from "../../packets/MS";
+import type {
+  EmoteModifier,
+  Flip,
+  ShoutModifier,
+  TextColor,
+} from "../../packets/MS";
 import { sendIC } from "./sendIC";
 import { sendSelf } from "./sendSelf";
 import { sendServer } from "./sendServer";
@@ -28,7 +33,7 @@ export interface ISender {
     evidence: number,
     flip: Flip,
     realization: boolean,
-    text_color: number,
+    text_color: TextColor,
     showname: string,
     other_charid: string,
     self_hoffset: number,

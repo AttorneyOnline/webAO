@@ -4,6 +4,7 @@ import type {
   Flip,
   ShoutModifier,
   Side,
+  TextColor,
 } from "../../packets/MS";
 import { PreloadedAssets } from "./PreloadedAssets";
 
@@ -14,7 +15,7 @@ export interface ChatMsg {
   startpreanim?: boolean;
   startspeaking?: boolean;
   side: Side;
-  color: number;
+  text_color: TextColor;
   snddelay: number;
   preanimdelay?: number;
   speed: number;

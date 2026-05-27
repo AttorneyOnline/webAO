@@ -115,7 +115,7 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
     evidence: Number(safeTags(packet.evidence)),
     flip: packet.flip,
     realization: packet.realization,
-    color: packet.text_color,
+    text_color: packet.text_color,
     speed: UPDATE_INTERVAL,
     showname: safeTags(decodeChat(packet.showname)),
     other_name: safeTags(packet.other_name),
@@ -441,7 +441,7 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
     for (const letter of client.viewport.getChatmsg().content) {
       const currentSelector = document.createElement("span");
       currentSelector.innerHTML = letter;
-      currentSelector.className = `text_${COLORS[client.viewport.getChatmsg().color]}`;
+      currentSelector.className = `text_${COLORS[client.viewport.getChatmsg().text_color]}`;
       output.push(currentSelector);
     }
     client.viewport.getChatmsg().parsed = output;
@@ -453,7 +453,7 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
       if (markdown) {
         client.viewport.getChatmsg().parsed = markdown.applyMarkdown(
           client.viewport.getChatmsg().content,
-          COLORS[client.viewport.getChatmsg().color],
+          COLORS[client.viewport.getChatmsg().text_color],
         );
       } else {
         processTextOnly();

@@ -1,7 +1,12 @@
 import { extrafeatures } from "../../client";
 import { escapeChat } from "../../encoding";
 import { client } from "../../client";
-import type { EmoteModifier, Flip, ShoutModifier } from "../../packets/MS";
+import type {
+  EmoteModifier,
+  Flip,
+  ShoutModifier,
+  TextColor,
+} from "../../packets/MS";
 import queryParser from "../../utils/queryParser";
 const { mode } = queryParser();
 
@@ -40,7 +45,7 @@ export const sendIC = (
   evidence: number,
   flip: Flip,
   realization: boolean,
-  text_color: number,
+  text_color: TextColor,
   showname: string,
   other_charid: string,
   self_hoffset: number,

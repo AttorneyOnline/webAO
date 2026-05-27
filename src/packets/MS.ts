@@ -113,6 +113,26 @@ export const parseFlip = (s: string | undefined): Flip => {
   return Flip.NONE;
 };
 
+/** Chat message text color. `BLUE` also disables the talking animation. */
+export enum TextColor {
+  WHITE = 0,
+  GREEN = 1,
+  RED = 2,
+  ORANGE = 3,
+  BLUE = 4,
+  YELLOW = 5,
+  PINK = 6,
+  CYAN = 7,
+  GREY = 8,
+  RAINBOW = 9,
+}
+
+export const parseTextColor = (s: string | undefined): TextColor => {
+  const n = Number(s);
+  if (Number.isInteger(n) && n >= 0 && n <= 9) return n as TextColor;
+  return TextColor.WHITE;
+};
+
 /** Character position. Wire values are the lowercase 3-letter codes. */
 export enum Side {
   DEFENSE = "def",
@@ -147,7 +167,7 @@ export interface MSPacketClient {
   evidence: string;
   flip: Flip;
   realization: boolean;
-  text_color: number;
+  text_color: TextColor;
   // cccc group
   showname: string;
   other_charid: number;
@@ -194,7 +214,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       evidence: str(args[12]),
       flip: parseFlip(args[13]),
       realization: args[14] === "1",
-      text_color: num(args[15]),
+      text_color: parseTextColor(args[15]),
       showname: str(args[16]),
       other_charid: num(args[17]),
       other_name: str(args[18]),
@@ -271,7 +291,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       evidence: str(args[12]),
       flip: parseFlip(args[13]),
       realization: args[14] === "1",
-      text_color: num(args[15]),
+      text_color: parseTextColor(args[15]),
       showname: str(args[16]),
       other_charid: num(args[17]),
       // Server-receiver form skips other_name (18) and other_emote (19).

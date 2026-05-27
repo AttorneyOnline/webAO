@@ -1,4 +1,4 @@
-import { ShoutModifier, Side } from "../../packets/MS";
+import { ShoutModifier, Side, TextColor } from "../../packets/MS";
 import { ChatMsg } from "../interfaces/ChatMsg";
 
 // Define UPDATE_INTERVAL locally to avoid circular dependency
@@ -11,7 +11,7 @@ export const defaultChatMsg: ChatMsg = {
   startpreanim: true,
   startspeaking: false,
   side: Side.WITNESS,
-  color: 0,
+  text_color: TextColor.WHITE,
   snddelay: 0,
   preanimdelay: 0,
   speed: UPDATE_INTERVAL,

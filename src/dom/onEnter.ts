@@ -1,6 +1,11 @@
 import { client, selectedShout } from "../client";
 import { escapeChat } from "../encoding";
-import { EmoteModifier, Flip, parseEmoteModifier } from "../packets/MS";
+import {
+  EmoteModifier,
+  Flip,
+  parseEmoteModifier,
+  parseTextColor,
+} from "../packets/MS";
 
 /**
  * Triggered when the Return key is pressed on the in-character chat input box.
@@ -28,7 +33,7 @@ export function onEnter(event: KeyboardEvent) {
     const looping_sfx = Boolean(
       (<HTMLInputElement>document.getElementById("check_loopsfx")).checked,
     );
-    const color = Number(
+    const color = parseTextColor(
       (<HTMLInputElement>document.getElementById("textcolor")).value,
     );
     const showname = escapeChat(
