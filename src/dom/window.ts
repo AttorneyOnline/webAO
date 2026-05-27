@@ -51,7 +51,7 @@ declare global {
     musiclist_click: (_event: any) => void;
     musiclist_filter: (_event: any) => void;
     resetOffset: (_event: any) => void;
-    onEnter: (event: any) => void;
+    onICEnter: (event: any) => void;
     onReplayGo: (_event: any) => void;
     onOOCEnter: (_event: any) => void;
     kickPlayer: (id: number) => void;

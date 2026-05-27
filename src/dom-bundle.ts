@@ -30,7 +30,7 @@ import "./dom/musicListClick";
 import "./dom/musicListFilter";
 import "./dom/muteListClick";
 import "./dom/notGuilty";
-import "./dom/onEnter";
+import "./dom/onICEnter";
 import "./dom/onOOCEnter";
 import "./dom/onReplayGo";
 import "./dom/opusCheck";

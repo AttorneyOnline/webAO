@@ -18,7 +18,7 @@ const isToggled = (id: string) =>
 /**
  * Triggered when the Return key is pressed on the in-character chat input box.
  */
-export function onEnter(event: KeyboardEvent) {
+export function onICEnter(event: KeyboardEvent) {
   if (event.key !== "Enter") return false;
 
   const my_char = client.character;
@@ -70,4 +70,4 @@ export function onEnter(event: KeyboardEvent) {
 
   return false;
 }
-window.onEnter = onEnter;
+window.onICEnter = onICEnter;
