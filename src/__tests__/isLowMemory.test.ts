@@ -1,9 +1,40 @@
-import { describe, it, expect, beforeAll, beforeEach, mock } from "bun:test";
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  beforeEach,
+  mock,
+} from "bun:test";
 
 const setOldLoadingMock = mock(() => {});
 
+// Mock the full named surface of `../client`, not just `setOldLoading`.
+// The mocked module replaces the real one for the entire `bun test` run
+// (mock.restore() doesn't invalidate already-cached importers), so any
+// downstream test file that statically imports anything from `../client`
+// will fail at module-load time if that name isn't in this object.
 mock.module("../client", () => ({
+  client: {},
+  clientState: { NotConnected: 0, Connected: 1, Joined: 2, Reconnecting: 3 },
+  autoChar: undefined,
+  autoArea: undefined,
+  oldLoading: false,
   setOldLoading: setOldLoadingMock,
+  setExtraFeatures: () => {},
+  UPDATE_INTERVAL: 60,
+  extrafeatures: [],
+  CHATBOX: "",
+  setCHATBOX: () => {},
+  setClient: () => {},
+  setLastICMessageTime: () => {},
+  lastICMessageTime: new Date(0),
+  setSelectedMenu: () => {},
+  setSelectedShout: () => {},
+  selectedMenu: 1,
+  selectedShout: 0,
+  setOldLoading2: () => {},
+  delay: () => Promise.resolve(),
 }));
 
 mock.module("../services/request", () => ({

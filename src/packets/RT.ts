@@ -38,6 +38,11 @@ export const handleRT = (packet: RTPacket) => {
   const judgeid = packet.judgeId ?? 0;
   switch (packet.animation) {
     case "testimony1":
+      // Since 2.9: `testimony1#1` hides the indicator instead of showing it.
+      if (judgeid === 1) {
+        client.viewport.disposeTestimony();
+        return;
+      }
       client.testimonyID = 1;
       break;
     case "testimony2":

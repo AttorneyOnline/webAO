@@ -5,9 +5,11 @@ import { decodeChat, escapeChat, safeTags, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
 
 /**
- * Music/area change. The client form is `MC#{track}#{char_id}#%`, the server
- * form adds showname/looping/channel/effects. All trailing fields are
- * optional.
+ * Music/area change. Per spec:
+ *   Server-receiver: `MC#{track}#{char_id}#{showname}#{effects}#%`
+ *   Client-receiver: `MC#{track}#{char_id}#{showname}#{looping}#{channel}#{effects}#%`
+ * All fields past `char_id` are modeled as optional so the same codec covers
+ * both directions and tolerates servers that omit later fields.
  */
 export interface MCPacket {
   track: string;
