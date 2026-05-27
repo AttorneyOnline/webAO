@@ -203,7 +203,7 @@ export interface MSPacketClient {
   frames_realization: string;
   frames_sfx: string;
   // 2.8 group
-  additive: number;
+  additive: boolean;
   effect: string;
   // 2.10.2 group
   blips: string;
@@ -247,7 +247,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       frames_shake: str(args[26]),
       frames_realization: str(args[27]),
       frames_sfx: str(args[28]),
-      additive: num(args[29]),
+      additive: args[29] === "1",
       effect: str(args[30]),
       blips: str(args[31]),
       slide: num(args[32]),
@@ -284,7 +284,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       escapeChat(p.frames_shake),
       escapeChat(p.frames_realization),
       escapeChat(p.frames_sfx),
-      p.additive,
+      Number(p.additive),
       escapeChat(p.effect),
       escapeChat(p.blips),
       p.slide,
@@ -323,7 +323,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       frames_shake: str(args[24]),
       frames_realization: str(args[25]),
       frames_sfx: str(args[26]),
-      additive: num(args[27]),
+      additive: args[27] === "1",
       effect: str(args[28]),
       blips: str(args[29]),
       slide: num(args[30]),
@@ -358,7 +358,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       escapeChat(p.frames_shake),
       escapeChat(p.frames_realization),
       escapeChat(p.frames_sfx),
-      p.additive,
+      Number(p.additive),
       escapeChat(p.effect),
       escapeChat(p.blips),
       p.slide,

@@ -121,7 +121,7 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
     noninterrupting_preanim: packet.noninterrupting_preanim,
     sfx_looping: packet.sfx_looping,
     screenshake: packet.screenshake,
-    additive: Boolean(packet.additive),
+    additive: packet.additive,
     effects: packet.effect.split("|"),
   };
 };
