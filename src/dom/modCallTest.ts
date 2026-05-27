@@ -1,4 +1,4 @@
-import { handleZZ } from "../packets/handlers/handleZZ";
+import { handleZZ } from "../packets/ZZ";
 /**
  * Triggered by the modcall sfx dropdown
  */

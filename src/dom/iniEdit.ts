@@ -1,6 +1,6 @@
 import { client } from "../client";
 import { handleCharacterInfo } from "../client/handleCharacterInfo";
-import { handlePV } from "../packets/handlers/handlePV";
+import { handlePV } from "../packets/PV";
 
 /**
  * Triggered by the ini button.

@@ -1,5 +1,5 @@
 import { client } from "../../client";
-import { CT } from "../../packets/types/CT";
+import { CT } from "../../packets/CT";
 import { saveChatlogHandle } from "../../client/saveChatLogHandle";
 /**
  * Sends an out-of-character chat message.

@@ -1,5 +1,5 @@
 import { client } from "../../client";
-import { ZZ } from "../../packets/types/ZZ";
+import { ZZ } from "../../packets/ZZ";
 
 /**
  * Sends call mod command.

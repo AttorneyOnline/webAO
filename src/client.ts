@@ -14,7 +14,7 @@ import masterViewport from "./viewport/viewport";
 import { Viewport } from "./viewport/interfaces/Viewport";
 import { EventEmitter } from "events";
 import { onReplayGo } from "./dom/onReplayGo";
-import { packetHandler } from "./packets/packetHandler";
+import { packetHandler } from "./packets";
 import { appendICNotice } from "./client/appendICNotice";
 import { loadResources } from "./client/loadResources";
 import { AO_HOST } from "./client/aoHost";

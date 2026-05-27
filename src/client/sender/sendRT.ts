@@ -1,5 +1,5 @@
 import { client } from "../../client";
-import { RT } from "../../packets/types/RT";
+import { RT } from "../../packets/RT";
 
 /**
  * Sends testimony command.

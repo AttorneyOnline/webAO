@@ -1,5 +1,5 @@
 import { client } from "../../client";
-import { HP } from "../../packets/types/HP";
+import { HP } from "../../packets/HP";
 
 /**
  * Sends health point command.

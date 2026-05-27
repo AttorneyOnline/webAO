@@ -1,5 +1,5 @@
 import { client } from "../../client";
-import { CC } from "../../packets/types/CC";
+import { CC } from "../../packets/CC";
 
 /**
  * Requests to play as a specified character.
