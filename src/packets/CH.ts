@@ -20,6 +20,6 @@ export const receiveCH = () => {};
 /**
  * Sends a keepalive packet.
  */
-export const sendCH = () => {
-  client.sender.sendServer(CH.encode({ charId: client.charID }));
+export const sendCH = (packet: CHPacket) => {
+  client.sendToServer(CH.encode(packet));
 };

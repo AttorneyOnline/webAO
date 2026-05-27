@@ -428,7 +428,7 @@ export const receiveMS = (packet: MSPacketClient) => {
  * (Client-receiver form, fields included with empty values).
  */
 export const sendMS = (packet: MSPacketServer) => {
-  // In replay mode, sendServer routes the wire back through the local
+  // In replay mode, sendToServer routes the wire back through the local
   // dispatcher -- which expects Client-receiver form (with `paired_*`
   // fields). Fill those in as zero/empty when self-sending.
   const wire =
@@ -442,7 +442,7 @@ export const sendMS = (packet: MSPacketServer) => {
       })
       : MSServer.encode(packet);
 
-  client.sender.sendServer(wire);
+  client.sendToServer(wire);
   if (mode === "replay") {
     (<HTMLInputElement>document.getElementById("client_ooclog")).value +=
       `wait#${

@@ -1,5 +1,4 @@
 import { client } from "../client";
-import { sendCT } from "../packets/CT";
 
 /**
  * Pair with a player on both supported pathways at once:
@@ -10,7 +9,8 @@ import { sendCT } from "../packets/CT";
  *     any vanilla AO server even when the OOC command is unknown.
  */
 export function pairPlayer(id: number) {
-  sendCT(`/pair ${id}`);
+  const name = (<HTMLInputElement>document.getElementById("OOC_name")).value;
+  client.sender.sendCT({ name, message: `/pair ${id}` });
 
   const target = client.playerlist?.get(id);
   if (target && Number.isInteger(target.charId) && target.charId >= 0) {

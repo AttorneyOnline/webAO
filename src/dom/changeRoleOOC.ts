@@ -7,8 +7,9 @@ import { parseSide } from "../packets/MS";
 export function changeRoleOOC() {
   const roleselect = <HTMLInputElement>document.getElementById("role_select");
 
-  client.sender.sendCT(`/pos ${roleselect.value}`);
-  client.sender.sendServer(`SP#${roleselect.value}#%`);
+  const name = (<HTMLInputElement>document.getElementById("OOC_name")).value;
+  client.sender.sendCT({ name, message: `/pos ${roleselect.value}` });
+  client.sendToServer(`SP#${roleselect.value}#%`);
   updateActionCommands(parseSide(roleselect.value));
 }
 window.changeRoleOOC = changeRoleOOC;

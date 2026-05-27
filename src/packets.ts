@@ -11,10 +11,10 @@ import { CharsCheck, receiveCharsCheck } from "./packets/CharsCheck";
 import { CHECK, receiveCHECK } from "./packets/CHECK";
 import { CI, receiveCI } from "./packets/CI";
 import { CT, receiveCT, sendCT } from "./packets/CT";
+import { DE, sendDE } from "./packets/DE";
 import { decryptor, receivedecryptor } from "./packets/decryptor";
-import { sendDE } from "./packets/DE";
 import { DONE, receiveDONE } from "./packets/DONE";
-import { sendEE } from "./packets/EE";
+import { EE, sendEE } from "./packets/EE";
 import { EI, receiveEI } from "./packets/EI";
 import { EM, receiveEM } from "./packets/EM";
 import { FA, receiveFA } from "./packets/FA";
@@ -27,11 +27,11 @@ import { JD, receiveJD } from "./packets/JD";
 import { KB, receiveKB } from "./packets/KB";
 import { KK, receiveKK } from "./packets/KK";
 import { LE, receiveLE } from "./packets/LE";
-import { sendMA } from "./packets/MA";
+import { MA, sendMA } from "./packets/MA";
 import { MC, receiveMC, sendMC } from "./packets/MC";
 import { MM, receiveMM } from "./packets/MM";
 import { MSClient, receiveMS, sendMS } from "./packets/MS";
-import { sendPE } from "./packets/PE";
+import { PE, sendPE } from "./packets/PE";
 import { PN, receivePN } from "./packets/PN";
 import { PR, receivePR } from "./packets/PR";
 import { PU, receivePU } from "./packets/PU";
@@ -53,7 +53,6 @@ import { VS_LEAVE, receiveVS_LEAVE } from "./packets/VS_LEAVE";
 import { VS_PEERS, receiveVS_PEERS } from "./packets/VS_PEERS";
 import { VS_SPEAK, receiveVS_SPEAK } from "./packets/VS_SPEAK";
 import { ZZ, receiveZZ, sendZZ } from "./packets/ZZ";
-import { sendSelf, sendServer } from "./client";
 
 /**
  * A codec for a single packet header. `decode` parses the `#`-split args
@@ -69,18 +68,24 @@ export interface PacketCodec<TPacket> {
   encode?(packet: TPacket): string;
 }
 
-/** One registry entry: codec paired with the receiver that consumes its output. */
-export interface PacketEntry<TPacket> {
+/**
+ * One registry entry per header. `receive` and `send` are both
+ * `(packet: T) => void`, mirroring each other: receive consumes a
+ * decoded incoming packet, send encodes-and-transports an outgoing
+ * one. Either or both may be present.
+ */
+export interface PacketBinding<TPacket> {
   codec: PacketCodec<TPacket>;
-  receive: (packet: TPacket) => void;
+  receive?: (packet: TPacket) => void;
+  send?: (packet: TPacket) => void;
 }
 
-// Each entry pairs the wire codec (decode/encode) with the typed receiver.
-// Keep this list alphabetical (case-insensitive).
+// Each entry pairs the wire codec (decode/encode) with the typed
+// receive/send handlers. Keep this list alphabetical (case-insensitive).
 //
-// For packets whose wire format differs by direction (i.e. the Server-as-
-// receiver form differs from the Client-as-receiver form), the convention
-// is two codecs + two packet types per header:
+// For packets whose wire format differs by direction (Server-as-
+// receiver form vs Client-as-receiver form), the convention is two
+// codecs + two packet types per header:
 //
 //   types:  XXPacketClient (decoded incoming), XXPacketServer (encoded out)
 //   codecs: XXClient (used by the dispatcher), XXServer (used by senders)
@@ -91,7 +96,7 @@ export interface PacketEntry<TPacket> {
 // MS is currently the only such packet; CT and ZZ technically have
 // direction-conditional wire forms too, but they're symmetric enough
 // that a single codec covers both.
-const packets: Record<string, PacketEntry<any>> = {
+const packets: Record<string, PacketBinding<any>> = {
   ARUP: { codec: ARUP, receive: receiveARUP },
   askchaa: { codec: askchaa, receive: receiveaskchaa },
   ASS: { codec: ASS, receive: receiveASS },
@@ -99,29 +104,33 @@ const packets: Record<string, PacketEntry<any>> = {
   BB: { codec: BB, receive: receiveBB },
   BD: { codec: BD, receive: receiveBD },
   BN: { codec: BN, receive: receiveBN },
-  CC: { codec: CC, receive: receiveCC },
-  CH: { codec: CH, receive: receiveCH },
+  CC: { codec: CC, receive: receiveCC, send: sendCC },
+  CH: { codec: CH, receive: receiveCH, send: sendCH },
   CharsCheck: { codec: CharsCheck, receive: receiveCharsCheck },
   CHECK: { codec: CHECK, receive: receiveCHECK },
   CI: { codec: CI, receive: receiveCI },
-  CT: { codec: CT, receive: receiveCT },
+  CT: { codec: CT, receive: receiveCT, send: sendCT },
+  DE: { codec: DE, send: sendDE },
   decryptor: { codec: decryptor, receive: receivedecryptor },
   DONE: { codec: DONE, receive: receiveDONE },
+  EE: { codec: EE, send: sendEE },
   EI: { codec: EI, receive: receiveEI },
   EM: { codec: EM, receive: receiveEM },
   FA: { codec: FA, receive: receiveFA },
   FL: { codec: FL, receive: receiveFL },
   FM: { codec: FM, receive: receiveFM },
   HI: { codec: HI, receive: receiveHI },
-  HP: { codec: HP, receive: receiveHP },
+  HP: { codec: HP, receive: receiveHP, send: sendHP },
   ID: { codec: ID, receive: receiveID },
   JD: { codec: JD, receive: receiveJD },
   KB: { codec: KB, receive: receiveKB },
   KK: { codec: KK, receive: receiveKK },
   LE: { codec: LE, receive: receiveLE },
-  MC: { codec: MC, receive: receiveMC },
+  MA: { codec: MA, send: sendMA },
+  MC: { codec: MC, receive: receiveMC, send: sendMC },
   MM: { codec: MM, receive: receiveMM },
-  MS: { codec: MSClient, receive: receiveMS },
+  MS: { codec: MSClient, receive: receiveMS, send: sendMS },
+  PE: { codec: PE, send: sendPE },
   PN: { codec: PN, receive: receivePN },
   PR: { codec: PR, receive: receivePR },
   PU: { codec: PU, receive: receivePU },
@@ -130,7 +139,7 @@ const packets: Record<string, PacketEntry<any>> = {
   RD: { codec: RD, receive: receiveRD },
   RM: { codec: RM, receive: receiveRM },
   RMC: { codec: RMC, receive: receiveRMC },
-  RT: { codec: RT, receive: receiveRT },
+  RT: { codec: RT, receive: receiveRT, send: sendRT },
   SC: { codec: SC, receive: receiveSC },
   SI: { codec: SI, receive: receiveSI },
   SM: { codec: SM, receive: receiveSM },
@@ -142,16 +151,15 @@ const packets: Record<string, PacketEntry<any>> = {
   VS_LEAVE: { codec: VS_LEAVE, receive: receiveVS_LEAVE },
   VS_PEERS: { codec: VS_PEERS, receive: receiveVS_PEERS },
   VS_SPEAK: { codec: VS_SPEAK, receive: receiveVS_SPEAK },
-  ZZ: { codec: ZZ, receive: receiveZZ },
+  ZZ: { codec: ZZ, receive: receiveZZ, send: sendZZ },
 };
 
 export const packetRegistry = new Map(Object.entries(packets));
 
 /**
- * Aggregator of every outbound packet sender, plus the transport-level
- * helpers (sendSelf, sendServer) that aren't tied to a single header.
- * Exposed on `client.sender` so call sites read as
- * `client.sender.sendXX(...)`.
+ * Aggregator of every outbound packet sender. Transport-level send
+ * helpers (`client.sendToServer`, `client.sendToSelf`) live on the
+ * Client class directly, since they aren't tied to a packet header.
  */
 export const sender = {
   sendCC,
@@ -165,8 +173,6 @@ export const sender = {
   sendMS,
   sendPE,
   sendRT,
-  sendSelf,
-  sendServer,
   sendZZ,
 };
 

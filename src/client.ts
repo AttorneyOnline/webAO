@@ -112,31 +112,6 @@ export const setLastICMessageTime = (val: Date) => {
   lastICMessageTime = val;
 };
 
-/**
- * Echoes a wire message back into the client's own dispatcher. Used by
- * handlers that synthesize follow-up packets (e.g. RD → BN/DONE) and by
- * replay mode to feed pre-recorded packets through.
- */
-export function sendSelf(message: string) {
-  (<HTMLInputElement>document.getElementById("client_ooclog")).value +=
-    `${message}\r\n`;
-  client.handleSelf(message);
-}
-
-/**
- * Writes a wire message to the server. In replay mode the websocket
- * isn't live, so outgoing packets are looped back through `sendSelf`
- * to drive the local dispatcher.
- */
-export function sendServer(message: string) {
-  console.debug("C: " + message);
-  if (mode === "replay") {
-    sendSelf(message);
-  } else {
-    client.serv.send(message);
-  }
-}
-
 class Client extends EventEmitter {
   serv: any;
   hp: number[];
@@ -269,19 +244,47 @@ class Client extends EventEmitter {
   }
 
   /**
+   * Echoes a wire message back into our own dispatcher. Used by handlers
+   * that synthesize follow-up packets (e.g. RD → BN/DONE) and by replay
+   * mode to feed pre-recorded packets through.
+   */
+  sendToSelf(message: string) {
+    (<HTMLInputElement>document.getElementById("client_ooclog")).value +=
+      `${message}\r\n`;
+    this.handleSelf(message);
+  }
+
+  /**
+   * Writes a wire message to the server. In replay mode the websocket
+   * isn't live, so outgoing packets loop back through `sendToSelf` to
+   * drive the local dispatcher.
+   */
+  sendToServer(message: string) {
+    console.debug("C: " + message);
+    if (mode === "replay") {
+      this.sendToSelf(message);
+    } else {
+      this.serv.send(message);
+    }
+  }
+
+  /**
    * Begins the handshake process by sending an identifier
    * to the server.
    */
   joinServer() {
-    this.sender.sendServer(`HI#${hdid}#%`);
+    this.sendToServer(`HI#${hdid}#%`);
     if (this.enableCaptcha && localStorage.getItem("hdid") !== hdid) {
-      this.sender.sendServer(localStorage.getItem("hdid"));
+      this.sendToServer(localStorage.getItem("hdid"));
       document.getElementById("client_secondfactor").style.display = "block";
       document.getElementById("client_charselect").remove();
       document.getElementById("client_ooc").remove();
     }
     if (mode !== "replay") {
-      this.checkUpdater = setInterval(() => this.sender.sendCH(), 5000);
+      this.checkUpdater = setInterval(
+        () => this.sender.sendCH({ charId: this.charID }),
+        5000,
+      );
     }
   }
 
@@ -354,13 +357,17 @@ class Client extends EventEmitter {
       return;
     }
 
-    // packetRegistry maps header -> { codec, receive }: decode the wire args
-    // into a typed packet, then dispatch to the receiver. Decode and receive
-    // are guarded individually so a single malformed/buggy packet can't
-    // poison its siblings in the same WebSocket frame.
+    // packetRegistry maps header -> { codec, receive?, send? }: decode the
+    // wire args into a typed packet, then dispatch to the receiver. Decode
+    // and receive are guarded individually so a single malformed/buggy packet
+    // can't poison its siblings in the same WebSocket frame.
     const entry = packetRegistry.get(header);
     if (!entry) {
       console.warn(`Invalid packet header ${header}`);
+      return;
+    }
+    if (!entry.receive) {
+      console.warn(`Received ${header} but no receiver is registered`);
       return;
     }
 

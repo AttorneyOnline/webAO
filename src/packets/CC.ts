@@ -36,16 +36,14 @@ export const CC: PacketCodec<CCPacket> = {
  * What? you want a character??
  */
 export const receiveCC = (packet: CCPacket) => {
-  client.sender.sendSelf(`PV#1#CID#${packet.charId}#%`);
+  client.sendToSelf(`PV#1#CID#${packet.charId}#%`);
 };
 
 /**
- * Requests to play as a specified character.
+ * Requests to play as a specified character. Gatekeeps unknown
+ * `charId`s so we don't ask the server for a slot that isn't real.
  */
-export const sendCC = (character: number) => {
-  if (character === -1 || client.chars[character].name) {
-    client.sender.sendServer(
-      CC.encode({ playerId: client.playerID, charId: character, charPw: "web" }),
-    );
-  }
+export const sendCC = (packet: CCPacket) => {
+  if (packet.charId !== -1 && !client.chars[packet.charId]?.name) return;
+  client.sendToServer(CC.encode(packet));
 };

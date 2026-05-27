@@ -88,6 +88,6 @@ export const receiveMC = (packet: MCPacket) => {
 /**
  * Requests to change the music to the specified track.
  */
-export const sendMC = (track: string) => {
-  client.sender.sendServer(MC.encode({ track, charId: client.charID }));
+export const sendMC = (packet: MCPacket) => {
+  client.sendToServer(MC.encode(packet));
 };

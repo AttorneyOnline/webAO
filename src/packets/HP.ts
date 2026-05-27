@@ -37,6 +37,6 @@ export const receiveHP = (packet: HPPacket) => {
 /**
  * Sends a health point change.
  */
-export const sendHP = (side: number, hp: number) => {
-  client.sender.sendServer(HP.encode({ bar: side, value: hp }));
+export const sendHP = (packet: HPPacket) => {
+  client.sendToServer(HP.encode(packet));
 };

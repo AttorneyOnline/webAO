@@ -11,6 +11,10 @@ export function pickChar(ccharacter: number) {
     document.getElementById("client_waiting")!.style.display = "none";
     document.getElementById("client_charselect")!.style.display = "none";
   }
-  client.sender.sendCC(ccharacter);
+  client.sender.sendCC({
+    playerId: client.playerID,
+    charId: ccharacter,
+    charPw: "web",
+  });
 }
 window.pickChar = pickChar;

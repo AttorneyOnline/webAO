@@ -16,8 +16,8 @@ export const RD: PacketCodec<RDPacket> = {
  * we are asking ourselves what characters there are
  */
 export const receiveRD = (_packet: RDPacket) => {
-  client.sender.sendSelf("BN#gs4#%");
-  client.sender.sendSelf("DONE#%");
+  client.sendToSelf("BN#gs4#%");
+  client.sendToSelf("DONE#%");
   const ooclog = <HTMLInputElement>document.getElementById("client_ooclog");
   ooclog.value = "";
   ooclog.readOnly = false;

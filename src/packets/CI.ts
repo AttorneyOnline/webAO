@@ -45,5 +45,5 @@ export const receiveCI = (packet: CIPacket) => {
     setTimeout(() => handleCharacterInfo(chargs, index), 500);
   }
   // Request the next pack
-  client.sender.sendServer(`AN#${packet.batchIndex / 10 + 1}#%`);
+  client.sendToServer(`AN#${packet.batchIndex / 10 + 1}#%`);
 };

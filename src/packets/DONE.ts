@@ -51,7 +51,11 @@ export const receiveDONE = (_packet: DONEPacket) => {
       (c: any) => c && c.name.toLowerCase() === autoChar.toLowerCase()
     );
     if (charIndex !== -1) {
-      client.sender.sendCC(charIndex);
+      client.sender.sendCC({
+        playerId: client.playerID,
+        charId: charIndex,
+        charPw: "web",
+      });
     }
   }
 };

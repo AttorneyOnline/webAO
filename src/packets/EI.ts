@@ -50,5 +50,5 @@ export const receiveEI = (packet: EIPacket) => {
     icon: `${AO_HOST}evidence/${encodeURI(packet.image.toLowerCase())}`,
   };
 
-  client.sender.sendServer("AE" + (packet.id + 1) + "#%");
+  client.sendToServer("AE" + (packet.id + 1) + "#%");
 };

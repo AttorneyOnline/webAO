@@ -53,5 +53,5 @@ export const receiveSM = (packet: SMPacket) => {
   }
 
   // Music done, carry on
-  client.sender.sendServer("RD#%");
+  client.sendToServer("RD#%");
 };

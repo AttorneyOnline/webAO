@@ -61,6 +61,6 @@ export const receiveRT = (packet: RTPacket) => {
 /**
  * Sends a testimony state change (witness testimony, cross-exam, judge ruling).
  */
-export const sendRT = (testimony: string) => {
-  client.sender.sendServer(RT.encode({ animation: testimony }));
+export const sendRT = (packet: RTPacket) => {
+  client.sendToServer(RT.encode(packet));
 };
