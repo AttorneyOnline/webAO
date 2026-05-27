@@ -42,7 +42,7 @@ export const sendIC = (
   emote_modifier: EmoteModifier,
   sfx_delay: number,
   shout_modifier: ShoutModifier,
-  evidence: number,
+  evidence_id: number,
   flip: Flip,
   realization: boolean,
   text_color: TextColor,
@@ -96,9 +96,7 @@ export const sendIC = (
     `#${escapeChat(message)}#${escapeChat(side)}#${escapeChat(
       sfx_name,
     )}#${emote_modifier}` +
-    `#${client.charID}#${sfx_delay}#${shout_modifier}#${Number(
-      evidence,
-    )}#${flip}#${Number(
+    `#${client.charID}#${sfx_delay}#${shout_modifier}#${evidence_id}#${flip}#${Number(
       realization,
     )}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
 

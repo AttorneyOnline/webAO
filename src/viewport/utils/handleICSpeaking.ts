@@ -112,7 +112,7 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
     emote_modifier: packet.emote_modifier,
     snddelay: packet.sfx_delay,
     shout_modifier: packet.shout_modifier,
-    evidence: Number(safeTags(packet.evidence)),
+    evidence_id: packet.evidence_id,
     flip: packet.flip,
     realization: packet.realization,
     text_color: packet.text_color,
@@ -166,12 +166,12 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
   const eviBox = document.getElementById("client_evi")!;
 
   if (
-    client.viewport.getLastEvidence() !== client.viewport.getChatmsg().evidence
+    client.viewport.getLastEvidence() !== client.viewport.getChatmsg().evidence_id
   ) {
     eviBox.style.opacity = "0";
     eviBox.style.height = "0%";
   }
-  client.viewport.setLastEvidence(client.viewport.getChatmsg().evidence);
+  client.viewport.setLastEvidence(client.viewport.getChatmsg().evidence_id);
 
   // these are for the full view pan, the other positions use 'client_char'
   const validSides: Side[] = [Side.DEFENSE, Side.PROSECUTION, Side.WITNESS];

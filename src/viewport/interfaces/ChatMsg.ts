@@ -38,7 +38,7 @@ export interface ChatMsg {
   screenshake?: number;
   realization?: boolean;
   emote_modifier?: EmoteModifier;
-  evidence?: number;
+  evidence_id?: number;
   looping_sfx?: boolean;
   noninterrupting_preanim?: number;
   additive?: boolean;

@@ -164,7 +164,7 @@ export interface MSPacketClient {
   char_id: number;
   sfx_delay: number;
   shout_modifier: ShoutModifier;
-  evidence: string;
+  evidence_id: number;
   flip: Flip;
   realization: boolean;
   text_color: TextColor;
@@ -211,7 +211,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       char_id: num(args[9]),
       sfx_delay: num(args[10]),
       shout_modifier: parseShoutModifier(args[11]),
-      evidence: str(args[12]),
+      evidence_id: num(args[12]),
       flip: parseFlip(args[13]),
       realization: args[14] === "1",
       text_color: parseTextColor(args[15]),
@@ -248,7 +248,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       p.char_id,
       p.sfx_delay,
       p.shout_modifier,
-      escapeChat(p.evidence),
+      p.evidence_id,
       p.flip,
       Number(p.realization),
       p.text_color,
@@ -288,7 +288,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       char_id: num(args[9]),
       sfx_delay: num(args[10]),
       shout_modifier: parseShoutModifier(args[11]),
-      evidence: str(args[12]),
+      evidence_id: num(args[12]),
       flip: parseFlip(args[13]),
       realization: args[14] === "1",
       text_color: parseTextColor(args[15]),
@@ -324,7 +324,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       p.char_id,
       p.sfx_delay,
       p.shout_modifier,
-      escapeChat(p.evidence),
+      p.evidence_id,
       p.flip,
       Number(p.realization),
       p.text_color,

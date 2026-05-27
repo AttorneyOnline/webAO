@@ -380,9 +380,9 @@ const viewport = (): Viewport => {
         chatmsg.startspeaking = false;
 
         // Evidence Bullshit
-        if (chatmsg.evidence > 0) {
+        if (chatmsg.evidence_id > 0) {
           // Prepare evidence
-          eviBox.src = client.evidences[chatmsg.evidence - 1].icon;
+          eviBox.src = client.evidences[chatmsg.evidence_id - 1].icon;
 
           eviBox.style.width = "auto";
           eviBox.style.height = "36.5%";

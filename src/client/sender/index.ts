@@ -30,7 +30,7 @@ export interface ISender {
     emote_modifier: EmoteModifier,
     sfx_delay: number,
     shout_modifier: ShoutModifier,
-    evidence: number,
+    evidence_id: number,
     flip: Flip,
     realization: boolean,
     text_color: TextColor,
