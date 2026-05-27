@@ -114,7 +114,7 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
     shout_modifier: packet.shout_modifier,
     evidence: Number(safeTags(packet.evidence)),
     flip: packet.flip,
-    flash: packet.realization,
+    realization: packet.realization,
     color: packet.text_color,
     speed: UPDATE_INTERVAL,
     showname: safeTags(decodeChat(packet.showname)),

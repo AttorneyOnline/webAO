@@ -336,7 +336,7 @@ const viewport = (): Viewport => {
         playSFX(stabUrl, false);
         gamewindow.style.animation = "shake 0.2s 1";
       }
-      if (chatmsg.flash === 1) {
+      if (chatmsg.realization) {
         // Flash screen
         const realizationUrl = chatmsg.preloadedAssets?.realizationSfxUrl
           ?? `${AO_HOST}sounds/general/sfx-realization.opus`;
