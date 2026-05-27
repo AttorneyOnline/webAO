@@ -1,33 +1,32 @@
+import { sendCC } from "../../packets/CC";
+import { sendCH } from "../../packets/CH";
+import { sendCT } from "../../packets/CT";
+import { sendDE } from "../../packets/DE";
+import { sendEE } from "../../packets/EE";
+import { sendHP } from "../../packets/HP";
+import { sendMA } from "../../packets/MA";
+import { sendMC } from "../../packets/MC";
+import { sendPE } from "../../packets/PE";
+import { sendRT } from "../../packets/RT";
+import { sendZZ } from "../../packets/ZZ";
 import { sendIC } from "./sendIC";
 import { sendSelf } from "./sendSelf";
 import { sendServer } from "./sendServer";
-import { sendCheck } from "./sendCheck";
-import { sendHP } from "./sendHP";
-import { sendOOC } from "./sendOOC";
-import { sendCharacter } from "./sendCharacter";
-import { sendRT } from "./sendRT";
-import { sendMusicChange } from "./sendMusicChange";
-import { sendZZ } from "./sendZZ";
-import { sendEE } from "./sendEE";
-import { sendDE } from "./sendDE";
-import { sendPE } from "./sendPE";
-import { sendMA } from "./sendMA";
 
 export const sender = {
+  sendCC,
+  sendCH,
+  sendCT,
+  sendDE,
+  sendEE,
+  sendHP,
   sendIC,
+  sendMA,
+  sendMC,
+  sendPE,
+  sendRT,
   sendSelf,
   sendServer,
-  sendCheck,
-  sendHP,
-  sendOOC,
-  sendCharacter,
-  sendRT,
-  sendMusicChange,
   sendZZ,
-  sendEE,
-  sendDE,
-  sendPE,
-  sendMA,
 };
 
-export type Sender = typeof sender;

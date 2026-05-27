@@ -57,3 +57,10 @@ export const receiveRT = (packet: RTPacket) => {
   }
   initTestimonyUpdater();
 };
+
+/**
+ * Sends a testimony state change (witness testimony, cross-exam, judge ruling).
+ */
+export const sendRT = (testimony: string) => {
+  client.sender.sendServer(RT.encode({ animation: testimony }));
+};

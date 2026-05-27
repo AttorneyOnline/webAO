@@ -1,3 +1,4 @@
+import { client } from "../client";
 import type { PacketCodec } from "../packets";
 
 /**
@@ -15,3 +16,10 @@ export const CH: PacketCodec<CHPacket> = {
 };
 
 export const receiveCH = () => {};
+
+/**
+ * Sends a keepalive packet.
+ */
+export const sendCH = () => {
+  client.sender.sendServer(CH.encode({ charId: client.charID }));
+};

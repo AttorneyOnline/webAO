@@ -7,7 +7,8 @@ import "./styles/client.css";
 import "./styles/goldenlayout.css";
 import { isLowMemory } from "./client/isLowMemory";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { sender, type Sender } from "./client/sender/index";
+import { sender } from "./client/sender/index";
+import type { Sender } from "./packets";
 import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources";
 import masterViewport from "./viewport/viewport";
@@ -270,7 +271,7 @@ class Client extends EventEmitter {
       document.getElementById("client_ooc").remove();
     }
     if (mode !== "replay") {
-      this.checkUpdater = setInterval(() => this.sender.sendCheck(), 5000);
+      this.checkUpdater = setInterval(() => this.sender.sendCH(), 5000);
     }
   }
 

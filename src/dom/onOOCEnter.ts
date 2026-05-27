@@ -5,7 +5,7 @@ import { client } from "../client";
  */
 export function onOOCEnter(event: KeyboardEvent) {
   if (event.keyCode === 13) {
-    client.sender.sendOOC(
+    client.sender.sendCT(
       (<HTMLInputElement>document.getElementById("client_oocinputbox")).value,
     );
     (<HTMLInputElement>document.getElementById("client_oocinputbox")).value =

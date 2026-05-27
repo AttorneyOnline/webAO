@@ -18,7 +18,7 @@ export function changeBackgroundOOC() {
   }
 
   if (mode === "join") {
-    client.sender.sendOOC(`/${changeBGCommand.replace("$1", filename)}`);
+    client.sender.sendCT(`/${changeBGCommand.replace("$1", filename)}`);
   } else if (mode === "replay") {
     client.sender.sendSelf(`BN#${filename}#%`);
   }

@@ -1,3 +1,5 @@
+import { client } from "../client";
+import { saveChatlogHandle } from "../client/saveChatLogHandle";
 import {
   decodeChat,
   escapeChat,
@@ -74,3 +76,27 @@ function addLinks(message: string) {
     (url) => `<a href="${url}" target="_blank">${url}</a>`,
   );
 }
+
+const OOC_COMMANDS = new Map<string, () => void>([
+  ["/save_chatlog", saveChatlogHandle],
+]);
+
+/**
+ * Sends an out-of-character chat message. Intercepts a small set of
+ * client-side slash commands (e.g. `/save_chatlog`) before sending.
+ */
+export const sendCT = (message: string) => {
+  const nameInput = <HTMLInputElement>document.getElementById("OOC_name");
+  localStorage.setItem("OOC_name", nameInput.value);
+
+  const command = OOC_COMMANDS.get(message?.toLowerCase() ?? "");
+  if (command) {
+    try {
+      command();
+    } catch {
+      // Command Not Recognized
+    }
+    return;
+  }
+  client.sender.sendServer(CT.encode({ name: nameInput.value, message }));
+};

@@ -38,3 +38,14 @@ export const CC: PacketCodec<CCPacket> = {
 export const receiveCC = (packet: CCPacket) => {
   client.sender.sendSelf(`PV#1#CID#${packet.charId}#%`);
 };
+
+/**
+ * Requests to play as a specified character.
+ */
+export const sendCC = (character: number) => {
+  if (character === -1 || client.chars[character].name) {
+    client.sender.sendServer(
+      CC.encode({ playerId: client.playerID, charId: character, charPw: "web" }),
+    );
+  }
+};

@@ -84,3 +84,10 @@ export const receiveMC = (packet: MCPacket) => {
 
   document.getElementById("client_trackstatustext")!.innerText = track;
 };
+
+/**
+ * Requests to change the music to the specified track.
+ */
+export const sendMC = (track: string) => {
+  client.sender.sendServer(MC.encode({ track, charId: client.charID }));
+};

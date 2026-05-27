@@ -49,6 +49,7 @@ import { VS_LEAVE, receiveVS_LEAVE } from "./packets/VS_LEAVE";
 import { VS_PEERS, receiveVS_PEERS } from "./packets/VS_PEERS";
 import { VS_SPEAK, receiveVS_SPEAK } from "./packets/VS_SPEAK";
 import { ZZ, receiveZZ } from "./packets/ZZ";
+import { sender } from "./client/sender";
 
 /**
  * A codec for a single packet header. `decode` parses the `#`-split args
@@ -141,3 +142,7 @@ const packets: Record<string, PacketEntry<any>> = {
 };
 
 export const packetRegistry = new Map(Object.entries(packets));
+
+// Sender type lives here so packets.ts is the single home for the public
+// packet API (codecs, receive registry, send signatures).
+export type Sender = typeof sender;

@@ -6,7 +6,7 @@ import { renderPlayerList } from "./renderPlayerList";
  */
 export function area_click(el: HTMLElement) {
   const area = client.areas[el.id.substring(4)].name;
-  client.sender.sendMusicChange(area);
+  client.sender.sendMC(area);
 
   const areaHr = document.createElement("div");
   areaHr.className = "hrtext";

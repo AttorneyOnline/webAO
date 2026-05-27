@@ -33,3 +33,10 @@ export const receiveHP = (packet: HPPacket) => {
   (<HTMLElement>healthbox.getElementsByClassName("health-bar")[0]).style.width =
     `${percent_hp}%`;
 };
+
+/**
+ * Sends a health point change.
+ */
+export const sendHP = (side: number, hp: number) => {
+  client.sender.sendServer(HP.encode({ bar: side, value: hp }));
+};
