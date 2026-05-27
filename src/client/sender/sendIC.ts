@@ -1,38 +1,26 @@
-import { extrafeatures } from "../../client";
-import { escapeChat } from "../../encoding";
 import { client } from "../../client";
-import type {
-  EmoteModifier,
+import {
   Flip,
-  ShoutModifier,
-  TextColor,
+  MS,
+  MSServer,
+  parseSide,
+  type DeskModifier,
+  type EmoteModifier,
+  type MSPacketServer,
+  type ShoutModifier,
+  type TextColor,
 } from "../../packets/MS";
 import queryParser from "../../utils/queryParser";
 const { mode } = queryParser();
 
 /**
- * Sends an in-character chat message.
- * @param {number} desk_modifier controls the desk
- * @param {string} speaking who is speaking
- * @param {string} name the name of the current character
- * @param {string} silent whether or not it's silent
- * @param {string} message the message to be sent
- * @param {string} side the name of the side in the background
- * @param {string} sfx_name the name of the sound effect
- * @param {number} emote_modifier whether or not to zoom
- * @param {number} sfx_delay the delay (in milliseconds) to play the sound effect
- * @param {number} shout_modifier the number of the shout to play
- * @param {string} evidence the filename of evidence to show
- * @param {boolean} flip change to 1 to reverse sprite for position changes
- * @param {boolean} realization screen flash effect
- * @param {number} text_color text color
- * @param {string} showname custom name to be displayed (optional)
- * @param {number} other_charid paired character (optional)
- * @param {number} self_offset offset to paired character (optional)
- * @param {number} noninterrupting_preanim play the full preanim (optional)
+ * Sends an in-character chat message. The packet variant depends on
+ * whether we're talking to a real server (Server-receiver form, no
+ * `other_name` / `other_emote`) or replaying to ourselves
+ * (Client-receiver form, fields included with empty values).
  */
 export const sendIC = (
-  desk_modifier: number,
+  desk_modifier: DeskModifier,
   preanim: string,
   name: string,
   emote: string,
@@ -53,54 +41,56 @@ export const sendIC = (
   noninterrupting_preanim: boolean,
   sfx_looping: boolean,
   screenshake: boolean,
-  frame_screenshake: string,
-  frame_realization: string,
-  frame_sfx: string,
+  frames_shake: string,
+  frames_realization: string,
+  frames_sfx: string,
   additive: boolean,
   effect: string,
 ) => {
-  let extra_cccc = "";
-  let other_emote = "";
-  let other_offset = "";
-  let extra_27 = "";
-  let extra_28 = "";
+  const packet: MSPacketServer = {
+    desk_modifier,
+    preanim,
+    character: name,
+    emote,
+    message,
+    side: parseSide(side),
+    sfx_name,
+    emote_modifier,
+    char_id: client.charID,
+    sfx_delay,
+    shout_modifier,
+    evidence_id,
+    flip,
+    realization,
+    text_color,
+    showname,
+    other_charid: Number(other_charid) || -1,
+    self_offset: { x: self_hoffset, y: self_yoffset },
+    noninterrupting_preanim,
+    sfx_looping,
+    screenshake,
+    frames_shake,
+    frames_realization,
+    frames_sfx,
+    additive,
+    effect,
+  };
 
-  if (extrafeatures.includes("cccc_ic_support")) {
-    const self_offset = extrafeatures.includes("y_offset")
-      ? `${self_hoffset}<and>${self_yoffset}`
-      : self_hoffset; // HACK: this should be an & but client fucked it up and all the servers adopted it
-    if (mode === "replay") {
-      other_emote = "##";
-      other_offset = "#0#0";
-    }
-    extra_cccc = `${escapeChat(
-      showname,
-    )}#${other_charid}${other_emote}#${self_offset}${other_offset}#${Number(
-      noninterrupting_preanim,
-    )}#`;
+  // In replay mode, sendServer routes the wire back through the local
+  // dispatcher -- which expects Client-receiver form (with `other_*`
+  // fields). Fill those in as zero/empty when self-sending.
+  const wire =
+    mode === "replay"
+      ? MS.encode({
+        ...packet,
+        other_name: "",
+        other_emote: "",
+        other_offset: { x: 0, y: 0 },
+        other_flip: Flip.NONE,
+      })
+      : MSServer.encode(packet);
 
-    if (extrafeatures.includes("looping_sfx")) {
-      extra_27 = `${Number(sfx_looping)}#${Number(
-        screenshake,
-      )}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
-      if (extrafeatures.includes("effects")) {
-        extra_28 = `${Number(additive)}#${escapeChat(effect)}#`;
-      }
-    }
-  }
-
-  const serverMessage =
-    `MS#${desk_modifier}#${escapeChat(preanim)}#${escapeChat(name)}#${escapeChat(
-      emote,
-    )}` +
-    `#${escapeChat(message)}#${escapeChat(side)}#${escapeChat(
-      sfx_name,
-    )}#${emote_modifier}` +
-    `#${client.charID}#${sfx_delay}#${shout_modifier}#${evidence_id}#${flip}#${Number(
-      realization,
-    )}#${text_color}#${extra_cccc}${extra_27}${extra_28}%`;
-
-  client.sender.sendServer(serverMessage);
+  client.sender.sendServer(wire);
   if (mode === "replay") {
     (<HTMLInputElement>document.getElementById("client_ooclog")).value +=
       `wait#${

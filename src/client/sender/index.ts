@@ -1,4 +1,5 @@
 import type {
+  DeskModifier,
   EmoteModifier,
   Flip,
   ShoutModifier,
@@ -20,7 +21,7 @@ import { sendPE } from "./sendPE";
 import { sendMA } from "./sendMA";
 export interface ISender {
   sendIC: (
-    desk_modifier: number,
+    desk_modifier: DeskModifier,
     preanim: string,
     name: string,
     emote: string,
@@ -41,9 +42,9 @@ export interface ISender {
     noninterrupting_preanim: boolean,
     sfx_looping: boolean,
     screenshake: boolean,
-    frame_screenshake: string,
-    frame_realization: string,
-    frame_sfx: string,
+    frames_shake: string,
+    frames_realization: string,
+    frames_sfx: string,
     additive: boolean,
     effect: string,
   ) => void;

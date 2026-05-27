@@ -205,13 +205,23 @@ export interface MSPacketClient {
   // 2.8 group
   additive: boolean;
   effect: string;
-  // 2.10.2 group
-  blips: string;
-  slide: boolean;
 }
 
-/** Server-as-receiver form: omits `other_name` and `other_emote`. */
-export type MSPacketServer = Omit<MSPacketClient, "other_name" | "other_emote">;
+/**
+ * Server-as-receiver form. The wire is 26 fields and omits:
+ *
+ *   - `other_name` and `other_emote` (server fills in from the paired
+ *     client's state on broadcast),
+ *   - `other_offset` and `other_flip` (same reasoning — server-only).
+ *
+ * The AO spec docs are misleading here: they imply only `other_name` /
+ * `other_emote` are absent on incoming, but real servers (KFO, Nyathena,
+ * Athena) and the reference AO2-Client all expect this 26-field shape.
+ */
+export type MSPacketServer = Omit<
+  MSPacketClient,
+  "other_name" | "other_emote" | "other_offset" | "other_flip"
+>;
 
 const str = (v: string | undefined) => unescapeChat(v ?? "");
 
@@ -259,8 +269,6 @@ export const MS: PacketCodec<MSPacketClient> = {
       frames_sfx: str(args[28]),
       additive: args[29] === "1",
       effect: str(args[30]),
-      blips: str(args[31]),
-      slide: args[32] === "1",
     };
   },
   encode(p) {
@@ -296,8 +304,6 @@ export const MS: PacketCodec<MSPacketClient> = {
       escapeChat(p.frames_sfx),
       Number(p.additive),
       escapeChat(p.effect),
-      escapeChat(p.blips),
-      Number(p.slide),
     ];
     return `${fields.join("#")}#%`;
   },
@@ -323,20 +329,17 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       text_color: parseTextColor(args[15]),
       showname: str(args[16]),
       other_charid: intOr(args[17], -1),
-      // Server-receiver form skips other_name (18) and other_emote (19).
+      // Server-receiver form jumps from other_charid straight to
+      // self_offset (and from self_offset to noninterrupting_preanim).
       self_offset: parseOffset(str(args[18])),
-      other_offset: parseOffset(str(args[19])),
-      other_flip: parseFlip(args[20]),
-      noninterrupting_preanim: args[21] === "1",
-      sfx_looping: args[22] === "1",
-      screenshake: args[23] === "1",
-      frames_shake: str(args[24]),
-      frames_realization: str(args[25]),
-      frames_sfx: str(args[26]),
-      additive: args[27] === "1",
-      effect: str(args[28]),
-      blips: str(args[29]),
-      slide: args[30] === "1",
+      noninterrupting_preanim: args[19] === "1",
+      sfx_looping: args[20] === "1",
+      screenshake: args[21] === "1",
+      frames_shake: str(args[22]),
+      frames_realization: str(args[23]),
+      frames_sfx: str(args[24]),
+      additive: args[25] === "1",
+      effect: str(args[26]),
     };
   },
   encode(p) {
@@ -360,8 +363,6 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       escapeChat(p.showname),
       p.other_charid,
       escapeChat(encodeOffset(p.self_offset)),
-      escapeChat(encodeOffset(p.other_offset)),
-      p.other_flip,
       Number(p.noninterrupting_preanim),
       Number(p.sfx_looping),
       Number(p.screenshake),
@@ -370,8 +371,6 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       escapeChat(p.frames_sfx),
       Number(p.additive),
       escapeChat(p.effect),
-      escapeChat(p.blips),
-      Number(p.slide),
     ];
     return `${fields.join("#")}#%`;
   },
