@@ -197,7 +197,7 @@ export interface MSPacketClient {
   other_flip: Flip;
   noninterrupting_preanim: boolean;
   // 2.7 group
-  sfx_looping: number;
+  sfx_looping: boolean;
   screenshake: number;
   frames_shake: string;
   frames_realization: string;
@@ -242,7 +242,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       other_offset: parseOffset(str(args[21])),
       other_flip: parseFlip(args[22]),
       noninterrupting_preanim: args[23] === "1",
-      sfx_looping: num(args[24]),
+      sfx_looping: args[24] === "1",
       screenshake: num(args[25]),
       frames_shake: str(args[26]),
       frames_realization: str(args[27]),
@@ -279,7 +279,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       escapeChat(encodeOffset(p.other_offset)),
       p.other_flip,
       Number(p.noninterrupting_preanim),
-      p.sfx_looping,
+      Number(p.sfx_looping),
       p.screenshake,
       escapeChat(p.frames_shake),
       escapeChat(p.frames_realization),
@@ -318,7 +318,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       other_offset: parseOffset(str(args[19])),
       other_flip: parseFlip(args[20]),
       noninterrupting_preanim: args[21] === "1",
-      sfx_looping: num(args[22]),
+      sfx_looping: args[22] === "1",
       screenshake: num(args[23]),
       frames_shake: str(args[24]),
       frames_realization: str(args[25]),
@@ -353,7 +353,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       escapeChat(encodeOffset(p.other_offset)),
       p.other_flip,
       Number(p.noninterrupting_preanim),
-      p.sfx_looping,
+      Number(p.sfx_looping),
       p.screenshake,
       escapeChat(p.frames_shake),
       escapeChat(p.frames_realization),

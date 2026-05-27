@@ -119,7 +119,7 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
     other_offset: packet.other_offset,
     other_flip: packet.other_flip,
     noninterrupting_preanim: packet.noninterrupting_preanim,
-    looping_sfx: Boolean(packet.sfx_looping),
+    sfx_looping: packet.sfx_looping,
     screenshake: packet.screenshake,
     additive: Boolean(packet.additive),
     effects: packet.effect.split("|"),

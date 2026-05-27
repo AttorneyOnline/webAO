@@ -39,7 +39,7 @@ export interface ISender {
     self_hoffset: number,
     self_yoffset: number,
     noninterrupting_preanim: boolean,
-    looping_sfx: boolean,
+    sfx_looping: boolean,
     screenshake: boolean,
     frame_screenshake: string,
     frame_realization: string,

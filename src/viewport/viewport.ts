@@ -490,7 +490,7 @@ const viewport = (): Viewport => {
       ) {
         const sfxUrl = chatmsg.preloadedAssets?.emoteSfxUrl
           ?? `${AO_HOST}sounds/general/${encodeURI(chatmsg.sound.toLowerCase())}.opus`;
-        playSFX(sfxUrl, chatmsg.looping_sfx);
+        playSFX(sfxUrl, chatmsg.sfx_looping);
       }
     }
     if (textnow === chatmsg.content && !startFirstTickCheck && !startSecondTickCheck) {

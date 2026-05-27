@@ -30,7 +30,7 @@ export function onEnter(event: KeyboardEvent) {
     const noninterrupting_preanim = Boolean(
       (<HTMLInputElement>document.getElementById("check_nonint")).checked,
     );
-    const looping_sfx = Boolean(
+    const sfx_looping = Boolean(
       (<HTMLInputElement>document.getElementById("check_loopsfx")).checked,
     );
     const color = parseTextColor(
@@ -96,7 +96,7 @@ export function onEnter(event: KeyboardEvent) {
       pairoffset,
       pairyoffset,
       noninterrupting_preanim,
-      looping_sfx,
+      sfx_looping,
       screenshake,
       "-",
       "-",

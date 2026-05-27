@@ -51,7 +51,7 @@ export const sendIC = (
   self_hoffset: number,
   self_yoffset: number,
   noninterrupting_preanim: boolean,
-  looping_sfx: boolean,
+  sfx_looping: boolean,
   screenshake: boolean,
   frame_screenshake: string,
   frame_realization: string,
@@ -80,7 +80,7 @@ export const sendIC = (
     )}#`;
 
     if (extrafeatures.includes("looping_sfx")) {
-      extra_27 = `${Number(looping_sfx)}#${Number(
+      extra_27 = `${Number(sfx_looping)}#${Number(
         screenshake,
       )}#${frame_screenshake}#${frame_realization}#${frame_sfx}#`;
       if (extrafeatures.includes("effects")) {
