@@ -1,22 +1,18 @@
 import { client } from "../../client";
 import { handleCharacterInfo } from "../../client/handleCharacterInfo";
+import type { CIPacket } from "../types/CI";
+
 /**
  * Handles incoming character information, bundling multiple characters
  * per packet.
- * CI#0#Phoenix&description&&&&&#1#Miles ...
- * @param {Array} args packet arguments
  */
-export const handleCI = (args: string[]) => {
-  // Loop through the 10 characters that were sent
+export const handleCI = (packet: CIPacket) => {
   document.getElementById("client_loadingtext")!.innerHTML =
-    `Loading Character ${args[1]}/${client.char_list_length}`;
-  for (let i = 2; i <= args.length - 2; i++) {
-    if (i % 2 === 0) {
-      const chargs = args[i].split("&");
-      const charid = Number(args[i - 1]);
-      setTimeout(() => handleCharacterInfo(chargs, charid), 500);
-    }
+    `Loading Character ${packet.batchIndex}/${client.char_list_length}`;
+  for (const { index, data } of packet.entries) {
+    const chargs = data.split("&");
+    setTimeout(() => handleCharacterInfo(chargs, index), 500);
   }
   // Request the next pack
-  client.sender.sendServer(`AN#${Number(args[1]) / 10 + 1}#%`);
+  client.sender.sendServer(`AN#${packet.batchIndex / 10 + 1}#%`);
 };

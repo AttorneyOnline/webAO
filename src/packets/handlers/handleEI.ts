@@ -1,26 +1,21 @@
 import { client } from "../../client";
 import { AO_HOST } from "../../client/aoHost";
-import { prepChat } from "../../encoding";
+import { safeTags } from "../../encoding";
+import type { EIPacket } from "../types/EI";
 
 /**
  * Handles incoming evidence information, containing only one evidence
  * item per packet.
- *
- * EI#id#name&description&type&image&##%
- *
- * @param {Array} args packet arguments
  */
-export const handleEI = (args: string[]) => {
+export const handleEI = (packet: EIPacket) => {
   document.getElementById("client_loadingtext")!.innerHTML =
-    `Loading Evidence ${args[1]}/${client.evidence_list_length}`;
-  const evidenceID = Number(args[1]);
-  const arg = args[2].split("&");
-  client.evidences[evidenceID] = {
-    name: prepChat(arg[0]),
-    desc: prepChat(arg[1]),
-    filename: arg[3],
-    icon: `${AO_HOST}evidence/${encodeURI(arg[3].toLowerCase())}`,
+    `Loading Evidence ${packet.id}/${client.evidence_list_length}`;
+  client.evidences[packet.id] = {
+    name: safeTags(packet.name),
+    desc: safeTags(packet.description),
+    filename: packet.image,
+    icon: `${AO_HOST}evidence/${encodeURI(packet.image.toLowerCase())}`,
   };
 
-  client.sender.sendServer("AE" + (evidenceID + 1) + "#%");
+  client.sender.sendServer("AE" + (packet.id + 1) + "#%");
 };

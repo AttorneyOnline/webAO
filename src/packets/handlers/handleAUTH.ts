@@ -1,9 +1,10 @@
+import type { AUTHPacket } from "../types/AUTH";
+
 /**
  * i am mod now
- * @param {Array} args packet arguments
  */
-export const handleAUTH = (args: string[]) => {
-  if (args[1] === "1") {
+export const handleAUTH = (packet: AUTHPacket) => {
+  if (packet.authState === 1) {
     (<HTMLAnchorElement>document.getElementById("mod_ui")).href =
       `styles/mod.css`;
   }

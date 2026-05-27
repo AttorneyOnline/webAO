@@ -1,23 +1,27 @@
 import { client, setOldLoading } from "../../client";
 import pkg from "../../../package.json";
+import type { IDPacket } from "../types/ID";
 
 const version = pkg.version;
 
 /**
  * Identifies the server and issues a playerID
- * @param {Array} args packet arguments
  */
-export const handleID = (args: string[]) => {
-  client.playerID = Number(args[1]);
-  const serverSoftware = args[2].split("&")[0];
+export const handleID = (packet: IDPacket) => {
+  client.playerID = packet.playerNumber;
+  // Some legacy servers pack software+version together in the software field
+  // separated by `&`. Split here rather than in the codec since this is a
+  // serverD-specific quirk, not the documented protocol.
+  const softwareParts = packet.software.split("&");
+  const serverSoftware = softwareParts[0];
   let serverVersion;
   if (serverSoftware === "serverD") {
-    serverVersion = args[2].split("&")[1];
+    serverVersion = softwareParts[1];
   } else if (serverSoftware === "webAO") {
     setOldLoading(false);
     client.sender.sendSelf("PN#0#1#%");
   } else {
-    serverVersion = args[3];
+    serverVersion = packet.version;
   }
 
   if (serverSoftware === "serverD" && serverVersion === "1377.152") {

@@ -1,8 +1,7 @@
 import { handlePeerJoined } from "../../voice/voice";
+import type { VS_JOINPacket } from "../types/VS_JOIN";
 
-// VS_JOIN#<uid>#%  — a peer joined the voice room.
-export const handleVS_JOIN = (args: string[]) => {
-  const uid = Number(args[1]);
-  if (!Number.isFinite(uid)) return;
-  void handlePeerJoined(uid);
+export const handleVS_JOIN = (packet: VS_JOINPacket) => {
+  if (!Number.isFinite(packet.uid)) return;
+  void handlePeerJoined(packet.uid);
 };

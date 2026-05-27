@@ -1,9 +1,9 @@
 import { client } from "../../client";
+import type { PNPacket } from "../types/PN";
 
 /**
  * Indicates how many users are on this server
- * @param {Array} args packet arguments
  */
-export const handlePN = (_args: string[]) => {
+export const handlePN = (_packet: PNPacket) => {
   client.sender.sendServer("askchaa#%");
 };

@@ -1,8 +1,8 @@
-import { packetHandler } from "../packets/packetHandler";
+import { handleZZ } from "../packets/handlers/handleZZ";
 /**
  * Triggered by the modcall sfx dropdown
  */
 export function modcall_test() {
-  packetHandler.get("ZZ")!("test#test".split("#"));
+  handleZZ({ reason: "test" });
 }
 window.modcall_test = modcall_test;

@@ -1,28 +1,28 @@
 import { client } from "../../client";
 import { safeTags } from "../../encoding";
+import type { ARUPPacket } from "../types/ARUP";
 
 /**
  * Handle the change of players in an area.
- * @param {Array} args packet arguments
  */
-export const handleARUP = (args: string[]) => {
-  args = args.slice(1);
-  for (let i = 0; i < args.length - 1; i++) {
+export const handleARUP = (packet: ARUPPacket) => {
+  const { updateType, updateData } = packet;
+  for (let i = 0; i < updateData.length; i++) {
     if (client.areas[i]) {
       // the server sends us ARUP before we even get the area list
       const thisarea = document.getElementById(`area${i}`)!;
-      switch (Number(args[0])) {
+      switch (updateType) {
         case 0: // playercount
-          client.areas[i].players = Number(args[i + 1]);
+          client.areas[i].players = Number(updateData[i]);
           break;
         case 1: // status
-          client.areas[i].status = safeTags(args[i + 1]);
+          client.areas[i].status = safeTags(String(updateData[i]));
           break;
         case 2:
-          client.areas[i].cm = safeTags(args[i + 1]);
+          client.areas[i].cm = safeTags(String(updateData[i]));
           break;
         case 3:
-          client.areas[i].locked = safeTags(args[i + 1]);
+          client.areas[i].locked = safeTags(String(updateData[i]));
           break;
       }
 

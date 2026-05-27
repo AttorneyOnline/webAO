@@ -1,8 +1,9 @@
 import { updateActionCommands } from "../../dom/updateActionCommands";
+import type { SPPacket } from "../types/SP";
+
 /**
  * position change
- * @param {string} pos new position
  */
-export const handleSP = (args: string[]) => {
-  updateActionCommands(args[1]);
+export const handleSP = (packet: SPPacket) => {
+  updateActionCommands(packet.side);
 };

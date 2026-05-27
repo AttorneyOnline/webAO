@@ -1,15 +1,14 @@
 import queryParser from "../../utils/queryParser";
 import { client, clientState, autoChar, autoArea } from "../../client";
 import { area_click } from "../../dom/areaClick";
+import type { DONEPacket } from "../types/DONE";
 
 const { mode } = queryParser();
 /**
  * Handles the handshake completion packet, meaning the player
  * is ready to select a character.
- *
- * @param {Array} args packet arguments
  */
-export const handleDONE = (_args: string[]) => {
+export const handleDONE = (_packet: DONEPacket) => {
   // DONE packet signals that the handshake is complete
   client.state = clientState.Joined;
   document.getElementById("client_loading")!.style.display = "none";

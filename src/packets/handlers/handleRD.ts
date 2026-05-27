@@ -1,10 +1,10 @@
 import { client } from "../../client";
+import type { RDPacket } from "../types/RD";
 
 /**
  * we are asking ourselves what characters there are
- * @param {Array} args packet arguments
  */
-export const handleRD = (_args: string[]) => {
+export const handleRD = (_packet: RDPacket) => {
   client.sender.sendSelf("BN#gs4#%");
   client.sender.sendSelf("DONE#%");
   const ooclog = <HTMLInputElement>document.getElementById("client_ooclog");

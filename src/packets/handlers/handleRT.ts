@@ -1,13 +1,13 @@
 import { client } from "../../client";
 import { initTestimonyUpdater } from "../../viewport/utils/initTestimonyUpdater";
+import type { RTPacket } from "../types/RT";
 
 /**
  * Handles a testimony states.
- * @param {Array} args packet arguments
  */
-export const handleRT = (args: string[]) => {
-  const judgeid = Number(args[2]);
-  switch (args[1]) {
+export const handleRT = (packet: RTPacket) => {
+  const judgeid = packet.judgeId ?? 0;
+  switch (packet.animation) {
     case "testimony1":
       client.testimonyID = 1;
       break;

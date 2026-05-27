@@ -1,12 +1,12 @@
 import { client } from "../../client";
 import { handleBans } from "../../client/handleBans";
+import type { KBPacket } from "../types/KB";
 
 /**
  * Handles the banned packet
  * this one is sent when you are kicked off the server
- * @param {Array} args ban reason
  */
-export const handleKB = (args: string[]) => {
+export const handleKB = (packet: KBPacket) => {
   client.banned = true;
-  handleBans("Banned", args[1]);
+  handleBans("Banned", packet.reason);
 };

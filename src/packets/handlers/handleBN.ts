@@ -5,14 +5,14 @@ import { getIndexFromSelect } from "../../dom/getIndexFromSelect";
 import { switchPanTilt } from "../../dom/switchPanTilt";
 import transparentPng from "../../constants/transparentPng";
 import { setBackgroundImage } from "../../viewport/utils/setSide"
+import type { BNPacket } from "../types/BN";
 
 /**
  * Handles a background change.
- * @param {Array} args packet arguments
  */
 
-export const handleBN = (args: string[]) => {
-  const bgFromArgs = safeTags(args[1]);
+export const handleBN = (packet: BNPacket) => {
+  const bgFromArgs = safeTags(packet.background);
   client.viewport.setBackgroundName(bgFromArgs);
   const bg_index = getIndexFromSelect(
     "bg_select",
@@ -27,21 +27,21 @@ export const handleBN = (args: string[]) => {
   }
 
 
-  setBackgroundImage("bg_preview",args[1],"defenseempty")
+  setBackgroundImage("bg_preview",packet.background,"defenseempty")
 
-  setBackgroundImage("client_def_bench",args[1],"defensedesk")
-  setBackgroundImage("client_wit_bench",args[1],"stand")
-  setBackgroundImage("client_pro_bench",args[1],"prosecutiondesk")
+  setBackgroundImage("client_def_bench",packet.background,"defensedesk")
+  setBackgroundImage("client_wit_bench",packet.background,"stand")
+  setBackgroundImage("client_pro_bench",packet.background,"prosecutiondesk")
 
-  setBackgroundImage("client_court_def",args[1],"defenseempty")
-  setBackgroundImage("client_court_wit",args[1],"witnessempty")
-  setBackgroundImage("client_court_pro",args[1],"prosecutorempty")
+  setBackgroundImage("client_court_def",packet.background,"defenseempty")
+  setBackgroundImage("client_court_wit",packet.background,"witnessempty")
+  setBackgroundImage("client_court_pro",packet.background,"prosecutorempty")
 
-  setBackgroundImage("client_court_deft",args[1],"transition_def")
-  setBackgroundImage("client_court_prot",args[1],"transition_pro")
+  setBackgroundImage("client_court_deft",packet.background,"transition_def")
+  setBackgroundImage("client_court_prot",packet.background,"transition_pro")
 
-  setBackgroundImage("client_court",args[1],"court")
-  
+  setBackgroundImage("client_court",packet.background,"court")
+
   if((<HTMLImageElement>document.getElementById("client_court")).src !== transparentPng) {
     const pantiltCheckbox = <HTMLInputElement>document.getElementById("client_pantilt");
     if (pantiltCheckbox.checked) {

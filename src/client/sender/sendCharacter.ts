@@ -1,4 +1,5 @@
 import { client } from "../../client";
+import { CC } from "../../packets/types/CC";
 
 /**
  * Requests to play as a specified character.
@@ -6,6 +7,8 @@ import { client } from "../../client";
  */
 export const sendCharacter = (character: number) => {
   if (character === -1 || client.chars[character].name) {
-    client.sender.sendServer(`CC#${client.playerID}#${character}#web#%`);
+    client.sender.sendServer(
+      CC.encode({ playerId: client.playerID, charId: character, charPw: "web" }),
+    );
   }
 };

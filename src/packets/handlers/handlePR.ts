@@ -1,16 +1,15 @@
 import { client } from "../../client";
 import { renderPlayerList } from "../../dom/renderPlayerList";
+import type { PRPacket } from "../types/PR";
 
 /**
  * Handles a player joining or leaving
- * @param {Array} args packet arguments
  */
-export const handlePR = (args: string[]) => {
-  const playerID = Number(args[1]);
-  if (Number(args[2]) === 0) {
-    client.playerlist.set(playerID, { charId: -1, charName: "", showName: "", name: "", area: 0 });
-  } else if (Number(args[2]) === 1) {
-    client.playerlist.delete(playerID);
+export const handlePR = (packet: PRPacket) => {
+  if (packet.type === 0) {
+    client.playerlist.set(packet.id, { charId: -1, charName: "", showName: "", name: "", area: 0 });
+  } else if (packet.type === 1) {
+    client.playerlist.delete(packet.id);
   }
   renderPlayerList();
 };

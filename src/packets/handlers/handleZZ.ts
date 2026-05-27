@@ -1,15 +1,15 @@
 import { client } from "../../client";
 import { AO_HOST } from "../../client/aoHost";
-import { prepChat } from "../../encoding";
+import { decodeChat, safeTags } from "../../encoding";
+import type { ZZPacket } from "../types/ZZ";
 
 /**
- * Handles a modcall
- * @param {Array} args packet arguments
+ * Handles a modcall.
  */
-export const handleZZ = (args: string[]) => {
+export const handleZZ = (packet: ZZPacket) => {
   const oocLog = document.getElementById("client_ooclog")!;
-  const message = args[1].replace(/\n/g, "<br>");
-  oocLog.innerHTML += `$Alert: ${prepChat(message)}<br>`;
+  const message = safeTags(decodeChat(packet.reason)).replace(/\n/g, "<br>");
+  oocLog.innerHTML += `$Alert: ${message}<br>`;
   if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
     oocLog.scrollTop = oocLog.scrollHeight;
   }

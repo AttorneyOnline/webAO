@@ -1,20 +1,18 @@
 import { client } from "../../client";
 import { ensureCharIni } from "../../client/handleCharacterInfo";
 import { renderPlayerList } from "../../dom/renderPlayerList";
+import type { PUPacket } from "../types/PU";
 
 /**
  * Handles a playerlist update
- * @param {Array} args packet arguments
  */
-export const handlePU = (args: string[]) => {
-  const playerID = Number(args[1]);
-  const player = client.playerlist.get(playerID);
+export const handlePU = (packet: PUPacket) => {
+  const player = client.playerlist.get(packet.id);
   if (!player) return;
 
-  const type = Number(args[2]);
-  const data = args[3];
+  const { data } = packet;
 
-  switch (type) {
+  switch (packet.type) {
     case 0:
       player.name = data;
       break;

@@ -1,22 +1,20 @@
+import type { TIPacket } from "../types/TI";
+
 /**
  * Handles a timer update
- * @param {Array} args packet arguments
  */
-export const handleTI = (args: string[]) => {
-  const timerid = Number(args[1]);
-  const type = Number(args[2]);
-  const timer_value = args[3];
-  switch (type) {
+export const handleTI = (packet: TIPacket) => {
+  switch (packet.command) {
     case 0:
     case 1:
-      document.getElementById(`client_timer${timerid}`)!.innerText =
-        timer_value;
+      document.getElementById(`client_timer${packet.timerId}`)!.innerText =
+        String(packet.time);
       break;
     case 2:
-      document.getElementById(`client_timer${timerid}`)!.style.display = "";
+      document.getElementById(`client_timer${packet.timerId}`)!.style.display = "";
       break;
     case 3:
-      document.getElementById(`client_timer${timerid}`)!.style.display = "none";
+      document.getElementById(`client_timer${packet.timerId}`)!.style.display = "none";
       break;
   }
 };

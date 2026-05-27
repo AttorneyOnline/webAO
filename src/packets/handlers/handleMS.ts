@@ -1,19 +1,19 @@
 import { client, UPDATE_INTERVAL } from "../../client";
 import { handleCharacterInfo, ensureCharIni } from "../../client/handleCharacterInfo";
 import { resetICParams } from "../../client/resetICParams";
-import { prepChat, safeTags } from "../../encoding";
+import { decodeChat, safeTags } from "../../encoding";
 import { handle_ic_speaking } from "../../viewport/utils/handleICSpeaking";
+import type { MSPacket } from "../types/MS";
 /**
  * Handles an in-character chat message.
- * @param {*} args packet arguments
  */
-export const handleMS = (args: string[]) => {
+export const handleMS = (packet: MSPacket) => {
   // duplicate message
-  if (args[5] !== client.viewport.getChatmsg().content) {
-    const char_id = Number(args[9]);
-    const char_name = safeTags(args[3]);
+  if (packet.message !== client.viewport.getChatmsg().content) {
+    const char_id = packet.charId;
+    const char_name = safeTags(packet.character);
 
-    let msg_nameplate = args[3];
+    let msg_nameplate = packet.character;
     let msg_blips = "male";
     let char_chatbox = "default";
     let char_muted = false;
@@ -34,7 +34,7 @@ export const handleMS = (args: string[]) => {
     try {
       msg_nameplate = client.chars[char_id].showname;
     } catch (e) {
-      msg_nameplate = args[3];
+      msg_nameplate = packet.character;
     }
 
     try {
@@ -58,54 +58,54 @@ export const handleMS = (args: string[]) => {
 
     if (char_muted === false) {
       let chatmsg = {
-        deskmod: Number(safeTags(args[1]).toLowerCase()),
-        preanim: safeTags(args[2]).toLowerCase(), // get preanim
+        deskmod: Number(safeTags(packet.deskMod).toLowerCase()),
+        preanim: safeTags(packet.preanim).toLowerCase(), // get preanim
         nameplate: msg_nameplate,
         chatbox: char_chatbox,
         name: char_name,
-        sprite: safeTags(args[4]).toLowerCase(),
-        content: prepChat(args[5]), // Escape HTML tags
-        side: args[6].toLowerCase(),
-        sound: safeTags(args[7]).toLowerCase(),
+        sprite: safeTags(packet.emote).toLowerCase(),
+        content: safeTags(decodeChat(packet.message)), // Escape HTML tags
+        side: packet.side.toLowerCase(),
+        sound: safeTags(packet.sfxName).toLowerCase(),
         blips: safeTags(msg_blips),
-        type: Number(args[8]),
+        type: packet.emoteModifier,
         charid: char_id,
-        snddelay: Number(args[10]),
-        objection: Number(args[11]),
-        evidence: Number(safeTags(args[12])),
-        flip: Number(args[13]),
-        flash: Number(args[14]),
-        color: Number(args[15]),
+        snddelay: packet.sfxDelay,
+        objection: packet.shoutModifier,
+        evidence: Number(safeTags(packet.evidence)),
+        flip: packet.flip,
+        flash: packet.realization,
+        color: packet.textColor,
         speed: UPDATE_INTERVAL,
       };
 
-      if (args.length > 16) {
+      if (packet.showname !== undefined) {
         const extra_cccc = {
-          showname: prepChat(args[16]),
-          other_charid: Number(args[17]),
-          other_name: safeTags(args[18]),
-          other_emote: safeTags(args[19]),
-          self_offset: args[20].split("<and>"), // HACK: here as well, client is fucked and uses this instead of &
-          other_offset: args[21].split("<and>"),
-          other_flip: Number(args[22]),
-          noninterrupting_preanim: Number(args[23]),
+          showname: safeTags(decodeChat(packet.showname)),
+          other_charid: packet.otherCharId ?? 0,
+          other_name: safeTags(packet.otherName ?? ""),
+          other_emote: safeTags(packet.otherEmote ?? ""),
+          self_offset: (packet.selfOffset ?? "").split("<and>"), // HACK: here as well, client is fucked and uses this instead of &
+          other_offset: (packet.otherOffset ?? "").split("<and>"),
+          other_flip: packet.otherFlip ?? 0,
+          noninterrupting_preanim: packet.nonInterruptingPreanim ?? 0,
         };
         chatmsg = Object.assign(extra_cccc, chatmsg);
 
-        if (args.length > 24) {
+        if (packet.loopingSfx !== undefined) {
           const extra_27 = {
-            looping_sfx: Number(args[24]),
-            screenshake: Number(args[25]),
-            frame_screenshake: safeTags(args[26]),
-            frame_realization: safeTags(args[27]),
-            frame_sfx: safeTags(args[28]),
+            looping_sfx: packet.loopingSfx,
+            screenshake: packet.screenshake ?? 0,
+            frame_screenshake: safeTags(packet.framesShake ?? ""),
+            frame_realization: safeTags(packet.framesRealization ?? ""),
+            frame_sfx: safeTags(packet.framesSfx ?? ""),
           };
           chatmsg = Object.assign(extra_27, chatmsg);
 
-          if (args.length > 29) {
+          if (packet.additive !== undefined) {
             const extra_28 = {
-              additive: Number(args[29]),
-              effects: args[30].split("|"),
+              additive: packet.additive,
+              effects: (packet.effect ?? "").split("|"),
             };
             chatmsg = Object.assign(extra_28, chatmsg);
           } else {

@@ -1,23 +1,21 @@
 import { client } from "../../client";
 import { AO_HOST } from "../../client/aoHost";
-import { prepChat } from "../../encoding";
+import { safeTags } from "../../encoding";
+import type { LEPacket } from "../types/LE";
 
 /**
  * Handles incoming evidence list, all evidences at once
  * item per packet.
- *
- * @param {Array} args packet arguments
  */
-export const handleLE = (args: string[]) => {
+export const handleLE = (packet: LEPacket) => {
   client.evidences = [];
-  for (let i = 1; i < args.length; i++) {
-    if (!args[i].includes("&")) break;
-    const arg = args[i].split("&");
-    client.evidences[i - 1] = {
-      name: prepChat(arg[0]),
-      desc: prepChat(arg[1]),
-      filename: arg[2],
-      icon: `${AO_HOST}evidence/${encodeURI(arg[2].toLowerCase())}`,
+  for (let i = 0; i < packet.evidence.length; i++) {
+    const ev = packet.evidence[i];
+    client.evidences[i] = {
+      name: safeTags(ev.name),
+      desc: safeTags(ev.description),
+      filename: ev.image,
+      icon: `${AO_HOST}evidence/${encodeURI(ev.image.toLowerCase())}`,
     };
   }
 

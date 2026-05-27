@@ -150,7 +150,6 @@ class Client extends EventEmitter {
   checkUpdater: any;
   _lastTimeICReceived: any;
   viewport: Viewport;
-  partial_packet: boolean;
   temp_packet: string;
   state: clientState;
   connect: () => void;
@@ -215,7 +214,6 @@ class Client extends EventEmitter {
     this.sender = sender;
     this.viewport = masterViewport();
     this._lastTimeICReceived = new Date(0);
-    this.partial_packet = false;
     this.temp_packet = "";
     loadResources;
     isLowMemory;
@@ -313,62 +311,59 @@ class Client extends EventEmitter {
     this.cleanup();
   }
 
-  /**
-   * Triggered when a packet is received from the server.
-   * @param {MessageEvent} e
-   */
+  /** Triggered when a packet (or chunk thereof) is received from the server. */
   onMessage(e: MessageEvent) {
     const msg = e.data;
     console.debug(`S: ${msg}`);
-
-    this.handle_server_packet(msg);
+    this.handleServerPacket(msg);
   }
 
   /**
-   * Decode the packet
-   * @param {MessageEvent} e
+   * Splits a server chunk on the `%` packet terminator and dispatches each
+   * complete packet. A trailing incomplete packet (no terminator yet) is
+   * buffered in `temp_packet` for the next chunk.
    */
-  handle_server_packet(p_data: string) {
-    let in_data = p_data;
+  handleServerPacket(chunk: string) {
+    const segments = (this.temp_packet + chunk).split("%");
+    this.temp_packet = segments.pop() ?? "";
+    for (const segment of segments) this.dispatchPacket(segment);
+  }
 
-    if (!p_data.endsWith("%")) {
-      this.partial_packet = true;
-      this.temp_packet = this.temp_packet + in_data;
-      console.log("Partial packet");
+  /** Decodes a single complete packet body (sans `%` terminator) and dispatches it. */
+  dispatchPacket(packet: string) {
+    if (packet === "") return;
+
+    // Packet should always end with #; parse anyway if it somehow doesn't.
+    const body = packet.endsWith("#") ? packet.slice(0, -1) : packet;
+    const args = body.split("#");
+    const header = args[0];
+    if (header === "") {
+      console.warn("WARNING: Empty packet received from server, skipping...");
       return;
-    } else {
-      if (this.partial_packet) {
-        in_data = this.temp_packet + in_data;
-        this.temp_packet = "";
-        this.partial_packet = false;
-      }
     }
 
-    const packet_list = in_data.split("%");
+    // packetHandler maps header -> { codec, handle }: decode the wire args
+    // into a typed packet, then dispatch to the handler. Decode and handle
+    // are guarded individually so a single malformed/buggy packet can't
+    // poison its siblings in the same WebSocket frame.
+    const entry = packetHandler.get(header);
+    if (!entry) {
+      console.warn(`Invalid packet header ${header}`);
+      return;
+    }
 
-    for (const packet of packet_list) {
-      let f_contents;
-      // Packet should *always* end with #
-      if (packet.endsWith("#")) {
-        f_contents = packet.slice(0, -1).split("#");
-      }
-      // But, if it somehow doesn't, we should still be able to handle it
-      else {
-        f_contents = packet.split("#");
-      }
-      // Empty packets are suspicious!
-      if (f_contents.length == 0) {
-        console.warn("WARNING: Empty packet received from server, skipping...");
-        continue;
-      }
-      // Take the first arg as the command
-      const command = f_contents[0];
-      if (command !== "") {
-        // The rest is contents of the packet
-        packetHandler.has(command)
-          ? packetHandler.get(command)(f_contents)
-          : console.warn(`Invalid packet header ${command}`);
-      }
+    let decoded;
+    try {
+      decoded = entry.codec.decode(args);
+    } catch (err) {
+      console.error(`Failed to decode ${header} packet:`, err, { body });
+      return;
+    }
+
+    try {
+      entry.handle(decoded);
+    } catch (err) {
+      console.error(`Handler for ${header} threw:`, err, { body });
     }
   }
 

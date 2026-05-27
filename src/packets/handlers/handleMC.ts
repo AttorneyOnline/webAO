@@ -1,19 +1,19 @@
-import { prepChat } from "../../encoding";
+import { safeTags, decodeChat } from "../../encoding";
 import { client } from "../../client";
 import { AO_HOST } from "../../client/aoHost";
 import { appendICLog } from "../../client/appendICLog";
+import type { MCPacket } from "../types/MC";
 
 /**
  * Handles a music change to an arbitrary resource.
- * @param {Array} args packet arguments
  */
-export const handleMC = (args: string[]) => {
-  const track = prepChat(args[1]);
-  let charID = Number(args[2]);
-  const showname = args[3] || "";
-  const looping = Boolean(Number(args[4])) || false;
-  const channel = Number(args[5]) || 0;
-  // const fading = Number(args[6]) || 0; // unused in web
+export const handleMC = (packet: MCPacket) => {
+  const track = safeTags(decodeChat(packet.track));
+  let charID = packet.charId;
+  const showname = packet.showname || "";
+  const looping = Boolean(packet.looping);
+  const channel = packet.channel ?? 0;
+  // const fading = packet.effects ?? 0; // unused in web
 
   const music = client.viewport.music[channel];
   let musicname;

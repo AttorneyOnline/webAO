@@ -5,6 +5,7 @@ import { pickEmotion } from "../../dom/pickEmotion";
 import { AO_HOST } from "../../client/aoHost";
 import { ensureCharIni } from "../../client/handleCharacterInfo";
 import { attachSpritePreview } from "../../dom/spritePreview";
+import type { PVPacket } from "../types/PV";
 
 function addEmoteButton(
   i: number,
@@ -28,11 +29,9 @@ function addEmoteButton(
 
 /**
  * Handles the server's assignment of a character for the player to use.
- * PV # playerID (unused) # CID # character ID
- * @param {Array} args packet arguments
  */
-export const handlePV = async (args: string[]) => {
-  client.charID = Number(args[3]);
+export const handlePV = async (packet: PVPacket) => {
+  client.charID = packet.charId;
   document.getElementById("client_waiting")!.style.display = "none";
   document.getElementById("client_charselect")!.style.display = "none";
 
@@ -47,9 +46,9 @@ export const handlePV = async (args: string[]) => {
   updateActionCommands(me.side);
   if (ini.emotions.number === 0) {
     emotesList.innerHTML = `<span
-					id="emo_0"
-					alt="unavailable"
-					class="emote_button">No emotes available</span>`;
+						id="emo_0"
+						alt="unavailable"
+						class="emote_button">No emotes available</span>`;
   } else {
     // Probe extensions once using button1_off, then reuse for all emotes
     const charPath = `${AO_HOST}characters/${encodeURI(me.name.toLowerCase())}/emotions/`;

@@ -1,16 +1,16 @@
 import { client, oldLoading } from "../../client";
 import { fetchExtensions } from "../../client/fetchLists";
 import { applyFavourites } from "../../dom/toggleFavourite";
+import type { SIPacket } from "../types/SI";
 
 /**
  * Received when the server announces its server info,
  * but we use it as a cue to begin retrieving characters.
- * @param {Array} args packet arguments
  */
-export const handleSI = (args: string[]) => {
-  client.char_list_length = Number(args[1]);
-  client.evidence_list_length = Number(args[2]);
-  client.music_list_length = Number(args[3]);
+export const handleSI = (packet: SIPacket) => {
+  client.char_list_length = packet.charCnt;
+  client.evidence_list_length = packet.eviCnt;
+  client.music_list_length = packet.musCnt;
 
   fetchExtensions();
 

@@ -2,14 +2,14 @@ import queryParser from "../../utils/queryParser";
 
 import { client } from "../../client";
 import { setupCharacterBasic } from "../../client/handleCharacterInfo";
+import type { SCPacket } from "../types/SC";
 const { mode } = queryParser();
 
 /**
  * Handles incoming character information, containing all characters
  * in one packet.
- * @param {Array} args packet arguments
  */
-export const handleSC = async (args: string[]) => {
+export const handleSC = async (packet: SCPacket) => {
   if (mode === "watch") {
     // Spectators don't need to pick a character
     document.getElementById("client_charselect")!.style.display = "none";
@@ -17,10 +17,9 @@ export const handleSC = async (args: string[]) => {
     document.getElementById("client_charselect")!.style.display = "block";
   }
 
-  for (let i = 1; i < args.length; i++) {
-    const chargs = args[i].split("&");
-    const charid = i - 1;
-    setupCharacterBasic(chargs, charid);
+  for (let i = 0; i < packet.charData.length; i++) {
+    const chargs = packet.charData[i].split("&");
+    setupCharacterBasic(chargs, i);
   }
   // We're done with the characters, request the music
   client.sender.sendServer("RM#%");

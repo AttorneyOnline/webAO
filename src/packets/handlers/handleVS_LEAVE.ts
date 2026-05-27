@@ -1,14 +1,14 @@
 import { client } from "../../client";
 import { handlePeerLeft, leaveVoice } from "../../voice/voice";
+import type { VS_LEAVEPacket } from "../types/VS_LEAVE";
 
-// VS_LEAVE#<uid>#%  — a peer left the voice room. If it's our own uid (server
-// auto-kicked us, e.g. on area change or mod /voicearea off), tear down locally.
-export const handleVS_LEAVE = (args: string[]) => {
-  const uid = Number(args[1]);
-  if (!Number.isFinite(uid)) return;
-  if (uid === client.playerID) {
+// If it's our own uid (server auto-kicked us, e.g. on area change or mod
+// /voicearea off), tear down locally.
+export const handleVS_LEAVE = (packet: VS_LEAVEPacket) => {
+  if (!Number.isFinite(packet.uid)) return;
+  if (packet.uid === client.playerID) {
     leaveVoice();
   } else {
-    handlePeerLeft(uid);
+    handlePeerLeft(packet.uid);
   }
 };

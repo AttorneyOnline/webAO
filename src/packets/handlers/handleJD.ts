@@ -1,9 +1,10 @@
+import type { JDPacket } from "../types/JD";
+
 /**
  * show/hide judge controls
- * @param {number} show either a 1 or a 0
  */
-export const handleJD = (args: string[]) => {
-  if (Number(args[1]) === 1) {
+export const handleJD = (packet: JDPacket) => {
+  if (packet.state === 1) {
     document.getElementById("judge_action")!.style.display = "inline-table";
     document.getElementById("no_action")!.style.display = "none";
   } else {

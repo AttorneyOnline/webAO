@@ -1,11 +1,11 @@
 import { setAOhost } from "../../client/aoHost";
 import { renderPlayerList } from "../../dom/renderPlayerList";
+import type { ASSPacket } from "../types/ASS";
 
 /**
  * new asset url!!
- * @param {Array} args packet arguments
  */
-export const handleASS = (args: string[]) => {
-  if (args[1] !== "None") setAOhost(args[1]);
+export const handleASS = (packet: ASSPacket) => {
+  if (packet.assetUrl !== "None") setAOhost(packet.assetUrl);
   renderPlayerList();
 };

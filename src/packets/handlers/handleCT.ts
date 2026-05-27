@@ -1,19 +1,18 @@
 import queryParser from "../../utils/queryParser";
-import { prepChat } from "../../encoding";
+import { decodeChat, safeTags } from "../../encoding";
 import { flashPairActivity } from "../../dom/pairNotification";
+import type { CTPacket } from "../types/CT";
 const { mode } = queryParser();
 
 /**
  * Handles an out-of-character chat message.
- * @param {Array} args packet arguments
  */
-export const handleCT = (args: string[]) => {
+export const handleCT = (packet: CTPacket) => {
   if (mode !== "replay") {
     const oocLog = document.getElementById("client_ooclog")!;
-    const username = prepChat(args[1]);
-    const rawMessage = prepChat(args[2]);
+    const username = safeTags(decodeChat(packet.name));
+    const rawMessage = safeTags(decodeChat(packet.message));
     let message = addLinks(rawMessage);
-    // Replace newlines with br
     message = message.replace(/\n/g, "<br>");
 
     oocLog.innerHTML += `${username}: ${message}<br>`;
@@ -24,7 +23,6 @@ export const handleCT = (args: string[]) => {
   }
 };
 
-// If the incoming message contains a link, add a href hyperlink to it
 function addLinks(message: string) {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   return message.replace(

@@ -1,16 +1,16 @@
 import { client } from "../../client";
+import type { CharsCheckPacket } from "../types/CharsCheck";
 
 /**
  * Handles the list of all used and vacant characters.
- * @param {Array} args list of all characters represented as a 0 for free or a -1 for taken
  */
-export const handleCharsCheck = (args: string[]) => {
+export const handleCharsCheck = (packet: CharsCheckPacket) => {
   for (let i = 0; i < client.char_list_length; i++) {
     const img = document.getElementById(`demo_${i}`)!;
 
-    if (args[i + 1] === "-1") {
+    if (packet.taken[i] === -1) {
       img.style.opacity = "0.25";
-    } else if (args[i + 1] === "0") {
+    } else if (packet.taken[i] === 0) {
       img.style.opacity = "1";
     }
   }
