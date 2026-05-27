@@ -1,7 +1,7 @@
 import { client } from "../../client";
 import {
   Flip,
-  MS,
+  MSClient,
   MSServer,
   parseSide,
   type DeskModifier,
@@ -81,7 +81,7 @@ export const sendIC = (
   // fields). Fill those in as zero/empty when self-sending.
   const wire =
     mode === "replay"
-      ? MS.encode({
+      ? MSClient.encode({
         ...packet,
         other_name: "",
         other_emote: "",

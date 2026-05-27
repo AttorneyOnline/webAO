@@ -27,7 +27,7 @@ import { KK, handleKK } from "./packets/KK";
 import { LE, handleLE } from "./packets/LE";
 import { MC, handleMC } from "./packets/MC";
 import { MM, handleMM } from "./packets/MM";
-import { MS, handleMS } from "./packets/MS";
+import { MSClient, handleMS } from "./packets/MS";
 import { PN, handlePN } from "./packets/PN";
 import { PR, handlePR } from "./packets/PR";
 import { PU, handlePU } from "./packets/PU";
@@ -72,6 +72,20 @@ export interface PacketEntry<TPacket> {
 
 // Each entry pairs the wire codec (decode/encode) with the typed handler.
 // Keep this list alphabetical (case-insensitive).
+//
+// For packets whose wire format differs by direction (i.e. the Server-as-
+// receiver form differs from the Client-as-receiver form), the convention
+// is two codecs + two packet types per header:
+//
+//   types:  XXPacketClient (decoded incoming), XXPacketServer (encoded out)
+//   codecs: XXClient (used by the dispatcher), XXServer (used by senders)
+//
+// Only the Client codec appears in this registry -- it's the one that
+// reads incoming wire bytes. The Server codec is imported directly by
+// whichever `sendXX.ts` builds the outbound packet (see sendIC.ts for an
+// example). MS is currently the only such packet; CT and ZZ technically
+// have direction-conditional wire forms too, but they're symmetric enough
+// that a single codec covers both.
 const packets: Record<string, PacketEntry<any>> = {
   ARUP: { codec: ARUP, handle: handleARUP },
   askchaa: { codec: askchaa, handle: handleaskchaa },
@@ -102,7 +116,7 @@ const packets: Record<string, PacketEntry<any>> = {
   LE: { codec: LE, handle: handleLE },
   MC: { codec: MC, handle: handleMC },
   MM: { codec: MM, handle: handleMM },
-  MS: { codec: MS, handle: handleMS },
+  MS: { codec: MSClient, handle: handleMS },
   PN: { codec: PN, handle: handlePN },
   PR: { codec: PR, handle: handlePR },
   PU: { codec: PU, handle: handlePU },

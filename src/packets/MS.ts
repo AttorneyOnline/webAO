@@ -15,7 +15,7 @@ import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
  * short wire forms get filled with the documented defaults.
  *
  *   Client-as-receiver (Server → Client): all 32 fields. Modeled by
- *     `MSPacketClient` + the `MS` codec (used by the dispatcher).
+ *     `MSPacketClient` + the `MSClient` codec (used by the dispatcher).
  *
  *   Server-as-receiver (Client → Server): same fields *except*
  *     `other_name` and `other_emote` are not present on the wire.
@@ -236,7 +236,7 @@ const intOr = (v: string | undefined, def: number): number => {
   return Number.isInteger(n) ? n : def;
 };
 
-export const MS: PacketCodec<MSPacketClient> = {
+export const MSClient: PacketCodec<MSPacketClient> = {
   decode(args) {
     return {
       desk_modifier: parseDeskModifier(args[1]),
