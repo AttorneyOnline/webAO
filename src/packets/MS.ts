@@ -216,6 +216,17 @@ export type MSPacketServer = Omit<MSPacketClient, "other_name" | "other_emote">;
 const str = (v: string | undefined) => unescapeChat(v ?? "");
 const num = (v: string | undefined) => Number(v) || 0;
 
+/**
+ * Parse a wire integer with a custom default for missing/empty/non-numeric
+ * input. Unlike `num`, this preserves `0` as a valid value (so callers can
+ * use `-1` as a "not set" sentinel without colliding with character id 0).
+ */
+const intOr = (v: string | undefined, def: number): number => {
+  if (v === undefined || v === "") return def;
+  const n = Number(v);
+  return Number.isInteger(n) ? n : def;
+};
+
 export const MS: PacketCodec<MSPacketClient> = {
   decode(args) {
     return {
@@ -235,7 +246,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       realization: args[14] === "1",
       text_color: parseTextColor(args[15]),
       showname: str(args[16]),
-      other_charid: num(args[17]),
+      other_charid: intOr(args[17], -1),
       other_name: str(args[18]),
       other_emote: str(args[19]),
       self_offset: parseOffset(str(args[20])),
@@ -312,7 +323,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       realization: args[14] === "1",
       text_color: parseTextColor(args[15]),
       showname: str(args[16]),
-      other_charid: num(args[17]),
+      other_charid: intOr(args[17], -1),
       // Server-receiver form skips other_name (18) and other_emote (19).
       self_offset: parseOffset(str(args[18])),
       other_offset: parseOffset(str(args[19])),
