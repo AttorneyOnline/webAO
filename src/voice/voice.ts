@@ -22,7 +22,7 @@
 //     VS_SPEAK#<on_off>#%
 
 import { client } from "../client";
-import { sender } from "../client/sender";
+import { sender } from "../packets";
 
 interface VoiceCaps {
   enabled: boolean;

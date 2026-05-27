@@ -65,7 +65,7 @@ export function onEnter(event: KeyboardEvent) {
     additive: input("check_additive").checked,
     effect: input("effect_select").value,
   };
-  client.sender.sendIC(packet);
+  client.sender.sendMS(packet);
 
   return false;
 }

@@ -1,4 +1,4 @@
-import { client, oldLoading } from "../client";
+import { client } from "../client";
 import { fetchExtensions } from "../client/fetchLists";
 import { applyFavourites } from "../dom/toggleFavourite";
 import type { PacketCodec } from "../packets";
@@ -63,10 +63,5 @@ export const receiveSI = (packet: SIPacket) => {
 
   applyFavourites();
 
-  // this is determined at the top of this file
-  if (!oldLoading) {
-    client.sender.sendServer("RC#%");
-  } else {
-    client.sender.sendServer("askchar2#%");
-  }
+  client.sender.sendServer("RC#%");
 };

@@ -5,10 +5,8 @@
  */
 import "./styles/client.css";
 import "./styles/goldenlayout.css";
-import { isLowMemory } from "./client/isLowMemory";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { sender } from "./client/sender/index";
-import type { Sender } from "./packets";
+import { sender, type Sender } from "./packets";
 import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources";
 import masterViewport from "./viewport/viewport";
@@ -40,17 +38,6 @@ export const setClient = (val: Client) => {
 };
 
 export const UPDATE_INTERVAL = 60;
-
-/**
- * Toggles AO1-style loading using paginated music packets for mobile platforms.
- * The old loading uses more smaller packets instead of a single big one,
- * which caused problems on low-memory devices in the past.
- */
-export let oldLoading = false;
-export const setOldLoading = (val: boolean) => {
-  console.warn("old loading set to " + val);
-  oldLoading = val;
-};
 
 // presettings
 export let selectedMenu = 1;
@@ -104,7 +91,6 @@ fpPromise
     client = new Client(connectionString);
     client.connect();
     client.hdid = hdid;
-    isLowMemory();
     loadResources();
     installVoiceUI();
   });
@@ -125,6 +111,32 @@ export let lastICMessageTime = new Date(0);
 export const setLastICMessageTime = (val: Date) => {
   lastICMessageTime = val;
 };
+
+/**
+ * Echoes a wire message back into the client's own dispatcher. Used by
+ * handlers that synthesize follow-up packets (e.g. RD → BN/DONE) and by
+ * replay mode to feed pre-recorded packets through.
+ */
+export function sendSelf(message: string) {
+  (<HTMLInputElement>document.getElementById("client_ooclog")).value +=
+    `${message}\r\n`;
+  client.handleSelf(message);
+}
+
+/**
+ * Writes a wire message to the server. In replay mode the websocket
+ * isn't live, so outgoing packets are looped back through `sendSelf`
+ * to drive the local dispatcher.
+ */
+export function sendServer(message: string) {
+  console.debug("C: " + message);
+  if (mode === "replay") {
+    sendSelf(message);
+  } else {
+    client.serv.send(message);
+  }
+}
+
 class Client extends EventEmitter {
   serv: any;
   hp: number[];
@@ -156,7 +168,6 @@ class Client extends EventEmitter {
   state: clientState;
   connect: () => void;
   loadResources: () => void;
-  isLowMemory: () => void;
   /** Maps player ID to player data */
   playerlist: Map<number, { charId: number; charName: string; showName: string; name: string; area: number }>;
   charicon_extensions: string[];
@@ -218,7 +229,6 @@ class Client extends EventEmitter {
     this._lastTimeICReceived = new Date(0);
     this.temp_packet = "";
     loadResources;
-    isLowMemory;
     this.playerlist = new Map();
     this.charicon_extensions = [".png", ".webp"];
     this.emote_extensions = [".gif", ".png", ".apng", ".webp", ".webp.static"];

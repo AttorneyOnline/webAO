@@ -5,29 +5,33 @@ import { AUTH, receiveAUTH } from "./packets/AUTH";
 import { BB, receiveBB } from "./packets/BB";
 import { BD, receiveBD } from "./packets/BD";
 import { BN, receiveBN } from "./packets/BN";
-import { CC, receiveCC } from "./packets/CC";
-import { CH, receiveCH } from "./packets/CH";
+import { CC, receiveCC, sendCC } from "./packets/CC";
+import { CH, receiveCH, sendCH } from "./packets/CH";
 import { CharsCheck, receiveCharsCheck } from "./packets/CharsCheck";
 import { CHECK, receiveCHECK } from "./packets/CHECK";
 import { CI, receiveCI } from "./packets/CI";
-import { CT, receiveCT } from "./packets/CT";
+import { CT, receiveCT, sendCT } from "./packets/CT";
 import { decryptor, receivedecryptor } from "./packets/decryptor";
+import { sendDE } from "./packets/DE";
 import { DONE, receiveDONE } from "./packets/DONE";
+import { sendEE } from "./packets/EE";
 import { EI, receiveEI } from "./packets/EI";
 import { EM, receiveEM } from "./packets/EM";
 import { FA, receiveFA } from "./packets/FA";
 import { FL, receiveFL } from "./packets/FL";
 import { FM, receiveFM } from "./packets/FM";
 import { HI, receiveHI } from "./packets/HI";
-import { HP, receiveHP } from "./packets/HP";
+import { HP, receiveHP, sendHP } from "./packets/HP";
 import { ID, receiveID } from "./packets/ID";
 import { JD, receiveJD } from "./packets/JD";
 import { KB, receiveKB } from "./packets/KB";
 import { KK, receiveKK } from "./packets/KK";
 import { LE, receiveLE } from "./packets/LE";
-import { MC, receiveMC } from "./packets/MC";
+import { sendMA } from "./packets/MA";
+import { MC, receiveMC, sendMC } from "./packets/MC";
 import { MM, receiveMM } from "./packets/MM";
-import { MSClient, receiveMS } from "./packets/MS";
+import { MSClient, receiveMS, sendMS } from "./packets/MS";
+import { sendPE } from "./packets/PE";
 import { PN, receivePN } from "./packets/PN";
 import { PR, receivePR } from "./packets/PR";
 import { PU, receivePU } from "./packets/PU";
@@ -36,7 +40,7 @@ import { RC, receiveRC } from "./packets/RC";
 import { RD, receiveRD } from "./packets/RD";
 import { RM, receiveRM } from "./packets/RM";
 import { RMC, receiveRMC } from "./packets/RMC";
-import { RT, receiveRT } from "./packets/RT";
+import { RT, receiveRT, sendRT } from "./packets/RT";
 import { SC, receiveSC } from "./packets/SC";
 import { SI, receiveSI } from "./packets/SI";
 import { SM, receiveSM } from "./packets/SM";
@@ -48,8 +52,8 @@ import { VS_JOIN, receiveVS_JOIN } from "./packets/VS_JOIN";
 import { VS_LEAVE, receiveVS_LEAVE } from "./packets/VS_LEAVE";
 import { VS_PEERS, receiveVS_PEERS } from "./packets/VS_PEERS";
 import { VS_SPEAK, receiveVS_SPEAK } from "./packets/VS_SPEAK";
-import { ZZ, receiveZZ } from "./packets/ZZ";
-import { sender } from "./client/sender";
+import { ZZ, receiveZZ, sendZZ } from "./packets/ZZ";
+import { sendSelf, sendServer } from "./client";
 
 /**
  * A codec for a single packet header. `decode` parses the `#`-split args
@@ -82,10 +86,10 @@ export interface PacketEntry<TPacket> {
 //   codecs: XXClient (used by the dispatcher), XXServer (used by senders)
 //
 // Only the Client codec appears in this registry -- it's the one that
-// reads incoming wire bytes. The Server codec is imported directly by
-// whichever `sendXX.ts` builds the outbound packet (see sendIC.ts for an
-// example). MS is currently the only such packet; CT and ZZ technically
-// have direction-conditional wire forms too, but they're symmetric enough
+// reads incoming wire bytes. The Server codec is used by the matching
+// sendXX in the same file (see `sendMS` in packets/MS.ts for an example).
+// MS is currently the only such packet; CT and ZZ technically have
+// direction-conditional wire forms too, but they're symmetric enough
 // that a single codec covers both.
 const packets: Record<string, PacketEntry<any>> = {
   ARUP: { codec: ARUP, receive: receiveARUP },
@@ -143,6 +147,27 @@ const packets: Record<string, PacketEntry<any>> = {
 
 export const packetRegistry = new Map(Object.entries(packets));
 
-// Sender type lives here so packets.ts is the single home for the public
-// packet API (codecs, receive registry, send signatures).
+/**
+ * Aggregator of every outbound packet sender, plus the transport-level
+ * helpers (sendSelf, sendServer) that aren't tied to a single header.
+ * Exposed on `client.sender` so call sites read as
+ * `client.sender.sendXX(...)`.
+ */
+export const sender = {
+  sendCC,
+  sendCH,
+  sendCT,
+  sendDE,
+  sendEE,
+  sendHP,
+  sendMA,
+  sendMC,
+  sendMS,
+  sendPE,
+  sendRT,
+  sendSelf,
+  sendServer,
+  sendZZ,
+};
+
 export type Sender = typeof sender;

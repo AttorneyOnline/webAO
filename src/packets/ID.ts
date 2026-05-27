@@ -1,5 +1,5 @@
 import pkg from "../../package.json";
-import { client, setOldLoading } from "../client";
+import { client } from "../client";
 import { escapeChat, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
 
@@ -47,21 +47,9 @@ export const receiveID = (packet: IDPacket) => {
   // serverD-specific quirk, not the documented protocol.
   const softwareParts = packet.software.split("&");
   const serverSoftware = softwareParts[0];
-  let serverVersion;
-  if (serverSoftware === "serverD") {
-    serverVersion = softwareParts[1];
-  } else if (serverSoftware === "webAO") {
-    setOldLoading(false);
+  if (serverSoftware === "webAO") {
     client.sender.sendSelf("PN#0#1#%");
   } else {
-    serverVersion = packet.version;
-  }
-
-  if (serverSoftware === "serverD" && serverVersion === "1377.152") {
-    setOldLoading(true);
-  } // bugged version
-
-  if (serverSoftware !== "webAO") {
     client.sender.sendServer(`ID#webAO#${version}#%`);
   }
 };
