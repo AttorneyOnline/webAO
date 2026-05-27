@@ -1,47 +1,44 @@
-import type {
-  DeskModifier,
-  EmoteModifier,
-  Flip,
-  Offset,
-  ShoutModifier,
-  Side,
-  TextColor,
-} from "../../packets/MS";
+import type { MSPacketClient } from "../../packets/MS";
 import { PreloadedAssets } from "./PreloadedAssets";
 
-export interface ChatMsg {
-  content: string;
-  shout_modifier: ShoutModifier;
-  sound: string;
+/**
+ * The viewport's in-character message state. Composed as the incoming MS
+ * packet (`MSPacketClient`) plus a render-state overlay -- the latter
+ * carries display-safe transforms of a few packet fields (HTML-escaped,
+ * lowercased filenames, parsed effects array), character-derived display
+ * data that doesn't live on the wire (`nameplate`, `chatbox`, `blips`
+ * sound), and chat-tick render-loop state (`parsed`, `preloadedAssets`,
+ * `speed`, …).
+ *
+ * Where the field names overlap (`preanim`, `showname`, `paired_name`,
+ * `paired_emote`), the render state shadows the packet's raw value with
+ * a `safeTags`'d display form. Both have type `string`, so the
+ * intersection collapses to one field; the runtime value is whatever the
+ * builder assigns last (= the display form).
+ */
+export type ChatMsg = MSPacketClient & {
+  // Display-safe versions of packet fields (shadow the raw value when
+  // the name matches; new fields otherwise).
+  content: string; // safeTags(decodeChat(packet.message))
+  name: string; // safeTags(packet.character)
+  sprite: string; // safeTags(packet.emote.toLowerCase())
+  sound: string; // safeTags(packet.sfx_name.toLowerCase())
+  preanim: string; // safeTags(packet.preanim.toLowerCase())
+  showname: string; // safeTags(decodeChat(packet.showname))
+  paired_name: string; // safeTags(packet.paired_name)
+  paired_emote: string; // safeTags(packet.paired_emote)
+  effects: string[]; // packet.effect.split("|")
+
+  // Character-derived display data (from client.chars[packet.char_id]).
+  nameplate: string;
+  chatbox: string;
+  blips: string; // blip-sound name, NOT the (removed) packet.blips field.
+
+  // Chat-tick render-loop state.
+  parsed?: HTMLSpanElement[];
+  preloadedAssets?: PreloadedAssets;
   startpreanim?: boolean;
   startspeaking?: boolean;
-  side: Side;
-  text_color: TextColor;
-  snddelay: number;
   preanimdelay?: number;
   speed: number;
-  blips: string;
-  self_offset?: Offset;
-  paired_offset?: Offset;
-  showname?: string;
-  nameplate?: string;
-  flip?: Flip;
-  paired_flip?: Flip;
-  effects?: string[];
-  desk_modifier?: DeskModifier;
-  preanim?: string;
-  paired_name?: string;
-  sprite?: string;
-  name?: string;
-  chatbox?: string;
-  paired_emote?: string;
-  parsed?: HTMLSpanElement[];
-  screenshake?: boolean;
-  realization?: boolean;
-  emote_modifier?: EmoteModifier;
-  evidence_id?: number;
-  sfx_looping?: boolean;
-  noninterrupting_preanim?: boolean;
-  additive?: boolean;
-  preloadedAssets?: PreloadedAssets;
-}
+};

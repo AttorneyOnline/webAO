@@ -477,7 +477,7 @@ const viewport = (): Viewport => {
       }
     }
 
-    if (!sfxplayed && chatmsg.snddelay + shoutTimer >= tickTimer) {
+    if (!sfxplayed && chatmsg.sfx_delay + shoutTimer >= tickTimer) {
       sfxplayed = 1;
       if (
         chatmsg.sound !== "0" &&

@@ -73,11 +73,10 @@ const flipTransform = (flip: Flip | undefined): string => {
 };
 
 /**
- * Builds the viewport's internal rendering state from an incoming MS packet.
- * The state is a `ChatMsg` that downstream tick() / updateTestimony /
- * preloader code reads back via `viewport.getChatmsg()`. Character-derived
- * fields (nameplate, chatbox, blips sound) come from `client.chars`;
- * everything else is mapped/transformed from the packet itself.
+ * Builds the viewport's render state from an incoming MS packet. The
+ * `ChatMsg` type is `MSPacketClient & {render-state extras}`, so we just
+ * spread the packet and add the display-transformed / char-derived /
+ * render-loop fields on top.
  */
 const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
   const char = client.chars[packet.char_id];
@@ -94,35 +93,24 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
   }
 
   return {
-    desk_modifier: packet.desk_modifier,
-    preanim: safeTags(packet.preanim).toLowerCase(),
-    nameplate: msg_nameplate,
-    chatbox,
+    ...packet,
+    // Display-safe transforms (preanim/showname/paired_name/paired_emote
+    // shadow the raw packet fields with safeTags'd versions).
+    content,
     name: safeTags(packet.character),
     sprite: safeTags(packet.emote).toLowerCase(),
-    content,
-    side: packet.side,
     sound: safeTags(packet.sfx_name).toLowerCase(),
-    blips: safeTags(msg_blips),
-    emote_modifier: packet.emote_modifier,
-    snddelay: packet.sfx_delay,
-    shout_modifier: packet.shout_modifier,
-    evidence_id: packet.evidence_id,
-    flip: packet.flip,
-    realization: packet.realization,
-    text_color: packet.text_color,
-    speed: UPDATE_INTERVAL,
+    preanim: safeTags(packet.preanim).toLowerCase(),
     showname: safeTags(decodeChat(packet.showname)),
     paired_name: safeTags(packet.paired_name),
     paired_emote: safeTags(packet.paired_emote),
-    self_offset: packet.self_offset,
-    paired_offset: packet.paired_offset,
-    paired_flip: packet.paired_flip,
-    noninterrupting_preanim: packet.noninterrupting_preanim,
-    sfx_looping: packet.sfx_looping,
-    screenshake: packet.screenshake,
-    additive: packet.additive,
     effects: packet.effect.split("|"),
+    // Char-derived
+    nameplate: msg_nameplate,
+    chatbox,
+    blips: safeTags(msg_blips),
+    // Render-loop state
+    speed: UPDATE_INTERVAL,
   };
 };
 
