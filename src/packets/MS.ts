@@ -207,7 +207,7 @@ export interface MSPacketClient {
   effect: string;
   // 2.10.2 group
   blips: string;
-  slide: number;
+  slide: boolean;
 }
 
 /** Server-as-receiver form: omits `other_name` and `other_emote`. */
@@ -250,7 +250,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       additive: args[29] === "1",
       effect: str(args[30]),
       blips: str(args[31]),
-      slide: num(args[32]),
+      slide: args[32] === "1",
     };
   },
   encode(p) {
@@ -287,7 +287,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       Number(p.additive),
       escapeChat(p.effect),
       escapeChat(p.blips),
-      p.slide,
+      Number(p.slide),
     ];
     return `${fields.join("#")}#%`;
   },
@@ -326,7 +326,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       additive: args[27] === "1",
       effect: str(args[28]),
       blips: str(args[29]),
-      slide: num(args[30]),
+      slide: args[30] === "1",
     };
   },
   encode(p) {
@@ -361,7 +361,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       Number(p.additive),
       escapeChat(p.effect),
       escapeChat(p.blips),
-      p.slide,
+      Number(p.slide),
     ];
     return `${fields.join("#")}#%`;
   },
