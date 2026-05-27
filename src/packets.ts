@@ -1,4 +1,3 @@
-import { ackMS, handleackMS } from "./packets/ackMS";
 import { ARUP, handleARUP } from "./packets/ARUP";
 import { askchaa, handleaskchaa } from "./packets/askchaa";
 import { ASS, handleASS } from "./packets/ASS";
@@ -74,7 +73,6 @@ export interface PacketEntry<TPacket> {
 // Each entry pairs the wire codec (decode/encode) with the typed handler.
 // Keep this list alphabetical (case-insensitive).
 const packets: Record<string, PacketEntry<any>> = {
-  ackMS: { codec: ackMS, handle: handleackMS },
   ARUP: { codec: ARUP, handle: handleARUP },
   askchaa: { codec: askchaa, handle: handleaskchaa },
   ASS: { codec: ASS, handle: handleASS },
