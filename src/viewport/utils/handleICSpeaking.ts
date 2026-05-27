@@ -12,7 +12,7 @@ import { COLORS } from "../constants/colors";
 import mlConfig from "../../utils/aoml";
 import request from "../../services/request";
 import { decodeChat, safeTags } from "../../encoding";
-import { DeskMod, Side, type MSPacketClient } from "../../packets/MS";
+import { DeskModifier, Side, type MSPacketClient } from "../../packets/MS";
 import preloadMessageAssets from "./preloadMessageAssets";
 import { setBlipUrl } from "./blipAudio";
 
@@ -83,7 +83,7 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
   }
 
   return {
-    deskmod: packet.desk_mod,
+    desk_modifier: packet.desk_modifier,
     preanim: safeTags(packet.preanim).toLowerCase(),
     nameplate: msg_nameplate,
     chatbox,
@@ -282,34 +282,34 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
     setAside.showDesk = false;
     client.viewport.set_side(setAside);
   } else {
-    switch (client.viewport.getChatmsg().deskmod) {
-      case DeskMod.HIDDEN:
+    switch (client.viewport.getChatmsg().desk_modifier) {
+      case DeskModifier.HIDDEN:
         setAside.showSpeedLines = false;
         setAside.showDesk = false;
         client.viewport.set_side(setAside);
         break;
-      case DeskMod.SHOWN:
+      case DeskModifier.SHOWN:
         setAside.showSpeedLines = false;
         setAside.showDesk = true;
         client.viewport.set_side(setAside);
         break;
-      case DeskMod.HIDE_DURING_PREANIM:
+      case DeskModifier.HIDE_DURING_PREANIM:
         setAside.showSpeedLines = false;
         setAside.showDesk = false;
         client.viewport.set_side(setAside);
         break;
-      case DeskMod.SHOW_DURING_PREANIM:
+      case DeskModifier.SHOW_DURING_PREANIM:
         setAside.showSpeedLines = false;
         setAside.showDesk = false;
         client.viewport.set_side(setAside);
         break;
-      case DeskMod.HIDE_AND_CENTER_DURING_PREANIM:
+      case DeskModifier.HIDE_AND_CENTER_DURING_PREANIM:
         setAside.showSpeedLines = false;
         setAside.showDesk = false;
         client.viewport.set_side(setAside);
         skipoffset = true;
         break;
-      case DeskMod.SHOW_DURING_PREANIM_THEN_CENTER:
+      case DeskModifier.SHOW_DURING_PREANIM_THEN_CENTER:
         setAside.showSpeedLines = false;
         setAside.showDesk = true;
         client.viewport.set_side(setAside);

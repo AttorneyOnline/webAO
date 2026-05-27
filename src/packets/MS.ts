@@ -26,7 +26,7 @@ import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
  * wart every server adopted), and the handler splits on `<and>` directly.
  */
 /** Desk visibility behavior. See spec for behavioral details per value. */
-export enum DeskMod {
+export enum DeskModifier {
   HIDDEN = 0,
   SHOWN = 1,
   HIDE_DURING_PREANIM = 2,
@@ -41,10 +41,10 @@ export enum DeskMod {
  * (including `"chat"`) fall back to `SHOWN`, matching the previous
  * handler's default switch branch.
  */
-const parseDeskMod = (s: string | undefined): DeskMod => {
+const parseDeskModifier = (s: string | undefined): DeskModifier => {
   const n = Number(s);
-  if (Number.isInteger(n) && n >= 0 && n <= 5) return n as DeskMod;
-  return DeskMod.SHOWN;
+  if (Number.isInteger(n) && n >= 0 && n <= 5) return n as DeskModifier;
+  return DeskModifier.SHOWN;
 };
 
 /** Character position. Wire values are the lowercase 3-letter codes. */
@@ -67,7 +67,7 @@ export const parseSide = (s: string | undefined): Side => {
 };
 
 export interface MSPacketClient {
-  desk_mod: DeskMod;
+  desk_modifier: DeskModifier;
   preanim: string;
   character: string;
   emote: string;
@@ -114,7 +114,7 @@ const num = (v: string | undefined) => Number(v) || 0;
 export const MS: PacketCodec<MSPacketClient> = {
   decode(args) {
     return {
-      desk_mod: parseDeskMod(args[1]),
+      desk_modifier: parseDeskModifier(args[1]),
       preanim: str(args[2]),
       character: str(args[3]),
       emote: str(args[4]),
@@ -151,7 +151,7 @@ export const MS: PacketCodec<MSPacketClient> = {
   encode(p) {
     const fields = [
       "MS",
-      String(p.desk_mod),
+      String(p.desk_modifier),
       escapeChat(p.preanim),
       escapeChat(p.character),
       escapeChat(p.emote),
@@ -191,7 +191,7 @@ export const MS: PacketCodec<MSPacketClient> = {
 export const MSServer: PacketCodec<MSPacketServer> = {
   decode(args) {
     return {
-      desk_mod: parseDeskMod(args[1]),
+      desk_modifier: parseDeskModifier(args[1]),
       preanim: str(args[2]),
       character: str(args[3]),
       emote: str(args[4]),
@@ -227,7 +227,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
   encode(p) {
     const fields = [
       "MS",
-      String(p.desk_mod),
+      String(p.desk_modifier),
       escapeChat(p.preanim),
       escapeChat(p.character),
       escapeChat(p.emote),

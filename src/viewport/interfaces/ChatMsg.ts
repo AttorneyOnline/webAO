@@ -1,4 +1,4 @@
-import type { DeskMod, Side } from "../../packets/MS";
+import type { DeskModifier, Side } from "../../packets/MS";
 import { PreloadedAssets } from "./PreloadedAssets";
 
 export interface ChatMsg {
@@ -20,7 +20,7 @@ export interface ChatMsg {
   flip?: number;
   other_flip?: number;
   effects?: string[];
-  deskmod?: DeskMod;
+  desk_modifier?: DeskModifier;
   preanim?: string;
   other_name?: string;
   sprite?: string;

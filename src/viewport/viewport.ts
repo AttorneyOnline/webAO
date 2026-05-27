@@ -15,7 +15,7 @@ import { createTestimonyAudio } from "./utils/createTestimonyAudio";
 import { Testimony } from "./interfaces/Testimony";
 import { COLORS } from "./constants/colors";
 import { set_side } from "./utils/setSide";
-import { DeskMod, Side } from "../packets/MS";
+import { DeskModifier, Side } from "../packets/MS";
 import { ChatMsg } from "./interfaces/ChatMsg";
 import {
   setStartFirstTickCheck,
@@ -407,29 +407,29 @@ const viewport = (): Viewport => {
           shoutSprite.style.animation = "";
         }
 
-        switch (chatmsg.deskmod) {
-          case DeskMod.HIDE_DURING_PREANIM:
+        switch (chatmsg.desk_modifier) {
+          case DeskModifier.HIDE_DURING_PREANIM:
             set_side({
               position: chatmsg.side,
               showSpeedLines: false,
               showDesk: true,
             });
             break;
-          case DeskMod.SHOW_DURING_PREANIM:
+          case DeskModifier.SHOW_DURING_PREANIM:
             set_side({
               position: chatmsg.side,
               showSpeedLines: false,
               showDesk: false,
             });
             break;
-          case DeskMod.HIDE_AND_CENTER_DURING_PREANIM:
+          case DeskModifier.HIDE_AND_CENTER_DURING_PREANIM:
             set_side({
               position: chatmsg.side,
               showSpeedLines: false,
               showDesk: true,
             });
             break;
-          case DeskMod.SHOW_DURING_PREANIM_THEN_CENTER:
+          case DeskModifier.SHOW_DURING_PREANIM_THEN_CENTER:
             set_side({
               position: chatmsg.side,
               showSpeedLines: false,

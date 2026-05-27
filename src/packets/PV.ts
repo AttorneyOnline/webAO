@@ -79,7 +79,7 @@ export const handlePV = async (packet: PVPacket) => {
           preanim: emoteinfo[1].toLowerCase(),
           emote: emoteinfo[2].toLowerCase(),
           zoom: Number(emoteinfo[3]) || 0,
-          deskmod: Number(emoteinfo[4]) || 1,
+          desk_modifier: Number(emoteinfo[4]) || 1,
           sfx: esfx.toLowerCase(),
           sfxdelay: esfxd,
           frame_screenshake: "",

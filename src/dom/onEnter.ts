@@ -69,7 +69,7 @@ export function onEnter(event: KeyboardEvent) {
     }
 
     client.sender.sendIC(
-      myemo.deskmod,
+      myemo.desk_modifier,
       myemo.preanim,
       mychar.name,
       myemo.emote,

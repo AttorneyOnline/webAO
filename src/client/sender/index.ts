@@ -14,7 +14,7 @@ import { sendPE } from "./sendPE";
 import { sendMA } from "./sendMA";
 export interface ISender {
   sendIC: (
-    deskmod: number,
+    desk_modifier: number,
     preanim: string,
     name: string,
     emote: string,

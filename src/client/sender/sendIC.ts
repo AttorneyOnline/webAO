@@ -6,7 +6,7 @@ const { mode } = queryParser();
 
 /**
  * Sends an in-character chat message.
- * @param {number} deskmod controls the desk
+ * @param {number} desk_modifier controls the desk
  * @param {string} speaking who is speaking
  * @param {string} name the name of the current character
  * @param {string} silent whether or not it's silent
@@ -26,7 +26,7 @@ const { mode } = queryParser();
  * @param {number} noninterrupting_preanim play the full preanim (optional)
  */
 export const sendIC = (
-  deskmod: number,
+  desk_modifier: number,
   preanim: string,
   name: string,
   emote: string,
@@ -84,7 +84,7 @@ export const sendIC = (
   }
 
   const serverMessage =
-    `MS#${deskmod}#${escapeChat(preanim)}#${escapeChat(name)}#${escapeChat(
+    `MS#${desk_modifier}#${escapeChat(preanim)}#${escapeChat(name)}#${escapeChat(
       emote,
     )}` +
     `#${escapeChat(message)}#${escapeChat(side)}#${escapeChat(
