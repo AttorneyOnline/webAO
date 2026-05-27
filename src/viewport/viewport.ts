@@ -370,7 +370,7 @@ const viewport = (): Viewport => {
       chatmsg.startspeaking = true;
     }
 
-    const hasNonInterruptingPreAnim = chatmsg.noninterrupting_preanim === 1;
+    const hasNonInterruptingPreAnim = chatmsg.noninterrupting_preanim === true;
     if (textnow !== chatmsg.content && hasNonInterruptingPreAnim) {
       const chatContainerBox = document.getElementById("client_chatcontainer");
       chatContainerBox.style.opacity = "1";

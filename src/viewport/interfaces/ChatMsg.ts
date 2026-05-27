@@ -41,7 +41,7 @@ export interface ChatMsg {
   emote_modifier?: EmoteModifier;
   evidence_id?: number;
   looping_sfx?: boolean;
-  noninterrupting_preanim?: number;
+  noninterrupting_preanim?: boolean;
   additive?: boolean;
   preloadedAssets?: PreloadedAssets;
 }
