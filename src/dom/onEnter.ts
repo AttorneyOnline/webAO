@@ -6,6 +6,7 @@ import {
   parseEmoteModifier,
   parseSide,
   parseTextColor,
+  type MSPacketServer,
 } from "../packets/MS";
 
 const input = (id: string) =>
@@ -17,33 +18,33 @@ const isToggled = (id: string) =>
  * Triggered when the Return key is pressed on the in-character chat input box.
  */
 export function onEnter(event: KeyboardEvent) {
-  if (event.keyCode !== 13) return false;
+  if (event.key !== "Enter") return false;
 
-  const mychar = client.character;
-  const myemo = client.emote;
+  const my_char = client.character;
+  const my_emote = client.emote;
   const sendSfx = input("sendsfx").checked;
   const sendPreanim = input("sendpreanim").checked;
 
   // sendpreanim toggle only flips between PREANIM and NO_PREANIM; don't
   // clobber zoom/objection variants from the ini.
-  let emote_modifier = parseEmoteModifier(String(myemo.zoom));
+  let emote_modifier = parseEmoteModifier(String(my_emote.zoom));
   if (sendPreanim && emote_modifier === EmoteModifier.NO_PREANIM) {
     emote_modifier = EmoteModifier.PREANIM;
   } else if (!sendPreanim && emote_modifier === EmoteModifier.PREANIM) {
     emote_modifier = EmoteModifier.NO_PREANIM;
   }
 
-  client.sender.sendIC({
-    desk_modifier: myemo.desk_modifier,
-    preanim: myemo.preanim,
-    character: mychar.name,
-    emote: myemo.emote,
+  const packet: MSPacketServer = {
+    desk_modifier: my_emote.desk_modifier,
+    preanim: my_emote.preanim,
+    character: my_char.name,
+    emote: my_emote.emote,
     message: input("client_inputbox").value,
-    side: parseSide(input("role_select").value || mychar.side),
-    sfx_name: sendSfx ? myemo.sfx : "0",
-    emote_modifier,
+    side: parseSide(input("role_select").value || my_char.side),
+    sfx_name: sendSfx ? my_emote.sfx : "0",
+    emote_modifier: emote_modifier,
     char_id: client.charID,
-    sfx_delay: sendSfx ? myemo.sfxdelay : 0,
+    sfx_delay: sendSfx ? my_emote.sfxdelay : 0,
     shout_modifier: selectedShout,
     evidence_id: client.evidence + 1,
     flip: isToggled("button_flip") ? Flip.HORIZONTAL : Flip.NONE,
@@ -63,7 +64,8 @@ export function onEnter(event: KeyboardEvent) {
     frames_sfx: "-",
     additive: input("check_additive").checked,
     effect: input("effect_select").value,
-  });
+  };
+  client.sender.sendIC(packet);
 
   return false;
 }
