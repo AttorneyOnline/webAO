@@ -19,4 +19,3 @@ export function toggleShout(shout: ShoutModifier) {
     setSelectedShout(shout);
   }
 }
-window.toggleShout = toggleShout;

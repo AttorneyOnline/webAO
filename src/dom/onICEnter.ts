@@ -70,4 +70,3 @@ export function onICEnter(event: KeyboardEvent) {
 
   return false;
 }
-window.onICEnter = onICEnter;

@@ -7,4 +7,3 @@ export function imgError(image: HTMLImageElement) {
   image.src = ""; // unload so the old sprite doesn't persist
   return true;
 }
-window.imgError = imgError;

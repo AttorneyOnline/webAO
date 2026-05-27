@@ -18,4 +18,3 @@ export function pickChar(ccharacter: number) {
     charPw: "web",
   });
 }
-window.pickChar = pickChar;

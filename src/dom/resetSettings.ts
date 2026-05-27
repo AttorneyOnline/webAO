@@ -170,4 +170,3 @@ export function resetSettings() {
     switchHideDesks();
   }
 }
-window.resetSettings = resetSettings;

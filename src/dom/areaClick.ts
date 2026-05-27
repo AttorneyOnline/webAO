@@ -16,4 +16,3 @@ export function area_click(el: HTMLElement) {
   client.area = Number(el.id.substring(4));
   renderPlayerList();
 }
-window.area_click = area_click;

@@ -1,7 +1,7 @@
 import { client } from "../client";
 /**
  * Triggered when the character search bar is changed
- * @param {MouseEvent} event
+ * @param {MouseEvent} _event
  */
 export function chartable_filter(_event: Event) {
   const searchname = (<HTMLInputElement>(
@@ -21,4 +21,3 @@ export function chartable_filter(_event: Event) {
     }
   });
 }
-window.chartable_filter = chartable_filter;

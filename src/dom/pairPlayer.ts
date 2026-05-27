@@ -28,4 +28,3 @@ export function pairPlayer(id: number) {
     }
   }
 }
-window.pairPlayer = pairPlayer;

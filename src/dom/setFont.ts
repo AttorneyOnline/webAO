@@ -20,7 +20,6 @@ export function setFont() {
     customRow.style.display = fontSelect.value === "custom" ? "block" : "none";
   }
 }
-window.setFont = setFont;
 
 /**
  * Apply a custom font typed by the user.
@@ -31,4 +30,3 @@ export function applyCustomFont() {
   document.body.style.fontFamily = fontValue;
   localStorage.setItem("customFont", customFontInput.value);
 }
-window.applyCustomFont = applyCustomFont;

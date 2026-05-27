@@ -14,4 +14,3 @@ export function callMod() {
     sendZZ({ reason: modcall, target: -1 });
   }
 }
-window.callMod = callMod;

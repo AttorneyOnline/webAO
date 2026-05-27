@@ -19,4 +19,3 @@ export function musiclist_click(_event: Event) {
     musiclist_elements[i].selected = false;
   }
 }
-window.musiclist_click = musiclist_click;

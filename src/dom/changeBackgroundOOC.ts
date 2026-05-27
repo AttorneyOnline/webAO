@@ -28,4 +28,3 @@ export function changeBackgroundOOC() {
     client.sendToSelf(`BN#${filename}#%`);
   }
 }
-window.changeBackgroundOOC = changeBackgroundOOC;

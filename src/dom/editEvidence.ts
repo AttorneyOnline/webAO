@@ -21,4 +21,3 @@ export function editEvidence() {
   });
   cancelEvidence();
 }
-window.editEvidence = editEvidence;

@@ -16,4 +16,3 @@ export async function switchAspectRatio() {
     offsetCheck.disabled = true;
   }
 }
-window.switchAspectRatio = switchAspectRatio;

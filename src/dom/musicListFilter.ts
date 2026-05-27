@@ -21,4 +21,3 @@ export function musiclist_filter(_event: Event) {
     }
   }
 }
-window.musiclist_filter = musiclist_filter;

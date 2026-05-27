@@ -120,7 +120,7 @@ function addEmoteButton(
   emote_item.src = imgurl;
   emote_item.alt = desc;
   emote_item.onclick = () => {
-    window.pickEmotion(i);
+    pickEmotion(i);
   };
   emotesList.appendChild(emote_item);
   attachSpritePreview(emote_item, charactername, emotename, desc);

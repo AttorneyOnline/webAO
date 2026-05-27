@@ -6,4 +6,3 @@ export function hcallback(hcaptcharesponse: string) {
   location.reload();
 }
 
-window.hcallback = hcallback;

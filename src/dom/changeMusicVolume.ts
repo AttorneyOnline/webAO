@@ -10,4 +10,3 @@ export const changeMusicVolume = (volume: number = -1) => {
   );
   localStorage.setItem("musicVolume", String(musicVolume));
 };
-window.changeMusicVolume = changeMusicVolume;

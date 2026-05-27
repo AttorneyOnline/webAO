@@ -1668,8 +1668,6 @@ export function restoreBlipPitch(): void {
   if (Number.isFinite(v)) applyBlipPitch(v);
 }
 
-window.applyBlipPitch = applyBlipPitch;
-window.restoreBlipPitch = restoreBlipPitch;
 
 // ─── Background video ────────────────────────────────────────────────────────
 // When config.bodyBgVideo is a data: URL, mount a <video> behind everything;
@@ -4397,7 +4395,6 @@ export function openThemeMaker(): void {
   if (modal) modal.focus();
 }
 
-window.openThemeMaker = openThemeMaker;
 
 /**
  * Restores a previously saved theme maker theme on page load.
@@ -4413,7 +4410,6 @@ export function restoreThemeMaker(): void {
   }
 }
 
-window.restoreThemeMaker = restoreThemeMaker;
 
 /**
  * Resets all theme maker settings (called from resetSettings).
@@ -4430,4 +4426,3 @@ export function resetThemeMaker(): void {
   if (el) el.remove();
 }
 
-window.resetThemeMaker = resetThemeMaker;

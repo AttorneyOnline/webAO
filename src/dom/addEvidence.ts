@@ -18,4 +18,3 @@ export function addEvidence() {
   });
   cancelEvidence();
 }
-window.addEvidence = addEvidence;

@@ -1,5 +1,7 @@
 import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
+import { banPlayer, kickPlayer } from "./banPlayer";
+import { pairPlayer } from "./pairPlayer";
 import {
   getSpeakingUids,
   isLocalSpeaking,
@@ -63,14 +65,14 @@ export function renderPlayerList() {
     kickCell.style.width = "64px";
     const kick = document.createElement("button");
     kick.innerText = "Kick";
-    kick.onclick = () => window.kickPlayer(playerID);
+    kick.onclick = () => kickPlayer(playerID);
     kickCell.appendChild(kick);
 
     const banCell = playerRow.insertCell(5);
     banCell.style.width = "64px";
     const ban = document.createElement("button");
     ban.innerText = "Ban";
-    ban.onclick = () => window.banPlayer(playerID);
+    ban.onclick = () => banPlayer(playerID);
     banCell.appendChild(ban);
 
     const pairCell = playerRow.insertCell(6);
@@ -81,7 +83,7 @@ export function renderPlayerList() {
     pair.innerText = "\u{1F517}";
     pair.title = `Pair with [${playerID}] ${player.charName || player.showName || player.name || "player"}`;
     pair.setAttribute("aria-label", pair.title);
-    pair.onclick = () => window.pairPlayer(playerID);
+    pair.onclick = () => pairPlayer(playerID);
     pairCell.appendChild(pair);
   }
 }

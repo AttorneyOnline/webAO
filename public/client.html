@@ -100,12 +100,12 @@
       </div>
       <div id="client_charselect">
         <p>Choose your character</p>
-        <button onclick="pickChar(-1)">Or spectate</button>
+        <button data-action="pickChar" data-char="-1">Or spectate</button>
         <br /><br />
         <input
           id="client_charactersearch"
           placeholder="Search"
-          oninput="chartable_filter(event)"
+          data-action="chartable_filter" data-event="input"
         />
         <br /><br />
         <div id="client_chartable"></div>
@@ -118,7 +118,7 @@
         <p id="client_error_code">
           Error code: <span id="error_id">(none)</span>
         </p>
-        <button id="client_reconnect" onclick="ReconnectButton()">
+        <button id="client_reconnect" data-action="ReconnectButton">
           Reconnect
         </button>
         <p id="client_error_help">
@@ -141,57 +141,57 @@
           <div id="client_fullview">
             <img id="client_court" />
             <div id="client_stitch_court">
-              <img id="client_court_def" onerror="imgError(this);" />
-              <img id="client_court_deft" onerror="imgError(this);" />
-              <img id="client_court_wit" onerror="imgError(this);" />
-              <img id="client_court_prot" onerror="imgError(this);" />
-              <img id="client_court_pro" onerror="imgError(this);" />
+              <img id="client_court_def" data-action="imgError" data-event="error" />
+              <img id="client_court_deft" data-action="imgError" data-event="error" />
+              <img id="client_court_wit" data-action="imgError" data-event="error" />
+              <img id="client_court_prot" data-action="imgError" data-event="error" />
+              <img id="client_court_pro" data-action="imgError" data-event="error" />
             </div>
             <div
               id="client_def_pair_char"
               class="client_char"
               alt="Paired character"
             >
-              <img id="client_def_pair_img" onerror="charError(this);" />
+              <img id="client_def_pair_img" data-action="charError" data-event="error" />
             </div>
             <div id="client_def_char" class="client_char" alt="Character">
-              <img id="client_def_char_img" onerror="charError(this);" />
+              <img id="client_def_char_img" data-action="charError" data-event="error" />
             </div>
             <div
               id="client_wit_pair_char"
               class="client_char"
               alt="Paired character"
             >
-              <img id="client_wit_pair_img" onerror="charError(this);" />
+              <img id="client_wit_pair_img" data-action="charError" data-event="error" />
             </div>
             <div id="client_wit_char" class="client_char" alt="Character">
-              <img id="client_wit_char_img" onerror="charError(this);" />
+              <img id="client_wit_char_img" data-action="charError" data-event="error" />
             </div>
             <div
               id="client_pro_pair_char"
               class="client_char"
               alt="Paired character"
             >
-              <img id="client_pro_pair_img" onerror="charError(this);" />
+              <img id="client_pro_pair_img" data-action="charError" data-event="error" />
             </div>
             <div id="client_pro_char" class="client_char" alt="Character">
-              <img id="client_pro_char_img" onerror="charError(this);" />
+              <img id="client_pro_char_img" data-action="charError" data-event="error" />
             </div>
             <img id="client_def_bench" class="client_bench" />
             <img id="client_wit_bench" class="client_bench" />
             <img id="client_pro_bench" class="client_bench" />
           </div>
           <div id="client_classicview">
-            <img id="client_court_classic" onerror="imgError(this);" />
+            <img id="client_court_classic" data-action="imgError" data-event="error" />
             <div
               id="client_pair_char"
               class="client_char"
               alt="Paired character"
             >
-              <img id="client_pair_img" onerror="charError(this);" />
+              <img id="client_pair_img" data-action="charError" data-event="error" />
             </div>
             <div id="client_char" class="client_char" alt="Character">
-              <img id="client_char_img" onerror="charError(this);" />
+              <img id="client_char_img" data-action="charError" data-event="error" />
             </div>
             <img id="client_bench_classic" class="client_bench" />
           </div>
@@ -204,13 +204,13 @@
             id="client_evi"
             src=""
             alt="Character Evidence"
-            onerror="imgError(this);"
+            data-action="imgError" data-event="error"
           />
           <img
             id="client_testimony"
             alt="Testimony overlay"
             src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-            onerror="imgError(this);"
+            data-action="imgError" data-event="error"
           />
           <img
             id="client_shout"
@@ -238,12 +238,12 @@
           </div>
         </div>
       </div>
-      <form onsubmit="return false">
+      <form data-action="preventDefault" data-event="submit">
         <input
           id="client_inputbox"
           class="long"
           type="text"
-          onkeypress="onICEnter(event)"
+          data-action="onICEnter" data-event="keypress"
           placeholder="Say something&hellip;"
           autocomplete="off"
         />
@@ -270,7 +270,7 @@
             id="button_1"
             alt="Hold it!"
             class="client_button"
-            onclick="toggleShout(1)"
+            data-action="toggleShout" data-shout="1"
           >
             Hold it!
           </button>
@@ -278,7 +278,7 @@
             id="button_2"
             alt="Objection!"
             class="client_button"
-            onclick="toggleShout(2)"
+            data-action="toggleShout" data-shout="2"
           >
             Objection!
           </button>
@@ -286,7 +286,7 @@
             id="button_3"
             alt="Take That!"
             class="client_button"
-            onclick="toggleShout(3)"
+            data-action="toggleShout" data-shout="3"
           >
             Take That!
           </button>
@@ -294,7 +294,7 @@
             id="button_4"
             alt="Custom"
             class="client_button"
-            onclick="toggleShout(4)"
+            data-action="toggleShout" data-shout="4"
             style="display: none"
           >
             Custom
@@ -330,7 +330,7 @@
             id="button_flip"
             alt="Flip"
             class="client_button"
-            onclick="toggleEffect(this)"
+            data-action="toggleEffect"
             style="display: none"
           >
             Flip
@@ -339,7 +339,7 @@
             id="button_flash"
             alt="Flash"
             class="client_button"
-            onclick="toggleEffect(this)"
+            data-action="toggleEffect"
           >
             Flash
           </button>
@@ -347,7 +347,7 @@
             id="button_shake"
             alt="Shake"
             class="client_button"
-            onclick="toggleEffect(this)"
+            data-action="toggleEffect"
             style="display: none"
           >
             Shake
@@ -360,7 +360,7 @@
           <select
             id="role_select"
             name="role_select"
-            onchange="changeRoleOOC()"
+            data-action="changeRoleOOC" data-event="change"
           >
             <option value="">Default</option>
             <option value="def">Defense</option>
@@ -378,7 +378,7 @@
             id="char_change"
             alt="Change"
             class="client_button hover_button"
-            onclick="changeCharacter()"
+            data-action="changeCharacter"
           >
             Change Character
           </button>
@@ -386,7 +386,7 @@
             id="char_random"
             alt="Random"
             class="client_button hover_button"
-            onclick="randomCharacterOOC()"
+            data-action="randomCharacterOOC"
           >
             Random Character
           </button>
@@ -397,7 +397,7 @@
               id="button_toggle_pairing"
               alt="Pairing"
               class="client_button"
-              onclick="toggleElement('pairing_settings')"
+              data-action="toggleElement" data-element="pairing_settings"
             >
               Pairing
             </button>
@@ -444,7 +444,7 @@
                 id="pair_reset"
                 type="button"
                 value="Reset"
-                onclick="resetOffset()"
+                data-action="resetOffset"
               />
             </span>
           </span>
@@ -459,7 +459,7 @@
               id="showname"
               name="showname"
               type="checkbox"
-              onclick="showname_click()"
+              data-action="showname_click"
               checked
             />
             <br />
@@ -498,7 +498,7 @@
         <span id="judge_action" style="display: none">
           <span
             id="menu_wt"
-            onclick="initWT()"
+            data-action="initWT"
             class="judge_button"
             style="color: blue"
             ><i>Witness<br />Testimony</i></span
@@ -506,7 +506,7 @@
 
           <span
             id="menu_ce"
-            onclick="initCE()"
+            data-action="initCE"
             class="judge_button"
             style="color: red"
             ><i>Cross<br />Examination</i></span
@@ -514,7 +514,7 @@
 
           <span
             id="menu_nguilty"
-            onclick="notguilty()"
+            data-action="notguilty"
             class="judge_button"
             style="
               color: white;
@@ -532,7 +532,7 @@
 
           <span
             id="menu_guilty"
-            onclick="guilty()"
+            data-action="guilty"
             class="judge_button"
             style="color: black; font-family: serif; font-size: 1.5em"
             >Guilty</span
@@ -540,20 +540,20 @@
 
           <br />
           <span style="display: inline-block; vertical-align: middle">
-            <span id="menu_rhpd" onclick="redHPD()" class="healthchange_button">
+            <span id="menu_rhpd" data-action="redHPD" class="healthchange_button">
               &#8863;
             </span>
             <span style="font-size: 1.25em">Defense</span>
-            <span id="menu_ahpd" onclick="addHPD()" class="healthchange_button">
+            <span id="menu_ahpd" data-action="addHPD" class="healthchange_button">
               &#8862;
             </span>
           </span>
           <span style="display: inline-block; vertical-align: middle">
-            <span id="menu_ahpp" onclick="addHPP()" class="healthchange_button">
+            <span id="menu_ahpp" data-action="addHPP" class="healthchange_button">
               &#8862;
             </span>
             <span style="font-size: 1.25em">Prosecution</span>
-            <span id="menu_rhpp" onclick="redHPP()" class="healthchange_button">
+            <span id="menu_rhpp" data-action="redHPP" class="healthchange_button">
               &#8863;
             </span>
           </span>
@@ -569,7 +569,7 @@
           <select
             name="mute_select"
             id="mute_select"
-            onchange="mutelist_click(event)"
+            data-action="mutelist_click" data-event="change"
           ></select>
         </span>
       </fieldset>
@@ -581,29 +581,29 @@
     <div id="client_menu">
       <div id="client_menu_buttons">
         <div class="hrtext">Main Menu</div>
-        <span id="menu_1" onclick="toggleMenu(1)" class="menu_button active">
+        <span id="menu_1" data-action="toggleMenu" data-menu="1" class="menu_button active">
           <b class="menu_icon">&#128205;</b>
           <div class="menu_text">Areas</div>
         </span>
-        <span id="menu_2" onclick="toggleMenu(2)" class="menu_button">
+        <span id="menu_2" data-action="toggleMenu" data-menu="2" class="menu_button">
           <b class="menu_icon">&#128188;</b>
           <div class="menu_text">Evidence</div>
         </span>
-        <span id="menu_3" onclick="toggleMenu(3)" class="menu_button">
+        <span id="menu_3" data-action="toggleMenu" data-menu="3" class="menu_button">
           <b class="menu_icon">&#128295;</b>
           <div class="menu_text">Settings</div>
         </span>
-        <span id="menu_4" onclick="toggleMenu(4)" class="menu_button">
+        <span id="menu_4" data-action="toggleMenu" data-menu="4" class="menu_button">
           <b class="menu_icon">&#10067;</b>
           <div class="menu_text">About</div>
         </span>
-        <span id="menu_cm" onclick="callMod()" class="menu_button">
+        <span id="menu_cm" data-action="callMod" class="menu_button">
           <b class="menu_icon">&#128680;</b>
           <div class="menu_text" style="color: #ce2727">Call Mod</div>
         </span>
         <span
           id="menu_voice"
-          onclick="toggleVoice()"
+          data-action="toggleVoice"
           class="menu_button"
           style="display: none"
           title="Toggle voice chat"
@@ -637,7 +637,7 @@
               id="bg_preview"
               src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
               alt="Background Preview"
-              onerror="imgError(this);"
+              data-action="imgError" data-event="error"
             />
           </span>
           <span style="display: inline-block">
@@ -646,7 +646,7 @@
             <select
               id="bg_select"
               name="bg_select"
-              onchange="updateBackgroundPreview()"
+              data-action="updateBackgroundPreview" data-event="change"
               style="margin-top: 10px"
             ></select>
             <br />
@@ -662,7 +662,7 @@
               id="bg_change"
               alt="Change"
               class="client_button hover_button"
-              onclick="changeBackgroundOOC()"
+              data-action="changeBackgroundOOC"
             >
               Change
             </button>
@@ -708,7 +708,7 @@
               class="evi_icon"
               src=""
               alt="Evidence Icon"
-              onerror="imgError(this);"
+              data-action="imgError" data-event="error"
             />
             <div id="evi_options">
               <input
@@ -722,7 +722,7 @@
               <select
                 id="evi_select"
                 name="evi_select"
-                onchange="updateEvidenceIcon()"
+                data-action="updateEvidenceIcon" data-event="change"
               ></select>
               <input
                 id="evi_filename"
@@ -747,7 +747,7 @@
               id="evi_add"
               alt="Add Evidence"
               class="client_button hover_button"
-              onclick="addEvidence()"
+              data-action="addEvidence"
             >
               Add
             </button>
@@ -755,7 +755,7 @@
               id="evi_edit"
               alt="Edit Evidence"
               class="client_button hover_button inactive"
-              onclick="editEvidence()"
+              data-action="editEvidence"
             >
               Edit
             </button>
@@ -763,7 +763,7 @@
               id="evi_cancel"
               alt="Cancel Evidence"
               class="client_button hover_button inactive"
-              onclick="cancelEvidence()"
+              data-action="cancelEvidence"
             >
               Cancel
             </button>
@@ -771,7 +771,7 @@
               id="evi_del"
               alt="Remove Evidence"
               class="client_button hover_button inactive"
-              onclick="deleteEvidence()"
+              data-action="deleteEvidence"
             >
               Remove
             </button>
@@ -784,7 +784,7 @@
           id="button_present"
           alt="Present"
           class="client_button"
-          onclick="toggleEffect(this)"
+          data-action="toggleEffect"
         >
           Present
         </button>
@@ -794,7 +794,7 @@
       <span class="menu_content" id="content_3">
         <meta name="frame-title" lang="en" content="Settings" />
         <h2>Volume</h2>
-        <p>Music <label><input type="checkbox" id="client_mute_music" onchange="toggleMuteMusic()"> Mute</label></p>
+        <p>Music <label><input type="checkbox" id="client_mute_music" data-action="toggleMuteMusic" data-event="change"> Mute</label></p>
         <input
           id="client_mvolume"
           class="long"
@@ -803,34 +803,34 @@
           max="1"
           value="1"
           step="0.01"
-          onchange="changeMusicVolume()"
+          data-action="changeMusicVolume" data-event="change"
         />
 
-        <p>SFX <label><input type="checkbox" id="client_mute_sfx" onchange="toggleMuteSfx()"> Mute</label></p>
+        <p>SFX <label><input type="checkbox" id="client_mute_sfx" data-action="toggleMuteSfx" data-event="change"> Mute</label></p>
         <audio
           id="client_sfxaudio"
-          onvolumechange="changeSFXVolume()"
-          onerror="opusCheck(this)"
+          data-action="changeSFXVolume" data-event="volumechange"
+          data-action="opusCheck" data-event="error"
           controls
         ></audio>
 
         <p>Shouts</p>
         <audio
           id="client_shoutaudio"
-          onvolumechange="changeShoutVolume()"
-          onerror="opusCheck(this)"
+          data-action="changeShoutVolume" data-event="volumechange"
+          data-action="opusCheck" data-event="error"
           controls
         ></audio>
 
         <p>Testimony/Guilty</p>
         <audio
           id="client_testimonyaudio"
-          onvolumechange="changeTestimonyVolume()"
-          onerror="opusCheck(this)"
+          data-action="changeTestimonyVolume" data-event="volumechange"
+          data-action="opusCheck" data-event="error"
           controls
         ></audio>
 
-        <p>Blip <label><input type="checkbox" id="client_mute_blips" onchange="toggleMuteBlips()"> Mute</label></p>
+        <p>Blip <label><input type="checkbox" id="client_mute_blips" data-action="toggleMuteBlips" data-event="change"> Mute</label></p>
         <input
           id="client_bvolume"
           class="long"
@@ -839,7 +839,7 @@
           max="1"
           value="1"
           step="0.01"
-          onchange="changeBlipVolume()"
+          data-action="changeBlipVolume" data-event="change"
         />
         <br />
         <br />
@@ -906,7 +906,7 @@
         <br />
         <button
           class="client_button hover_button"
-          onclick="openThemeMaker()"
+          data-action="openThemeMaker"
           title="Open the advanced visual Theme Maker"
           style="margin-bottom: 8px; font-size: 14px; padding: 6px 18px"
         >
@@ -918,7 +918,7 @@
         <select
           id="client_themeselect"
           name="client_themeselect"
-          onchange="reloadTheme()"
+          data-action="reloadTheme" data-event="change"
         >
           <option value="default" selected>Default</option>
           <option value="dark">Dark</option>
@@ -938,7 +938,7 @@
             type="file"
             id="client_customcss"
             accept=".css"
-            onchange="importCustomCSS(event)"
+            data-action="importCustomCSS" data-event="change"
           />
           <br />
           <span style="font-size: 11px; opacity: 0.7">
@@ -951,7 +951,7 @@
         <select
           id="client_chatboxselect"
           name="client_chatboxselect"
-          onchange="setChatbox(this.value)"
+          data-action="setChatbox" data-event="change"
         >
           <option value="dynamic" selected>Use characters</option>
           <option value="aa">AA</option>
@@ -986,7 +986,7 @@
         <!--
 			<br>
 			<br>
-			<button id="client_modcall" onclick="modcall_test()">Test modcall</button>
+			<button id="client_modcall" data-action="modcall_test">Test modcall</button>
 			-->
         <br />
         <br />
@@ -994,7 +994,7 @@
         <select
           id="client_fontselect"
           name="client_fontselect"
-          onchange="setFont()"
+          data-action="setFont" data-event="change"
         >
           <option value="sans-serif" selected>Default (sans-serif)</option>
           <option value="Igiari Cyrillic, Ace Attorney, sans-serif">Igiari (Ace Attorney)</option>
@@ -1014,7 +1014,7 @@
             type="text"
             id="client_customfont"
             placeholder="e.g. 'Noto Sans', sans-serif"
-            oninput="applyCustomFont()"
+            data-action="applyCustomFont" data-event="input"
             style="width: 100%; box-sizing: border-box"
           />
         </div>
@@ -1025,10 +1025,10 @@
         <select
           id="client_iniselect"
           name="client_iniselect"
-          onchange="updateIniswap()"
+          data-action="updateIniswap" data-event="change"
         ></select>
         <input id="client_ininame" name="client_ininame" />
-        <button id="client_inichange" onclick="iniedit()">Change</button>
+        <button id="client_inichange" data-action="iniedit">Change</button>
         <br />
         <br />
         <p>Pan-tilt (experimental)</p>
@@ -1037,7 +1037,7 @@
           type="checkbox"
           id="client_pantilt"
           name="client_pantilt"
-          onclick="switchPanTilt()"
+          data-action="switchPanTilt"
         />
         <br />
         <br />
@@ -1047,7 +1047,7 @@
           type="checkbox"
           id="client_hdviewport"
           name="client_hdviewport"
-          onclick="switchAspectRatio()"
+          data-action="switchAspectRatio"
         />
         <br />
         <label for="client_hdviewport_offset">Offset chatbox:</label>
@@ -1055,7 +1055,7 @@
           type="checkbox"
           id="client_hdviewport_offset"
           id="client_hdviewport_offset"
-          onclick="switchChatOffset()"
+          data-action="switchChatOffset"
         />
         <br />
         <br />
@@ -1065,7 +1065,7 @@
           type="checkbox"
           id="client_hidedesks"
           name="client_hidedesks"
-          onclick="switchHideDesks()"
+          data-action="switchHideDesks"
         />
         <br />
         <br />
@@ -1077,7 +1077,7 @@
           rows="4"
           cols="10"
           placeholder="Put 1 callword per line here"
-          onchange="changeCallwords()"
+          data-action="changeCallwords" data-event="change"
         ></textarea>
         <br />
         <br />
@@ -1090,13 +1090,13 @@
         <button
           id="client_resetsettings"
           class="client_button hover_button"
-          onclick="resetSettings()"
+          data-action="resetSettings"
           title="Reset all settings to defaults and turn off all custom features"
         >
           Reset All Settings
         </button>
         &nbsp;
-        <button id="client_disconnect" onclick="DisconnectButton()">
+        <button id="client_disconnect" data-action="DisconnectButton">
           Disconnect
         </button>
         <br />
@@ -1105,7 +1105,7 @@
         &nbsp;
         <button
           class="client_button"
-          onclick="exportLog('txt')"
+          data-action="exportLog" data-format="txt"
           title="Download log as plain text"
         >
           ⬇ .txt
@@ -1113,7 +1113,7 @@
         &nbsp;
         <button
           class="client_button"
-          onclick="exportLog('html')"
+          data-action="exportLog" data-format="html"
           title="Download log as HTML"
         >
           ⬇ .html
@@ -1200,7 +1200,7 @@
         <input
           id="client_oocinputbox"
           type="text"
-          onkeypress="onOOCEnter(event)"
+          data-action="onOOCEnter" data-event="keypress"
         />
       </span>
       <span
@@ -1211,7 +1211,7 @@
           id="client_replaygo"
           style="width: 25%"
           type="button"
-          onclick="onReplayGo(event)"
+          data-action="onReplayGo"
           value="GO"
         />
         <input
@@ -1229,12 +1229,12 @@
     <input
       id="client_musicsearch"
       placeholder="Search"
-      oninput="musiclist_filter(event)"
+      data-action="musiclist_filter" data-event="input"
     />
     <select
       id="client_musiclist"
       size="5"
-      onchange="musiclist_click(event)"
+      data-action="musiclist_click" data-event="change"
     ></select>
   </template>
 

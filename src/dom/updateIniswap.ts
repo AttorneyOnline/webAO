@@ -13,4 +13,3 @@ export function updateIniswap() {
     ini_name.style.display = "none";
   }
 }
-window.updateIniswap = updateIniswap;

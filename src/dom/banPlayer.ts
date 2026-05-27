@@ -10,7 +10,6 @@ export function banPlayer(id: number) {
 
   sendMA({ id, length, reason });
 }
-window.banPlayer = banPlayer;
 
 /**
  * Tries to kick a player from the playerlist
@@ -21,4 +20,3 @@ export function kickPlayer(id: number) {
 
   sendMA({ id, length: 0, reason });
 }
-window.kickPlayer = kickPlayer;

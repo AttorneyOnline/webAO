@@ -18,4 +18,3 @@ export async function iniedit() {
   await handleCharacterInfo(newname.split("&"), inicharID);
   receivePV({ playerId: 0, charId: inicharID });
 }
-window.iniedit = iniedit;

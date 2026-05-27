@@ -25,4 +25,3 @@ export function updateActionCommands(side: Side) {
     }
   }
 }
-window.updateActionCommands = updateActionCommands;

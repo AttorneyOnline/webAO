@@ -9,4 +9,3 @@ export function changeCallwords() {
   )).value.split("\n");
   localStorage.setItem("callwords", client.callwords.join("\n"));
 }
-window.changeCallwords = changeCallwords;

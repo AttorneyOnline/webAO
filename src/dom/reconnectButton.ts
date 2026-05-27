@@ -25,4 +25,3 @@ export function ReconnectButton() {
   newClient.hdid = hdid;
   newClient.connect();
 }
-window.ReconnectButton = ReconnectButton;

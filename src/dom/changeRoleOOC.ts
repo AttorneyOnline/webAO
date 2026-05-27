@@ -13,4 +13,3 @@ export function changeRoleOOC() {
   client.sendToServer(`SP#${roleselect.value}#%`);
   updateActionCommands(parseSide(roleselect.value));
 }
-window.changeRoleOOC = changeRoleOOC;

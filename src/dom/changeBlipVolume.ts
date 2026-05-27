@@ -9,4 +9,3 @@ export const changeBlipVolume = () => {
   setBlipVolume(Number(blipVolume));
   localStorage.setItem("blipVolume", blipVolume);
 };
-window.changeBlipVolume = changeBlipVolume;

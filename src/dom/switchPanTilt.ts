@@ -23,4 +23,3 @@ export async function switchPanTilt() {
     fullview.style.transition = "none";
   }
 }
-window.switchPanTilt = switchPanTilt;

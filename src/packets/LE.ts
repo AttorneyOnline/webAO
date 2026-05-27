@@ -1,5 +1,6 @@
 import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
+import { pickEvidence } from "../dom/pickEvidence";
 import { escapeChat, safeTags, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
 
@@ -66,7 +67,7 @@ export const receiveLE = (packet: LEPacket) => {
     evi_item.src = client.evidences[i].icon;
     evi_item.alt = client.evidences[i].name;
     evi_item.onclick = () => {
-      window.pickEvidence(i);
+      pickEvidence(i);
     };
     evidence_box.appendChild(evi_item);
   }

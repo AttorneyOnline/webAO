@@ -9,4 +9,3 @@ export function DisconnectButton() {
     client.serv.close();
   }
 }
-window.DisconnectButton = DisconnectButton;

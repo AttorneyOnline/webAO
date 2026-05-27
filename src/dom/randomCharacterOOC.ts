@@ -6,4 +6,3 @@ export function randomCharacterOOC() {
   const name = (<HTMLInputElement>document.getElementById("OOC_name")).value;
   sendCT({ name, message: `/randomchar` });
 }
-window.randomCharacterOOC = randomCharacterOOC;

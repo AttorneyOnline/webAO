@@ -31,4 +31,3 @@ export function onOOCEnter(event: KeyboardEvent) {
 
   inputbox.value = "";
 }
-window.onOOCEnter = onOOCEnter;

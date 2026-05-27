@@ -25,4 +25,3 @@ export function setChatbox(setstyle: string) {
     chatbox_theme.href = `styles/chatbox/${CHATBOX}.css`;
   }
 }
-window.setChatbox = setChatbox;

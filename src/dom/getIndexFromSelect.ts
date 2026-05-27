@@ -13,4 +13,3 @@ export function getIndexFromSelect(select_box: string, value: string) {
   }
   return 0;
 }
-window.getIndexFromSelect = getIndexFromSelect;

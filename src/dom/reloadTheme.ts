@@ -28,7 +28,6 @@ export const reloadTheme = () => {
   (<HTMLAnchorElement>document.getElementById("client_theme")).href =
     `styles/${client.viewport.getTheme()}.css`;
 };
-window.reloadTheme = reloadTheme;
 
 /**
  * Apply an inline CSS string as the active theme.
@@ -64,4 +63,3 @@ export const importCustomCSS = (event: Event) => {
   };
   reader.readAsText(file);
 };
-window.importCustomCSS = importCustomCSS;

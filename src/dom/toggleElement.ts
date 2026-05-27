@@ -10,5 +10,4 @@ export function toggleElement(elementId: string): void {
     element.style.display = "block";
   }
 }
-window.toggleElement = toggleElement;
 export default toggleElement;

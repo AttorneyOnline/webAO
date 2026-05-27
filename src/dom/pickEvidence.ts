@@ -49,4 +49,3 @@ export function pickEvidence(evidence: number) {
     cancelEvidence();
   }
 }
-window.pickEvidence = pickEvidence;

@@ -22,4 +22,3 @@ export async function switchHideDesks() {
     if (bench) bench.style.opacity = enabled ? "0" : "1";
   }
 }
-window.switchHideDesks = switchHideDesks;

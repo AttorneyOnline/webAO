@@ -10,4 +10,3 @@ export function deleteEvidence() {
   sendDE({ id });
   cancelEvidence();
 }
-window.deleteEvidence = deleteEvidence;
