@@ -5,7 +5,7 @@ import { sendOOC } from "../client/sender/sendOOC";
  * Pair with a player on both supported pathways at once:
  *  1. Server-side OOC command `/pair <playerID>` (used by servers that
  *     implement bidirectional pairing announcements).
- *  2. Local `#pair_select` dropdown (the canonical AO `other_charid`
+ *  2. Local `#pair_select` dropdown (the canonical AO `paired_charid`
  *     route — embedded in the next outgoing IC message). This works on
  *     any vanilla AO server even when the OOC command is unknown.
  */

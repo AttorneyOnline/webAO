@@ -320,8 +320,8 @@ const viewport = (): Viewport => {
     const charName = chatmsg.name.toLowerCase();
     const charEmote = chatmsg.sprite.toLowerCase();
 
-    const pairName = chatmsg.other_name.toLowerCase();
-    const pairEmote = chatmsg.other_emote.toLowerCase();
+    const pairName = chatmsg.paired_name.toLowerCase();
+    const pairEmote = chatmsg.paired_emote.toLowerCase();
 
     // TODO: preanims sometimes play when they're not supposed to
     const isShoutOver = tickTimer >= shoutTimer;
@@ -356,7 +356,7 @@ const viewport = (): Viewport => {
         }
       }
 
-      if (chatmsg.other_name) {
+      if (chatmsg.paired_name) {
         pairLayers.style.opacity = "1";
       } else {
         pairLayers.style.opacity = "0";
@@ -438,7 +438,7 @@ const viewport = (): Viewport => {
             break;
         }
 
-        if (chatmsg.other_name) {
+        if (chatmsg.paired_name) {
           if (chatmsg.preloadedAssets) {
             setEmoteFromUrl(chatmsg.preloadedAssets.pairIdleUrl, true, chatmsg.side);
           } else {

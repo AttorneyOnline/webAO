@@ -108,9 +108,9 @@ export default async function preloadMessageAssets(
       ? buildEmoteUrls(AO_HOST, emoteExtensions, charName, chatmsg.preanim!.toLowerCase(), "")
       : null;
 
-    const hasPair = !!chatmsg.other_name;
+    const hasPair = !!chatmsg.paired_name;
     const pairIdleUrls = hasPair
-      ? buildEmoteUrls(AO_HOST, emoteExtensions, chatmsg.other_name!.toLowerCase(), chatmsg.other_emote!.toLowerCase(), "(a)")
+      ? buildEmoteUrls(AO_HOST, emoteExtensions, chatmsg.paired_name!.toLowerCase(), chatmsg.paired_emote!.toLowerCase(), "(a)")
       : null;
 
     // Shout SFX per-character path

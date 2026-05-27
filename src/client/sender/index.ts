@@ -36,7 +36,7 @@ export interface ISender {
     realization: boolean,
     text_color: TextColor,
     showname: string,
-    other_charid: string,
+    paired_charid: string,
     self_hoffset: number,
     self_yoffset: number,
     noninterrupting_preanim: boolean,

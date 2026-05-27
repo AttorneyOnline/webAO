@@ -16,7 +16,7 @@ const { mode } = queryParser();
 /**
  * Sends an in-character chat message. The packet variant depends on
  * whether we're talking to a real server (Server-receiver form, no
- * `other_name` / `other_emote`) or replaying to ourselves
+ * `paired_name` / `paired_emote`) or replaying to ourselves
  * (Client-receiver form, fields included with empty values).
  */
 export const sendIC = (
@@ -35,7 +35,7 @@ export const sendIC = (
   realization: boolean,
   text_color: TextColor,
   showname: string,
-  other_charid: string,
+  paired_charid: string,
   self_hoffset: number,
   self_yoffset: number,
   noninterrupting_preanim: boolean,
@@ -64,7 +64,7 @@ export const sendIC = (
     realization,
     text_color,
     showname,
-    other_charid: Number(other_charid) || -1,
+    paired_charid: Number(paired_charid) || -1,
     self_offset: { x: self_hoffset, y: self_yoffset },
     noninterrupting_preanim,
     sfx_looping,
@@ -83,10 +83,10 @@ export const sendIC = (
     mode === "replay"
       ? MSClient.encode({
         ...packet,
-        other_name: "",
-        other_emote: "",
-        other_offset: { x: 0, y: 0 },
-        other_flip: Flip.NONE,
+        paired_name: "",
+        paired_emote: "",
+        paired_offset: { x: 0, y: 0 },
+        paired_flip: Flip.NONE,
       })
       : MSServer.encode(packet);
 

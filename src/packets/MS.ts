@@ -18,10 +18,10 @@ import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
  *     `MSPacketClient` + the `MSClient` codec (used by the dispatcher).
  *
  *   Server-as-receiver (Client → Server): same fields *except*
- *     `other_name` and `other_emote` are not present on the wire.
+ *     `paired_name` and `paired_emote` are not present on the wire.
  *     Modeled by `MSPacketServer` + the `MSServer` codec.
  *
- * `self_offset` / `other_offset` are decoded into `{x, y}` here. The wire
+ * `self_offset` / `paired_offset` are decoded into `{x, y}` here. The wire
  * format is the spec form `{x}&{y}` -- but `&` is a FantaCode control
  * character (escape `<and>`), so on the actual bytes you see `{x}<and>{y}`.
  * That's why every AO server in the wild appears to "use literal `<and>`":
@@ -189,12 +189,12 @@ export interface MSPacketClient {
   text_color: TextColor;
   // cccc group
   showname: string;
-  other_charid: number;
-  other_name: string;
-  other_emote: string;
+  paired_charid: number;
+  paired_name: string;
+  paired_emote: string;
   self_offset: Offset;
-  other_offset: Offset;
-  other_flip: Flip;
+  paired_offset: Offset;
+  paired_flip: Flip;
   noninterrupting_preanim: boolean;
   // 2.7 group
   sfx_looping: boolean;
@@ -210,17 +210,17 @@ export interface MSPacketClient {
 /**
  * Server-as-receiver form. The wire is 26 fields and omits:
  *
- *   - `other_name` and `other_emote` (server fills in from the paired
+ *   - `paired_name` and `paired_emote` (server fills in from the paired
  *     client's state on broadcast),
- *   - `other_offset` and `other_flip` (same reasoning — server-only).
+ *   - `paired_offset` and `paired_flip` (same reasoning — server-only).
  *
- * The AO spec docs are misleading here: they imply only `other_name` /
- * `other_emote` are absent on incoming, but real servers (KFO, Nyathena,
+ * The AO spec docs are misleading here: they imply only `paired_name` /
+ * `paired_emote` are absent on incoming, but real servers (KFO, Nyathena,
  * Athena) and the reference AO2-Client all expect this 26-field shape.
  */
 export type MSPacketServer = Omit<
   MSPacketClient,
-  "other_name" | "other_emote" | "other_offset" | "other_flip"
+  "paired_name" | "paired_emote" | "paired_offset" | "paired_flip"
 >;
 
 const str = (v: string | undefined) => unescapeChat(v ?? "");
@@ -255,12 +255,12 @@ export const MSClient: PacketCodec<MSPacketClient> = {
       realization: args[14] === "1",
       text_color: parseTextColor(args[15]),
       showname: str(args[16]),
-      other_charid: intOr(args[17], -1),
-      other_name: str(args[18]),
-      other_emote: str(args[19]),
+      paired_charid: intOr(args[17], -1),
+      paired_name: str(args[18]),
+      paired_emote: str(args[19]),
       self_offset: parseOffset(str(args[20])),
-      other_offset: parseOffset(str(args[21])),
-      other_flip: parseFlip(args[22]),
+      paired_offset: parseOffset(str(args[21])),
+      paired_flip: parseFlip(args[22]),
       noninterrupting_preanim: args[23] === "1",
       sfx_looping: args[24] === "1",
       screenshake: args[25] === "1",
@@ -290,12 +290,12 @@ export const MSClient: PacketCodec<MSPacketClient> = {
       Number(p.realization),
       p.text_color,
       escapeChat(p.showname),
-      p.other_charid,
-      escapeChat(p.other_name),
-      escapeChat(p.other_emote),
+      p.paired_charid,
+      escapeChat(p.paired_name),
+      escapeChat(p.paired_emote),
       escapeChat(encodeOffset(p.self_offset)),
-      escapeChat(encodeOffset(p.other_offset)),
-      p.other_flip,
+      escapeChat(encodeOffset(p.paired_offset)),
+      p.paired_flip,
       Number(p.noninterrupting_preanim),
       Number(p.sfx_looping),
       Number(p.screenshake),
@@ -328,8 +328,8 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       realization: args[14] === "1",
       text_color: parseTextColor(args[15]),
       showname: str(args[16]),
-      other_charid: intOr(args[17], -1),
-      // Server-receiver form jumps from other_charid straight to
+      paired_charid: intOr(args[17], -1),
+      // Server-receiver form jumps from paired_charid straight to
       // self_offset (and from self_offset to noninterrupting_preanim).
       self_offset: parseOffset(str(args[18])),
       noninterrupting_preanim: args[19] === "1",
@@ -361,7 +361,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       Number(p.realization),
       p.text_color,
       escapeChat(p.showname),
-      p.other_charid,
+      p.paired_charid,
       escapeChat(encodeOffset(p.self_offset)),
       Number(p.noninterrupting_preanim),
       Number(p.sfx_looping),

@@ -113,11 +113,11 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
     text_color: packet.text_color,
     speed: UPDATE_INTERVAL,
     showname: safeTags(decodeChat(packet.showname)),
-    other_name: safeTags(packet.other_name),
-    other_emote: safeTags(packet.other_emote),
+    paired_name: safeTags(packet.paired_name),
+    paired_emote: safeTags(packet.paired_emote),
     self_offset: packet.self_offset,
-    other_offset: packet.other_offset,
-    other_flip: packet.other_flip,
+    paired_offset: packet.paired_offset,
+    paired_flip: packet.paired_flip,
     noninterrupting_preanim: packet.noninterrupting_preanim,
     sfx_looping: packet.sfx_looping,
     screenshake: packet.screenshake,
@@ -226,7 +226,7 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
   // Set initial idle emote using pre-cached URLs (synchronous, images already in cache)
   setEmoteFromUrl(preloaded.idleUrl, false, client.viewport.getChatmsg().side);
 
-  if (client.viewport.getChatmsg().other_name) {
+  if (client.viewport.getChatmsg().paired_name) {
     setEmoteFromUrl(preloaded.pairIdleUrl, true, client.viewport.getChatmsg().side);
   }
 
@@ -346,7 +346,7 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
       client.viewport.getChatmsg().flip,
     );
     pairLayers.style.transform = flipTransform(
-      client.viewport.getChatmsg().other_flip,
+      client.viewport.getChatmsg().paired_flip,
     );
 
     // Shift by the horizontal offset
@@ -357,11 +357,11 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
         : chatmsgNow.side === Side.PROSECUTION
           ? 400
           : 0;
-    pairLayers.style.left = `${baseLeft + (chatmsgNow.other_offset?.x ?? 0)}%`;
+    pairLayers.style.left = `${baseLeft + (chatmsgNow.paired_offset?.x ?? 0)}%`;
     charLayers.style.left = `${baseLeft + (chatmsgNow.self_offset?.x ?? 0)}%`;
 
     // Vertical offsets
-    pairLayers.style.top = `${chatmsgNow.other_offset?.y ?? 0}%`;
+    pairLayers.style.top = `${chatmsgNow.paired_offset?.y ?? 0}%`;
     charLayers.style.top = `${chatmsgNow.self_offset?.y ?? 0}%`;
   }
 
