@@ -1,4 +1,4 @@
-import { EmoteModifier } from "../../packets/MS";
+import { EmoteModifier, ShoutModifier } from "../../packets/MS";
 import { ChatMsg } from "../interfaces/ChatMsg";
 import { PreloadedAssets } from "../interfaces/PreloadedAssets";
 import {
@@ -115,16 +115,21 @@ export default async function preloadMessageAssets(
 
     // Shout SFX per-character path
     const shoutNames = [undefined, "holdit", "objection", "takethat", "custom"];
-    const shoutName = shoutNames[chatmsg.objection];
-    const shoutSfxPath = (chatmsg.objection > 0 && chatmsg.objection < 4 && shoutName)
+    const shoutName = shoutNames[chatmsg.shout_modifier];
+    const isStandardShout =
+      chatmsg.shout_modifier === ShoutModifier.HOLD_IT ||
+      chatmsg.shout_modifier === ShoutModifier.OBJECTION ||
+      chatmsg.shout_modifier === ShoutModifier.TAKE_THAT;
+    const isCustomShout = chatmsg.shout_modifier === ShoutModifier.CUSTOM;
+    const shoutSfxPath = isStandardShout && shoutName
       ? `${AO_HOST}characters/${encodeURI(charName)}/${shoutName}.opus`
       : null;
 
     // Shout bubble: try per-character override first (multiple extensions),
     // then fall back to misc/default/<name>_bubble.png. Custom shouts have
     // no default — only per-character custom.<ext>.
-    const shoutBubbleUrls = (chatmsg.objection > 0 && chatmsg.objection <= 4 && shoutName)
-      ? buildShoutBubbleUrls(AO_HOST, charName, shoutName, chatmsg.objection === 4)
+    const shoutBubbleUrls = (isStandardShout || isCustomShout) && shoutName
+      ? buildShoutBubbleUrls(AO_HOST, charName, shoutName, isCustomShout)
       : null;
 
     // Emote SFX

@@ -1,7 +1,7 @@
 import { extrafeatures } from "../../client";
 import { escapeChat } from "../../encoding";
 import { client } from "../../client";
-import type { EmoteModifier } from "../../packets/MS";
+import type { EmoteModifier, ShoutModifier } from "../../packets/MS";
 import queryParser from "../../utils/queryParser";
 const { mode } = queryParser();
 
@@ -16,7 +16,7 @@ const { mode } = queryParser();
  * @param {string} sfx_name the name of the sound effect
  * @param {number} emote_modifier whether or not to zoom
  * @param {number} sfx_delay the delay (in milliseconds) to play the sound effect
- * @param {number} objection_modifier the number of the shout to play
+ * @param {number} shout_modifier the number of the shout to play
  * @param {string} evidence the filename of evidence to show
  * @param {boolean} flip change to 1 to reverse sprite for position changes
  * @param {boolean} realization screen flash effect
@@ -36,7 +36,7 @@ export const sendIC = (
   sfx_name: string,
   emote_modifier: EmoteModifier,
   sfx_delay: number,
-  objection_modifier: number,
+  shout_modifier: ShoutModifier,
   evidence: number,
   flip: boolean,
   realization: boolean,
@@ -91,7 +91,7 @@ export const sendIC = (
     `#${escapeChat(message)}#${escapeChat(side)}#${escapeChat(
       sfx_name,
     )}#${emote_modifier}` +
-    `#${client.charID}#${sfx_delay}#${Number(objection_modifier)}#${Number(
+    `#${client.charID}#${sfx_delay}#${Number(shout_modifier)}#${Number(
       evidence,
     )}#${Number(flip)}#${Number(
       realization,

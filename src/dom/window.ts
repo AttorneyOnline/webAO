@@ -1,6 +1,6 @@
 declare global {
   interface Window {
-    toggleShout: (shout: number) => void;
+    toggleShout: (shout: import("../packets/MS").ShoutModifier) => void;
     toggleMenu: (menu: number) => void;
     updateBackgroundPreview: () => void;
     redHPP: () => void;

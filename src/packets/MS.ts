@@ -73,6 +73,28 @@ export const parseEmoteModifier = (s: string | undefined): EmoteModifier => {
   }
 };
 
+/**
+ * Shout selector. The spec also defines a `4&{name}` form for naming the
+ * custom shout (since 2.8); the codec strips that suffix and just exposes
+ * `CUSTOM`. The named-custom-shout feature isn't wired through anywhere
+ * downstream today.
+ */
+export enum ShoutModifier {
+  NONE = 0,
+  HOLD_IT = 1,
+  OBJECTION = 2,
+  TAKE_THAT = 3,
+  CUSTOM = 4,
+}
+
+export const parseShoutModifier = (s: string | undefined): ShoutModifier => {
+  // strip optional `&{name}` suffix on the custom-shout form
+  const prefix = (s ?? "").split("&")[0];
+  const n = Number(prefix);
+  if (Number.isInteger(n) && n >= 0 && n <= 4) return n as ShoutModifier;
+  return ShoutModifier.NONE;
+};
+
 /** Character position. Wire values are the lowercase 3-letter codes. */
 export enum Side {
   DEFENSE = "def",
@@ -103,7 +125,7 @@ export interface MSPacketClient {
   emote_modifier: EmoteModifier;
   char_id: number;
   sfx_delay: number;
-  shout_modifier: number;
+  shout_modifier: ShoutModifier;
   evidence: string;
   flip: number;
   realization: number;
@@ -150,7 +172,7 @@ export const MS: PacketCodec<MSPacketClient> = {
       emote_modifier: parseEmoteModifier(args[8]),
       char_id: num(args[9]),
       sfx_delay: num(args[10]),
-      shout_modifier: num(args[11]),
+      shout_modifier: parseShoutModifier(args[11]),
       evidence: str(args[12]),
       flip: num(args[13]),
       realization: num(args[14]),
@@ -227,7 +249,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       emote_modifier: parseEmoteModifier(args[8]),
       char_id: num(args[9]),
       sfx_delay: num(args[10]),
-      shout_modifier: num(args[11]),
+      shout_modifier: parseShoutModifier(args[11]),
       evidence: str(args[12]),
       flip: num(args[13]),
       realization: num(args[14]),

@@ -56,8 +56,9 @@ export let selectedMenu = 1;
 export const setSelectedMenu = (val: number) => {
   selectedMenu = val;
 };
-export let selectedShout = 0;
-export const setSelectedShout = (val: number) => {
+import { ShoutModifier } from "./packets/MS";
+export let selectedShout: ShoutModifier = ShoutModifier.NONE;
+export const setSelectedShout = (val: ShoutModifier) => {
   selectedShout = val;
 };
 export let extrafeatures: string[] = [];

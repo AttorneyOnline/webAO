@@ -1,9 +1,14 @@
-import type { DeskModifier, EmoteModifier, Side } from "../../packets/MS";
+import type {
+  DeskModifier,
+  EmoteModifier,
+  ShoutModifier,
+  Side,
+} from "../../packets/MS";
 import { PreloadedAssets } from "./PreloadedAssets";
 
 export interface ChatMsg {
   content: string;
-  objection: number;
+  shout_modifier: ShoutModifier;
   sound: string;
   startpreanim?: boolean;
   startspeaking?: boolean;

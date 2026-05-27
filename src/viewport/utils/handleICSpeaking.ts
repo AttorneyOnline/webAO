@@ -15,6 +15,7 @@ import { decodeChat, safeTags } from "../../encoding";
 import {
   DeskModifier,
   EmoteModifier,
+  ShoutModifier,
   Side,
   type MSPacketClient,
 } from "../../packets/MS";
@@ -100,7 +101,7 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
     blips: safeTags(msg_blips),
     emote_modifier: packet.emote_modifier,
     snddelay: packet.sfx_delay,
-    objection: packet.shout_modifier,
+    shout_modifier: packet.shout_modifier,
     evidence: Number(safeTags(packet.evidence)),
     flip: packet.flip,
     flash: packet.realization,
@@ -227,7 +228,7 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
   // gets which shout shall played
   const shoutSprite = <HTMLImageElement>document.getElementById("client_shout");
 
-  const shout = SHOUTS[client.viewport.getChatmsg().objection];
+  const shout = SHOUTS[client.viewport.getChatmsg().shout_modifier];
   if (shout) {
     // Hide message box
     chatContainerBox.style.opacity = "0";
@@ -236,7 +237,7 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
     // was found. For custom shouts there is no default fallback, so we use
     // the legacy character/<name>/custom.gif path which will be hidden by
     // the onerror handler below if missing.
-    if (client.viewport.getChatmsg().objection === 4) {
+    if (client.viewport.getChatmsg().shout_modifier === ShoutModifier.CUSTOM) {
       shoutSprite.src = preloaded.shoutBubbleUrl
         ?? `${AO_HOST}characters/${encodeURI(
           client.viewport.getChatmsg().name!.toLowerCase(),

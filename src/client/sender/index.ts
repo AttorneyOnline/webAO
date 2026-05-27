@@ -1,4 +1,4 @@
-import type { EmoteModifier } from "../../packets/MS";
+import type { EmoteModifier, ShoutModifier } from "../../packets/MS";
 import { sendIC } from "./sendIC";
 import { sendSelf } from "./sendSelf";
 import { sendServer } from "./sendServer";
@@ -24,7 +24,7 @@ export interface ISender {
     sfx_name: string,
     emote_modifier: EmoteModifier,
     sfx_delay: number,
-    objection_modifier: number,
+    shout_modifier: ShoutModifier,
     evidence: number,
     flip: boolean,
     realization: boolean,
