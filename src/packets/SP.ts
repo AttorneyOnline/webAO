@@ -18,6 +18,6 @@ export const SP: PacketCodec<SPPacket> = {
 /**
  * position change
  */
-export const handleSP = (packet: SPPacket) => {
+export const receiveSP = (packet: SPPacket) => {
   updateActionCommands(packet.side);
 };

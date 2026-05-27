@@ -26,7 +26,7 @@ export const SI: PacketCodec<SIPacket> = {
  * Received when the server announces its server info,
  * but we use it as a cue to begin retrieving characters.
  */
-export const handleSI = (packet: SIPacket) => {
+export const receiveSI = (packet: SIPacket) => {
   client.char_list_length = packet.charCnt;
   client.evidence_list_length = packet.eviCnt;
   client.music_list_length = packet.musCnt;

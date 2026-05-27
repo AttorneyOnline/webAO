@@ -17,7 +17,7 @@ export const CharsCheck: PacketCodec<CharsCheckPacket> = {
 /**
  * Handles the list of all used and vacant characters.
  */
-export const handleCharsCheck = (packet: CharsCheckPacket) => {
+export const receiveCharsCheck = (packet: CharsCheckPacket) => {
   for (let i = 0; i < client.char_list_length; i++) {
     const img = document.getElementById(`demo_${i}`)!;
 

@@ -381,7 +381,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
  * muted) and then delegates rendering to `handle_ic_speaking`, which owns
  * the viewport state construction from the packet.
  */
-export const handleMS = (packet: MSPacketClient) => {
+export const receiveMS = (packet: MSPacketClient) => {
   // duplicate message
   if (packet.message === client.viewport.getChatmsg().content) return;
 

@@ -27,7 +27,7 @@ export const RMC: PacketCodec<RMCPacket> = {
 /**
  * Handles a music change to an arbitrary resource, with an offset in seconds.
  */
-export const handleRMC = (packet: RMCPacket) => {
+export const receiveRMC = (packet: RMCPacket) => {
   client.viewport.music.pause();
   const { music } = client.viewport;
   // Music offset + drift from song loading

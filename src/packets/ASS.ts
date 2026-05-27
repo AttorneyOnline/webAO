@@ -19,7 +19,7 @@ export const ASS: PacketCodec<ASSPacket> = {
 /**
  * new asset url!!
  */
-export const handleASS = (packet: ASSPacket) => {
+export const receiveASS = (packet: ASSPacket) => {
   if (packet.assetUrl !== "None") setAOhost(packet.assetUrl);
   renderPlayerList();
 };

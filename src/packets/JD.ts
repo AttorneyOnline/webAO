@@ -16,7 +16,7 @@ export const JD: PacketCodec<JDPacket> = {
 /**
  * show/hide judge controls
  */
-export const handleJD = (packet: JDPacket) => {
+export const receiveJD = (packet: JDPacket) => {
   if (packet.state === 1) {
     document.getElementById("judge_action")!.style.display = "inline-table";
     document.getElementById("no_action")!.style.display = "none";

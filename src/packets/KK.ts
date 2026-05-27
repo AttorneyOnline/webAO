@@ -19,7 +19,7 @@ export const KK: PacketCodec<KKPacket> = {
 /**
  * Handles the kicked packet
  */
-export const handleKK = (packet: KKPacket) => {
+export const receiveKK = (packet: KKPacket) => {
   client.banned = true;
   handleBans("Kicked", packet.reason);
 };

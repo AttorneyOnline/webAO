@@ -29,7 +29,7 @@ export const PV: PacketCodec<PVPacket> = {
 /**
  * Handles the server's assignment of a character for the player to use.
  */
-export const handlePV = async (packet: PVPacket) => {
+export const receivePV = async (packet: PVPacket) => {
   client.charID = packet.charId;
   document.getElementById("client_waiting")!.style.display = "none";
   document.getElementById("client_charselect")!.style.display = "none";

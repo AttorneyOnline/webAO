@@ -31,7 +31,7 @@ export const SC: PacketCodec<SCPacket> = {
  * Handles incoming character information, containing all characters
  * in one packet.
  */
-export const handleSC = async (packet: SCPacket) => {
+export const receiveSC = async (packet: SCPacket) => {
   if (mode === "watch") {
     // Spectators don't need to pick a character
     document.getElementById("client_charselect")!.style.display = "none";

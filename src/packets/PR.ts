@@ -19,7 +19,7 @@ export const PR: PacketCodec<PRPacket> = {
 /**
  * Handles a player joining or leaving
  */
-export const handlePR = (packet: PRPacket) => {
+export const receivePR = (packet: PRPacket) => {
   if (packet.type === 0) {
     client.playerlist.set(packet.id, { charId: -1, charName: "", showName: "", name: "", area: 0 });
   } else if (packet.type === 1) {

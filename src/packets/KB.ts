@@ -20,7 +20,7 @@ export const KB: PacketCodec<KBPacket> = {
  * Handles the banned packet
  * this one is sent when you are kicked off the server
  */
-export const handleKB = (packet: KBPacket) => {
+export const receiveKB = (packet: KBPacket) => {
   client.banned = true;
   handleBans("Banned", packet.reason);
 };

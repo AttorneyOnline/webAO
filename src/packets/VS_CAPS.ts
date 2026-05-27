@@ -36,7 +36,7 @@ export const VS_CAPS: PacketCodec<VS_CAPSPacket> = {
 };
 
 // Arrives twice (after FL, again after DONE). Idempotent — use latest.
-export const handleVS_CAPS = (packet: VS_CAPSPacket) => {
+export const receiveVS_CAPS = (packet: VS_CAPSPacket) => {
   console.debug(
     `voice: VS_CAPS received enabled=${packet.enabled} ptt=${packet.pttOnly} maxPeers=${packet.maxPeers} codec=${packet.codec} sr=${packet.sampleRate} frame=${packet.frameMs}ms maxBytes=${packet.maxFrameBytes}`,
   );

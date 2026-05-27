@@ -34,7 +34,7 @@ export const BN: PacketCodec<BNPacket> = {
  * Handles a background change.
  */
 
-export const handleBN = (packet: BNPacket) => {
+export const receiveBN = (packet: BNPacket) => {
   const bgFromArgs = safeTags(packet.background);
   client.viewport.setBackgroundName(bgFromArgs);
   const bg_index = getIndexFromSelect(

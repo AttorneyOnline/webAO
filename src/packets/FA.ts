@@ -19,7 +19,7 @@ export const FA: PacketCodec<FAPacket> = {
 /**
  * Handles updated area list
  */
-export const handleFA = (packet: FAPacket) => {
+export const receiveFA = (packet: FAPacket) => {
   client.resetAreaList();
 
   for (let i = 0; i < packet.areas.length; i++) {

@@ -16,7 +16,7 @@ export const AUTH: PacketCodec<AUTHPacket> = {
 /**
  * i am mod now
  */
-export const handleAUTH = (packet: AUTHPacket) => {
+export const receiveAUTH = (packet: AUTHPacket) => {
   if (packet.authState === 1) {
     (<HTMLAnchorElement>document.getElementById("mod_ui")).href =
       `styles/mod.css`;

@@ -21,7 +21,7 @@ export const VS_AUDIO: PacketCodec<VS_AUDIOPacket> = {
   },
 };
 
-export const handleVS_AUDIO = (packet: VS_AUDIOPacket) => {
+export const receiveVS_AUDIO = (packet: VS_AUDIOPacket) => {
   if (!Number.isFinite(packet.fromUid) || !packet.payload) return;
   handleRemoteAudio(packet.fromUid, packet.payload);
 };

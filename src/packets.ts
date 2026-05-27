@@ -1,54 +1,54 @@
-import { ARUP, handleARUP } from "./packets/ARUP";
-import { askchaa, handleaskchaa } from "./packets/askchaa";
-import { ASS, handleASS } from "./packets/ASS";
-import { AUTH, handleAUTH } from "./packets/AUTH";
-import { BB, handleBB } from "./packets/BB";
-import { BD, handleBD } from "./packets/BD";
-import { BN, handleBN } from "./packets/BN";
-import { CC, handleCC } from "./packets/CC";
-import { CH, handleCH } from "./packets/CH";
-import { CharsCheck, handleCharsCheck } from "./packets/CharsCheck";
-import { CHECK, handleCHECK } from "./packets/CHECK";
-import { CI, handleCI } from "./packets/CI";
-import { CT, handleCT } from "./packets/CT";
-import { decryptor, handledecryptor } from "./packets/decryptor";
-import { DONE, handleDONE } from "./packets/DONE";
-import { EI, handleEI } from "./packets/EI";
-import { EM, handleEM } from "./packets/EM";
-import { FA, handleFA } from "./packets/FA";
-import { FL, handleFL } from "./packets/FL";
-import { FM, handleFM } from "./packets/FM";
-import { HI, handleHI } from "./packets/HI";
-import { HP, handleHP } from "./packets/HP";
-import { ID, handleID } from "./packets/ID";
-import { JD, handleJD } from "./packets/JD";
-import { KB, handleKB } from "./packets/KB";
-import { KK, handleKK } from "./packets/KK";
-import { LE, handleLE } from "./packets/LE";
-import { MC, handleMC } from "./packets/MC";
-import { MM, handleMM } from "./packets/MM";
-import { MSClient, handleMS } from "./packets/MS";
-import { PN, handlePN } from "./packets/PN";
-import { PR, handlePR } from "./packets/PR";
-import { PU, handlePU } from "./packets/PU";
-import { PV, handlePV } from "./packets/PV";
-import { RC, handleRC } from "./packets/RC";
-import { RD, handleRD } from "./packets/RD";
-import { RM, handleRM } from "./packets/RM";
-import { RMC, handleRMC } from "./packets/RMC";
-import { RT, handleRT } from "./packets/RT";
-import { SC, handleSC } from "./packets/SC";
-import { SI, handleSI } from "./packets/SI";
-import { SM, handleSM } from "./packets/SM";
-import { SP, handleSP } from "./packets/SP";
-import { TI, handleTI } from "./packets/TI";
-import { VS_AUDIO, handleVS_AUDIO } from "./packets/VS_AUDIO";
-import { VS_CAPS, handleVS_CAPS } from "./packets/VS_CAPS";
-import { VS_JOIN, handleVS_JOIN } from "./packets/VS_JOIN";
-import { VS_LEAVE, handleVS_LEAVE } from "./packets/VS_LEAVE";
-import { VS_PEERS, handleVS_PEERS } from "./packets/VS_PEERS";
-import { VS_SPEAK, handleVS_SPEAK } from "./packets/VS_SPEAK";
-import { ZZ, handleZZ } from "./packets/ZZ";
+import { ARUP, receiveARUP } from "./packets/ARUP";
+import { askchaa, receiveaskchaa } from "./packets/askchaa";
+import { ASS, receiveASS } from "./packets/ASS";
+import { AUTH, receiveAUTH } from "./packets/AUTH";
+import { BB, receiveBB } from "./packets/BB";
+import { BD, receiveBD } from "./packets/BD";
+import { BN, receiveBN } from "./packets/BN";
+import { CC, receiveCC } from "./packets/CC";
+import { CH, receiveCH } from "./packets/CH";
+import { CharsCheck, receiveCharsCheck } from "./packets/CharsCheck";
+import { CHECK, receiveCHECK } from "./packets/CHECK";
+import { CI, receiveCI } from "./packets/CI";
+import { CT, receiveCT } from "./packets/CT";
+import { decryptor, receivedecryptor } from "./packets/decryptor";
+import { DONE, receiveDONE } from "./packets/DONE";
+import { EI, receiveEI } from "./packets/EI";
+import { EM, receiveEM } from "./packets/EM";
+import { FA, receiveFA } from "./packets/FA";
+import { FL, receiveFL } from "./packets/FL";
+import { FM, receiveFM } from "./packets/FM";
+import { HI, receiveHI } from "./packets/HI";
+import { HP, receiveHP } from "./packets/HP";
+import { ID, receiveID } from "./packets/ID";
+import { JD, receiveJD } from "./packets/JD";
+import { KB, receiveKB } from "./packets/KB";
+import { KK, receiveKK } from "./packets/KK";
+import { LE, receiveLE } from "./packets/LE";
+import { MC, receiveMC } from "./packets/MC";
+import { MM, receiveMM } from "./packets/MM";
+import { MSClient, receiveMS } from "./packets/MS";
+import { PN, receivePN } from "./packets/PN";
+import { PR, receivePR } from "./packets/PR";
+import { PU, receivePU } from "./packets/PU";
+import { PV, receivePV } from "./packets/PV";
+import { RC, receiveRC } from "./packets/RC";
+import { RD, receiveRD } from "./packets/RD";
+import { RM, receiveRM } from "./packets/RM";
+import { RMC, receiveRMC } from "./packets/RMC";
+import { RT, receiveRT } from "./packets/RT";
+import { SC, receiveSC } from "./packets/SC";
+import { SI, receiveSI } from "./packets/SI";
+import { SM, receiveSM } from "./packets/SM";
+import { SP, receiveSP } from "./packets/SP";
+import { TI, receiveTI } from "./packets/TI";
+import { VS_AUDIO, receiveVS_AUDIO } from "./packets/VS_AUDIO";
+import { VS_CAPS, receiveVS_CAPS } from "./packets/VS_CAPS";
+import { VS_JOIN, receiveVS_JOIN } from "./packets/VS_JOIN";
+import { VS_LEAVE, receiveVS_LEAVE } from "./packets/VS_LEAVE";
+import { VS_PEERS, receiveVS_PEERS } from "./packets/VS_PEERS";
+import { VS_SPEAK, receiveVS_SPEAK } from "./packets/VS_SPEAK";
+import { ZZ, receiveZZ } from "./packets/ZZ";
 
 /**
  * A codec for a single packet header. `decode` parses the `#`-split args
@@ -64,13 +64,13 @@ export interface PacketCodec<TPacket> {
   encode?(packet: TPacket): string;
 }
 
-/** One registry entry: codec paired with the handler that consumes its output. */
+/** One registry entry: codec paired with the receiver that consumes its output. */
 export interface PacketEntry<TPacket> {
   codec: PacketCodec<TPacket>;
-  handle: (packet: TPacket) => void;
+  receive: (packet: TPacket) => void;
 }
 
-// Each entry pairs the wire codec (decode/encode) with the typed handler.
+// Each entry pairs the wire codec (decode/encode) with the typed receiver.
 // Keep this list alphabetical (case-insensitive).
 //
 // For packets whose wire format differs by direction (i.e. the Server-as-
@@ -87,57 +87,57 @@ export interface PacketEntry<TPacket> {
 // have direction-conditional wire forms too, but they're symmetric enough
 // that a single codec covers both.
 const packets: Record<string, PacketEntry<any>> = {
-  ARUP: { codec: ARUP, handle: handleARUP },
-  askchaa: { codec: askchaa, handle: handleaskchaa },
-  ASS: { codec: ASS, handle: handleASS },
-  AUTH: { codec: AUTH, handle: handleAUTH },
-  BB: { codec: BB, handle: handleBB },
-  BD: { codec: BD, handle: handleBD },
-  BN: { codec: BN, handle: handleBN },
-  CC: { codec: CC, handle: handleCC },
-  CH: { codec: CH, handle: handleCH },
-  CharsCheck: { codec: CharsCheck, handle: handleCharsCheck },
-  CHECK: { codec: CHECK, handle: handleCHECK },
-  CI: { codec: CI, handle: handleCI },
-  CT: { codec: CT, handle: handleCT },
-  decryptor: { codec: decryptor, handle: handledecryptor },
-  DONE: { codec: DONE, handle: handleDONE },
-  EI: { codec: EI, handle: handleEI },
-  EM: { codec: EM, handle: handleEM },
-  FA: { codec: FA, handle: handleFA },
-  FL: { codec: FL, handle: handleFL },
-  FM: { codec: FM, handle: handleFM },
-  HI: { codec: HI, handle: handleHI },
-  HP: { codec: HP, handle: handleHP },
-  ID: { codec: ID, handle: handleID },
-  JD: { codec: JD, handle: handleJD },
-  KB: { codec: KB, handle: handleKB },
-  KK: { codec: KK, handle: handleKK },
-  LE: { codec: LE, handle: handleLE },
-  MC: { codec: MC, handle: handleMC },
-  MM: { codec: MM, handle: handleMM },
-  MS: { codec: MSClient, handle: handleMS },
-  PN: { codec: PN, handle: handlePN },
-  PR: { codec: PR, handle: handlePR },
-  PU: { codec: PU, handle: handlePU },
-  PV: { codec: PV, handle: handlePV },
-  RC: { codec: RC, handle: handleRC },
-  RD: { codec: RD, handle: handleRD },
-  RM: { codec: RM, handle: handleRM },
-  RMC: { codec: RMC, handle: handleRMC },
-  RT: { codec: RT, handle: handleRT },
-  SC: { codec: SC, handle: handleSC },
-  SI: { codec: SI, handle: handleSI },
-  SM: { codec: SM, handle: handleSM },
-  SP: { codec: SP, handle: handleSP },
-  TI: { codec: TI, handle: handleTI },
-  VS_AUDIO: { codec: VS_AUDIO, handle: handleVS_AUDIO },
-  VS_CAPS: { codec: VS_CAPS, handle: handleVS_CAPS },
-  VS_JOIN: { codec: VS_JOIN, handle: handleVS_JOIN },
-  VS_LEAVE: { codec: VS_LEAVE, handle: handleVS_LEAVE },
-  VS_PEERS: { codec: VS_PEERS, handle: handleVS_PEERS },
-  VS_SPEAK: { codec: VS_SPEAK, handle: handleVS_SPEAK },
-  ZZ: { codec: ZZ, handle: handleZZ },
+  ARUP: { codec: ARUP, receive: receiveARUP },
+  askchaa: { codec: askchaa, receive: receiveaskchaa },
+  ASS: { codec: ASS, receive: receiveASS },
+  AUTH: { codec: AUTH, receive: receiveAUTH },
+  BB: { codec: BB, receive: receiveBB },
+  BD: { codec: BD, receive: receiveBD },
+  BN: { codec: BN, receive: receiveBN },
+  CC: { codec: CC, receive: receiveCC },
+  CH: { codec: CH, receive: receiveCH },
+  CharsCheck: { codec: CharsCheck, receive: receiveCharsCheck },
+  CHECK: { codec: CHECK, receive: receiveCHECK },
+  CI: { codec: CI, receive: receiveCI },
+  CT: { codec: CT, receive: receiveCT },
+  decryptor: { codec: decryptor, receive: receivedecryptor },
+  DONE: { codec: DONE, receive: receiveDONE },
+  EI: { codec: EI, receive: receiveEI },
+  EM: { codec: EM, receive: receiveEM },
+  FA: { codec: FA, receive: receiveFA },
+  FL: { codec: FL, receive: receiveFL },
+  FM: { codec: FM, receive: receiveFM },
+  HI: { codec: HI, receive: receiveHI },
+  HP: { codec: HP, receive: receiveHP },
+  ID: { codec: ID, receive: receiveID },
+  JD: { codec: JD, receive: receiveJD },
+  KB: { codec: KB, receive: receiveKB },
+  KK: { codec: KK, receive: receiveKK },
+  LE: { codec: LE, receive: receiveLE },
+  MC: { codec: MC, receive: receiveMC },
+  MM: { codec: MM, receive: receiveMM },
+  MS: { codec: MSClient, receive: receiveMS },
+  PN: { codec: PN, receive: receivePN },
+  PR: { codec: PR, receive: receivePR },
+  PU: { codec: PU, receive: receivePU },
+  PV: { codec: PV, receive: receivePV },
+  RC: { codec: RC, receive: receiveRC },
+  RD: { codec: RD, receive: receiveRD },
+  RM: { codec: RM, receive: receiveRM },
+  RMC: { codec: RMC, receive: receiveRMC },
+  RT: { codec: RT, receive: receiveRT },
+  SC: { codec: SC, receive: receiveSC },
+  SI: { codec: SI, receive: receiveSI },
+  SM: { codec: SM, receive: receiveSM },
+  SP: { codec: SP, receive: receiveSP },
+  TI: { codec: TI, receive: receiveTI },
+  VS_AUDIO: { codec: VS_AUDIO, receive: receiveVS_AUDIO },
+  VS_CAPS: { codec: VS_CAPS, receive: receiveVS_CAPS },
+  VS_JOIN: { codec: VS_JOIN, receive: receiveVS_JOIN },
+  VS_LEAVE: { codec: VS_LEAVE, receive: receiveVS_LEAVE },
+  VS_PEERS: { codec: VS_PEERS, receive: receiveVS_PEERS },
+  VS_SPEAK: { codec: VS_SPEAK, receive: receiveVS_SPEAK },
+  ZZ: { codec: ZZ, receive: receiveZZ },
 };
 
-export const packetHandler = new Map(Object.entries(packets));
+export const packetRegistry = new Map(Object.entries(packets));

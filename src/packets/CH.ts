@@ -14,4 +14,4 @@ export const CH: PacketCodec<CHPacket> = {
   encode: (packet) => `CH#${packet.charId}#%`,
 };
 
-export const handleCH = () => {};
+export const receiveCH = () => {};

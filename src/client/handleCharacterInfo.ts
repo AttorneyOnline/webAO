@@ -110,7 +110,7 @@ export const ensureCharIni = async (charid: number): Promise<any> => {
 };
 
 /**
- * Full character info load (used by iniEdit and handleMS ini-edit path).
+ * Full character info load (used by iniEdit and receiveMS ini-edit path).
  * Fetches icon + ini for a single character, replacing any existing data.
  */
 export const handleCharacterInfo = async (chargs: string[], charid: number) => {

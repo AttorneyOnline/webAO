@@ -16,6 +16,6 @@ export const askchaa: PacketCodec<AskchaaPacket> = {
 /**
  * What? you want a character list from me??
  */
-export const handleaskchaa = (_packet: AskchaaPacket) => {
+export const receiveaskchaa = (_packet: AskchaaPacket) => {
   client.sender.sendSelf(`SI#${vanilla_character_arr.length}#0#0#%`);
 };

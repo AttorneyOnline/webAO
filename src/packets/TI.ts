@@ -22,7 +22,7 @@ export const TI: PacketCodec<TIPacket> = {
 /**
  * Handles a timer update
  */
-export const handleTI = (packet: TIPacket) => {
+export const receiveTI = (packet: TIPacket) => {
   switch (packet.command) {
     case 0:
     case 1:

@@ -19,7 +19,7 @@ export const VS_SPEAK: PacketCodec<VS_SPEAKPacket> = {
   },
 };
 
-export const handleVS_SPEAK = (packet: VS_SPEAKPacket) => {
+export const receiveVS_SPEAK = (packet: VS_SPEAKPacket) => {
   if (!Number.isFinite(packet.uid)) return;
   notifyRemoteSpeaking(packet.uid, packet.on);
 };

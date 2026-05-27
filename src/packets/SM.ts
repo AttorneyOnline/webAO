@@ -22,7 +22,7 @@ export const SM: PacketCodec<SMPacket> = {
 /**
  * Handles incoming music information, containing all music in one packet.
  */
-export const handleSM = (packet: SMPacket) => {
+export const receiveSM = (packet: SMPacket) => {
   document.getElementById("client_loadingtext")!.innerHTML = "Loading Music ";
   client.resetMusicList();
   client.resetAreaList();

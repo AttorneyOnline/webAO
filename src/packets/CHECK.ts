@@ -10,4 +10,4 @@ export const CHECK: PacketCodec<CHECKPacket> = {
   encode: () => "CHECK#%",
 };
 
-export const handleCHECK = () => {};
+export const receiveCHECK = () => {};

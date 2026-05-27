@@ -19,7 +19,7 @@ export const FM: PacketCodec<FMPacket> = {
 /**
  * Handles updated music list
  */
-export const handleFM = (packet: FMPacket) => {
+export const receiveFM = (packet: FMPacket) => {
   client.resetMusicList();
 
   // The legacy loop iterated `1..length-1`, skipping the trailing empty

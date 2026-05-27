@@ -37,7 +37,7 @@ export const CI: PacketCodec<CIPacket> = {
  * Handles incoming character information, bundling multiple characters
  * per packet.
  */
-export const handleCI = (packet: CIPacket) => {
+export const receiveCI = (packet: CIPacket) => {
   document.getElementById("client_loadingtext")!.innerHTML =
     `Loading Character ${packet.batchIndex}/${client.char_list_length}`;
   for (const { index, data } of packet.entries) {

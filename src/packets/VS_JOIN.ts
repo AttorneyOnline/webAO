@@ -17,7 +17,7 @@ export const VS_JOIN: PacketCodec<VS_JOINPacket> = {
   },
 };
 
-export const handleVS_JOIN = (packet: VS_JOINPacket) => {
+export const receiveVS_JOIN = (packet: VS_JOINPacket) => {
   if (!Number.isFinite(packet.uid)) return;
   void handlePeerJoined(packet.uid);
 };

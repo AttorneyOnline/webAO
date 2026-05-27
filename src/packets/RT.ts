@@ -34,7 +34,7 @@ export const RT: PacketCodec<RTPacket> = {
 /**
  * Handles a testimony states.
  */
-export const handleRT = (packet: RTPacket) => {
+export const receiveRT = (packet: RTPacket) => {
   const judgeid = packet.judgeId ?? 0;
   switch (packet.animation) {
     case "testimony1":

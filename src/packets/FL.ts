@@ -18,7 +18,7 @@ export const FL: PacketCodec<FLPacket> = {
 /**
  * With this the server tells us which features it supports
  */
-export const handleFL = (packet: FLPacket) => {
+export const receiveFL = (packet: FLPacket) => {
   const { features } = packet;
   console.info("Server-supported features:");
   console.info(features);

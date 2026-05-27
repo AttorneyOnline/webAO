@@ -44,7 +44,7 @@ export const EM: PacketCodec<EMPacket> = {
  * Handles incoming music information, containing multiple entries
  * per packet.
  */
-export const handleEM = (packet: EMPacket) => {
+export const receiveEM = (packet: EMPacket) => {
   document.getElementById("client_loadingtext")!.innerHTML = "Loading Music";
   if (packet.batchIndex === 0) {
     client.resetMusicList();

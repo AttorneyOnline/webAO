@@ -45,7 +45,7 @@ export const MC: PacketCodec<MCPacket> = {
 /**
  * Handles a music change to an arbitrary resource.
  */
-export const handleMC = (packet: MCPacket) => {
+export const receiveMC = (packet: MCPacket) => {
   const track = safeTags(decodeChat(packet.track));
   let charID = packet.charId;
   const showname = packet.showname || "";

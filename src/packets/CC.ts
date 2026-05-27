@@ -35,6 +35,6 @@ export const CC: PacketCodec<CCPacket> = {
 /**
  * What? you want a character??
  */
-export const handleCC = (packet: CCPacket) => {
+export const receiveCC = (packet: CCPacket) => {
   client.sender.sendSelf(`PV#1#CID#${packet.charId}#%`);
 };

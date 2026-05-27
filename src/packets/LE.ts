@@ -45,7 +45,7 @@ export const LE: PacketCodec<LEPacket> = {
  * Handles incoming evidence list, all evidences at once
  * item per packet.
  */
-export const handleLE = (packet: LEPacket) => {
+export const receiveLE = (packet: LEPacket) => {
   client.evidences = [];
   for (let i = 0; i < packet.evidence.length; i++) {
     const ev = packet.evidence[i];

@@ -51,7 +51,7 @@ const { mode } = queryParser();
 /**
  * Handles an out-of-character chat message.
  */
-export const handleCT = (packet: CTPacket) => {
+export const receiveCT = (packet: CTPacket) => {
   if (mode !== "replay") {
     const oocLog = document.getElementById("client_ooclog")!;
     const username = safeTags(decodeChat(packet.name));

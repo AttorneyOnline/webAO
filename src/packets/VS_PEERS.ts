@@ -28,6 +28,6 @@ export const VS_PEERS: PacketCodec<VS_PEERSPacket> = {
   },
 };
 
-export const handleVS_PEERS = (packet: VS_PEERSPacket) => {
+export const receiveVS_PEERS = (packet: VS_PEERSPacket) => {
   void handleInitialPeers(packet.uids);
 };

@@ -14,7 +14,7 @@ import masterViewport from "./viewport/viewport";
 import { Viewport } from "./viewport/interfaces/Viewport";
 import { EventEmitter } from "events";
 import { onReplayGo } from "./dom/onReplayGo";
-import { packetHandler } from "./packets";
+import { packetRegistry } from "./packets";
 import { appendICNotice } from "./client/appendICNotice";
 import { loadResources } from "./client/loadResources";
 import { AO_HOST } from "./client/aoHost";
@@ -343,11 +343,11 @@ class Client extends EventEmitter {
       return;
     }
 
-    // packetHandler maps header -> { codec, handle }: decode the wire args
-    // into a typed packet, then dispatch to the handler. Decode and handle
+    // packetRegistry maps header -> { codec, receive }: decode the wire args
+    // into a typed packet, then dispatch to the receiver. Decode and receive
     // are guarded individually so a single malformed/buggy packet can't
     // poison its siblings in the same WebSocket frame.
-    const entry = packetHandler.get(header);
+    const entry = packetRegistry.get(header);
     if (!entry) {
       console.warn(`Invalid packet header ${header}`);
       return;
@@ -362,9 +362,9 @@ class Client extends EventEmitter {
     }
 
     try {
-      entry.handle(decoded);
+      entry.receive(decoded);
     } catch (err) {
-      console.error(`Handler for ${header} threw:`, err, { body });
+      console.error(`Receiver for ${header} threw:`, err, { body });
     }
   }
 

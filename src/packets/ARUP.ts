@@ -39,7 +39,7 @@ export const ARUP: PacketCodec<ARUPPacket> = {
 /**
  * Handle the change of players in an area.
  */
-export const handleARUP = (packet: ARUPPacket) => {
+export const receiveARUP = (packet: ARUPPacket) => {
   const { updateType, updateData } = packet;
   for (let i = 0; i < updateData.length; i++) {
     if (client.areas[i]) {

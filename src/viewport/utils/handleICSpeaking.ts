@@ -397,7 +397,7 @@ const renderICMessage = (chatmsg: ChatMsg) => {
 // ---------------------------------------------------------------------------
 
 /**
- * Composed pipeline: build + preload + render. Called from handleMS.
+ * Composed pipeline: build + preload + render. Called from receiveMS.
  *
  *   prepareICMessage(packet)  // async: build chatmsg, preload, parse markdown
  *   renderICMessage(chatmsg)  // sync:  apply to DOM, start chat_tick

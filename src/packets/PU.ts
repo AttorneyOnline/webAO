@@ -26,7 +26,7 @@ export const PU: PacketCodec<PUPacket> = {
 /**
  * Handles a playerlist update
  */
-export const handlePU = (packet: PUPacket) => {
+export const receivePU = (packet: PUPacket) => {
   const player = client.playerlist.get(packet.id);
   if (!player) return;
 

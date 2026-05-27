@@ -40,7 +40,7 @@ export const EI: PacketCodec<EIPacket> = {
  * Handles incoming evidence information, containing only one evidence
  * item per packet.
  */
-export const handleEI = (packet: EIPacket) => {
+export const receiveEI = (packet: EIPacket) => {
   document.getElementById("client_loadingtext")!.innerHTML =
     `Loading Evidence ${packet.id}/${client.evidence_list_length}`;
   client.evidences[packet.id] = {

@@ -39,7 +39,7 @@ export const ZZ: PacketCodec<ZZPacket> = {
 /**
  * Handles a modcall.
  */
-export const handleZZ = (packet: ZZPacket) => {
+export const receiveZZ = (packet: ZZPacket) => {
   const oocLog = document.getElementById("client_ooclog")!;
   const message = safeTags(decodeChat(packet.reason)).replace(/\n/g, "<br>");
   oocLog.innerHTML += `$Alert: ${message}<br>`;

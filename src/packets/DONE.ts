@@ -20,7 +20,7 @@ export const DONE: PacketCodec<DONEPacket> = {
  * Handles the handshake completion packet, meaning the player
  * is ready to select a character.
  */
-export const handleDONE = (_packet: DONEPacket) => {
+export const receiveDONE = (_packet: DONEPacket) => {
   // DONE packet signals that the handshake is complete
   client.state = clientState.Joined;
   document.getElementById("client_loading")!.style.display = "none";

@@ -11,4 +11,4 @@ export const decryptor: PacketCodec<DecryptorPacket> = {
   decode: () => ({}),
 };
 
-export const handledecryptor = () => {};
+export const receivedecryptor = () => {};

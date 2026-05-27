@@ -40,7 +40,7 @@ export const ID: PacketCodec<IDPacket> = {
 /**
  * Identifies the server and issues a playerID
  */
-export const handleID = (packet: IDPacket) => {
+export const receiveID = (packet: IDPacket) => {
   client.playerID = packet.playerNumber;
   // Some legacy servers pack software+version together in the software field
   // separated by `&`. Split here rather than in the codec since this is a

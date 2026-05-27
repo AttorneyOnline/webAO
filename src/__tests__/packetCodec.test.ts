@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import { packetHandler } from "../packets";
+import { packetRegistry } from "../packets";
 
 /**
  * Reverse the dispatcher's wire-level parsing: given a string like
@@ -29,7 +29,7 @@ function makeArgs(header: string): string[] {
 }
 
 describe("packet codec round-trip idempotence", () => {
-  for (const [header, entry] of packetHandler) {
+  for (const [header, entry] of packetRegistry) {
     if (!entry.codec.encode) {
       it.skip(`${header}: codec is receive-only (no encode)`, () => {});
       continue;

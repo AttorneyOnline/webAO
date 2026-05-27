@@ -18,7 +18,7 @@ export const HP: PacketCodec<HPPacket> = {
 /**
  * Handles a change in the health bars' states.
  */
-export const handleHP = (packet: HPPacket) => {
+export const receiveHP = (packet: HPPacket) => {
   const percent_hp = packet.value * 10;
   let healthbox;
   if (packet.bar === 1) {
