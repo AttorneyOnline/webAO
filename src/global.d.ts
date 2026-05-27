@@ -25,7 +25,7 @@ declare global {
     showname_click: (_event: Event | null) => void;
     switchPanTilt: () => Promise<void>;
     switchHideDesks: () => Promise<void>;
-    updateActionCommands: (side: string) => void;
+    updateActionCommands: (side: import("./packets/MS").Side) => void;
     updateBackgroundPreview: () => void;
     openThemeMaker: () => void;
     restoreThemeMaker: () => void;

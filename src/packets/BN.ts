@@ -5,6 +5,7 @@ import { switchPanTilt } from "../dom/switchPanTilt";
 import { updateBackgroundPreview } from "../dom/updateBackgroundPreview";
 import { escapeChat, safeTags, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
+import { Side } from "./MS";
 import { setBackgroundImage } from "../viewport/utils/setSide"
 
 export interface BNPacket {
@@ -73,7 +74,7 @@ export const handleBN = (packet: BNPacket) => {
 
   if (client.charID === -1) {
     client.viewport.set_side({
-      position: "jud",
+      position: Side.JUDGE,
       showSpeedLines: false,
       showDesk: true,
     });

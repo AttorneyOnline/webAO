@@ -16,7 +16,7 @@ declare global {
     randomCharacterOOC: () => void;
     changeRoleOOC: () => void;
     changeBackgroundOOC: () => void;
-    updateActionCommands: (side: string) => void;
+    updateActionCommands: (side: import("../packets/MS").Side) => void;
     updateEvidenceIcon: () => void;
     updateIniswap: () => void;
     resizeChatbox: () => void;

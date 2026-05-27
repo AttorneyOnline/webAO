@@ -12,7 +12,7 @@ import { COLORS } from "../constants/colors";
 import mlConfig from "../../utils/aoml";
 import request from "../../services/request";
 import { decodeChat, safeTags } from "../../encoding";
-import type { MSPacketClient } from "../../packets/MS";
+import { DeskMod, Side, type MSPacketClient } from "../../packets/MS";
 import preloadMessageAssets from "./preloadMessageAssets";
 import { setBlipUrl } from "./blipAudio";
 
@@ -83,14 +83,14 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
   }
 
   return {
-    deskmod: Number(safeTags(packet.desk_mod).toLowerCase()),
+    deskmod: packet.desk_mod,
     preanim: safeTags(packet.preanim).toLowerCase(),
     nameplate: msg_nameplate,
     chatbox,
     name: safeTags(packet.character),
     sprite: safeTags(packet.emote).toLowerCase(),
     content,
-    side: packet.side.toLowerCase(),
+    side: packet.side,
     sound: safeTags(packet.sfx_name).toLowerCase(),
     blips: safeTags(msg_blips),
     type: packet.emote_modifier,
@@ -157,7 +157,8 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
   }
   client.viewport.setLastEvidence(client.viewport.getChatmsg().evidence);
 
-  const validSides: string[] = ["def", "pro", "wit"]; // these are for the full view pan, the other positions use 'client_char'
+  // these are for the full view pan, the other positions use 'client_char'
+  const validSides: Side[] = [Side.DEFENSE, Side.PROSECUTION, Side.WITNESS];
   if (validSides.includes(client.viewport.getChatmsg().side)) {
     charLayers = document.getElementById(
       `client_${client.viewport.getChatmsg().side}_char`,
@@ -281,34 +282,34 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
     setAside.showDesk = false;
     client.viewport.set_side(setAside);
   } else {
-    switch (Number(client.viewport.getChatmsg().deskmod)) {
-      case 0: //desk is hidden
+    switch (client.viewport.getChatmsg().deskmod) {
+      case DeskMod.HIDDEN:
         setAside.showSpeedLines = false;
         setAside.showDesk = false;
         client.viewport.set_side(setAside);
         break;
-      case 1: //desk is shown
+      case DeskMod.SHOWN:
         setAside.showSpeedLines = false;
         setAside.showDesk = true;
         client.viewport.set_side(setAside);
         break;
-      case 2: //desk is hidden during preanim, but shown during idle/talk
+      case DeskMod.HIDE_DURING_PREANIM:
         setAside.showSpeedLines = false;
         setAside.showDesk = false;
         client.viewport.set_side(setAside);
         break;
-      case 3: //opposite of 2
+      case DeskMod.SHOW_DURING_PREANIM:
         setAside.showSpeedLines = false;
         setAside.showDesk = false;
         client.viewport.set_side(setAside);
         break;
-      case 4: //desk is hidden, character offset is ignored, pair character is hidden during preanim, normal behavior during idle/talk
+      case DeskMod.HIDE_AND_CENTER_DURING_PREANIM:
         setAside.showSpeedLines = false;
         setAside.showDesk = false;
         client.viewport.set_side(setAside);
         skipoffset = true;
         break;
-      case 5: //opposite of 4
+      case DeskMod.SHOW_DURING_PREANIM_THEN_CENTER:
         setAside.showSpeedLines = false;
         setAside.showDesk = true;
         client.viewport.set_side(setAside);
@@ -339,11 +340,11 @@ export const handle_ic_speaking = async (packet: MSPacketClient) => {
 
     // Shift by the horizontal offset
     switch (client.viewport.getChatmsg().side) {
-      case "wit":
+      case Side.WITNESS:
         pairLayers.style.left = `${200 + Number(client.viewport.getChatmsg().other_offset[0])}%`;
         charLayers.style.left = `${200 + Number(client.viewport.getChatmsg().self_offset[0])}%`;
         break;
-      case "pro":
+      case Side.PROSECUTION:
         pairLayers.style.left = `${400 + Number(client.viewport.getChatmsg().other_offset[0])}%`;
         charLayers.style.left = `${400 + Number(client.viewport.getChatmsg().self_offset[0])}%`;
         break;

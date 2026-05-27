@@ -15,6 +15,7 @@ import { createTestimonyAudio } from "./utils/createTestimonyAudio";
 import { Testimony } from "./interfaces/Testimony";
 import { COLORS } from "./constants/colors";
 import { set_side } from "./utils/setSide";
+import { DeskMod, Side } from "../packets/MS";
 import { ChatMsg } from "./interfaces/ChatMsg";
 import {
   setStartFirstTickCheck,
@@ -305,7 +306,8 @@ const viewport = (): Viewport => {
       document.getElementById("client_pair_char")
     );
 
-    const validSides: string[] = ["def", "pro", "wit"]; // these are for the full view pan, the other positions use 'client_char'
+    // these are for the full view pan, the other positions use 'client_char'
+    const validSides: Side[] = [Side.DEFENSE, Side.PROSECUTION, Side.WITNESS];
     if (validSides.includes(chatmsg.side)) {
       charLayers = <HTMLImageElement>(
         document.getElementById(`client_${chatmsg.side}_char`)
@@ -389,7 +391,7 @@ const viewport = (): Viewport => {
           testimonyAudio.src = `${AO_HOST}sounds/general/sfx-evidenceshoop.opus`;
           testimonyAudio.play().catch(() => {});
 
-          if (chatmsg.side === "def") {
+          if (chatmsg.side === Side.DEFENSE) {
             // Only def show evidence on right
             eviBox.style.right = "1em";
             eviBox.style.left = "initial";
@@ -405,29 +407,29 @@ const viewport = (): Viewport => {
           shoutSprite.style.animation = "";
         }
 
-        switch (Number(chatmsg.deskmod)) {
-          case 2:
+        switch (chatmsg.deskmod) {
+          case DeskMod.HIDE_DURING_PREANIM:
             set_side({
               position: chatmsg.side,
               showSpeedLines: false,
               showDesk: true,
             });
             break;
-          case 3:
+          case DeskMod.SHOW_DURING_PREANIM:
             set_side({
               position: chatmsg.side,
               showSpeedLines: false,
               showDesk: false,
             });
             break;
-          case 4:
+          case DeskMod.HIDE_AND_CENTER_DURING_PREANIM:
             set_side({
               position: chatmsg.side,
               showSpeedLines: false,
               showDesk: true,
             });
             break;
-          case 5:
+          case DeskMod.SHOW_DURING_PREANIM_THEN_CENTER:
             set_side({
               position: chatmsg.side,
               showSpeedLines: false,

@@ -1,6 +1,7 @@
 import { client } from "../client";
 import { safeTags } from "../encoding";
 import iniParse from "../iniParse";
+import { Side } from "../packets/MS";
 import request from "../services/request";
 import { AO_HOST } from "./aoHost";
 
@@ -35,7 +36,7 @@ export const setupCharacterBasic = (chargs: string[], charid: number) => {
       desc: safeTags(chargs[1]),
       blips: "male",
       gender: "",
-      side: "def",
+      side: Side.DEFENSE,
       chat: "",
       evidence: chargs[3],
       icon: "",
@@ -73,7 +74,7 @@ export const ensureCharIni = async (charid: number): Promise<any> => {
   const default_options = {
     name: char.name,
     showname: char.name,
-    side: "def",
+    side: Side.DEFENSE,
     blips: "male",
     chat: "",
     category: "",

@@ -1,9 +1,16 @@
 import { positions } from "../constants/positions";
 import { AO_HOST } from "../../client/aoHost";
 import { client } from "../../client";
+import { Side } from "../../packets/MS";
 import transparentPng from "../../constants/transparentPng";
 import fileExists from "../../utils/fileExists";
 import { isHideDesksEnabled } from "../../dom/switchHideDesks";
+
+// Function-based checks rather than module-level arrays: enum members
+// are accessed only at call time, avoiding "Side is undefined" during
+// circular-import init (BN.ts -> setSide.ts -> MS.ts -> setSide.ts).
+const isFullView = (s: Side): boolean =>
+  s === Side.DEFENSE || s === Side.PROSECUTION || s === Side.WITNESS;
 
 export async function setBackgroundImage(elementid: string, bgname: string, bgpart: string) {
 
@@ -27,44 +34,38 @@ export async function setBackgroundImage(elementid: string, bgname: string, bgpa
 
 
 /**
- * Changes the viewport background based on a given position.
- *
- * Valid positions: `def, pro, hld, hlp, wit, jud, jur, sea`
- * @param {string} position the position to change into
+ * Changes the viewport background based on a given position. Unknown
+ * positions fall back to a generic backdrop using the position string as
+ * the bg filename stem.
  */
 export const set_side = async ({
   position,
   showSpeedLines,
   showDesk,
 }: {
-  position: string;
+  position: Side;
   showSpeedLines: boolean;
   showDesk: boolean;
 }) => {
   const view = document.getElementById("client_fullview")!;
-  let bench: HTMLImageElement;
-  if (["def", "pro", "wit"].includes(position)) {
-    bench = <HTMLImageElement>(
-      document.getElementById(`client_${position}_bench`)
-    );
-  } else {
-    bench = <HTMLImageElement>document.getElementById("client_bench_classic");
-  }
+  const fullView = isFullView(position);
 
-  let court: HTMLImageElement;
-  if ("def,pro,wit".includes(position)) {
-    court = <HTMLImageElement>(
-      document.getElementById(`client_court_${position}`)
-    );
-  } else {
-    court = <HTMLImageElement>document.getElementById("client_court_classic");
-  }
+  const bench = <HTMLImageElement>(
+    document.getElementById(
+      fullView ? `client_${position}_bench` : "client_bench_classic",
+    )
+  );
+  const court = <HTMLImageElement>(
+    document.getElementById(
+      fullView ? `client_court_${position}` : "client_court_classic",
+    )
+  );
 
   let bg;
   let desk;
   let speedLines;
 
-  if ("def,pro,hld,hlp,wit,jud,jur,sea".includes(position)) {
+  if (position in positions) {
     bg = positions[position].bg;
     desk = positions[position].desk;
     speedLines = positions[position].speedLines;
@@ -107,17 +108,17 @@ export const set_side = async ({
     bench.style.opacity = "0";
   }
 
-  if ("def,pro,wit".includes(position)) {
+  if (fullView) {
     view.style.display = "";
     document.getElementById("client_classicview")!.style.display = "none";
     switch (position) {
-      case "def":
+      case Side.DEFENSE:
         view.style.left = "0";
         break;
-      case "wit":
+      case Side.WITNESS:
         view.style.left = "-200%";
         break;
-      case "pro":
+      case Side.PROSECUTION:
         view.style.left = "-400%";
         break;
     }

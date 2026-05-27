@@ -25,13 +25,54 @@ import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
  * AO2-Client serializes them with `<and>` instead of `&` (a historical
  * wart every server adopted), and the handler splits on `<and>` directly.
  */
+/** Desk visibility behavior. See spec for behavioral details per value. */
+export enum DeskMod {
+  HIDDEN = 0,
+  SHOWN = 1,
+  HIDE_DURING_PREANIM = 2,
+  SHOW_DURING_PREANIM = 3,
+  HIDE_AND_CENTER_DURING_PREANIM = 4,
+  SHOW_DURING_PREANIM_THEN_CENTER = 5,
+}
+
+/**
+ * The wire value `"chat"` (position-dependent default) isn't modeled in
+ * the enum -- it's a hack we don't honor today. Unknown wire values
+ * (including `"chat"`) fall back to `SHOWN`, matching the previous
+ * handler's default switch branch.
+ */
+const parseDeskMod = (s: string | undefined): DeskMod => {
+  const n = Number(s);
+  if (Number.isInteger(n) && n >= 0 && n <= 5) return n as DeskMod;
+  return DeskMod.SHOWN;
+};
+
+/** Character position. Wire values are the lowercase 3-letter codes. */
+export enum Side {
+  DEFENSE = "def",
+  PROSECUTION = "pro",
+  DEFENSE_HELPER = "hld",
+  PROSECUTION_HELPER = "hlp",
+  WITNESS = "wit",
+  JUDGE = "jud",
+  JURY = "jur",
+  SEANCE = "sea",
+}
+
+const KNOWN_SIDES = new Set<string>(Object.values(Side));
+/** Wire string → `Side`. Unknown values fall back to `WITNESS`. */
+export const parseSide = (s: string | undefined): Side => {
+  const lower = (s ?? "").toLowerCase();
+  return KNOWN_SIDES.has(lower) ? (lower as Side) : Side.WITNESS;
+};
+
 export interface MSPacketClient {
-  desk_mod: string;
+  desk_mod: DeskMod;
   preanim: string;
   character: string;
   emote: string;
   message: string;
-  side: string;
+  side: Side;
   sfx_name: string;
   emote_modifier: number;
   char_id: number;
@@ -73,12 +114,12 @@ const num = (v: string | undefined) => Number(v) || 0;
 export const MS: PacketCodec<MSPacketClient> = {
   decode(args) {
     return {
-      desk_mod: str(args[1]),
+      desk_mod: parseDeskMod(args[1]),
       preanim: str(args[2]),
       character: str(args[3]),
       emote: str(args[4]),
       message: str(args[5]),
-      side: str(args[6]),
+      side: parseSide(args[6]),
       sfx_name: str(args[7]),
       emote_modifier: num(args[8]),
       char_id: num(args[9]),
@@ -110,7 +151,7 @@ export const MS: PacketCodec<MSPacketClient> = {
   encode(p) {
     const fields = [
       "MS",
-      escapeChat(p.desk_mod),
+      String(p.desk_mod),
       escapeChat(p.preanim),
       escapeChat(p.character),
       escapeChat(p.emote),
@@ -150,12 +191,12 @@ export const MS: PacketCodec<MSPacketClient> = {
 export const MSServer: PacketCodec<MSPacketServer> = {
   decode(args) {
     return {
-      desk_mod: str(args[1]),
+      desk_mod: parseDeskMod(args[1]),
       preanim: str(args[2]),
       character: str(args[3]),
       emote: str(args[4]),
       message: str(args[5]),
-      side: str(args[6]),
+      side: parseSide(args[6]),
       sfx_name: str(args[7]),
       emote_modifier: num(args[8]),
       char_id: num(args[9]),
@@ -186,7 +227,7 @@ export const MSServer: PacketCodec<MSPacketServer> = {
   encode(p) {
     const fields = [
       "MS",
-      escapeChat(p.desk_mod),
+      String(p.desk_mod),
       escapeChat(p.preanim),
       escapeChat(p.character),
       escapeChat(p.emote),
