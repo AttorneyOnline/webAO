@@ -6,7 +6,7 @@
 import "./styles/client.css";
 import "./styles/goldenlayout.css";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { sender, type Sender } from "./packets";
+import { sendCH } from "./packets/CH";
 import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources";
 import masterViewport from "./viewport/viewport";
@@ -135,7 +135,6 @@ class Client extends EventEmitter {
   resources: any;
   selectedEmote: number;
   selectedEvidence: number;
-  sender: Sender;
   checkUpdater: any;
   _lastTimeICReceived: any;
   viewport: Viewport;
@@ -199,7 +198,6 @@ class Client extends EventEmitter {
     this.selectedEmote = -1;
     this.selectedEvidence = -1;
     this.checkUpdater = null;
-    this.sender = sender;
     this.viewport = masterViewport();
     this._lastTimeICReceived = new Date(0);
     this.temp_packet = "";
@@ -282,7 +280,7 @@ class Client extends EventEmitter {
     }
     if (mode !== "replay") {
       this.checkUpdater = setInterval(
-        () => this.sender.sendCH({ charId: this.charID }),
+        () => sendCH({ charId: this.charID }),
         5000,
       );
     }

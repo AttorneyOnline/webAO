@@ -1,9 +1,9 @@
-import { client } from "../client";
+import { sendRT } from "../packets/RT";
 
 /**
  * Declare the defendant not guilty
  */
 export function notguilty() {
-  client.sender.sendRT({ animation: "judgeruling", judgeId: 0 });
+  sendRT({ animation: "judgeruling", judgeId: 0 });
 }
 window.notguilty = notguilty;

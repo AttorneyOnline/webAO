@@ -1,4 +1,5 @@
 import { client, clientState, autoChar, autoArea } from "../client";
+import { sendCC } from "./CC";
 import { area_click } from "../dom/areaClick";
 import type { PacketCodec } from "../packets";
 import queryParser from "../utils/queryParser";
@@ -51,7 +52,7 @@ export const receiveDONE = (_packet: DONEPacket) => {
       (c: any) => c && c.name.toLowerCase() === autoChar.toLowerCase()
     );
     if (charIndex !== -1) {
-      client.sender.sendCC({
+      sendCC({
         playerId: client.playerID,
         charId: charIndex,
         charPw: "web",

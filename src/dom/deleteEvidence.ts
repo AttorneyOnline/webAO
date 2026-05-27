@@ -1,4 +1,5 @@
 import { client } from "../client";
+import { sendDE } from "../packets/DE";
 import { cancelEvidence } from "./cancelEvidence";
 
 /**
@@ -6,7 +7,7 @@ import { cancelEvidence } from "./cancelEvidence";
  */
 export function deleteEvidence() {
   const id = client.selectedEvidence;
-  client.sender.sendDE({ id });
+  sendDE({ id });
   cancelEvidence();
 }
 window.deleteEvidence = deleteEvidence;

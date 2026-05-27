@@ -1,9 +1,9 @@
-import { client } from "../client";
+import { sendRT } from "../packets/RT";
 
 /**
  * Declare witness testimony.
  */
 export function initWT() {
-  client.sender.sendRT({ animation: "testimony1" });
+  sendRT({ animation: "testimony1" });
 }
 window.initWT = initWT;

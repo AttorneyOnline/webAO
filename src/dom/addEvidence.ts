@@ -1,4 +1,4 @@
-import { client } from "../client";
+import { sendPE } from "../packets/PE";
 import { cancelEvidence } from "./cancelEvidence";
 
 /**
@@ -8,7 +8,7 @@ export function addEvidence() {
   const evidence_select = <HTMLSelectElement>(
     document.getElementById("evi_select")
   );
-  client.sender.sendPE({
+  sendPE({
     name: (<HTMLInputElement>document.getElementById("evi_name")).value,
     desc: (<HTMLInputElement>document.getElementById("evi_desc")).value,
     img:

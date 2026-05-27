@@ -1,4 +1,5 @@
 import { client } from "../client";
+import { sendCC } from "../packets/CC";
 
 /**
  * Requests to play as a character.
@@ -11,7 +12,7 @@ export function pickChar(ccharacter: number) {
     document.getElementById("client_waiting")!.style.display = "none";
     document.getElementById("client_charselect")!.style.display = "none";
   }
-  client.sender.sendCC({
+  sendCC({
     playerId: client.playerID,
     charId: ccharacter,
     charPw: "web",

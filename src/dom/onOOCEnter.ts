@@ -1,5 +1,5 @@
-import { client } from "../client";
 import { saveChatlogHandle } from "../client/saveChatLogHandle";
+import { sendCT } from "../packets/CT";
 
 const OOC_COMMANDS = new Map<string, () => void>([
   ["/save_chatlog", saveChatlogHandle],
@@ -26,7 +26,7 @@ export function onOOCEnter(event: KeyboardEvent) {
       // Command Not Recognized
     }
   } else {
-    client.sender.sendCT({ name, message });
+    sendCT({ name, message });
   }
 
   inputbox.value = "";

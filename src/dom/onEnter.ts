@@ -6,6 +6,7 @@ import {
   parseEmoteModifier,
   parseSide,
   parseTextColor,
+  sendMS,
   type MSPacketServer,
 } from "../packets/MS";
 
@@ -65,7 +66,7 @@ export function onEnter(event: KeyboardEvent) {
     additive: input("check_additive").checked,
     effect: input("effect_select").value,
   };
-  client.sender.sendMS(packet);
+  sendMS(packet);
 
   return false;
 }

@@ -156,24 +156,3 @@ const packets: Record<string, PacketBinding<any>> = {
 
 export const packetRegistry = new Map(Object.entries(packets));
 
-/**
- * Aggregator of every outbound packet sender. Transport-level send
- * helpers (`client.sendToServer`, `client.sendToSelf`) live on the
- * Client class directly, since they aren't tied to a packet header.
- */
-export const sender = {
-  sendCC,
-  sendCH,
-  sendCT,
-  sendDE,
-  sendEE,
-  sendHP,
-  sendMA,
-  sendMC,
-  sendMS,
-  sendPE,
-  sendRT,
-  sendZZ,
-};
-
-export type Sender = typeof sender;

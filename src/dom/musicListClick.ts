@@ -1,4 +1,5 @@
 import { client } from "../client";
+import { sendMC } from "../packets/MC";
 /**
  * Triggered when an item on the music list is clicked.
  * @param {MouseEvent} event
@@ -7,7 +8,7 @@ export function musiclist_click(_event: Event) {
   const playtrack = (<HTMLInputElement>(
     document.getElementById("client_musiclist")
   )).value;
-  client.sender.sendMC({ track: playtrack, charId: client.charID });
+  sendMC({ track: playtrack, charId: client.charID });
 
   // This is here so you can't actually select multiple tracks,
   // even though the select tag has the multiple option to render differently

@@ -1,4 +1,5 @@
 import { client } from "../client";
+import { sendCT } from "../packets/CT";
 
 /**
  * Pair with a player on both supported pathways at once:
@@ -10,7 +11,7 @@ import { client } from "../client";
  */
 export function pairPlayer(id: number) {
   const name = (<HTMLInputElement>document.getElementById("OOC_name")).value;
-  client.sender.sendCT({ name, message: `/pair ${id}` });
+  sendCT({ name, message: `/pair ${id}` });
 
   const target = client.playerlist?.get(id);
   if (target && Number.isInteger(target.charId) && target.charId >= 0) {

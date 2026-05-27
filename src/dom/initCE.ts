@@ -1,9 +1,9 @@
-import { client } from "../client";
+import { sendRT } from "../packets/RT";
 
 /**
  * Declare cross examination.
  */
 export function initCE() {
-  client.sender.sendRT({ animation: "testimony2" });
+  sendRT({ animation: "testimony2" });
 }
 window.initCE = initCE;
