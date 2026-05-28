@@ -20,8 +20,6 @@ export const FL: PacketCodec<FLPacket> = {
  */
 export const receiveFL = (packet: FLPacket) => {
   const { features } = packet;
-  console.info("Server-supported features:");
-  console.info(features);
   setExtraFeatures(features);
 
   if (features.includes("yellowtext")) {
