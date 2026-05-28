@@ -15,7 +15,13 @@ import masterViewport from "./viewport/viewport";
 import { Viewport } from "./viewport/interfaces/Viewport";
 import { EventEmitter } from "events";
 import { onReplayGo } from "./dom/onReplayGo";
-import { packetRegistry, type PacketCodec } from "./packets";
+import {
+  packetRegistry,
+  type PacketCodec,
+  parsePacket,
+  encodePacket,
+  readHeader,
+} from "./packets";
 import { appendICNotice } from "./client/appendICNotice";
 import { loadResources } from "./client/loadResources";
 import { AO_HOST } from "./client/aoHost";
@@ -56,7 +62,15 @@ export const setExtraFeatures = (val: any) => {
   extrafeatures = val;
 };
 
-export const encode_packets_as_json = false;
+/**
+ * Global wire-format flag. Starts in fantacode mode; flips to JSON when the
+ * server sends `decryptor#JSON#%` during the handshake. Once flipped, all
+ * outgoing packets are JSON-encoded (incoming auto-detects regardless).
+ */
+export let encode_packets_as_json = false;
+export const setEncodePacketsAsJson = (v: boolean) => {
+  encode_packets_as_json = v;
+};
 
 let hdid: string;
 
@@ -269,19 +283,21 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Sends a typed packet using `codec`. JSON mode produces
-   * `{"$header": codec.header, ...packet}`; legacy mode delegates to
-   * `codec.encode(packet)`.
+   * Sends a typed packet using `codec`, picking the wire format from
+   * `encode_packets_as_json`. The encoding machinery lives in
+   * `encodePacket`; this method just wires the flag through.
    */
   sendPacketToServer<T>(codec: PacketCodec<T>, packet: T) {
-    if (encode_packets_as_json) {
-      this.sendStringToServer(JSON.stringify({ $header: codec.header, ...packet }));
-      return;
-    }
-    if (!codec.encode) {
-      throw new Error(`No encoder defined for codec ${codec.header}`);
-    }
-    this.sendStringToServer(codec.encode(packet));
+    this.sendStringToServer(encodePacket(codec, packet, encode_packets_as_json));
+  }
+
+  /**
+   * Echoes a typed packet back into our own dispatcher. Replaces hand-built
+   * `sendToSelf("HEADER#...#%")` strings; the wire format honors the JSON
+   * flag uniformly.
+   */
+  sendPacketToSelf<T>(codec: PacketCodec<T>, packet: T) {
+    this.sendToSelf(encodePacket(codec, packet, encode_packets_as_json));
   }
 
   /**
@@ -299,7 +315,10 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Triggered when a connection is established to the server.
+   * Triggered when a connection is established to the server. We don't send
+   * `HI` here yet — that's deferred until we receive the server's `decryptor`
+   * packet (which doubles as our wire-format negotiation handshake). See
+   * `receivedecryptor` for the continuation.
    */
   onOpen(_e: Event) {
     client.state = clientState.Connected;
@@ -308,7 +327,6 @@ class Client extends EventEmitter {
     document.getElementById("client_loading").style.display = "block";
     document.getElementById("client_charselect").style.display = "none";
     appendICNotice("Connected");
-    client.joinServer();
   }
 
   /**
@@ -360,17 +378,19 @@ class Client extends EventEmitter {
 
     // Packet should always end with #; parse anyway if it somehow doesn't.
     const body = packet.endsWith("#") ? packet.slice(0, -1) : packet;
-    const args = body.split("#");
-    const header = args[0];
+
+    let header: string;
+    try {
+      header = readHeader(body);
+    } catch (err) {
+      console.error(`Failed to read packet header:`, err, { body });
+      return;
+    }
     if (header === "") {
       console.warn("WARNING: Empty packet received from server, skipping...");
       return;
     }
 
-    // packetRegistry maps header -> { codec, receive?, send? }: decode the
-    // wire args into a typed packet, then dispatch to the receiver. Decode
-    // and receive are guarded individually so a single malformed/buggy packet
-    // can't poison its siblings in the same WebSocket frame.
     const entry = packetRegistry.get(header);
     if (!entry) {
       console.warn(`Invalid packet header ${header}`);
@@ -381,9 +401,13 @@ class Client extends EventEmitter {
       return;
     }
 
+    // `parsePacket` auto-detects positional vs JSON form and applies the
+    // schema defaults (for schema-driven codecs). Decode and receive are
+    // guarded individually so a single malformed/buggy packet can't poison
+    // its siblings in the same WebSocket frame.
     let decoded;
     try {
-      decoded = entry.codec.decode(args);
+      decoded = parsePacket(entry.codec, body);
     } catch (err) {
       console.error(`Failed to decode ${header} packet:`, err, { body });
       return;

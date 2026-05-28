@@ -1,3 +1,4 @@
+import { escapeChat, unescapeChat } from "./encoding";
 import { ARUP, receiveARUP } from "./packets/ARUP";
 import { askchaa, receiveaskchaa } from "./packets/askchaa";
 import { ASS, receiveASS } from "./packets/ASS";
@@ -28,7 +29,7 @@ import { KB, receiveKB } from "./packets/KB";
 import { KK, receiveKK } from "./packets/KK";
 import { LE, receiveLE } from "./packets/LE";
 import { MA, sendMA } from "./packets/MA";
-import { MC, receiveMC, sendMC } from "./packets/MC";
+import { MCClient, receiveMC, sendMC } from "./packets/MC";
 import { MM, receiveMM } from "./packets/MM";
 import { MSClient, receiveMS, sendMS } from "./packets/MS";
 import { PE, sendPE } from "./packets/PE";
@@ -54,23 +55,174 @@ import { VS_PEERS, receiveVS_PEERS } from "./packets/VS_PEERS";
 import { VS_SPEAKClient, receiveVS_SPEAK } from "./packets/VS_SPEAK";
 import { ZZ, receiveZZ, sendZZ } from "./packets/ZZ";
 
+// ---------- New schema-driven API ----------
+
+/**
+ * Field schema. `default` (when present) makes the field optional — it's
+ * used when the wire / JSON omits the value. Without `default`, the field
+ * is required and `decode` throws if the wire is missing it.
+ */
+export interface Field {
+  name: string;
+  type: "string" | "number" | "boolean";
+  default?: unknown;
+}
+
+const coerce = (raw: string, t: Field["type"]): unknown =>
+  t === "string" ? unescapeChat(raw)
+  : t === "number" ? Number(raw)
+  : raw === "1";
+
+const serialize = (v: unknown, t: Field["type"]): string =>
+  t === "string" ? escapeChat(v as string)
+  : t === "number" ? String(v)
+  : v ? "1" : "0";
+
+/**
+ * Decode a wire body (either positional `HEADER#a#b#%` or JSON
+ * `{"$header": "HEADER", ...}`) into a typed packet. Missing optional
+ * fields get their `default`; missing required fields throw.
+ */
+export function decode<T>(fields: readonly Field[], body: string): T {
+  const out: Record<string, unknown> = {};
+  if (body.startsWith("{")) {
+    Object.assign(out, JSON.parse(body));
+    delete out.$header;
+  } else {
+    const args = (body.endsWith("#") ? body.slice(0, -1) : body).split("#");
+    fields.forEach((f, i) => {
+      const v = args[i + 1];
+      if (v !== undefined) out[f.name] = coerce(v, f.type);
+    });
+  }
+  for (const f of fields) {
+    if (out[f.name] !== undefined) continue;
+    if ("default" in f) out[f.name] = f.default;
+    else throw new Error(`Missing required field '${f.name}'`);
+  }
+  return out as T;
+}
+
+/**
+ * Encode a typed packet to wire bytes. JSON mode emits
+ * `{"$header": header, ...packet}`; legacy mode emits positional
+ * `HEADER#a#b#%`. Missing fields fall back to `default`; missing required
+ * fields throw.
+ */
+export function encode<T>(
+  header: string,
+  fields: readonly Field[],
+  packet: T,
+  asJson: boolean,
+): string {
+  if (asJson) return JSON.stringify({ $header: header, ...packet });
+  const parts = fields.map((f) => {
+    let v = (packet as Record<string, unknown>)[f.name];
+    if (v === undefined) {
+      if (!("default" in f)) {
+        throw new Error(`Missing required field '${f.name}' encoding ${header}`);
+      }
+      v = f.default;
+    }
+    return serialize(v, f.type);
+  });
+  return `${header}#${parts.join("#")}#%`;
+}
+
+// ---------- Legacy codec API (kept until all packets migrate) ----------
+
 /**
  * A codec for a single packet header. `decode` parses the `#`-split args
  * (with args[0] being the header) into a typed packet. `encode` serializes
  * a typed packet back to the wire format, including the trailing `#%`.
- *
- * `encode` is optional: receive-only packets omit it. The dispatcher only
- * calls `decode`; encoders are called directly by name from the sender
- * modules.
- *
- * `header` is the wire header for this codec (e.g. `"MS"`, `"PE"`). Both
- * direction-specific codecs for the same packet (like `MSClient` and
- * `MSServer`) share the same header.
  */
 export interface PacketCodec<TPacket> {
   header: string;
+  fields?: readonly Field[];
   decode(args: string[]): TPacket;
   encode?(packet: TPacket): string;
+}
+
+export type FieldType = Field["type"];
+export type FieldSpec = Field;
+
+const zeroFor = (t: FieldType): unknown =>
+  t === "string" ? "" : t === "number" ? 0 : false;
+
+/**
+ * Legacy factory bundling header+fields into a `PacketCodec` object. New
+ * packets should use the free `decode`/`encode` functions directly.
+ */
+export function makeCodec<T>(
+  header: string,
+  fields: readonly Field[],
+): PacketCodec<T> {
+  return {
+    header,
+    fields,
+    decode(args) {
+      const out: Record<string, unknown> = {};
+      fields.forEach((f, i) => {
+        const v = args[i + 1];
+        if (v === undefined) {
+          out[f.name] = f.default ?? zeroFor(f.type);
+          return;
+        }
+        if (f.type === "string") out[f.name] = unescapeChat(v);
+        else if (f.type === "number") out[f.name] = Number(v);
+        else out[f.name] = v === "1";
+      });
+      return out as T;
+    },
+    encode(packet) {
+      const parts: string[] = fields.map((f) => {
+        let v = (packet as Record<string, unknown>)[f.name];
+        if (v === undefined) v = f.default ?? zeroFor(f.type);
+        if (f.type === "string") return escapeChat(v as string);
+        if (f.type === "number") return String(v);
+        return v ? "1" : "0";
+      });
+      return `${header}#${parts.join("#")}#%`;
+    },
+  };
+}
+
+function fillDefaults<T>(fields: readonly Field[], partial: Partial<T>): T {
+  const out: Record<string, unknown> = { ...(partial as Record<string, unknown>) };
+  for (const f of fields) {
+    if (out[f.name] === undefined) out[f.name] = f.default ?? zeroFor(f.type);
+  }
+  return out as T;
+}
+
+export function parsePacket<T>(codec: PacketCodec<T>, body: string): T {
+  if (body.startsWith("{")) {
+    const obj = JSON.parse(body) as Partial<T> & { $header?: string };
+    delete obj.$header;
+    return codec.fields ? fillDefaults<T>(codec.fields, obj) : (obj as T);
+  }
+  const trimmed = body.endsWith("#") ? body.slice(0, -1) : body;
+  return codec.decode(trimmed.split("#"));
+}
+
+export function encodePacket<T>(
+  codec: PacketCodec<T>,
+  packet: T,
+  asJson: boolean,
+): string {
+  if (asJson) return JSON.stringify({ $header: codec.header, ...packet });
+  if (!codec.encode) {
+    throw new Error(`No encoder defined for codec ${codec.header}`);
+  }
+  return codec.encode(packet);
+}
+
+export function readHeader(body: string): string {
+  if (body.startsWith("{")) {
+    return (JSON.parse(body) as { $header?: string }).$header ?? "";
+  }
+  const idx = body.indexOf("#");
+  return idx === -1 ? body : body.slice(0, idx);
 }
 
 /**
@@ -132,7 +284,7 @@ const packets: Record<string, PacketBinding<any>> = {
   KK: { codec: KK, receive: receiveKK },
   LE: { codec: LE, receive: receiveLE },
   MA: { codec: MA, send: sendMA },
-  MC: { codec: MC, receive: receiveMC, send: sendMC },
+  MC: { codec: MCClient, receive: receiveMC, send: sendMC },
   MM: { codec: MM, receive: receiveMM },
   MS: { codec: MSClient, receive: receiveMS, send: sendMS },
   PE: { codec: PE, send: sendPE },

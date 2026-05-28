@@ -1,58 +1,63 @@
 import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
 import { appendICLog } from "../client/appendICLog";
-import { decodeChat, escapeChat, safeTags, unescapeChat } from "../encoding";
-import type { PacketCodec } from "../packets";
+import { decodeChat, safeTags } from "../encoding";
+import { makeCodec } from "../packets";
 
 /**
- * Music/area change. Per spec:
- *   Server-receiver: `MC#{name}#{char_id}#{showname}#{effects}#%`
- *   Client-receiver: `MC#{name}#{char_id}#{showname}#{looping}#{channel}#{effects}#%`
- * All fields past `char_id` are modeled as optional so the same codec covers
- * both directions and tolerates servers that omit later fields.
+ * Music/area change. Two wire variants per spec:
+ *
+ *   - Server -> Client (`MCClient`): all 6 fields.
+ *     `MC#{name}#{char_id}#{showname}#{looping}#{channel}#{effects}#%`
+ *   - Client -> Server (`MCServer`): omits `looping` and `channel`.
+ *     `MC#{name}#{char_id}#{showname}#{effects}#%`
  */
-export interface MCPacket {
+export interface MCPacketClient {
+  name: string;
+  char_id: number;
+  showname: string;
+  looping: number;
+  channel: number;
+  effects: number;
+}
+
+/**
+ * Outgoing form. Fields are partial because the factory fills in defaults
+ * on encode, so callers can pass just `{name, char_id}` when they don't
+ * need to override the rest.
+ */
+export interface MCPacketServer {
   name: string;
   char_id: number;
   showname?: string;
-  looping?: number;
-  channel?: number;
   effects?: number;
 }
 
-export const MC: PacketCodec<MCPacket> = {
-  header: "MC",
-  decode(args) {
-    const packet: MCPacket = {
-      name: unescapeChat(args[1] ?? ""),
-      char_id: Number(args[2]),
-    };
-    if (args[3] !== undefined) packet.showname = unescapeChat(args[3]);
-    if (args[4] !== undefined) packet.looping = Number(args[4]);
-    if (args[5] !== undefined) packet.channel = Number(args[5]);
-    if (args[6] !== undefined) packet.effects = Number(args[6]);
-    return packet;
-  },
-  encode(packet) {
-    let out = `MC#${escapeChat(packet.name)}#${packet.char_id}`;
-    if (packet.showname !== undefined) out += `#${escapeChat(packet.showname)}`;
-    if (packet.looping !== undefined) out += `#${packet.looping}`;
-    if (packet.channel !== undefined) out += `#${packet.channel}`;
-    if (packet.effects !== undefined) out += `#${packet.effects}`;
-    return `${out}#%`;
-  },
-};
+export const MCClient = makeCodec<MCPacketClient>("MC", [
+  { name: "name", type: "string" },
+  { name: "char_id", type: "number" },
+  { name: "showname", type: "string" },
+  { name: "looping", type: "number" },
+  { name: "channel", type: "number" },
+  { name: "effects", type: "number" },
+]);
+
+export const MCServer = makeCodec<MCPacketServer>("MC", [
+  { name: "name", type: "string" },
+  { name: "char_id", type: "number" },
+  { name: "showname", type: "string" },
+  { name: "effects", type: "number" },
+]);
 
 /**
  * Handles a music change to an arbitrary resource.
  */
-export const receiveMC = (packet: MCPacket) => {
+export const receiveMC = (packet: MCPacketClient) => {
   const track = safeTags(decodeChat(packet.name));
   let charID = packet.char_id;
-  const showname = packet.showname || "";
+  const { showname, channel } = packet;
   const looping = Boolean(packet.looping);
-  const channel = packet.channel ?? 0;
-  // const fading = packet.effects ?? 0; // unused in web
+  // const fading = packet.effects; // unused in web
 
   const music = client.viewport.music[channel];
   let musicname;
@@ -89,6 +94,6 @@ export const receiveMC = (packet: MCPacket) => {
 /**
  * Requests to change the music to the specified track.
  */
-export const sendMC = (packet: MCPacket) => {
-  client.sendPacketToServer(MC, packet);
+export const sendMC = (packet: MCPacketServer) => {
+  client.sendPacketToServer(MCServer, packet);
 };
