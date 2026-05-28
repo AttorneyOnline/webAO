@@ -6,9 +6,9 @@ import { sendMA } from "../packets/MA";
  */
 export function banPlayer(id: number) {
   const reason = prompt("Please enter the reason", "Being annoying");
-  const length = Number(prompt("Please enter the ban length in minutes", "60"));
+  const duration = Number(prompt("Please enter the ban duration in minutes", "60"));
 
-  sendMA({ id, length, reason });
+  sendMA({ id, duration, reason });
 }
 
 /**
@@ -18,5 +18,5 @@ export function banPlayer(id: number) {
 export function kickPlayer(id: number) {
   const reason = prompt("Please enter the reason", "Being annoying");
 
-  sendMA({ id, length: 0, reason });
+  sendMA({ id, duration: 0, reason });
 }

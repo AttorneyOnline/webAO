@@ -14,7 +14,7 @@ import type { PacketCodec } from "../packets";
  *   Client -> Server: `CT#{name}#{message}#%`
  *   Server -> Client: `CT#{name}#{message}#{is_from_server}#%` (is_from_server optional)
  *
- * `isFromServer` is therefore only meaningful on incoming packets; if it is
+ * `is_from_server` is therefore only meaningful on incoming packets; if it is
  * defined when encoding, the server-form (with the trailing flag) is emitted.
  *
  * String fields hold logical (unescaped) values -- the codec handles
@@ -23,7 +23,7 @@ import type { PacketCodec } from "../packets";
 export interface CTPacket {
   name: string;
   message: string;
-  isFromServer?: boolean;
+  is_from_server?: boolean;
 }
 
 export const CT: PacketCodec<CTPacket> = {
@@ -34,15 +34,15 @@ export const CT: PacketCodec<CTPacket> = {
       message: unescapeChat(args[2] ?? ""),
     };
     if (args[3] !== undefined) {
-      packet.isFromServer = args[3] === "1";
+      packet.is_from_server = args[3] === "1";
     }
     return packet;
   },
   encode(packet) {
     const name = escapeChat(packet.name);
     const message = escapeChat(packet.message);
-    if (packet.isFromServer !== undefined) {
-      return `CT#${name}#${message}#${packet.isFromServer ? 1 : 0}#%`;
+    if (packet.is_from_server !== undefined) {
+      return `CT#${name}#${message}#${packet.is_from_server ? 1 : 0}#%`;
     }
     return `CT#${name}#${message}#%`;
   },

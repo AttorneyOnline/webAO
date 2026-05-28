@@ -13,8 +13,8 @@ export function pickChar(ccharacter: number) {
     document.getElementById("client_charselect")!.style.display = "none";
   }
   sendCC({
-    playerId: client.playerID,
-    charId: ccharacter,
-    charPw: "web",
+    player_id: client.playerID,
+    char_id: ccharacter,
+    char_pw: "web",
   });
 }

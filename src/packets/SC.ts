@@ -16,16 +16,16 @@ const { mode } = queryParser();
  * split.
  */
 export interface SCPacket {
-  charData: string[];
+  char_data: string[];
 }
 
 export const SC: PacketCodec<SCPacket> = {
   header: "SC",
   decode(args) {
-    return { charData: args.slice(1) };
+    return { char_data: args.slice(1) };
   },
   encode(packet) {
-    return `SC#${packet.charData.join("#")}#%`;
+    return `SC#${packet.char_data.join("#")}#%`;
   },
 };
 
@@ -41,8 +41,8 @@ export const receiveSC = async (packet: SCPacket) => {
     document.getElementById("client_charselect")!.style.display = "block";
   }
 
-  for (let i = 0; i < packet.charData.length; i++) {
-    const chargs = packet.charData[i].split("&");
+  for (let i = 0; i < packet.char_data.length; i++) {
+    const chargs = packet.char_data[i].split("&");
     setupCharacterBasic(chargs, i);
   }
   // We're done with the characters, request the music

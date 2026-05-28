@@ -3,37 +3,37 @@ import { escapeChat, safeTags, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
 
 /**
- * `updateType` selects what the rest of the packet means:
+ * `update_type` selects what the rest of the packet means:
  *   0: player counts (numbers per area)
  *   1: area statuses (strings)
  *   2: case manager names (strings)
  *   3: locked states (strings)
  *
- * We keep `updateData` as `(number | string)[]` rather than a discriminated
+ * We keep `update_data` as `(number | string)[]` rather than a discriminated
  * union since the values arrive as strings on the wire and the handler picks
  * the cell-level type itself.
  */
 export interface ARUPPacket {
-  updateType: 0 | 1 | 2 | 3;
-  updateData: (number | string)[];
+  update_type: 0 | 1 | 2 | 3;
+  update_data: (number | string)[];
 }
 
 export const ARUP: PacketCodec<ARUPPacket> = {
   header: "ARUP",
   decode(args) {
-    const updateType = Number(args[1]) as 0 | 1 | 2 | 3;
+    const update_type = Number(args[1]) as 0 | 1 | 2 | 3;
     const rest = args.slice(2);
-    const updateData =
-      updateType === 0
+    const update_data =
+      update_type === 0
         ? rest.map((v) => Number(v))
         : rest.map((v) => unescapeChat(v));
-    return { updateType, updateData };
+    return { update_type, update_data };
   },
   encode(packet) {
-    const data = packet.updateData
+    const data = packet.update_data
       .map((v) => (typeof v === "string" ? escapeChat(v) : v))
       .join("#");
-    return `ARUP#${packet.updateType}#${data}#%`;
+    return `ARUP#${packet.update_type}#${data}#%`;
   },
 };
 
@@ -41,23 +41,23 @@ export const ARUP: PacketCodec<ARUPPacket> = {
  * Handle the change of players in an area.
  */
 export const receiveARUP = (packet: ARUPPacket) => {
-  const { updateType, updateData } = packet;
-  for (let i = 0; i < updateData.length; i++) {
+  const { update_type, update_data } = packet;
+  for (let i = 0; i < update_data.length; i++) {
     if (client.areas[i]) {
       // the server sends us ARUP before we even get the area list
       const thisarea = document.getElementById(`area${i}`)!;
-      switch (updateType) {
+      switch (update_type) {
         case 0: // playercount
-          client.areas[i].players = Number(updateData[i]);
+          client.areas[i].players = Number(update_data[i]);
           break;
         case 1: // status
-          client.areas[i].status = safeTags(String(updateData[i]));
+          client.areas[i].status = safeTags(String(update_data[i]));
           break;
         case 2:
-          client.areas[i].cm = safeTags(String(updateData[i]));
+          client.areas[i].cm = safeTags(String(update_data[i]));
           break;
         case 3:
-          client.areas[i].locked = safeTags(String(updateData[i]));
+          client.areas[i].locked = safeTags(String(update_data[i]));
           break;
       }
 

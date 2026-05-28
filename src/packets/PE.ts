@@ -8,19 +8,19 @@ import type { PacketCodec } from "../packets";
  */
 export interface PEPacket {
   name: string;
-  desc: string;
-  img: string;
+  description: string;
+  image: string;
 }
 
 export const PE: PacketCodec<PEPacket> = {
   header: "PE",
   decode: (args) => ({
     name: unescapeChat(args[1] ?? ""),
-    desc: unescapeChat(args[2] ?? ""),
-    img: unescapeChat(args[3] ?? ""),
+    description: unescapeChat(args[2] ?? ""),
+    image: unescapeChat(args[3] ?? ""),
   }),
   encode: (p) =>
-    `PE#${escapeChat(p.name)}#${escapeChat(p.desc)}#${escapeChat(p.img)}#%`,
+    `PE#${escapeChat(p.name)}#${escapeChat(p.description)}#${escapeChat(p.image)}#%`,
 };
 
 export const sendPE = (packet: PEPacket) => {

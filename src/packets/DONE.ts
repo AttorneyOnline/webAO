@@ -54,9 +54,9 @@ export const receiveDONE = (_packet: DONEPacket) => {
     );
     if (charIndex !== -1) {
       sendCC({
-        playerId: client.playerID,
-        charId: charIndex,
-        charPw: "web",
+        player_id: client.playerID,
+        char_id: charIndex,
+        char_pw: "web",
       });
     }
   }

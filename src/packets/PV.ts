@@ -13,17 +13,17 @@ import fileExists from "../utils/fileExists";
  * encode.
  */
 export interface PVPacket {
-  playerId: number;
-  charId: number;
+  player_id: number;
+  char_id: number;
 }
 
 export const PV: PacketCodec<PVPacket> = {
   header: "PV",
   decode(args) {
-    return { playerId: Number(args[1]), charId: Number(args[3]) };
+    return { player_id: Number(args[1]), char_id: Number(args[3]) };
   },
   encode(packet) {
-    return `PV#${packet.playerId}#CID#${packet.charId}#%`;
+    return `PV#${packet.player_id}#CID#${packet.char_id}#%`;
   },
 };
 
@@ -31,7 +31,7 @@ export const PV: PacketCodec<PVPacket> = {
  * Handles the server's assignment of a character for the player to use.
  */
 export const receivePV = async (packet: PVPacket) => {
-  client.charID = packet.charId;
+  client.charID = packet.char_id;
   document.getElementById("client_waiting")!.style.display = "none";
   document.getElementById("client_charselect")!.style.display = "none";
 

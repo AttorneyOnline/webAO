@@ -5,22 +5,22 @@ import type { PacketCodec } from "../packets";
 import { RC } from "./RC";
 
 export interface SIPacket {
-  charCnt: number;
-  eviCnt: number;
-  musCnt: number;
+  char_cnt: number;
+  evi_cnt: number;
+  mus_cnt: number;
 }
 
 export const SI: PacketCodec<SIPacket> = {
   header: "SI",
   decode(args) {
     return {
-      charCnt: Number(args[1]),
-      eviCnt: Number(args[2]),
-      musCnt: Number(args[3]),
+      char_cnt: Number(args[1]),
+      evi_cnt: Number(args[2]),
+      mus_cnt: Number(args[3]),
     };
   },
   encode(packet) {
-    return `SI#${packet.charCnt}#${packet.eviCnt}#${packet.musCnt}#%`;
+    return `SI#${packet.char_cnt}#${packet.evi_cnt}#${packet.mus_cnt}#%`;
   },
 };
 
@@ -29,9 +29,9 @@ export const SI: PacketCodec<SIPacket> = {
  * but we use it as a cue to begin retrieving characters.
  */
 export const receiveSI = (packet: SIPacket) => {
-  client.char_list_length = packet.charCnt;
-  client.evidence_list_length = packet.eviCnt;
-  client.music_list_length = packet.musCnt;
+  client.char_list_length = packet.char_cnt;
+  client.evidence_list_length = packet.evi_cnt;
+  client.music_list_length = packet.mus_cnt;
 
   fetchExtensions();
 

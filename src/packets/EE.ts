@@ -9,8 +9,8 @@ import type { PacketCodec } from "../packets";
 export interface EEPacket {
   id: number;
   name: string;
-  desc: string;
-  img: string;
+  description: string;
+  image: string;
 }
 
 export const EE: PacketCodec<EEPacket> = {
@@ -18,11 +18,11 @@ export const EE: PacketCodec<EEPacket> = {
   decode: (args) => ({
     id: Number(args[1]),
     name: unescapeChat(args[2] ?? ""),
-    desc: unescapeChat(args[3] ?? ""),
-    img: unescapeChat(args[4] ?? ""),
+    description: unescapeChat(args[3] ?? ""),
+    image: unescapeChat(args[4] ?? ""),
   }),
   encode: (p) =>
-    `EE#${p.id}#${escapeChat(p.name)}#${escapeChat(p.desc)}#${escapeChat(p.img)}#%`,
+    `EE#${p.id}#${escapeChat(p.name)}#${escapeChat(p.description)}#${escapeChat(p.image)}#%`,
 };
 
 export const sendEE = (packet: EEPacket) => {

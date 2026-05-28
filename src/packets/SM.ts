@@ -8,16 +8,16 @@ import type { PacketCodec } from "../packets";
 import { RD } from "./RD";
 
 export interface SMPacket {
-  musicList: string[];
+  music_list: string[];
 }
 
 export const SM: PacketCodec<SMPacket> = {
   header: "SM",
   decode(args) {
-    return { musicList: args.slice(1).map((v) => unescapeChat(v)) };
+    return { music_list: args.slice(1).map((v) => unescapeChat(v)) };
   },
   encode(packet) {
-    return `SM#${packet.musicList.map(escapeChat).join("#")}#%`;
+    return `SM#${packet.music_list.map(escapeChat).join("#")}#%`;
   },
 };
 
@@ -33,7 +33,7 @@ export const receiveSM = (packet: SMPacket) => {
 
   document.getElementById("client_loadingtext")!.innerHTML = `Loading Music`;
 
-  const tracks = packet.musicList;
+  const tracks = packet.music_list;
   // Legacy iterated up to length-1 to skip the trailing empty entry from the
   // wire-format split.
   const end = tracks.length > 0 && tracks[tracks.length - 1] === ""

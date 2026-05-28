@@ -292,7 +292,7 @@ class Client extends EventEmitter {
     this.sendPacketToServer(HI, { hdid });
     if (mode !== "replay") {
       this.checkUpdater = setInterval(
-        () => sendCH({ charId: this.charID }),
+        () => sendCH({ char_id: this.charID }),
         5000,
       );
     }

@@ -1,7 +1,7 @@
 import type { PacketCodec } from "../packets";
 
 export interface TIPacket {
-  timerId: number;
+  timer_id: number;
   command: number;
   time: number;
 }
@@ -10,13 +10,13 @@ export const TI: PacketCodec<TIPacket> = {
   header: "TI",
   decode(args) {
     return {
-      timerId: Number(args[1]),
+      timer_id: Number(args[1]),
       command: Number(args[2]),
       time: Number(args[3]),
     };
   },
   encode(packet) {
-    return `TI#${packet.timerId}#${packet.command}#${packet.time}#%`;
+    return `TI#${packet.timer_id}#${packet.command}#${packet.time}#%`;
   },
 };
 
@@ -27,14 +27,14 @@ export const receiveTI = (packet: TIPacket) => {
   switch (packet.command) {
     case 0:
     case 1:
-      document.getElementById(`client_timer${packet.timerId}`)!.innerText =
+      document.getElementById(`client_timer${packet.timer_id}`)!.innerText =
         String(packet.time);
       break;
     case 2:
-      document.getElementById(`client_timer${packet.timerId}`)!.style.display = "";
+      document.getElementById(`client_timer${packet.timer_id}`)!.style.display = "";
       break;
     case 3:
-      document.getElementById(`client_timer${packet.timerId}`)!.style.display = "none";
+      document.getElementById(`client_timer${packet.timer_id}`)!.style.display = "none";
       break;
   }
 };

@@ -7,13 +7,13 @@ import type { PacketCodec } from "../packets";
  * still includes it so an echo is silently ignored rather than warned about.
  */
 export interface CHPacket {
-  charId: number;
+  char_id: number;
 }
 
 export const CH: PacketCodec<CHPacket> = {
   header: "CH",
-  decode: (args) => ({ charId: Number(args[1]) }),
-  encode: (packet) => `CH#${packet.charId}#%`,
+  decode: (args) => ({ char_id: Number(args[1]) }),
+  encode: (packet) => `CH#${packet.char_id}#%`,
 };
 
 export const receiveCH = () => {};

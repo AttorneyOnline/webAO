@@ -4,16 +4,16 @@ import { escapeChat, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
 
 export interface ASSPacket {
-  assetUrl: string;
+  asset_url: string;
 }
 
 export const ASS: PacketCodec<ASSPacket> = {
   header: "ASS",
   decode(args) {
-    return { assetUrl: unescapeChat(args[1] ?? "") };
+    return { asset_url: unescapeChat(args[1] ?? "") };
   },
   encode(packet) {
-    return `ASS#${escapeChat(packet.assetUrl)}#%`;
+    return `ASS#${escapeChat(packet.asset_url)}#%`;
   },
 };
 
@@ -21,6 +21,6 @@ export const ASS: PacketCodec<ASSPacket> = {
  * new asset url!!
  */
 export const receiveASS = (packet: ASSPacket) => {
-  if (packet.assetUrl !== "None") setAOhost(packet.assetUrl);
+  if (packet.asset_url !== "None") setAOhost(packet.asset_url);
   renderPlayerList();
 };

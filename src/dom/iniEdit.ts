@@ -16,5 +16,5 @@ export async function iniedit() {
     iniselect.selectedIndex === 0 ? ininame.value : iniselect.value;
 
   await handleCharacterInfo(newname.split("&"), inicharID);
-  receivePV({ playerId: 0, charId: inicharID });
+  receivePV({ player_id: 0, char_id: inicharID });
 }

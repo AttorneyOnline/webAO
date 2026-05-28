@@ -7,8 +7,8 @@ import type { PacketCodec } from "../packets";
  */
 export interface MAPacket {
   id: number;
-  /** Length in minutes. Use 0 for a kick. */
-  length: number;
+  /** Duration in minutes. Use 0 for a kick. */
+  duration: number;
   reason: string;
 }
 
@@ -16,10 +16,10 @@ export const MA: PacketCodec<MAPacket> = {
   header: "MA",
   decode: (args) => ({
     id: Number(args[1]),
-    length: Number(args[2]),
+    duration: Number(args[2]),
     reason: unescapeChat(args[3] ?? ""),
   }),
-  encode: (p) => `MA#${p.id}#${p.length}#${escapeChat(p.reason)}#%`,
+  encode: (p) => `MA#${p.id}#${p.duration}#${escapeChat(p.reason)}#%`,
 };
 
 export const sendMA = (packet: MAPacket) => {

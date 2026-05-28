@@ -6,14 +6,14 @@ import type { PacketCodec } from "../packets";
 
 /**
  * Music/area change. Per spec:
- *   Server-receiver: `MC#{track}#{char_id}#{showname}#{effects}#%`
- *   Client-receiver: `MC#{track}#{char_id}#{showname}#{looping}#{channel}#{effects}#%`
+ *   Server-receiver: `MC#{name}#{char_id}#{showname}#{effects}#%`
+ *   Client-receiver: `MC#{name}#{char_id}#{showname}#{looping}#{channel}#{effects}#%`
  * All fields past `char_id` are modeled as optional so the same codec covers
  * both directions and tolerates servers that omit later fields.
  */
 export interface MCPacket {
-  track: string;
-  charId: number;
+  name: string;
+  char_id: number;
   showname?: string;
   looping?: number;
   channel?: number;
@@ -24,8 +24,8 @@ export const MC: PacketCodec<MCPacket> = {
   header: "MC",
   decode(args) {
     const packet: MCPacket = {
-      track: unescapeChat(args[1] ?? ""),
-      charId: Number(args[2]),
+      name: unescapeChat(args[1] ?? ""),
+      char_id: Number(args[2]),
     };
     if (args[3] !== undefined) packet.showname = unescapeChat(args[3]);
     if (args[4] !== undefined) packet.looping = Number(args[4]);
@@ -34,7 +34,7 @@ export const MC: PacketCodec<MCPacket> = {
     return packet;
   },
   encode(packet) {
-    let out = `MC#${escapeChat(packet.track)}#${packet.charId}`;
+    let out = `MC#${escapeChat(packet.name)}#${packet.char_id}`;
     if (packet.showname !== undefined) out += `#${escapeChat(packet.showname)}`;
     if (packet.looping !== undefined) out += `#${packet.looping}`;
     if (packet.channel !== undefined) out += `#${packet.channel}`;
@@ -47,8 +47,8 @@ export const MC: PacketCodec<MCPacket> = {
  * Handles a music change to an arbitrary resource.
  */
 export const receiveMC = (packet: MCPacket) => {
-  const track = safeTags(decodeChat(packet.track));
-  let charID = packet.charId;
+  const track = safeTags(decodeChat(packet.name));
+  let charID = packet.char_id;
   const showname = packet.showname || "";
   const looping = Boolean(packet.looping);
   const channel = packet.channel ?? 0;

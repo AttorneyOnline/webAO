@@ -13,8 +13,8 @@ export function editEvidence() {
   sendEE({
     id,
     name: (<HTMLInputElement>document.getElementById("evi_name")).value,
-    desc: (<HTMLInputElement>document.getElementById("evi_desc")).value,
-    img:
+    description: (<HTMLInputElement>document.getElementById("evi_desc")).value,
+    image:
       evidence_select.selectedIndex === 0
         ? (<HTMLInputElement>document.getElementById("evi_filename")).value
         : evidence_select.options[evidence_select.selectedIndex].text,

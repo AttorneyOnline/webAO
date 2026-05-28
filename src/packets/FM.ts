@@ -4,16 +4,16 @@ import { escapeChat, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
 
 export interface FMPacket {
-  musicList: string[];
+  music_list: string[];
 }
 
 export const FM: PacketCodec<FMPacket> = {
   header: "FM",
   decode(args) {
-    return { musicList: args.slice(1).map((v) => unescapeChat(v)) };
+    return { music_list: args.slice(1).map((v) => unescapeChat(v)) };
   },
   encode(packet) {
-    return `FM#${packet.musicList.map(escapeChat).join("#")}#%`;
+    return `FM#${packet.music_list.map(escapeChat).join("#")}#%`;
   },
 };
 
@@ -26,7 +26,7 @@ export const receiveFM = (packet: FMPacket) => {
   // The legacy loop iterated `1..length-1`, skipping the trailing empty
   // string left by the wire-format split. We preserve that by dropping the
   // last entry if it is empty.
-  const tracks = packet.musicList;
+  const tracks = packet.music_list;
   const end = tracks.length > 0 && tracks[tracks.length - 1] === ""
     ? tracks.length - 1
     : tracks.length;
