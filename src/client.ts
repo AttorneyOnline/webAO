@@ -201,7 +201,6 @@ class Client extends EventEmitter {
     this.viewport = masterViewport();
     this._lastTimeICReceived = new Date(0);
     this.temp_packet = "";
-    loadResources;
     this.playerlist = new Map();
     this.charicon_extensions = [".png", ".webp"];
     this.emote_extensions = [".gif", ".png", ".apng", ".webp", ".webp.static"];

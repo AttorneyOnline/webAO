@@ -15,7 +15,7 @@ A forked client of WebAO for the Attorney Online roleplaying chatroom, written i
 bun install
 
 # Start the dev server (hot reload, http://localhost:8080)
-bun run start
+bun run dev
 
 # Run the test suite
 bun test
