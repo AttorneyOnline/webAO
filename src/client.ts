@@ -5,6 +5,7 @@
  */
 import "./styles/client.css";
 import "./styles/goldenlayout.css";
+import "golden-layout/dist/css/themes/goldenlayout-dark-theme.css";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { sendCH } from "./packets/CH";
 import queryParser from "./utils/queryParser";
