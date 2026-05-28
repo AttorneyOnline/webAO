@@ -90,16 +90,10 @@ fpPromise
     }
 
     client = new Client(connectionString);
+    client.connect();
     client.hdid = hdid;
     loadResources();
     installVoiceUI();
-    // Defer the WebSocket open until after the page's `load` event so the
-    // long-lived WS connection doesn't keep the tab spinner spinning forever.
-    if (document.readyState === "complete") {
-      client.connect();
-    } else {
-      window.addEventListener("load", () => client.connect(), { once: true });
-    }
   });
 
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
