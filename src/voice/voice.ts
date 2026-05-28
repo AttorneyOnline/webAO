@@ -1,13 +1,13 @@
 // Server-relayed voice transport.
 //
-// Every audio frame travels client → AO2 server → other clients over the
+// Every audio frame travels client -> AO2 server -> other clients over the
 // existing AO2 WebSocket. There is no WebRTC, no STUN/TURN/ICE, no SDP.
 // Peers never connect to each other, so their IPs cannot leak via packet
 // capture — this is a structural privacy property of the transport.
 //
 // Wire protocol (`#` separator, `%` terminator; base64 needs no escaping):
 //
-//   Server → client
+//   Server -> client
 //     VS_CAPS#<enabled>#<ptt_only>#<max_peers>#<codec>#<sample_rate>#<frame_ms>#<max_frame_bytes>#%
 //     VS_PEERS#<csv_uids>#%
 //     VS_JOIN#<uid>#%
@@ -15,13 +15,17 @@
 //     VS_SPEAK#<uid>#<on_off>#%
 //     VS_AUDIO#<from_uid>#<b64_opus>#%
 //
-//   Client → server
+//   Client -> server
 //     VS_JOIN#%
 //     VS_LEAVE#%
 //     VS_FRAME#<b64_opus>#%
 //     VS_SPEAK#<on_off>#%
 
 import { client } from "../client";
+import { VS_FRAME } from "../packets/VS_FRAME";
+import { VS_JOINServer } from "../packets/VS_JOIN";
+import { VS_LEAVEServer } from "../packets/VS_LEAVE";
+import { VS_SPEAKServer } from "../packets/VS_SPEAK";
 
 interface VoiceCaps {
   enabled: boolean;
@@ -285,7 +289,7 @@ function syncSpeakState(): void {
   if (want === lastEmittedSpeak) return;
   lastEmittedSpeak = want;
   if (inVoice) {
-    client.sendToServer(`VS_SPEAK#${want ? 1 : 0}#%`);
+    client.sendPacketToServer(VS_SPEAKServer, { on: want });
   }
   notifySpeakingListeners();
 }
@@ -368,7 +372,7 @@ async function startCapture(): Promise<void> {
         // Server would drop oversize frames anyway
         return;
       }
-      client.sendToServer(`VS_FRAME#${b64}#%`);
+      client.sendPacketToServer(VS_FRAME, { payload: b64 });
     },
     error: (e: DOMException) => {
       console.error("voice: encoder error", e);
@@ -566,7 +570,7 @@ export async function joinVoiceListenOnly(): Promise<void> {
   }
   inVoice = true;
   listenOnly = true;
-  client.sendToServer(`VS_JOIN#%`);
+  client.sendPacketToServer(VS_JOINServer, {});
   syncSpeakState();
 }
 
@@ -606,7 +610,7 @@ export async function joinVoice(): Promise<void> {
   }
   if (!wasListenOnly) {
     inVoice = true;
-    client.sendToServer(`VS_JOIN#%`);
+    client.sendPacketToServer(VS_JOINServer, {});
   }
   listenOnly = false;
   syncSpeakState();
@@ -616,9 +620,9 @@ export function leaveVoice(): void {
   if (!inVoice) return;
   if (lastEmittedSpeak) {
     lastEmittedSpeak = false;
-    client.sendToServer(`VS_SPEAK#0#%`);
+    client.sendPacketToServer(VS_SPEAKServer, { on: false });
   }
-  client.sendToServer(`VS_LEAVE#%`);
+  client.sendPacketToServer(VS_LEAVEServer, {});
   teardownAll();
   notifyCapsUpdated();
 }

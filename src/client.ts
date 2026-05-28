@@ -8,13 +8,14 @@ import "./styles/goldenlayout.css";
 import "golden-layout/dist/css/themes/goldenlayout-dark-theme.css";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { sendCH } from "./packets/CH";
+import { HI } from "./packets/HI";
 import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources";
 import masterViewport from "./viewport/viewport";
 import { Viewport } from "./viewport/interfaces/Viewport";
 import { EventEmitter } from "events";
 import { onReplayGo } from "./dom/onReplayGo";
-import { packetRegistry } from "./packets";
+import { packetRegistry, type PacketCodec } from "./packets";
 import { appendICNotice } from "./client/appendICNotice";
 import { loadResources } from "./client/loadResources";
 import { AO_HOST } from "./client/aoHost";
@@ -54,6 +55,8 @@ export let extrafeatures: string[] = [];
 export const setExtraFeatures = (val: any) => {
   extrafeatures = val;
 };
+
+export const encode_packets_as_json = false;
 
 let hdid: string;
 
@@ -241,7 +244,7 @@ class Client extends EventEmitter {
 
   /**
    * Echoes a wire message back into our own dispatcher. Used by handlers
-   * that synthesize follow-up packets (e.g. RD → BN/DONE) and by replay
+   * that synthesize follow-up packets (e.g. RD -> BN/DONE) and by replay
    * mode to feed pre-recorded packets through.
    */
   sendToSelf(message: string) {
@@ -251,11 +254,12 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Writes a wire message to the server. In replay mode the websocket
-   * isn't live, so outgoing packets loop back through `sendToSelf` to
-   * drive the local dispatcher.
+   * Writes a raw wire-format string to the server. Escape hatch for senders
+   * that build the wire bytes inline without going through a codec. In
+   * replay mode the websocket isn't live, so outgoing packets loop back
+   * through `sendToSelf` to drive the local dispatcher.
    */
-  sendToServer(message: string) {
+  sendStringToServer(message: string) {
     console.debug("C: " + message);
     if (mode === "replay") {
       this.sendToSelf(message);
@@ -265,11 +269,27 @@ class Client extends EventEmitter {
   }
 
   /**
+   * Sends a typed packet using `codec`. JSON mode produces
+   * `{"$header": codec.header, ...packet}`; legacy mode delegates to
+   * `codec.encode(packet)`.
+   */
+  sendPacketToServer<T>(codec: PacketCodec<T>, packet: T) {
+    if (encode_packets_as_json) {
+      this.sendStringToServer(JSON.stringify({ $header: codec.header, ...packet }));
+      return;
+    }
+    if (!codec.encode) {
+      throw new Error(`No encoder defined for codec ${codec.header}`);
+    }
+    this.sendStringToServer(codec.encode(packet));
+  }
+
+  /**
    * Begins the handshake process by sending an identifier
    * to the server.
    */
   joinServer() {
-    this.sendToServer(`HI#${hdid}#%`);
+    this.sendPacketToServer(HI, { hdid });
     if (mode !== "replay") {
       this.checkUpdater = setInterval(
         () => sendCH({ charId: this.charID }),

@@ -8,6 +8,7 @@ export interface ASSPacket {
 }
 
 export const ASS: PacketCodec<ASSPacket> = {
+  header: "ASS",
   decode(args) {
     return { assetUrl: unescapeChat(args[1] ?? "") };
   },

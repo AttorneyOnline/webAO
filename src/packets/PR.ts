@@ -8,6 +8,7 @@ export interface PRPacket {
 }
 
 export const PR: PacketCodec<PRPacket> = {
+  header: "PR",
   decode(args) {
     return { id: Number(args[1]), type: Number(args[2]) };
   },

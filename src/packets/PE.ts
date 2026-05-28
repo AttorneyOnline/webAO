@@ -13,6 +13,7 @@ export interface PEPacket {
 }
 
 export const PE: PacketCodec<PEPacket> = {
+  header: "PE",
   decode: (args) => ({
     name: unescapeChat(args[1] ?? ""),
     desc: unescapeChat(args[2] ?? ""),
@@ -23,5 +24,5 @@ export const PE: PacketCodec<PEPacket> = {
 };
 
 export const sendPE = (packet: PEPacket) => {
-  client.sendToServer(PE.encode(packet));
+  client.sendPacketToServer(PE, packet);
 };

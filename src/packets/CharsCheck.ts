@@ -6,6 +6,7 @@ export interface CharsCheckPacket {
 }
 
 export const CharsCheck: PacketCodec<CharsCheckPacket> = {
+  header: "CharsCheck",
   decode(args) {
     return { taken: args.slice(1).map((v) => Number(v)) };
   },

@@ -18,6 +18,7 @@ export interface PVPacket {
 }
 
 export const PV: PacketCodec<PVPacket> = {
+  header: "PV",
   decode(args) {
     return { playerId: Number(args[1]), charId: Number(args[3]) };
   },

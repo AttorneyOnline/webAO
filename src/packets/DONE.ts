@@ -9,6 +9,7 @@ const { mode } = queryParser();
 export type DONEPacket = Record<string, never>;
 
 export const DONE: PacketCodec<DONEPacket> = {
+  header: "DONE",
   decode() {
     return {};
   },

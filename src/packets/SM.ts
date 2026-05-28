@@ -5,12 +5,14 @@ import { fix_last_area } from "../client/fixLastArea";
 import { isAudio } from "../client/isAudio";
 import { escapeChat, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
+import { RD } from "./RD";
 
 export interface SMPacket {
   musicList: string[];
 }
 
 export const SM: PacketCodec<SMPacket> = {
+  header: "SM",
   decode(args) {
     return { musicList: args.slice(1).map((v) => unescapeChat(v)) };
   },
@@ -53,5 +55,5 @@ export const receiveSM = (packet: SMPacket) => {
   }
 
   // Music done, carry on
-  client.sendToServer("RD#%");
+  client.sendPacketToServer(RD, {});
 };

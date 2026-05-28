@@ -21,4 +21,4 @@ if (!result.success) {
   process.exit(1);
 }
 
-console.log(`✓ built ${result.outputs.length} files → ./dist`);
+console.log(`✓ built ${result.outputs.length} files -> ./dist`);

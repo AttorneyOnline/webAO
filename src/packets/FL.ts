@@ -7,6 +7,7 @@ export interface FLPacket {
 }
 
 export const FL: PacketCodec<FLPacket> = {
+  header: "FL",
   decode(args) {
     return { features: args.slice(1).map((v) => unescapeChat(v)) };
   },

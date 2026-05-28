@@ -8,6 +8,7 @@ export interface HIPacket {
 }
 
 export const HI: PacketCodec<HIPacket> = {
+  header: "HI",
   decode(args) {
     return { hdid: unescapeChat(args[1] ?? "") };
   },

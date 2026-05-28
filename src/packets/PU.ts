@@ -11,6 +11,7 @@ export interface PUPacket {
 }
 
 export const PU: PacketCodec<PUPacket> = {
+  header: "PU",
   decode(args) {
     return {
       id: Number(args[1]),

@@ -19,6 +19,7 @@ export interface VS_CAPSPacket {
 }
 
 export const VS_CAPS: PacketCodec<VS_CAPSPacket> = {
+  header: "VS_CAPS",
   decode(args) {
     return {
       enabled: args[1] === "1",

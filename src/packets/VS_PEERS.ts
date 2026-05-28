@@ -12,6 +12,7 @@ export interface VS_PEERSPacket {
 }
 
 export const VS_PEERS: PacketCodec<VS_PEERSPacket> = {
+  header: "VS_PEERS",
   decode(args) {
     const csv = args[1] || "";
     const uids: number[] = [];

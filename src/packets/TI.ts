@@ -7,6 +7,7 @@ export interface TIPacket {
 }
 
 export const TI: PacketCodec<TIPacket> = {
+  header: "TI",
   decode(args) {
     return {
       timerId: Number(args[1]),

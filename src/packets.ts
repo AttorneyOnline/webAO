@@ -22,7 +22,7 @@ import { FL, receiveFL } from "./packets/FL";
 import { FM, receiveFM } from "./packets/FM";
 import { HI, receiveHI } from "./packets/HI";
 import { HP, receiveHP, sendHP } from "./packets/HP";
-import { ID, receiveID } from "./packets/ID";
+import { IDClient, receiveID } from "./packets/ID";
 import { JD, receiveJD } from "./packets/JD";
 import { KB, receiveKB } from "./packets/KB";
 import { KK, receiveKK } from "./packets/KK";
@@ -48,10 +48,10 @@ import { SP, receiveSP } from "./packets/SP";
 import { TI, receiveTI } from "./packets/TI";
 import { VS_AUDIO, receiveVS_AUDIO } from "./packets/VS_AUDIO";
 import { VS_CAPS, receiveVS_CAPS } from "./packets/VS_CAPS";
-import { VS_JOIN, receiveVS_JOIN } from "./packets/VS_JOIN";
-import { VS_LEAVE, receiveVS_LEAVE } from "./packets/VS_LEAVE";
+import { VS_JOINClient, receiveVS_JOIN } from "./packets/VS_JOIN";
+import { VS_LEAVEClient, receiveVS_LEAVE } from "./packets/VS_LEAVE";
 import { VS_PEERS, receiveVS_PEERS } from "./packets/VS_PEERS";
-import { VS_SPEAK, receiveVS_SPEAK } from "./packets/VS_SPEAK";
+import { VS_SPEAKClient, receiveVS_SPEAK } from "./packets/VS_SPEAK";
 import { ZZ, receiveZZ, sendZZ } from "./packets/ZZ";
 
 /**
@@ -62,8 +62,13 @@ import { ZZ, receiveZZ, sendZZ } from "./packets/ZZ";
  * `encode` is optional: receive-only packets omit it. The dispatcher only
  * calls `decode`; encoders are called directly by name from the sender
  * modules.
+ *
+ * `header` is the wire header for this codec (e.g. `"MS"`, `"PE"`). Both
+ * direction-specific codecs for the same packet (like `MSClient` and
+ * `MSServer`) share the same header.
  */
 export interface PacketCodec<TPacket> {
+  header: string;
   decode(args: string[]): TPacket;
   encode?(packet: TPacket): string;
 }
@@ -121,7 +126,7 @@ const packets: Record<string, PacketBinding<any>> = {
   FM: { codec: FM, receive: receiveFM },
   HI: { codec: HI, receive: receiveHI },
   HP: { codec: HP, receive: receiveHP, send: sendHP },
-  ID: { codec: ID, receive: receiveID },
+  ID: { codec: IDClient, receive: receiveID },
   JD: { codec: JD, receive: receiveJD },
   KB: { codec: KB, receive: receiveKB },
   KK: { codec: KK, receive: receiveKK },
@@ -147,10 +152,10 @@ const packets: Record<string, PacketBinding<any>> = {
   TI: { codec: TI, receive: receiveTI },
   VS_AUDIO: { codec: VS_AUDIO, receive: receiveVS_AUDIO },
   VS_CAPS: { codec: VS_CAPS, receive: receiveVS_CAPS },
-  VS_JOIN: { codec: VS_JOIN, receive: receiveVS_JOIN },
-  VS_LEAVE: { codec: VS_LEAVE, receive: receiveVS_LEAVE },
+  VS_JOIN: { codec: VS_JOINClient, receive: receiveVS_JOIN },
+  VS_LEAVE: { codec: VS_LEAVEClient, receive: receiveVS_LEAVE },
   VS_PEERS: { codec: VS_PEERS, receive: receiveVS_PEERS },
-  VS_SPEAK: { codec: VS_SPEAK, receive: receiveVS_SPEAK },
+  VS_SPEAK: { codec: VS_SPEAKClient, receive: receiveVS_SPEAK },
   ZZ: { codec: ZZ, receive: receiveZZ, send: sendZZ },
 };
 

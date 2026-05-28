@@ -19,6 +19,7 @@ export interface ARUPPacket {
 }
 
 export const ARUP: PacketCodec<ARUPPacket> = {
+  header: "ARUP",
   decode(args) {
     const updateType = Number(args[1]) as 0 | 1 | 2 | 3;
     const rest = args.slice(2);

@@ -3,7 +3,6 @@ import { handleCharacterInfo, ensureCharIni } from "../client/handleCharacterInf
 import { resetICParams } from "../client/resetICParams";
 import { escapeChat, safeTags, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
-import queryParser from "../utils/queryParser";
 import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
 
 /**
@@ -15,10 +14,10 @@ import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
  * papers over the groups by always producing a fully-populated packet;
  * short wire forms get filled with the documented defaults.
  *
- *   Client-as-receiver (Server → Client): all 32 fields. Modeled by
+ *   Client-as-receiver (Server -> Client): all 32 fields. Modeled by
  *     `MSPacketClient` + the `MSClient` codec (used by the dispatcher).
  *
- *   Server-as-receiver (Client → Server): same fields *except*
+ *   Server-as-receiver (Client -> Server): same fields *except*
  *     `paired_name` and `paired_emote` are not present on the wire.
  *     Modeled by `MSPacketServer` + the `MSServer` codec.
  *
@@ -27,7 +26,7 @@ import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
  * character (escape `<and>`), so on the actual bytes you see `{x}<and>{y}`.
  * That's why every AO server in the wild appears to "use literal `<and>`":
  * it's just standard FantaCode escape of `&`. The codec runs the regular
- * unescape (`<and>` → `&`) on decode and re-escapes on encode, so
+ * unescape (`<and>` -> `&`) on decode and re-escapes on encode, so
  * downstream consumers see logical `{x, y}` and never have to think about
  * the wire-level dance.
  */
@@ -83,8 +82,6 @@ export type MSPacketServer = Omit<
   "paired_name" | "paired_emote" | "paired_offset" | "paired_flip"
 >;
 
-const { mode } = queryParser();
-
 /** Numeric x/y offset pair parsed from the `{x}&{y}` wire form. */
 export interface Offset {
   x: number;
@@ -92,7 +89,7 @@ export interface Offset {
 }
 
 const parseOffset = (s: string | undefined): Offset => {
-  // `str()` already unescaped `<and>` → `&` for us; split on the logical `&`.
+  // `str()` already unescaped `<and>` -> `&` for us; split on the logical `&`.
   const [xs = "0", ys = "0"] = (s ?? "").split("&");
   return { x: Number(xs) || 0, y: Number(ys) || 0 };
 };
@@ -220,7 +217,7 @@ export enum Side {
 }
 
 const KNOWN_SIDES = new Set<string>(Object.values(Side));
-/** Wire string → `Side`. Unknown values fall back to `WITNESS`. */
+/** Wire string -> `Side`. Unknown values fall back to `WITNESS`. */
 export const parseSide = (s: string | undefined): Side => {
   const lower = (s ?? "").toLowerCase();
   return KNOWN_SIDES.has(lower) ? (lower as Side) : Side.WITNESS;
@@ -248,6 +245,7 @@ const intOr = (v: string | undefined, def: number): number => {
 };
 
 export const MSClient: PacketCodec<MSPacketClient> = {
+  header: "MS",
   decode(args) {
     return {
       desk_modifier: parseDeskModifier(args[1]),
@@ -321,6 +319,7 @@ export const MSClient: PacketCodec<MSPacketClient> = {
 };
 
 export const MSServer: PacketCodec<MSPacketServer> = {
+  header: "MS",
   decode(args) {
     return {
       desk_modifier: parseDeskModifier(args[1]),
@@ -421,32 +420,6 @@ export const receiveMS = (packet: MSPacketClient) => {
   handle_ic_speaking(packet);
 };
 
-/**
- * Sends an in-character chat message. The packet variant depends on
- * whether we're talking to a real server (Server-receiver form, no
- * `paired_name` / `paired_emote`) or replaying to ourselves
- * (Client-receiver form, fields included with empty values).
- */
 export const sendMS = (packet: MSPacketServer) => {
-  // In replay mode, sendToServer routes the wire back through the local
-  // dispatcher -- which expects Client-receiver form (with `paired_*`
-  // fields). Fill those in as zero/empty when self-sending.
-  const wire =
-    mode === "replay"
-      ? MSClient.encode({
-        ...packet,
-        paired_name: "",
-        paired_emote: "",
-        paired_offset: { x: 0, y: 0 },
-        paired_flip: Flip.NONE,
-      })
-      : MSServer.encode(packet);
-
-  client.sendToServer(wire);
-  if (mode === "replay") {
-    (<HTMLInputElement>document.getElementById("client_ooclog")).value +=
-      `wait#${
-        (<HTMLInputElement>document.getElementById("client_replaytimer")).value
-      }#%\r\n`;
-  }
+  client.sendPacketToServer(MSServer, packet);
 };

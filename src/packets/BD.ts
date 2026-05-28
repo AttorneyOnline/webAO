@@ -8,6 +8,7 @@ export interface BDPacket {
 }
 
 export const BD: PacketCodec<BDPacket> = {
+  header: "BD",
   decode(args) {
     return { reason: unescapeChat(args[1] ?? "") };
   },

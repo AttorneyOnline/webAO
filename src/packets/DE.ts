@@ -10,10 +10,11 @@ export interface DEPacket {
 }
 
 export const DE: PacketCodec<DEPacket> = {
+  header: "DE",
   decode: (args) => ({ id: Number(args[1]) }),
   encode: (packet) => `DE#${packet.id}#%`,
 };
 
 export const sendDE = (packet: DEPacket) => {
-  client.sendToServer(DE.encode(packet));
+  client.sendPacketToServer(DE, packet);
 };

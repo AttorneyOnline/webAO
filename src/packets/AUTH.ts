@@ -5,6 +5,7 @@ export interface AUTHPacket {
 }
 
 export const AUTH: PacketCodec<AUTHPacket> = {
+  header: "AUTH",
   decode(args) {
     return { authState: Number(args[1]) };
   },

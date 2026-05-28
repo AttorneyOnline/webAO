@@ -14,6 +14,7 @@ export interface EEPacket {
 }
 
 export const EE: PacketCodec<EEPacket> = {
+  header: "EE",
   decode: (args) => ({
     id: Number(args[1]),
     name: unescapeChat(args[2] ?? ""),
@@ -25,5 +26,5 @@ export const EE: PacketCodec<EEPacket> = {
 };
 
 export const sendEE = (packet: EEPacket) => {
-  client.sendToServer(EE.encode(packet));
+  client.sendPacketToServer(EE, packet);
 };

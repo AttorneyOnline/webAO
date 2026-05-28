@@ -14,6 +14,7 @@ export interface BNPacket {
 }
 
 export const BN: PacketCodec<BNPacket> = {
+  header: "BN",
   decode(args) {
     const packet: BNPacket = { background: unescapeChat(args[1] ?? "") };
     if (args[2] !== undefined) {

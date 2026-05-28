@@ -8,6 +8,7 @@ export interface KBPacket {
 }
 
 export const KB: PacketCodec<KBPacket> = {
+  header: "KB",
   decode(args) {
     return { reason: unescapeChat(args[1] ?? "") };
   },

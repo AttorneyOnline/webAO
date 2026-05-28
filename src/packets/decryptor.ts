@@ -8,6 +8,7 @@ import type { PacketCodec } from "../packets";
 export type DecryptorPacket = Record<string, never>;
 
 export const decryptor: PacketCodec<DecryptorPacket> = {
+  header: "decryptor",
   decode: () => ({}),
 };
 

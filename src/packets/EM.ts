@@ -5,6 +5,7 @@ import { fix_last_area } from "../client/fixLastArea";
 import { isAudio } from "../client/isAudio";
 import { escapeChat, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
+import { AM } from "./AM";
 
 /**
  * Incremental music/area list packet. Wire format is essentially
@@ -19,6 +20,7 @@ export interface EMPacket {
 }
 
 export const EM: PacketCodec<EMPacket> = {
+  header: "EM",
   decode(args) {
     const batchIndex = Number(args[1]);
     const entries: { index: number; name: string }[] = [];
@@ -64,5 +66,5 @@ export const receiveEM = (packet: EMPacket) => {
     }
   }
   // get the next batch of tracks
-  client.sendToServer(`AM#${packet.batchIndex / 10 + 1}#%`);
+  client.sendPacketToServer(AM, { batch: packet.batchIndex / 10 + 1 });
 };

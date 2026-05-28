@@ -2,6 +2,7 @@ import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
 import { escapeChat, safeTags, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
+import { AE } from "./AE";
 
 /**
  * Per-evidence incremental info packet. Wire format is
@@ -20,6 +21,7 @@ export interface EIPacket {
 }
 
 export const EI: PacketCodec<EIPacket> = {
+  header: "EI",
   decode(args) {
     const parts = (args[2] ?? "").split("&");
     return {
@@ -50,5 +52,5 @@ export const receiveEI = (packet: EIPacket) => {
     icon: `${AO_HOST}evidence/${encodeURI(packet.image.toLowerCase())}`,
   };
 
-  client.sendToServer("AE" + (packet.id + 1) + "#%");
+  client.sendPacketToServer(AE, { id: packet.id + 1 });
 };

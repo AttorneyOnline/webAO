@@ -14,6 +14,7 @@ export interface RMCPacket {
 }
 
 export const RMC: PacketCodec<RMCPacket> = {
+  header: "RMC",
   decode(args) {
     return { toTime: unescapeChat(args[1] ?? "") };
   },

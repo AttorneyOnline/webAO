@@ -1,5 +1,5 @@
 /**
- * DOM → TS dispatch via `data-action` attributes.
+ * DOM -> TS dispatch via `data-action` attributes.
  *
  * HTML elements declare their handler with `data-action="<name>"`. The
  * default event is "click"; override with `data-event="change"` etc.

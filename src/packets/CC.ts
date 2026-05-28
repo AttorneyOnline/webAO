@@ -14,6 +14,7 @@ export interface CCPacket {
 }
 
 export const CC: PacketCodec<CCPacket> = {
+  header: "CC",
   decode(args) {
     const packet: CCPacket = {
       playerId: Number(args[1]),
@@ -45,5 +46,5 @@ export const receiveCC = (packet: CCPacket) => {
  */
 export const sendCC = (packet: CCPacket) => {
   if (packet.charId !== -1 && !client.chars[packet.charId]?.name) return;
-  client.sendToServer(CC.encode(packet));
+  client.sendPacketToServer(CC, packet);
 };

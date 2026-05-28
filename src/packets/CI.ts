@@ -1,6 +1,7 @@
 import { client } from "../client";
 import { handleCharacterInfo } from "../client/handleCharacterInfo";
 import type { PacketCodec } from "../packets";
+import { AN } from "./AN";
 
 /**
  * Incremental character info packet. Wire format is
@@ -15,6 +16,7 @@ export interface CIPacket {
 }
 
 export const CI: PacketCodec<CIPacket> = {
+  header: "CI",
   decode(args) {
     const batchIndex = Number(args[1]);
     const entries: { index: number; data: string }[] = [];
@@ -45,5 +47,5 @@ export const receiveCI = (packet: CIPacket) => {
     setTimeout(() => handleCharacterInfo(chargs, index), 500);
   }
   // Request the next pack
-  client.sendToServer(`AN#${packet.batchIndex / 10 + 1}#%`);
+  client.sendPacketToServer(AN, { batch: packet.batchIndex / 10 + 1 });
 };

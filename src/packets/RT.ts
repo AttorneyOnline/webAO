@@ -15,6 +15,7 @@ export interface RTPacket {
 }
 
 export const RT: PacketCodec<RTPacket> = {
+  header: "RT",
   decode(args) {
     const packet: RTPacket = { animation: unescapeChat(args[1] ?? "") };
     if (args[2] !== undefined && args[2] !== "") {
@@ -62,5 +63,5 @@ export const receiveRT = (packet: RTPacket) => {
  * Sends a testimony state change (witness testimony, cross-exam, judge ruling).
  */
 export const sendRT = (packet: RTPacket) => {
-  client.sendToServer(RT.encode(packet));
+  client.sendPacketToServer(RT, packet);
 };

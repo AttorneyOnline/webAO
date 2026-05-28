@@ -21,6 +21,7 @@ export interface MCPacket {
 }
 
 export const MC: PacketCodec<MCPacket> = {
+  header: "MC",
   decode(args) {
     const packet: MCPacket = {
       track: unescapeChat(args[1] ?? ""),
@@ -89,5 +90,5 @@ export const receiveMC = (packet: MCPacket) => {
  * Requests to change the music to the specified track.
  */
 export const sendMC = (packet: MCPacket) => {
-  client.sendToServer(MC.encode(packet));
+  client.sendPacketToServer(MC, packet);
 };

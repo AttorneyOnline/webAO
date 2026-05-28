@@ -2,6 +2,7 @@ import { client } from "../client";
 import { setupCharacterBasic } from "../client/handleCharacterInfo";
 import type { PacketCodec } from "../packets";
 import queryParser from "../utils/queryParser";
+import { RM } from "./RM";
 
 const { mode } = queryParser();
 
@@ -19,6 +20,7 @@ export interface SCPacket {
 }
 
 export const SC: PacketCodec<SCPacket> = {
+  header: "SC",
   decode(args) {
     return { charData: args.slice(1) };
   },
@@ -44,5 +46,5 @@ export const receiveSC = async (packet: SCPacket) => {
     setupCharacterBasic(chargs, i);
   }
   // We're done with the characters, request the music
-  client.sendToServer("RM#%");
+  client.sendPacketToServer(RM, {});
 };

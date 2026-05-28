@@ -7,6 +7,7 @@ import type { PacketCodec } from "../packets";
 export type MMPacket = Record<string, never>;
 
 export const MM: PacketCodec<MMPacket> = {
+  header: "MM",
   decode() {
     return {};
   },

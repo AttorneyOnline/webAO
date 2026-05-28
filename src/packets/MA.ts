@@ -13,6 +13,7 @@ export interface MAPacket {
 }
 
 export const MA: PacketCodec<MAPacket> = {
+  header: "MA",
   decode: (args) => ({
     id: Number(args[1]),
     length: Number(args[2]),
@@ -22,5 +23,5 @@ export const MA: PacketCodec<MAPacket> = {
 };
 
 export const sendMA = (packet: MAPacket) => {
-  client.sendToServer(MA.encode(packet));
+  client.sendPacketToServer(MA, packet);
 };

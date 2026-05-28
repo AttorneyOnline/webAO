@@ -6,6 +6,7 @@ import type { PacketCodec } from "../packets";
 export type CHECKPacket = Record<string, never>;
 
 export const CHECK: PacketCodec<CHECKPacket> = {
+  header: "CHECK",
   decode: () => ({}),
   encode: () => "CHECK#%",
 };

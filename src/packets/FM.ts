@@ -8,6 +8,7 @@ export interface FMPacket {
 }
 
 export const FM: PacketCodec<FMPacket> = {
+  header: "FM",
   decode(args) {
     return { musicList: args.slice(1).map((v) => unescapeChat(v)) };
   },

@@ -1,6 +1,7 @@
 import { client } from "../client";
 import { escapeChat, unescapeChat } from "../encoding";
 import type { PacketCodec } from "../packets";
+import { askchaa } from "./askchaa";
 
 export interface PNPacket {
   playerCount: number;
@@ -9,6 +10,7 @@ export interface PNPacket {
 }
 
 export const PN: PacketCodec<PNPacket> = {
+  header: "PN",
   decode(args) {
     const packet: PNPacket = {
       playerCount: Number(args[1]),
@@ -31,5 +33,5 @@ export const PN: PacketCodec<PNPacket> = {
  * Indicates how many users are on this server
  */
 export const receivePN = (_packet: PNPacket) => {
-  client.sendToServer("askchaa#%");
+  client.sendPacketToServer(askchaa, {});
 };

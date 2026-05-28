@@ -15,6 +15,7 @@ export interface LEPacket {
 }
 
 export const LE: PacketCodec<LEPacket> = {
+  header: "LE",
   decode(args) {
     const evidence: EvidenceData[] = [];
     for (let i = 1; i < args.length; i++) {

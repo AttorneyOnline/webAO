@@ -27,6 +27,7 @@ export interface CTPacket {
 }
 
 export const CT: PacketCodec<CTPacket> = {
+  header: "CT",
   decode(args) {
     const packet: CTPacket = {
       name: unescapeChat(args[1] ?? ""),
@@ -80,5 +81,5 @@ function addLinks(message: string) {
  * Sends an out-of-character chat message.
  */
 export const sendCT = (packet: CTPacket) => {
-  client.sendToServer(CT.encode(packet));
+  client.sendPacketToServer(CT, packet);
 };

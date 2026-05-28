@@ -17,6 +17,7 @@ export interface ZZPacket {
 }
 
 export const ZZ: PacketCodec<ZZPacket> = {
+  header: "ZZ",
   decode(args) {
     const packet: ZZPacket = { reason: unescapeChat(args[1] ?? "") };
     if (args[2] !== undefined && args[2] !== "") {
@@ -59,5 +60,5 @@ export const receiveZZ = (packet: ZZPacket) => {
  * Sends a modcall.
  */
 export const sendZZ = (packet: ZZPacket) => {
-  client.sendToServer(ZZ.encode(packet));
+  client.sendPacketToServer(ZZ, packet);
 };

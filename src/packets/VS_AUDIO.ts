@@ -13,6 +13,7 @@ export interface VS_AUDIOPacket {
 }
 
 export const VS_AUDIO: PacketCodec<VS_AUDIOPacket> = {
+  header: "VS_AUDIO",
   decode(args) {
     return { fromUid: Number(args[1]), payload: args[2] || "" };
   },

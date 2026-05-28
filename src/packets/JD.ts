@@ -5,6 +5,7 @@ export interface JDPacket {
 }
 
 export const JD: PacketCodec<JDPacket> = {
+  header: "JD",
   decode(args) {
     return { state: Number(args[1]) };
   },

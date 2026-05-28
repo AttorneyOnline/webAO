@@ -5,6 +5,7 @@ import type { PacketCodec } from "../packets";
 export type RCPacket = Record<string, never>;
 
 export const RC: PacketCodec<RCPacket> = {
+  header: "RC",
   decode() {
     return {};
   },

@@ -8,6 +8,7 @@ export interface KKPacket {
 }
 
 export const KK: PacketCodec<KKPacket> = {
+  header: "KK",
   decode(args) {
     return { reason: unescapeChat(args[1] ?? "") };
   },

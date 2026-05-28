@@ -2,13 +2,20 @@ import type { PacketCodec } from "../packets";
 import { handlePeerJoined } from "../voice/voice";
 
 /**
- * Undocumented voice subsystem packet. Wire format: `VS_JOIN#<uid>#%`.
+ * Voice subsystem peer-join packet. Two wire variants:
+ *
+ *   - Server -> Client (`VS_JOINClient`): `VS_JOIN#<uid>#%`.
+ *   - Client -> Server (`VS_JOINServer`): `VS_JOIN#%`.
+ *     The server attaches the source uid before broadcasting.
  */
-export interface VS_JOINPacket {
+export interface VS_JOINPacketClient {
   uid: number;
 }
 
-export const VS_JOIN: PacketCodec<VS_JOINPacket> = {
+export type VS_JOINPacketServer = Record<string, never>;
+
+export const VS_JOINClient: PacketCodec<VS_JOINPacketClient> = {
+  header: "VS_JOIN",
   decode(args) {
     return { uid: Number(args[1]) };
   },
@@ -17,7 +24,17 @@ export const VS_JOIN: PacketCodec<VS_JOINPacket> = {
   },
 };
 
-export const receiveVS_JOIN = (packet: VS_JOINPacket) => {
+export const VS_JOINServer: PacketCodec<VS_JOINPacketServer> = {
+  header: "VS_JOIN",
+  decode() {
+    return {};
+  },
+  encode() {
+    return `VS_JOIN#%`;
+  },
+};
+
+export const receiveVS_JOIN = (packet: VS_JOINPacketClient) => {
   if (!Number.isFinite(packet.uid)) return;
   void handlePeerJoined(packet.uid);
 };

@@ -7,6 +7,7 @@ export interface SPPacket {
 }
 
 export const SP: PacketCodec<SPPacket> = {
+  header: "SP",
   decode(args) {
     return { side: parseSide(args[1]) };
   },

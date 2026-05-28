@@ -8,6 +8,7 @@ export interface FAPacket {
 }
 
 export const FA: PacketCodec<FAPacket> = {
+  header: "FA",
   decode(args) {
     return { areas: args.slice(1).map((v) => unescapeChat(v)) };
   },

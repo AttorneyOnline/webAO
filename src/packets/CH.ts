@@ -11,6 +11,7 @@ export interface CHPacket {
 }
 
 export const CH: PacketCodec<CHPacket> = {
+  header: "CH",
   decode: (args) => ({ charId: Number(args[1]) }),
   encode: (packet) => `CH#${packet.charId}#%`,
 };
@@ -21,5 +22,5 @@ export const receiveCH = () => {};
  * Sends a keepalive packet.
  */
 export const sendCH = (packet: CHPacket) => {
-  client.sendToServer(CH.encode(packet));
+  client.sendPacketToServer(CH, packet);
 };

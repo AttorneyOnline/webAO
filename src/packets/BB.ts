@@ -6,6 +6,7 @@ export interface BBPacket {
 }
 
 export const BB: PacketCodec<BBPacket> = {
+  header: "BB",
   decode(args) {
     return { message: unescapeChat(args[1] ?? "") };
   },

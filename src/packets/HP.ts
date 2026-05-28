@@ -7,6 +7,7 @@ export interface HPPacket {
 }
 
 export const HP: PacketCodec<HPPacket> = {
+  header: "HP",
   decode(args) {
     return { bar: Number(args[1]), value: Number(args[2]) };
   },
@@ -38,5 +39,5 @@ export const receiveHP = (packet: HPPacket) => {
  * Sends a health point change.
  */
 export const sendHP = (packet: HPPacket) => {
-  client.sendToServer(HP.encode(packet));
+  client.sendPacketToServer(HP, packet);
 };
