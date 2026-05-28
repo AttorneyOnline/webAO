@@ -143,12 +143,21 @@ function addServer(server: AOServer) {
   let ws_protocol = "";
   let http_protocol = "";
 
+  // When the page is served over plain http (typically localhost dev),
+  // mixed-content rules prevent wss/https from working anyway, so prefer
+  // the plain ws/http ports if available.
+  const preferPlain = window.location.protocol === "http:";
+
   if (server.ws_port) {
     ws_port = server.ws_port;
     ws_protocol = "ws";
     http_protocol = "http";
   }
-  if (server.wss_port && !window.navigator.userAgent.includes("Nintendo")) {
+  if (
+    server.wss_port &&
+    !preferPlain &&
+    !window.navigator.userAgent.includes("Nintendo")
+  ) {
     ws_port = server.wss_port;
     ws_protocol = "wss";
     http_protocol = "https";
