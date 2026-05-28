@@ -32,7 +32,7 @@ const defaultPacket: MSPacketClient = {
   paired_charid: -1,
   paired_name: "",
   paired_emote: "",
-  self_offset: { x: 0, y: 0 },
+  offset: { x: 0, y: 0 },
   paired_offset: { x: 0, y: 0 },
   paired_flip: Flip.NONE,
   noninterrupting_preanim: false,

@@ -393,11 +393,11 @@ const renderICMessage = (chatmsg: ChatMsg) => {
           ? 400
           : 0;
     pairLayers.style.left = `${baseLeft + (chatmsg.paired_offset?.x ?? 0)}%`;
-    charLayers.style.left = `${baseLeft + (chatmsg.self_offset?.x ?? 0)}%`;
+    charLayers.style.left = `${baseLeft + (chatmsg.offset?.x ?? 0)}%`;
 
     // Vertical offsets.
     pairLayers.style.top = `${chatmsg.paired_offset?.y ?? 0}%`;
-    charLayers.style.top = `${chatmsg.self_offset?.y ?? 0}%`;
+    charLayers.style.top = `${chatmsg.offset?.y ?? 0}%`;
   }
 
   setBlipUrl(

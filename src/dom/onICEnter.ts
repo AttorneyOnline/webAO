@@ -53,7 +53,7 @@ export function onICEnter(event: KeyboardEvent) {
     text_color: parseTextColor(input("textcolor").value),
     showname: escapeChat(input("ic_chat_name").value),
     paired_charid: Number(input("pair_select").value) || -1,
-    self_offset: {
+    offset: {
       x: Number(input("pair_offset").value) || 0,
       y: Number(input("pair_y_offset").value) || 0,
     },
