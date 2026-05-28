@@ -1,6 +1,10 @@
 import Client from "../client";
+import { Side } from "../packets/MS";
 import transparentPng from "../constants/transparentPng";
 import fileExists from "../utils/fileExists";
+
+const isFullView = (s: Side): boolean =>
+  s === Side.DEFENSE || s === Side.PROSECUTION || s === Side.WITNESS;
 
 /**
  * Sets all the img tags to the right sources
@@ -14,12 +18,11 @@ const setEmote = async (
   emotename: string,
   prefix: string,
   pair: boolean,
-  side: string,
+  side: Side,
 ) => {
   const pairID = pair ? "pair" : "char";
   const characterFolder = `${AO_HOST}characters/`;
-  const acceptedPositions = ["def", "pro", "wit"];
-  const position = acceptedPositions.includes(side) ? `${side}_` : "";
+  const position = isFullView(side) ? `${side}_` : "";
   const emoteSelector = document.getElementById(
     `client_${position}${pairID}_img`,
   ) as HTMLImageElement;

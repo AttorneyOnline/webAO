@@ -500,13 +500,5 @@ export function installVoiceUI(): void {
   render();
 }
 
-if (typeof document !== "undefined") {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", installVoiceUI, { once: true });
-  } else {
-    installVoiceUI();
-  }
-}
-
 // Suppress unused warning when populateDeviceList is unused otherwise.
 void deviceListPopulated;

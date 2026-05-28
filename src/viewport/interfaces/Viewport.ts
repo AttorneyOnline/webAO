@@ -1,4 +1,4 @@
-/* eslint @typescript-eslint/ban-types: "off" */
+/* eslint @typescript-eslint/no-unsafe-function-type: "off" */
 
 export interface Viewport {
   getTextNow: Function;

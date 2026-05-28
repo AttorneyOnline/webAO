@@ -1,4 +1,4 @@
-import { client } from "../client";
+import { sendMA } from "../packets/MA";
 
 /**
  * Tries to ban a player from the playerlist
@@ -8,9 +8,8 @@ export function banPlayer(id: number) {
   const reason = prompt("Please enter the reason", "Being annoying");
   const length = Number(prompt("Please enter the ban length in minutes", "60"));
 
-  client.sender.sendMA(id, length, reason);
+  sendMA({ id, length, reason });
 }
-window.banPlayer = banPlayer;
 
 /**
  * Tries to kick a player from the playerlist
@@ -19,6 +18,5 @@ window.banPlayer = banPlayer;
 export function kickPlayer(id: number) {
   const reason = prompt("Please enter the reason", "Being annoying");
 
-  client.sender.sendMA(id, 0, reason);
+  sendMA({ id, length: 0, reason });
 }
-window.kickPlayer = kickPlayer;

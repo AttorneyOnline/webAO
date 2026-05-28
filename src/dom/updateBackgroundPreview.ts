@@ -43,4 +43,3 @@ export function updateBackgroundPreview() {
     background_preview.src = resp;
   });
 }
-window.updateBackgroundPreview = updateBackgroundPreview;

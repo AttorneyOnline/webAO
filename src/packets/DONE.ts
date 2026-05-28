@@ -1,0 +1,62 @@
+import { client, clientState, autoChar, autoArea } from "../client";
+import { sendCC } from "./CC";
+import { area_click } from "../dom/areaClick";
+import type { PacketCodec } from "../packets";
+import queryParser from "../utils/queryParser";
+
+const { mode } = queryParser();
+
+export type DONEPacket = Record<string, never>;
+
+export const DONE: PacketCodec<DONEPacket> = {
+  decode() {
+    return {};
+  },
+  encode() {
+    return `DONE#%`;
+  },
+};
+
+/**
+ * Handles the handshake completion packet, meaning the player
+ * is ready to select a character.
+ */
+export const receiveDONE = (_packet: DONEPacket) => {
+  // DONE packet signals that the handshake is complete
+  client.state = clientState.Joined;
+  document.getElementById("client_loading")!.style.display = "none";
+  if (mode === "watch") {
+    // Spectators don't need to pick a character
+    document.getElementById("client_waiting")!.style.display = "none";
+  }
+
+  if (autoArea) {
+    const areaIndex = client.areas.findIndex(
+      (a: any) => a && a.name.toLowerCase() === autoArea.toLowerCase()
+    );
+    if (areaIndex !== -1) {
+      const el = document.getElementById(`area${areaIndex}`);
+      if (el) {
+        area_click(el as HTMLElement);
+      }
+    }
+  }
+
+  if (autoChar) {
+    // Hide charselect immediately (spectator mode) so the user isn't stuck
+    // on the selection screen. If the CC request succeeds, PV will confirm it.
+    document.getElementById("client_waiting")!.style.display = "none";
+    document.getElementById("client_charselect")!.style.display = "none";
+
+    const charIndex = client.chars.findIndex(
+      (c: any) => c && c.name.toLowerCase() === autoChar.toLowerCase()
+    );
+    if (charIndex !== -1) {
+      sendCC({
+        playerId: client.playerID,
+        charId: charIndex,
+        charPw: "web",
+      });
+    }
+  }
+};

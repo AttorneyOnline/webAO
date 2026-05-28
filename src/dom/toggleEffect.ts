@@ -9,5 +9,4 @@ export function toggleEffect(button: HTMLElement): void {
     button.className = "client_button dark";
   }
 }
-window.toggleEffect = toggleEffect;
 export default toggleEffect;

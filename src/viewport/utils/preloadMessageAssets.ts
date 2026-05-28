@@ -1,3 +1,4 @@
+import { EmoteModifier, ShoutModifier } from "../../packets/MS";
 import { ChatMsg } from "../interfaces/ChatMsg";
 import { PreloadedAssets } from "../interfaces/PreloadedAssets";
 import {
@@ -98,7 +99,7 @@ export default async function preloadMessageAssets(
     const talkingUrls = buildEmoteUrls(AO_HOST, emoteExtensions, charName, charEmote, "(b)");
 
     const hasPreanim =
-      chatmsg.type === 1 &&
+      chatmsg.emote_modifier === EmoteModifier.PREANIM &&
       chatmsg.preanim &&
       chatmsg.preanim !== "-" &&
       chatmsg.preanim !== "";
@@ -107,30 +108,37 @@ export default async function preloadMessageAssets(
       ? buildEmoteUrls(AO_HOST, emoteExtensions, charName, chatmsg.preanim!.toLowerCase(), "")
       : null;
 
-    const hasPair = !!chatmsg.other_name;
+    const hasPair = !!chatmsg.paired_name;
     const pairIdleUrls = hasPair
-      ? buildEmoteUrls(AO_HOST, emoteExtensions, chatmsg.other_name!.toLowerCase(), chatmsg.other_emote!.toLowerCase(), "(a)")
+      ? buildEmoteUrls(AO_HOST, emoteExtensions, chatmsg.paired_name!.toLowerCase(), chatmsg.paired_emote!.toLowerCase(), "(a)")
       : null;
 
     // Shout SFX per-character path
     const shoutNames = [undefined, "holdit", "objection", "takethat", "custom"];
-    const shoutName = shoutNames[chatmsg.objection];
-    const shoutSfxPath = (chatmsg.objection > 0 && chatmsg.objection < 4 && shoutName)
+    const shoutName = shoutNames[chatmsg.shout_modifier];
+    const isStandardShout =
+      chatmsg.shout_modifier === ShoutModifier.HOLD_IT ||
+      chatmsg.shout_modifier === ShoutModifier.OBJECTION ||
+      chatmsg.shout_modifier === ShoutModifier.TAKE_THAT;
+    const isCustomShout = chatmsg.shout_modifier === ShoutModifier.CUSTOM;
+    const shoutSfxPath = isStandardShout && shoutName
       ? `${AO_HOST}characters/${encodeURI(charName)}/${shoutName}.opus`
       : null;
 
     // Shout bubble: try per-character override first (multiple extensions),
     // then fall back to misc/default/<name>_bubble.png. Custom shouts have
     // no default — only per-character custom.<ext>.
-    const shoutBubbleUrls = (chatmsg.objection > 0 && chatmsg.objection <= 4 && shoutName)
-      ? buildShoutBubbleUrls(AO_HOST, charName, shoutName, chatmsg.objection === 4)
+    const shoutBubbleUrls = (isStandardShout || isCustomShout) && shoutName
+      ? buildShoutBubbleUrls(AO_HOST, charName, shoutName, isCustomShout)
       : null;
 
     // Emote SFX
     const invalidSounds = ["0", "1", "", undefined];
     const emoteSfxPath = (
       !invalidSounds.includes(chatmsg.sound) &&
-      (chatmsg.type == 1 || chatmsg.type == 2 || chatmsg.type == 6)
+      (chatmsg.emote_modifier === EmoteModifier.PREANIM ||
+        chatmsg.emote_modifier === EmoteModifier.PREANIM_AND_OBJECTION ||
+        chatmsg.emote_modifier === EmoteModifier.OBJECTION_ZOOM)
     ) ? `${AO_HOST}sounds/general/${encodeURI(chatmsg.sound.toLowerCase())}.opus`
       : null;
 

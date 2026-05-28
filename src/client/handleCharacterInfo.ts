@@ -1,8 +1,10 @@
 import { client } from "../client";
 import { safeTags } from "../encoding";
 import iniParse from "../iniParse";
+import { Side } from "../packets/MS";
 import request from "../services/request";
 import { AO_HOST } from "./aoHost";
+import { observeCharIcon } from "./observeCharIcons";
 
 /**
  * Lightweight character setup that runs on join. Sets the icon src directly
@@ -15,9 +17,14 @@ export const setupCharacterBasic = (chargs: string[], charid: number) => {
     img.alt = chargs[0];
     img.title = chargs[0];
     const iconExt = client.charicon_extensions[0] || ".png";
-    img.src = `${AO_HOST}characters/${encodeURI(
+    // Store the icon URL in dataset; observeCharIcon copies it onto
+    // `src` when the slot scrolls into view. Setting src on thousands
+    // of icons up front leaves them all .complete=false forever,
+    // blocking window.load.
+    img.dataset.iconUrl = `${AO_HOST}characters/${encodeURI(
       chargs[0].toLowerCase(),
     )}/char_icon${iconExt}`;
+    observeCharIcon(img);
 
     const mute_select = <HTMLSelectElement>(
       document.getElementById("mute_select")
@@ -35,7 +42,7 @@ export const setupCharacterBasic = (chargs: string[], charid: number) => {
       desc: safeTags(chargs[1]),
       blips: "male",
       gender: "",
-      side: "def",
+      side: Side.DEFENSE,
       chat: "",
       evidence: chargs[3],
       icon: "",
@@ -73,7 +80,7 @@ export const ensureCharIni = async (charid: number): Promise<any> => {
   const default_options = {
     name: char.name,
     showname: char.name,
-    side: "def",
+    side: Side.DEFENSE,
     blips: "male",
     chat: "",
     category: "",
@@ -109,7 +116,7 @@ export const ensureCharIni = async (charid: number): Promise<any> => {
 };
 
 /**
- * Full character info load (used by iniEdit and handleMS ini-edit path).
+ * Full character info load (used by iniEdit and receiveMS ini-edit path).
  * Fetches icon + ini for a single character, replacing any existing data.
  */
 export const handleCharacterInfo = async (chargs: string[], charid: number) => {

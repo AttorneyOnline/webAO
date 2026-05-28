@@ -50,7 +50,6 @@ ${logHtml}
     downloadBlob(html, `${filename}.html`, "text/html;charset=utf-8");
   }
 }
-window.exportLog = exportLog;
 
 function downloadBlob(content: string, filename: string, mimeType: string) {
   const blob = new Blob([content], { type: mimeType });

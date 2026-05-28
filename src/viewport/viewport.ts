@@ -15,6 +15,7 @@ import { createTestimonyAudio } from "./utils/createTestimonyAudio";
 import { Testimony } from "./interfaces/Testimony";
 import { COLORS } from "./constants/colors";
 import { set_side } from "./utils/setSide";
+import { DeskModifier, EmoteModifier, Side } from "../packets/MS";
 import { ChatMsg } from "./interfaces/ChatMsg";
 import {
   setStartFirstTickCheck,
@@ -305,7 +306,8 @@ const viewport = (): Viewport => {
       document.getElementById("client_pair_char")
     );
 
-    const validSides: string[] = ["def", "pro", "wit"]; // these are for the full view pan, the other positions use 'client_char'
+    // these are for the full view pan, the other positions use 'client_char'
+    const validSides: Side[] = [Side.DEFENSE, Side.PROSECUTION, Side.WITNESS];
     if (validSides.includes(chatmsg.side)) {
       charLayers = <HTMLImageElement>(
         document.getElementById(`client_${chatmsg.side}_char`)
@@ -318,8 +320,8 @@ const viewport = (): Viewport => {
     const charName = chatmsg.name.toLowerCase();
     const charEmote = chatmsg.sprite.toLowerCase();
 
-    const pairName = chatmsg.other_name.toLowerCase();
-    const pairEmote = chatmsg.other_emote.toLowerCase();
+    const pairName = chatmsg.paired_name.toLowerCase();
+    const pairEmote = chatmsg.paired_emote.toLowerCase();
 
     // TODO: preanims sometimes play when they're not supposed to
     const isShoutOver = tickTimer >= shoutTimer;
@@ -327,14 +329,14 @@ const viewport = (): Viewport => {
       tickTimer >= shoutTimer + chatmsg.preanimdelay;
     if (isShoutOver && startFirstTickCheck) {
       // Effect stuff
-      if (chatmsg.screenshake === 1) {
+      if (chatmsg.screenshake) {
         // Shake screen
         const stabUrl = chatmsg.preloadedAssets?.stabSfxUrl
           ?? `${AO_HOST}sounds/general/sfx-stab.opus`;
         playSFX(stabUrl, false);
         gamewindow.style.animation = "shake 0.2s 1";
       }
-      if (chatmsg.flash === 1) {
+      if (chatmsg.realization) {
         // Flash screen
         const realizationUrl = chatmsg.preloadedAssets?.realizationSfxUrl
           ?? `${AO_HOST}sounds/general/sfx-realization.opus`;
@@ -354,7 +356,7 @@ const viewport = (): Viewport => {
         }
       }
 
-      if (chatmsg.other_name) {
+      if (chatmsg.paired_name) {
         pairLayers.style.opacity = "1";
       } else {
         pairLayers.style.opacity = "0";
@@ -368,7 +370,7 @@ const viewport = (): Viewport => {
       chatmsg.startspeaking = true;
     }
 
-    const hasNonInterruptingPreAnim = chatmsg.noninterrupting_preanim === 1;
+    const hasNonInterruptingPreAnim = chatmsg.noninterrupting_preanim === true;
     if (textnow !== chatmsg.content && hasNonInterruptingPreAnim) {
       const chatContainerBox = document.getElementById("client_chatcontainer");
       chatContainerBox.style.opacity = "1";
@@ -378,9 +380,9 @@ const viewport = (): Viewport => {
         chatmsg.startspeaking = false;
 
         // Evidence Bullshit
-        if (chatmsg.evidence > 0) {
+        if (chatmsg.evidence_id > 0) {
           // Prepare evidence
-          eviBox.src = client.evidences[chatmsg.evidence - 1].icon;
+          eviBox.src = client.evidences[chatmsg.evidence_id - 1].icon;
 
           eviBox.style.width = "auto";
           eviBox.style.height = "36.5%";
@@ -389,7 +391,7 @@ const viewport = (): Viewport => {
           testimonyAudio.src = `${AO_HOST}sounds/general/sfx-evidenceshoop.opus`;
           testimonyAudio.play().catch(() => {});
 
-          if (chatmsg.side === "def") {
+          if (chatmsg.side === Side.DEFENSE) {
             // Only def show evidence on right
             eviBox.style.right = "1em";
             eviBox.style.left = "initial";
@@ -398,36 +400,36 @@ const viewport = (): Viewport => {
             eviBox.style.left = "1em";
           }
         }
-        chatBoxInner.className = `text_${COLORS[chatmsg.color]}`;
+        chatBoxInner.className = `text_${COLORS[chatmsg.text_color]}`;
 
         if (chatmsg.preanimdelay === 0) {
           shoutSprite.style.display = "none";
           shoutSprite.style.animation = "";
         }
 
-        switch (Number(chatmsg.deskmod)) {
-          case 2:
+        switch (chatmsg.desk_modifier) {
+          case DeskModifier.HIDE_DURING_PREANIM:
             set_side({
               position: chatmsg.side,
               showSpeedLines: false,
               showDesk: true,
             });
             break;
-          case 3:
+          case DeskModifier.SHOW_DURING_PREANIM:
             set_side({
               position: chatmsg.side,
               showSpeedLines: false,
               showDesk: false,
             });
             break;
-          case 4:
+          case DeskModifier.HIDE_AND_CENTER_DURING_PREANIM:
             set_side({
               position: chatmsg.side,
               showSpeedLines: false,
               showDesk: true,
             });
             break;
-          case 5:
+          case DeskModifier.SHOW_DURING_PREANIM_THEN_CENTER:
             set_side({
               position: chatmsg.side,
               showSpeedLines: false,
@@ -436,7 +438,7 @@ const viewport = (): Viewport => {
             break;
         }
 
-        if (chatmsg.other_name) {
+        if (chatmsg.paired_name) {
           if (chatmsg.preloadedAssets) {
             setEmoteFromUrl(chatmsg.preloadedAssets.pairIdleUrl, true, chatmsg.side);
           } else {
@@ -475,18 +477,20 @@ const viewport = (): Viewport => {
       }
     }
 
-    if (!sfxplayed && chatmsg.snddelay + shoutTimer >= tickTimer) {
+    if (!sfxplayed && chatmsg.sfx_delay + shoutTimer >= tickTimer) {
       sfxplayed = 1;
       if (
         chatmsg.sound !== "0" &&
         chatmsg.sound !== "1" &&
         chatmsg.sound !== "" &&
         chatmsg.sound !== undefined &&
-        (chatmsg.type == 1 || chatmsg.type == 2 || chatmsg.type == 6)
+        (chatmsg.emote_modifier === EmoteModifier.PREANIM ||
+          chatmsg.emote_modifier === EmoteModifier.PREANIM_AND_OBJECTION ||
+          chatmsg.emote_modifier === EmoteModifier.OBJECTION_ZOOM)
       ) {
         const sfxUrl = chatmsg.preloadedAssets?.emoteSfxUrl
           ?? `${AO_HOST}sounds/general/${encodeURI(chatmsg.sound.toLowerCase())}.opus`;
-        playSFX(sfxUrl, chatmsg.looping_sfx);
+        playSFX(sfxUrl, chatmsg.sfx_looping);
       }
     }
     if (textnow === chatmsg.content && !startFirstTickCheck && !startSecondTickCheck) {

@@ -2,11 +2,7 @@ import vanilla_evidence_arr from "../constants/evidence";
 import vanilla_background_arr from "../constants/backgrounds";
 import { changeMusicVolume } from "../dom/changeMusicVolume";
 import { setChatbox } from "../dom/setChatbox";
-import {
-  changeSFXVolume,
-  changeShoutVolume,
-  changeTestimonyVolume,
-} from "../dom/changeVolume";
+import { changeSFXVolume } from "../dom/changeVolume";
 import { showname_click } from "../dom/showNameClick";
 import { changeBlipVolume } from "../dom/changeBlipVolume";
 import { unlockBlipAudio } from "../viewport/utils/blipAudio";
@@ -75,15 +71,9 @@ export const loadResources = () => {
   (<HTMLInputElement>document.getElementById("client_mvolume")).value =
     localStorage.getItem("musicVolume") || "1";
   changeMusicVolume();
-  (<HTMLAudioElement>document.getElementById("client_sfxaudio")).volume =
-    Number(localStorage.getItem("sfxVolume")) || 1;
+  (<HTMLInputElement>document.getElementById("client_svolume")).value =
+    localStorage.getItem("sfxVolume") || "1";
   changeSFXVolume();
-  (<HTMLAudioElement>document.getElementById("client_shoutaudio")).volume =
-    Number(localStorage.getItem("shoutVolume")) || 1;
-  changeShoutVolume();
-  (<HTMLAudioElement>document.getElementById("client_testimonyaudio")).volume =
-    Number(localStorage.getItem("testimonyVolume")) || 1;
-  changeTestimonyVolume();
   (<HTMLInputElement>document.getElementById("client_bvolume")).value =
     localStorage.getItem("blipVolume") || "1";
   changeBlipVolume();

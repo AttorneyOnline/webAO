@@ -70,4 +70,3 @@ export function resizeChatbox() {
     );
   }
 }
-window.resizeChatbox = resizeChatbox;

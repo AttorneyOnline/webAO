@@ -16,4 +16,3 @@ export function mutelist_click(_event: Event) {
     selected_character.text = client.chars[selected_character.value].name;
   }
 }
-window.mutelist_click = mutelist_click;

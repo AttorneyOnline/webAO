@@ -79,4 +79,3 @@ export function toggleFavourite(charid: number, event: Event) {
   saveFavourites(favs);
   sortFavourites();
 }
-window.toggleFavourite = toggleFavourite;

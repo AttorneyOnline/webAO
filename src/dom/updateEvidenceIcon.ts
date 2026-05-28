@@ -25,4 +25,3 @@ export function updateEvidenceIcon() {
     )}`;
   }
 }
-window.updateEvidenceIcon = updateEvidenceIcon;

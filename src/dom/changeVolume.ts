@@ -1,49 +1,17 @@
-declare global {
-  interface Window {
-    changeSFXVolume: () => void;
-    changeTestimonyVolume: () => void;
-    changeShoutVolume: () => void;
-  }
-}
+const SFX_AUDIO_IDS = [
+  "client_sfxaudio",
+  "client_shoutaudio",
+  "client_testimonyaudio",
+];
 
-/**
- * Triggered by the sound effect volume slider.
- */
+/** Triggered by the combined SFX/Shout/Testimony volume slider. */
 export function changeSFXVolume(): void {
-  const sfxAudioElement = document.getElementById("client_sfxaudio") as HTMLAudioElement;
-  if (sfxAudioElement) {
-    localStorage.setItem("sfxVolume", sfxAudioElement.volume.toString());
+  const slider = document.getElementById("client_svolume") as HTMLInputElement | null;
+  if (!slider) return;
+  const volume = Number(slider.value);
+  for (const id of SFX_AUDIO_IDS) {
+    const el = document.getElementById(id) as HTMLAudioElement | null;
+    if (el) el.volume = volume;
   }
-}
-if (typeof window.changeSFXVolume !== 'function') {
-  window.changeSFXVolume = changeSFXVolume;
-}
-
-/**
- * Triggered by the testimony volume slider.
- */
-export function changeTestimonyVolume(): void {
-  const testimonyAudioElement = document.getElementById("client_testimonyaudio") as HTMLAudioElement;
-  if (testimonyAudioElement) {
-    localStorage.setItem(
-      "testimonyVolume",
-      testimonyAudioElement.volume.toString()
-    );
-  }
-}
-if (typeof window.changeTestimonyVolume !== 'function') {
-  window.changeTestimonyVolume = changeTestimonyVolume;
-}
-
-/**
- * Triggered by the shout volume slider.
- */
-export function changeShoutVolume(): void {
-  const shoutAudioElement = document.getElementById("client_shoutaudio") as HTMLAudioElement;
-  if (shoutAudioElement) {
-    localStorage.setItem("shoutVolume", shoutAudioElement.volume.toString());
-  }
-}
-if (typeof window.changeShoutVolume !== 'function') {
-  window.changeShoutVolume = changeShoutVolume;
+  localStorage.setItem("sfxVolume", String(volume));
 }

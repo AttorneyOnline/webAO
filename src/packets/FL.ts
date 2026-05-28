@@ -1,0 +1,56 @@
+import { setExtraFeatures } from "../client";
+import { escapeChat, unescapeChat } from "../encoding";
+import type { PacketCodec } from "../packets";
+
+export interface FLPacket {
+  features: string[];
+}
+
+export const FL: PacketCodec<FLPacket> = {
+  decode(args) {
+    return { features: args.slice(1).map((v) => unescapeChat(v)) };
+  },
+  encode(packet) {
+    return `FL#${packet.features.map(escapeChat).join("#")}#%`;
+  },
+};
+
+/**
+ * With this the server tells us which features it supports
+ */
+export const receiveFL = (packet: FLPacket) => {
+  const { features } = packet;
+  setExtraFeatures(features);
+
+  if (features.includes("yellowtext")) {
+    const colorselect = <HTMLSelectElement>document.getElementById("textcolor");
+
+    colorselect.options[colorselect.options.length] = new Option("Yellow", "5");
+    colorselect.options[colorselect.options.length] = new Option("Pink", "6");
+    colorselect.options[colorselect.options.length] = new Option("Cyan", "7");
+    colorselect.options[colorselect.options.length] = new Option("Grey", "8");
+    colorselect.options[colorselect.options.length] = new Option("Rainbow", "9");
+  }
+
+  if (features.includes("cccc_ic_support")) {
+    document.getElementById("cccc")!.style.display = "";
+    document.getElementById("pairing")!.style.display = "";
+  }
+
+  if (features.includes("flipping")) {
+    document.getElementById("button_flip")!.style.display = "";
+  }
+
+  if (features.includes("looping_sfx")) {
+    document.getElementById("button_shake")!.style.display = "";
+    document.getElementById("2.7")!.style.display = "";
+  }
+
+  if (features.includes("effects")) {
+    document.getElementById("2.8")!.style.display = "";
+  }
+
+  if (features.includes("y_offset")) {
+    document.getElementById("y_offset")!.style.display = "";
+  }
+};

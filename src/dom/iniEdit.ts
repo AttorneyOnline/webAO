@@ -1,6 +1,6 @@
 import { client } from "../client";
 import { handleCharacterInfo } from "../client/handleCharacterInfo";
-import { packetHandler } from "../packets/packetHandler";
+import { receivePV } from "../packets/PV";
 
 /**
  * Triggered by the ini button.
@@ -16,6 +16,5 @@ export async function iniedit() {
     iniselect.selectedIndex === 0 ? ininame.value : iniselect.value;
 
   await handleCharacterInfo(newname.split("&"), inicharID);
-  packetHandler.get("PV")!(`PV#0#CID#${inicharID}`.split("#"));
+  receivePV({ playerId: 0, charId: inicharID });
 }
-window.iniedit = iniedit;

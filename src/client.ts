@@ -5,16 +5,16 @@
  */
 import "./styles/client.css";
 import "./styles/goldenlayout.css";
-import { isLowMemory } from "./client/isLowMemory";
+import "golden-layout/dist/css/themes/goldenlayout-dark-theme.css";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { sender, ISender } from "./client/sender/index";
+import { sendCH } from "./packets/CH";
 import queryParser from "./utils/queryParser";
 import getResources from "./utils/getResources";
 import masterViewport from "./viewport/viewport";
 import { Viewport } from "./viewport/interfaces/Viewport";
 import { EventEmitter } from "events";
 import { onReplayGo } from "./dom/onReplayGo";
-import { packetHandler } from "./packets/packetHandler";
+import { packetRegistry } from "./packets";
 import { appendICNotice } from "./client/appendICNotice";
 import { loadResources } from "./client/loadResources";
 import { AO_HOST } from "./client/aoHost";
@@ -40,24 +40,14 @@ export const setClient = (val: Client) => {
 
 export const UPDATE_INTERVAL = 60;
 
-/**
- * Toggles AO1-style loading using paginated music packets for mobile platforms.
- * The old loading uses more smaller packets instead of a single big one,
- * which caused problems on low-memory devices in the past.
- */
-export let oldLoading = false;
-export const setOldLoading = (val: boolean) => {
-  console.warn("old loading set to " + val);
-  oldLoading = val;
-};
-
 // presettings
 export let selectedMenu = 1;
 export const setSelectedMenu = (val: number) => {
   selectedMenu = val;
 };
-export let selectedShout = 0;
-export const setSelectedShout = (val: number) => {
+import { ShoutModifier } from "./packets/MS";
+export let selectedShout: ShoutModifier = ShoutModifier.NONE;
+export const setSelectedShout = (val: ShoutModifier) => {
   selectedShout = val;
 };
 export let extrafeatures: string[] = [];
@@ -102,7 +92,6 @@ fpPromise
     client = new Client(connectionString);
     client.connect();
     client.hdid = hdid;
-    isLowMemory();
     loadResources();
     installVoiceUI();
   });
@@ -123,6 +112,7 @@ export let lastICMessageTime = new Date(0);
 export const setLastICMessageTime = (val: Date) => {
   lastICMessageTime = val;
 };
+
 class Client extends EventEmitter {
   serv: any;
   hp: number[];
@@ -140,22 +130,18 @@ class Client extends EventEmitter {
   musics: any;
   musics_time: boolean;
   callwords: string[];
-  enableCaptcha: boolean;
   banned: boolean;
   hdid: string;
   resources: any;
   selectedEmote: number;
   selectedEvidence: number;
-  sender: ISender;
   checkUpdater: any;
   _lastTimeICReceived: any;
   viewport: Viewport;
-  partial_packet: boolean;
   temp_packet: string;
   state: clientState;
   connect: () => void;
   loadResources: () => void;
-  isLowMemory: () => void;
   /** Maps player ID to player data */
   playerlist: Map<number, { charId: number; charName: string; showName: string; name: string; area: number }>;
   charicon_extensions: string[];
@@ -191,7 +177,6 @@ class Client extends EventEmitter {
       }
     };
 
-    this.enableCaptcha = false;
     this.banned = false;
     this.hp = [0, 0];
     this.playerID = 1;
@@ -212,13 +197,9 @@ class Client extends EventEmitter {
     this.selectedEmote = -1;
     this.selectedEvidence = -1;
     this.checkUpdater = null;
-    this.sender = sender;
     this.viewport = masterViewport();
     this._lastTimeICReceived = new Date(0);
-    this.partial_packet = false;
     this.temp_packet = "";
-    loadResources;
-    isLowMemory;
     this.playerlist = new Map();
     this.charicon_extensions = [".png", ".webp"];
     this.emote_extensions = [".gif", ".png", ".apng", ".webp", ".webp.static"];
@@ -259,19 +240,41 @@ class Client extends EventEmitter {
   }
 
   /**
+   * Echoes a wire message back into our own dispatcher. Used by handlers
+   * that synthesize follow-up packets (e.g. RD → BN/DONE) and by replay
+   * mode to feed pre-recorded packets through.
+   */
+  sendToSelf(message: string) {
+    (<HTMLInputElement>document.getElementById("client_ooclog")).value +=
+      `${message}\r\n`;
+    this.handleSelf(message);
+  }
+
+  /**
+   * Writes a wire message to the server. In replay mode the websocket
+   * isn't live, so outgoing packets loop back through `sendToSelf` to
+   * drive the local dispatcher.
+   */
+  sendToServer(message: string) {
+    console.debug("C: " + message);
+    if (mode === "replay") {
+      this.sendToSelf(message);
+    } else {
+      this.serv.send(message);
+    }
+  }
+
+  /**
    * Begins the handshake process by sending an identifier
    * to the server.
    */
   joinServer() {
-    this.sender.sendServer(`HI#${hdid}#%`);
-    if (this.enableCaptcha && localStorage.getItem("hdid") !== hdid) {
-      this.sender.sendServer(localStorage.getItem("hdid"));
-      document.getElementById("client_secondfactor").style.display = "block";
-      document.getElementById("client_charselect").remove();
-      document.getElementById("client_ooc").remove();
-    }
+    this.sendToServer(`HI#${hdid}#%`);
     if (mode !== "replay") {
-      this.checkUpdater = setInterval(() => this.sender.sendCheck(), 5000);
+      this.checkUpdater = setInterval(
+        () => sendCH({ charId: this.charID }),
+        5000,
+      );
     }
   }
 
@@ -313,62 +316,63 @@ class Client extends EventEmitter {
     this.cleanup();
   }
 
-  /**
-   * Triggered when a packet is received from the server.
-   * @param {MessageEvent} e
-   */
+  /** Triggered when a packet (or chunk thereof) is received from the server. */
   onMessage(e: MessageEvent) {
     const msg = e.data;
     console.debug(`S: ${msg}`);
-
-    this.handle_server_packet(msg);
+    this.handleServerPacket(msg);
   }
 
   /**
-   * Decode the packet
-   * @param {MessageEvent} e
+   * Splits a server chunk on the `%` packet terminator and dispatches each
+   * complete packet. A trailing incomplete packet (no terminator yet) is
+   * buffered in `temp_packet` for the next chunk.
    */
-  handle_server_packet(p_data: string) {
-    let in_data = p_data;
+  handleServerPacket(chunk: string) {
+    const segments = (this.temp_packet + chunk).split("%");
+    this.temp_packet = segments.pop() ?? "";
+    for (const segment of segments) this.dispatchPacket(segment);
+  }
 
-    if (!p_data.endsWith("%")) {
-      this.partial_packet = true;
-      this.temp_packet = this.temp_packet + in_data;
-      console.log("Partial packet");
+  /** Decodes a single complete packet body (sans `%` terminator) and dispatches it. */
+  dispatchPacket(packet: string) {
+    if (packet === "") return;
+
+    // Packet should always end with #; parse anyway if it somehow doesn't.
+    const body = packet.endsWith("#") ? packet.slice(0, -1) : packet;
+    const args = body.split("#");
+    const header = args[0];
+    if (header === "") {
+      console.warn("WARNING: Empty packet received from server, skipping...");
       return;
-    } else {
-      if (this.partial_packet) {
-        in_data = this.temp_packet + in_data;
-        this.temp_packet = "";
-        this.partial_packet = false;
-      }
     }
 
-    const packet_list = in_data.split("%");
+    // packetRegistry maps header -> { codec, receive?, send? }: decode the
+    // wire args into a typed packet, then dispatch to the receiver. Decode
+    // and receive are guarded individually so a single malformed/buggy packet
+    // can't poison its siblings in the same WebSocket frame.
+    const entry = packetRegistry.get(header);
+    if (!entry) {
+      console.warn(`Invalid packet header ${header}`);
+      return;
+    }
+    if (!entry.receive) {
+      console.warn(`Received ${header} but no receiver is registered`);
+      return;
+    }
 
-    for (const packet of packet_list) {
-      let f_contents;
-      // Packet should *always* end with #
-      if (packet.endsWith("#")) {
-        f_contents = packet.slice(0, -1).split("#");
-      }
-      // But, if it somehow doesn't, we should still be able to handle it
-      else {
-        f_contents = packet.split("#");
-      }
-      // Empty packets are suspicious!
-      if (f_contents.length == 0) {
-        console.warn("WARNING: Empty packet received from server, skipping...");
-        continue;
-      }
-      // Take the first arg as the command
-      const command = f_contents[0];
-      if (command !== "") {
-        // The rest is contents of the packet
-        packetHandler.has(command)
-          ? packetHandler.get(command)(f_contents)
-          : console.warn(`Invalid packet header ${command}`);
-      }
+    let decoded;
+    try {
+      decoded = entry.codec.decode(args);
+    } catch (err) {
+      console.error(`Failed to decode ${header} packet:`, err, { body });
+      return;
+    }
+
+    try {
+      entry.receive(decoded);
+    } catch (err) {
+      console.error(`Receiver for ${header} threw:`, err, { body });
     }
   }
 

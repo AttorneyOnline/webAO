@@ -20,4 +20,3 @@ export function showname_click(_event: Event | null) {
     css_s.href = "styles/nameplates.css";
   }
 }
-window.showname_click = showname_click;

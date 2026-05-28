@@ -1,8 +1,10 @@
+import { Side } from "../packets/MS";
+
 /**
  * Update evidence icon.
  */
-export function updateActionCommands(side: string) {
-  if (side === "jud") {
+export function updateActionCommands(side: Side) {
+  if (side === Side.JUDGE) {
     document.getElementById("judge_action")!.style.display = "inline-table";
     document.getElementById("no_action")!.style.display = "none";
   } else {
@@ -23,4 +25,3 @@ export function updateActionCommands(side: string) {
     }
   }
 }
-window.updateActionCommands = updateActionCommands;

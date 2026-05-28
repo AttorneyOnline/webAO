@@ -63,6 +63,3 @@ export function toggleMuteBlips(): void {
   applyBlipMute(checkbox.checked);
 }
 
-window.toggleMuteMusic = toggleMuteMusic;
-window.toggleMuteSfx = toggleMuteSfx;
-window.toggleMuteBlips = toggleMuteBlips;

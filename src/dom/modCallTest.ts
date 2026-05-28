@@ -1,8 +1,7 @@
-import { packetHandler } from "../packets/packetHandler";
+import { receiveZZ } from "../packets/ZZ";
 /**
  * Triggered by the modcall sfx dropdown
  */
 export function modcall_test() {
-  packetHandler.get("ZZ")!("test#test".split("#"));
+  receiveZZ({ reason: "test" });
 }
-window.modcall_test = modcall_test;

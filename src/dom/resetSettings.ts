@@ -1,10 +1,6 @@
 import { changeMusicVolume } from "./changeMusicVolume";
 import { setChatbox } from "./setChatbox";
-import {
-  changeSFXVolume,
-  changeShoutVolume,
-  changeTestimonyVolume,
-} from "./changeVolume";
+import { changeSFXVolume } from "./changeVolume";
 import { changeBlipVolume } from "./changeBlipVolume";
 import { reloadTheme } from "./reloadTheme";
 import { setFont } from "./setFont";
@@ -22,8 +18,6 @@ const SETTINGS_KEYS = [
   "chatbox",
   "musicVolume",
   "sfxVolume",
-  "shoutVolume",
-  "testimonyVolume",
   "blipVolume",
   "callwords",
   "ic_chat_name",
@@ -86,25 +80,11 @@ export function resetSettings() {
     changeMusicVolume();
   }
 
-  // --- SFX volume ---
-  const sfxAudio = <HTMLAudioElement>document.getElementById("client_sfxaudio");
-  if (sfxAudio) {
-    sfxAudio.volume = 1;
+  // --- SFX volume (combined SFX/Shout/Testimony) ---
+  const svolume = <HTMLInputElement>document.getElementById("client_svolume");
+  if (svolume) {
+    svolume.value = "1";
     changeSFXVolume();
-  }
-
-  // --- Shout volume ---
-  const shoutAudio = <HTMLAudioElement>document.getElementById("client_shoutaudio");
-  if (shoutAudio) {
-    shoutAudio.volume = 1;
-    changeShoutVolume();
-  }
-
-  // --- Testimony volume ---
-  const testimonyAudio = <HTMLAudioElement>document.getElementById("client_testimonyaudio");
-  if (testimonyAudio) {
-    testimonyAudio.volume = 1;
-    changeTestimonyVolume();
   }
 
   // --- Blip volume ---
@@ -170,4 +150,3 @@ export function resetSettings() {
     switchHideDesks();
   }
 }
-window.resetSettings = resetSettings;

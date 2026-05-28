@@ -13,3 +13,5 @@ Thumbs.db
 
 # Dependencies
 node_modules/
+
+tmp/

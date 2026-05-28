@@ -7,4 +7,3 @@ import { client } from "../client";
 export function onReplayGo(_event: Event) {
   client.handleReplay();
 }
-window.onReplayGo = onReplayGo;
