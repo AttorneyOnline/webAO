@@ -29,7 +29,7 @@ import { KB, receiveKB } from "./packets/KB";
 import { KK, receiveKK } from "./packets/KK";
 import { LE, receiveLE } from "./packets/LE";
 import { MA, sendMA } from "./packets/MA";
-import { MCPacketClient, receiveMC, sendMC } from "./packets/MC";
+import { receiveMC, sendMC } from "./packets/MC";
 import { MM, receiveMM } from "./packets/MM";
 import { MSClient, receiveMS, sendMS } from "./packets/MS";
 import { PE, sendPE } from "./packets/PE";
@@ -107,7 +107,7 @@ const isReq = (v: unknown): v is ReqMarker =>
   typeof v === "object" && v !== null && REQ in v;
 
 /** Schema reference: either a `Field[]` array or a class constructor. */
-type Schema<T> = readonly Field[] | (new () => T);
+export type Schema<T> = readonly Field[] | (new () => T);
 
 /**
  * Walk a schema (`Field[]` or class) and yield `(name, type, default?)`
@@ -136,70 +136,76 @@ function* walkSchema<T>(
 }
 
 /**
- * Decode a wire body (positional `HEADER#a#b#%` or JSON
- * `{"$header": "HEADER", ...}`) into a typed packet. Missing optional
- * fields get their `default`; missing required fields throw.
+ * The "type gauntlet" — shared by `encode` and `decode`. Builds a
+ * fully-populated packet from a partial object: for class schemas,
+ * instantiating runs the field initializers (defaults + `req()`
+ * sentinels), then we overlay the partial values and throw if any
+ * required field is still a sentinel. For `Field[]` schemas (legacy),
+ * walks the array and fills defaults / throws on missing required.
  */
-export function decode<T>(schema: readonly Field[], body: string): T;
-export function decode<T>(schema: new () => T, body: string): T;
-export function decode<T>(schema: Schema<T>, body: string): T {
-  const out: Record<string, unknown> = {};
-  const specs = [...walkSchema<T>(schema)];
-
-  if (body.startsWith("{")) {
-    Object.assign(out, JSON.parse(body));
-    delete out.$header;
-  } else {
-    const args = (body.endsWith("#") ? body.slice(0, -1) : body).split("#");
-    specs.forEach((f, i) => {
-      const v = args[i + 1];
-      if (v !== undefined) out[f.name] = coerce(v, f.type);
-    });
+function cast<T>(schema: Schema<T>, partial: Record<string, unknown>): T {
+  if (typeof schema === "function") {
+    const instance = new (schema as new () => T)() as Record<string, unknown>;
+    Object.assign(instance, partial);
+    for (const [name, val] of Object.entries(instance)) {
+      if (isReq(val)) throw new Error(`Missing required field '${name}'`);
+    }
+    return instance as T;
   }
-  for (const f of specs) {
-    if (out[f.name] !== undefined) continue;
-    if (!f.required) out[f.name] = f.default;
+  for (const f of walkSchema<T>(schema)) {
+    if (partial[f.name] !== undefined) continue;
+    if (!f.required) partial[f.name] = f.default;
     else throw new Error(`Missing required field '${f.name}'`);
   }
-  return out as T;
+  return partial as T;
 }
 
 /**
- * Encode a typed packet. JSON mode emits `{"$header": header, ...packet}`;
- * legacy mode emits positional `HEADER#a#b#%`. Missing optional fields
- * fall back to `default`; missing required fields throw.
+ * Parse a wire body into a typed packet. Accepts either a string body
+ * (positional `HEADER#a#b#%` or JSON `{"$header":"HEADER",...}`) or an
+ * already-parsed object (e.g. from `JSON.parse` in `receiveString`).
+ * Runs the type gauntlet: missing optional fields get their `default`;
+ * missing required fields throw.
  */
-export function encode<T>(
-  header: string,
-  schema: readonly Field[],
-  packet: Partial<T>,
-  asJson: boolean,
-): string;
-export function encode<T>(
-  header: string,
-  schema: new () => T,
-  packet: Partial<T>,
-  asJson: boolean,
-): string;
+export function decode<T>(
+  schema: Schema<T>,
+  body: string | Record<string, unknown>,
+): T {
+  let partial: Record<string, unknown>;
+  if (typeof body === "string") {
+    if (body.startsWith("{")) {
+      partial = JSON.parse(body);
+      delete partial.$header;
+    } else {
+      partial = {};
+      const specs = [...walkSchema<T>(schema)];
+      const args = (body.endsWith("#") ? body.slice(0, -1) : body).split("#");
+      specs.forEach((f, i) => {
+        const v = args[i + 1];
+        if (v !== undefined) partial[f.name] = coerce(v, f.type);
+      });
+    }
+  } else {
+    partial = body;
+  }
+  return cast<T>(schema, partial);
+}
+
+/**
+ * Serialize a typed packet to wire bytes. Runs the same type gauntlet as
+ * `decode` (defaults filled, required validated), then emits either the
+ * JSON envelope `{"$header": header, ...packet}` or positional
+ * `HEADER#a#b#%`.
+ */
 export function encode<T>(
   header: string,
   schema: Schema<T>,
   packet: Partial<T>,
   asJson: boolean,
 ): string {
-  if (asJson) return JSON.stringify({ $header: header, ...packet });
-  const parts = [...walkSchema<T>(schema)].map((f) => {
-    let v = (packet as Record<string, unknown>)[f.name];
-    // Treat REQ sentinels (a fresh `new SchemaClass()` with required fields
-    // unset) as missing.
-    if (v === undefined || isReq(v)) {
-      if (f.required) {
-        throw new Error(`Missing required field '${f.name}' encoding ${header}`);
-      }
-      v = f.default;
-    }
-    return serialize(v, f.type);
-  });
+  const full = cast<T>(schema, packet as Record<string, unknown>) as Record<string, unknown>;
+  if (asJson) return JSON.stringify({ $header: header, ...full });
+  const parts = [...walkSchema<T>(schema)].map((f) => serialize(full[f.name], f.type));
   return `${header}#${parts.join("#")}#%`;
 }
 
@@ -305,16 +311,23 @@ export function readHeader(body: string): string {
  * one. Either or both may be present.
  */
 /**
- * Registry entry. Schema-driven packets set either `schema` (a class
- * constructor) or `fields` (a `Field[]` array); hand-rolled (irregular
- * wire format) packets set `codec`. Exactly one of the three should be
- * present.
+ * Registry entry.
+ *
+ * New pattern (e.g. MC): only `receive` and `send`. `receive(body)` is the
+ * inverse of `send(packet)` — it takes wire input (fanta string or parsed
+ * JSON object) and runs the whole pipeline. The dispatcher passes the raw
+ * body straight through.
+ *
+ * Legacy pattern: `codec` / `fields` / `schema` describes how to decode the
+ * wire into a typed packet, and `receive(packet)` is the typed handler.
+ * The dispatcher decodes first, then calls `receive` with the typed packet.
  */
 export interface PacketBinding<TPacket> {
   codec?: PacketCodec<TPacket>;
   fields?: readonly Field[];
   schema?: new () => TPacket;
-  receive?: (packet: TPacket) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  receive?: (input: any) => void;
   send?: (packet: TPacket) => void;
 }
 
@@ -365,7 +378,7 @@ const packets: Record<string, PacketBinding<any>> = {
   KK: { codec: KK, receive: receiveKK },
   LE: { codec: LE, receive: receiveLE },
   MA: { codec: MA, send: sendMA },
-  MC: { schema: MCPacketClient, receive: receiveMC, send: sendMC },
+  MC: { receive: receiveMC, send: sendMC },
   MM: { codec: MM, receive: receiveMM },
   MS: { codec: MSClient, receive: receiveMS, send: sendMS },
   PE: { codec: PE, send: sendPE },
