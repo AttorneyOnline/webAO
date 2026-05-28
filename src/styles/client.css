@@ -130,18 +130,6 @@
   color: #6af;
 }
 
-#client_secondfactor {
-  display: block;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  align-items: center;
-  background: black;
-  color: lightgreen;
-  font-size: large;
-  z-index: 200;
-}
-
 #client_waiting {
   display: block;
   flex-direction: column;
