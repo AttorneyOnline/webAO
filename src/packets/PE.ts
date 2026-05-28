@@ -24,5 +24,5 @@ export const PE: PacketCodec<PEPacket> = {
 };
 
 export const sendPE = (packet: PEPacket) => {
-  client.sendPacketToServer(PE, packet);
+  client.sendPacket(PE, packet);
 };

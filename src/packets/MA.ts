@@ -23,5 +23,5 @@ export const MA: PacketCodec<MAPacket> = {
 };
 
 export const sendMA = (packet: MAPacket) => {
-  client.sendPacketToServer(MA, packet);
+  client.sendPacket(MA, packet);
 };

@@ -46,5 +46,5 @@ export const receiveSC = async (packet: SCPacket) => {
     setupCharacterBasic(chargs, i);
   }
   // We're done with the characters, request the music
-  client.sendPacketToServer(RM, {});
+  client.sendPacket(RM, {});
 };

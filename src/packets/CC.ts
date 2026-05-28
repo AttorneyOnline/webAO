@@ -46,5 +46,5 @@ export const receiveCC = (packet: CCPacket) => {
  */
 export const sendCC = (packet: CCPacket) => {
   if (packet.char_id !== -1 && !client.chars[packet.char_id]?.name) return;
-  client.sendPacketToServer(CC, packet);
+  client.sendPacket(CC, packet);
 };

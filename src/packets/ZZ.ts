@@ -60,5 +60,5 @@ export const receiveZZ = (packet: ZZPacket) => {
  * Sends a modcall.
  */
 export const sendZZ = (packet: ZZPacket) => {
-  client.sendPacketToServer(ZZ, packet);
+  client.sendPacket(ZZ, packet);
 };

@@ -12,6 +12,6 @@ export function changeRoleOOC() {
   const name = (<HTMLInputElement>document.getElementById("OOC_name")).value;
   const side = parseSide(roleselect.value);
   sendCT({ name, message: `/pos ${roleselect.value}` });
-  client.sendPacketToServer(SP, { side });
+  client.sendPacket(SP, { side });
   updateActionCommands(side);
 }

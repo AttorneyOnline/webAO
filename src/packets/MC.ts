@@ -58,5 +58,5 @@ export function receiveMC(packet: MCPacketClient) {
  * Requests to change the music to the specified track.
  */
 export function sendMC(packet: Partial<MCPacketServer>) {
-  client.sendPacketToServer(MCPacketServer, packet);
+  client.sendPacket(MCPacketServer, packet);
 }

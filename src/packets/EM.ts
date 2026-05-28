@@ -66,5 +66,5 @@ export const receiveEM = (packet: EMPacket) => {
     }
   }
   // get the next batch of tracks
-  client.sendPacketToServer(AM, { batch: packet.batchIndex / 10 + 1 });
+  client.sendPacket(AM, { batch: packet.batchIndex / 10 + 1 });
 };

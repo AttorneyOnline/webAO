@@ -421,5 +421,5 @@ export const receiveMS = (packet: MSPacketClient) => {
 };
 
 export const sendMS = (packet: MSPacketServer) => {
-  client.sendPacketToServer(MSServer, packet);
+  client.sendPacket(MSServer, packet);
 };

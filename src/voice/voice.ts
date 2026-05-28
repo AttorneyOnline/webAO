@@ -289,7 +289,7 @@ function syncSpeakState(): void {
   if (want === lastEmittedSpeak) return;
   lastEmittedSpeak = want;
   if (inVoice) {
-    client.sendPacketToServer(VS_SPEAKServer, { on: want });
+    client.sendPacket(VS_SPEAKServer, { on: want });
   }
   notifySpeakingListeners();
 }
@@ -372,7 +372,7 @@ async function startCapture(): Promise<void> {
         // Server would drop oversize frames anyway
         return;
       }
-      client.sendPacketToServer(VS_FRAME, { payload: b64 });
+      client.sendPacket(VS_FRAME, { payload: b64 });
     },
     error: (e: DOMException) => {
       console.error("voice: encoder error", e);
@@ -570,7 +570,7 @@ export async function joinVoiceListenOnly(): Promise<void> {
   }
   inVoice = true;
   listenOnly = true;
-  client.sendPacketToServer(VS_JOINServer, {});
+  client.sendPacket(VS_JOINServer, {});
   syncSpeakState();
 }
 
@@ -610,7 +610,7 @@ export async function joinVoice(): Promise<void> {
   }
   if (!wasListenOnly) {
     inVoice = true;
-    client.sendPacketToServer(VS_JOINServer, {});
+    client.sendPacket(VS_JOINServer, {});
   }
   listenOnly = false;
   syncSpeakState();
@@ -620,9 +620,9 @@ export function leaveVoice(): void {
   if (!inVoice) return;
   if (lastEmittedSpeak) {
     lastEmittedSpeak = false;
-    client.sendPacketToServer(VS_SPEAKServer, { on: false });
+    client.sendPacket(VS_SPEAKServer, { on: false });
   }
-  client.sendPacketToServer(VS_LEAVEServer, {});
+  client.sendPacket(VS_LEAVEServer, {});
   teardownAll();
   notifyCapsUpdated();
 }

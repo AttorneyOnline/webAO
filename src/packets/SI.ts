@@ -64,5 +64,5 @@ export const receiveSI = (packet: SIPacket) => {
 
   applyFavourites();
 
-  client.sendPacketToServer(RC, {});
+  client.sendPacket(RC, {});
 };

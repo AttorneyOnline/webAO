@@ -26,5 +26,5 @@ export const EE: PacketCodec<EEPacket> = {
 };
 
 export const sendEE = (packet: EEPacket) => {
-  client.sendPacketToServer(EE, packet);
+  client.sendPacket(EE, packet);
 };

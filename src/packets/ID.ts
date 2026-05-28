@@ -77,6 +77,6 @@ export const receiveID = (packet: IDPacketClient) => {
   if (serverSoftware === "webAO") {
     client.sendToSelf("PN#0#1#%");
   } else {
-    client.sendPacketToServer(IDServer, { software: "webAO", version });
+    client.sendPacket(IDServer, { software: "webAO", version });
   }
 };

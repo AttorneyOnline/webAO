@@ -275,7 +275,7 @@ class Client extends EventEmitter {
    * replay mode the websocket isn't live, so outgoing packets loop back
    * through `sendToSelf` to drive the local dispatcher.
    */
-  sendStringToServer(message: string) {
+  sendString(message: string) {
     console.debug("C: " + message);
     if (mode === "replay") {
       this.sendToSelf(message);
@@ -290,27 +290,27 @@ class Client extends EventEmitter {
    * class-schema constructor (e.g. `MCPacketServer`). Class-schema
    * constructors must expose a `static header: string`.
    */
-  sendPacketToServer<T>(codec: PacketCodec<T>, packet: T): void;
-  sendPacketToServer<T>(
+  sendPacket<T>(codec: PacketCodec<T>, packet: T): void;
+  sendPacket<T>(
     SchemaClass: (new () => T) & { header: string },
     packet: Partial<T>,
   ): void;
-  sendPacketToServer<T>(
+  sendPacket<T>(
     schema: PacketCodec<T> | ((new () => T) & { header: string }),
     packet: T | Partial<T>,
   ) {
     if (typeof schema === "function") {
-      this.sendStringToServer(
+      this.sendString(
         encode(schema.header, schema, packet as Partial<T>, encode_packets_as_json),
       );
     } else {
-      this.sendStringToServer(encodePacket(schema, packet as T, encode_packets_as_json));
+      this.sendString(encodePacket(schema, packet as T, encode_packets_as_json));
     }
   }
 
   /**
    * Echoes a typed packet back into our own dispatcher. Same dispatch rules
-   * as `sendPacketToServer`.
+   * as `sendPacket`.
    */
   sendPacketToSelf<T>(codec: PacketCodec<T>, packet: T): void;
   sendPacketToSelf<T>(
@@ -335,7 +335,7 @@ class Client extends EventEmitter {
    * to the server.
    */
   joinServer() {
-    this.sendPacketToServer(HI, { hdid });
+    this.sendPacket(HI, { hdid });
     if (mode !== "replay") {
       this.checkUpdater = setInterval(
         () => sendCH({ char_id: this.charID }),
@@ -388,7 +388,7 @@ class Client extends EventEmitter {
   onMessage(e: MessageEvent) {
     const msg = e.data;
     console.debug(`S: ${msg}`);
-    this.handleServerPacket(msg);
+    this.receiveString(msg);
   }
 
   /**
@@ -396,7 +396,7 @@ class Client extends EventEmitter {
    * complete packet. A trailing incomplete packet (no terminator yet) is
    * buffered in `temp_packet` for the next chunk.
    */
-  handleServerPacket(chunk: string) {
+  receiveString(chunk: string) {
     const segments = (this.temp_packet + chunk).split("%");
     this.temp_packet = segments.pop() ?? "";
     for (const segment of segments) this.dispatchPacket(segment);

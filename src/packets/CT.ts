@@ -81,5 +81,5 @@ function addLinks(message: string) {
  * Sends an out-of-character chat message.
  */
 export const sendCT = (packet: CTPacket) => {
-  client.sendPacketToServer(CT, packet);
+  client.sendPacket(CT, packet);
 };

@@ -16,5 +16,5 @@ export const DE: PacketCodec<DEPacket> = {
 };
 
 export const sendDE = (packet: DEPacket) => {
-  client.sendPacketToServer(DE, packet);
+  client.sendPacket(DE, packet);
 };

@@ -33,5 +33,5 @@ export const PN: PacketCodec<PNPacket> = {
  * Indicates how many users are on this server
  */
 export const receivePN = (_packet: PNPacket) => {
-  client.sendPacketToServer(askchaa, {});
+  client.sendPacket(askchaa, {});
 };

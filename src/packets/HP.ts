@@ -39,5 +39,5 @@ export const receiveHP = (packet: HPPacket) => {
  * Sends a health point change.
  */
 export const sendHP = (packet: HPPacket) => {
-  client.sendPacketToServer(HP, packet);
+  client.sendPacket(HP, packet);
 };

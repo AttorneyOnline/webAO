@@ -22,5 +22,5 @@ export const receiveCH = () => {};
  * Sends a keepalive packet.
  */
 export const sendCH = (packet: CHPacket) => {
-  client.sendPacketToServer(CH, packet);
+  client.sendPacket(CH, packet);
 };
