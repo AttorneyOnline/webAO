@@ -62,6 +62,7 @@ import { switchHideDesks } from "./switchHideDesks";
 import { switchPanTilt } from "./switchPanTilt";
 import { openThemeMaker } from "./themeMaker";
 import { toggleEffect } from "./toggleEffect";
+import { toggleFavourite } from "./toggleFavourite";
 import { toggleElement } from "./toggleElement";
 import { toggleMenu } from "./toggleMenu";
 import { toggleShout } from "./toggleShout";
@@ -148,6 +149,10 @@ const actions: Record<string, (e: Event) => void> = {
   toggleMenu: (e) => toggleMenu(Number(datasetOf(e).menu)),
   toggleElement: (e) => toggleElement(datasetOf(e).element!),
   exportLog: (e) => exportLog(datasetOf(e).format!),
+  toggleFavourite: (e) => {
+    const slot = (e.currentTarget as HTMLElement).closest<HTMLElement>(".char-slot");
+    if (slot) toggleFavourite(Number(slot.dataset.charid), e);
+  },
 };
 
 const EVENT_TYPES = [

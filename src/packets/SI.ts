@@ -46,14 +46,13 @@ export const receiveSI = (packet: SIPacket) => {
     demothing.className = "demothing";
     demothing.loading = "lazy";
     demothing.id = `demo_${i}`;
-    const demoonclick = document.createAttribute("onclick");
-    demoonclick.value = `pickChar(${i})`;
-    demothing.setAttributeNode(demoonclick);
+    demothing.dataset.action = "pickChar";
+    demothing.dataset.char = String(i);
 
     const favBtn = document.createElement("button");
     favBtn.className = "fav-btn";
     favBtn.title = "Favourite";
-    favBtn.setAttribute("onclick", `toggleFavourite(${i}, event)`);
+    favBtn.dataset.action = "toggleFavourite";
     favBtn.textContent = "★";
 
     slot.appendChild(demothing);
