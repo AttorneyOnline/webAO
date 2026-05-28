@@ -393,60 +393,20 @@ class Client extends EventEmitter {
 
   /**
    * Format-aware entry point for raw server bytes:
-   *   - JSON mode: each chunk is one JSON object; parse and hand to
-   *     `receivePacket`, the inverse of `sendPacket`.
+   *   - JSON mode: each chunk is one complete JSON-encoded packet — hand
+   *     it straight to `dispatchPacket`, which auto-detects the format.
    *   - Fanta mode: chunks can carry multiple `%`-terminated packets and
    *     may end mid-packet. Split on `%`, buffer the tail in `temp_packet`
    *     for the next chunk, and dispatch each complete segment.
    */
   receiveString(data: string) {
     if (encode_packets_as_json) {
-      let obj: Record<string, unknown>;
-      try {
-        obj = JSON.parse(data);
-      } catch (err) {
-        console.error("Failed to parse JSON packet:", err, { chunk: data });
-        return;
-      }
-      this.receivePacket(obj);
+      this.dispatchPacket(data);
       return;
     }
     const chunks = (this.temp_packet + data).split("%");
     this.temp_packet = chunks.pop() ?? "";
     for (const chunk of chunks) this.dispatchPacket(chunk);
-  }
-
-  /**
-   * Inverse of `sendPacket`. Looks up the registry entry by `$header` and
-   * hands the body straight to `entry.receive` — the per-packet receive
-   * function (e.g. `receiveMC`) owns decoding and side effects. Legacy
-   * entries with a `schema`/`fields`/`codec` get decoded first.
-   */
-  receivePacket(obj: Record<string, unknown>) {
-    const $header = obj.$header as string | undefined;
-    if (!$header) {
-      console.warn("JSON packet missing $header", obj);
-      return;
-    }
-    const entry = packetRegistry.get($header);
-    if (!entry?.receive) {
-      console.warn(`No receiver registered for ${$header}`);
-      return;
-    }
-
-    delete obj.$header;
-
-    try {
-      if (entry.schema) {
-        entry.receive(decode(entry.schema, obj));
-      } else if (entry.fields) {
-        entry.receive(decode(entry.fields, obj));
-      } else {
-        entry.receive(obj);
-      }
-    } catch (err) {
-      console.error(`Receiver for ${$header} threw:`, err, { obj });
-    }
   }
 
   /** Decodes a single complete packet body (sans `%` terminator) and dispatches it. */

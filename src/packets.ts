@@ -161,32 +161,24 @@ function cast<T>(schema: Schema<T>, partial: Record<string, unknown>): T {
 }
 
 /**
- * Parse a wire body into a typed packet. Accepts either a string body
- * (positional `HEADER#a#b#%` or JSON `{"$header":"HEADER",...}`) or an
- * already-parsed object (e.g. from `JSON.parse` in `receiveString`).
- * Runs the type gauntlet: missing optional fields get their `default`;
- * missing required fields throw.
+ * Parse a wire body into a typed packet. Auto-detects format: bodies that
+ * start with `{` are JSON envelopes (`{"$header":"HEADER",...}`); anything
+ * else is positional `HEADER#a#b#%`. Runs the type gauntlet: missing
+ * optional fields get their `default`; missing required fields throw.
  */
-export function decode<T>(
-  schema: Schema<T>,
-  body: string | Record<string, unknown>,
-): T {
+export function decode<T>(schema: Schema<T>, body: string): T {
   let partial: Record<string, unknown>;
-  if (typeof body === "string") {
-    if (body.startsWith("{")) {
-      partial = JSON.parse(body);
-      delete partial.$header;
-    } else {
-      partial = {};
-      const specs = [...walkSchema<T>(schema)];
-      const args = (body.endsWith("#") ? body.slice(0, -1) : body).split("#");
-      specs.forEach((f, i) => {
-        const v = args[i + 1];
-        if (v !== undefined) partial[f.name] = coerce(v, f.type);
-      });
-    }
+  if (body.startsWith("{")) {
+    partial = JSON.parse(body);
+    delete partial.$header;
   } else {
-    partial = body;
+    partial = {};
+    const specs = [...walkSchema<T>(schema)];
+    const args = (body.endsWith("#") ? body.slice(0, -1) : body).split("#");
+    specs.forEach((f, i) => {
+      const v = args[i + 1];
+      if (v !== undefined) partial[f.name] = coerce(v, f.type);
+    });
   }
   return cast<T>(schema, partial);
 }

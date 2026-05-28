@@ -30,11 +30,11 @@ export class MCPacketServer {
 }
 
 /**
- * Type/defaults layer — wire body to typed packet. This is the seam where a
- * future schema/codec library could plug in; `receiveMC` and the dispatcher
- * only ever call `decodeMC`, never the generic `decode` directly.
+ * Type/defaults layer — wire string to typed packet. This is the seam
+ * where a future schema/codec library could plug in; `receiveMC` and the
+ * dispatcher only ever call `decodeMC`, never the generic `decode` directly.
  */
-export function decodeMC(body: string | Record<string, unknown>): MCPacketClient {
+export function decodeMC(body: string): MCPacketClient {
   return decode(MCPacketClient, body);
 }
 
@@ -50,7 +50,7 @@ export function encodeMC(packet: Partial<MCPacketServer>): string {
  * Inverse of `sendMC`: decode the body into a typed packet, then apply the
  * music change.
  */
-export function receiveMC(body: string | Record<string, unknown>) {
+export function receiveMC(body: string) {
   const packet = decodeMC(body);
   const music = client.viewport.music[packet.channel];
   music.pause();
