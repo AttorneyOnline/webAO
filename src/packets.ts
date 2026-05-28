@@ -29,7 +29,7 @@ import { KB, receiveKB } from "./packets/KB";
 import { KK, receiveKK } from "./packets/KK";
 import { LE, receiveLE } from "./packets/LE";
 import { MA, sendMA } from "./packets/MA";
-import { MCClient, receiveMC, sendMC } from "./packets/MC";
+import { MCPacketClient, receiveMC, sendMC } from "./packets/MC";
 import { MM, receiveMM } from "./packets/MM";
 import { MSClient, receiveMS, sendMS } from "./packets/MS";
 import { PE, sendPE } from "./packets/PE";
@@ -57,69 +57,141 @@ import { ZZ, receiveZZ, sendZZ } from "./packets/ZZ";
 
 // ---------- New schema-driven API ----------
 
+export type FieldType = "string" | "number" | "boolean";
+
 /**
- * Field schema. `default` (when present) makes the field optional — it's
- * used when the wire / JSON omits the value. Without `default`, the field
- * is required and `decode` throws if the wire is missing it.
+ * Field schema (object-array form). `default` (when present) makes the
+ * field optional — used when the wire / JSON omits the value. Without
+ * `default`, the field is required and `decode` throws if missing.
  */
 export interface Field {
   name: string;
-  type: "string" | "number" | "boolean";
+  type: FieldType;
   default?: unknown;
 }
 
-const coerce = (raw: string, t: Field["type"]): unknown =>
+const coerce = (raw: string, t: FieldType): unknown =>
   t === "string" ? unescapeChat(raw)
   : t === "number" ? Number(raw)
   : raw === "1";
 
-const serialize = (v: unknown, t: Field["type"]): string =>
+const serialize = (v: unknown, t: FieldType): string =>
   t === "string" ? escapeChat(v as string)
   : t === "number" ? String(v)
   : v ? "1" : "0";
 
+// ---------- Class-based schema sentinel ----------
+
+const REQ = Symbol("required");
+interface ReqMarker { [REQ]: FieldType; }
+
+// Memoised sentinels so `new MCPacketClient()` doesn't allocate on every decode.
+const REQ_STRING: ReqMarker = { [REQ]: "string" };
+const REQ_NUMBER: ReqMarker = { [REQ]: "number" };
+const REQ_BOOLEAN: ReqMarker = { [REQ]: "boolean" };
+
 /**
- * Decode a wire body (either positional `HEADER#a#b#%` or JSON
+ * Marks a class field as required. At compile time the return type is
+ * the actual field type (so the class is usable as a TS type); at runtime
+ * it's a sentinel that `decode` recognises and either fills from the wire
+ * or throws on missing.
+ */
+export function req(t: "string"): string;
+export function req(t: "number"): number;
+export function req(t: "boolean"): boolean;
+export function req(t: FieldType): unknown {
+  return t === "string" ? REQ_STRING : t === "number" ? REQ_NUMBER : REQ_BOOLEAN;
+}
+
+const isReq = (v: unknown): v is ReqMarker =>
+  typeof v === "object" && v !== null && REQ in v;
+
+/** Schema reference: either a `Field[]` array or a class constructor. */
+type Schema<T> = readonly Field[] | (new () => T);
+
+/**
+ * Walk a schema (`Field[]` or class) and yield `(name, type, default?)`
+ * triplets in wire order. For classes we instantiate once to read the
+ * declared defaults / required markers.
+ */
+function* walkSchema<T>(
+  schema: Schema<T>,
+): Generator<{ name: string; type: FieldType; default?: unknown; required: boolean }> {
+  if (Array.isArray(schema)) {
+    for (const f of schema as readonly Field[]) {
+      const required = !("default" in f);
+      yield { name: f.name, type: f.type, default: f.default, required };
+    }
+    return;
+  }
+  const exemplar = new (schema as new () => T)();
+  for (const [name, val] of Object.entries(exemplar as object)) {
+    if (isReq(val)) {
+      yield { name, type: val[REQ], required: true };
+    } else {
+      const type = typeof val as FieldType;
+      yield { name, type, default: val, required: false };
+    }
+  }
+}
+
+/**
+ * Decode a wire body (positional `HEADER#a#b#%` or JSON
  * `{"$header": "HEADER", ...}`) into a typed packet. Missing optional
  * fields get their `default`; missing required fields throw.
  */
-export function decode<T>(fields: readonly Field[], body: string): T {
+export function decode<T>(schema: readonly Field[], body: string): T;
+export function decode<T>(schema: new () => T, body: string): T;
+export function decode<T>(schema: Schema<T>, body: string): T {
   const out: Record<string, unknown> = {};
+  const specs = [...walkSchema<T>(schema)];
+
   if (body.startsWith("{")) {
     Object.assign(out, JSON.parse(body));
     delete out.$header;
   } else {
     const args = (body.endsWith("#") ? body.slice(0, -1) : body).split("#");
-    fields.forEach((f, i) => {
+    specs.forEach((f, i) => {
       const v = args[i + 1];
       if (v !== undefined) out[f.name] = coerce(v, f.type);
     });
   }
-  for (const f of fields) {
+  for (const f of specs) {
     if (out[f.name] !== undefined) continue;
-    if ("default" in f) out[f.name] = f.default;
+    if (!f.required) out[f.name] = f.default;
     else throw new Error(`Missing required field '${f.name}'`);
   }
   return out as T;
 }
 
 /**
- * Encode a typed packet to wire bytes. JSON mode emits
- * `{"$header": header, ...packet}`; legacy mode emits positional
- * `HEADER#a#b#%`. Missing fields fall back to `default`; missing required
- * fields throw.
+ * Encode a typed packet. JSON mode emits `{"$header": header, ...packet}`;
+ * legacy mode emits positional `HEADER#a#b#%`. Missing optional fields
+ * fall back to `default`; missing required fields throw.
  */
 export function encode<T>(
   header: string,
-  fields: readonly Field[],
-  packet: T,
+  schema: readonly Field[],
+  packet: Partial<T>,
+  asJson: boolean,
+): string;
+export function encode<T>(
+  header: string,
+  schema: new () => T,
+  packet: Partial<T>,
+  asJson: boolean,
+): string;
+export function encode<T>(
+  header: string,
+  schema: Schema<T>,
+  packet: Partial<T>,
   asJson: boolean,
 ): string {
   if (asJson) return JSON.stringify({ $header: header, ...packet });
-  const parts = fields.map((f) => {
+  const parts = [...walkSchema<T>(schema)].map((f) => {
     let v = (packet as Record<string, unknown>)[f.name];
     if (v === undefined) {
-      if (!("default" in f)) {
+      if (f.required) {
         throw new Error(`Missing required field '${f.name}' encoding ${header}`);
       }
       v = f.default;
@@ -143,7 +215,6 @@ export interface PacketCodec<TPacket> {
   encode?(packet: TPacket): string;
 }
 
-export type FieldType = Field["type"];
 export type FieldSpec = Field;
 
 const zeroFor = (t: FieldType): unknown =>
@@ -231,8 +302,16 @@ export function readHeader(body: string): string {
  * decoded incoming packet, send encodes-and-transports an outgoing
  * one. Either or both may be present.
  */
+/**
+ * Registry entry. Schema-driven packets set either `schema` (a class
+ * constructor) or `fields` (a `Field[]` array); hand-rolled (irregular
+ * wire format) packets set `codec`. Exactly one of the three should be
+ * present.
+ */
 export interface PacketBinding<TPacket> {
-  codec: PacketCodec<TPacket>;
+  codec?: PacketCodec<TPacket>;
+  fields?: readonly Field[];
+  schema?: new () => TPacket;
   receive?: (packet: TPacket) => void;
   send?: (packet: TPacket) => void;
 }
@@ -284,7 +363,7 @@ const packets: Record<string, PacketBinding<any>> = {
   KK: { codec: KK, receive: receiveKK },
   LE: { codec: LE, receive: receiveLE },
   MA: { codec: MA, send: sendMA },
-  MC: { codec: MCClient, receive: receiveMC, send: sendMC },
+  MC: { schema: MCPacketClient, receive: receiveMC, send: sendMC },
   MM: { codec: MM, receive: receiveMM },
   MS: { codec: MSClient, receive: receiveMS, send: sendMS },
   PE: { codec: PE, send: sendPE },

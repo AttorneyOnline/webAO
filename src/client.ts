@@ -21,6 +21,7 @@ import {
   parsePacket,
   encodePacket,
   readHeader,
+  decode,
 } from "./packets";
 import { appendICNotice } from "./client/appendICNotice";
 import { loadResources } from "./client/loadResources";
@@ -401,13 +402,22 @@ class Client extends EventEmitter {
       return;
     }
 
-    // `parsePacket` auto-detects positional vs JSON form and applies the
-    // schema defaults (for schema-driven codecs). Decode and receive are
-    // guarded individually so a single malformed/buggy packet can't poison
-    // its siblings in the same WebSocket frame.
+    // Schema-driven entries (`schema` class or `fields` array) go through
+    // the universal `decode` machine; hand-rolled ones (`codec`) keep the
+    // legacy `parsePacket` path. Decode and receive are guarded individually
+    // so a single malformed/buggy packet can't poison its siblings in the
+    // same WebSocket frame.
     let decoded;
     try {
-      decoded = parsePacket(entry.codec, body);
+      if (entry.schema) {
+        decoded = decode(entry.schema, body);
+      } else if (entry.fields) {
+        decoded = decode(entry.fields, body);
+      } else if (entry.codec) {
+        decoded = parsePacket(entry.codec, body);
+      } else {
+        throw new Error(`Registry entry for ${header} has no schema, fields, or codec`);
+      }
     } catch (err) {
       console.error(`Failed to decode ${header} packet:`, err, { body });
       return;
