@@ -28,11 +28,7 @@ import { changeCallwords } from "./changeCallwords";
 import { changeCharacter } from "./changeCharacter";
 import { changeMusicVolume } from "./changeMusicVolume";
 import { changeRoleOOC } from "./changeRoleOOC";
-import {
-  changeSFXVolume,
-  changeTestimonyVolume,
-  changeShoutVolume,
-} from "./changeVolume";
+import { changeSFXVolume } from "./changeVolume";
 import { charError } from "./charError";
 import { chartable_filter } from "./charTableFilter";
 import { deleteEvidence } from "./deleteEvidence";
@@ -102,8 +98,6 @@ const actions: Record<string, (e: Event) => void> = {
   changeMusicVolume: () => changeMusicVolume(),
   changeRoleOOC: () => changeRoleOOC(),
   changeSFXVolume: () => changeSFXVolume(),
-  changeShoutVolume: () => changeShoutVolume(),
-  changeTestimonyVolume: () => changeTestimonyVolume(),
   deleteEvidence: () => deleteEvidence(),
   DisconnectButton: () => DisconnectButton(),
   editEvidence: () => editEvidence(),

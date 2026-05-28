@@ -804,28 +804,19 @@
         />
 
         <p>SFX <label><input type="checkbox" id="client_mute_sfx" data-action="toggleMuteSfx" data-event="change"> Mute</label></p>
-        <audio
-          id="client_sfxaudio"
-          data-action="changeSFXVolume" data-event="volumechange"
-          data-action="opusCheck" data-event="error"
-          controls
-        ></audio>
-
-        <p>Shouts</p>
-        <audio
-          id="client_shoutaudio"
-          data-action="changeShoutVolume" data-event="volumechange"
-          data-action="opusCheck" data-event="error"
-          controls
-        ></audio>
-
-        <p>Testimony/Guilty</p>
-        <audio
-          id="client_testimonyaudio"
-          data-action="changeTestimonyVolume" data-event="volumechange"
-          data-action="opusCheck" data-event="error"
-          controls
-        ></audio>
+        <input
+          id="client_svolume"
+          class="long"
+          type="range"
+          min="0"
+          max="1"
+          value="1"
+          step="0.01"
+          data-action="changeSFXVolume" data-event="change"
+        />
+        <audio id="client_sfxaudio" data-action="opusCheck" data-event="error"></audio>
+        <audio id="client_shoutaudio" data-action="opusCheck" data-event="error"></audio>
+        <audio id="client_testimonyaudio" data-action="opusCheck" data-event="error"></audio>
 
         <p>Blip <label><input type="checkbox" id="client_mute_blips" data-action="toggleMuteBlips" data-event="change"> Mute</label></p>
         <input
