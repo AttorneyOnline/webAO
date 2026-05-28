@@ -22,6 +22,7 @@ import {
   encodePacket,
   readHeader,
   decode,
+  encode,
 } from "./packets";
 import { appendICNotice } from "./client/appendICNotice";
 import { loadResources } from "./client/loadResources";
@@ -284,21 +285,49 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Sends a typed packet using `codec`, picking the wire format from
-   * `encode_packets_as_json`. The encoding machinery lives in
-   * `encodePacket`; this method just wires the flag through.
+   * Sends a typed packet, picking the wire format from
+   * `encode_packets_as_json`. Accepts either a legacy `PacketCodec` or a
+   * class-schema constructor (e.g. `MCPacketServer`). Class-schema
+   * constructors must expose a `static header: string`.
    */
-  sendPacketToServer<T>(codec: PacketCodec<T>, packet: T) {
-    this.sendStringToServer(encodePacket(codec, packet, encode_packets_as_json));
+  sendPacketToServer<T>(codec: PacketCodec<T>, packet: T): void;
+  sendPacketToServer<T>(
+    SchemaClass: (new () => T) & { header: string },
+    packet: Partial<T>,
+  ): void;
+  sendPacketToServer<T>(
+    schema: PacketCodec<T> | ((new () => T) & { header: string }),
+    packet: T | Partial<T>,
+  ) {
+    if (typeof schema === "function") {
+      this.sendStringToServer(
+        encode(schema.header, schema, packet as Partial<T>, encode_packets_as_json),
+      );
+    } else {
+      this.sendStringToServer(encodePacket(schema, packet as T, encode_packets_as_json));
+    }
   }
 
   /**
-   * Echoes a typed packet back into our own dispatcher. Replaces hand-built
-   * `sendToSelf("HEADER#...#%")` strings; the wire format honors the JSON
-   * flag uniformly.
+   * Echoes a typed packet back into our own dispatcher. Same dispatch rules
+   * as `sendPacketToServer`.
    */
-  sendPacketToSelf<T>(codec: PacketCodec<T>, packet: T) {
-    this.sendToSelf(encodePacket(codec, packet, encode_packets_as_json));
+  sendPacketToSelf<T>(codec: PacketCodec<T>, packet: T): void;
+  sendPacketToSelf<T>(
+    SchemaClass: (new () => T) & { header: string },
+    packet: Partial<T>,
+  ): void;
+  sendPacketToSelf<T>(
+    schema: PacketCodec<T> | ((new () => T) & { header: string }),
+    packet: T | Partial<T>,
+  ) {
+    if (typeof schema === "function") {
+      this.sendToSelf(
+        encode(schema.header, schema, packet as Partial<T>, encode_packets_as_json),
+      );
+    } else {
+      this.sendToSelf(encodePacket(schema, packet as T, encode_packets_as_json));
+    }
   }
 
   /**

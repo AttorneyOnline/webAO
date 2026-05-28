@@ -1,4 +1,4 @@
-import { escapeChat, unescapeChat } from "./encoding";
+import { decodeChat, escapeChat, unescapeChat } from "./encoding";
 import { ARUP, receiveARUP } from "./packets/ARUP";
 import { askchaa, receiveaskchaa } from "./packets/askchaa";
 import { ASS, receiveASS } from "./packets/ASS";
@@ -71,7 +71,7 @@ export interface Field {
 }
 
 const coerce = (raw: string, t: FieldType): unknown =>
-  t === "string" ? unescapeChat(raw)
+  t === "string" ? decodeChat(unescapeChat(raw))
   : t === "number" ? Number(raw)
   : raw === "1";
 
@@ -190,7 +190,9 @@ export function encode<T>(
   if (asJson) return JSON.stringify({ $header: header, ...packet });
   const parts = [...walkSchema<T>(schema)].map((f) => {
     let v = (packet as Record<string, unknown>)[f.name];
-    if (v === undefined) {
+    // Treat REQ sentinels (a fresh `new SchemaClass()` with required fields
+    // unset) as missing.
+    if (v === undefined || isReq(v)) {
       if (f.required) {
         throw new Error(`Missing required field '${f.name}' encoding ${header}`);
       }

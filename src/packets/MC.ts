@@ -1,8 +1,7 @@
-import { client, encode_packets_as_json } from "../client";
+import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
 import { appendICLog } from "../client/appendICLog";
-import { decodeChat, safeTags } from "../encoding";
-import { encode, req } from "../packets";
+import { req } from "../packets";
 
 /**
  * Music/area change. Two wire variants per spec:
@@ -13,15 +12,17 @@ import { encode, req } from "../packets";
  *     `MC#{name}#{char_id}#{showname}#{effects}#%`
  */
 export class MCPacketClient {
+  static header = "MC";
   name = req("string");
   char_id = req("number");
   showname = "";
-  looping = 0;
+  looping = false;
   channel = 0;
   effects = 0;
 }
 
 export class MCPacketServer {
+  static header = "MC";
   name = req("string");
   char_id = req("number");
   showname = "";
@@ -31,50 +32,31 @@ export class MCPacketServer {
 /**
  * Handles a music change to an arbitrary resource.
  */
-export const receiveMC = (packet: MCPacketClient) => {
-  const track = safeTags(decodeChat(packet.name));
-  let charID = packet.char_id;
-  const { showname, channel } = packet;
-  const looping = Boolean(packet.looping);
-  // const fading = packet.effects; // unused in web
-
-  const music = client.viewport.music[channel];
-  let musicname;
+export function receiveMC(packet: MCPacketClient) {
+  const music = client.viewport.music[packet.channel];
   music.pause();
-  if (track.startsWith("http")) {
-    music.src = track;
+  if (packet.name.startsWith("http")) {
+    music.src = packet.name;
   } else {
-    music.src = `${AO_HOST}sounds/music/${encodeURI(track.toLowerCase())}`;
+    music.src = `${AO_HOST}sounds/music/${encodeURI(packet.name.toLowerCase())}`;
   }
-  music.loop = looping;
+  music.loop = packet.looping;
   music.play().catch(() => {});
 
-  try {
-    musicname = client.chars[charID].name;
-  } catch (e) {
-    charID = -1;
-  }
-
-  let looptext = "";
-
-  if (looping)
-    looptext = "(looping)";
-
-  if (charID >= 0) {
-    musicname = client.chars[charID].name;
-    appendICLog(`changed music to ${track} ${looptext}`, showname, musicname);
+  const musicname: string | undefined = client.chars[packet.char_id]?.name;
+  const looptext = packet.looping ? "(looping)" : "";
+  if (musicname) {
+    appendICLog(`changed music to ${packet.name} ${looptext}`, packet.showname, musicname);
   } else {
-    appendICLog(`The music was changed to ${track} ${looptext}`, showname);
+    appendICLog(`The music was changed to ${packet.name} ${looptext}`, packet.showname);
   }
 
-  document.getElementById("client_trackstatustext")!.innerText = track;
-};
+  document.getElementById("client_trackstatustext")!.innerText = packet.name;
+}
 
 /**
- * Requests to change the music to the specified track. Callers can pass a
- * partial packet — the schema's defaults fill in any omitted fields.
+ * Requests to change the music to the specified track.
  */
-export const sendMC = (packet: Partial<MCPacketServer>) => {
-  const wire = encode("MC", MCPacketServer, packet, encode_packets_as_json);
-  client.sendStringToServer(wire);
-};
+export function sendMC(packet: Partial<MCPacketServer>) {
+  client.sendPacketToServer(MCPacketServer, packet);
+}
