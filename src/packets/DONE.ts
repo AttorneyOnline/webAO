@@ -1,5 +1,4 @@
 import { client, clientState, autoChar, autoArea } from "../client";
-import { sendCC } from "./CC";
 import { area_click } from "../dom/areaClick";
 import { Packet } from "../Packet";
 import { decode } from "../packets";
@@ -49,7 +48,7 @@ export function receiveDONE(body: string) {
       (c: any) => c && c.name.toLowerCase() === autoChar.toLowerCase(),
     );
     if (charIndex !== -1) {
-      sendCC({
+      client.send.CC({
         char_id: charIndex,
       });
     }

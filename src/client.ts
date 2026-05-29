@@ -17,6 +17,7 @@ import { EventEmitter } from "events";
 import { onReplayGo } from "./dom/onReplayGo";
 import {
   clientReceive,
+  clientSend,
   type Packet,
   type PacketCodec,
   type Schema,
@@ -138,6 +139,20 @@ export const setLastICMessageTime = (val: Date) => {
 };
 
 class Client extends EventEmitter {
+  /**
+   * Typed sender registry. Call as `client.send.MC({ ... })` to send
+   * a packet with autocomplete on both the header and the typed
+   * packet shape.
+   */
+  send = clientSend;
+
+  /**
+   * Typed receiver registry. Call as `client.receive.AUTH(body)` to
+   * invoke a receive handler directly (replay, tests, etc.). The
+   * normal inbound dispatch path also resolves through this table.
+   */
+  receive = clientReceive;
+
   serv: any;
   hp: number[];
   playerID: number;
@@ -253,21 +268,6 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Transmit a wire frame to the server. In replay mode there is no
-   * real server, so the frame is fed to our own server-side dispatcher
-   * (`receiveDataAsServer`) and the local handlers synthesize what the
-   * server would have done.
-   */
-  sendData(message: string) {
-    console.debug("C: " + message);
-    if (mode === "replay") {
-      this.receiveDataAsServer(message);
-    } else {
-      this.serv.send(message);
-    }
-  }
-
-  /**
    * Sends a typed packet, picking the wire format from
    * `json_mode`. Accepts either a legacy `PacketCodec` or a
    * class-schema constructor (e.g. `MCPacketServer`). Class-schema
@@ -341,6 +341,21 @@ class Client extends EventEmitter {
     this.cleanup();
   }
 
+  /**
+   * Transmit a wire frame to the server. In replay mode there is no
+   * real server, so the frame is fed to our own server-side dispatcher
+   * (`receiveDataAsServer`) and the local handlers synthesize what the
+   * server would have done.
+   */
+  sendData(message: string) {
+    console.debug("C: " + message);
+    if (mode === "replay") {
+      this.receiveDataAsServer(message);
+    } else {
+      this.serv.send(message);
+    }
+  }
+
   /** Triggered when a packet (or chunk thereof) is received from the server. */
   onMessage(e: MessageEvent) {
     const msg = e.data;
@@ -370,7 +385,7 @@ class Client extends EventEmitter {
 
   private dispatchFrame(
     data: string,
-    map: Map<string, (body: string) => void>,
+    receiverLookup: Record<string, (body: string) => void>,
     role: string,
   ) {
     let header: string;
@@ -384,13 +399,13 @@ class Client extends EventEmitter {
       console.warn(`WARNING: Empty header received, skipping...`);
       return;
     }
-    const fn = map.get(header);
-    if (!fn) {
+    const receiver = receiverLookup[header];
+    if (!receiver) {
       console.warn(`Unknown packet header for ${role} receiver:`, header);
       return;
     }
     try {
-      fn(data);
+      receiver(data);
     } catch (err) {
       console.error(`Receiver for ${header} threw:`, err, { body: data });
     }
@@ -422,7 +437,6 @@ class Client extends EventEmitter {
 
   /**
    * Parse the lines in the OOC and play them
-   * @param {*} args packet arguments
    */
   handleReplay() {
     const ooclog = <HTMLInputElement>document.getElementById("client_ooclog");

@@ -460,42 +460,25 @@ const serverPackets: Record<string, PacketBinding<any>> = {
 
 export const serverPacketRegistry = new Map(Object.entries(serverPackets));
 
-// ---------- Quadrant model (replaces the legacy registries above) ----------
-//
-// Four maps, one per (role, direction) quadrant. Each entry is a single
-// function — no `codec`/`schema` bundling, no shared binding object. The
-// receive handler owns its own decode; the send helper owns its own encode.
-//
-//   clientReceive[H] — invoked when, acting as Client, we receive H (from server)
-//   clientSend[H]    — produces H bound for the server
-//   serverReceive[H] — invoked when, acting as Server, we receive H (from client)
-//   serverSend[H]    — produces H bound for a client
-//
-// Headers may appear in any subset of the four maps, including all four.
-// For direction-asymmetric headers like MC, each quadrant uses its own
-// wire schema (server-receives form vs client-receives form), so the four
-// entries are genuinely independent — bundling them would be misleading.
+// Packets we can send as a client
+export const clientSend = {
+  CC: sendCC,
+  MC: sendMC,
+};
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SendFn = (packet: any) => void;
-type ReceiveFn = (body: string) => void;
+// Packets we can receive as a client
+export const clientReceive = {
+  AUTH: receiveAUTH,
+  BB: receiveBB,
+  DONE: receiveDONE,
+  MC: receiveMC,
+  PV: receivePV,
+};
 
-export const clientReceive = new Map<string, ReceiveFn>([
-  ["AUTH", receiveAUTH],
-  ["BB", receiveBB],
-  ["DONE", receiveDONE],
-  ["MC", receiveMC],
-  ["PV", receivePV],
-]);
+// Packets we can send as a server
+export const serverSend = {};
 
-export const clientSend = new Map<string, SendFn>([
-  ["CC", sendCC],
-  ["MC", sendMC],
-]);
-
-export const serverReceive = new Map<string, ReceiveFn>([
-  ["CC", receiveCC],
-]);
-
-export const serverSend = new Map<string, SendFn>();
-
+// Packets we can receive as a server
+export const serverReceive = {
+  CC: receiveCC,
+};

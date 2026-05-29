@@ -1,5 +1,4 @@
 import { client } from "../client";
-import { sendMC } from "../packets/MC";
 import { renderPlayerList } from "./renderPlayerList";
 /**
  * Triggered when an item on the area list is clicked.
@@ -7,7 +6,7 @@ import { renderPlayerList } from "./renderPlayerList";
  */
 export function area_click(el: HTMLElement) {
   const area = client.areas[el.id.substring(4)].name;
-  sendMC({ name: area, char_id: client.charID });
+  client.send.MC({ name: area, char_id: client.charID });
 
   const areaHr = document.createElement("div");
   areaHr.className = "hrtext";
