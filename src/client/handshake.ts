@@ -35,7 +35,7 @@ export function applyEncryptionMode() {
  * and the join stalls.
  */
 export function applyServerIdentity(packet: aolib.IDPacket) {
-  client.playerID = packet.player_count;
+  client.playerID = packet.player_number;
   const serverSoftware = packet.software.split("&")[0];
   if (serverSoftware === "webAO") {
     client.server.receive("PN#0#1#%");

@@ -66,7 +66,7 @@ wss.on("connection", (ws) => {
 
   client.on.HI((_packet) => {
     client.send.ID({
-      player_count: clients.size,
+      player_number: clients.size,
       software: "LemmyAO-server",
       version: "1.0",
     });

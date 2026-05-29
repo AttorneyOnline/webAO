@@ -1,9 +1,9 @@
 /**
  * ID — identity packet. Bidirectional with asymmetric shapes:
  *
- *   Server -> client (ID): `ID#<player_count>#<software>#<version>#%`.
+ *   Server -> client (ID): `ID#<player_number>#<software>#<version>#%`.
  *     Server identifies itself in response to HI and assigns the
- *     client a player slot.
+ *     client its player slot id (NOT a population count — that's PN).
  *
  *   Client -> server (IDRequest): `ID#<software>#<version>#%`.
  *     The client identifies itself back. Most legacy servers (akashi,
@@ -16,9 +16,9 @@
 import { packet } from "../schema";
 import { str, num } from "../fields";
 
-/** Server -> client: the server identifies itself. */
+/** Server -> client: the server identifies itself and assigns a slot. */
 export const ID = packet("ID", {
-  player_count: num(),
+  player_number: num(),
   software: str(),
   version: str(),
 });
