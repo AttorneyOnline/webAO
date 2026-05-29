@@ -36,10 +36,11 @@ export {
 } from "./fields";
 
 // ---------------------------------------------------------------------
-// JSON walker (library-side).
+// Wire-format walkers (library-side).
 // ---------------------------------------------------------------------
 
 export { fromJson, toJson } from "./json";
+export { fromFantaArgs, toFantaArgs } from "./fanta";
 
 // ---------------------------------------------------------------------
 // Type-level walkers — `In<S>` (caller input shape) and `Out<S>`
