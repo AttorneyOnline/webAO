@@ -1,0 +1,45 @@
+{
+  "name": "aolib",
+  "version": "0.0.0",
+  "description": "Self-contained TypeScript library for the Attorney Online protocol. Owns every packet schema, both wire formats (fantacode + JSON), encode/decode, and the typed dispatch surface.",
+  "type": "module",
+  "main": "./index.ts",
+  "module": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "import": "./index.ts",
+      "default": "./index.ts"
+    }
+  },
+  "files": [
+    "*.ts",
+    "packets/**/*.ts",
+    "tests/**/*.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "attorney-online",
+    "ao",
+    "ao1",
+    "ao2",
+    "websocket",
+    "protocol",
+    "typescript"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
