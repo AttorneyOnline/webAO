@@ -1,24 +1,17 @@
-import type { PacketCodec } from "../packets";
+import { Packet } from "../Packet";
+import { decode } from "../packets";
 
 /**
- * "MusicMode" packet. Not in the official spec and unused by the current
- * client -- kept as a no-op codec for registry completeness.
+ * "MusicMode" packet. Not in the official spec and unused by the
+ * current client — kept as a no-op for registry completeness. Modern
+ * servers gate music changes server-side instead.
  */
-export type MMPacket = Record<string, never>;
 
-export const MM: PacketCodec<MMPacket> = {
-  header: "MM",
-  decode() {
-    return {};
-  },
-  encode() {
-    return `MM#%`;
-  },
-};
+// Receiver: Client
+export class MMPacket extends Packet {
+  static $header = "MM";
+}
 
-/**
- * Handles the "MusicMode" packet
- */
-export const receiveMM = (_packet: MMPacket) => {
-  // It's unused nowadays, as preventing people from changing the music is now serverside
-};
+export function receiveMM(body: string) {
+  decode(MMPacket, body);
+}

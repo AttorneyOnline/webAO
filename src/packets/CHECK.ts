@@ -1,14 +1,16 @@
-import type { PacketCodec } from "../packets";
+import { Packet } from "../Packet";
+import { decode } from "../packets";
 
 /**
- * Server keepalive response to the client's `CH`. No fields, no action.
+ * Keepalive ack. Server's response to the client's `CH`. No fields,
+ * no client-side action — just keeps the connection from idling.
  */
-export type CHECKPacket = Record<string, never>;
 
-export const CHECK: PacketCodec<CHECKPacket> = {
-  header: "CHECK",
-  decode: () => ({}),
-  encode: () => "CHECK#%",
-};
+// Receiver: Client
+export class CHECKPacket extends Packet {
+  static $header = "CHECK";
+}
 
-export const receiveCHECK = () => {};
+export function receiveCHECK(body: string) {
+  decode(CHECKPacket, body);
+}

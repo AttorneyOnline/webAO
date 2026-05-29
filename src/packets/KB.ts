@@ -1,27 +1,21 @@
 import { client } from "../client";
 import { handleBans } from "../client/handleBans";
-import { escapeFanta, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
-
-export interface KBPacket {
-  reason: string;
-}
-
-export const KB: PacketCodec<KBPacket> = {
-  header: "KB",
-  decode(args) {
-    return { reason: unescapeFanta(args[1] ?? "") };
-  },
-  encode(packet) {
-    return `KB#${escapeFanta(packet.reason)}#%`;
-  },
-};
+import { Packet } from "../Packet";
+import { decode, req } from "../packets";
 
 /**
- * Handles the banned packet
- * this one is sent when you are kicked off the server
+ * Kicked-and-banned. Server is kicking the client and adding a
+ * persistent ban. Reason is shown in the ban screen.
  */
-export const receiveKB = (packet: KBPacket) => {
+
+// Receiver: Client
+export class KBPacket extends Packet {
+  static $header = "KB";
+  reason = req("string");
+}
+
+export function receiveKB(body: string) {
+  const packet = decode(KBPacket, body);
   client.banned = true;
   handleBans("Banned", packet.reason);
-};
+}

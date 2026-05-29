@@ -2,7 +2,6 @@ import { client } from "../client";
 import { fetchExtensions } from "../client/fetchLists";
 import { applyFavourites } from "../dom/toggleFavourite";
 import type { PacketCodec } from "../packets";
-import { RC } from "./RC";
 
 export interface SIPacket {
   char_cnt: number;
@@ -64,5 +63,5 @@ export const receiveSI = (packet: SIPacket) => {
 
   applyFavourites();
 
-  client.sendPacket(RC, {});
+  client.send.RC({});
 };

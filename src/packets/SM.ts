@@ -5,7 +5,6 @@ import { fix_last_area } from "../client/fixLastArea";
 import { isAudio } from "../client/isAudio";
 import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
-import { RD } from "./RD";
 
 export interface SMPacket {
   music_list: string[];
@@ -55,5 +54,5 @@ export const receiveSM = (packet: SMPacket) => {
   }
 
   // Music done, carry on
-  client.sendPacket(RD, {});
+  client.send.RD({});
 };

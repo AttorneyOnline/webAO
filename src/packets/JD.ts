@@ -1,23 +1,19 @@
-import type { PacketCodec } from "../packets";
-
-export interface JDPacket {
-  state: number;
-}
-
-export const JD: PacketCodec<JDPacket> = {
-  header: "JD",
-  decode(args) {
-    return { state: Number(args[1]) };
-  },
-  encode(packet) {
-    return `JD#${packet.state}#%`;
-  },
-};
+import { Packet } from "../Packet";
+import { decode, req } from "../packets";
 
 /**
- * show/hide judge controls
+ * Judge-controls toggle. `state === 1` shows the judge action panel;
+ * anything else hides it.
  */
-export const receiveJD = (packet: JDPacket) => {
+
+// Receiver: Client
+export class JDPacket extends Packet {
+  static $header = "JD";
+  state = req("number");
+}
+
+export function receiveJD(body: string) {
+  const packet = decode(JDPacket, body);
   if (packet.state === 1) {
     document.getElementById("judge_action")!.style.display = "inline-table";
     document.getElementById("no_action")!.style.display = "none";
@@ -25,4 +21,4 @@ export const receiveJD = (packet: JDPacket) => {
     document.getElementById("judge_action")!.style.display = "none";
     document.getElementById("no_action")!.style.display = "inline-table";
   }
-};
+}

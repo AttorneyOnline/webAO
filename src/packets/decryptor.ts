@@ -1,31 +1,27 @@
 import { client, setJsonMode } from "../client";
-import type { PacketCodec } from "../packets";
+import { Packet } from "../Packet";
+import { decode, req } from "../packets";
 
 /**
  * Obsolete FantaCrypt initialization marker. Modern servers advertise
  * `noencryption` in `FL` and never send this in its original role.
  *
- * Repurposed as the wire-format negotiation + handshake-trigger packet:
- *   1. If `value === "JSON"`, we flip into JSON wire mode (encode + decode).
- *   2. Either way, we now send `HI` to begin the handshake. The client
- *      defers `HI` until this point so the format choice is settled
- *      before the first outgoing packet.
- *
- * Every modern server sends `decryptor` on client connect, so this is a
- * reliable handshake anchor.
+ * Repurposed as the wire-format negotiation + handshake-trigger
+ * packet: when `value === "JSON"` the client flips into JSON wire
+ * mode; either way we send `HI` to begin the handshake (deferred
+ * until now so the format choice is settled first).
  */
-export interface DecryptorPacket {
-  value: string;
+
+// Receiver: Client
+export class DecryptorPacket extends Packet {
+  static $header = "decryptor";
+  value = req("string");
 }
 
-export const decryptor: PacketCodec<DecryptorPacket> = {
-  header: "decryptor",
-  decode: (args) => ({ value: args[1] ?? "" }),
-};
-
-export const receivedecryptor = (packet: DecryptorPacket) => {
+export function receivedecryptor(body: string) {
+  const packet = decode(DecryptorPacket, body);
   if (packet.value === "JSON") {
     setJsonMode(true);
   }
   client.joinServer();
-};
+}

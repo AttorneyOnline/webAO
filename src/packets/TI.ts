@@ -1,29 +1,21 @@
-import type { PacketCodec } from "../packets";
-
-export interface TIPacket {
-  timer_id: number;
-  command: number;
-  time: number;
-}
-
-export const TI: PacketCodec<TIPacket> = {
-  header: "TI",
-  decode(args) {
-    return {
-      timer_id: Number(args[1]),
-      command: Number(args[2]),
-      time: Number(args[3]),
-    };
-  },
-  encode(packet) {
-    return `TI#${packet.timer_id}#${packet.command}#${packet.time}#%`;
-  },
-};
+import { Packet } from "../Packet";
+import { decode, req } from "../packets";
 
 /**
- * Handles a timer update
+ * Timer state update. `command` selects the action: 0/1 = set the
+ * displayed time, 2 = show, 3 = hide.
  */
-export const receiveTI = (packet: TIPacket) => {
+
+// Receiver: Client
+export class TIPacket extends Packet {
+  static $header = "TI";
+  timer_id = req("number");
+  command = req("number");
+  time = req("number");
+}
+
+export function receiveTI(body: string) {
+  const packet = decode(TIPacket, body);
   switch (packet.command) {
     case 0:
     case 1:
@@ -37,4 +29,4 @@ export const receiveTI = (packet: TIPacket) => {
       document.getElementById(`client_timer${packet.timer_id}`)!.style.display = "none";
       break;
   }
-};
+}

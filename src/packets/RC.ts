@@ -1,22 +1,25 @@
-import { client } from "../client";
+import { client, json_mode } from "../client";
 import vanilla_character_arr from "../constants/characters";
-import type { PacketCodec } from "../packets";
-
-export type RCPacket = Record<string, never>;
-
-export const RC: PacketCodec<RCPacket> = {
-  header: "RC",
-  decode() {
-    return {};
-  },
-  encode() {
-    return `RC#%`;
-  },
-};
+import { Packet } from "../Packet";
+import { decode, encode } from "../packets";
 
 /**
- * we are asking ourselves what characters there are
+ * "Ask for characters." Client -> Server, empty payload. In replay
+ * mode the server-side handler synthesises an `SC` response from the
+ * vanilla character list.
  */
-export const receiveRC = (_packet: RCPacket) => {
+
+// Wire shape is the same in both directions.
+export class RCPacket extends Packet {
+  static $header = "RC";
+}
+
+export function sendRC(packet: Partial<RCPacket>) {
+  client.sendData(encode(RCPacket, packet, json_mode));
+}
+
+// Receiver: Server (server-emulation in replay mode).
+export function receiveRC(body: string) {
+  decode(RCPacket, body);
   client.receiveData(`SC#${vanilla_character_arr.join("#")}#%`);
-};
+}

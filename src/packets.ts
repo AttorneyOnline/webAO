@@ -1,19 +1,19 @@
 import { unescapeUnicode, escapeFanta, unescapeFanta } from "./escaping";
 import { ARUP, receiveARUP } from "./packets/ARUP";
 import { askchaa, receiveaskchaa } from "./packets/askchaa";
-import { ASS, receiveASS } from "./packets/ASS";
+import { receiveASS } from "./packets/ASS";
 import { receiveAUTH } from "./packets/AUTH";
 import { receiveBB } from "./packets/BB";
-import { BD, receiveBD } from "./packets/BD";
+import { receiveBD } from "./packets/BD";
 import { BN, receiveBN } from "./packets/BN";
 import { receiveCC, sendCC } from "./packets/CC";
 import { CH, receiveCH, sendCH } from "./packets/CH";
 import { CharsCheck, receiveCharsCheck } from "./packets/CharsCheck";
-import { CHECK, receiveCHECK } from "./packets/CHECK";
+import { receiveCHECK } from "./packets/CHECK";
 import { CI, receiveCI } from "./packets/CI";
 import { CT, receiveCT, sendCT } from "./packets/CT";
 import { DE, sendDE } from "./packets/DE";
-import { decryptor, receivedecryptor } from "./packets/decryptor";
+import { receivedecryptor } from "./packets/decryptor";
 import { receiveDONE } from "./packets/DONE";
 import { EE, sendEE } from "./packets/EE";
 import { EI, receiveEI } from "./packets/EI";
@@ -24,29 +24,29 @@ import { FM, receiveFM } from "./packets/FM";
 import { HI, receiveHI } from "./packets/HI";
 import { HP, receiveHP, sendHP } from "./packets/HP";
 import { IDClient, receiveID } from "./packets/ID";
-import { JD, receiveJD } from "./packets/JD";
-import { KB, receiveKB } from "./packets/KB";
-import { KK, receiveKK } from "./packets/KK";
+import { receiveJD } from "./packets/JD";
+import { receiveKB } from "./packets/KB";
+import { receiveKK } from "./packets/KK";
 import { LE, receiveLE } from "./packets/LE";
 import { MA, sendMA } from "./packets/MA";
 import { receiveMC, sendMC } from "./packets/MC";
-import { MM, receiveMM } from "./packets/MM";
+import { receiveMM } from "./packets/MM";
 import { MSClient, MSServer, receiveMS, sendMS } from "./packets/MS";
 import { PE, sendPE } from "./packets/PE";
 import { PN, receivePN } from "./packets/PN";
-import { PR, receivePR } from "./packets/PR";
+import { receivePR } from "./packets/PR";
 import { PU, receivePU } from "./packets/PU";
 import { receivePV } from "./packets/PV";
-import { RC, receiveRC } from "./packets/RC";
-import { RD, receiveRD } from "./packets/RD";
-import { RM, receiveRM } from "./packets/RM";
+import { receiveRC, sendRC } from "./packets/RC";
+import { receiveRD, sendRD } from "./packets/RD";
+import { receiveRM, sendRM } from "./packets/RM";
 import { RMC, receiveRMC } from "./packets/RMC";
 import { RT, receiveRT, sendRT } from "./packets/RT";
 import { SC, receiveSC } from "./packets/SC";
 import { SI, receiveSI } from "./packets/SI";
 import { SM, receiveSM } from "./packets/SM";
 import { SP, receiveSP } from "./packets/SP";
-import { TI, receiveTI } from "./packets/TI";
+import { receiveTI } from "./packets/TI";
 import { VS_AUDIO, receiveVS_AUDIO } from "./packets/VS_AUDIO";
 import { VS_CAPS, receiveVS_CAPS } from "./packets/VS_CAPS";
 import { VS_JOINClient, receiveVS_JOIN } from "./packets/VS_JOIN";
@@ -398,14 +398,10 @@ export interface PacketBinding<TPacket> {
 // Keep each list alphabetical (case-insensitive).
 const clientPackets: Record<string, PacketBinding<any>> = {
   ARUP: { codec: ARUP, receive: receiveARUP },
-  ASS: { codec: ASS, receive: receiveASS },
-  BD: { codec: BD, receive: receiveBD },
   BN: { codec: BN, receive: receiveBN },
   CharsCheck: { codec: CharsCheck, receive: receiveCharsCheck },
-  CHECK: { codec: CHECK, receive: receiveCHECK },
   CI: { codec: CI, receive: receiveCI },
   CT: { codec: CT, receive: receiveCT },
-  decryptor: { codec: decryptor, receive: receivedecryptor },
   EI: { codec: EI, receive: receiveEI },
   EM: { codec: EM, receive: receiveEM },
   FA: { codec: FA, receive: receiveFA },
@@ -413,25 +409,16 @@ const clientPackets: Record<string, PacketBinding<any>> = {
   FM: { codec: FM, receive: receiveFM },
   HP: { codec: HP, receive: receiveHP },
   ID: { codec: IDClient, receive: receiveID },
-  JD: { codec: JD, receive: receiveJD },
-  KB: { codec: KB, receive: receiveKB },
-  KK: { codec: KK, receive: receiveKK },
   LE: { codec: LE, receive: receiveLE },
-  MM: { codec: MM, receive: receiveMM },
   MS: { codec: MSClient, receive: receiveMS },
   PN: { codec: PN, receive: receivePN },
-  PR: { codec: PR, receive: receivePR },
   PU: { codec: PU, receive: receivePU },
-  RC: { codec: RC, receive: receiveRC },
-  RD: { codec: RD, receive: receiveRD },
-  RM: { codec: RM, receive: receiveRM },
   RMC: { codec: RMC, receive: receiveRMC },
   RT: { codec: RT, receive: receiveRT },
   SC: { codec: SC, receive: receiveSC },
   SI: { codec: SI, receive: receiveSI },
   SM: { codec: SM, receive: receiveSM },
   SP: { codec: SP, receive: receiveSP },
-  TI: { codec: TI, receive: receiveTI },
   VS_AUDIO: { codec: VS_AUDIO, receive: receiveVS_AUDIO },
   VS_CAPS: { codec: VS_CAPS, receive: receiveVS_CAPS },
   VS_JOIN: { codec: VS_JOINClient, receive: receiveVS_JOIN },
@@ -464,15 +451,28 @@ export const serverPacketRegistry = new Map(Object.entries(serverPackets));
 export const clientSend = {
   CC: sendCC,
   MC: sendMC,
+  RC: sendRC,
+  RD: sendRD,
+  RM: sendRM,
 };
 
 // Packets we can receive as a client
 export const clientReceive = {
+  ASS: receiveASS,
   AUTH: receiveAUTH,
   BB: receiveBB,
+  BD: receiveBD,
+  CHECK: receiveCHECK,
+  decryptor: receivedecryptor,
   DONE: receiveDONE,
+  JD: receiveJD,
+  KB: receiveKB,
+  KK: receiveKK,
   MC: receiveMC,
+  MM: receiveMM,
+  PR: receivePR,
   PV: receivePV,
+  TI: receiveTI,
 };
 
 // Packets we can send as a server
@@ -481,4 +481,7 @@ export const serverSend = {};
 // Packets we can receive as a server
 export const serverReceive = {
   CC: receiveCC,
+  RC: receiveRC,
+  RD: receiveRD,
+  RM: receiveRM,
 };

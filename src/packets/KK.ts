@@ -1,26 +1,21 @@
 import { client } from "../client";
 import { handleBans } from "../client/handleBans";
-import { escapeFanta, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
-
-export interface KKPacket {
-  reason: string;
-}
-
-export const KK: PacketCodec<KKPacket> = {
-  header: "KK",
-  decode(args) {
-    return { reason: unescapeFanta(args[1] ?? "") };
-  },
-  encode(packet) {
-    return `KK#${escapeFanta(packet.reason)}#%`;
-  },
-};
+import { Packet } from "../Packet";
+import { decode, req } from "../packets";
 
 /**
- * Handles the kicked packet
+ * Kicked (no ban). Server is dropping the connection with a reason
+ * but won't refuse a subsequent reconnect.
  */
-export const receiveKK = (packet: KKPacket) => {
+
+// Receiver: Client
+export class KKPacket extends Packet {
+  static $header = "KK";
+  reason = req("string");
+}
+
+export function receiveKK(body: string) {
+  const packet = decode(KKPacket, body);
   client.banned = true;
   handleBans("Kicked", packet.reason);
-};
+}

@@ -1,26 +1,24 @@
 import { setAOhost } from "../client/aoHost";
 import { renderPlayerList } from "../dom/renderPlayerList";
-import { escapeFanta, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
-
-export interface ASSPacket {
-  asset_url: string;
-}
-
-export const ASS: PacketCodec<ASSPacket> = {
-  header: "ASS",
-  decode(args) {
-    return { asset_url: unescapeFanta(args[1] ?? "") };
-  },
-  encode(packet) {
-    return `ASS#${escapeFanta(packet.asset_url)}#%`;
-  },
-};
+import { Packet } from "../Packet";
+import { decode, req } from "../packets";
 
 /**
- * new asset url!!
+ * Asset URL update. Server tells the client to fetch character /
+ * background / sound assets from a new origin. `None` is a sentinel
+ * meaning "keep using the current asset host."
  */
-export const receiveASS = (packet: ASSPacket) => {
+
+// Receiver: Client
+export class ASSPacket extends Packet {
+  static $header = "ASS";
+  asset_url = req("string");
+}
+
+// Apply the new asset origin and refresh the player list (which
+// renders character icons from the asset host).
+export function receiveASS(body: string) {
+  const packet = decode(ASSPacket, body);
   if (packet.asset_url !== "None") setAOhost(packet.asset_url);
   renderPlayerList();
-};
+}
