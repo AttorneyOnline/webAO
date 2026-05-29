@@ -1,5 +1,4 @@
 import { client } from "../client";
-import { escapeFanta, unescapeFanta } from "../escaping";
 import { version } from "../version";
 import * as aolib from "../aolib";
 

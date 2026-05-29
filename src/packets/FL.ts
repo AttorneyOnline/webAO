@@ -1,5 +1,4 @@
 import { setExtraFeatures } from "../client";
-import { escapeFanta, unescapeFanta } from "../escaping";
 import * as aolib from "../aolib";
 
 

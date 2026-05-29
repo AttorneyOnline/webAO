@@ -1,4 +1,4 @@
-import { EmoteModifier, ShoutModifier } from "../../packets/MS";
+import { EmoteModifier, ShoutModifier } from "../../aolib";
 import { ChatMsg } from "../interfaces/ChatMsg";
 import { PreloadedAssets } from "../interfaces/PreloadedAssets";
 import {

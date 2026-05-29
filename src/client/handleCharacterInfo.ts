@@ -1,7 +1,7 @@
 import { client } from "../client";
 import { safeHtmlTags } from "../escaping";
 import iniParse from "../iniParse";
-import { Side } from "../packets/MS";
+import { Side } from "../aolib";
 import request from "../services/request";
 import { AO_HOST } from "./aoHost";
 import { observeCharIcon } from "./observeCharIcons";

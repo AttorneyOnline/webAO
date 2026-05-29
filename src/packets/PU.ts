@@ -1,7 +1,6 @@
 import { client } from "../client";
 import { ensureCharIni } from "../client/handleCharacterInfo";
 import { renderPlayerList } from "../dom/renderPlayerList";
-import { escapeFanta, unescapeFanta } from "../escaping";
 import * as aolib from "../aolib";
 
 

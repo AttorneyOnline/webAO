@@ -1,5 +1,5 @@
 import { selectedShout, setSelectedShout } from "../client";
-import { ShoutModifier } from "../packets/MS";
+import { ShoutModifier } from "../aolib";
 
 /**
  * Highlights and selects a shout for in-character chat.

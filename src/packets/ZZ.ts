@@ -1,21 +1,9 @@
 import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
-import { unescapeUnicode, escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
-import * as aolib from "../aolib";
+import { unescapeUnicode, safeHtmlTags } from "../escaping";
+import type * as aolib from "../aolib";
 
-/**
- * Modcall packet. `reason` is per the AO spec; `target` is a non-spec
- * extension used by AO2-Client (and supported by tsuserver/akashi) to
- * direct the modcall at a specific player id (or `-1` for any mod).
- *
- * Servers only ever send `reason` to clients, so `target` is outbound-only
- * in practice -- but `decode` accepts it for symmetry.
- */
-
-
-/**
- * Handles a modcall.
- */
+/** Show a modcall alert (server-broadcast or local replay echo). */
 export const showModcallNotice = (packet: aolib.Out<typeof aolib.ZZ>) => {
   const oocLog = document.getElementById("client_ooclog")!;
   const message = safeHtmlTags(unescapeUnicode(packet.reason)).replace(/\n/g, "<br>");
@@ -31,7 +19,3 @@ export const showModcallNotice = (packet: aolib.Out<typeof aolib.ZZ>) => {
   client.viewport.getSfxAudio().play().catch(() => {});
   client.viewport.getSfxAudio().volume = oldvolume;
 };
-
-/**
- * Sends a modcall.
- */

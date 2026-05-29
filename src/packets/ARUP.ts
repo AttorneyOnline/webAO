@@ -1,5 +1,5 @@
 import { client } from "../client";
-import { escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
+import { safeHtmlTags } from "../escaping";
 import * as aolib from "../aolib";
 
 /**

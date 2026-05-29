@@ -1,4 +1,3 @@
-import { escapeFanta, unescapeFanta } from "../escaping";
 import { applyVoiceCaps } from "../voice/voice";
 import { installVoiceUI } from "../voice/voiceUI";
 import * as aolib from "../aolib";

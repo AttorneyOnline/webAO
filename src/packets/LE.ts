@@ -1,21 +1,10 @@
 import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
 import { pickEvidence } from "../dom/pickEvidence";
-import { escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
-import * as aolib from "../aolib";
+import { safeHtmlTags } from "../escaping";
+import type * as aolib from "../aolib";
 
-export interface EvidenceData {
-  name: string;
-  description: string;
-  image: string;
-}
-
-
-
-/**
- * Handles incoming evidence list, all evidences at once
- * item per packet.
- */
+/** Replace the client's evidence list with the server's full snapshot. */
 export const applyEvidenceList = (packet: aolib.Out<typeof aolib.LE>) => {
   client.evidences = [];
   for (let i = 0; i < packet.evidence.length; i++) {

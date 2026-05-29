@@ -1,7 +1,7 @@
 import { positions } from "../constants/positions";
 import { AO_HOST } from "../../client/aoHost";
 import { client } from "../../client";
-import { isFullView, Side } from "../../packets/MS";
+import { isFullView, Side } from "../../aolib";
 import transparentPng from "../../constants/transparentPng";
 import fileExists from "../../utils/fileExists";
 import { isHideDesksEnabled } from "../../dom/switchHideDesks";

@@ -1,28 +1,18 @@
 import { client } from "../client";
 import { setupCharacterBasic } from "../client/handleCharacterInfo";
 import queryParser from "../utils/queryParser";
-import * as aolib from "../aolib";
+import type * as aolib from "../aolib";
 
 const { mode } = queryParser();
 
 /**
- * Server character list. The wire format packs each character's fields
- * (name/desc/evidence) into one `&`-delimited string per character slot.
- *
- * We keep the raw `&`-joined string per slot (without unescaping) because
- * downstream consumers re-split on `&` and unescape per-subfield. Unescaping
- * the whole slot here would convert `<and>` to literal `&` and corrupt the
- * split.
- */
-
-
-/**
- * Handles incoming character information, containing all characters
- * in one packet.
+ * Apply the full character list. Each entry's `&`-delimited fields
+ * are re-split here and forwarded to `setupCharacterBasic`. Once the
+ * roster is loaded we ask the server for the music list (`RM`).
  */
 export const applyFullCharacterList = async (packet: aolib.Out<typeof aolib.SC>) => {
   if (mode === "watch") {
-    // Spectators don't need to pick a character
+    // Spectators don't pick a character
     document.getElementById("client_charselect")!.style.display = "none";
   } else {
     document.getElementById("client_charselect")!.style.display = "block";
@@ -32,6 +22,5 @@ export const applyFullCharacterList = async (packet: aolib.Out<typeof aolib.SC>)
     const chargs = packet.char_data[i].split("&");
     setupCharacterBasic(chargs, i);
   }
-  // We're done with the characters, request the music
   client.server.send.RM({});
 };

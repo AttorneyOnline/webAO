@@ -1,24 +1,17 @@
 import { client } from "../client";
-import { escapeFanta, unescapeFanta } from "../escaping";
 import { initTestimonyUpdater } from "../viewport/utils/initTestimonyUpdater";
-import * as aolib from "../aolib";
+import type * as aolib from "../aolib";
 
 /**
- * `animation` is the testimony/judgeruling string. The wire format may
- * include a `#`-delimited suffix (e.g. `judgeruling#0`); since `#` is the
- * field separator, that suffix arrives as a second arg. The handler reads
- * it from `judgeId` only when `animation === "judgeruling"`.
- */
-
-
-/**
- * Handles a testimony states.
+ * Drive the testimony / judge-ruling state machine for the viewport.
+ * `judgeId` is meaningful only when `animation === "judgeruling"`; for
+ * `testimony1`, `judgeId === 1` is the "since 2.9" form that hides the
+ * indicator instead of showing it.
  */
 export const applyTestimonyState = (packet: aolib.Out<typeof aolib.RT>) => {
   const judgeid = packet.judgeId ?? 0;
   switch (packet.animation) {
     case "testimony1":
-      // Since 2.9: `testimony1#1` hides the indicator instead of showing it.
       if (judgeid === 1) {
         client.viewport.disposeTestimony();
         return;
@@ -26,7 +19,6 @@ export const applyTestimonyState = (packet: aolib.Out<typeof aolib.RT>) => {
       client.testimonyID = 1;
       break;
     case "testimony2":
-      // Cross Examination
       client.testimonyID = 2;
       break;
     case "judgeruling":
@@ -37,7 +29,3 @@ export const applyTestimonyState = (packet: aolib.Out<typeof aolib.RT>) => {
   }
   initTestimonyUpdater();
 };
-
-/**
- * Sends a testimony state change (witness testimony, cross-exam, judge ruling).
- */

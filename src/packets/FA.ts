@@ -1,6 +1,5 @@
 import { client } from "../client";
 import { createArea } from "../client/createArea";
-import { escapeFanta, unescapeFanta } from "../escaping";
 import * as aolib from "../aolib";
 
 

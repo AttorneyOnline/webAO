@@ -1,6 +1,5 @@
 import { client } from "../client";
 import { addTrack } from "../client/addTrack";
-import { escapeFanta, unescapeFanta } from "../escaping";
 import * as aolib from "../aolib";
 
 

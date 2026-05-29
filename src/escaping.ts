@@ -1,30 +1,4 @@
 /**
- * Escape a string for inclusion in a fantacode wire field. AO1 uses
- * `#`, `&`, `%`, `$` as wire meta-characters; this replaces them with
- * the `<num>` / `<and>` / `<percent>` / `<dollar>` tokens so payloads
- * containing those characters survive transit.
- */
-export function escapeFanta(estring: string): string {
-  return estring
-    .replaceAll("#", "<num>")
-    .replaceAll("&", "<and>")
-    .replaceAll("%", "<percent>")
-    .replaceAll("$", "<dollar>");
-}
-
-/**
- * Inverse of `escapeFanta`: convert the AO1 escape tokens back into
- * their meta-character form.
- */
-export function unescapeFanta(estring: string): string {
-  return estring
-    .replaceAll("<num>", "#")
-    .replaceAll("<and>", "&")
-    .replaceAll("<percent>", "%")
-    .replaceAll("<dollar>", "$");
-}
-
-/**
  * Replace HTML angle brackets with full-width substitutes so a string
  * can be inserted into `innerHTML` without parsing as tags.
  *

@@ -15,7 +15,7 @@ import { createTestimonyAudio } from "./utils/createTestimonyAudio";
 import { Testimony } from "./interfaces/Testimony";
 import { COLORS } from "./constants/colors";
 import { set_side } from "./utils/setSide";
-import { DeskModifier, EmoteModifier, Side } from "../packets/MS";
+import { DeskModifier, EmoteModifier, Side } from "../aolib";
 import { ChatMsg } from "./interfaces/ChatMsg";
 import {
   setStartFirstTickCheck,

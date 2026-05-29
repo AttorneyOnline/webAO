@@ -64,7 +64,7 @@ import { toggleVoice } from "./toggleVoice";
 import { updateBackgroundPreview } from "./updateBackgroundPreview";
 import { updateEvidenceIcon } from "./updateEvidenceIcon";
 import { updateIniswap } from "./updateIniswap";
-import { ShoutModifier } from "../packets/MS";
+import { ShoutModifier } from "../aolib";
 
 const datasetOf = (e: Event) => (e.currentTarget as HTMLElement).dataset;
 

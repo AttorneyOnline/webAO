@@ -3,7 +3,6 @@ import { addTrack } from "../client/addTrack";
 import { createArea } from "../client/createArea";
 import { fix_last_area } from "../client/fixLastArea";
 import { isAudio } from "../client/isAudio";
-import { escapeFanta, unescapeFanta } from "../escaping";
 import * as aolib from "../aolib";
 
 

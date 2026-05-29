@@ -1,4 +1,4 @@
-import { Side } from "../packets/MS";
+import { Side } from "../aolib";
 import transparentPng from "../constants/transparentPng";
 
 // Function rather than module-level array: enum members are accessed only

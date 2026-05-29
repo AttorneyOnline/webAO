@@ -1,5 +1,5 @@
 import Client from "../client";
-import { Side } from "../packets/MS";
+import { Side } from "../aolib";
 import transparentPng from "../constants/transparentPng";
 import fileExists from "../utils/fileExists";
 
