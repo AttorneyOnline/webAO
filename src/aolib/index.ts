@@ -48,16 +48,20 @@ export {
   s2cSchemas,
   type C2SSchemas,
   type S2CSchemas,
-  HI,
-  CC,
-  MCRequest,
-  MCBroadcast,
-  decryptor,
-  ID,
-  PV,
-  BB,
-  DONE,
-  SM,
+  // unidirectional and symmetric-bidirectional schemas
+  HI, CC, decryptor, ID, PV, BB, DONE, SM,
+  HP, RT, ZZ,
+  AE, AM, AN, askchaa, CH, DE, EE, MA, PE, RC, RD, RM, VS_FRAME,
+  ASS, AUTH, BD, BN, CHECK, CharsCheck, FA, FL, FM, JD, KB, KK,
+  PN, PR, PU, RMC, SC, SI, SP, TI,
+  VS_AUDIO, VS_CAPS, VS_PEERS,
+  CI, EM, EI, LE,
+  // bidirectional asymmetric (per-direction shapes)
+  MCRequest, MCBroadcast,
+  CTRequest, CTBroadcast,
+  VSJoinRequest, VSJoinBroadcast,
+  VSLeaveRequest, VSLeaveBroadcast,
+  VSSpeakRequest, VSSpeakBroadcast,
 } from "./packets";
 
 // ---------------------------------------------------------------------
