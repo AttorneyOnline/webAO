@@ -139,7 +139,7 @@ export function registerProtocol(
   server.on.BB(showBlockingAlert);
   server.on.BD(showBanDialog);
   server.on.BN(applyBackgroundChange);
-  server.on.CHECK(() => {});                  // server keepalive — no body
+  server.on.CHECK(() => {});
   server.on.CharsCheck(applyCharacterAvailability);
   server.on.CI(applyCharacterBatch);
   server.on.CT(appendOOCMessage);

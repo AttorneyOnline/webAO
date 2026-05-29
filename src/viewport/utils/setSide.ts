@@ -32,7 +32,7 @@ export async function setBackgroundImage(elementid: string, bgname: string, bgpa
  * positions fall back to a generic backdrop using the position string as
  * the bg filename stem.
  */
-export const set_side = async ({
+export async function set_side({
   position,
   showSpeedLines,
   showDesk,
@@ -40,7 +40,7 @@ export const set_side = async ({
   position: Side;
   showSpeedLines: boolean;
   showDesk: boolean;
-}) => {
+}) {
   const view = document.getElementById("client_fullview")!;
   const fullView = isFullView(position);
 
@@ -120,7 +120,7 @@ export const set_side = async ({
     view.style.display = "none";
     document.getElementById("client_classicview").style.display = "";
   }
-};
+}
 
 import { getIndexFromSelect } from "../../dom/getIndexFromSelect";
 import { switchPanTilt } from "../../dom/switchPanTilt";
@@ -129,7 +129,7 @@ import { safeHtmlTags } from "../../escaping";
 import type * as aolib from "../../aolib";
 
 /** BN: background change broadcast — swap every viewport background slot. */
-export const applyBackgroundChange = (packet: aolib.BNPacket) => {
+export function applyBackgroundChange(packet: aolib.BNPacket) {
   const bgFromArgs = safeHtmlTags(packet.background);
   client.viewport.setBackgroundName(bgFromArgs);
   const bg_index = getIndexFromSelect("bg_select", client.viewport.getBackgroundName());
@@ -165,4 +165,4 @@ export const applyBackgroundChange = (packet: aolib.BNPacket) => {
       showDesk: true,
     });
   }
-};
+}

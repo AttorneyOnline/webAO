@@ -11,7 +11,7 @@ import { observeCharIcon } from "./observeCharIcons";
  * (letting the browser handle loading) and stores default character data.
  * Does NOT fetch char.ini — that is deferred until needed via ensureCharIni.
  */
-export const setupCharacterBasic = (chargs: string[], charid: number) => {
+export function setupCharacterBasic(chargs: string[], charid: number) {
   const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
   if (chargs[0]) {
     img.alt = chargs[0];
@@ -52,7 +52,7 @@ export const setupCharacterBasic = (chargs: string[], charid: number) => {
     console.warn(`missing charid ${charid}`);
     img.style.display = "none";
   }
-};
+}
 
 /**
  * Fetches and parses char.ini for a character if not already loaded.
@@ -119,7 +119,7 @@ export const ensureCharIni = async (charid: number): Promise<any> => {
  * Full character info load (used by iniEdit and receiveMS ini-edit path).
  * Fetches icon + ini for a single character, replacing any existing data.
  */
-export const handleCharacterInfo = async (chargs: string[], charid: number) => {
+export async function handleCharacterInfo(chargs: string[], charid: number) {
   const img = <HTMLImageElement>document.getElementById(`demo_${charid}`);
   if (chargs[0]) {
     img.alt = chargs[0];
@@ -142,7 +142,7 @@ export const handleCharacterInfo = async (chargs: string[], charid: number) => {
     console.warn(`missing charid ${charid}`);
     img.style.display = "none";
   }
-};
+}
 
 // ---------------------------------------------------------------------
 // Inbound packet handlers for the character download phase. Registered
@@ -159,7 +159,7 @@ const { mode: characterListMode } = queryParser();
  * fields are split here and forwarded to `setupCharacterBasic`. Once the
  * roster is loaded we ask the server for the music list.
  */
-export const applyFullCharacterList = async (packet: aolib.SCPacket) => {
+export async function applyFullCharacterList(packet: aolib.SCPacket) {
   if (characterListMode === "watch") {
     // Spectators don't pick a character
     document.getElementById("client_charselect")!.style.display = "none";
@@ -172,13 +172,13 @@ export const applyFullCharacterList = async (packet: aolib.SCPacket) => {
     setupCharacterBasic(chargs, i);
   }
   client.server.send.RM({});
-};
+}
 
 /**
  * CI: server pushes one incremental character batch; we forward each
  * `&`-delimited entry and request the next batch.
  */
-export const applyCharacterBatch = (packet: aolib.CIPacket) => {
+export function applyCharacterBatch(packet: aolib.CIPacket) {
   document.getElementById("client_loadingtext")!.innerHTML =
     `Loading Character ${packet.batchIndex}/${client.char_list_length}`;
   for (const { index, data } of packet.entries) {
@@ -186,4 +186,4 @@ export const applyCharacterBatch = (packet: aolib.CIPacket) => {
     setTimeout(() => handleCharacterInfo(chargs, index), 500);
   }
   client.server.send.AN({ batch: packet.batchIndex / 10 + 1 });
-};
+}

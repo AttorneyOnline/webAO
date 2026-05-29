@@ -2,7 +2,7 @@ import { client } from "../client";
 import { safeHtmlTags } from "../escaping";
 import { getFilenameFromPath } from "../utils/paths";
 
-export const addTrack = (trackname: string) => {
+export function addTrack(trackname: string) {
   const newentry = <HTMLOptionElement>document.createElement("OPTION");
   const songName = getFilenameFromPath(trackname);
   // aolib's str field already unescaped chat-meta tokens before we got here.
@@ -12,7 +12,7 @@ export const addTrack = (trackname: string) => {
     newentry,
   );
   client.musics.push(trackname);
-};
+}
 
 import { createArea } from "./createArea";
 import { fix_last_area } from "./fixLastArea";
@@ -23,7 +23,7 @@ import type * as aolib from "../aolib";
  * SM: server pushes the full music + area list at once. Areas come
  * first (until we hit an entry that's an audio file), then music.
  */
-export const applyMusicListBatch = (packet: aolib.SMPacket) => {
+export function applyMusicListBatch(packet: aolib.SMPacket) {
   document.getElementById("client_loadingtext")!.innerHTML = "Loading Music";
   client.resetMusicList();
   client.resetAreaList();
@@ -50,10 +50,10 @@ export const applyMusicListBatch = (packet: aolib.SMPacket) => {
 
   // Music done, carry on
   client.server.send.RD({});
-};
+}
 
 /** FM: server pushes the full music list (refresh after edits). */
-export const applyFullMusicList = (packet: aolib.FMPacket) => {
+export function applyFullMusicList(packet: aolib.FMPacket) {
   client.resetMusicList();
 
   // Legacy iterated 1..length-1 to skip the trailing empty entry from
@@ -65,14 +65,14 @@ export const applyFullMusicList = (packet: aolib.FMPacket) => {
   for (let i = 0; i < end; i++) {
     addTrack(tracks[i]);
   }
-};
+}
 
 /**
  * EM: server pushes one incremental music/area batch. Entries before
  * the first audio file are areas; everything after is music. Acks by
  * requesting the next batch.
  */
-export const applyEvidenceListBatch = (packet: aolib.EMPacket) => {
+export function applyEvidenceListBatch(packet: aolib.EMPacket) {
   document.getElementById("client_loadingtext")!.innerHTML = "Loading Music";
   if (packet.batchIndex === 0) {
     client.resetMusicList();
@@ -92,4 +92,4 @@ export const applyEvidenceListBatch = (packet: aolib.EMPacket) => {
     }
   }
   client.server.send.AM({ batch: packet.batchIndex / 10 + 1 });
-};
+}

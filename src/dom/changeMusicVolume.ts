@@ -1,6 +1,6 @@
 import { client } from "../client";
 
-export const changeMusicVolume = (volume: number = -1) => {
+export function changeMusicVolume(volume: number = -1) {
   const clientVolume = Number(
     (<HTMLInputElement>document.getElementById("client_mvolume")).value,
   );
@@ -9,4 +9,4 @@ export const changeMusicVolume = (volume: number = -1) => {
     (channel: HTMLAudioElement) => (channel.volume = musicVolume),
   );
   localStorage.setItem("musicVolume", String(musicVolume));
-};
+}

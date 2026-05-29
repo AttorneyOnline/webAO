@@ -1,6 +1,6 @@
 import downloadFile from "../services/downloadFile";
 
-export const saveChatlogHandle = async () => {
+export async function saveChatlogHandle() {
   const clientLog = document.getElementById("client_log")!;
   const icMessageLogs = clientLog.getElementsByTagName("p");
   const messages: string[] = [];
@@ -23,4 +23,4 @@ export const saveChatlogHandle = async () => {
 
   // Reset Chatbox to Empty
   (<HTMLInputElement>document.getElementById("client_inputbox")).value = "";
-};
+}

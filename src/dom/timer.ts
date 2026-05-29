@@ -6,7 +6,7 @@ import type * as aolib from "../aolib";
  *   2 = show the timer
  *   3 = hide the timer
  */
-export const applyTimerUpdate = (packet: aolib.TIPacket) => {
+export function applyTimerUpdate(packet: aolib.TIPacket) {
   switch (packet.command) {
     case 0:
     case 1:
@@ -20,4 +20,4 @@ export const applyTimerUpdate = (packet: aolib.TIPacket) => {
       document.getElementById(`client_timer${packet.timer_id}`)!.style.display = "none";
       break;
   }
-};
+}

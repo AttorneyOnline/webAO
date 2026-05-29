@@ -6,7 +6,7 @@ import type * as aolib from "../aolib";
  * any other value is prosecution. `value` is 0..10; we paint that as a
  * width percentage on the `.health-bar` child.
  */
-export const applyHealthBar = (packet: aolib.HPPacket) => {
+export function applyHealthBar(packet: aolib.HPPacket) {
   const percent_hp = packet.value * 10;
   let healthbox;
   if (packet.bar === 1) {
@@ -18,4 +18,4 @@ export const applyHealthBar = (packet: aolib.HPPacket) => {
   }
   (<HTMLElement>healthbox.getElementsByClassName("health-bar")[0]).style.width =
     `${percent_hp}%`;
-};
+}

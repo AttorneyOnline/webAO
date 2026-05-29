@@ -18,9 +18,9 @@ const { mode } = queryParser();
  * session into JSON mode when `value === "JSON"`; we kick off the
  * client-side join by sending HI.
  */
-export const applyEncryptionMode = () => {
+export function applyEncryptionMode() {
   client.joinServer();
-};
+}
 
 /**
  * ID: server identity packet. Some legacy servers (serverD) pack
@@ -28,25 +28,25 @@ export const applyEncryptionMode = () => {
  * quirk here rather than in the schema. webAO doesn't push a PN, so
  * we synthesise an empty one locally to keep the UI happy.
  */
-export const applyServerIdentity = (packet: aolib.IDPacket) => {
+export function applyServerIdentity(packet: aolib.IDPacket) {
   client.playerID = packet.player_count;
   const serverSoftware = packet.software.split("&")[0];
   if (serverSoftware === "webAO") {
     client.server.receive("PN#0#1#%");
   }
-};
+}
 
 /** PN: server population. Triggers the character list request. */
-export const applyServerInfo = (_packet: aolib.PNPacket) => {
+export function applyServerInfo(_packet: aolib.PNPacket) {
   client.server.send.askchaa({});
-};
+}
 
 /**
  * DONE: handshake complete. Reveal the char-select UI (unless we're a
  * spectator), then honor `?char=` / `?area=` autopick params from the
  * URL by clicking the matching area/char.
  */
-export const finishServerJoin = () => {
+export function finishServerJoin() {
   client.state = clientState.Joined;
   document.getElementById("client_loading")!.style.display = "none";
   if (mode === "watch") {
@@ -77,4 +77,4 @@ export const finishServerJoin = () => {
       client.server.send.CC({ char_id: charIndex });
     }
   }
-};
+}

@@ -2,7 +2,7 @@ import { client } from "../client";
 import { area_click } from "../dom/areaClick";
 import { safeHtmlTags } from "../escaping";
 
-export const createArea = (id: number, aname: string) => {
+export function createArea(id: number, aname: string) {
   const name = safeHtmlTags(aname);
   const thisarea = {
     name,
@@ -29,24 +29,24 @@ export const createArea = (id: number, aname: string) => {
   };
 
   document.getElementById("areas")!.appendChild(newarea);
-};
+}
 
 import type * as aolib from "../aolib";
 
 /** FA: server pushes the full area list (replaces local cache). */
-export const applyFullAreaList = (packet: aolib.FAPacket) => {
+export function applyFullAreaList(packet: aolib.FAPacket) {
   client.resetAreaList();
   for (let i = 0; i < packet.areas.length; i++) {
     createArea(i, packet.areas[i]);
   }
-};
+}
 
 /**
  * ARUP: per-area status update. `update_type` discriminates which
  * column changes (player count / status / CM / lock state) and the
  * positional payload carries the new values per area index.
  */
-export const applyAreaStatus = (packet: aolib.ARUPPacket) => {
+export function applyAreaStatus(packet: aolib.ARUPPacket) {
   const { update_type, update_data } = packet;
   for (let i = 0; i < update_data.length; i++) {
     if (!client.areas[i]) continue; // server may send ARUP before FA
@@ -74,4 +74,4 @@ export const applyAreaStatus = (packet: aolib.ARUPPacket) => {
       `CM: ${client.areas[i].cm}\n` +
       `Area lock: ${client.areas[i].locked}`;
   }
-};
+}

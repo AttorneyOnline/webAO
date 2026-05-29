@@ -2,7 +2,7 @@ import { client } from "../client";
 import { AO_HOST } from "./aoHost";
 import { request } from "../services/request";
 
-export const fetchBackgroundList = async () => {
+export async function fetchBackgroundList() {
   try {
     const bgdata = await request(`${AO_HOST}backgrounds.json`);
     const bg_array = JSON.parse(bgdata);
@@ -18,9 +18,9 @@ export const fetchBackgroundList = async () => {
   } catch (err) {
     console.warn("there was no backgrounds.json file");
   }
-};
+}
 
-export const fetchCharacterList = async () => {
+export async function fetchCharacterList() {
   const char_select = <HTMLSelectElement>(
     document.getElementById("client_iniselect")
   );
@@ -39,9 +39,9 @@ export const fetchCharacterList = async () => {
   } catch (err) {
     console.warn("there was no characters.json file");
   }
-};
+}
 
-export const fetchEvidenceList = async () => {
+export async function fetchEvidenceList() {
   const evi_select = <HTMLSelectElement>document.getElementById("evi_select");
   evi_select.innerHTML = "";
 
@@ -56,9 +56,9 @@ export const fetchEvidenceList = async () => {
   } catch (err) {
     console.warn("there was no evidence.json file");
   }
-};
+}
 
-export const fetchExtensions = async () => {
+export async function fetchExtensions() {
   try {
     const extensiondata = await request(`${AO_HOST}extensions.json`);
     const allextensions = JSON.parse(extensiondata);
@@ -73,7 +73,7 @@ export const fetchExtensions = async () => {
   } catch (err) {
     console.warn("there was no extensions.json file");
   }
-};
+}
 
 import { applyFavourites } from "../dom/toggleFavourite";
 import type * as aolib from "../aolib";
@@ -83,7 +83,7 @@ import type * as aolib from "../aolib";
  * with placeholder slots (filled in by SC / CI) and start the download
  * sequence by sending RC.
  */
-export const applyServerCounts = (packet: aolib.SIPacket) => {
+export function applyServerCounts(packet: aolib.SIPacket) {
   client.char_list_length = packet.char_cnt;
   client.evidence_list_length = packet.evi_cnt;
   client.music_list_length = packet.mus_cnt;
@@ -119,4 +119,4 @@ export const applyServerCounts = (packet: aolib.SIPacket) => {
   applyFavourites();
 
   client.server.send.RC({});
-};
+}

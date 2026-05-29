@@ -24,7 +24,7 @@ import { version } from "../version";
 /**
  * Load game resources and stored settings.
  */
-export const loadResources = () => {
+export function loadResources() {
   document.getElementById("client_version")!.innerText = `version ${version}`;
   (document.getElementById("mod_ui") as HTMLLinkElement).href = "styles/nomod.css";
   // Load background array to select
@@ -138,4 +138,4 @@ export const loadResources = () => {
     }
     setFont();
   }
-};
+}

@@ -1,6 +1,6 @@
 import { opusCheck } from "../../dom/opusCheck";
 
-export const createMusic = () => {
+export function createMusic() {
   const audioChannels = document.getElementsByClassName(
     "audioChannel",
   ) as HTMLCollectionOf<HTMLAudioElement>;
@@ -10,4 +10,4 @@ export const createMusic = () => {
     (channel: HTMLAudioElement) => (channel.onerror = opusCheck(channel)),
   );
   return music;
-};
+}

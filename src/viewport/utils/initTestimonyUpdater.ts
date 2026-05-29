@@ -3,7 +3,7 @@ import { client, UPDATE_INTERVAL } from "../../client";
 /**
  * Intialize testimony updater
  */
-export const initTestimonyUpdater = () => {
+export function initTestimonyUpdater() {
   const testimonyFilenames: Testimony = {
     1: "witnesstestimony",
     2: "crossexamination",
@@ -30,7 +30,7 @@ export const initTestimonyUpdater = () => {
   client.viewport.setTestimonyUpdater(
     setTimeout(() => client.viewport.updateTestimony(), UPDATE_INTERVAL),
   );
-};
+}
 
 import type * as aolib from "../../aolib";
 
@@ -39,7 +39,7 @@ import type * as aolib from "../../aolib";
  * meaningful only for `judgeruling`; `testimony1#1` (since 2.9) hides
  * the indicator instead of showing it.
  */
-export const applyTestimonyState = (packet: aolib.RTPacket) => {
+export function applyTestimonyState(packet: aolib.RTPacket) {
   const judgeid = packet.judgeId ?? 0;
   switch (packet.animation) {
     case "testimony1":
@@ -59,4 +59,4 @@ export const applyTestimonyState = (packet: aolib.RTPacket) => {
       console.warn("Invalid testimony");
   }
   initTestimonyUpdater();
-};
+}

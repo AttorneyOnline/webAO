@@ -3,7 +3,7 @@ import { client } from "../client";
 /**
  * Triggered by the theme selector.
  */
-export const reloadTheme = () => {
+export function reloadTheme() {
   const themeSelect = <HTMLSelectElement>document.getElementById("client_themeselect");
   const customCSSRow = document.getElementById("client_customcss_row");
 
@@ -27,7 +27,7 @@ export const reloadTheme = () => {
   localStorage.setItem("theme", client.viewport.getTheme());
   (<HTMLAnchorElement>document.getElementById("client_theme")).href =
     `styles/${client.viewport.getTheme()}.css`;
-};
+}
 
 /**
  * Apply an inline CSS string as the active theme.
@@ -47,7 +47,7 @@ function applyCustomCSSText(css: string) {
 /**
  * Triggered by the custom CSS file input.
  */
-export const importCustomCSS = (event: Event) => {
+export function importCustomCSS(event: Event) {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   if (!file) return;
@@ -62,4 +62,4 @@ export const importCustomCSS = (event: Event) => {
     applyCustomCSSText(css);
   };
   reader.readAsText(file);
-};
+}

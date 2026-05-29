@@ -4,7 +4,7 @@ import { appendICLog } from "../../client/appendICLog";
 import type * as aolib from "../../aolib";
 
 /** MC: server announces a music change; switch the channel and log it. */
-export const playMusicChange = (packet: aolib.MCPacket) => {
+export function playMusicChange(packet: aolib.MCPacket) {
   const music = client.viewport.music[packet.channel];
   music.pause();
   if (packet.name.startsWith("http")) {
@@ -24,14 +24,14 @@ export const playMusicChange = (packet: aolib.MCPacket) => {
   }
 
   document.getElementById("client_trackstatustext")!.innerText = packet.name;
-};
+}
 
 /**
  * RMC: music seek to a specific offset. Undocumented; not in the
  * official Packet Reference. `toTime` is a seconds string the legacy
  * audio element parses with `parseFloat`.
  */
-export const applyMusicSeek = (packet: aolib.RMCPacket) => {
+export function applyMusicSeek(packet: aolib.RMCPacket) {
   client.viewport.music.pause();
   const { music } = client.viewport;
   music.totime = packet.toTime;
@@ -46,4 +46,4 @@ export const applyMusicSeek = (packet: aolib.RMCPacket) => {
     },
     false,
   );
-};
+}

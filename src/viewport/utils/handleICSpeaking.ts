@@ -56,17 +56,17 @@ const initAttorneyMarkdown = async () => {
 };
 
 export let startFirstTickCheck: boolean;
-export const setStartFirstTickCheck = (val: boolean) => {
+export function setStartFirstTickCheck(val: boolean) {
   startFirstTickCheck = val;
-};
+}
 export let startSecondTickCheck: boolean;
-export const setStartSecondTickCheck = (val: boolean) => {
+export function setStartSecondTickCheck(val: boolean) {
   startSecondTickCheck = val;
-};
+}
 export let startThirdTickCheck: boolean;
-export const setStartThirdTickCheck = (val: boolean) => {
+export function setStartThirdTickCheck(val: boolean) {
   startThirdTickCheck = val;
-};
+}
 
 /** Per-axis mirroring CSS transform for a Flip value. */
 const flipTransform = (flip: Flip | undefined): string => {
@@ -428,10 +428,10 @@ const renderICMessage = (chatmsg: ChatMsg) => {
  *   prepareICMessage(packet)  // async: build chatmsg, preload, parse markdown
  *   renderICMessage(chatmsg)  // sync:  apply to DOM, start chat_tick
  */
-export const handle_ic_speaking = async (packet: aolib.MSPacket) => {
+export async function handle_ic_speaking(packet: aolib.MSPacket) {
   const chatmsg = await prepareICMessage(packet);
   renderICMessage(chatmsg);
-};
+}
 
 import { handleCharacterInfo as handleCharacterInfoForChat, ensureCharIni as ensureCharIniForChat } from "../../client/handleCharacterInfo";
 import { resetICParams } from "../../client/resetICParams";
@@ -440,7 +440,7 @@ import { resetICParams } from "../../client/resetICParams";
  * MS: in-character chat broadcast. Gatekeeps (duplicate / iniedit /
  * muted) and delegates rendering to `handle_ic_speaking`.
  */
-export const handleChatMessage = (packet: aolib.MSPacket) => {
+export function handleChatMessage(packet: aolib.MSPacket) {
   // duplicate message
   if (packet.message === client.viewport.getChatmsg().content) return;
 
@@ -467,4 +467,4 @@ export const handleChatMessage = (packet: aolib.MSPacket) => {
   }
 
   handle_ic_speaking(packet);
-};
+}

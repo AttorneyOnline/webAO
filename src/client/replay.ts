@@ -19,38 +19,38 @@ import { version } from "../version";
 import type * as aolib from "../aolib";
 
 /** HI: synthesise ID + FL responses so the client thinks it's handshaken. */
-export const onClientIdentify = (_packet: aolib.HIPacket) => {
+export function onClientIdentify(_packet: aolib.HIPacket) {
   client.server.receive(`ID#1#webAO#${version}#%`);
   client.server.receive(
     "FL#fastloading#yellowtext#cccc_ic_support#flipping#looping_sfx#effects#%",
   );
-};
+}
 
 /** askchaa: respond with the vanilla SI counts. */
-export const onAreaCharRequest = (_packet: aolib.askchaaPacket) => {
+export function onAreaCharRequest(_packet: aolib.askchaaPacket) {
   client.server.receive(`SI#${vanilla_character_arr.length}#0#0#%`);
-};
+}
 
 /** CC: synthesise a PV ack so the local UI confirms the character pick. */
-export const onCharacterChoose = (packet: aolib.CCPacket) => {
+export function onCharacterChoose(packet: aolib.CCPacket) {
   client.clientSession.send.PV({ player_id: 1, char_id: packet.char_id });
-};
+}
 
 /** RC: respond with the bundled vanilla character list as SC. */
-export const onCharacterListRequest = () => {
+export function onCharacterListRequest() {
   client.server.receive(`SC#${vanilla_character_arr.join("#")}#%`);
-};
+}
 
 /** RM: respond with the bundled vanilla music list as SM. */
-export const onMusicListRequest = () => {
+export function onMusicListRequest() {
   client.server.receive(`SM#${vanilla_music_arr.join("#")}#%`);
-};
+}
 
 /**
  * RD: feed back BN (default bg) + DONE so the UI advances, then make
  * the OOC log writable for the replay queue.
  */
-export const onReady = () => {
+export function onReady() {
   client.server.receive("BN#gs4#%");
   client.server.receive("DONE#%");
   const ooclog = <HTMLInputElement>document.getElementById("client_ooclog");
@@ -59,4 +59,4 @@ export const onReady = () => {
 
   document.getElementById("client_oocinput")!.style.display = "none";
   document.getElementById("client_replaycontrols")!.style.display = "inline-block";
-};
+}

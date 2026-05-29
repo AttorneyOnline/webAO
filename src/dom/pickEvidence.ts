@@ -58,7 +58,7 @@ import type * as aolib from "../aolib";
  * EI: server pushes one evidence item during the streaming download.
  * Acks by requesting the next item (`AE`).
  */
-export const applyEvidenceInfo = (packet: aolib.EIPacket) => {
+export function applyEvidenceInfo(packet: aolib.EIPacket) {
   const d = packet.details;
   document.getElementById("client_loadingtext")!.innerHTML =
     `Loading Evidence ${packet.id}/${client.evidence_list_length}`;
@@ -69,10 +69,10 @@ export const applyEvidenceInfo = (packet: aolib.EIPacket) => {
     icon: `${AO_HOST}evidence/${encodeURI(d.image.toLowerCase())}`,
   };
   client.server.send.AE({ id: packet.id + 1 });
-};
+}
 
 /** LE: server pushes the full evidence list (replaces local cache). */
-export const applyEvidenceList = (packet: aolib.LEPacket) => {
+export function applyEvidenceList(packet: aolib.LEPacket) {
   client.evidences = [];
   for (let i = 0; i < packet.evidence.length; i++) {
     const ev = packet.evidence[i];
@@ -97,4 +97,4 @@ export const applyEvidenceList = (packet: aolib.LEPacket) => {
     };
     evidence_box.appendChild(evi_item);
   }
-};
+}

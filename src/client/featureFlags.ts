@@ -6,7 +6,7 @@ import type * as aolib from "../aolib";
  * on a piece of UI (yellowtext = expanded color palette, cccc_ic_support
  * = pairing UI, flipping = mirror button, etc.).
  */
-export const applyFeatureFlags = (packet: aolib.FLPacket) => {
+export function applyFeatureFlags(packet: aolib.FLPacket) {
   const { features } = packet;
   setExtraFeatures(features);
 
@@ -40,4 +40,4 @@ export const applyFeatureFlags = (packet: aolib.FLPacket) => {
   if (features.includes("y_offset")) {
     document.getElementById("y_offset")!.style.display = "";
   }
-};
+}
