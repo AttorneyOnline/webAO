@@ -14,7 +14,7 @@ import { Viewport } from "./viewport/interfaces/Viewport";
 import { EventEmitter } from "events";
 import { onReplayGo } from "./dom/onReplayGo";
 import * as aolib from "./aolib";
-import { registerProtocol } from "./packets";
+import { registerProtocol } from "./registerProtocol";
 import { appendICNotice } from "./client/appendICNotice";
 import { loadResources } from "./client/loadResources";
 import { AO_HOST } from "./client/aoHost";
