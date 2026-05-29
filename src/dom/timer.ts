@@ -1,7 +1,12 @@
-import * as aolib from "../aolib";
+import type * as aolib from "../aolib";
 
-/** Timer state update. `command`: 0/1 = set time, 2 = show, 3 = hide. */
-export function applyTimerUpdate(packet: aolib.Out<typeof aolib.TI>) {
+/**
+ * TI: timer state update. `command` selects the action:
+ *   0 / 1 = set displayed time (`time` ms)
+ *   2 = show the timer
+ *   3 = hide the timer
+ */
+export const applyTimerUpdate = (packet: aolib.Out<typeof aolib.TI>) => {
   switch (packet.command) {
     case 0:
     case 1:
@@ -15,4 +20,4 @@ export function applyTimerUpdate(packet: aolib.Out<typeof aolib.TI>) {
       document.getElementById(`client_timer${packet.timer_id}`)!.style.display = "none";
       break;
   }
-}
+};

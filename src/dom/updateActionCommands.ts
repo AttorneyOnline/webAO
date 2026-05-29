@@ -1,8 +1,7 @@
 import { Side } from "../aolib";
+import type * as aolib from "../aolib";
 
-/**
- * Update evidence icon.
- */
+/** Sync the judge-action UI and the role-select dropdown for a side. */
 export function updateActionCommands(side: Side) {
   if (side === Side.JUDGE) {
     document.getElementById("judge_action")!.style.display = "inline-table";
@@ -25,3 +24,19 @@ export function updateActionCommands(side: Side) {
     }
   }
 }
+
+/** SP: server confirms a position change for the local character. */
+export const applyCharacterSide = (packet: aolib.Out<typeof aolib.SP>) => {
+  updateActionCommands(packet.side);
+};
+
+/** JD: toggle the judge-action panel (`state === 1` shows, else hides). */
+export const toggleJudgePanel = (packet: aolib.Out<typeof aolib.JD>) => {
+  if (packet.state === 1) {
+    document.getElementById("judge_action")!.style.display = "inline-table";
+    document.getElementById("no_action")!.style.display = "none";
+  } else {
+    document.getElementById("judge_action")!.style.display = "none";
+    document.getElementById("no_action")!.style.display = "inline-table";
+  }
+};

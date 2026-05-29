@@ -1,10 +1,10 @@
 import { setExtraFeatures } from "../client";
-import * as aolib from "../aolib";
-
-
+import type * as aolib from "../aolib";
 
 /**
- * With this the server tells us which features it supports
+ * FL: server advertises its supported features. Each known flag turns
+ * on a piece of UI (yellowtext = expanded color palette, cccc_ic_support
+ * = pairing UI, flipping = mirror button, etc.).
  */
 export const applyFeatureFlags = (packet: aolib.Out<typeof aolib.FL>) => {
   const { features } = packet;
@@ -12,7 +12,6 @@ export const applyFeatureFlags = (packet: aolib.Out<typeof aolib.FL>) => {
 
   if (features.includes("yellowtext")) {
     const colorselect = <HTMLSelectElement>document.getElementById("textcolor");
-
     colorselect.options[colorselect.options.length] = new Option("Yellow", "5");
     colorselect.options[colorselect.options.length] = new Option("Pink", "6");
     colorselect.options[colorselect.options.length] = new Option("Cyan", "7");

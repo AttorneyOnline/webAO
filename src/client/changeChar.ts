@@ -5,6 +5,12 @@ import { pickEmotion } from "../dom/pickEmotion";
 import { attachSpritePreview } from "../dom/spritePreview";
 import { updateActionCommands } from "../dom/updateActionCommands";
 import fileExists from "../utils/fileExists";
+import type * as aolib from "../aolib";
+
+/** PV: server assigns a character to this player. */
+export const applyCharacterPick = (packet: aolib.Out<typeof aolib.PV>) => {
+  changeChar(packet.char_id);
+};
 
 /**
  * Switch the player to a different character. Loads the char's ini,

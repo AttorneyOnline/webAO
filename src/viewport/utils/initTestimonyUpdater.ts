@@ -31,3 +31,32 @@ export const initTestimonyUpdater = () => {
     setTimeout(() => client.viewport.updateTestimony(), UPDATE_INTERVAL),
   );
 };
+
+import type * as aolib from "../../aolib";
+
+/**
+ * RT: drive the testimony / judge-ruling state machine. `judgeId` is
+ * meaningful only for `judgeruling`; `testimony1#1` (since 2.9) hides
+ * the indicator instead of showing it.
+ */
+export const applyTestimonyState = (packet: aolib.Out<typeof aolib.RT>) => {
+  const judgeid = packet.judgeId ?? 0;
+  switch (packet.animation) {
+    case "testimony1":
+      if (judgeid === 1) {
+        client.viewport.disposeTestimony();
+        return;
+      }
+      client.testimonyID = 1;
+      break;
+    case "testimony2":
+      client.testimonyID = 2;
+      break;
+    case "judgeruling":
+      client.testimonyID = 3 + judgeid;
+      break;
+    default:
+      console.warn("Invalid testimony");
+  }
+  initTestimonyUpdater();
+};

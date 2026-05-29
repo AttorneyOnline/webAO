@@ -74,3 +74,49 @@ export const fetchExtensions = async () => {
     console.warn("there was no extensions.json file");
   }
 };
+
+import { applyFavourites } from "../dom/toggleFavourite";
+import type * as aolib from "../aolib";
+
+/**
+ * SI: server announces its asset counts. We seed the char-select grid
+ * with placeholder slots (filled in by SC / CI) and start the download
+ * sequence by sending RC.
+ */
+export const applyServerCounts = (packet: aolib.Out<typeof aolib.SI>) => {
+  client.char_list_length = packet.char_cnt;
+  client.evidence_list_length = packet.evi_cnt;
+  client.music_list_length = packet.mus_cnt;
+
+  fetchExtensions();
+
+  // Build the char-select grid; the character loader will fill icons in.
+  document.getElementById("client_chartable")!.innerHTML = "";
+
+  for (let i = 0; i < client.char_list_length; i++) {
+    const slot = document.createElement("div");
+    slot.className = "char-slot";
+    slot.dataset.charid = String(i);
+
+    const demothing = document.createElement("img");
+    demothing.className = "demothing";
+    demothing.loading = "lazy";
+    demothing.id = `demo_${i}`;
+    demothing.dataset.action = "pickChar";
+    demothing.dataset.char = String(i);
+
+    const favBtn = document.createElement("button");
+    favBtn.className = "fav-btn";
+    favBtn.title = "Favourite";
+    favBtn.dataset.action = "toggleFavourite";
+    favBtn.textContent = "★";
+
+    slot.appendChild(demothing);
+    slot.appendChild(favBtn);
+    document.getElementById("client_chartable")!.appendChild(slot);
+  }
+
+  applyFavourites();
+
+  client.server.send.RC({});
+};

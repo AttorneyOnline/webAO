@@ -143,3 +143,47 @@ export const handleCharacterInfo = async (chargs: string[], charid: number) => {
     img.style.display = "none";
   }
 };
+
+// ---------------------------------------------------------------------
+// Inbound packet handlers for the character download phase. Registered
+// against the aolib session in `src/packets.ts`.
+// ---------------------------------------------------------------------
+
+import queryParser from "../utils/queryParser";
+import type * as aolib from "../aolib";
+
+const { mode: characterListMode } = queryParser();
+
+/**
+ * SC: server pushes the full character roster. Each entry's `&`-delimited
+ * fields are split here and forwarded to `setupCharacterBasic`. Once the
+ * roster is loaded we ask the server for the music list.
+ */
+export const applyFullCharacterList = async (packet: aolib.Out<typeof aolib.SC>) => {
+  if (characterListMode === "watch") {
+    // Spectators don't pick a character
+    document.getElementById("client_charselect")!.style.display = "none";
+  } else {
+    document.getElementById("client_charselect")!.style.display = "block";
+  }
+
+  for (let i = 0; i < packet.char_data.length; i++) {
+    const chargs = packet.char_data[i].split("&");
+    setupCharacterBasic(chargs, i);
+  }
+  client.server.send.RM({});
+};
+
+/**
+ * CI: server pushes one incremental character batch; we forward each
+ * `&`-delimited entry and request the next batch.
+ */
+export const applyCharacterBatch = (packet: aolib.Out<typeof aolib.CI>) => {
+  document.getElementById("client_loadingtext")!.innerHTML =
+    `Loading Character ${packet.batchIndex}/${client.char_list_length}`;
+  for (const { index, data } of packet.entries) {
+    const chargs = data.split("&");
+    setTimeout(() => handleCharacterInfo(chargs, index), 500);
+  }
+  client.server.send.AN({ batch: packet.batchIndex / 10 + 1 });
+};

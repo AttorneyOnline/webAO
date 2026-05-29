@@ -1,27 +1,21 @@
 import { client } from "../client";
-import * as aolib from "../aolib";
-
-
+import type * as aolib from "../aolib";
 
 /**
- * Handles a change in the health bars' states.
+ * HP: defense or prosecution health bar update. `bar === 1` is defense;
+ * any other value is prosecution. `value` is 0..10; we paint that as a
+ * width percentage on the `.health-bar` child.
  */
 export const applyHealthBar = (packet: aolib.Out<typeof aolib.HP>) => {
   const percent_hp = packet.value * 10;
   let healthbox;
   if (packet.bar === 1) {
-    // Def hp
     client.hp[0] = packet.value;
     healthbox = document.getElementById("client_defense_hp");
   } else {
-    // Pro hp
     client.hp[1] = packet.value;
     healthbox = document.getElementById("client_prosecutor_hp");
   }
   (<HTMLElement>healthbox.getElementsByClassName("health-bar")[0]).style.width =
     `${percent_hp}%`;
 };
-
-/**
- * Sends a health point change.
- */
