@@ -2,7 +2,7 @@ import { unescapeUnicode, escapeFanta, unescapeFanta } from "./escaping";
 import { ARUP, receiveARUP } from "./packets/ARUP";
 import { askchaa, receiveaskchaa } from "./packets/askchaa";
 import { ASS, receiveASS } from "./packets/ASS";
-import { AUTH, receiveAUTH } from "./packets/AUTH";
+import { receiveAUTH } from "./packets/AUTH";
 import { BB, receiveBB } from "./packets/BB";
 import { BD, receiveBD } from "./packets/BD";
 import { BN, receiveBN } from "./packets/BN";
@@ -352,7 +352,6 @@ export interface PacketBinding<TPacket> {
 const clientPackets: Record<string, PacketBinding<any>> = {
   ARUP: { codec: ARUP, receive: receiveARUP },
   ASS: { codec: ASS, receive: receiveASS },
-  AUTH: { codec: AUTH, receive: receiveAUTH },
   BB: { codec: BB, receive: receiveBB },
   BD: { codec: BD, receive: receiveBD },
   BN: { codec: BN, receive: receiveBN },
@@ -437,6 +436,7 @@ type SendFn = (packet: any) => void;
 type ReceiveFn = (body: string) => void;
 
 export const clientReceive = new Map<string, ReceiveFn>([
+  ["AUTH", receiveAUTH],
   ["DONE", receiveDONE],
   ["MC", receiveMC],
 ]);

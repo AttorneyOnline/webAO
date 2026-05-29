@@ -1,25 +1,21 @@
-import type { PacketCodec } from "../packets";
-
-export interface AUTHPacket {
-  auth_state: number;
-}
-
-export const AUTH: PacketCodec<AUTHPacket> = {
-  header: "AUTH",
-  decode(args) {
-    return { auth_state: Number(args[1]) };
-  },
-  encode(packet) {
-    return `AUTH#${packet.auth_state}#%`;
-  },
-};
+import { Packet } from "../Packet";
+import { decode, req } from "../packets";
 
 /**
- * i am mod now
+ * Auth state update. Server tells the client their mod-privilege
+ * level: `1` means they are now logged in as a moderator.
  */
-export const receiveAUTH = (packet: AUTHPacket) => {
+
+// Receiver: Client
+export class AUTHPacket extends Packet {
+  static $header = "AUTH";
+  auth_state = req("number");
+}
+
+// i am mod now
+export function receiveAUTH(body: string) {
+  const packet = decode(AUTHPacket, body);
   if (packet.auth_state === 1) {
-    (<HTMLAnchorElement>document.getElementById("mod_ui")).href =
-      `styles/mod.css`;
+    (<HTMLAnchorElement>document.getElementById("mod_ui")).href = `styles/mod.css`;
   }
-};
+}
