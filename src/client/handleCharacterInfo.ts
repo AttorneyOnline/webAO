@@ -159,7 +159,7 @@ const { mode: characterListMode } = queryParser();
  * fields are split here and forwarded to `setupCharacterBasic`. Once the
  * roster is loaded we ask the server for the music list.
  */
-export const applyFullCharacterList = async (packet: aolib.Out<typeof aolib.SC>) => {
+export const applyFullCharacterList = async (packet: aolib.SCPacket) => {
   if (characterListMode === "watch") {
     // Spectators don't pick a character
     document.getElementById("client_charselect")!.style.display = "none";
@@ -178,7 +178,7 @@ export const applyFullCharacterList = async (packet: aolib.Out<typeof aolib.SC>)
  * CI: server pushes one incremental character batch; we forward each
  * `&`-delimited entry and request the next batch.
  */
-export const applyCharacterBatch = (packet: aolib.Out<typeof aolib.CI>) => {
+export const applyCharacterBatch = (packet: aolib.CIPacket) => {
   document.getElementById("client_loadingtext")!.innerHTML =
     `Loading Character ${packet.batchIndex}/${client.char_list_length}`;
   for (const { index, data } of packet.entries) {

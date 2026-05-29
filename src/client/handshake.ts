@@ -28,7 +28,7 @@ export const applyEncryptionMode = () => {
  * quirk here rather than in the schema. webAO doesn't push a PN, so
  * we synthesise an empty one locally to keep the UI happy.
  */
-export const applyServerIdentity = (packet: aolib.Out<typeof aolib.ID>) => {
+export const applyServerIdentity = (packet: aolib.IDPacket) => {
   client.playerID = packet.player_count;
   const serverSoftware = packet.software.split("&")[0];
   if (serverSoftware === "webAO") {
@@ -37,7 +37,7 @@ export const applyServerIdentity = (packet: aolib.Out<typeof aolib.ID>) => {
 };
 
 /** PN: server population. Triggers the character list request. */
-export const applyServerInfo = (_packet: aolib.Out<typeof aolib.PN>) => {
+export const applyServerInfo = (_packet: aolib.PNPacket) => {
   client.server.send.askchaa({});
 };
 

@@ -8,7 +8,7 @@ import fileExists from "../utils/fileExists";
 import type * as aolib from "../aolib";
 
 /** PV: server assigns a character to this player. */
-export const applyCharacterPick = (packet: aolib.Out<typeof aolib.PV>) => {
+export const applyCharacterPick = (packet: aolib.PVPacket) => {
   changeChar(packet.char_id);
 };
 

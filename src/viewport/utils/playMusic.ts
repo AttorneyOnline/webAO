@@ -4,7 +4,7 @@ import { appendICLog } from "../../client/appendICLog";
 import type * as aolib from "../../aolib";
 
 /** MC: server announces a music change; switch the channel and log it. */
-export const playMusicChange = (packet: aolib.Out<typeof aolib.MCBroadcast>) => {
+export const playMusicChange = (packet: aolib.MCPacket) => {
   const music = client.viewport.music[packet.channel];
   music.pause();
   if (packet.name.startsWith("http")) {
@@ -31,7 +31,7 @@ export const playMusicChange = (packet: aolib.Out<typeof aolib.MCBroadcast>) => 
  * official Packet Reference. `toTime` is a seconds string the legacy
  * audio element parses with `parseFloat`.
  */
-export const applyMusicSeek = (packet: aolib.Out<typeof aolib.RMC>) => {
+export const applyMusicSeek = (packet: aolib.RMCPacket) => {
   client.viewport.music.pause();
   const { music } = client.viewport;
   music.totime = packet.toTime;

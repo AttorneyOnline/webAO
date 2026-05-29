@@ -129,7 +129,7 @@ import { safeHtmlTags } from "../../escaping";
 import type * as aolib from "../../aolib";
 
 /** BN: background change broadcast — swap every viewport background slot. */
-export const applyBackgroundChange = (packet: aolib.Out<typeof aolib.BN>) => {
+export const applyBackgroundChange = (packet: aolib.BNPacket) => {
   const bgFromArgs = safeHtmlTags(packet.background);
   client.viewport.setBackgroundName(bgFromArgs);
   const bg_index = getIndexFromSelect("bg_select", client.viewport.getBackgroundName());

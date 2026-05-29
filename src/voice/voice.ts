@@ -813,7 +813,7 @@ import { installVoiceUI } from "./voiceUI";
 import type * as aolib from "../aolib";
 
 /** VS_CAPS: server announces voice subsystem capabilities (idempotent). */
-export const applyVoiceCapabilities = (packet: aolib.Out<typeof aolib.VS_CAPS>) => {
+export const applyVoiceCapabilities = (packet: aolib.VS_CAPSPacket) => {
   console.debug(
     `voice: VS_CAPS received enabled=${packet.enabled} ptt=${packet.pttOnly} maxPeers=${packet.maxPeers} codec=${packet.codec} sr=${packet.sampleRate} frame=${packet.frameMs}ms maxBytes=${packet.maxFrameBytes}`,
   );
@@ -830,12 +830,12 @@ export const applyVoiceCapabilities = (packet: aolib.Out<typeof aolib.VS_CAPS>) 
 };
 
 /** VS_PEERS: initial list of voice-active peer uids when we join. */
-export const applyVoicePeerList = (packet: aolib.Out<typeof aolib.VS_PEERS>) => {
+export const applyVoicePeerList = (packet: aolib.VS_PEERSPacket) => {
   void handleInitialPeers(packet.uids);
 };
 
 /** VS_JOIN: a remote peer joined the voice mesh. */
-export const handleVoicePeerJoin = (packet: aolib.Out<typeof aolib.VSJoinBroadcast>) => {
+export const handleVoicePeerJoin = (packet: aolib.VS_JOINPacket) => {
   if (!Number.isFinite(packet.uid)) return;
   void handlePeerJoined(packet.uid);
 };
@@ -845,7 +845,7 @@ export const handleVoicePeerJoin = (packet: aolib.Out<typeof aolib.VSJoinBroadca
  * (server auto-kicked us, e.g. on area change or `/voicearea off`),
  * we tear down locally instead.
  */
-export const handleVoicePeerLeave = (packet: aolib.Out<typeof aolib.VSLeaveBroadcast>) => {
+export const handleVoicePeerLeave = (packet: aolib.VS_LEAVEPacket) => {
   if (!Number.isFinite(packet.uid)) return;
   if (packet.uid === client.playerID) {
     leaveVoice();
@@ -855,13 +855,13 @@ export const handleVoicePeerLeave = (packet: aolib.Out<typeof aolib.VSLeaveBroad
 };
 
 /** VS_SPEAK: a remote peer toggled their speaking-state indicator. */
-export const applyVoicePeerSpeak = (packet: aolib.Out<typeof aolib.VSSpeakBroadcast>) => {
+export const applyVoicePeerSpeak = (packet: aolib.VS_SPEAKPacket) => {
   if (!Number.isFinite(packet.uid)) return;
   notifyRemoteSpeaking(packet.uid, packet.on);
 };
 
 /** VS_AUDIO: opus audio frame from a remote peer; play it. */
-export const handleVoiceAudio = (packet: aolib.Out<typeof aolib.VS_AUDIO>) => {
+export const handleVoiceAudio = (packet: aolib.VS_AUDIOPacket) => {
   if (!Number.isFinite(packet.fromUid) || !packet.payload) return;
   handleRemoteAudio(packet.fromUid, packet.payload);
 };

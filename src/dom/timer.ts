@@ -6,7 +6,7 @@ import type * as aolib from "../aolib";
  *   2 = show the timer
  *   3 = hide the timer
  */
-export const applyTimerUpdate = (packet: aolib.Out<typeof aolib.TI>) => {
+export const applyTimerUpdate = (packet: aolib.TIPacket) => {
   switch (packet.command) {
     case 0:
     case 1:

@@ -29,7 +29,7 @@ import type * as aolib from "../aolib";
  * ASS: server tells the client to fetch assets from a new origin.
  * `"None"` is a sentinel meaning "keep using the current host".
  */
-export const applyAssetOrigin = (packet: aolib.Out<typeof aolib.ASS>) => {
+export const applyAssetOrigin = (packet: aolib.ASSPacket) => {
   if (packet.asset_url !== "None") setAOhost(packet.asset_url);
   renderPlayerList();
 };

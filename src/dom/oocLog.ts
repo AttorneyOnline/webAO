@@ -23,7 +23,7 @@ function addLinks(message: string): string {
 }
 
 /** CT: server broadcast of an OOC chat message; append to the log. */
-export const appendOOCMessage = (packet: aolib.Out<typeof aolib.CTBroadcast>) => {
+export const appendOOCMessage = (packet: aolib.CTPacket) => {
   if (mode === "replay") return;
 
   const oocLog = document.getElementById("client_ooclog")!;
@@ -41,7 +41,7 @@ export const appendOOCMessage = (packet: aolib.Out<typeof aolib.CTBroadcast>) =>
 };
 
 /** ZZ: server modcall broadcast; show a `$Alert:` notice and play the gallery sfx. */
-export const showModcallNotice = (packet: aolib.Out<typeof aolib.ZZ>) => {
+export const showModcallNotice = (packet: aolib.ZZPacket) => {
   const oocLog = document.getElementById("client_ooclog")!;
   const message = safeHtmlTags(unescapeUnicode(packet.reason)).replace(/\n/g, "<br>");
   oocLog.innerHTML += `$Alert: ${message}<br>`;

@@ -26,12 +26,12 @@ export function updateActionCommands(side: Side) {
 }
 
 /** SP: server confirms a position change for the local character. */
-export const applyCharacterSide = (packet: aolib.Out<typeof aolib.SP>) => {
+export const applyCharacterSide = (packet: aolib.SPPacket) => {
   updateActionCommands(packet.side);
 };
 
 /** JD: toggle the judge-action panel (`state === 1` shows, else hides). */
-export const toggleJudgePanel = (packet: aolib.Out<typeof aolib.JD>) => {
+export const toggleJudgePanel = (packet: aolib.JDPacket) => {
   if (packet.state === 1) {
     document.getElementById("judge_action")!.style.display = "inline-table";
     document.getElementById("no_action")!.style.display = "none";

@@ -19,7 +19,7 @@ export function pickChar(ccharacter: number) {
 }
 
 /** CharsCheck: server reports which character slots are taken vs free. */
-export const applyCharacterAvailability = (packet: aolib.Out<typeof aolib.CharsCheck>) => {
+export const applyCharacterAvailability = (packet: aolib.CharsCheckPacket) => {
   for (let i = 0; i < client.char_list_length; i++) {
     const img = document.getElementById(`demo_${i}`)!;
     if (packet.taken[i] === -1) {

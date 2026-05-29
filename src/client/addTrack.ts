@@ -23,7 +23,7 @@ import type * as aolib from "../aolib";
  * SM: server pushes the full music + area list at once. Areas come
  * first (until we hit an entry that's an audio file), then music.
  */
-export const applyMusicListBatch = (packet: aolib.Out<typeof aolib.SM>) => {
+export const applyMusicListBatch = (packet: aolib.SMPacket) => {
   document.getElementById("client_loadingtext")!.innerHTML = "Loading Music";
   client.resetMusicList();
   client.resetAreaList();
@@ -53,7 +53,7 @@ export const applyMusicListBatch = (packet: aolib.Out<typeof aolib.SM>) => {
 };
 
 /** FM: server pushes the full music list (refresh after edits). */
-export const applyFullMusicList = (packet: aolib.Out<typeof aolib.FM>) => {
+export const applyFullMusicList = (packet: aolib.FMPacket) => {
   client.resetMusicList();
 
   // Legacy iterated 1..length-1 to skip the trailing empty entry from
@@ -72,7 +72,7 @@ export const applyFullMusicList = (packet: aolib.Out<typeof aolib.FM>) => {
  * the first audio file are areas; everything after is music. Acks by
  * requesting the next batch.
  */
-export const applyEvidenceListBatch = (packet: aolib.Out<typeof aolib.EM>) => {
+export const applyEvidenceListBatch = (packet: aolib.EMPacket) => {
   document.getElementById("client_loadingtext")!.innerHTML = "Loading Music";
   if (packet.batchIndex === 0) {
     client.resetMusicList();

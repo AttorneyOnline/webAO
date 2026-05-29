@@ -34,7 +34,7 @@ export const createArea = (id: number, aname: string) => {
 import type * as aolib from "../aolib";
 
 /** FA: server pushes the full area list (replaces local cache). */
-export const applyFullAreaList = (packet: aolib.Out<typeof aolib.FA>) => {
+export const applyFullAreaList = (packet: aolib.FAPacket) => {
   client.resetAreaList();
   for (let i = 0; i < packet.areas.length; i++) {
     createArea(i, packet.areas[i]);
@@ -46,7 +46,7 @@ export const applyFullAreaList = (packet: aolib.Out<typeof aolib.FA>) => {
  * column changes (player count / status / CM / lock state) and the
  * positional payload carries the new values per area index.
  */
-export const applyAreaStatus = (packet: aolib.Out<typeof aolib.ARUP>) => {
+export const applyAreaStatus = (packet: aolib.ARUPPacket) => {
   const { update_type, update_data } = packet;
   for (let i = 0; i < update_data.length; i++) {
     if (!client.areas[i]) continue; // server may send ARUP before FA

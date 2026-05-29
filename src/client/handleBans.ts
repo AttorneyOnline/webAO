@@ -18,24 +18,24 @@ export const handleBans = (type: string, reason: string) => {
 };
 
 /** BB: server pops a blocking warning the user must dismiss. */
-export const showBlockingAlert = (packet: aolib.Out<typeof aolib.BB>) => {
+export const showBlockingAlert = (packet: aolib.BBPacket) => {
   alert(packet.message);
 };
 
 /** BD: server rejects the connection with a persistent ban reason. */
-export const showBanDialog = (packet: aolib.Out<typeof aolib.BD>) => {
+export const showBanDialog = (packet: aolib.BDPacket) => {
   client.banned = true;
   handleBans("Banned", packet.reason);
 };
 
 /** KB: kicked AND banned (reconnect refused). */
-export const showKickAndBanScreen = (packet: aolib.Out<typeof aolib.KB>) => {
+export const showKickAndBanScreen = (packet: aolib.KBPacket) => {
   client.banned = true;
   handleBans("Banned", packet.reason);
 };
 
 /** KK: kicked (no ban); reconnect still allowed. */
-export const showKickScreen = (packet: aolib.Out<typeof aolib.KK>) => {
+export const showKickScreen = (packet: aolib.KKPacket) => {
   client.banned = true;
   handleBans("Kicked", packet.reason);
 };

@@ -77,6 +77,10 @@ export {
   type AreaUpdateData,
 } from "./packets";
 
+// Public typed-packet aliases — `aolib.MSPacket` instead of
+// `aolib.Out<typeof aolib.MSBroadcast>` in handler signatures.
+export type * from "./packetTypes";
+
 // ---------------------------------------------------------------------
 // Field primitives (schema DSL).
 // ---------------------------------------------------------------------

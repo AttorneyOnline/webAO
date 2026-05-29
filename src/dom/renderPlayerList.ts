@@ -92,7 +92,7 @@ import { ensureCharIni } from "../client/handleCharacterInfo";
 import type * as aolib from "../aolib";
 
 /** PR: a player joined (type 0) or left (type 1) the roster. */
-export const applyPlayerRosterChange = (packet: aolib.Out<typeof aolib.PR>) => {
+export const applyPlayerRosterChange = (packet: aolib.PRPacket) => {
   if (packet.type === 0) {
     client.playerlist.set(packet.id, { charId: -1, charName: "", showName: "", name: "", area: 0 });
   } else if (packet.type === 1) {
@@ -106,7 +106,7 @@ export const applyPlayerRosterChange = (packet: aolib.Out<typeof aolib.PR>) => {
  * area). The `type` discriminator picks which field; the payload's
  * `data` carries the new value.
  */
-export const applyPlayerFieldUpdate = (packet: aolib.Out<typeof aolib.PU>) => {
+export const applyPlayerFieldUpdate = (packet: aolib.PUPacket) => {
   const player = client.playerlist.get(packet.id);
   if (!player) return;
 

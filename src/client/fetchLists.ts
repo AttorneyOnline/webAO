@@ -83,7 +83,7 @@ import type * as aolib from "../aolib";
  * with placeholder slots (filled in by SC / CI) and start the download
  * sequence by sending RC.
  */
-export const applyServerCounts = (packet: aolib.Out<typeof aolib.SI>) => {
+export const applyServerCounts = (packet: aolib.SIPacket) => {
   client.char_list_length = packet.char_cnt;
   client.evidence_list_length = packet.evi_cnt;
   client.music_list_length = packet.mus_cnt;
