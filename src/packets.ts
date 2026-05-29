@@ -6,7 +6,7 @@ import { AUTH, receiveAUTH } from "./packets/AUTH";
 import { BB, receiveBB } from "./packets/BB";
 import { BD, receiveBD } from "./packets/BD";
 import { BN, receiveBN } from "./packets/BN";
-import { CC, receiveCC, sendCC } from "./packets/CC";
+import { receiveCC, sendCC } from "./packets/CC";
 import { CH, receiveCH, sendCH } from "./packets/CH";
 import { CharsCheck, receiveCharsCheck } from "./packets/CharsCheck";
 import { CHECK, receiveCHECK } from "./packets/CHECK";
@@ -14,7 +14,7 @@ import { CI, receiveCI } from "./packets/CI";
 import { CT, receiveCT, sendCT } from "./packets/CT";
 import { DE, sendDE } from "./packets/DE";
 import { decryptor, receivedecryptor } from "./packets/decryptor";
-import { DONE, receiveDONE } from "./packets/DONE";
+import { receiveDONE } from "./packets/DONE";
 import { EE, sendEE } from "./packets/EE";
 import { EI, receiveEI } from "./packets/EI";
 import { EM, receiveEM } from "./packets/EM";
@@ -31,7 +31,7 @@ import { LE, receiveLE } from "./packets/LE";
 import { MA, sendMA } from "./packets/MA";
 import { receiveMC, sendMC } from "./packets/MC";
 import { MM, receiveMM } from "./packets/MM";
-import { MSClient, receiveMS, sendMS } from "./packets/MS";
+import { MSClient, MSServer, receiveMS, sendMS } from "./packets/MS";
 import { PE, sendPE } from "./packets/PE";
 import { PN, receivePN } from "./packets/PN";
 import { PR, receivePR } from "./packets/PR";
@@ -70,10 +70,21 @@ export interface Field {
   default?: unknown;
 }
 
-const coerce = (raw: string, t: FieldType): unknown =>
-  t === "string" ? decodeChat(unescapeChat(raw))
-  : t === "number" ? Number(raw)
-  : raw === "1";
+const coerce = (raw: string, t: FieldType, name: string): unknown => {
+  if (t === "string") return decodeChat(unescapeChat(raw));
+  if (t === "number") {
+    // `Number("")` returns 0 in JS, which would mask an empty token as a
+    // valid value. Reject empty + non-numeric tokens explicitly.
+    if (raw === "") throw new Error(`Invalid number for field '${name}': empty token`);
+    const n = Number(raw);
+    if (Number.isNaN(n)) throw new Error(`Invalid number for field '${name}': ${JSON.stringify(raw)}`);
+    return n;
+  }
+  if (raw !== "0" && raw !== "1") {
+    throw new Error(`Invalid boolean for field '${name}': ${JSON.stringify(raw)}`);
+  }
+  return raw === "1";
+};
 
 const serialize = (v: unknown, t: FieldType): string =>
   t === "string" ? escapeChat(v as string)
@@ -106,58 +117,42 @@ export function req(t: FieldType): unknown {
 const isReq = (v: unknown): v is ReqMarker =>
   typeof v === "object" && v !== null && REQ in v;
 
-/** Schema reference: either a `Field[]` array or a class constructor. */
-export type Schema<T> = readonly Field[] | (new () => T);
+import { Packet } from "./Packet";
+export { Packet };
+
+/** A packet schema: a class whose field initializers describe the wire. */
+export type Schema<T extends Packet> = new () => T;
 
 /**
- * Walk a schema (`Field[]` or class) and yield `(name, type, default?)`
- * triplets in wire order. For classes we instantiate once to read the
- * declared defaults / required markers.
+ * Walk a schema's declared fields in wire order, yielding `(name, type)`
+ * pairs. Instantiates the class once to read the field initializers
+ * (defaults + `req()` sentinels) and reports the declared type for each.
  */
-function* walkSchema<T>(
-  schema: Schema<T>,
-): Generator<{ name: string; type: FieldType; default?: unknown; required: boolean }> {
-  if (Array.isArray(schema)) {
-    for (const f of schema as readonly Field[]) {
-      const required = !("default" in f);
-      yield { name: f.name, type: f.type, default: f.default, required };
-    }
-    return;
-  }
-  const exemplar = new (schema as new () => T)();
-  for (const [name, val] of Object.entries(exemplar as object)) {
-    if (isReq(val)) {
-      yield { name, type: val[REQ], required: true };
-    } else {
-      const type = typeof val as FieldType;
-      yield { name, type, default: val, required: false };
-    }
+function* walkSchema<T extends Packet>(
+  SchemaClass: Schema<T>,
+): Generator<{ name: string; type: FieldType }> {
+  const exemplar = new SchemaClass();
+  for (const [name, val] of Object.entries(exemplar)) {
+    const type = isReq(val) ? val[REQ] : (typeof val as FieldType);
+    yield { name, type };
   }
 }
 
 /**
- * The "type gauntlet" — shared by `encode` and `decode`. Builds a
- * fully-populated packet from a partial object: for class schemas,
- * instantiating runs the field initializers (defaults + `req()`
- * sentinels), then we overlay the partial values and throw if any
- * required field is still a sentinel. For `Field[]` schemas (legacy),
- * walks the array and fills defaults / throws on missing required.
+ * The "type gauntlet" — shared by `encode` and `decode`. Instantiate the
+ * class (which runs field initializers for defaults + `req()` sentinels),
+ * overlay only declared fields from the partial, then throw if any
+ * required field is still a sentinel. Extra keys in the partial are
+ * silently dropped — the schema is the source of truth for shape.
  */
-function cast<T>(schema: Schema<T>, partial: Record<string, unknown>): T {
-  if (typeof schema === "function") {
-    const instance = new (schema as new () => T)() as Record<string, unknown>;
-    Object.assign(instance, partial);
-    for (const [name, val] of Object.entries(instance)) {
-      if (isReq(val)) throw new Error(`Missing required field '${name}'`);
-    }
-    return instance as T;
+function cast<T extends Packet>(SchemaClass: Schema<T>, partial: Partial<T>): T {
+  const instance: Packet = new SchemaClass();
+  const bag = partial as Packet;
+  for (const name of Object.keys(instance)) {
+    if (bag[name] !== undefined) instance[name] = bag[name];
+    if (isReq(instance[name])) throw new Error(`Missing required field '${name}'`);
   }
-  for (const f of walkSchema<T>(schema)) {
-    if (partial[f.name] !== undefined) continue;
-    if (!f.required) partial[f.name] = f.default;
-    else throw new Error(`Missing required field '${f.name}'`);
-  }
-  return partial as T;
+  return instance as T;
 }
 
 /**
@@ -166,39 +161,46 @@ function cast<T>(schema: Schema<T>, partial: Record<string, unknown>): T {
  * else is positional `HEADER#a#b#%`. Runs the type gauntlet: missing
  * optional fields get their `default`; missing required fields throw.
  */
-export function decode<T>(schema: Schema<T>, body: string): T {
-  let partial: Record<string, unknown>;
+export function decode<T extends Packet>(schema: Schema<T>, body: string): T {
+  let partial: Packet;
   if (body.startsWith("{")) {
     partial = JSON.parse(body);
-    delete partial.$header;
   } else {
-    partial = {};
+    partial = {} as Packet;
     const specs = [...walkSchema<T>(schema)];
-    const args = (body.endsWith("#") ? body.slice(0, -1) : body).split("#");
+    // Accept `HEADER#a#b#%` (canonical), `HEADER#a#b#`, or `HEADER#a#b`
+    // by peeling each terminator char if present.
+    let trimmed = body;
+    if (trimmed.endsWith("%")) trimmed = trimmed.slice(0, -1);
+    if (trimmed.endsWith("#")) trimmed = trimmed.slice(0, -1);
+    const args = trimmed.split("#");
     specs.forEach((f, i) => {
       const v = args[i + 1];
-      if (v !== undefined) partial[f.name] = coerce(v, f.type);
+      if (v !== undefined) partial[f.name] = coerce(v, f.type, f.name);
     });
   }
-  return cast<T>(schema, partial);
+  return cast<T>(schema, partial as Partial<T>);
 }
 
 /**
- * Serialize a typed packet to wire bytes. Runs the same type gauntlet as
- * `decode` (defaults filled, required validated), then emits either the
- * JSON envelope `{"$header": header, ...packet}` or positional
- * `HEADER#a#b#%`.
+ * Serialize a typed packet to wire bytes. Reads the header from
+ * `SchemaClass.$header` (matches the JSON envelope key). Pure library
+ * function — callers pass in the format they want. Runs the same type
+ * gauntlet as `decode` (defaults filled, required validated).
  */
-export function encode<T>(
-  header: string,
-  schema: Schema<T>,
+export function encode<T extends Packet>(
+  SchemaClass: Schema<T> & { $header: string },
   packet: Partial<T>,
-  asJson: boolean,
+  asJson: boolean = false,
 ): string {
-  const full = cast<T>(schema, packet as Record<string, unknown>) as Record<string, unknown>;
-  if (asJson) return JSON.stringify({ $header: header, ...full });
-  const parts = [...walkSchema<T>(schema)].map((f) => serialize(full[f.name], f.type));
-  return `${header}#${parts.join("#")}#%`;
+  const full = cast<T>(SchemaClass, packet);
+  if (asJson) {
+    return JSON.stringify({ $header: SchemaClass.$header, ...full });
+  }
+  const parts = [...walkSchema<T>(SchemaClass)].map((f) => serialize(full[f.name], f.type));
+  // Zero-field packets are spec'd as `HEADER#%`, not `HEADER##%`.
+  if (parts.length === 0) return `${SchemaClass.$header}#%`;
+  return `${SchemaClass.$header}#${parts.join("#")}#%`;
 }
 
 // ---------- Legacy codec API (kept until all packets migrate) ----------
@@ -324,56 +326,54 @@ export interface PacketBinding<TPacket> {
 }
 
 // Each entry pairs the wire codec (decode/encode) with the typed
-// receive/send handlers. Keep this list alphabetical (case-insensitive).
+// receive/send handlers. Registries are indexed by *receiver*:
 //
-// For packets whose wire format differs by direction (Server-as-
-// receiver form vs Client-as-receiver form), the convention is two
-// codecs + two packet types per header:
+//   clientPacketRegistry -- headers this program receives as a Client
+//     (server -> client direction). Each entry exposes `receive`.
+//   serverPacketRegistry -- headers this program receives as a Server
+//     (client -> server direction). Each entry exposes `send` (the
+//     outbound helper produces wire bytes the server would receive) and/or
+//     `receive` (used for self-emulation: when we want to act as a server
+//     locally to drive replay / self-hosted modes).
+//
+// Bidirectional headers (CT, HP, MC, MS, RT, ZZ, VS_JOIN, VS_LEAVE,
+// VS_SPEAK, ID) appear in *both* registries -- the client-receive form
+// in `clientPackets`, the server-receive form in `serverPackets`.
+//
+// For headers whose wire format differs by direction, the convention is
+// two codecs + two packet types per header:
 //
 //   types:  XXPacketClient (decoded incoming), XXPacketServer (encoded out)
-//   codecs: XXClient (used by the dispatcher), XXServer (used by senders)
+//   codecs: XXClient (in clientPackets), XXServer (in serverPackets)
 //
-// Only the Client codec appears in this registry -- it's the one that
-// reads incoming wire bytes. The Server codec is used by the matching
-// sendXX in the same file (see `sendMS` in packets/MS.ts for an example).
-// MS is currently the only such packet; CT and ZZ technically have
-// direction-conditional wire forms too, but they're symmetric enough
-// that a single codec covers both.
-const packets: Record<string, PacketBinding<any>> = {
+// CT, HP, RT, and ZZ are symmetric enough that a single codec covers
+// both directions, so the same codec is referenced from both registries.
+// Keep each list alphabetical (case-insensitive).
+const clientPackets: Record<string, PacketBinding<any>> = {
   ARUP: { codec: ARUP, receive: receiveARUP },
-  askchaa: { codec: askchaa, receive: receiveaskchaa },
   ASS: { codec: ASS, receive: receiveASS },
   AUTH: { codec: AUTH, receive: receiveAUTH },
   BB: { codec: BB, receive: receiveBB },
   BD: { codec: BD, receive: receiveBD },
   BN: { codec: BN, receive: receiveBN },
-  CC: { codec: CC, receive: receiveCC, send: sendCC },
-  CH: { codec: CH, receive: receiveCH, send: sendCH },
   CharsCheck: { codec: CharsCheck, receive: receiveCharsCheck },
   CHECK: { codec: CHECK, receive: receiveCHECK },
   CI: { codec: CI, receive: receiveCI },
-  CT: { codec: CT, receive: receiveCT, send: sendCT },
-  DE: { codec: DE, send: sendDE },
+  CT: { codec: CT, receive: receiveCT },
   decryptor: { codec: decryptor, receive: receivedecryptor },
-  DONE: { codec: DONE, receive: receiveDONE },
-  EE: { codec: EE, send: sendEE },
   EI: { codec: EI, receive: receiveEI },
   EM: { codec: EM, receive: receiveEM },
   FA: { codec: FA, receive: receiveFA },
   FL: { codec: FL, receive: receiveFL },
   FM: { codec: FM, receive: receiveFM },
-  HI: { codec: HI, receive: receiveHI },
-  HP: { codec: HP, receive: receiveHP, send: sendHP },
+  HP: { codec: HP, receive: receiveHP },
   ID: { codec: IDClient, receive: receiveID },
   JD: { codec: JD, receive: receiveJD },
   KB: { codec: KB, receive: receiveKB },
   KK: { codec: KK, receive: receiveKK },
   LE: { codec: LE, receive: receiveLE },
-  MA: { codec: MA, send: sendMA },
-  MC: { receive: receiveMC, send: sendMC },
   MM: { codec: MM, receive: receiveMM },
-  MS: { codec: MSClient, receive: receiveMS, send: sendMS },
-  PE: { codec: PE, send: sendPE },
+  MS: { codec: MSClient, receive: receiveMS },
   PN: { codec: PN, receive: receivePN },
   PR: { codec: PR, receive: receivePR },
   PU: { codec: PU, receive: receivePU },
@@ -382,7 +382,7 @@ const packets: Record<string, PacketBinding<any>> = {
   RD: { codec: RD, receive: receiveRD },
   RM: { codec: RM, receive: receiveRM },
   RMC: { codec: RMC, receive: receiveRMC },
-  RT: { codec: RT, receive: receiveRT, send: sendRT },
+  RT: { codec: RT, receive: receiveRT },
   SC: { codec: SC, receive: receiveSC },
   SI: { codec: SI, receive: receiveSI },
   SM: { codec: SM, receive: receiveSM },
@@ -394,8 +394,61 @@ const packets: Record<string, PacketBinding<any>> = {
   VS_LEAVE: { codec: VS_LEAVEClient, receive: receiveVS_LEAVE },
   VS_PEERS: { codec: VS_PEERS, receive: receiveVS_PEERS },
   VS_SPEAK: { codec: VS_SPEAKClient, receive: receiveVS_SPEAK },
-  ZZ: { codec: ZZ, receive: receiveZZ, send: sendZZ },
+  ZZ: { codec: ZZ, receive: receiveZZ },
 };
 
-export const packetRegistry = new Map(Object.entries(packets));
+export const clientPacketRegistry = new Map(Object.entries(clientPackets));
+
+const serverPackets: Record<string, PacketBinding<any>> = {
+  askchaa: { codec: askchaa, receive: receiveaskchaa },
+  CH: { codec: CH, receive: receiveCH, send: sendCH },
+  CT: { codec: CT, send: sendCT },
+  DE: { codec: DE, send: sendDE },
+  EE: { codec: EE, send: sendEE },
+  HI: { codec: HI, receive: receiveHI },
+  HP: { codec: HP, send: sendHP },
+  MA: { codec: MA, send: sendMA },
+  MS: { codec: MSServer, send: sendMS },
+  PE: { codec: PE, send: sendPE },
+  RT: { codec: RT, send: sendRT },
+  ZZ: { codec: ZZ, send: sendZZ },
+};
+
+export const serverPacketRegistry = new Map(Object.entries(serverPackets));
+
+// ---------- Quadrant model (replaces the legacy registries above) ----------
+//
+// Four maps, one per (role, direction) quadrant. Each entry is a single
+// function — no `codec`/`schema` bundling, no shared binding object. The
+// receive handler owns its own decode; the send helper owns its own encode.
+//
+//   clientReceive[H] — invoked when, acting as Client, we receive H (from server)
+//   clientSend[H]    — produces H bound for the server
+//   serverReceive[H] — invoked when, acting as Server, we receive H (from client)
+//   serverSend[H]    — produces H bound for a client
+//
+// Headers may appear in any subset of the four maps, including all four.
+// For direction-asymmetric headers like MC, each quadrant uses its own
+// wire schema (server-receives form vs client-receives form), so the four
+// entries are genuinely independent — bundling them would be misleading.
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SendFn = (packet: any) => void;
+type ReceiveFn = (body: string) => void;
+
+export const clientReceive = new Map<string, ReceiveFn>([
+  ["DONE", receiveDONE],
+  ["MC", receiveMC],
+]);
+
+export const clientSend = new Map<string, SendFn>([
+  ["CC", sendCC],
+  ["MC", sendMC],
+]);
+
+export const serverReceive = new Map<string, ReceiveFn>([
+  ["CC", receiveCC],
+]);
+
+export const serverSend = new Map<string, SendFn>();
 

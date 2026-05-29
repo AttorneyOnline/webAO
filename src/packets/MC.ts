@@ -1,18 +1,16 @@
-import { client, encode_packets_as_json } from "../client";
+import { client, json_mode } from "../client";
 import { AO_HOST } from "../client/aoHost";
 import { appendICLog } from "../client/appendICLog";
+import { Packet } from "../Packet";
 import { decode, encode, req } from "../packets";
 
 /**
- * Music/area change. Two wire variants per spec:
- *
- *   - Server -> Client (`MCPacketClient`): all 6 fields.
- *     `MC#{name}#{char_id}#{showname}#{looping}#{channel}#{effects}#%`
- *   - Client -> Server (`MCPacketServer`): omits `looping` and `channel`.
- *     `MC#{name}#{char_id}#{showname}#{effects}#%`
+ * Music/area change.
  */
-export class MCPacketClient {
-  static header = "MC";
+
+// Receiver: Client
+export class MCPacketClient extends Packet {
+  static $header = "MC";
   name = req("string");
   char_id = req("number");
   showname = "";
@@ -21,37 +19,23 @@ export class MCPacketClient {
   effects = 0;
 }
 
-export class MCPacketServer {
-  static header = "MC";
+// Receiver: Server
+export class MCPacketServer extends Packet {
+  static $header = "MC";
   name = req("string");
   char_id = req("number");
   showname = "";
   effects = 0;
 }
 
-/**
- * Type/defaults layer — wire string to typed packet. This is the seam
- * where a future schema/codec library could plug in; `receiveMC` and the
- * dispatcher only ever call `decodeMC`, never the generic `decode` directly.
- */
-export function decodeMC(body: string): MCPacketClient {
-  return decode(MCPacketClient, body);
+// Send music/area change request to server
+export function sendMC(packet: Partial<MCPacketServer>) {
+  client.sendString(encode(MCPacketServer, packet, json_mode));
 }
 
-/**
- * Type/defaults layer — typed packet to wire string. Matching seam for
- * outbound. `sendMC` only ever calls `encodeMC`, never `encode` directly.
- */
-export function encodeMC(packet: Partial<MCPacketServer>): string {
-  return encode("MC", MCPacketServer, packet, encode_packets_as_json);
-}
-
-/**
- * Inverse of `sendMC`: decode the body into a typed packet, then apply the
- * music change.
- */
+// Receive music change request from server
 export function receiveMC(body: string) {
-  const packet = decodeMC(body);
+  const packet = decode(MCPacketClient, body);
   const music = client.viewport.music[packet.channel];
   music.pause();
   if (packet.name.startsWith("http")) {
@@ -71,11 +55,4 @@ export function receiveMC(body: string) {
   }
 
   document.getElementById("client_trackstatustext")!.innerText = packet.name;
-}
-
-/**
- * Encode the packet via `encodeMC` and transmit.
- */
-export function sendMC(packet: Partial<MCPacketServer>) {
-  client.sendString(encodeMC(packet));
 }

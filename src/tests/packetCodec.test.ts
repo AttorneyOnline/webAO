@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import { packetRegistry } from "../packets";
+import { clientPacketRegistry, serverPacketRegistry } from "../packets";
 
 /**
  * Reverse the dispatcher's wire-level parsing: given a string like
@@ -29,19 +29,33 @@ function makeArgs(header: string): string[] {
 }
 
 describe("packet codec round-trip idempotence", () => {
-  for (const [header, entry] of packetRegistry) {
-    if (!entry.codec.encode) {
-      it.skip(`${header}: codec is receive-only (no encode)`, () => {});
+  // Bidirectional headers appear in both registries; dedupe by the codec
+  // identity so we don't run the same round-trip twice.
+  const seen = new Set<unknown>();
+  const entries = [
+    ...[...clientPacketRegistry].map(([h, e]) => [h, e, "client"] as const),
+    ...[...serverPacketRegistry].map(([h, e]) => [h, e, "server"] as const),
+  ];
+
+  for (const [header, entry, role] of entries) {
+    // New-pattern entries (e.g. MC) have no `codec` — they're covered by
+    // their own per-packet tests (see `MC.test.ts`).
+    const codec = entry.codec;
+    if (!codec) continue;
+    if (seen.has(codec)) continue;
+    seen.add(codec);
+    if (!codec.encode) {
+      it.skip(`${header} (${role}): codec is receive-only (no encode)`, () => {});
       continue;
     }
 
-    it(`${header}: decode -> encode -> decode is a fixpoint`, () => {
+    it(`${header} (${role}): decode -> encode -> decode is a fixpoint`, () => {
       const args = makeArgs(header);
-      const first = entry.codec.decode(args);
-      const wire = entry.codec.encode!(first);
+      const first = codec.decode(args);
+      const wire = codec.encode!(first);
       const args2 = parseWire(wire);
       expect(args2[0]).toBe(header);
-      const second = entry.codec.decode(args2);
+      const second = codec.decode(args2);
       expect(second).toEqual(first);
     });
   }

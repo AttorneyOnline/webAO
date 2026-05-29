@@ -1,29 +1,25 @@
 import { client, clientState, autoChar, autoArea } from "../client";
 import { sendCC } from "./CC";
 import { area_click } from "../dom/areaClick";
-import type { PacketCodec } from "../packets";
+import { Packet } from "../Packet";
+import { decode } from "../packets";
 import queryParser from "../utils/queryParser";
 
 const { mode } = queryParser();
 
-export type DONEPacket = Record<string, never>;
-
-export const DONE: PacketCodec<DONEPacket> = {
-  header: "DONE",
-  decode() {
-    return {};
-  },
-  encode() {
-    return `DONE#%`;
-  },
-};
-
 /**
- * Handles the handshake completion packet, meaning the player
- * is ready to select a character.
+ * Handshake completion. Empty payload; arrival means the player can
+ * now select a character.
  */
-export const receiveDONE = (_packet: DONEPacket) => {
-  // DONE packet signals that the handshake is complete
+
+// Receiver: Client
+export class DONEPacket extends Packet {
+  static $header = "DONE";
+}
+
+// Receive handshake completion; advance to character select.
+export function receiveDONE(body: string) {
+  decode(DONEPacket, body);
   client.state = clientState.Joined;
   document.getElementById("client_loading")!.style.display = "none";
   if (mode === "watch") {
@@ -33,7 +29,7 @@ export const receiveDONE = (_packet: DONEPacket) => {
 
   if (autoArea) {
     const areaIndex = client.areas.findIndex(
-      (a: any) => a && a.name.toLowerCase() === autoArea.toLowerCase()
+      (a: any) => a && a.name.toLowerCase() === autoArea.toLowerCase(),
     );
     if (areaIndex !== -1) {
       const el = document.getElementById(`area${areaIndex}`);
@@ -50,7 +46,7 @@ export const receiveDONE = (_packet: DONEPacket) => {
     document.getElementById("client_charselect")!.style.display = "none";
 
     const charIndex = client.chars.findIndex(
-      (c: any) => c && c.name.toLowerCase() === autoChar.toLowerCase()
+      (c: any) => c && c.name.toLowerCase() === autoChar.toLowerCase(),
     );
     if (charIndex !== -1) {
       sendCC({
@@ -60,4 +56,4 @@ export const receiveDONE = (_packet: DONEPacket) => {
       });
     }
   }
-};
+}

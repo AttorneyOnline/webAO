@@ -24,28 +24,28 @@ describe("MC encode/decode are inverses", () => {
   };
 
   it("MCPacketClient: fanta encode -> decode preserves values", () => {
-    const wire = encode("MC", MCPacketClient, clientPacket, false);
+    const wire = encode(MCPacketClient, clientPacket, false);
     expect(decode(MCPacketClient, wire)).toEqual(clientPacket);
   });
 
   it("MCPacketClient: JSON encode -> decode preserves values", () => {
-    const wire = encode("MC", MCPacketClient, clientPacket, true);
+    const wire = encode(MCPacketClient, clientPacket, true);
     expect(decode(MCPacketClient, wire)).toEqual(clientPacket);
   });
 
   it("MCPacketServer: fanta encode -> decode preserves values", () => {
-    const wire = encode("MC", MCPacketServer, serverPacket, false);
+    const wire = encode(MCPacketServer, serverPacket, false);
     expect(decode(MCPacketServer, wire)).toEqual(serverPacket);
   });
 
   it("MCPacketServer: JSON encode -> decode preserves values", () => {
-    const wire = encode("MC", MCPacketServer, serverPacket, true);
+    const wire = encode(MCPacketServer, serverPacket, true);
     expect(decode(MCPacketServer, wire)).toEqual(serverPacket);
   });
 
   it("partial packet is filled with class defaults on encode -> decode", () => {
     const partial = { name: "track.opus", char_id: 5 };
-    const wire = encode("MC", MCPacketServer, partial, false);
+    const wire = encode(MCPacketServer, partial, false);
     const decoded = decode(MCPacketServer, wire);
     expect(decoded.name).toBe("track.opus");
     expect(decoded.char_id).toBe(5);
@@ -54,7 +54,7 @@ describe("MC encode/decode are inverses", () => {
   });
 
   it("encode throws when a required field is missing", () => {
-    expect(() => encode("MC", MCPacketServer, {}, false)).toThrow(
+    expect(() => encode(MCPacketServer, {}, false)).toThrow(
       /Missing required field/,
     );
   });
@@ -62,5 +62,13 @@ describe("MC encode/decode are inverses", () => {
   it("decode throws when a required field is missing on the wire", () => {
     // Fanta wire with only the header — both required fields absent.
     expect(() => decode(MCPacketServer, "MC#%")).toThrow(/Missing required field/);
+  });
+
+  // The dispatcher now hands the raw frame straight to the receiver, so
+  // decode has to accept the full `HEADER#a#b#%` form, not just the
+  // pre-stripped body.
+  it("decode accepts the raw frame including `#%` terminator", () => {
+    const wire = encode(MCPacketClient, clientPacket, false);
+    expect(decode(MCPacketClient, wire)).toEqual(clientPacket);
   });
 });

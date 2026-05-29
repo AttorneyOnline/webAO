@@ -16,12 +16,12 @@ import { Viewport } from "./viewport/interfaces/Viewport";
 import { EventEmitter } from "events";
 import { onReplayGo } from "./dom/onReplayGo";
 import {
-  packetRegistry,
+  clientReceive,
+  type Packet,
   type PacketCodec,
-  parsePacket,
+  type Schema,
   encodePacket,
   readHeader,
-  decode,
   encode,
 } from "./packets";
 import { appendICNotice } from "./client/appendICNotice";
@@ -65,14 +65,18 @@ export const setExtraFeatures = (val: any) => {
 };
 
 /**
- * Global wire-format flag. Starts in fantacode mode; flips to JSON when the
- * server sends `decryptor#JSON#%` during the handshake. Once flipped, all
- * outgoing packets are JSON-encoded (incoming auto-detects regardless).
+ * Wire-format mode for both directions. Starts in fantacode; flips to
+ * JSON when the server sends `decryptor#JSON#%` during the handshake.
+ * Outgoing packets use this to choose how to encode; the receive path
+ * uses it to choose how to frame incoming bytes (JSON arrives as whole
+ * envelopes per socket frame; fanta needs `%`-splitting + buffering).
+ * Per-packet `decode` auto-detects regardless.
  */
-export let encode_packets_as_json = false;
-export const setEncodePacketsAsJson = (v: boolean) => {
-  encode_packets_as_json = v;
+export let json_mode = false;
+export const setJsonMode = (v: boolean) => {
+  json_mode = v;
 };
+
 
 let hdid: string;
 
@@ -157,7 +161,6 @@ class Client extends EventEmitter {
   checkUpdater: any;
   _lastTimeICReceived: any;
   viewport: Viewport;
-  temp_packet: string;
   state: clientState;
   connect: () => void;
   loadResources: () => void;
@@ -218,7 +221,6 @@ class Client extends EventEmitter {
     this.checkUpdater = null;
     this.viewport = masterViewport();
     this._lastTimeICReceived = new Date(0);
-    this.temp_packet = "";
     this.playerlist = new Map();
     this.charicon_extensions = [".png", ".webp"];
     this.emote_extensions = [".gif", ".png", ".apng", ".webp", ".webp.static"];
@@ -286,47 +288,23 @@ class Client extends EventEmitter {
 
   /**
    * Sends a typed packet, picking the wire format from
-   * `encode_packets_as_json`. Accepts either a legacy `PacketCodec` or a
+   * `json_mode`. Accepts either a legacy `PacketCodec` or a
    * class-schema constructor (e.g. `MCPacketServer`). Class-schema
-   * constructors must expose a `static header: string`.
+   * constructors must expose a `static $header: string`.
    */
   sendPacket<T>(codec: PacketCodec<T>, packet: T): void;
-  sendPacket<T>(
-    SchemaClass: (new () => T) & { header: string },
+  sendPacket<T extends Packet>(
+    SchemaClass: Schema<T> & { $header: string },
     packet: Partial<T>,
   ): void;
-  sendPacket<T>(
-    schema: PacketCodec<T> | ((new () => T) & { header: string }),
-    packet: T | Partial<T>,
-  ) {
+  // The impl signature is loose because the type discipline lives on the
+  // two overloads above; the runtime branch picks which encoder to call.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sendPacket(schema: any, packet: any) {
     if (typeof schema === "function") {
-      this.sendString(
-        encode(schema.header, schema, packet as Partial<T>, encode_packets_as_json),
-      );
+      this.sendString(encode(schema, packet, json_mode));
     } else {
-      this.sendString(encodePacket(schema, packet as T, encode_packets_as_json));
-    }
-  }
-
-  /**
-   * Echoes a typed packet back into our own dispatcher. Same dispatch rules
-   * as `sendPacket`.
-   */
-  sendPacketToSelf<T>(codec: PacketCodec<T>, packet: T): void;
-  sendPacketToSelf<T>(
-    SchemaClass: (new () => T) & { header: string },
-    packet: Partial<T>,
-  ): void;
-  sendPacketToSelf<T>(
-    schema: PacketCodec<T> | ((new () => T) & { header: string }),
-    packet: T | Partial<T>,
-  ) {
-    if (typeof schema === "function") {
-      this.sendToSelf(
-        encode(schema.header, schema, packet as Partial<T>, encode_packets_as_json),
-      );
-    } else {
-      this.sendToSelf(encodePacket(schema, packet as T, encode_packets_as_json));
+      this.sendString(encodePacket(schema, packet, json_mode));
     }
   }
 
@@ -345,10 +323,8 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Triggered when a connection is established to the server. We don't send
-   * `HI` here yet — that's deferred until we receive the server's `decryptor`
-   * packet (which doubles as our wire-format negotiation handshake). See
-   * `receivedecryptor` for the continuation.
+   * Triggered when a connection is established to the server.
+   * @param {Event} _e
    */
   onOpen(_e: Event) {
     client.state = clientState.Connected;
@@ -388,73 +364,39 @@ class Client extends EventEmitter {
   onMessage(e: MessageEvent) {
     const msg = e.data;
     console.debug(`S: ${msg}`);
-    this.receiveString(msg);
+    this.receiveData(msg);
   }
 
   /**
-   * Format-aware entry point for raw server bytes:
-   *   - JSON mode: each chunk is one complete JSON-encoded packet — hand
-   *     it straight to `dispatchPacket`, which auto-detects the format.
-   *   - Fanta mode: chunks can carry multiple `%`-terminated packets and
-   *     may end mid-packet. Split on `%`, buffer the tail in `temp_packet`
-   *     for the next chunk, and dispatch each complete segment.
+   * Dispatch one WebSocket frame as one packet. Reads the header
+   * (`readHeader` handles both wire formats) and hands the raw frame to
+   * the registered receiver, which owns its own decode.
    */
-  receiveString(data: string) {
-    if (encode_packets_as_json) {
-      this.dispatchPacket(data);
-      return;
-    }
-    const chunks = (this.temp_packet + data).split("%");
-    this.temp_packet = chunks.pop() ?? "";
-    for (const chunk of chunks) this.dispatchPacket(chunk);
-  }
-
-  /** Decodes a single complete packet body (sans `%` terminator) and dispatches it. */
-  dispatchPacket(packet: string) {
-    if (packet === "") return;
-
-    // Packet should always end with #; parse anyway if it somehow doesn't.
-    const body = packet.endsWith("#") ? packet.slice(0, -1) : packet;
-
+  receiveData(data: string) {
     let header: string;
     try {
-      header = readHeader(body);
+      header = readHeader(data);
     } catch (err) {
-      console.error(`Failed to read packet header:`, err, { body });
+      console.error(`Failed to read packet header:`, err, { body: data });
       return;
     }
     if (header === "") {
-      console.warn("WARNING: Empty packet received from server, skipping...");
+      console.warn("WARNING: Empty header received from server, skipping...");
       return;
     }
 
-    const entry = packetRegistry.get(header);
-    if (!entry) {
-      console.warn(`Invalid packet header ${header}`);
-      return;
-    }
-    if (!entry.receive) {
-      console.warn(`Received ${header} but no receiver is registered`);
+    const receiverFunction = clientReceive.get(header);
+
+    if (!receiverFunction) {
+      console.warn(`Unknown packet header for Client receiver:`, header);
       return;
     }
 
-    // New pattern (entry has only `receive`/`send`): hand the raw body to
-    // `entry.receive`, which owns decoding internally. Legacy patterns
-    // decode first, then call `entry.receive(typed)`. Decode and receive
-    // are guarded together so a single malformed/buggy packet can't poison
-    // its siblings in the same WebSocket frame.
     try {
-      if (entry.schema) {
-        entry.receive(decode(entry.schema, body));
-      } else if (entry.fields) {
-        entry.receive(decode(entry.fields, body));
-      } else if (entry.codec) {
-        entry.receive(parsePacket(entry.codec, body));
-      } else {
-        entry.receive(body);
-      }
+      receiverFunction(data);
     } catch (err) {
-      console.error(`Receiver for ${header} threw:`, err, { body });
+      console.error(`Receiver for ${header} threw:`, err, { body: data });
+      return;
     }
   }
 

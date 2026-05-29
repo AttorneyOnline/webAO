@@ -1,4 +1,4 @@
-import { client, setEncodePacketsAsJson } from "../client";
+import { client, setJsonMode } from "../client";
 import type { PacketCodec } from "../packets";
 
 /**
@@ -25,7 +25,7 @@ export const decryptor: PacketCodec<DecryptorPacket> = {
 
 export const receivedecryptor = (packet: DecryptorPacket) => {
   if (packet.value === "JSON") {
-    setEncodePacketsAsJson(true);
+    setJsonMode(true);
   }
   client.joinServer();
 };

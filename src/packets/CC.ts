@@ -1,50 +1,29 @@
-import { client } from "../client";
-import { escapeChat, unescapeChat } from "../encoding";
-import type { PacketCodec } from "../packets";
+import { client, json_mode } from "../client";
+import { Packet } from "../Packet";
+import { decode, encode, req } from "../packets";
 
 /**
- * Wire format: `CC#0#{char_id}#{char_pw}#%` — the leading `0` is a hardcoded
- * literal in the spec. webAO's existing senders use `CC#{playerID}#{char_id}#web#%`
- * (deviating from spec), so we keep an explicit `player_id` field as well.
+ * Choose character. Client requests to play as char_id; server acks
+ * the selection (we emulate the ack with PV).
  */
-export interface CCPacket {
-  player_id: number;
-  char_id: number;
-  char_pw?: string;
+
+// Receiver: Server
+export class CCPacketServer extends Packet {
+  static $header = "CC";
+  player_id = req("number");
+  char_id = req("number");
+  char_pw = "";
 }
 
-export const CC: PacketCodec<CCPacket> = {
-  header: "CC",
-  decode(args) {
-    const packet: CCPacket = {
-      player_id: Number(args[1]),
-      char_id: Number(args[2]),
-    };
-    if (args[3] !== undefined) {
-      packet.char_pw = unescapeChat(args[3]);
-    }
-    return packet;
-  },
-  encode(packet) {
-    if (packet.char_pw !== undefined) {
-      return `CC#${packet.player_id}#${packet.char_id}#${escapeChat(packet.char_pw)}#%`;
-    }
-    return `CC#${packet.player_id}#${packet.char_id}#%`;
-  },
-};
+// Request to play as char_id. Gatekeeps unknown char_ids so we don't
+// ask for a slot that isn't real.
+export function sendCC(packet: Partial<CCPacketServer>) {
+  if (packet.char_id !== -1 && !client.chars[packet.char_id!]?.name) return;
+  client.sendString(encode(CCPacketServer, packet, json_mode));
+}
 
-/**
- * What? you want a character??
- */
-export const receiveCC = (packet: CCPacket) => {
+// Receive character choice from client; ack with PV.
+export function receiveCC(body: string) {
+  const packet = decode(CCPacketServer, body);
   client.sendToSelf(`PV#1#CID#${packet.char_id}#%`);
-};
-
-/**
- * Requests to play as a specified character. Gatekeeps unknown
- * `char_id`s so we don't ask the server for a slot that isn't real.
- */
-export const sendCC = (packet: CCPacket) => {
-  if (packet.char_id !== -1 && !client.chars[packet.char_id]?.name) return;
-  client.sendPacket(CC, packet);
-};
+}
