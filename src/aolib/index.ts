@@ -36,9 +36,14 @@ export {
 } from "./fields";
 
 // ---------------------------------------------------------------------
-// Wire-format walkers (library-side).
+// Public encode / decode + wire-format walkers (library-side).
 // ---------------------------------------------------------------------
 
+export { encode, type WireMode } from "./encode";
+export { decode } from "./decode";
+export { cast } from "./cast";
+
+// Per-field walkers (lower-level — most callers won't need these).
 export { fromJson, toJson } from "./json";
 export { fromFantaArgs, toFantaArgs } from "./fanta";
 
