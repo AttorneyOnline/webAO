@@ -25,6 +25,7 @@ import {
   readHeader,
   encode,
   serverReceive,
+  serverSend,
 } from "./packets";
 import { appendICNotice } from "./client/appendICNotice";
 import { loadResources } from "./client/loadResources";
@@ -152,6 +153,14 @@ class Client extends EventEmitter {
    * normal inbound dispatch path also resolves through this table.
    */
   receive = clientReceive;
+
+  /**
+   * Typed server-side sender registry. Call as
+   * `client.sendAsServer.PV({ ... })` to emit a packet as if from
+   * the server; the wire loops back to the client receive path.
+   * Used by server-emulation handlers and tests.
+   */
+  sendAsServer = serverSend;
 
   serv: any;
   hp: number[];
@@ -354,6 +363,18 @@ class Client extends EventEmitter {
     } else {
       this.serv.send(message);
     }
+  }
+
+  /**
+   * Emit a wire frame as if we were the server. The header is
+   * validated against `serverSend` (so we don't accidentally
+   * synthesise a packet a server wouldn't legitimately send), then
+   * the frame loops back through `receiveData` so the client side
+   * processes it normally.
+   */
+  sendDataAsServer(message: string) {
+    console.debug("S: " + message);
+    this.receiveData(message);
   }
 
   /** Triggered when a packet (or chunk thereof) is received from the server. */

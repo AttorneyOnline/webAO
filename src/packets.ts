@@ -36,7 +36,7 @@ import { PE, sendPE } from "./packets/PE";
 import { PN, receivePN } from "./packets/PN";
 import { receivePR } from "./packets/PR";
 import { PU, receivePU } from "./packets/PU";
-import { receivePV } from "./packets/PV";
+import { receivePV, sendPV } from "./packets/PV";
 import { receiveRC, sendRC } from "./packets/RC";
 import { receiveRD, sendRD } from "./packets/RD";
 import { receiveRM, sendRM } from "./packets/RM";
@@ -476,7 +476,9 @@ export const clientReceive = {
 };
 
 // Packets we can send as a server
-export const serverSend = {};
+export const serverSend = {
+  PV: sendPV,
+};
 
 // Packets we can receive as a server
 export const serverReceive = {

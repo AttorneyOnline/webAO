@@ -1,6 +1,7 @@
+import { client, json_mode } from "../client";
 import { changeChar } from "../client/changeChar";
 import { Packet } from "../Packet";
-import { decode, lit, req } from "../packets";
+import { decode, encode, lit, req, Wire } from "../packets";
 
 /**
  * Server assigns a character to the player. Wire:
@@ -14,6 +15,11 @@ export class PVPacket extends Packet {
   player_id = req("number");
   _cid = lit("CID");
   char_id = req("number");
+}
+
+// Emit a PV as a server (loopback to the client receive path).
+export function sendPV(packet: Partial<Wire<PVPacket>>) {
+  client.sendDataAsServer(encode(PVPacket, packet, json_mode));
 }
 
 // Apply the server's character assignment.
