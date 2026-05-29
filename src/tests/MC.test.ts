@@ -54,7 +54,7 @@ describe("MC encode/decode are inverses", () => {
   });
 
   it("encode throws when a required field is missing", () => {
-    expect(() => encode(MCPacketServer, {}, false)).toThrow(
+    expect(() => encode(MCPacketServer, {} as MCPacketServer, false)).toThrow(
       /Missing required field/,
     );
   });

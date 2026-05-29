@@ -12,7 +12,7 @@ import { decode, req } from "../packets";
 // Receiver: Client
 export class ASSPacket extends Packet {
   static $header = "ASS";
-  asset_url = req("string");
+  asset_url: string = req("string");
 }
 
 // Apply the new asset origin and refresh the player list (which

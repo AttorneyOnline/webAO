@@ -9,7 +9,7 @@ import { decode, req } from "../packets";
 // Receiver: Client
 export class BBPacket extends Packet {
   static $header = "BB";
-  message = req("string");
+  message: string = req("string");
 }
 
 // Show the server's warning to the user.

@@ -1,3 +1,4 @@
+import { client, json_mode } from "./client";
 import { unescapeUnicode, escapeFanta, unescapeFanta } from "./escaping";
 import { ARUP, receiveARUP } from "./packets/ARUP";
 import { askchaa, receiveaskchaa } from "./packets/askchaa";
@@ -6,7 +7,7 @@ import { receiveAUTH } from "./packets/AUTH";
 import { receiveBB } from "./packets/BB";
 import { receiveBD } from "./packets/BD";
 import { BN, receiveBN } from "./packets/BN";
-import { receiveCC, sendCC } from "./packets/CC";
+import { CCPacketServer, receiveCC } from "./packets/CC";
 import { CH, receiveCH, sendCH } from "./packets/CH";
 import { CharsCheck, receiveCharsCheck } from "./packets/CharsCheck";
 import { receiveCHECK } from "./packets/CHECK";
@@ -29,17 +30,17 @@ import { receiveKB } from "./packets/KB";
 import { receiveKK } from "./packets/KK";
 import { LE, receiveLE } from "./packets/LE";
 import { MA, sendMA } from "./packets/MA";
-import { receiveMC, sendMC } from "./packets/MC";
+import { MCPacketServer, receiveMC } from "./packets/MC";
 import { receiveMM } from "./packets/MM";
 import { MSClient, MSServer, receiveMS, sendMS } from "./packets/MS";
 import { PE, sendPE } from "./packets/PE";
 import { PN, receivePN } from "./packets/PN";
 import { receivePR } from "./packets/PR";
 import { PU, receivePU } from "./packets/PU";
-import { receivePV, sendPV } from "./packets/PV";
-import { receiveRC, sendRC } from "./packets/RC";
-import { receiveRD, sendRD } from "./packets/RD";
-import { receiveRM, sendRM } from "./packets/RM";
+import { PVPacket, receivePV } from "./packets/PV";
+import { RCPacket, receiveRC } from "./packets/RC";
+import { RDPacket, receiveRD } from "./packets/RD";
+import { RMPacket, receiveRM } from "./packets/RM";
 import { RMC, receiveRMC } from "./packets/RMC";
 import { RT, receiveRT, sendRT } from "./packets/RT";
 import { SC, receiveSC } from "./packets/SC";
@@ -117,42 +118,6 @@ export function req(t: FieldType): unknown {
 const isReq = (v: unknown): v is ReqMarker =>
   typeof v === "object" && v !== null && REQ in v;
 
-const LIT = Symbol("literal");
-interface LitMarker { [LIT]: string | number | boolean; }
-
-/**
- * Brand type for wire-only literal fields. The actual runtime value is a
- * `{ [LIT]: value }` sentinel; this type-level brand lets `Wire<T>`
- * detect and strip the literal field from the public-facing API.
- */
-export type Literal = { readonly __literal__: true };
-
-/**
- * Marks a class field as a wire-only literal. Used for fanta positional
- * slots that the spec hardcodes to a fixed value (e.g. CC's leading `0`)
- * but that aren't part of the typed packet API. The field is emitted at
- * its declared wire position on encode, the position is consumed but
- * dropped on decode, and `cast` removes it from the typed result.
- *
- * `Wire<T>` strips the literal-typed fields from the input/output of
- * `encode`/`decode`, so callers never see `_zero` and friends.
- */
-export function lit(value: string | number | boolean): Literal;
-export function lit(value: string | number | boolean): unknown {
-  return { [LIT]: value };
-}
-
-/**
- * Strips wire-only literal fields from a packet schema type, leaving
- * only the fields callers care about.
- */
-export type Wire<T> = {
-  [K in keyof T as T[K] extends Literal ? never : K]: T[K];
-};
-
-const isLit = (v: unknown): v is LitMarker =>
-  typeof v === "object" && v !== null && LIT in v;
-
 import { Packet } from "./Packet";
 export { Packet };
 
@@ -160,18 +125,24 @@ export { Packet };
 export type Schema<T extends Packet> = new () => T;
 
 /**
+ * Decoded packet shape: every field made required, because `cast` fills
+ * defaults or throws on missing required. Models the runtime guarantee
+ * `decode` provides.
+ */
+export type Decoded<T> = { [K in keyof T]-?: T[K] };
+
+/**
  * Walk a schema's declared fields in wire order, yielding `(name, type)`
- * pairs. Instantiates the class once to read the field initializers
- * (defaults + `req()` sentinels) and reports the declared type for each.
+ * pairs. Instantiates the class once to read field initializers (defaults
+ * + `req()` sentinels) and reports the declared type for each.
  */
 function* walkSchema<T extends Packet>(
   SchemaClass: Schema<T>,
-): Generator<{ name: string; type: FieldType; literal?: string | number | boolean }> {
+): Generator<{ name: string; type: FieldType }> {
   const exemplar = new SchemaClass();
   for (const [name, val] of Object.entries(exemplar)) {
-    if (isReq(val)) yield { name, type: val[REQ] };
-    else if (isLit(val)) yield { name, type: typeof val[LIT] as FieldType, literal: val[LIT] };
-    else yield { name, type: typeof val as FieldType };
+    const type = isReq(val) ? val[REQ] : (typeof val as FieldType);
+    yield { name, type };
   }
 }
 
@@ -186,12 +157,6 @@ function cast<T extends Packet>(SchemaClass: Schema<T>, partial: Partial<T>): T 
   const instance: Packet = new SchemaClass();
   const bag = partial as Packet;
   for (const name of Object.keys(instance)) {
-    // Literal fields are wire-only placeholders; drop them from the
-    // typed result and don't accept overrides from the caller.
-    if (isLit(instance[name])) {
-      delete instance[name];
-      continue;
-    }
     if (bag[name] !== undefined) instance[name] = bag[name];
     if (isReq(instance[name])) throw new Error(`Missing required field '${name}'`);
   }
@@ -199,55 +164,112 @@ function cast<T extends Packet>(SchemaClass: Schema<T>, partial: Partial<T>): T 
 }
 
 /**
- * Parse a wire body into a typed packet. Auto-detects format: bodies that
- * start with `{` are JSON envelopes (`{"$header":"HEADER",...}`); anything
- * else is positional `HEADER#a#b#%`. Runs the type gauntlet: missing
- * optional fields get their `default`; missing required fields throw.
+ * Default args-list emitter for the fanta path: walks the schema and
+ * serializes each declared field. Schemas with weird positional layouts
+ * (extra literals, `&`-delimited sub-blobs, conditional slots) override
+ * `static toArgs` to take over this step; everything else stays library.
  */
-export function decode<T extends Packet>(schema: Schema<T>, body: string): Wire<T> {
+export function defaultToArgs<T extends Packet>(
+  SchemaClass: Schema<T>,
+  packet: T,
+): string[] {
+  return [...walkSchema<T>(SchemaClass)].map((f) =>
+    serialize(packet[f.name], f.type),
+  );
+}
+
+/**
+ * Default args-list parser for the fanta path: maps positional args to
+ * declared fields in order, coercing each. Schemas with positional
+ * weirdness override `static fromArgs` to take over.
+ */
+export function defaultFromArgs<T extends Packet>(
+  SchemaClass: Schema<T>,
+  args: string[],
+): Partial<T> {
+  const partial: Record<string, unknown> = {};
+  let i = 0;
+  for (const f of walkSchema<T>(SchemaClass)) {
+    const v = args[i];
+    if (v !== undefined) partial[f.name] = coerce(v, f.type, f.name);
+    i++;
+  }
+  return partial as Partial<T>;
+}
+
+/**
+ * Parse a wire body into a typed packet. Auto-detects format: bodies
+ * starting with `{` are JSON envelopes; anything else is positional
+ * `HEADER#a#b#%`. For fanta, the args list is parsed via the schema's
+ * `static fromArgs` if defined, else `defaultFromArgs`. Then `cast`
+ * fills defaults and validates required fields.
+ */
+export function decode<T extends Packet>(schema: Schema<T>, body: string): Decoded<T> {
   let partial: Packet;
   if (body.startsWith("{")) {
     partial = JSON.parse(body);
   } else {
-    partial = {} as Packet;
-    const specs = [...walkSchema<T>(schema)];
-    // Accept `HEADER#a#b#%` (canonical), `HEADER#a#b#`, or `HEADER#a#b`
-    // by peeling each terminator char if present.
+    // Accept `HEADER#a#b#%` (canonical), `HEADER#a#b#`, or `HEADER#a#b`.
     let trimmed = body;
     if (trimmed.endsWith("%")) trimmed = trimmed.slice(0, -1);
     if (trimmed.endsWith("#")) trimmed = trimmed.slice(0, -1);
-    const args = trimmed.split("#");
-    specs.forEach((f, i) => {
-      // Literal slots take a wire position but don't store onto the result.
-      if (f.literal !== undefined) return;
-      const v = args[i + 1];
-      if (v !== undefined) partial[f.name] = coerce(v, f.type, f.name);
-    });
+    const args = trimmed.split("#").slice(1);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fromArgs = (schema as any).fromArgs as
+      | ((a: string[]) => Partial<T>)
+      | undefined;
+    partial = (fromArgs ? fromArgs(args) : defaultFromArgs(schema, args)) as Packet;
   }
-  return cast<T>(schema, partial as Partial<T>) as Wire<T>;
+  return cast<T>(schema, partial as Partial<T>) as unknown as Decoded<T>;
 }
 
 /**
- * Serialize a typed packet to wire bytes. Reads the header from
- * `SchemaClass.$header` (matches the JSON envelope key). Pure library
- * function — callers pass in the format they want. Runs the same type
- * gauntlet as `decode` (defaults filled, required validated).
+ * Serialize a typed packet to wire bytes. JSON path emits the
+ * `{$header, ...fields}` envelope. Fanta path delegates the args list
+ * to the schema's `static toArgs` if defined, else `defaultToArgs`, and
+ * the library handles the `HEADER#…#%` framing.
  */
 export function encode<T extends Packet>(
   SchemaClass: Schema<T> & { $header: string },
-  packet: Partial<Wire<T>>,
+  packet: T,
   asJson: boolean = false,
 ): string {
-  const full = cast<T>(SchemaClass, packet as Partial<T>);
+  const full = cast<T>(SchemaClass, packet);
   if (asJson) {
     return JSON.stringify({ $header: SchemaClass.$header, ...full });
   }
-  const parts = [...walkSchema<T>(SchemaClass)].map((f) =>
-    f.literal !== undefined ? serialize(f.literal, f.type) : serialize(full[f.name], f.type),
-  );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const toArgs = (SchemaClass as any).toArgs as ((p: T) => string[]) | undefined;
+  const args = toArgs ? toArgs(full) : defaultToArgs(SchemaClass, full);
   // Zero-field packets are spec'd as `HEADER#%`, not `HEADER##%`.
-  if (parts.length === 0) return `${SchemaClass.$header}#%`;
-  return `${SchemaClass.$header}#${parts.join("#")}#%`;
+  if (args.length === 0) return `${SchemaClass.$header}#%`;
+  return `${SchemaClass.$header}#${args.join("#")}#%`;
+}
+
+/**
+ * Build a client-side sender for a packet schema. The returned
+ * function encodes against the schema and ships the wire via
+ * `client.sendData`. Its parameter type is `T` — inferred from the
+ * schema, so call sites get autocomplete with the true required/optional
+ * shape of the packet.
+ */
+export function makeSender<T extends Packet>(
+  SchemaClass: Schema<T> & { $header: string },
+) {
+  return (packet: T) =>
+    client.sendData(encode(SchemaClass, packet, json_mode));
+}
+
+/**
+ * Mirror of `makeSender` for the server-side sender path. The wire
+ * loops back to the client-side receive table via `sendDataAsServer`,
+ * which validates the header against `serverSend`.
+ */
+export function makeServerSender<T extends Packet>(
+  SchemaClass: Schema<T> & { $header: string },
+) {
+  return (packet: T) =>
+    client.sendDataAsServer(encode(SchemaClass, packet, json_mode));
 }
 
 // ---------- Legacy codec API (kept until all packets migrate) ----------
@@ -262,67 +284,6 @@ export interface PacketCodec<TPacket> {
   fields?: readonly Field[];
   decode(args: string[]): TPacket;
   encode?(packet: TPacket): string;
-}
-
-export type FieldSpec = Field;
-
-const zeroFor = (t: FieldType): unknown =>
-  t === "string" ? "" : t === "number" ? 0 : false;
-
-/**
- * Legacy factory bundling header+fields into a `PacketCodec` object. New
- * packets should use the free `decode`/`encode` functions directly.
- */
-export function makeCodec<T>(
-  header: string,
-  fields: readonly Field[],
-): PacketCodec<T> {
-  return {
-    header,
-    fields,
-    decode(args) {
-      const out: Record<string, unknown> = {};
-      fields.forEach((f, i) => {
-        const v = args[i + 1];
-        if (v === undefined) {
-          out[f.name] = f.default ?? zeroFor(f.type);
-          return;
-        }
-        if (f.type === "string") out[f.name] = unescapeFanta(v);
-        else if (f.type === "number") out[f.name] = Number(v);
-        else out[f.name] = v === "1";
-      });
-      return out as T;
-    },
-    encode(packet) {
-      const parts: string[] = fields.map((f) => {
-        let v = (packet as Record<string, unknown>)[f.name];
-        if (v === undefined) v = f.default ?? zeroFor(f.type);
-        if (f.type === "string") return escapeFanta(v as string);
-        if (f.type === "number") return String(v);
-        return v ? "1" : "0";
-      });
-      return `${header}#${parts.join("#")}#%`;
-    },
-  };
-}
-
-function fillDefaults<T>(fields: readonly Field[], partial: Partial<T>): T {
-  const out: Record<string, unknown> = { ...(partial as Record<string, unknown>) };
-  for (const f of fields) {
-    if (out[f.name] === undefined) out[f.name] = f.default ?? zeroFor(f.type);
-  }
-  return out as T;
-}
-
-export function parsePacket<T>(codec: PacketCodec<T>, body: string): T {
-  if (body.startsWith("{")) {
-    const obj = JSON.parse(body) as Partial<T> & { $header?: string };
-    delete obj.$header;
-    return codec.fields ? fillDefaults<T>(codec.fields, obj) : (obj as T);
-  }
-  const trimmed = body.endsWith("#") ? body.slice(0, -1) : body;
-  return codec.decode(trimmed.split("#"));
 }
 
 export function encodePacket<T>(
@@ -449,11 +410,11 @@ export const serverPacketRegistry = new Map(Object.entries(serverPackets));
 
 // Packets we can send as a client
 export const clientSend = {
-  CC: sendCC,
-  MC: sendMC,
-  RC: sendRC,
-  RD: sendRD,
-  RM: sendRM,
+  CC: makeSender(CCPacketServer),
+  MC: makeSender(MCPacketServer),
+  RC: makeSender(RCPacket),
+  RD: makeSender(RDPacket),
+  RM: makeSender(RMPacket),
 };
 
 // Packets we can receive as a client
@@ -477,7 +438,7 @@ export const clientReceive = {
 
 // Packets we can send as a server
 export const serverSend = {
-  PV: sendPV,
+  PV: makeServerSender(PVPacket),
 };
 
 // Packets we can receive as a server

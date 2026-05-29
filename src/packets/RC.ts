@@ -1,7 +1,7 @@
-import { client, json_mode } from "../client";
+import { client } from "../client";
 import vanilla_character_arr from "../constants/characters";
 import { Packet } from "../Packet";
-import { decode, encode } from "../packets";
+import { decode } from "../packets";
 
 /**
  * "Ask for characters." Client -> Server, empty payload. In replay
@@ -12,10 +12,6 @@ import { decode, encode } from "../packets";
 // Wire shape is the same in both directions.
 export class RCPacket extends Packet {
   static $header = "RC";
-}
-
-export function sendRC(packet: Partial<RCPacket>) {
-  client.sendData(encode(RCPacket, packet, json_mode));
 }
 
 // Receiver: Server (server-emulation in replay mode).

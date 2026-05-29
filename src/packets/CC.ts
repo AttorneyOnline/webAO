@@ -1,27 +1,28 @@
+import { client } from "../client";
 import { Packet } from "../Packet";
-import { client, json_mode } from "../client";
-import { decode, encode, lit, req, Wire } from "../packets";
+import { decode, req } from "../packets";
 
 /**
  * Choose character. Client requests to play as char_id; server acks
- * with PV. Wire: `CC#0#{char_id}#{char_pw}#%`:
- *   - position 0: spec-mandated literal `0` (webAO has historically
- *     sent playerID here in violation of the spec)
- *   - position 2: char_pw, deprecated — we always emit empty
+ * with PV. Wire: `CC#0#{char_id}#{char_pw}#%` — the leading `0` is a
+ * spec-mandated literal at position 0 (webAO has historically sent
+ * playerID there in violation of the spec), and `char_pw` is a
+ * deprecated slot we always emit empty. Both are kept entirely inside
+ * `toArgs`/`fromArgs`; callers only see `char_id`.
  */
 
 // Receiver: Server
 export class CCPacketServer extends Packet {
   static $header = "CC";
-  _zero = lit(0);
-  char_id = req("number");
-  _char_pw_deprecated = lit("");
-}
+  char_id: number = req("number");
 
-// Request to play as char_id. Caller is responsible for validating
-// that the char_id refers to a real slot.
-export function sendCC(packet: Partial<Wire<CCPacketServer>>) {
-  client.sendData(encode(CCPacketServer, packet, json_mode));
+  static toArgs(p: CCPacketServer): string[] {
+    return ["0", String(p.char_id), ""];
+  }
+
+  static fromArgs(args: string[]): Partial<CCPacketServer> {
+    return args[1] !== undefined ? { char_id: Number(args[1]) } : {};
+  }
 }
 
 // Receive character choice from client; ack with PV.

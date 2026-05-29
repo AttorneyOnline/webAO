@@ -11,7 +11,7 @@ import { decode, req } from "../packets";
 // Receiver: Client
 export class BDPacket extends Packet {
   static $header = "BD";
-  reason = req("string");
+  reason: string = req("string");
 }
 
 export function receiveBD(body: string) {

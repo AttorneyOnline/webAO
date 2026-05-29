@@ -16,7 +16,7 @@ describe("CC encode/decode are inverses", () => {
   });
 
   it("encode throws when char_id is missing", () => {
-    expect(() => encode(CCPacketServer, {}, false)).toThrow(
+    expect(() => encode(CCPacketServer, {} as CCPacketServer, false)).toThrow(
       /Missing required field 'char_id'/,
     );
   });
@@ -26,17 +26,13 @@ describe("CC encode/decode are inverses", () => {
   });
 });
 
-describe("CC literal slots follow the spec", () => {
-  it("fanta encode emits both spec literals (`0` and empty char_pw)", () => {
-    const wire = encode(CCPacketServer, { char_id: 5 }, false);
-    expect(wire).toBe("CC#0#5##%");
+describe("CC wire-spec literals are handled inside toArgs/fromArgs", () => {
+  it("fanta encode emits the spec wire `CC#0#{char_id}##%`", () => {
+    expect(encode(CCPacketServer, { char_id: 5 }, false)).toBe("CC#0#5##%");
   });
 
-  it("decode strips both literal slots from the typed result", () => {
-    const decoded = decode(CCPacketServer, "CC#0#5##%");
-    expect(decoded).toEqual({ char_id: 5 });
-    expect("_zero" in decoded).toBe(false);
-    expect("_char_pw_deprecated" in decoded).toBe(false);
+  it("decode ignores both literal slots and returns just char_id", () => {
+    expect(decode(CCPacketServer, "CC#0#5##%")).toEqual({ char_id: 5 });
   });
 
   it("decode is forgiving about unexpected values at literal positions", () => {
@@ -45,7 +41,7 @@ describe("CC literal slots follow the spec", () => {
     expect(decode(CCPacketServer, "CC#7#5#web#%")).toEqual({ char_id: 5 });
   });
 
-  it("JSON envelope omits both literals", () => {
+  it("JSON envelope contains only char_id", () => {
     expect(encode(CCPacketServer, { char_id: 5 }, true)).toBe(
       '{"$header":"CC","char_id":5}',
     );

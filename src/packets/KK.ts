@@ -11,7 +11,7 @@ import { decode, req } from "../packets";
 // Receiver: Client
 export class KKPacket extends Packet {
   static $header = "KK";
-  reason = req("string");
+  reason: string = req("string");
 }
 
 export function receiveKK(body: string) {

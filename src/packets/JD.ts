@@ -9,7 +9,7 @@ import { decode, req } from "../packets";
 // Receiver: Client
 export class JDPacket extends Packet {
   static $header = "JD";
-  state = req("number");
+  state: number = req("number");
 }
 
 export function receiveJD(body: string) {

@@ -9,9 +9,9 @@ import { decode, req } from "../packets";
 // Receiver: Client
 export class TIPacket extends Packet {
   static $header = "TI";
-  timer_id = req("number");
-  command = req("number");
-  time = req("number");
+  timer_id: number = req("number");
+  command: number = req("number");
+  time: number = req("number");
 }
 
 export function receiveTI(body: string) {

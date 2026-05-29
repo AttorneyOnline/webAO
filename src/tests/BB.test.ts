@@ -22,7 +22,7 @@ describe("BB encode/decode are inverses", () => {
   });
 
   it("encode throws when message is missing", () => {
-    expect(() => encode(BBPacket, {}, false)).toThrow(
+    expect(() => encode(BBPacket, {} as BBPacket, false)).toThrow(
       /Missing required field 'message'/,
     );
   });

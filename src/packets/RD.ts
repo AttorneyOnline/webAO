@@ -1,6 +1,6 @@
-import { client, json_mode } from "../client";
+import { client } from "../client";
 import { Packet } from "../Packet";
-import { decode, encode } from "../packets";
+import { decode } from "../packets";
 
 /**
  * "Ready / done with handshake." Client -> Server, empty payload. In
@@ -12,10 +12,6 @@ import { decode, encode } from "../packets";
 // Wire shape is the same in both directions.
 export class RDPacket extends Packet {
   static $header = "RD";
-}
-
-export function sendRD(packet: Partial<RDPacket>) {
-  client.sendData(encode(RDPacket, packet, json_mode));
 }
 
 // Receiver: Server (server-emulation in replay mode).

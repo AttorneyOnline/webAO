@@ -11,8 +11,8 @@ import { decode, req } from "../packets";
 // Receiver: Client
 export class PRPacket extends Packet {
   static $header = "PR";
-  id = req("number");
-  type = req("number");
+  id: number = req("number");
+  type: number = req("number");
 }
 
 export function receivePR(body: string) {

@@ -16,7 +16,7 @@ describe("AUTH encode/decode are inverses", () => {
   });
 
   it("encode throws when the required auth_state is missing", () => {
-    expect(() => encode(AUTHPacket, {}, false)).toThrow(
+    expect(() => encode(AUTHPacket, {} as AUTHPacket, false)).toThrow(
       /Missing required field 'auth_state'/,
     );
   });

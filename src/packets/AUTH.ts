@@ -9,7 +9,7 @@ import { decode, req } from "../packets";
 // Receiver: Client
 export class AUTHPacket extends Packet {
   static $header = "AUTH";
-  auth_state = req("number");
+  auth_state: number = req("number");
 }
 
 // i am mod now

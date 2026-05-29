@@ -16,23 +16,22 @@ describe("PV encode/decode are inverses", () => {
   });
 });
 
-describe("PV CID literal slot follows the spec", () => {
+describe("PV CID literal is handled inside toArgs/fromArgs", () => {
   it("fanta encode emits the literal `CID` between player_id and char_id", () => {
-    const wire = encode(PVPacket, { player_id: 3, char_id: 7 }, false);
-    expect(wire).toBe("PV#3#CID#7#%");
+    expect(encode(PVPacket, { player_id: 3, char_id: 7 }, false)).toBe(
+      "PV#3#CID#7#%",
+    );
   });
 
-  it("decode strips the `_cid` slot from the typed result", () => {
-    const decoded = decode(PVPacket, "PV#3#CID#7#%");
-    expect(decoded).toEqual({ player_id: 3, char_id: 7 });
-    expect("_cid" in decoded).toBe(false);
+  it("decode ignores the CID slot and returns just player_id + char_id", () => {
+    expect(decode(PVPacket, "PV#3#CID#7#%")).toEqual({ player_id: 3, char_id: 7 });
   });
 
   it("decode is forgiving about a different value at the CID position", () => {
     expect(decode(PVPacket, "PV#3#FOO#7#%")).toEqual({ player_id: 3, char_id: 7 });
   });
 
-  it("JSON envelope omits the CID literal", () => {
+  it("JSON envelope contains only player_id and char_id", () => {
     expect(encode(PVPacket, { player_id: 3, char_id: 7 }, true)).toBe(
       '{"$header":"PV","player_id":3,"char_id":7}',
     );

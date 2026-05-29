@@ -16,7 +16,7 @@ describe("ASS round-trip", () => {
   it("fanta", () => expect(decode(ASSPacket, encode(ASSPacket, sample, false))).toEqual(sample));
   it("JSON", () => expect(decode(ASSPacket, encode(ASSPacket, sample, true))).toEqual(sample));
   it("encode throws when asset_url missing", () =>
-    expect(() => encode(ASSPacket, {}, false)).toThrow(/Missing required field 'asset_url'/));
+    expect(() => encode(ASSPacket, {} as ASSPacket, false)).toThrow(/Missing required field 'asset_url'/));
 });
 
 describe("BD round-trip", () => {
@@ -24,7 +24,7 @@ describe("BD round-trip", () => {
   it("fanta", () => expect(decode(BDPacket, encode(BDPacket, sample, false))).toEqual(sample));
   it("JSON", () => expect(decode(BDPacket, encode(BDPacket, sample, true))).toEqual(sample));
   it("encode throws when reason missing", () =>
-    expect(() => encode(BDPacket, {}, false)).toThrow(/Missing required field 'reason'/));
+    expect(() => encode(BDPacket, {} as BDPacket, false)).toThrow(/Missing required field 'reason'/));
 });
 
 describe("KB round-trip", () => {
@@ -43,7 +43,7 @@ describe("JD round-trip", () => {
   it("fanta state=1", () => expect(decode(JDPacket, encode(JDPacket, { state: 1 }, false))).toEqual({ state: 1 }));
   it("JSON state=0", () => expect(decode(JDPacket, encode(JDPacket, { state: 0 }, true))).toEqual({ state: 0 }));
   it("encode throws when state missing", () =>
-    expect(() => encode(JDPacket, {}, false)).toThrow(/Missing required field 'state'/));
+    expect(() => encode(JDPacket, {} as JDPacket, false)).toThrow(/Missing required field 'state'/));
 });
 
 describe("CHECK (empty payload) round-trip", () => {

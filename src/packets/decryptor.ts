@@ -15,7 +15,7 @@ import { decode, req } from "../packets";
 // Receiver: Client
 export class DecryptorPacket extends Packet {
   static $header = "decryptor";
-  value = req("string");
+  value: string = req("string");
 }
 
 export function receivedecryptor(body: string) {

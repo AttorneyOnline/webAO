@@ -140,35 +140,21 @@ export const setLastICMessageTime = (val: Date) => {
 };
 
 class Client extends EventEmitter {
-  /**
-   * Typed sender registry. Call as `client.send.MC({ ... })` to send
-   * a packet with autocomplete on both the header and the typed
-   * packet shape.
-   */
+  // Sender registry
   send = clientSend;
 
-  /**
-   * Typed receiver registry. Call as `client.receive.AUTH(body)` to
-   * invoke a receive handler directly (replay, tests, etc.). The
-   * normal inbound dispatch path also resolves through this table.
-   */
+  // Receiver registry
   receive = clientReceive;
 
-  /**
-   * Typed server-side sender registry. Call as
-   * `client.sendAsServer.PV({ ... })` to emit a packet as if from
-   * the server; the wire loops back to the client receive path.
-   * Used by server-emulation handlers and tests.
-   */
+  // Sender as Server registry
   sendAsServer = serverSend;
+
+  // Receiver as Server registry
+  receiveAsServer = serverReceive;
 
   /**
    * When true, we synthesise the server locally instead of talking
-   * to a real one: `sendData` loops outbound frames back through
-   * `receiveDataAsServer`, and the server-side handlers in
-   * `serverReceive` drive the conversation. Initialised from
-   * `mode === "replay"` but flippable independently for tests and
-   * future server-emulation modes.
+   * to a real one
    */
   acting_as_server = false;
 
@@ -362,10 +348,7 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Transmit a wire frame to the server. When `acting_as_server` is
-   * set there is no real server, so the frame is fed to our own
-   * server-side dispatcher (`receiveDataAsServer`) and the local
-   * handlers synthesize what a server would have done.
+   * Transmit a wire frame to the server. Loop back to ourselves if acting as server.
    */
   sendData(message: string) {
     console.debug("C: " + message);
@@ -396,30 +379,27 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Dispatch a wire frame as if we (the Client) just received it from
-   * the server. Called by `onMessage` for real network frames, and by
-   * handlers that synthesize a server -> client packet for local
-   * processing (e.g. RD -> BN + DONE).
+   * Receive data as a client
    */
   receiveData(data: string) {
-    this.dispatchFrame(data, clientReceive, "Client");
+    this.dispatchFrame(data, "Client");
   }
 
   /**
-   * Mirror of `receiveData` for the opposite direction: dispatch a
-   * wire frame as if we (acting as a Server) just received it from a
-   * client. Used by replay mode (the actual server is absent, so we
-   * synthesize its role) and by tests / server-emulation handlers.
+   * Mirror of `receiveData` for the opposite direction: receive data as if we're a server
    */
   receiveDataAsServer(data: string) {
-    this.dispatchFrame(data, serverReceive, "Server");
+    this.dispatchFrame(data, "Server");
   }
 
   private dispatchFrame(
     data: string,
-    receiverLookup: Record<string, (body: string) => void>,
-    role: string,
+    role: "Client" | "Server",
   ) {
+    // Widen the per-table key type to plain `string` so we can look up
+    // an unknown header without TS complaining about index access.
+    const receiverLookup: Record<string, (body: string) => void> =
+      role === "Client" ? this.receive : this.receiveAsServer;
     let header: string;
     try {
       header = readHeader(data);

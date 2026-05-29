@@ -1,39 +1,50 @@
 import { describe, it, expect } from "bun:test";
-import { decode, encode, lit, Packet, req } from "../packets";
+import { decode, encode, Packet, req } from "../packets";
 
 // Synthetic schemas exercise the encode/decode mechanics independent of
 // any real packet. Keep them small and focused.
 
 class AllRequired extends Packet {
   static $header = "ALLREQ";
-  s = req("string");
-  n = req("number");
-  b = req("boolean");
+  s: string = req("string");
+  n: number = req("number");
+  b: boolean = req("boolean");
 }
 
 class AllOptional extends Packet {
   static $header = "ALLOPT";
-  s = "hi";
-  n = 42;
-  b = true;
+  s?: string = "hi";
+  n?: number = 42;
+  b?: boolean = true;
 }
 
 class Mixed extends Packet {
   static $header = "MIX";
-  s = req("string");
-  n = 99;
-  b = false;
+  s: string = req("string");
+  n?: number = 99;
+  b?: boolean = false;
 }
 
 class Empty extends Packet {
   static $header = "EMPTY";
 }
 
-class WithLiteral extends Packet {
-  static $header = "LIT";
-  _zero = lit(0);
-  n = req("number");
-  s = "x";
+// Tests the static `toArgs` / `fromArgs` override hooks: this schema
+// emits a wire with a literal `0` at position 0 and an `&`-delimited
+// blob at position 1, while only exposing `n` and `s` on the typed API.
+class WithOverride extends Packet {
+  static $header = "OVR";
+  n: number = req("number");
+  s?: string = "x";
+
+  static toArgs(p: WithOverride): string[] {
+    return ["0", `${p.n}&${p.s}`];
+  }
+
+  static fromArgs(args: string[]): Partial<WithOverride> {
+    const [nStr, sStr] = (args[1] ?? "").split("&");
+    return { n: Number(nStr), s: sStr };
+  }
 }
 
 describe("encode: fanta wire shape", () => {
@@ -73,13 +84,13 @@ describe("encode: JSON wire shape", () => {
 
 describe("encode: required-field gauntlet", () => {
   it("throws when a required field is missing", () => {
-    expect(() => encode(AllRequired, { s: "x", n: 1 }, false)).toThrow(
+    expect(() => encode(AllRequired, { s: "x", n: 1 } as AllRequired, false)).toThrow(
       /Missing required field 'b'/,
     );
   });
 
   it("throws on the first missing required field, regardless of format", () => {
-    expect(() => encode(AllRequired, {}, true)).toThrow(/Missing required field/);
+    expect(() => encode(AllRequired, {} as AllRequired, true)).toThrow(/Missing required field/);
   });
 });
 
@@ -331,34 +342,40 @@ describe("encode -> decode round-trip: chat escapes (fanta only)", () => {
   });
 });
 
-describe("literal fields (lit)", () => {
-  it("fanta encode emits the literal at its declared wire position", () => {
-    expect(encode(WithLiteral, { n: 5, s: "y" }, false)).toBe("LIT#0#5#y#%");
+describe("static toArgs / fromArgs override hooks", () => {
+  it("fanta encode dispatches to `toArgs` for the args list", () => {
+    expect(encode(WithOverride, { n: 5, s: "y" }, false)).toBe("OVR#0#5&y#%");
   });
 
-  it("fanta decode consumes the literal slot but drops it from the result", () => {
-    const decoded = decode(WithLiteral, "LIT#0#5#y#%");
-    expect(decoded).toEqual({ n: 5, s: "y" });
-    expect("_zero" in decoded).toBe(false);
+  it("fanta decode dispatches to `fromArgs` to extract fields", () => {
+    expect(decode(WithOverride, "OVR#0#5&y#%")).toEqual({ n: 5, s: "y" });
   });
 
-  it("encode ignores any value smuggled in at the literal slot", () => {
-    // TS rejects `_zero` on the typed signature; force the runtime path.
-    const wire = encode(
-      WithLiteral,
-      { _zero: 99, n: 5, s: "y" } as unknown as Parameters<typeof encode<WithLiteral>>[1],
-      false,
+  it("override fields aren't visible on the typed input — only declared ones are", () => {
+    // No `_zero` or other slot is on the type; only `n` (required) and `s`.
+    expect(encode(WithOverride, { n: 5 }, false)).toBe("OVR#0#5&x#%");  // default s
+  });
+
+  it("JSON envelope bypasses the override (JSON is keyed, not positional)", () => {
+    expect(encode(WithOverride, { n: 5, s: "y" }, true)).toBe(
+      '{"$header":"OVR","n":5,"s":"y"}',
     );
-    expect(wire).toBe("LIT#0#5#y#%");
   });
 
-  it("decode is forgiving about an unexpected value at the literal slot", () => {
-    expect(decode(WithLiteral, "LIT#99#5#y#%")).toEqual({ n: 5, s: "y" });
-  });
-
-  it("JSON envelope omits the literal entirely", () => {
-    expect(encode(WithLiteral, { n: 5, s: "y" }, true)).toBe(
-      '{"$header":"LIT","n":5,"s":"y"}',
+  it("required-field gauntlet still runs on the override's output", () => {
+    // fromArgs returns `n: NaN` when args[1] is empty (Number(undefined&undef) = NaN).
+    // cast wouldn't catch NaN as missing, but it would catch a missing required key.
+    // Use a forged override-returning-partial through a synthetic test:
+    class PartialOverride extends Packet {
+      static $header = "PRT";
+      a: string = req("string");
+      b: string = req("string");
+      static fromArgs(): Partial<PartialOverride> {
+        return { a: "x" };  // intentionally omits b
+      }
+    }
+    expect(() => decode(PartialOverride, "PRT#anything#%")).toThrow(
+      /Missing required field 'b'/,
     );
   });
 });

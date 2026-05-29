@@ -1,8 +1,8 @@
-import { client, json_mode } from "../client";
+import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
 import { appendICLog } from "../client/appendICLog";
 import { Packet } from "../Packet";
-import { decode, encode, req } from "../packets";
+import { decode, req } from "../packets";
 
 /**
  * Music/area change.
@@ -11,26 +11,21 @@ import { decode, encode, req } from "../packets";
 // Receiver: Client
 export class MCPacketClient extends Packet {
   static $header = "MC";
-  name = req("string");
-  char_id = req("number");
-  showname = "";
-  looping = false;
-  channel = 0;
-  effects = 0;
+  name: string = req("string");
+  char_id: number = req("number");
+  showname?: string = "";
+  looping?: boolean = false;
+  channel?: number = 0;
+  effects?: number = 0;
 }
 
 // Receiver: Server
 export class MCPacketServer extends Packet {
   static $header = "MC";
-  name = req("string");
-  char_id = req("number");
-  showname = "";
-  effects = 0;
-}
-
-// Send music/area change request to server
-export function sendMC(packet: Partial<MCPacketServer>) {
-  client.sendData(encode(MCPacketServer, packet, json_mode));
+  name: string = req("string");
+  char_id: number = req("number");
+  showname?: string = "";
+  effects?: number = 0;
 }
 
 // Receive music change request from server
