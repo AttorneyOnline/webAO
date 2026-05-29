@@ -1,24 +1,19 @@
-import { escapeFanta, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
-
-export interface BBPacket {
-  message: string;
-}
-
-export const BB: PacketCodec<BBPacket> = {
-  header: "BB",
-  decode(args) {
-    return { message: unescapeFanta(args[1] ?? "") };
-  },
-  encode(packet) {
-    return `BB#${escapeFanta(packet.message)}#%`;
-  },
-};
+import { Packet } from "../Packet";
+import { decode, req } from "../packets";
 
 /**
- * Handles the warning packet
- * on client this spawns a message box you can't close for 2 seconds
+ * Warning. Server pushes a message; the client shows it in an
+ * alert box the user can't dismiss for 2 seconds.
  */
-export const receiveBB = (packet: BBPacket) => {
+
+// Receiver: Client
+export class BBPacket extends Packet {
+  static $header = "BB";
+  message = req("string");
+}
+
+// Show the server's warning to the user.
+export function receiveBB(body: string) {
+  const packet = decode(BBPacket, body);
   alert(packet.message);
-};
+}

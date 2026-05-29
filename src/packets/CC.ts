@@ -1,24 +1,26 @@
-import { client, json_mode } from "../client";
 import { Packet } from "../Packet";
-import { decode, encode, req } from "../packets";
+import { client, json_mode } from "../client";
+import { decode, encode, lit, req, Wire } from "../packets";
 
 /**
  * Choose character. Client requests to play as char_id; server acks
- * the selection (we emulate the ack with PV).
+ * with PV. Wire: `CC#0#{char_id}#{char_pw}#%`:
+ *   - position 0: spec-mandated literal `0` (webAO has historically
+ *     sent playerID here in violation of the spec)
+ *   - position 2: char_pw, deprecated — we always emit empty
  */
 
 // Receiver: Server
 export class CCPacketServer extends Packet {
   static $header = "CC";
-  player_id = req("number");
+  _zero = lit(0);
   char_id = req("number");
-  char_pw = "";
+  _char_pw_deprecated = lit("");
 }
 
-// Request to play as char_id. Gatekeeps unknown char_ids so we don't
-// ask for a slot that isn't real.
-export function sendCC(packet: Partial<CCPacketServer>) {
-  if (packet.char_id !== -1 && !client.chars[packet.char_id!]?.name) return;
+// Request to play as char_id. Caller is responsible for validating
+// that the char_id refers to a real slot.
+export function sendCC(packet: Partial<Wire<CCPacketServer>>) {
   client.sendString(encode(CCPacketServer, packet, json_mode));
 }
 

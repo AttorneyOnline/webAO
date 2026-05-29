@@ -50,9 +50,7 @@ export function receiveDONE(body: string) {
     );
     if (charIndex !== -1) {
       sendCC({
-        player_id: client.playerID,
         char_id: charIndex,
-        char_pw: "web",
       });
     }
   }

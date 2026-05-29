@@ -3,7 +3,7 @@ import { ARUP, receiveARUP } from "./packets/ARUP";
 import { askchaa, receiveaskchaa } from "./packets/askchaa";
 import { ASS, receiveASS } from "./packets/ASS";
 import { receiveAUTH } from "./packets/AUTH";
-import { BB, receiveBB } from "./packets/BB";
+import { receiveBB } from "./packets/BB";
 import { BD, receiveBD } from "./packets/BD";
 import { BN, receiveBN } from "./packets/BN";
 import { receiveCC, sendCC } from "./packets/CC";
@@ -117,6 +117,42 @@ export function req(t: FieldType): unknown {
 const isReq = (v: unknown): v is ReqMarker =>
   typeof v === "object" && v !== null && REQ in v;
 
+const LIT = Symbol("literal");
+interface LitMarker { [LIT]: string | number | boolean; }
+
+/**
+ * Brand type for wire-only literal fields. The actual runtime value is a
+ * `{ [LIT]: value }` sentinel; this type-level brand lets `Wire<T>`
+ * detect and strip the literal field from the public-facing API.
+ */
+export type Literal = { readonly __literal__: true };
+
+/**
+ * Marks a class field as a wire-only literal. Used for fanta positional
+ * slots that the spec hardcodes to a fixed value (e.g. CC's leading `0`)
+ * but that aren't part of the typed packet API. The field is emitted at
+ * its declared wire position on encode, the position is consumed but
+ * dropped on decode, and `cast` removes it from the typed result.
+ *
+ * `Wire<T>` strips the literal-typed fields from the input/output of
+ * `encode`/`decode`, so callers never see `_zero` and friends.
+ */
+export function lit(value: string | number | boolean): Literal;
+export function lit(value: string | number | boolean): unknown {
+  return { [LIT]: value };
+}
+
+/**
+ * Strips wire-only literal fields from a packet schema type, leaving
+ * only the fields callers care about.
+ */
+export type Wire<T> = {
+  [K in keyof T as T[K] extends Literal ? never : K]: T[K];
+};
+
+const isLit = (v: unknown): v is LitMarker =>
+  typeof v === "object" && v !== null && LIT in v;
+
 import { Packet } from "./Packet";
 export { Packet };
 
@@ -130,11 +166,12 @@ export type Schema<T extends Packet> = new () => T;
  */
 function* walkSchema<T extends Packet>(
   SchemaClass: Schema<T>,
-): Generator<{ name: string; type: FieldType }> {
+): Generator<{ name: string; type: FieldType; literal?: string | number | boolean }> {
   const exemplar = new SchemaClass();
   for (const [name, val] of Object.entries(exemplar)) {
-    const type = isReq(val) ? val[REQ] : (typeof val as FieldType);
-    yield { name, type };
+    if (isReq(val)) yield { name, type: val[REQ] };
+    else if (isLit(val)) yield { name, type: typeof val[LIT] as FieldType, literal: val[LIT] };
+    else yield { name, type: typeof val as FieldType };
   }
 }
 
@@ -149,6 +186,12 @@ function cast<T extends Packet>(SchemaClass: Schema<T>, partial: Partial<T>): T 
   const instance: Packet = new SchemaClass();
   const bag = partial as Packet;
   for (const name of Object.keys(instance)) {
+    // Literal fields are wire-only placeholders; drop them from the
+    // typed result and don't accept overrides from the caller.
+    if (isLit(instance[name])) {
+      delete instance[name];
+      continue;
+    }
     if (bag[name] !== undefined) instance[name] = bag[name];
     if (isReq(instance[name])) throw new Error(`Missing required field '${name}'`);
   }
@@ -161,7 +204,7 @@ function cast<T extends Packet>(SchemaClass: Schema<T>, partial: Partial<T>): T 
  * else is positional `HEADER#a#b#%`. Runs the type gauntlet: missing
  * optional fields get their `default`; missing required fields throw.
  */
-export function decode<T extends Packet>(schema: Schema<T>, body: string): T {
+export function decode<T extends Packet>(schema: Schema<T>, body: string): Wire<T> {
   let partial: Packet;
   if (body.startsWith("{")) {
     partial = JSON.parse(body);
@@ -175,11 +218,13 @@ export function decode<T extends Packet>(schema: Schema<T>, body: string): T {
     if (trimmed.endsWith("#")) trimmed = trimmed.slice(0, -1);
     const args = trimmed.split("#");
     specs.forEach((f, i) => {
+      // Literal slots take a wire position but don't store onto the result.
+      if (f.literal !== undefined) return;
       const v = args[i + 1];
       if (v !== undefined) partial[f.name] = coerce(v, f.type, f.name);
     });
   }
-  return cast<T>(schema, partial as Partial<T>);
+  return cast<T>(schema, partial as Partial<T>) as Wire<T>;
 }
 
 /**
@@ -190,14 +235,16 @@ export function decode<T extends Packet>(schema: Schema<T>, body: string): T {
  */
 export function encode<T extends Packet>(
   SchemaClass: Schema<T> & { $header: string },
-  packet: Partial<T>,
+  packet: Partial<Wire<T>>,
   asJson: boolean = false,
 ): string {
-  const full = cast<T>(SchemaClass, packet);
+  const full = cast<T>(SchemaClass, packet as Partial<T>);
   if (asJson) {
     return JSON.stringify({ $header: SchemaClass.$header, ...full });
   }
-  const parts = [...walkSchema<T>(SchemaClass)].map((f) => serialize(full[f.name], f.type));
+  const parts = [...walkSchema<T>(SchemaClass)].map((f) =>
+    f.literal !== undefined ? serialize(f.literal, f.type) : serialize(full[f.name], f.type),
+  );
   // Zero-field packets are spec'd as `HEADER#%`, not `HEADER##%`.
   if (parts.length === 0) return `${SchemaClass.$header}#%`;
   return `${SchemaClass.$header}#${parts.join("#")}#%`;
@@ -352,7 +399,6 @@ export interface PacketBinding<TPacket> {
 const clientPackets: Record<string, PacketBinding<any>> = {
   ARUP: { codec: ARUP, receive: receiveARUP },
   ASS: { codec: ASS, receive: receiveASS },
-  BB: { codec: BB, receive: receiveBB },
   BD: { codec: BD, receive: receiveBD },
   BN: { codec: BN, receive: receiveBN },
   CharsCheck: { codec: CharsCheck, receive: receiveCharsCheck },
@@ -437,6 +483,7 @@ type ReceiveFn = (body: string) => void;
 
 export const clientReceive = new Map<string, ReceiveFn>([
   ["AUTH", receiveAUTH],
+  ["BB", receiveBB],
   ["DONE", receiveDONE],
   ["MC", receiveMC],
 ]);

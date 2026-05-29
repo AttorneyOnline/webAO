@@ -3,11 +3,7 @@ import { decode, encode } from "../packets";
 import { CCPacketServer } from "../packets/CC";
 
 describe("CC encode/decode are inverses", () => {
-  const packet = {
-    player_id: 7,
-    char_id: 5,
-    char_pw: "web",
-  };
+  const packet = { char_id: 5 };
 
   it("fanta encode -> decode preserves values", () => {
     const wire = encode(CCPacketServer, packet, false);
@@ -19,22 +15,39 @@ describe("CC encode/decode are inverses", () => {
     expect(decode(CCPacketServer, wire)).toEqual(packet);
   });
 
-  it("partial packet is filled with class defaults on encode -> decode", () => {
-    const partial = { player_id: 7, char_id: 5 };
-    const wire = encode(CCPacketServer, partial, false);
-    const decoded = decode(CCPacketServer, wire);
-    expect(decoded.player_id).toBe(7);
-    expect(decoded.char_id).toBe(5);
-    expect(decoded.char_pw).toBe("");
-  });
-
-  it("encode throws when a required field is missing", () => {
+  it("encode throws when char_id is missing", () => {
     expect(() => encode(CCPacketServer, {}, false)).toThrow(
-      /Missing required field/,
+      /Missing required field 'char_id'/,
     );
   });
 
-  it("decode throws when a required field is missing on the wire", () => {
+  it("decode throws when char_id is missing on the wire", () => {
     expect(() => decode(CCPacketServer, "CC#%")).toThrow(/Missing required field/);
+  });
+});
+
+describe("CC literal slots follow the spec", () => {
+  it("fanta encode emits both spec literals (`0` and empty char_pw)", () => {
+    const wire = encode(CCPacketServer, { char_id: 5 }, false);
+    expect(wire).toBe("CC#0#5##%");
+  });
+
+  it("decode strips both literal slots from the typed result", () => {
+    const decoded = decode(CCPacketServer, "CC#0#5##%");
+    expect(decoded).toEqual({ char_id: 5 });
+    expect("_zero" in decoded).toBe(false);
+    expect("_char_pw_deprecated" in decoded).toBe(false);
+  });
+
+  it("decode is forgiving about unexpected values at literal positions", () => {
+    // A legacy/non-conforming server may put non-zero or a real pw
+    // there; we still parse char_id and don't reject the packet.
+    expect(decode(CCPacketServer, "CC#7#5#web#%")).toEqual({ char_id: 5 });
+  });
+
+  it("JSON envelope omits both literals", () => {
+    expect(encode(CCPacketServer, { char_id: 5 }, true)).toBe(
+      '{"$header":"CC","char_id":5}',
+    );
   });
 });

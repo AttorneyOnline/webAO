@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import { decode, encode, Packet, req } from "../packets";
+import { decode, encode, lit, Packet, req } from "../packets";
 
 // Synthetic schemas exercise the encode/decode mechanics independent of
 // any real packet. Keep them small and focused.
@@ -27,6 +27,13 @@ class Mixed extends Packet {
 
 class Empty extends Packet {
   static $header = "EMPTY";
+}
+
+class WithLiteral extends Packet {
+  static $header = "LIT";
+  _zero = lit(0);
+  n = req("number");
+  s = "x";
 }
 
 describe("encode: fanta wire shape", () => {
@@ -321,5 +328,37 @@ describe("encode -> decode round-trip: chat escapes (fanta only)", () => {
   it("strings with `$` round-trip through fanta", () => {
     const wire = encode(Mixed, { s: "$5" }, false);
     expect(decode(Mixed, wire).s).toBe("$5");
+  });
+});
+
+describe("literal fields (lit)", () => {
+  it("fanta encode emits the literal at its declared wire position", () => {
+    expect(encode(WithLiteral, { n: 5, s: "y" }, false)).toBe("LIT#0#5#y#%");
+  });
+
+  it("fanta decode consumes the literal slot but drops it from the result", () => {
+    const decoded = decode(WithLiteral, "LIT#0#5#y#%");
+    expect(decoded).toEqual({ n: 5, s: "y" });
+    expect("_zero" in decoded).toBe(false);
+  });
+
+  it("encode ignores any value smuggled in at the literal slot", () => {
+    // TS rejects `_zero` on the typed signature; force the runtime path.
+    const wire = encode(
+      WithLiteral,
+      { _zero: 99, n: 5, s: "y" } as unknown as Parameters<typeof encode<WithLiteral>>[1],
+      false,
+    );
+    expect(wire).toBe("LIT#0#5#y#%");
+  });
+
+  it("decode is forgiving about an unexpected value at the literal slot", () => {
+    expect(decode(WithLiteral, "LIT#99#5#y#%")).toEqual({ n: 5, s: "y" });
+  });
+
+  it("JSON envelope omits the literal entirely", () => {
+    expect(encode(WithLiteral, { n: 5, s: "y" }, true)).toBe(
+      '{"$header":"LIT","n":5,"s":"y"}',
+    );
   });
 });
