@@ -27,7 +27,7 @@ describe("registry shape", () => {
     expect(Object.keys(c2sSchemas).sort()).toEqual(
       [
         "AE", "AM", "AN", "CC", "CH", "CT", "DE", "EE", "HI", "HP",
-        "MA", "MC", "PE", "RC", "RD", "RM", "RT", "VS_FRAME",
+        "MA", "MC", "MS", "PE", "RC", "RD", "RM", "RT", "VS_FRAME",
         "VS_JOIN", "VS_LEAVE", "VS_SPEAK", "ZZ", "askchaa",
       ].sort(),
     );
@@ -38,8 +38,8 @@ describe("registry shape", () => {
       [
         "ASS", "AUTH", "BB", "BD", "BN", "CHECK", "CI", "CT",
         "CharsCheck", "DONE", "EI", "EM", "FA", "FL", "FM", "HP",
-        "ID", "JD", "KB", "KK", "LE", "MC", "PN", "PR", "PU", "PV",
-        "RMC", "RT", "SC", "SI", "SM", "SP", "TI",
+        "ID", "JD", "KB", "KK", "LE", "MC", "MS", "PN", "PR", "PU",
+        "PV", "RMC", "RT", "SC", "SI", "SM", "SP", "TI",
         "VS_AUDIO", "VS_CAPS", "VS_JOIN", "VS_LEAVE", "VS_PEERS",
         "VS_SPEAK", "ZZ", "decryptor",
       ].sort(),

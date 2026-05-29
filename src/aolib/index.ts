@@ -58,10 +58,20 @@ export {
   CI, EM, EI, LE,
   // bidirectional asymmetric (per-direction shapes)
   MCRequest, MCBroadcast,
+  MSRequest, MSBroadcast,
   CTRequest, CTBroadcast,
   VSJoinRequest, VSJoinBroadcast,
   VSLeaveRequest, VSLeaveBroadcast,
   VSSpeakRequest, VSSpeakBroadcast,
+  // MS enums (public type surface for chat fields)
+  Side,
+  DeskModifier,
+  EmoteModifier,
+  ShoutModifier,
+  Flip,
+  TextColor,
+  isFullView,
+  type Offset,
 } from "./packets";
 
 // ---------------------------------------------------------------------

@@ -21,6 +21,7 @@
 import { HI } from "./HI";
 import { CC } from "./CC";
 import { MCRequest, MCBroadcast } from "./MC";
+import { MSRequest, MSBroadcast } from "./MS";
 import { CTRequest, CTBroadcast } from "./CT";
 import { HP } from "./HP";
 import { RT } from "./RT";
@@ -91,6 +92,7 @@ export const c2sSchemas = {
   CC,
   CT: CTRequest,
   MC: MCRequest,
+  MS: MSRequest,
   HP,
   RT,
   ZZ,
@@ -122,6 +124,7 @@ export const s2cSchemas = {
   BB,
   CT: CTBroadcast,
   MC: MCBroadcast,
+  MS: MSBroadcast,
   HP,
   RT,
   ZZ,
@@ -168,7 +171,8 @@ export type S2CSchemas = typeof s2cSchemas;
 // ---------------------------------------------------------------------
 
 export {
-  HI, CC, MCRequest, MCBroadcast, decryptor, ID, PV, BB, DONE, SM,
+  HI, CC, MCRequest, MCBroadcast, MSRequest, MSBroadcast,
+  decryptor, ID, PV, BB, DONE, SM,
   CTRequest, CTBroadcast, HP, RT, ZZ,
   VSJoinRequest, VSJoinBroadcast,
   VSLeaveRequest, VSLeaveBroadcast,
@@ -179,3 +183,16 @@ export {
   VS_AUDIO, VS_CAPS, VS_PEERS,
   CI, EM, EI, LE,
 };
+
+// MS exposes the AO enums (Side, etc.) as the public type surface
+// for callers — re-export them by name.
+export {
+  Side,
+  DeskModifier,
+  EmoteModifier,
+  ShoutModifier,
+  Flip,
+  TextColor,
+  isFullView,
+  type Offset,
+} from "./MS";
