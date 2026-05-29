@@ -144,6 +144,7 @@ aolib/
 ├── encode.ts                  ← fanta + JSON encode dispatch
 ├── decode.ts                  ← fanta + JSON decode + auto-detect
 ├── types.ts                   ← In<S> / Out<S> type derivation
+├── jsonSchema.ts              ← toJsonSchema(schema) — JSON Schema export
 ├── packets/                   ← every AO packet schema lives here
 │   ├── MS.ts                  ← export const MS = packet("MS", { ... });
 │   ├── MC.ts
@@ -241,6 +242,59 @@ export const VS_PEERS = packet("VS_PEERS", {
 For genuinely one-off weirdness, fall back to `custom(...)` at the
 field level (preferred) or to a hand-rolled codec module under
 `packets/` (last resort).
+
+## Documentation export
+
+`toJsonSchema(schema)` walks a packet schema and emits standards-compliant
+JSON Schema (draft-07). Use it to generate per-packet docs that drop into
+AsyncAPI (purpose-built for WebSocket protocols), Stoplight, Redoc, or
+any other JSON Schema renderer.
+
+```ts
+import { toJsonSchema, MC } from "./aolib";
+import { writeFileSync } from "node:fs";
+
+writeFileSync(
+  "docs/schemas/MC.json",
+  JSON.stringify(toJsonSchema(MC), null, 2),
+);
+```
+
+Output for `MC`:
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MC",
+  "type": "object",
+  "properties": {
+    "$header": { "type": "string", "const": "MC" },
+    "name":    { "type": "string" },
+    "char_id": { "type": "number" },
+    "showname":{ "type": "string", "default": "" },
+    "effects": { "type": "number", "default": 0 }
+  },
+  "required": ["$header", "name", "char_id"],
+  "additionalProperties": false
+}
+```
+
+Literal fields (CC's leading `0`, PV's `CID`) are wire-only positional
+padding and don't appear in JSON envelopes — they're omitted from the
+generated schema, matching what the JSON wire actually contains.
+
+`nested(...)` becomes a `type: "object"` block; `array(...)` becomes a
+`type: "array"` block with typed `items`. Recurses to whatever depth the
+schema declares.
+
+If a `custom(...)` field needs a specific JSON Schema, attach a
+`jsonSchema` property to the returned field — `toJsonSchema` reads it
+verbatim. Default is `{}` (any value permitted).
+
+This is the documentation path, not the runtime path. Inbound JSON
+validation still uses `fromJson` (recursive, fast enough for AO sizes).
+If a future use case demands compiled validators, an Ajv adapter could
+consume the same `toJsonSchema` output — but our walker is enough today.
 
 ## Design principles
 

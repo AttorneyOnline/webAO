@@ -42,6 +42,26 @@ export {
 export { fromJson, toJson } from "./json";
 
 // ---------------------------------------------------------------------
+// Type-level walkers — `In<S>` (caller input shape) and `Out<S>`
+// (decoded output shape). The only types client code should reach for.
+// ---------------------------------------------------------------------
+
+export type {
+  In,
+  Out,
+  InFields,
+  OutFields,
+  FieldInValue,
+  FieldOutValue,
+} from "./types";
+
+// ---------------------------------------------------------------------
+// JSON Schema export for documentation / cross-language interop.
+// ---------------------------------------------------------------------
+
+export { toJsonSchema } from "./jsonSchema";
+
+// ---------------------------------------------------------------------
 // Schema builder.
 // ---------------------------------------------------------------------
 

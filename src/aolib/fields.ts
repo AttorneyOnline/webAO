@@ -121,9 +121,15 @@ export interface NestedField<S extends Record<string, Field<unknown>>>
   readonly separator: string;
 }
 
-export interface ArrayField<T> extends Field<T[]> {
+/**
+ * `ArrayField` is parameterised by the element FIELD (not just its
+ * value type), so `In<S>` / `Out<S>` can recurse into the element's
+ * structure — e.g. `array(nested({...}))` produces a typed array of
+ * typed nested objects, not `Array<unknown>`.
+ */
+export interface ArrayField<E extends Field<unknown>> extends Field<unknown[]> {
   readonly kind: "array";
-  readonly element: Field<T>;
+  readonly element: E;
 }
 
 export interface CustomField<T> extends Field<T> {
@@ -285,7 +291,7 @@ export function nested<S extends Record<string, Field<unknown>>>(
  *   fanta wire: `VS_PEERS#1&Alice#2&Bob#%`
  *   JSON value: `[{uid: 1, name: "Alice"}, {uid: 2, name: "Bob"}]`
  */
-export function array<T>(element: Field<T>): ArrayField<T> {
+export function array<E extends Field<unknown>>(element: E): ArrayField<E> {
   const reject = (name: string): never => {
     throw new Error(
       `array field '${name}' must be consumed by the schema walker — its ` +
@@ -296,7 +302,7 @@ export function array<T>(element: Field<T>): ArrayField<T> {
   return {
     kind: "array",
     element,
-    fromFanta: (_token, name) => reject(name) as T[],
+    fromFanta: (_token, name) => reject(name) as unknown[],
     toFanta: () => reject("(toFanta)") as string,
   };
 }

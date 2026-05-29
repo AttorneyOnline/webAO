@@ -88,7 +88,7 @@ export function fromJson<T>(field: Field<T>, value: unknown, name: string): T {
     }
 
     case "array": {
-      const f = field as unknown as ArrayField<unknown>;
+      const f = field as unknown as ArrayField<Field<unknown>>;
       if (!Array.isArray(value)) {
         throw new Error(
           `Field '${name}': expected array, got ${typeOfDesc(value)}`,
@@ -145,7 +145,7 @@ export function toJson<T>(field: Field<T>, value: T): unknown {
     }
 
     case "array": {
-      const f = field as unknown as ArrayField<unknown>;
+      const f = field as unknown as ArrayField<Field<unknown>>;
       return (value as unknown[]).map((item) =>
         toJson(f.element, item as never),
       );
