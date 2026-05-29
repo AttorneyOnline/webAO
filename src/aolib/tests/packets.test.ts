@@ -27,7 +27,7 @@ describe("registry shape", () => {
     expect(Object.keys(c2sSchemas).sort()).toEqual(
       [
         "AE", "AM", "AN", "CC", "CH", "CT", "DE", "EE", "HI", "HP",
-        "MA", "MC", "MS", "PE", "RC", "RD", "RM", "RT", "VS_FRAME",
+        "ID", "MA", "MC", "MS", "PE", "RC", "RD", "RM", "RT", "VS_FRAME",
         "VS_JOIN", "VS_LEAVE", "VS_SPEAK", "ZZ", "askchaa",
       ].sort(),
     );

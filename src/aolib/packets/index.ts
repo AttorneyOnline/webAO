@@ -45,7 +45,7 @@ import { RM } from "./RM";
 import { VS_FRAME } from "./VS_FRAME";
 
 import { decryptor } from "./decryptor";
-import { ID } from "./ID";
+import { ID, IDRequest } from "./ID";
 import { PV } from "./PV";
 import { BB } from "./BB";
 import { DONE } from "./DONE";
@@ -84,6 +84,7 @@ import { LE } from "./LE";
 export const c2sSchemas = {
   // handshake / lifecycle
   HI,
+  ID: IDRequest,
   askchaa,
   RC,
   RD,
@@ -174,7 +175,7 @@ export type S2CSchemas = typeof s2cSchemas;
 
 export {
   HI, CC, MCRequest, MCBroadcast, MSRequest, MSBroadcast,
-  decryptor, ID, PV, BB, DONE, SM,
+  decryptor, ID, IDRequest, PV, BB, DONE, SM,
   CTRequest, CTBroadcast, HP, RT, ZZ,
   VSJoinRequest, VSJoinBroadcast,
   VSLeaveRequest, VSLeaveBroadcast,

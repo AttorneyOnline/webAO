@@ -19,11 +19,12 @@ import type { In, Out } from "./types";
 import type {
   // unidirectional
   ARUP, ASS, AUTH, BB, BD, BN, CC, CH, CHECK, CharsCheck, CI,
-  DE, DONE, EE, EI, EM, FA, FL, FM, HI, HP, ID, JD,
+  DE, DONE, EE, EI, EM, FA, FL, FM, HI, HP, JD,
   KB, KK, LE, MA, PE, PN, PR, PU, PV, RC, RD, RM, RMC, RT,
   SC, SI, SM, SP, TI, VS_AUDIO, VS_CAPS, VS_FRAME, VS_PEERS, ZZ,
   askchaa, decryptor,
   // bidirectional asymmetric
+  ID, IDRequest,
   MCBroadcast, MCRequest,
   MSBroadcast, MSRequest,
   CTBroadcast, CTRequest,
@@ -57,7 +58,6 @@ export type FLPacket = Out<typeof FL>;
 export type FMPacket = Out<typeof FM>;
 export type HIPacket = Out<typeof HI>;
 export type HPPacket = Out<typeof HP>;
-export type IDPacket = Out<typeof ID>;
 export type JDPacket = Out<typeof JD>;
 export type KBPacket = Out<typeof KB>;
 export type KKPacket = Out<typeof KK>;
@@ -97,6 +97,11 @@ export type decryptorPacket = Out<typeof decryptor>;
 //   `XRequestPacket`  = Out<XRequest>   (server-side decode)
 //   `XBroadcastInput` = In<XBroadcast>  (server-side send)
 // ---------------------------------------------------------------------
+
+export type IDPacket = Out<typeof ID>;
+export type IDInput = In<typeof IDRequest>;
+export type IDRequestPacket = Out<typeof IDRequest>;
+export type IDBroadcastInput = In<typeof ID>;
 
 export type MCPacket = Out<typeof MCBroadcast>;
 export type MCInput = In<typeof MCRequest>;
