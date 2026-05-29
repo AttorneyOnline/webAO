@@ -36,7 +36,7 @@ describe("registry shape", () => {
   it("s2cSchemas covers the expected headers", () => {
     expect(Object.keys(s2cSchemas).sort()).toEqual(
       [
-        "ASS", "AUTH", "BB", "BD", "BN", "CHECK", "CI", "CT",
+        "ARUP", "ASS", "AUTH", "BB", "BD", "BN", "CHECK", "CI", "CT",
         "CharsCheck", "DONE", "EI", "EM", "FA", "FL", "FM", "HP",
         "ID", "JD", "KB", "KK", "LE", "MC", "MS", "PN", "PR", "PU",
         "PV", "RMC", "RT", "SC", "SI", "SM", "SP", "TI",

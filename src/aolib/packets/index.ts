@@ -51,6 +51,7 @@ import { BB } from "./BB";
 import { DONE } from "./DONE";
 import { SM } from "./SM";
 
+import { ARUP } from "./ARUP";
 import { ASS } from "./ASS";
 import { AUTH } from "./AUTH";
 import { BD } from "./BD";
@@ -134,6 +135,7 @@ export const s2cSchemas = {
   BN,
   ASS,
   AUTH,
+  ARUP,
   // lists / batches
   SM,
   FM,
@@ -178,7 +180,7 @@ export {
   VSLeaveRequest, VSLeaveBroadcast,
   VSSpeakRequest, VSSpeakBroadcast,
   AE, AM, AN, askchaa, CH, DE, EE, MA, PE, RC, RD, RM, VS_FRAME,
-  ASS, AUTH, BD, BN, CHECK, CharsCheck, FA, FL, FM, JD, KB, KK,
+  ARUP, ASS, AUTH, BD, BN, CHECK, CharsCheck, FA, FL, FM, JD, KB, KK,
   PN, PR, PU, RMC, SC, SI, SP, TI,
   VS_AUDIO, VS_CAPS, VS_PEERS,
   CI, EM, EI, LE,
@@ -196,3 +198,9 @@ export {
   isFullView,
   type Offset,
 } from "./MS";
+
+// ARUP exposes its discriminator enum and payload type.
+export {
+  AreaUpdateType,
+  type AreaUpdateData,
+} from "./ARUP";

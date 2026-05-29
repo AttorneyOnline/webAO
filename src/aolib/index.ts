@@ -72,6 +72,9 @@ export {
   TextColor,
   isFullView,
   type Offset,
+  // ARUP discriminator
+  AreaUpdateType,
+  type AreaUpdateData,
 } from "./packets";
 
 // ---------------------------------------------------------------------
