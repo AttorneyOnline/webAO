@@ -1,56 +1,23 @@
 import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
-import { escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
-import { AE } from "./AE";
+import { safeHtmlTags } from "../escaping";
+import * as aolib from "../aolib";
 
 /**
- * Per-evidence incremental info packet. Wire format is
- * `EI#{id}#{name}&{description}&{type}&{image}&#%`.
- *
- * Subfields are unescaped individually since `&` is a control character at
- * this layer -- unescaping at the codec boundary would risk re-introducing
- * raw `&`s mid-string.
+ * Per-evidence incremental info packet. aolib packs name/description/
+ * type/image into the nested `details` sub-object; the handler reaches
+ * through to flatten the fields into the local cache.
  */
-export interface EIPacket {
-  id: number;
-  name: string;
-  description: string;
-  type: string;
-  image: string;
-}
-
-export const EI: PacketCodec<EIPacket> = {
-  header: "EI",
-  decode(args) {
-    const parts = (args[2] ?? "").split("&");
-    return {
-      id: Number(args[1]),
-      name: unescapeFanta(parts[0] ?? ""),
-      description: unescapeFanta(parts[1] ?? ""),
-      type: unescapeFanta(parts[2] ?? ""),
-      image: unescapeFanta(parts[3] ?? ""),
-    };
-  },
-  encode(packet) {
-    const sub = `${escapeFanta(packet.name)}&${escapeFanta(packet.description)}&${escapeFanta(packet.type)}&${escapeFanta(packet.image)}&`;
-    return `EI#${packet.id}#${sub}#%`;
-  },
-};
-
-/**
- * Handles incoming evidence information, containing only one evidence
- * item per packet.
- */
-export const receiveEI = (packet: EIPacket) => {
+export const applyEvidenceInfo = (packet: aolib.Out<typeof aolib.EI>) => {
+  const d = packet.details;
   document.getElementById("client_loadingtext")!.innerHTML =
     `Loading Evidence ${packet.id}/${client.evidence_list_length}`;
   client.evidences[packet.id] = {
-    name: safeHtmlTags(packet.name),
-    desc: safeHtmlTags(packet.description),
-    filename: packet.image,
-    icon: `${AO_HOST}evidence/${encodeURI(packet.image.toLowerCase())}`,
+    name: safeHtmlTags(d.name),
+    desc: safeHtmlTags(d.description),
+    filename: d.image,
+    icon: `${AO_HOST}evidence/${encodeURI(d.image.toLowerCase())}`,
   };
 
-  client.sendPacket(AE, { id: packet.id + 1 });
+  client.server.send.AE({ id: packet.id + 1 });
 };

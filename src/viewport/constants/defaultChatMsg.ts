@@ -1,3 +1,4 @@
+import * as aolib from "../../aolib";
 import {
   DeskModifier,
   EmoteModifier,
@@ -5,14 +6,13 @@ import {
   ShoutModifier,
   Side,
   TextColor,
-  type MSPacketClient,
-} from "../../packets/MS";
+} from "../../aolib";
 import { ChatMsg } from "../interfaces/ChatMsg";
 
 // Define UPDATE_INTERVAL locally to avoid circular dependency
 const UPDATE_INTERVAL = 60;
 
-const defaultPacket: MSPacketClient = {
+const defaultPacket: aolib.Out<typeof aolib.MSBroadcast> = {
   desk_modifier: DeskModifier.SHOWN,
   preanim: "",
   character: "",

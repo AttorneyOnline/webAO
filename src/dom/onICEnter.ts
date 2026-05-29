@@ -1,14 +1,5 @@
 import { client, selectedShout } from "../client";
-import { escapeFanta } from "../escaping";
-import {
-  EmoteModifier,
-  Flip,
-  parseEmoteModifier,
-  parseSide,
-  parseTextColor,
-  sendMS,
-  type MSPacketServer,
-} from "../packets/MS";
+import * as aolib from "../aolib";
 
 const input = (id: string) =>
   document.getElementById(id) as HTMLInputElement;
@@ -28,30 +19,42 @@ export function onICEnter(event: KeyboardEvent) {
 
   // sendpreanim toggle only flips between PREANIM and NO_PREANIM; don't
   // clobber zoom/objection variants from the ini.
-  let emote_modifier = parseEmoteModifier(String(my_emote.zoom));
-  if (sendPreanim && emote_modifier === EmoteModifier.NO_PREANIM) {
-    emote_modifier = EmoteModifier.PREANIM;
-  } else if (!sendPreanim && emote_modifier === EmoteModifier.PREANIM) {
-    emote_modifier = EmoteModifier.NO_PREANIM;
+  let emote_modifier: aolib.EmoteModifier = Number(my_emote.zoom);
+  if (!Number.isInteger(emote_modifier)) emote_modifier = aolib.EmoteModifier.NO_PREANIM;
+  if (sendPreanim && emote_modifier === aolib.EmoteModifier.NO_PREANIM) {
+    emote_modifier = aolib.EmoteModifier.PREANIM;
+  } else if (!sendPreanim && emote_modifier === aolib.EmoteModifier.PREANIM) {
+    emote_modifier = aolib.EmoteModifier.NO_PREANIM;
   }
 
-  const packet: MSPacketServer = {
+  const sideStr = input("role_select").value || my_char.side;
+  const side: aolib.Side = (Object.values(aolib.Side) as string[]).includes(sideStr)
+    ? (sideStr as aolib.Side)
+    : aolib.Side.WITNESS;
+
+  const colorN = Number(input("textcolor").value);
+  const text_color: aolib.TextColor =
+    Number.isInteger(colorN) && colorN >= 0 && colorN <= 9
+      ? (colorN as aolib.TextColor)
+      : aolib.TextColor.WHITE;
+
+  client.server.send.MS({
     desk_modifier: my_emote.desk_modifier,
     preanim: my_emote.preanim,
     character: my_char.name,
     emote: my_emote.emote,
     message: input("client_inputbox").value,
-    side: parseSide(input("role_select").value || my_char.side),
+    side,
     sfx_name: sendSfx ? my_emote.sfx : "0",
-    emote_modifier: emote_modifier,
+    emote_modifier,
     char_id: client.charID,
     sfx_delay: sendSfx ? my_emote.sfxdelay : 0,
     shout_modifier: selectedShout,
     evidence_id: client.evidence + 1,
-    flip: isToggled("button_flip") ? Flip.HORIZONTAL : Flip.NONE,
+    flip: isToggled("button_flip") ? aolib.Flip.HORIZONTAL : aolib.Flip.NONE,
     realization: isToggled("button_flash"),
-    text_color: parseTextColor(input("textcolor").value),
-    showname: escapeFanta(input("ic_chat_name").value),
+    text_color,
+    showname: input("ic_chat_name").value,
     paired_charid: Number(input("pair_select").value) || -1,
     offset: {
       x: Number(input("pair_offset").value) || 0,
@@ -65,8 +68,7 @@ export function onICEnter(event: KeyboardEvent) {
     frames_sfx: "-",
     additive: input("check_additive").checked,
     effect: input("effect_select").value,
-  };
-  sendMS(packet);
+  });
 
   return false;
 }

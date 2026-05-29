@@ -1,21 +1,7 @@
-import { Packet } from "../Packet";
-import { decode, req } from "../packets";
+import * as aolib from "../aolib";
 
-/**
- * Timer state update. `command` selects the action: 0/1 = set the
- * displayed time, 2 = show, 3 = hide.
- */
-
-// Receiver: Client
-export class TIPacket extends Packet {
-  static $header = "TI";
-  timer_id: number = req("number");
-  command: number = req("number");
-  time: number = req("number");
-}
-
-export function receiveTI(body: string) {
-  const packet = decode(TIPacket, body);
+/** Timer state update. `command`: 0/1 = set time, 2 = show, 3 = hide. */
+export function applyTimerUpdate(packet: aolib.Out<typeof aolib.TI>) {
   switch (packet.command) {
     case 0:
     case 1:

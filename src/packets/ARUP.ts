@@ -1,6 +1,6 @@
 import { client } from "../client";
 import { escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
+import * as aolib from "../aolib";
 
 /**
  * `update_type` selects what the rest of the packet means:
@@ -13,34 +13,12 @@ import type { PacketCodec } from "../packets";
  * union since the values arrive as strings on the wire and the handler picks
  * the cell-level type itself.
  */
-export interface ARUPPacket {
-  update_type: 0 | 1 | 2 | 3;
-  update_data: (number | string)[];
-}
 
-export const ARUP: PacketCodec<ARUPPacket> = {
-  header: "ARUP",
-  decode(args) {
-    const update_type = Number(args[1]) as 0 | 1 | 2 | 3;
-    const rest = args.slice(2);
-    const update_data =
-      update_type === 0
-        ? rest.map((v) => Number(v))
-        : rest.map((v) => unescapeFanta(v));
-    return { update_type, update_data };
-  },
-  encode(packet) {
-    const data = packet.update_data
-      .map((v) => (typeof v === "string" ? escapeFanta(v) : v))
-      .join("#");
-    return `ARUP#${packet.update_type}#${data}#%`;
-  },
-};
 
 /**
  * Handle the change of players in an area.
  */
-export const receiveARUP = (packet: ARUPPacket) => {
+export const applyAreaStatus = (packet: aolib.Out<typeof aolib.ARUP>) => {
   const { update_type, update_data } = packet;
   for (let i = 0; i < update_data.length; i++) {
     if (client.areas[i]) {

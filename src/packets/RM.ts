@@ -1,21 +1,11 @@
 import { client } from "../client";
 import vanilla_music_arr from "../constants/music";
-import { Packet } from "../Packet";
-import { decode } from "../packets";
+import * as aolib from "../aolib";
 
 /**
- * "Ask for music." Client -> Server, empty payload. In replay mode
- * the server-side handler synthesises an `SM` response from the
- * vanilla music list.
+ * Replay-mode synthesis: when the local client requests the music
+ * list, feed back the bundled vanilla list as if a server had sent it.
  */
-
-// Wire shape is the same in both directions.
-export class RMPacket extends Packet {
-  static $header = "RM";
-}
-
-// Receiver: Server (server-emulation in replay mode).
-export function receiveRM(body: string) {
-  decode(RMPacket, body);
-  client.receiveData(`SM#${vanilla_music_arr.join("#")}#%`);
+export function onMusicListRequest() {
+  client.server.receive(`SM#${vanilla_music_arr.join("#")}#%`);
 }

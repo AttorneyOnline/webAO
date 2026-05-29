@@ -1,4 +1,4 @@
-import { Side } from "../packets/MS";
+import { Side } from "../aolib";
 
 /**
  * Update evidence icon.

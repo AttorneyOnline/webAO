@@ -1,5 +1,4 @@
 import { client } from "../client";
-import { sendEE } from "../packets/EE";
 import { cancelEvidence } from "./cancelEvidence";
 
 /**
@@ -10,7 +9,7 @@ export function editEvidence() {
     document.getElementById("evi_select")
   );
   const id = client.selectedEvidence;
-  sendEE({
+  client.server.send.EE({
     id,
     name: (<HTMLInputElement>document.getElementById("evi_name")).value,
     description: (<HTMLInputElement>document.getElementById("evi_desc")).value,

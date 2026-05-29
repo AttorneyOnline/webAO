@@ -2,8 +2,8 @@ import { client } from "../client";
 import { handleCharacterInfo, ensureCharIni } from "../client/handleCharacterInfo";
 import { resetICParams } from "../client/resetICParams";
 import { escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
 import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
+import * as aolib from "../aolib";
 
 /**
  * In-character chat message. Field names mirror the spec verbatim
@@ -15,11 +15,11 @@ import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
  * short wire forms get filled with the documented defaults.
  *
  *   Client-as-receiver (Server -> Client): all 32 fields. Modeled by
- *     `MSPacketClient` + the `MSClient` codec (used by the dispatcher).
+ *     `aolib.Out<typeof aolib.MSBroadcast>` + the `MSClient` codec (used by the dispatcher).
  *
  *   Server-as-receiver (Client -> Server): same fields *except*
  *     `paired_name` and `paired_emote` are not present on the wire.
- *     Modeled by `MSPacketServer` + the `MSServer` codec.
+ *     Modeled by `aolib.In<typeof aolib.MSRequest>` + the `MSServer` codec.
  *
  * `offset` / `paired_offset` are decoded into `{x, y}` here. The wire
  * format is the spec form `{x}&{y}` -- but `&` is a FantaCode control
@@ -30,41 +30,6 @@ import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
  * downstream consumers see logical `{x, y}` and never have to think about
  * the wire-level dance.
  */
-export interface MSPacketClient {
-  desk_modifier: DeskModifier;
-  preanim: string;
-  character: string;
-  emote: string;
-  message: string;
-  side: Side;
-  sfx_name: string;
-  emote_modifier: EmoteModifier;
-  char_id: number;
-  sfx_delay: number;
-  shout_modifier: ShoutModifier;
-  evidence_id: number;
-  flip: Flip;
-  realization: boolean;
-  text_color: TextColor;
-  // cccc group
-  showname: string;
-  paired_charid: number;
-  paired_name: string;
-  paired_emote: string;
-  offset: Offset;
-  paired_offset: Offset;
-  paired_flip: Flip;
-  noninterrupting_preanim: boolean;
-  // 2.7 group
-  sfx_looping: boolean;
-  screenshake: boolean;
-  frames_shake: string;
-  frames_realization: string;
-  frames_sfx: string;
-  // 2.8 group
-  additive: boolean;
-  effect: string;
-}
 
 /**
  * Server-as-receiver form. The wire is 26 fields and omits:
@@ -77,10 +42,6 @@ export interface MSPacketClient {
  * `paired_emote` are absent on incoming, but real servers (KFO, Nyathena,
  * Athena) and the reference AO2-Client all expect this 26-field shape.
  */
-export type MSPacketServer = Omit<
-  MSPacketClient,
-  "paired_name" | "paired_emote" | "paired_offset" | "paired_flip"
->;
 
 /** Numeric x/y offset pair parsed from the `{x}&{y}` wire form. */
 export interface Offset {
@@ -244,154 +205,14 @@ const intOr = (v: string | undefined, def: number): number => {
   return Number.isInteger(n) ? n : def;
 };
 
-export const MSClient: PacketCodec<MSPacketClient> = {
-  header: "MS",
-  decode(args) {
-    return {
-      desk_modifier: parseDeskModifier(args[1]),
-      preanim: str(args[2]),
-      character: str(args[3]),
-      emote: str(args[4]),
-      message: str(args[5]),
-      side: parseSide(args[6]),
-      sfx_name: str(args[7]),
-      emote_modifier: parseEmoteModifier(args[8]),
-      char_id: intOr(args[9], -1),
-      sfx_delay: intOr(args[10], 0),
-      shout_modifier: parseShoutModifier(args[11]),
-      evidence_id: intOr(args[12], 0),
-      flip: parseFlip(args[13]),
-      realization: args[14] === "1",
-      text_color: parseTextColor(args[15]),
-      showname: str(args[16]),
-      paired_charid: intOr(args[17], -1),
-      paired_name: str(args[18]),
-      paired_emote: str(args[19]),
-      offset: parseOffset(str(args[20])),
-      paired_offset: parseOffset(str(args[21])),
-      paired_flip: parseFlip(args[22]),
-      noninterrupting_preanim: args[23] === "1",
-      sfx_looping: args[24] === "1",
-      screenshake: args[25] === "1",
-      frames_shake: str(args[26]),
-      frames_realization: str(args[27]),
-      frames_sfx: str(args[28]),
-      additive: args[29] === "1",
-      effect: str(args[30]),
-    };
-  },
-  encode(p) {
-    const fields = [
-      "MS",
-      String(p.desk_modifier),
-      escapeFanta(p.preanim),
-      escapeFanta(p.character),
-      escapeFanta(p.emote),
-      escapeFanta(p.message),
-      escapeFanta(p.side),
-      escapeFanta(p.sfx_name),
-      p.emote_modifier,
-      p.char_id,
-      p.sfx_delay,
-      p.shout_modifier,
-      p.evidence_id,
-      p.flip,
-      Number(p.realization),
-      p.text_color,
-      escapeFanta(p.showname),
-      p.paired_charid,
-      escapeFanta(p.paired_name),
-      escapeFanta(p.paired_emote),
-      escapeFanta(encodeOffset(p.offset)),
-      escapeFanta(encodeOffset(p.paired_offset)),
-      p.paired_flip,
-      Number(p.noninterrupting_preanim),
-      Number(p.sfx_looping),
-      Number(p.screenshake),
-      escapeFanta(p.frames_shake),
-      escapeFanta(p.frames_realization),
-      escapeFanta(p.frames_sfx),
-      Number(p.additive),
-      escapeFanta(p.effect),
-    ];
-    return `${fields.join("#")}#%`;
-  },
-};
 
-export const MSServer: PacketCodec<MSPacketServer> = {
-  header: "MS",
-  decode(args) {
-    return {
-      desk_modifier: parseDeskModifier(args[1]),
-      preanim: str(args[2]),
-      character: str(args[3]),
-      emote: str(args[4]),
-      message: str(args[5]),
-      side: parseSide(args[6]),
-      sfx_name: str(args[7]),
-      emote_modifier: parseEmoteModifier(args[8]),
-      char_id: intOr(args[9], -1),
-      sfx_delay: intOr(args[10], 0),
-      shout_modifier: parseShoutModifier(args[11]),
-      evidence_id: intOr(args[12], 0),
-      flip: parseFlip(args[13]),
-      realization: args[14] === "1",
-      text_color: parseTextColor(args[15]),
-      showname: str(args[16]),
-      paired_charid: intOr(args[17], -1),
-      // Server-receiver form jumps from paired_charid straight to
-      // offset (and from offset to noninterrupting_preanim).
-      offset: parseOffset(str(args[18])),
-      noninterrupting_preanim: args[19] === "1",
-      sfx_looping: args[20] === "1",
-      screenshake: args[21] === "1",
-      frames_shake: str(args[22]),
-      frames_realization: str(args[23]),
-      frames_sfx: str(args[24]),
-      additive: args[25] === "1",
-      effect: str(args[26]),
-    };
-  },
-  encode(p) {
-    const fields = [
-      "MS",
-      String(p.desk_modifier),
-      escapeFanta(p.preanim),
-      escapeFanta(p.character),
-      escapeFanta(p.emote),
-      escapeFanta(p.message),
-      escapeFanta(p.side),
-      escapeFanta(p.sfx_name),
-      p.emote_modifier,
-      p.char_id,
-      p.sfx_delay,
-      p.shout_modifier,
-      p.evidence_id,
-      p.flip,
-      Number(p.realization),
-      p.text_color,
-      escapeFanta(p.showname),
-      p.paired_charid,
-      escapeFanta(encodeOffset(p.offset)),
-      Number(p.noninterrupting_preanim),
-      Number(p.sfx_looping),
-      Number(p.screenshake),
-      escapeFanta(p.frames_shake),
-      escapeFanta(p.frames_realization),
-      escapeFanta(p.frames_sfx),
-      Number(p.additive),
-      escapeFanta(p.effect),
-    ];
-    return `${fields.join("#")}#%`;
-  },
-};
 
 /**
  * Handles an in-character chat message. Gatekeeps (duplicate / iniedit /
  * muted) and then delegates rendering to `handle_ic_speaking`, which owns
  * the viewport state construction from the packet.
  */
-export const receiveMS = (packet: MSPacketClient) => {
+export const handleChatMessage = (packet: aolib.Out<typeof aolib.MSBroadcast>) => {
   // duplicate message
   if (packet.message === client.viewport.getChatmsg().content) return;
 
@@ -418,8 +239,4 @@ export const receiveMS = (packet: MSPacketClient) => {
   }
 
   handle_ic_speaking(packet);
-};
-
-export const sendMS = (packet: MSPacketServer) => {
-  client.sendPacket(MSServer, packet);
 };

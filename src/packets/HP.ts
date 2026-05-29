@@ -1,25 +1,12 @@
 import { client } from "../client";
-import type { PacketCodec } from "../packets";
+import * as aolib from "../aolib";
 
-export interface HPPacket {
-  bar: number;
-  value: number;
-}
 
-export const HP: PacketCodec<HPPacket> = {
-  header: "HP",
-  decode(args) {
-    return { bar: Number(args[1]), value: Number(args[2]) };
-  },
-  encode(packet) {
-    return `HP#${packet.bar}#${packet.value}#%`;
-  },
-};
 
 /**
  * Handles a change in the health bars' states.
  */
-export const receiveHP = (packet: HPPacket) => {
+export const applyHealthBar = (packet: aolib.Out<typeof aolib.HP>) => {
   const percent_hp = packet.value * 10;
   let healthbox;
   if (packet.bar === 1) {
@@ -38,6 +25,3 @@ export const receiveHP = (packet: HPPacket) => {
 /**
  * Sends a health point change.
  */
-export const sendHP = (packet: HPPacket) => {
-  client.sendPacket(HP, packet);
-};

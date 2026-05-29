@@ -1,22 +1,13 @@
 import { client } from "../client";
 import vanilla_character_arr from "../constants/characters";
-import type { PacketCodec } from "../packets";
+import * as aolib from "../aolib";
 
 export type AskchaaPacket = Record<string, never>;
 
-export const askchaa: PacketCodec<AskchaaPacket> = {
-  header: "askchaa",
-  decode() {
-    return {};
-  },
-  encode() {
-    return `askchaa#%`;
-  },
-};
 
 /**
  * What? you want a character list from me??
  */
-export const receiveaskchaa = (_packet: AskchaaPacket) => {
-  client.receiveData(`SI#${vanilla_character_arr.length}#0#0#%`);
+export const onAreaCharRequest = (_packet: AskchaaPacket) => {
+  client.server.receive(`SI#${vanilla_character_arr.length}#0#0#%`);
 };

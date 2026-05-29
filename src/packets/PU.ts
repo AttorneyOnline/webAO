@@ -2,32 +2,14 @@ import { client } from "../client";
 import { ensureCharIni } from "../client/handleCharacterInfo";
 import { renderPlayerList } from "../dom/renderPlayerList";
 import { escapeFanta, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
+import * as aolib from "../aolib";
 
-export interface PUPacket {
-  id: number;
-  type: number;
-  data: string;
-}
 
-export const PU: PacketCodec<PUPacket> = {
-  header: "PU",
-  decode(args) {
-    return {
-      id: Number(args[1]),
-      type: Number(args[2]),
-      data: unescapeFanta(args[3] ?? ""),
-    };
-  },
-  encode(packet) {
-    return `PU#${packet.id}#${packet.type}#${escapeFanta(packet.data)}#%`;
-  },
-};
 
 /**
  * Handles a playerlist update
  */
-export const receivePU = (packet: PUPacket) => {
+export const applyPlayerFieldUpdate = (packet: aolib.Out<typeof aolib.PU>) => {
   const player = client.playerlist.get(packet.id);
   if (!player) return;
 

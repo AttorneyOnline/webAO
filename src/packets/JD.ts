@@ -1,19 +1,10 @@
-import { Packet } from "../Packet";
-import { decode, req } from "../packets";
+import * as aolib from "../aolib";
 
 /**
- * Judge-controls toggle. `state === 1` shows the judge action panel;
- * anything else hides it.
+ * Toggle the judge action panel. `state === 1` shows it; anything else
+ * hides it.
  */
-
-// Receiver: Client
-export class JDPacket extends Packet {
-  static $header = "JD";
-  state: number = req("number");
-}
-
-export function receiveJD(body: string) {
-  const packet = decode(JDPacket, body);
+export function toggleJudgePanel(packet: aolib.Out<typeof aolib.JD>) {
   if (packet.state === 1) {
     document.getElementById("judge_action")!.style.display = "inline-table";
     document.getElementById("no_action")!.style.display = "none";

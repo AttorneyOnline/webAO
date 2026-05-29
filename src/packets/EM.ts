@@ -3,50 +3,14 @@ import { addTrack } from "../client/addTrack";
 import { createArea } from "../client/createArea";
 import { fix_last_area } from "../client/fixLastArea";
 import { isAudio } from "../client/isAudio";
-import { escapeFanta, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
-import { AM } from "./AM";
+import * as aolib from "../aolib";
 
 /**
- * Incremental music/area list packet. Wire format is essentially
- * `EM#{batch_index}#{idx0}#{name0}#{idx1}#{name1}#...#%`. The trailing entry
- * is empty due to wire-format split semantics, so we drop it.
+ * Incremental music/area list packet. Entries arrive as
+ * (index, name) pairs; the first run of areas is followed by an
+ * audio entry — that switch flips us into music-list mode.
  */
-export interface EMPacket {
-  batchIndex: number;
-  // TODO: confirm field meaning -- legacy handler treats odd-indexed pairs
-  // as `(trackIndex, trackName)`.
-  entries: { index: number; name: string }[];
-}
-
-export const EM: PacketCodec<EMPacket> = {
-  header: "EM",
-  decode(args) {
-    const batchIndex = Number(args[1]);
-    const entries: { index: number; name: string }[] = [];
-    // args = ["EM", batchIndex, idx0, name0, idx1, name1, ..., ""]
-    for (let i = 2; i < args.length - 1; i += 2) {
-      if (args[i + 1] === undefined) break;
-      entries.push({
-        index: Number(args[i]),
-        name: unescapeFanta(args[i + 1]),
-      });
-    }
-    return { batchIndex, entries };
-  },
-  encode(packet) {
-    const flat = packet.entries
-      .map((e) => `${e.index}#${escapeFanta(e.name)}`)
-      .join("#");
-    return `EM#${packet.batchIndex}#${flat}#%`;
-  },
-};
-
-/**
- * Handles incoming music information, containing multiple entries
- * per packet.
- */
-export const receiveEM = (packet: EMPacket) => {
+export const applyEvidenceListBatch = (packet: aolib.Out<typeof aolib.EM>) => {
   document.getElementById("client_loadingtext")!.innerHTML = "Loading Music";
   if (packet.batchIndex === 0) {
     client.resetMusicList();
@@ -65,6 +29,5 @@ export const receiveEM = (packet: EMPacket) => {
       createArea(index, name);
     }
   }
-  // get the next batch of tracks
-  client.sendPacket(AM, { batch: packet.batchIndex / 10 + 1 });
+  client.server.send.AM({ batch: packet.batchIndex / 10 + 1 });
 };

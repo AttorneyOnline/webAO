@@ -1,27 +1,8 @@
 import { client } from "../client";
 import { escapeFanta, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
+import * as aolib from "../aolib";
 
 /**
  * Mod-action packet (mute/ban). Client-to-server only.
  */
-export interface MAPacket {
-  id: number;
-  /** Duration in minutes. Use 0 for a kick. */
-  duration: number;
-  reason: string;
-}
 
-export const MA: PacketCodec<MAPacket> = {
-  header: "MA",
-  decode: (args) => ({
-    id: Number(args[1]),
-    duration: Number(args[2]),
-    reason: unescapeFanta(args[3] ?? ""),
-  }),
-  encode: (p) => `MA#${p.id}#${p.duration}#${escapeFanta(p.reason)}#%`,
-};
-
-export const sendMA = (packet: MAPacket) => {
-  client.sendPacket(MA, packet);
-};

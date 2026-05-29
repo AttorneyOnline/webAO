@@ -1,24 +1,12 @@
 import { client, clientState, autoChar, autoArea } from "../client";
 import { area_click } from "../dom/areaClick";
-import { Packet } from "../Packet";
-import { decode } from "../packets";
 import queryParser from "../utils/queryParser";
+import * as aolib from "../aolib";
 
 const { mode } = queryParser();
 
-/**
- * Handshake completion. Empty payload; arrival means the player can
- * now select a character.
- */
-
-// Receiver: Client
-export class DONEPacket extends Packet {
-  static $header = "DONE";
-}
-
-// Receive handshake completion; advance to character select.
-export function receiveDONE(body: string) {
-  decode(DONEPacket, body);
+/** Handshake completion. Advance to character select. */
+export function finishServerJoin() {
   client.state = clientState.Joined;
   document.getElementById("client_loading")!.style.display = "none";
   if (mode === "watch") {
@@ -48,9 +36,7 @@ export function receiveDONE(body: string) {
       (c: any) => c && c.name.toLowerCase() === autoChar.toLowerCase(),
     );
     if (charIndex !== -1) {
-      client.send.CC({
-        char_id: charIndex,
-      });
+      client.server.send.CC({ char_id: charIndex });
     }
   }
 }

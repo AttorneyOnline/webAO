@@ -52,7 +52,7 @@ export {
   HI, CC, decryptor, ID, PV, BB, DONE, SM,
   HP, RT, ZZ,
   AE, AM, AN, askchaa, CH, DE, EE, MA, PE, RC, RD, RM, VS_FRAME,
-  ASS, AUTH, BD, BN, CHECK, CharsCheck, FA, FL, FM, JD, KB, KK,
+  ARUP, ASS, AUTH, BD, BN, CHECK, CharsCheck, FA, FL, FM, JD, KB, KK,
   PN, PR, PU, RMC, SC, SI, SP, TI,
   VS_AUDIO, VS_CAPS, VS_PEERS,
   CI, EM, EI, LE,

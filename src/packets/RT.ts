@@ -1,7 +1,7 @@
 import { client } from "../client";
 import { escapeFanta, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
 import { initTestimonyUpdater } from "../viewport/utils/initTestimonyUpdater";
+import * as aolib from "../aolib";
 
 /**
  * `animation` is the testimony/judgeruling string. The wire format may
@@ -9,33 +9,12 @@ import { initTestimonyUpdater } from "../viewport/utils/initTestimonyUpdater";
  * field separator, that suffix arrives as a second arg. The handler reads
  * it from `judgeId` only when `animation === "judgeruling"`.
  */
-export interface RTPacket {
-  animation: string;
-  judgeId?: number;
-}
 
-export const RT: PacketCodec<RTPacket> = {
-  header: "RT",
-  decode(args) {
-    const packet: RTPacket = { animation: unescapeFanta(args[1] ?? "") };
-    if (args[2] !== undefined && args[2] !== "") {
-      packet.judgeId = Number(args[2]);
-    }
-    return packet;
-  },
-  encode(packet) {
-    const animation = escapeFanta(packet.animation);
-    if (packet.judgeId !== undefined) {
-      return `RT#${animation}#${packet.judgeId}#%`;
-    }
-    return `RT#${animation}#%`;
-  },
-};
 
 /**
  * Handles a testimony states.
  */
-export const receiveRT = (packet: RTPacket) => {
+export const applyTestimonyState = (packet: aolib.Out<typeof aolib.RT>) => {
   const judgeid = packet.judgeId ?? 0;
   switch (packet.animation) {
     case "testimony1":
@@ -62,6 +41,3 @@ export const receiveRT = (packet: RTPacket) => {
 /**
  * Sends a testimony state change (witness testimony, cross-exam, judge ruling).
  */
-export const sendRT = (packet: RTPacket) => {
-  client.sendPacket(RT, packet);
-};

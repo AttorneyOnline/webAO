@@ -1,7 +1,7 @@
 import { client } from "../client";
 import { setupCharacterBasic } from "../client/handleCharacterInfo";
-import type { PacketCodec } from "../packets";
 import queryParser from "../utils/queryParser";
+import * as aolib from "../aolib";
 
 const { mode } = queryParser();
 
@@ -14,25 +14,13 @@ const { mode } = queryParser();
  * the whole slot here would convert `<and>` to literal `&` and corrupt the
  * split.
  */
-export interface SCPacket {
-  char_data: string[];
-}
 
-export const SC: PacketCodec<SCPacket> = {
-  header: "SC",
-  decode(args) {
-    return { char_data: args.slice(1) };
-  },
-  encode(packet) {
-    return `SC#${packet.char_data.join("#")}#%`;
-  },
-};
 
 /**
  * Handles incoming character information, containing all characters
  * in one packet.
  */
-export const receiveSC = async (packet: SCPacket) => {
+export const applyFullCharacterList = async (packet: aolib.Out<typeof aolib.SC>) => {
   if (mode === "watch") {
     // Spectators don't need to pick a character
     document.getElementById("client_charselect")!.style.display = "none";
@@ -45,5 +33,5 @@ export const receiveSC = async (packet: SCPacket) => {
     setupCharacterBasic(chargs, i);
   }
   // We're done with the characters, request the music
-  client.send.RM({});
+  client.server.send.RM({});
 };

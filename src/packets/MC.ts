@@ -1,36 +1,10 @@
 import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
 import { appendICLog } from "../client/appendICLog";
-import { Packet } from "../Packet";
-import { decode, req } from "../packets";
+import * as aolib from "../aolib";
 
-/**
- * Music/area change.
- */
-
-// Receiver: Client
-export class MCPacketClient extends Packet {
-  static $header = "MC";
-  name: string = req("string");
-  char_id: number = req("number");
-  showname?: string = "";
-  looping?: boolean = false;
-  channel?: number = 0;
-  effects?: number = 0;
-}
-
-// Receiver: Server
-export class MCPacketServer extends Packet {
-  static $header = "MC";
-  name: string = req("string");
-  char_id: number = req("number");
-  showname?: string = "";
-  effects?: number = 0;
-}
-
-// Receive music change request from server
-export function receiveMC(body: string) {
-  const packet = decode(MCPacketClient, body);
+/** Apply a music change announcement from the server. */
+export function playMusicChange(packet: aolib.Out<typeof aolib.MCBroadcast>) {
   const music = client.viewport.music[packet.channel];
   music.pause();
   if (packet.name.startsWith("http")) {

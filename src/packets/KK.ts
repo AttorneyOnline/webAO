@@ -1,21 +1,9 @@
 import { client } from "../client";
 import { handleBans } from "../client/handleBans";
-import { Packet } from "../Packet";
-import { decode, req } from "../packets";
+import * as aolib from "../aolib";
 
-/**
- * Kicked (no ban). Server is dropping the connection with a reason
- * but won't refuse a subsequent reconnect.
- */
-
-// Receiver: Client
-export class KKPacket extends Packet {
-  static $header = "KK";
-  reason: string = req("string");
-}
-
-export function receiveKK(body: string) {
-  const packet = decode(KKPacket, body);
+/** Kicked (no ban). Show the kick screen; reconnect still allowed. */
+export function showKickScreen(packet: aolib.Out<typeof aolib.KK>) {
   client.banned = true;
   handleBans("Kicked", packet.reason);
 }

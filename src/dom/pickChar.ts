@@ -12,7 +12,7 @@ export function pickChar(ccharacter: number) {
     document.getElementById("client_waiting")!.style.display = "none";
     document.getElementById("client_charselect")!.style.display = "none";
   }
-  client.send.CC({
+  client.server.send.CC({
     char_id: ccharacter,
   });
 }

@@ -1,7 +1,7 @@
 import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
 import { unescapeUnicode, escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
+import * as aolib from "../aolib";
 
 /**
  * Modcall packet. `reason` is per the AO spec; `target` is a non-spec
@@ -11,36 +11,12 @@ import type { PacketCodec } from "../packets";
  * Servers only ever send `reason` to clients, so `target` is outbound-only
  * in practice -- but `decode` accepts it for symmetry.
  */
-export interface ZZPacket {
-  reason: string;
-  target?: number;
-}
 
-export const ZZ: PacketCodec<ZZPacket> = {
-  header: "ZZ",
-  decode(args) {
-    const packet: ZZPacket = { reason: unescapeFanta(args[1] ?? "") };
-    if (args[2] !== undefined && args[2] !== "") {
-      packet.target = Number(args[2]);
-    }
-    return packet;
-  },
-  encode(packet) {
-    const reason = escapeFanta(packet.reason);
-    if (packet.target !== undefined) {
-      return `ZZ#${reason}#${packet.target}#%`;
-    }
-    if (reason !== "") {
-      return `ZZ#${reason}#%`;
-    }
-    return `ZZ#%`;
-  },
-};
 
 /**
  * Handles a modcall.
  */
-export const receiveZZ = (packet: ZZPacket) => {
+export const showModcallNotice = (packet: aolib.Out<typeof aolib.ZZ>) => {
   const oocLog = document.getElementById("client_ooclog")!;
   const message = safeHtmlTags(unescapeUnicode(packet.reason)).replace(/\n/g, "<br>");
   oocLog.innerHTML += `$Alert: ${message}<br>`;
@@ -59,6 +35,3 @@ export const receiveZZ = (packet: ZZPacket) => {
 /**
  * Sends a modcall.
  */
-export const sendZZ = (packet: ZZPacket) => {
-  client.sendPacket(ZZ, packet);
-};

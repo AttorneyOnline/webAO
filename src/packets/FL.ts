@@ -1,25 +1,13 @@
 import { setExtraFeatures } from "../client";
 import { escapeFanta, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
+import * as aolib from "../aolib";
 
-export interface FLPacket {
-  features: string[];
-}
 
-export const FL: PacketCodec<FLPacket> = {
-  header: "FL",
-  decode(args) {
-    return { features: args.slice(1).map((v) => unescapeFanta(v)) };
-  },
-  encode(packet) {
-    return `FL#${packet.features.map(escapeFanta).join("#")}#%`;
-  },
-};
 
 /**
  * With this the server tells us which features it supports
  */
-export const receiveFL = (packet: FLPacket) => {
+export const applyFeatureFlags = (packet: aolib.Out<typeof aolib.FL>) => {
   const { features } = packet;
   setExtraFeatures(features);
 

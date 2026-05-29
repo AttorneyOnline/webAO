@@ -1,33 +1,15 @@
 import { client } from "../client";
 import { fetchExtensions } from "../client/fetchLists";
 import { applyFavourites } from "../dom/toggleFavourite";
-import type { PacketCodec } from "../packets";
+import * as aolib from "../aolib";
 
-export interface SIPacket {
-  char_cnt: number;
-  evi_cnt: number;
-  mus_cnt: number;
-}
 
-export const SI: PacketCodec<SIPacket> = {
-  header: "SI",
-  decode(args) {
-    return {
-      char_cnt: Number(args[1]),
-      evi_cnt: Number(args[2]),
-      mus_cnt: Number(args[3]),
-    };
-  },
-  encode(packet) {
-    return `SI#${packet.char_cnt}#${packet.evi_cnt}#${packet.mus_cnt}#%`;
-  },
-};
 
 /**
  * Received when the server announces its server info,
  * but we use it as a cue to begin retrieving characters.
  */
-export const receiveSI = (packet: SIPacket) => {
+export const applyServerCounts = (packet: aolib.Out<typeof aolib.SI>) => {
   client.char_list_length = packet.char_cnt;
   client.evidence_list_length = packet.evi_cnt;
   client.music_list_length = packet.mus_cnt;
@@ -63,5 +45,5 @@ export const receiveSI = (packet: SIPacket) => {
 
   applyFavourites();
 
-  client.send.RC({});
+  client.server.send.RC({});
 };

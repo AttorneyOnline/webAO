@@ -1,5 +1,5 @@
-import type { PacketCodec } from "../packets";
 import { handleInitialPeers } from "../voice/voice";
+import * as aolib from "../aolib";
 
 /**
  * Undocumented voice subsystem packet. Wire format:
@@ -7,28 +7,8 @@ import { handleInitialPeers } from "../voice/voice";
  * a single string here so the handler can preserve its own empty/invalid
  * filtering semantics.
  */
-export interface VS_PEERSPacket {
-  uids: number[];
-}
 
-export const VS_PEERS: PacketCodec<VS_PEERSPacket> = {
-  header: "VS_PEERS",
-  decode(args) {
-    const csv = args[1] || "";
-    const uids: number[] = [];
-    if (csv.length > 0) {
-      for (const part of csv.split(",")) {
-        const n = Number(part);
-        if (Number.isFinite(n)) uids.push(n);
-      }
-    }
-    return { uids };
-  },
-  encode(packet) {
-    return `VS_PEERS#${packet.uids.join(",")}#%`;
-  },
-};
 
-export const receiveVS_PEERS = (packet: VS_PEERSPacket) => {
+export const applyVoicePeerList = (packet: aolib.Out<typeof aolib.VS_PEERS>) => {
   void handleInitialPeers(packet.uids);
 };

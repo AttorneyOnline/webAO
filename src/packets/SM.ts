@@ -4,26 +4,14 @@ import { createArea } from "../client/createArea";
 import { fix_last_area } from "../client/fixLastArea";
 import { isAudio } from "../client/isAudio";
 import { escapeFanta, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
+import * as aolib from "../aolib";
 
-export interface SMPacket {
-  music_list: string[];
-}
 
-export const SM: PacketCodec<SMPacket> = {
-  header: "SM",
-  decode(args) {
-    return { music_list: args.slice(1).map((v) => unescapeFanta(v)) };
-  },
-  encode(packet) {
-    return `SM#${packet.music_list.map(escapeFanta).join("#")}#%`;
-  },
-};
 
 /**
  * Handles incoming music information, containing all music in one packet.
  */
-export const receiveSM = (packet: SMPacket) => {
+export const applyMusicListBatch = (packet: aolib.Out<typeof aolib.SM>) => {
   document.getElementById("client_loadingtext")!.innerHTML = "Loading Music ";
   client.resetMusicList();
   client.resetAreaList();
@@ -54,5 +42,5 @@ export const receiveSM = (packet: SMPacket) => {
   }
 
   // Music done, carry on
-  client.send.RD({});
+  client.server.send.RD({});
 };

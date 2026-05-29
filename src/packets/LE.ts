@@ -2,7 +2,7 @@ import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
 import { pickEvidence } from "../dom/pickEvidence";
 import { escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
-import type { PacketCodec } from "../packets";
+import * as aolib from "../aolib";
 
 export interface EvidenceData {
   name: string;
@@ -10,44 +10,13 @@ export interface EvidenceData {
   image: string;
 }
 
-export interface LEPacket {
-  evidence: EvidenceData[];
-}
 
-export const LE: PacketCodec<LEPacket> = {
-  header: "LE",
-  decode(args) {
-    const evidence: EvidenceData[] = [];
-    for (let i = 1; i < args.length; i++) {
-      // Trailing empty entry from the wire-format split, or any otherwise
-      // malformed cell (no `&` subfield separators) terminates the list --
-      // this matches the legacy handler's behavior.
-      if (!args[i].includes("&")) break;
-      const parts = args[i].split("&");
-      evidence.push({
-        name: unescapeFanta(parts[0] ?? ""),
-        description: unescapeFanta(parts[1] ?? ""),
-        image: unescapeFanta(parts[2] ?? ""),
-      });
-    }
-    return { evidence };
-  },
-  encode(packet) {
-    const parts = packet.evidence
-      .map(
-        (e) =>
-          `${escapeFanta(e.name)}&${escapeFanta(e.description)}&${escapeFanta(e.image)}`,
-      )
-      .join("#");
-    return `LE#${parts}#%`;
-  },
-};
 
 /**
  * Handles incoming evidence list, all evidences at once
  * item per packet.
  */
-export const receiveLE = (packet: LEPacket) => {
+export const applyEvidenceList = (packet: aolib.Out<typeof aolib.LE>) => {
   client.evidences = [];
   for (let i = 0; i < packet.evidence.length; i++) {
     const ev = packet.evidence[i];

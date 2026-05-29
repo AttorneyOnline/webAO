@@ -7,7 +7,7 @@ import {
 } from "../escaping";
 import queryParser from "../utils/queryParser";
 import { flashPairActivity } from "../dom/pairNotification";
-import type { PacketCodec } from "../packets";
+import * as aolib from "../aolib";
 
 /**
  * OOC chat message. The wire format differs by direction:
@@ -20,40 +20,14 @@ import type { PacketCodec } from "../packets";
  * String fields hold logical (unescaped) values -- the codec handles
  * FantaCode escape/unescape so handlers never see `<num>` / `<and>` / etc.
  */
-export interface CTPacket {
-  name: string;
-  message: string;
-  is_from_server?: boolean;
-}
 
-export const CT: PacketCodec<CTPacket> = {
-  header: "CT",
-  decode(args) {
-    const packet: CTPacket = {
-      name: unescapeFanta(args[1] ?? ""),
-      message: unescapeFanta(args[2] ?? ""),
-    };
-    if (args[3] !== undefined) {
-      packet.is_from_server = args[3] === "1";
-    }
-    return packet;
-  },
-  encode(packet) {
-    const name = escapeFanta(packet.name);
-    const message = escapeFanta(packet.message);
-    if (packet.is_from_server !== undefined) {
-      return `CT#${name}#${message}#${packet.is_from_server ? 1 : 0}#%`;
-    }
-    return `CT#${name}#${message}#%`;
-  },
-};
 
 const { mode } = queryParser();
 
 /**
  * Handles an out-of-character chat message.
  */
-export const receiveCT = (packet: CTPacket) => {
+export const appendOOCMessage = (packet: aolib.Out<typeof aolib.CTBroadcast>) => {
   if (mode !== "replay") {
     const oocLog = document.getElementById("client_ooclog")!;
     const username = safeHtmlTags(unescapeUnicode(packet.name));
@@ -80,6 +54,3 @@ function addLinks(message: string) {
 /**
  * Sends an out-of-character chat message.
  */
-export const sendCT = (packet: CTPacket) => {
-  client.sendPacket(CT, packet);
-};

@@ -1,21 +1,9 @@
 import { client } from "../client";
 import { handleBans } from "../client/handleBans";
-import { Packet } from "../Packet";
-import { decode, req } from "../packets";
+import * as aolib from "../aolib";
 
-/**
- * Ban-on-reconnect. Server rejects the connection because the client
- * is banned; the reason is shown in the ban screen.
- */
-
-// Receiver: Client
-export class BDPacket extends Packet {
-  static $header = "BD";
-  reason: string = req("string");
-}
-
-export function receiveBD(body: string) {
-  const packet = decode(BDPacket, body);
+/** Ban-on-reconnect: mark the session banned and show the ban screen. */
+export function showBanDialog(packet: aolib.Out<typeof aolib.BD>) {
   client.banned = true;
   handleBans("Banned", packet.reason);
 }

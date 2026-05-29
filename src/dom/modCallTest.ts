@@ -1,7 +1,6 @@
-import { receiveZZ } from "../packets/ZZ";
-/**
- * Triggered by the modcall sfx dropdown
- */
+import { showModcallNotice } from "../packets/ZZ";
+
+/** Triggered by the modcall sfx dropdown — preview the modcall alert. */
 export function modcall_test() {
-  receiveZZ({ reason: "test" });
+  showModcallNotice({ reason: "test", target: -1 });
 }

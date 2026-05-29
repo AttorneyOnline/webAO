@@ -1,29 +1,18 @@
 import { client } from "../client";
-import { Packet } from "../Packet";
-import { decode } from "../packets";
+import * as aolib from "../aolib";
 
 /**
- * "Ready / done with handshake." Client -> Server, empty payload. In
- * replay mode the server-side handler synthesises the post-handshake
- * setup: default background and DONE, then flips the OOC textarea to
- * writable for the replay queue.
+ * Replay-mode synthesis: when the local client signals ready, feed
+ * back BN (default background) and DONE as if a server had sent them,
+ * then make the OOC log writable for the replay queue.
  */
-
-// Wire shape is the same in both directions.
-export class RDPacket extends Packet {
-  static $header = "RD";
-}
-
-// Receiver: Server (server-emulation in replay mode).
-export function receiveRD(body: string) {
-  decode(RDPacket, body);
-  client.receiveData("BN#gs4#%");
-  client.receiveData("DONE#%");
+export function onReady() {
+  client.server.receive("BN#gs4#%");
+  client.server.receive("DONE#%");
   const ooclog = <HTMLInputElement>document.getElementById("client_ooclog");
   ooclog.value = "";
   ooclog.readOnly = false;
 
   document.getElementById("client_oocinput")!.style.display = "none";
-  document.getElementById("client_replaycontrols")!.style.display =
-    "inline-block";
+  document.getElementById("client_replaycontrols")!.style.display = "inline-block";
 }

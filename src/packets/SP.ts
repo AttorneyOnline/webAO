@@ -1,24 +1,7 @@
 import { updateActionCommands } from "../dom/updateActionCommands";
-import type { PacketCodec } from "../packets";
-import { Side, parseSide } from "./MS";
+import type * as aolib from "../aolib";
 
-export interface SPPacket {
-  side: Side;
-}
-
-export const SP: PacketCodec<SPPacket> = {
-  header: "SP",
-  decode(args) {
-    return { side: parseSide(args[1]) };
-  },
-  encode(packet) {
-    return `SP#${packet.side}#%`;
-  },
-};
-
-/**
- * position change
- */
-export const receiveSP = (packet: SPPacket) => {
+/** Apply a side / position change for the local character. */
+export const applyCharacterSide = (packet: aolib.Out<typeof aolib.SP>) => {
   updateActionCommands(packet.side);
 };

@@ -1,4 +1,5 @@
-import type { PacketCodec } from "../packets";
+import * as aolib from "../aolib";
+
 
 /**
  * Client -> server voice frame. Carries a base64-encoded Opus packet; the
@@ -7,16 +8,4 @@ import type { PacketCodec } from "../packets";
  *
  * Wire: `VS_FRAME#<b64_opus>#%`.
  */
-export interface VS_FRAMEPacket {
-  payload: string;
-}
 
-export const VS_FRAME: PacketCodec<VS_FRAMEPacket> = {
-  header: "VS_FRAME",
-  decode() {
-    throw new Error("VS_FRAME is send-only");
-  },
-  encode(packet) {
-    return `VS_FRAME#${packet.payload}#%`;
-  },
-};

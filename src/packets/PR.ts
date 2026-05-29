@@ -1,22 +1,9 @@
 import { client } from "../client";
 import { renderPlayerList } from "../dom/renderPlayerList";
-import { Packet } from "../Packet";
-import { decode, req } from "../packets";
+import * as aolib from "../aolib";
 
-/**
- * Player roster change. `type === 0` = player `id` joined; `type === 1`
- * = player `id` left. Anything else is currently ignored.
- */
-
-// Receiver: Client
-export class PRPacket extends Packet {
-  static $header = "PR";
-  id: number = req("number");
-  type: number = req("number");
-}
-
-export function receivePR(body: string) {
-  const packet = decode(PRPacket, body);
+/** Player roster change. type 0 = join, 1 = leave. */
+export function applyPlayerRosterChange(packet: aolib.Out<typeof aolib.PR>) {
   if (packet.type === 0) {
     client.playerlist.set(packet.id, { charId: -1, charName: "", showName: "", name: "", area: 0 });
   } else if (packet.type === 1) {

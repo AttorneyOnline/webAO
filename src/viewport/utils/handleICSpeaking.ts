@@ -12,6 +12,7 @@ import { COLORS } from "../constants/colors";
 import mlConfig from "../../utils/aoml";
 import request from "../../services/request";
 import { unescapeUnicode, safeHtmlTags } from "../../escaping";
+import * as aolib from "../../aolib";
 import {
   DeskModifier,
   EmoteModifier,
@@ -19,8 +20,7 @@ import {
   isFullView,
   ShoutModifier,
   Side,
-  type MSPacketClient,
-} from "../../packets/MS";
+} from "../../aolib";
 import preloadMessageAssets from "./preloadMessageAssets";
 import { setBlipUrl } from "./blipAudio";
 
@@ -83,11 +83,11 @@ const flipTransform = (flip: Flip | undefined): string => {
 
 /**
  * Builds the viewport's render state from an incoming MS packet. The
- * `ChatMsg` type is `MSPacketClient & {render-state extras}`, so we just
+ * `ChatMsg` type is `aolib.Out<typeof aolib.MSBroadcast> & {render-state extras}`, so we just
  * spread the packet and add the display-transformed / char-derived /
  * render-loop fields on top.
  */
-const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
+const buildChatMsg = (packet: aolib.Out<typeof aolib.MSBroadcast>): ChatMsg => {
   const char = client.chars[packet.char_id];
   const msg_nameplate = char?.showname ?? packet.character;
   const msg_blips = char?.blips ?? "male";
@@ -156,7 +156,7 @@ const parseContent = async (chatmsg: ChatMsg): Promise<HTMLSpanElement[]> => {
  * preload, markdown parsing) and computes derived render-loop flags.
  * No DOM mutation here -- only state on the chatmsg object itself.
  */
-const prepareICMessage = async (packet: MSPacketClient): Promise<ChatMsg> => {
+const prepareICMessage = async (packet: aolib.Out<typeof aolib.MSBroadcast>): Promise<ChatMsg> => {
   const chatmsg = buildChatMsg(packet);
 
   // Preload all assets in parallel; primes browser cache.
@@ -428,7 +428,7 @@ const renderICMessage = (chatmsg: ChatMsg) => {
  *   prepareICMessage(packet)  // async: build chatmsg, preload, parse markdown
  *   renderICMessage(chatmsg)  // sync:  apply to DOM, start chat_tick
  */
-export const handle_ic_speaking = async (packet: MSPacketClient) => {
+export const handle_ic_speaking = async (packet: aolib.Out<typeof aolib.MSBroadcast>) => {
   const chatmsg = await prepareICMessage(packet);
   renderICMessage(chatmsg);
 };
