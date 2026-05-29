@@ -162,6 +162,16 @@ class Client extends EventEmitter {
    */
   sendAsServer = serverSend;
 
+  /**
+   * When true, we synthesise the server locally instead of talking
+   * to a real one: `sendData` loops outbound frames back through
+   * `receiveDataAsServer`, and the server-side handlers in
+   * `serverReceive` drive the conversation. Initialised from
+   * `mode === "replay"` but flippable independently for tests and
+   * future server-emulation modes.
+   */
+  acting_as_server = false;
+
   serv: any;
   hp: number[];
   playerID: number;
@@ -198,6 +208,7 @@ class Client extends EventEmitter {
   constructor(connectionString: string) {
     super();
 
+    this.acting_as_server = mode === "replay";
     this.state = clientState.NotConnected;
     this.connect = () => {
       this.on("open", this.onOpen.bind(this));
@@ -351,14 +362,14 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Transmit a wire frame to the server. In replay mode there is no
-   * real server, so the frame is fed to our own server-side dispatcher
-   * (`receiveDataAsServer`) and the local handlers synthesize what the
-   * server would have done.
+   * Transmit a wire frame to the server. When `acting_as_server` is
+   * set there is no real server, so the frame is fed to our own
+   * server-side dispatcher (`receiveDataAsServer`) and the local
+   * handlers synthesize what a server would have done.
    */
   sendData(message: string) {
     console.debug("C: " + message);
-    if (mode === "replay") {
+    if (this.acting_as_server) {
       this.receiveDataAsServer(message);
     } else {
       this.serv.send(message);
