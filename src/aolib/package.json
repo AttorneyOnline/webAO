@@ -1,5 +1,5 @@
 {
-  "name": "aolib",
+  "name": "aolib-ts",
   "version": "0.0.0",
   "description": "Self-contained TypeScript library for the Attorney Online protocol. Owns every packet schema, both wire formats (fantacode + JSON), encode/decode, and the typed dispatch surface.",
   "type": "module",

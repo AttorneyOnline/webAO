@@ -1,15 +1,15 @@
 /**
  * Example: aolib used from a browser client.
  *
- * Demonstrates the intended public surface for client-side code. Runs
- * once the schema/encode/decode/dispatch implementation lands; today
- * the session bodies are stubs (every send/on call throws).
+ * Demonstrates the intended public surface for client-side code.
+ * Uses only the packets currently in the registry — once more schemas
+ * land in `packets/`, more `.on.X` / `.send.X` calls become valid.
  *
  * Read this file top-to-bottom — it's documentation that also
  * typechecks.
  */
 
-import { aolib, type MSPacket, type MCPacket } from "./index";
+import { aolib } from "./index";
 
 // ---------------------------------------------------------------------
 // Application state and stub helpers — what real client code would
@@ -19,9 +19,10 @@ import { aolib, type MSPacket, type MCPacket } from "./index";
 const state = { charID: -1 };
 
 function getHardwareID(): string { return "stub-hwid"; }
-function appendChat(_character: string, _text: string): void {}
 function playMusic(_track: string, _channel: number): void {}
 function loadCharacter(_charId: number): void {}
+function loadMusicList(_tracks: string[]): void {}
+function alert(_msg: string): void {}
 
 // In a browser this is `globalThis.WebSocket`; types come from `lib.dom`.
 declare const WebSocket: { new (url: string): {
@@ -54,17 +55,15 @@ ws.onmessage = (e) => server.receive(e.data);
 // Fully typed, defaults filled, literals stripped.
 // ---------------------------------------------------------------------
 
-server.on.MS((packet: MSPacket) => {
-  appendChat(packet.character, packet.text);
-});
-
-server.on.MC((packet: MCPacket) => {
+server.on.MC((packet) => {
   // packet.showname defaults to "" if the server omitted it.
   playMusic(packet.name, packet.channel);
 });
 
 server.on.BB((packet) => alert(packet.message));
 server.on.PV((packet) => loadCharacter(packet.char_id));
+server.on.SM((packet) => loadMusicList(packet.music_list));
+server.on.DONE(() => console.log("handshake done"));
 
 // ---------------------------------------------------------------------
 // Send packets TO the server. TS enforces input shape per header.
@@ -72,17 +71,10 @@ server.on.PV((packet) => loadCharacter(packet.char_id));
 
 server.send.HI({ hdid: getHardwareID() });
 
-export function onEnterChat(text: string): void {
-  server.send.MS({
-    msg_type: "1",
-    pre: "phoenix-confident",
-    character: "Phoenix",
-    text,
-    side: "def",
-    // ... other required MS fields
-  });
-}
-
 export function onMusicListClick(track: string): void {
   server.send.MC({ name: track, char_id: state.charID });
+}
+
+export function onCharacterPick(charId: number): void {
+  server.send.CC({ char_id: charId });
 }

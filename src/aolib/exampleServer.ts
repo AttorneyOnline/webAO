@@ -6,10 +6,11 @@
  * and outbound transport. Sessions on the same server can be in
  * different formats simultaneously.
  *
- * Read this file top-to-bottom. Runs once aolib's runtime is real.
+ * Uses only the packets currently in the registry — once more schemas
+ * land in `packets/`, more `.on.X` / `.send.X` calls become valid.
  */
 
-import { aolib, type ClientSession, type MSPacket } from "./index";
+import { aolib, type ClientSession } from "./index";
 
 // ---------------------------------------------------------------------
 // Minimal inline declarations for the Node `ws` package's
@@ -69,27 +70,18 @@ wss.on("connection", (ws) => {
       software: "LemmyAO-server",
       version: "1.0",
     });
-    client.send.FL({
-      features: ["fastloading", "noencryption"],
-    });
+    client.send.SM({ music_list: ["track1.mp3", "track2.mp3"] });
+    client.send.DONE({});
   });
 
   client.on.CC((packet) => {
-    // packet: CCPacket — only { char_id } on the public type.
-    // (The spec literal `0` and deprecated char_pw slot are sealed
-    //  inside the CC schema; we never see them here.)
     client.send.PV({ player_id: 1, char_id: packet.char_id });
   });
 
-  client.on.MS((packet: MSPacket) => {
-    // Chat message — re-broadcast to other clients in the same area.
-    broadcastIC(client.area ?? 0, packet, client);
-  });
-
-  client.on.CT((packet) => {
-    for (const peer of clients) {
-      if (peer !== client) peer.send.CT(packet);
-    }
+  client.on.MC((packet) => {
+    // Music change request — re-broadcast to every connected client
+    // in the same area as a server-side MC announcement.
+    broadcastMC(client.area ?? 0, packet, client);
   });
 });
 
@@ -99,13 +91,18 @@ wss.on("connection", (ws) => {
 // loop at the call site.
 // ---------------------------------------------------------------------
 
-function broadcastIC(
+function broadcastMC(
   area: number,
-  packet: MSPacket,
+  request: { name: string; char_id: number },
   except?: ClientSession,
 ): void {
   for (const peer of clients) {
     if (peer === except) continue;
-    if (peer.area === area) peer.send.MS(packet);
+    if (peer.area === area) {
+      peer.send.MC({
+        name: request.name,
+        char_id: request.char_id,
+      });
+    }
   }
 }

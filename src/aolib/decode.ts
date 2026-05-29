@@ -37,6 +37,24 @@ export function decode<F extends Fields>(
   return wire.startsWith("{") ? decodeJson(schema, wire) : decodeFanta(schema, wire);
 }
 
+/**
+ * Read the header from a wire frame without fully decoding the body.
+ * Used by the session dispatcher to look up which schema to pass to
+ * `decode`. Throws on malformed input (caller routes via the
+ * `onMalformedFrame` hook).
+ */
+export function readHeader(wire: string): string {
+  if (wire.startsWith("{")) {
+    const parsed = JSON.parse(wire) as { $header?: unknown };
+    if (typeof parsed.$header !== "string") {
+      throw new Error(`JSON envelope missing $header string`);
+    }
+    return parsed.$header;
+  }
+  const idx = wire.indexOf("#");
+  return idx === -1 ? wire : wire.slice(0, idx);
+}
+
 function decodeJson<F extends Fields>(
   schema: Schema<F>,
   wire: string,
