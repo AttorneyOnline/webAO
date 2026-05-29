@@ -11,7 +11,7 @@ import transparentPng from "../../constants/transparentPng";
 import { COLORS } from "../constants/colors";
 import mlConfig from "../../utils/aoml";
 import request from "../../services/request";
-import { decodeChat, safeTags } from "../../encoding";
+import { unescapeUnicode, safeHtmlTags } from "../../escaping";
 import {
   DeskModifier,
   EmoteModifier,
@@ -93,7 +93,7 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
   const msg_blips = char?.blips ?? "male";
   const char_chatbox = char?.chat ?? "default";
 
-  let content = safeTags(decodeChat(packet.message));
+  let content = safeHtmlTags(unescapeUnicode(packet.message));
   let chatbox = char_chatbox;
   if (content.trim() === "") {
     // blankpost: empty chatbox means hide it
@@ -104,20 +104,20 @@ const buildChatMsg = (packet: MSPacketClient): ChatMsg => {
   return {
     ...packet,
     // Display-safe transforms (preanim/showname/paired_name/paired_emote
-    // shadow the raw packet fields with safeTags'd versions).
+    // shadow the raw packet fields with safeHtmlTags'd versions).
     content,
-    name: safeTags(packet.character),
-    sprite: safeTags(packet.emote).toLowerCase(),
-    sound: safeTags(packet.sfx_name).toLowerCase(),
-    preanim: safeTags(packet.preanim).toLowerCase(),
-    showname: safeTags(decodeChat(packet.showname)),
-    paired_name: safeTags(packet.paired_name),
-    paired_emote: safeTags(packet.paired_emote),
+    name: safeHtmlTags(packet.character),
+    sprite: safeHtmlTags(packet.emote).toLowerCase(),
+    sound: safeHtmlTags(packet.sfx_name).toLowerCase(),
+    preanim: safeHtmlTags(packet.preanim).toLowerCase(),
+    showname: safeHtmlTags(unescapeUnicode(packet.showname)),
+    paired_name: safeHtmlTags(packet.paired_name),
+    paired_emote: safeHtmlTags(packet.paired_emote),
     effects: packet.effect.split("|"),
     // Char-derived
     nameplate: msg_nameplate,
     chatbox,
-    blips: safeTags(msg_blips),
+    blips: safeHtmlTags(msg_blips),
     // Render-loop state
     speed: UPDATE_INTERVAL,
   };

@@ -1,7 +1,7 @@
 import { client } from "../client";
 import { ensureCharIni } from "../client/handleCharacterInfo";
 import { renderPlayerList } from "../dom/renderPlayerList";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 export interface PUPacket {
@@ -16,11 +16,11 @@ export const PU: PacketCodec<PUPacket> = {
     return {
       id: Number(args[1]),
       type: Number(args[2]),
-      data: unescapeChat(args[3] ?? ""),
+      data: unescapeFanta(args[3] ?? ""),
     };
   },
   encode(packet) {
-    return `PU#${packet.id}#${packet.type}#${escapeChat(packet.data)}#%`;
+    return `PU#${packet.id}#${packet.type}#${escapeFanta(packet.data)}#%`;
   },
 };
 

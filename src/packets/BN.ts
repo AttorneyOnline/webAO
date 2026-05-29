@@ -3,7 +3,7 @@ import transparentPng from "../constants/transparentPng";
 import { getIndexFromSelect } from "../dom/getIndexFromSelect";
 import { switchPanTilt } from "../dom/switchPanTilt";
 import { updateBackgroundPreview } from "../dom/updateBackgroundPreview";
-import { escapeChat, safeTags, unescapeChat } from "../encoding";
+import { escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 import { Side } from "./MS";
 import { setBackgroundImage } from "../viewport/utils/setSide"
@@ -16,16 +16,16 @@ export interface BNPacket {
 export const BN: PacketCodec<BNPacket> = {
   header: "BN",
   decode(args) {
-    const packet: BNPacket = { background: unescapeChat(args[1] ?? "") };
+    const packet: BNPacket = { background: unescapeFanta(args[1] ?? "") };
     if (args[2] !== undefined) {
-      packet.position = unescapeChat(args[2]);
+      packet.position = unescapeFanta(args[2]);
     }
     return packet;
   },
   encode(packet) {
-    const background = escapeChat(packet.background);
+    const background = escapeFanta(packet.background);
     if (packet.position !== undefined) {
-      return `BN#${background}#${escapeChat(packet.position)}#%`;
+      return `BN#${background}#${escapeFanta(packet.position)}#%`;
     }
     return `BN#${background}#%`;
   },
@@ -36,7 +36,7 @@ export const BN: PacketCodec<BNPacket> = {
  */
 
 export const receiveBN = (packet: BNPacket) => {
-  const bgFromArgs = safeTags(packet.background);
+  const bgFromArgs = safeHtmlTags(packet.background);
   client.viewport.setBackgroundName(bgFromArgs);
   const bg_index = getIndexFromSelect(
     "bg_select",

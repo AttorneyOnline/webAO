@@ -1,6 +1,6 @@
 import { client } from "../client";
 import { handleBans } from "../client/handleBans";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 export interface BDPacket {
@@ -10,10 +10,10 @@ export interface BDPacket {
 export const BD: PacketCodec<BDPacket> = {
   header: "BD",
   decode(args) {
-    return { reason: unescapeChat(args[1] ?? "") };
+    return { reason: unescapeFanta(args[1] ?? "") };
   },
   encode(packet) {
-    return `BD#${escapeChat(packet.reason)}#%`;
+    return `BD#${escapeFanta(packet.reason)}#%`;
   },
 };
 

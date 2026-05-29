@@ -1,6 +1,6 @@
 import pkg from "../../package.json";
 import { client } from "../client";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 const version = pkg.version;
@@ -35,17 +35,17 @@ export const IDClient: PacketCodec<IDPacketClient> = {
   decode(args) {
     const packet: IDPacketClient = {
       player_count: Number(args[1]),
-      software: unescapeChat(args[2] ?? ""),
+      software: unescapeFanta(args[2] ?? ""),
     };
     if (args[3] !== undefined) {
-      packet.version = unescapeChat(args[3]);
+      packet.version = unescapeFanta(args[3]);
     }
     return packet;
   },
   encode(packet) {
-    const software = escapeChat(packet.software);
+    const software = escapeFanta(packet.software);
     if (packet.version !== undefined) {
-      return `ID#${packet.player_count}#${software}#${escapeChat(packet.version)}#%`;
+      return `ID#${packet.player_count}#${software}#${escapeFanta(packet.version)}#%`;
     }
     return `ID#${packet.player_count}#${software}#%`;
   },
@@ -55,12 +55,12 @@ export const IDServer: PacketCodec<IDPacketServer> = {
   header: "ID",
   decode(args) {
     return {
-      software: unescapeChat(args[1] ?? ""),
-      version: unescapeChat(args[2] ?? ""),
+      software: unescapeFanta(args[1] ?? ""),
+      version: unescapeFanta(args[2] ?? ""),
     };
   },
   encode(packet) {
-    return `ID#${escapeChat(packet.software)}#${escapeChat(packet.version)}#%`;
+    return `ID#${escapeFanta(packet.software)}#${escapeFanta(packet.version)}#%`;
   },
 };
 

@@ -1,5 +1,5 @@
 import { client } from "../client";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 /**
@@ -15,12 +15,12 @@ export interface PEPacket {
 export const PE: PacketCodec<PEPacket> = {
   header: "PE",
   decode: (args) => ({
-    name: unescapeChat(args[1] ?? ""),
-    description: unescapeChat(args[2] ?? ""),
-    image: unescapeChat(args[3] ?? ""),
+    name: unescapeFanta(args[1] ?? ""),
+    description: unescapeFanta(args[2] ?? ""),
+    image: unescapeFanta(args[3] ?? ""),
   }),
   encode: (p) =>
-    `PE#${escapeChat(p.name)}#${escapeChat(p.description)}#${escapeChat(p.image)}#%`,
+    `PE#${escapeFanta(p.name)}#${escapeFanta(p.description)}#${escapeFanta(p.image)}#%`,
 };
 
 export const sendPE = (packet: PEPacket) => {

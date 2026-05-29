@@ -1,6 +1,6 @@
 import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
-import { decodeChat, escapeChat, safeTags, unescapeChat } from "../encoding";
+import { unescapeUnicode, escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 /**
@@ -19,14 +19,14 @@ export interface ZZPacket {
 export const ZZ: PacketCodec<ZZPacket> = {
   header: "ZZ",
   decode(args) {
-    const packet: ZZPacket = { reason: unescapeChat(args[1] ?? "") };
+    const packet: ZZPacket = { reason: unescapeFanta(args[1] ?? "") };
     if (args[2] !== undefined && args[2] !== "") {
       packet.target = Number(args[2]);
     }
     return packet;
   },
   encode(packet) {
-    const reason = escapeChat(packet.reason);
+    const reason = escapeFanta(packet.reason);
     if (packet.target !== undefined) {
       return `ZZ#${reason}#${packet.target}#%`;
     }
@@ -42,7 +42,7 @@ export const ZZ: PacketCodec<ZZPacket> = {
  */
 export const receiveZZ = (packet: ZZPacket) => {
   const oocLog = document.getElementById("client_ooclog")!;
-  const message = safeTags(decodeChat(packet.reason)).replace(/\n/g, "<br>");
+  const message = safeHtmlTags(unescapeUnicode(packet.reason)).replace(/\n/g, "<br>");
   oocLog.innerHTML += `$Alert: ${message}<br>`;
   if (oocLog.scrollTop > oocLog.scrollHeight - 60) {
     oocLog.scrollTop = oocLog.scrollHeight;

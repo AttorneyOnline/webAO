@@ -1,7 +1,7 @@
 import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
 import { pickEvidence } from "../dom/pickEvidence";
-import { escapeChat, safeTags, unescapeChat } from "../encoding";
+import { escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 export interface EvidenceData {
@@ -25,9 +25,9 @@ export const LE: PacketCodec<LEPacket> = {
       if (!args[i].includes("&")) break;
       const parts = args[i].split("&");
       evidence.push({
-        name: unescapeChat(parts[0] ?? ""),
-        description: unescapeChat(parts[1] ?? ""),
-        image: unescapeChat(parts[2] ?? ""),
+        name: unescapeFanta(parts[0] ?? ""),
+        description: unescapeFanta(parts[1] ?? ""),
+        image: unescapeFanta(parts[2] ?? ""),
       });
     }
     return { evidence };
@@ -36,7 +36,7 @@ export const LE: PacketCodec<LEPacket> = {
     const parts = packet.evidence
       .map(
         (e) =>
-          `${escapeChat(e.name)}&${escapeChat(e.description)}&${escapeChat(e.image)}`,
+          `${escapeFanta(e.name)}&${escapeFanta(e.description)}&${escapeFanta(e.image)}`,
       )
       .join("#");
     return `LE#${parts}#%`;
@@ -52,8 +52,8 @@ export const receiveLE = (packet: LEPacket) => {
   for (let i = 0; i < packet.evidence.length; i++) {
     const ev = packet.evidence[i];
     client.evidences[i] = {
-      name: safeTags(ev.name),
-      desc: safeTags(ev.description),
+      name: safeHtmlTags(ev.name),
+      desc: safeHtmlTags(ev.description),
       filename: ev.image,
       icon: `${AO_HOST}evidence/${encodeURI(ev.image.toLowerCase())}`,
     };

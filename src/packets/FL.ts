@@ -1,5 +1,5 @@
 import { setExtraFeatures } from "../client";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 export interface FLPacket {
@@ -9,10 +9,10 @@ export interface FLPacket {
 export const FL: PacketCodec<FLPacket> = {
   header: "FL",
   decode(args) {
-    return { features: args.slice(1).map((v) => unescapeChat(v)) };
+    return { features: args.slice(1).map((v) => unescapeFanta(v)) };
   },
   encode(packet) {
-    return `FL#${packet.features.map(escapeChat).join("#")}#%`;
+    return `FL#${packet.features.map(escapeFanta).join("#")}#%`;
   },
 };
 

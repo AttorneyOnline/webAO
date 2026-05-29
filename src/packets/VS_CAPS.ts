@@ -1,4 +1,4 @@
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 import { applyVoiceCaps } from "../voice/voice";
 import { installVoiceUI } from "../voice/voiceUI";
@@ -25,14 +25,14 @@ export const VS_CAPS: PacketCodec<VS_CAPSPacket> = {
       enabled: args[1] === "1",
       pttOnly: args[2] === "1",
       maxPeers: Number(args[3]) || 0,
-      codec: unescapeChat(args[4] ?? "") || "opus",
+      codec: unescapeFanta(args[4] ?? "") || "opus",
       sampleRate: Number(args[5]) || 48000,
       frameMs: Number(args[6]) || 20,
       maxFrameBytes: Number(args[7]) || 0,
     };
   },
   encode(packet) {
-    return `VS_CAPS#${packet.enabled ? 1 : 0}#${packet.pttOnly ? 1 : 0}#${packet.maxPeers}#${escapeChat(packet.codec)}#${packet.sampleRate}#${packet.frameMs}#${packet.maxFrameBytes}#%`;
+    return `VS_CAPS#${packet.enabled ? 1 : 0}#${packet.pttOnly ? 1 : 0}#${packet.maxPeers}#${escapeFanta(packet.codec)}#${packet.sampleRate}#${packet.frameMs}#${packet.maxFrameBytes}#%`;
   },
 };
 

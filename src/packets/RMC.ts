@@ -1,5 +1,5 @@
 import { client } from "../client";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 /**
@@ -16,10 +16,10 @@ export interface RMCPacket {
 export const RMC: PacketCodec<RMCPacket> = {
   header: "RMC",
   decode(args) {
-    return { toTime: unescapeChat(args[1] ?? "") };
+    return { toTime: unescapeFanta(args[1] ?? "") };
   },
   encode(packet) {
-    return `RMC#${escapeChat(packet.toTime)}#%`;
+    return `RMC#${escapeFanta(packet.toTime)}#%`;
   },
 };
 

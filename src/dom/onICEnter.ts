@@ -1,5 +1,5 @@
 import { client, selectedShout } from "../client";
-import { escapeChat } from "../encoding";
+import { escapeFanta } from "../escaping";
 import {
   EmoteModifier,
   Flip,
@@ -51,7 +51,7 @@ export function onICEnter(event: KeyboardEvent) {
     flip: isToggled("button_flip") ? Flip.HORIZONTAL : Flip.NONE,
     realization: isToggled("button_flash"),
     text_color: parseTextColor(input("textcolor").value),
-    showname: escapeChat(input("ic_chat_name").value),
+    showname: escapeFanta(input("ic_chat_name").value),
     paired_charid: Number(input("pair_select").value) || -1,
     offset: {
       x: Number(input("pair_offset").value) || 0,

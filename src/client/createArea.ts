@@ -1,9 +1,9 @@
 import { client } from "../client";
 import { area_click } from "../dom/areaClick";
-import { safeTags } from "../encoding";
+import { safeHtmlTags } from "../escaping";
 
 export const createArea = (id: number, aname: string) => {
-  const name = safeTags(aname);
+  const name = safeHtmlTags(aname);
   const thisarea = {
     name,
     players: 0,

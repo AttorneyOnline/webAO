@@ -12,21 +12,21 @@ import { PreloadedAssets } from "./PreloadedAssets";
  *
  * Where the field names overlap (`preanim`, `showname`, `paired_name`,
  * `paired_emote`), the render state shadows the packet's raw value with
- * a `safeTags`'d display form. Both have type `string`, so the
+ * a `safeHtmlTags`'d display form. Both have type `string`, so the
  * intersection collapses to one field; the runtime value is whatever the
  * builder assigns last (= the display form).
  */
 export type ChatMsg = MSPacketClient & {
   // Display-safe versions of packet fields (shadow the raw value when
   // the name matches; new fields otherwise).
-  content: string; // safeTags(decodeChat(packet.message))
-  name: string; // safeTags(packet.character)
-  sprite: string; // safeTags(packet.emote.toLowerCase())
-  sound: string; // safeTags(packet.sfx_name.toLowerCase())
-  preanim: string; // safeTags(packet.preanim.toLowerCase())
-  showname: string; // safeTags(decodeChat(packet.showname))
-  paired_name: string; // safeTags(packet.paired_name)
-  paired_emote: string; // safeTags(packet.paired_emote)
+  content: string; // safeHtmlTags(unescapeUnicode(packet.message))
+  name: string; // safeHtmlTags(packet.character)
+  sprite: string; // safeHtmlTags(packet.emote.toLowerCase())
+  sound: string; // safeHtmlTags(packet.sfx_name.toLowerCase())
+  preanim: string; // safeHtmlTags(packet.preanim.toLowerCase())
+  showname: string; // safeHtmlTags(unescapeUnicode(packet.showname))
+  paired_name: string; // safeHtmlTags(packet.paired_name)
+  paired_emote: string; // safeHtmlTags(packet.paired_emote)
   effects: string[]; // packet.effect.split("|")
 
   // Character-derived display data (from client.chars[packet.char_id]).

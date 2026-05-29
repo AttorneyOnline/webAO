@@ -1,5 +1,5 @@
 import { client } from "../client";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 import { initTestimonyUpdater } from "../viewport/utils/initTestimonyUpdater";
 
@@ -17,14 +17,14 @@ export interface RTPacket {
 export const RT: PacketCodec<RTPacket> = {
   header: "RT",
   decode(args) {
-    const packet: RTPacket = { animation: unescapeChat(args[1] ?? "") };
+    const packet: RTPacket = { animation: unescapeFanta(args[1] ?? "") };
     if (args[2] !== undefined && args[2] !== "") {
       packet.judgeId = Number(args[2]);
     }
     return packet;
   },
   encode(packet) {
-    const animation = escapeChat(packet.animation);
+    const animation = escapeFanta(packet.animation);
     if (packet.judgeId !== undefined) {
       return `RT#${animation}#${packet.judgeId}#%`;
     }

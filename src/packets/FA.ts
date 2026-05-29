@@ -1,6 +1,6 @@
 import { client } from "../client";
 import { createArea } from "../client/createArea";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 export interface FAPacket {
@@ -10,10 +10,10 @@ export interface FAPacket {
 export const FA: PacketCodec<FAPacket> = {
   header: "FA",
   decode(args) {
-    return { areas: args.slice(1).map((v) => unescapeChat(v)) };
+    return { areas: args.slice(1).map((v) => unescapeFanta(v)) };
   },
   encode(packet) {
-    return `FA#${packet.areas.map(escapeChat).join("#")}#%`;
+    return `FA#${packet.areas.map(escapeFanta).join("#")}#%`;
   },
 };
 

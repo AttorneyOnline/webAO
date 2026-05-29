@@ -1,4 +1,4 @@
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 export interface BBPacket {
@@ -8,10 +8,10 @@ export interface BBPacket {
 export const BB: PacketCodec<BBPacket> = {
   header: "BB",
   decode(args) {
-    return { message: unescapeChat(args[1] ?? "") };
+    return { message: unescapeFanta(args[1] ?? "") };
   },
   encode(packet) {
-    return `BB#${escapeChat(packet.message)}#%`;
+    return `BB#${escapeFanta(packet.message)}#%`;
   },
 };
 

@@ -1,5 +1,5 @@
 import { client } from "../client";
-import { escapeChat, safeTags, unescapeChat } from "../encoding";
+import { escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 /**
@@ -26,12 +26,12 @@ export const ARUP: PacketCodec<ARUPPacket> = {
     const update_data =
       update_type === 0
         ? rest.map((v) => Number(v))
-        : rest.map((v) => unescapeChat(v));
+        : rest.map((v) => unescapeFanta(v));
     return { update_type, update_data };
   },
   encode(packet) {
     const data = packet.update_data
-      .map((v) => (typeof v === "string" ? escapeChat(v) : v))
+      .map((v) => (typeof v === "string" ? escapeFanta(v) : v))
       .join("#");
     return `ARUP#${packet.update_type}#${data}#%`;
   },
@@ -51,13 +51,13 @@ export const receiveARUP = (packet: ARUPPacket) => {
           client.areas[i].players = Number(update_data[i]);
           break;
         case 1: // status
-          client.areas[i].status = safeTags(String(update_data[i]));
+          client.areas[i].status = safeHtmlTags(String(update_data[i]));
           break;
         case 2:
-          client.areas[i].cm = safeTags(String(update_data[i]));
+          client.areas[i].cm = safeHtmlTags(String(update_data[i]));
           break;
         case 3:
-          client.areas[i].locked = safeTags(String(update_data[i]));
+          client.areas[i].locked = safeHtmlTags(String(update_data[i]));
           break;
       }
 

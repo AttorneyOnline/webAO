@@ -1,4 +1,4 @@
-import { decodeChat, escapeChat, unescapeChat } from "./encoding";
+import { unescapeUnicode, escapeFanta, unescapeFanta } from "./escaping";
 import { ARUP, receiveARUP } from "./packets/ARUP";
 import { askchaa, receiveaskchaa } from "./packets/askchaa";
 import { ASS, receiveASS } from "./packets/ASS";
@@ -71,7 +71,7 @@ export interface Field {
 }
 
 const coerce = (raw: string, t: FieldType, name: string): unknown => {
-  if (t === "string") return decodeChat(unescapeChat(raw));
+  if (t === "string") return unescapeUnicode(unescapeFanta(raw));
   if (t === "number") {
     // `Number("")` returns 0 in JS, which would mask an empty token as a
     // valid value. Reject empty + non-numeric tokens explicitly.
@@ -87,7 +87,7 @@ const coerce = (raw: string, t: FieldType, name: string): unknown => {
 };
 
 const serialize = (v: unknown, t: FieldType): string =>
-  t === "string" ? escapeChat(v as string)
+  t === "string" ? escapeFanta(v as string)
   : t === "number" ? String(v)
   : v ? "1" : "0";
 
@@ -241,7 +241,7 @@ export function makeCodec<T>(
           out[f.name] = f.default ?? zeroFor(f.type);
           return;
         }
-        if (f.type === "string") out[f.name] = unescapeChat(v);
+        if (f.type === "string") out[f.name] = unescapeFanta(v);
         else if (f.type === "number") out[f.name] = Number(v);
         else out[f.name] = v === "1";
       });
@@ -251,7 +251,7 @@ export function makeCodec<T>(
       const parts: string[] = fields.map((f) => {
         let v = (packet as Record<string, unknown>)[f.name];
         if (v === undefined) v = f.default ?? zeroFor(f.type);
-        if (f.type === "string") return escapeChat(v as string);
+        if (f.type === "string") return escapeFanta(v as string);
         if (f.type === "number") return String(v);
         return v ? "1" : "0";
       });

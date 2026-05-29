@@ -3,7 +3,7 @@ import { addTrack } from "../client/addTrack";
 import { createArea } from "../client/createArea";
 import { fix_last_area } from "../client/fixLastArea";
 import { isAudio } from "../client/isAudio";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 import { AM } from "./AM";
 
@@ -29,14 +29,14 @@ export const EM: PacketCodec<EMPacket> = {
       if (args[i + 1] === undefined) break;
       entries.push({
         index: Number(args[i]),
-        name: unescapeChat(args[i + 1]),
+        name: unescapeFanta(args[i + 1]),
       });
     }
     return { batchIndex, entries };
   },
   encode(packet) {
     const flat = packet.entries
-      .map((e) => `${e.index}#${escapeChat(e.name)}`)
+      .map((e) => `${e.index}#${escapeFanta(e.name)}`)
       .join("#");
     return `EM#${packet.batchIndex}#${flat}#%`;
   },

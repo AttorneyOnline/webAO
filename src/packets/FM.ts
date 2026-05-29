@@ -1,6 +1,6 @@
 import { client } from "../client";
 import { addTrack } from "../client/addTrack";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 export interface FMPacket {
@@ -10,10 +10,10 @@ export interface FMPacket {
 export const FM: PacketCodec<FMPacket> = {
   header: "FM",
   decode(args) {
-    return { music_list: args.slice(1).map((v) => unescapeChat(v)) };
+    return { music_list: args.slice(1).map((v) => unescapeFanta(v)) };
   },
   encode(packet) {
-    return `FM#${packet.music_list.map(escapeChat).join("#")}#%`;
+    return `FM#${packet.music_list.map(escapeFanta).join("#")}#%`;
   },
 };
 

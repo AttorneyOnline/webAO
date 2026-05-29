@@ -3,7 +3,7 @@ import { addTrack } from "../client/addTrack";
 import { createArea } from "../client/createArea";
 import { fix_last_area } from "../client/fixLastArea";
 import { isAudio } from "../client/isAudio";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 import { RD } from "./RD";
 
@@ -14,10 +14,10 @@ export interface SMPacket {
 export const SM: PacketCodec<SMPacket> = {
   header: "SM",
   decode(args) {
-    return { music_list: args.slice(1).map((v) => unescapeChat(v)) };
+    return { music_list: args.slice(1).map((v) => unescapeFanta(v)) };
   },
   encode(packet) {
-    return `SM#${packet.music_list.map(escapeChat).join("#")}#%`;
+    return `SM#${packet.music_list.map(escapeFanta).join("#")}#%`;
   },
 };
 

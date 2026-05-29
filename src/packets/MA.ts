@@ -1,5 +1,5 @@
 import { client } from "../client";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 /**
@@ -17,9 +17,9 @@ export const MA: PacketCodec<MAPacket> = {
   decode: (args) => ({
     id: Number(args[1]),
     duration: Number(args[2]),
-    reason: unescapeChat(args[3] ?? ""),
+    reason: unescapeFanta(args[3] ?? ""),
   }),
-  encode: (p) => `MA#${p.id}#${p.duration}#${escapeChat(p.reason)}#%`,
+  encode: (p) => `MA#${p.id}#${p.duration}#${escapeFanta(p.reason)}#%`,
 };
 
 export const sendMA = (packet: MAPacket) => {

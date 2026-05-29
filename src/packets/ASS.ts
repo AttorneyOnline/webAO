@@ -1,6 +1,6 @@
 import { setAOhost } from "../client/aoHost";
 import { renderPlayerList } from "../dom/renderPlayerList";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 export interface ASSPacket {
@@ -10,10 +10,10 @@ export interface ASSPacket {
 export const ASS: PacketCodec<ASSPacket> = {
   header: "ASS",
   decode(args) {
-    return { asset_url: unescapeChat(args[1] ?? "") };
+    return { asset_url: unescapeFanta(args[1] ?? "") };
   },
   encode(packet) {
-    return `ASS#${escapeChat(packet.asset_url)}#%`;
+    return `ASS#${escapeFanta(packet.asset_url)}#%`;
   },
 };
 

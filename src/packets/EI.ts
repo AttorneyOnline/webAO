@@ -1,6 +1,6 @@
 import { client } from "../client";
 import { AO_HOST } from "../client/aoHost";
-import { escapeChat, safeTags, unescapeChat } from "../encoding";
+import { escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 import { AE } from "./AE";
 
@@ -26,14 +26,14 @@ export const EI: PacketCodec<EIPacket> = {
     const parts = (args[2] ?? "").split("&");
     return {
       id: Number(args[1]),
-      name: unescapeChat(parts[0] ?? ""),
-      description: unescapeChat(parts[1] ?? ""),
-      type: unescapeChat(parts[2] ?? ""),
-      image: unescapeChat(parts[3] ?? ""),
+      name: unescapeFanta(parts[0] ?? ""),
+      description: unescapeFanta(parts[1] ?? ""),
+      type: unescapeFanta(parts[2] ?? ""),
+      image: unescapeFanta(parts[3] ?? ""),
     };
   },
   encode(packet) {
-    const sub = `${escapeChat(packet.name)}&${escapeChat(packet.description)}&${escapeChat(packet.type)}&${escapeChat(packet.image)}&`;
+    const sub = `${escapeFanta(packet.name)}&${escapeFanta(packet.description)}&${escapeFanta(packet.type)}&${escapeFanta(packet.image)}&`;
     return `EI#${packet.id}#${sub}#%`;
   },
 };
@@ -46,8 +46,8 @@ export const receiveEI = (packet: EIPacket) => {
   document.getElementById("client_loadingtext")!.innerHTML =
     `Loading Evidence ${packet.id}/${client.evidence_list_length}`;
   client.evidences[packet.id] = {
-    name: safeTags(packet.name),
-    desc: safeTags(packet.description),
+    name: safeHtmlTags(packet.name),
+    desc: safeHtmlTags(packet.description),
     filename: packet.image,
     icon: `${AO_HOST}evidence/${encodeURI(packet.image.toLowerCase())}`,
   };

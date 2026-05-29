@@ -1,5 +1,5 @@
 import "./styles/master.css";
-import { safeTags } from "./encoding";
+import { safeHtmlTags } from "./escaping";
 import { version as clientVersion } from "./version";
 
 interface AOServer {
@@ -178,10 +178,10 @@ function addServer(server: AOServer) {
 
   document.getElementById("masterlist").innerHTML +=
     `<details name="servers">` +
-    `<summary><p>${safeTags(server.name)} (${server.players})</p>` +
+    `<summary><p>${safeHtmlTags(server.name)} (${server.players})</p>` +
     `<a class="button" href="${fullClientJoinURL}" target="_blank">Join</a>` +
     `<a class="button" href="${fullClientWatchURL}" target="_blank">Watch</a></summary>` +
-    `<p>${safeTags(server.description)}</p>` +
+    `<p>${safeHtmlTags(server.description)}</p>` +
     `</details>`;
 }
 

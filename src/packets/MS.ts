@@ -1,7 +1,7 @@
 import { client } from "../client";
 import { handleCharacterInfo, ensureCharIni } from "../client/handleCharacterInfo";
 import { resetICParams } from "../client/resetICParams";
-import { escapeChat, safeTags, unescapeChat } from "../encoding";
+import { escapeFanta, safeHtmlTags, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 import { handle_ic_speaking } from "../viewport/utils/handleICSpeaking";
 
@@ -231,7 +231,7 @@ export const parseSide = (s: string | undefined): Side => {
 export const isFullView = (s: Side): boolean =>
   s === Side.DEFENSE || s === Side.PROSECUTION || s === Side.WITNESS;
 
-const str = (v: string | undefined) => unescapeChat(v ?? "");
+const str = (v: string | undefined) => unescapeFanta(v ?? "");
 
 /**
  * Parse a wire integer with a custom default for missing/empty/non-integer
@@ -284,12 +284,12 @@ export const MSClient: PacketCodec<MSPacketClient> = {
     const fields = [
       "MS",
       String(p.desk_modifier),
-      escapeChat(p.preanim),
-      escapeChat(p.character),
-      escapeChat(p.emote),
-      escapeChat(p.message),
-      escapeChat(p.side),
-      escapeChat(p.sfx_name),
+      escapeFanta(p.preanim),
+      escapeFanta(p.character),
+      escapeFanta(p.emote),
+      escapeFanta(p.message),
+      escapeFanta(p.side),
+      escapeFanta(p.sfx_name),
       p.emote_modifier,
       p.char_id,
       p.sfx_delay,
@@ -298,21 +298,21 @@ export const MSClient: PacketCodec<MSPacketClient> = {
       p.flip,
       Number(p.realization),
       p.text_color,
-      escapeChat(p.showname),
+      escapeFanta(p.showname),
       p.paired_charid,
-      escapeChat(p.paired_name),
-      escapeChat(p.paired_emote),
-      escapeChat(encodeOffset(p.offset)),
-      escapeChat(encodeOffset(p.paired_offset)),
+      escapeFanta(p.paired_name),
+      escapeFanta(p.paired_emote),
+      escapeFanta(encodeOffset(p.offset)),
+      escapeFanta(encodeOffset(p.paired_offset)),
       p.paired_flip,
       Number(p.noninterrupting_preanim),
       Number(p.sfx_looping),
       Number(p.screenshake),
-      escapeChat(p.frames_shake),
-      escapeChat(p.frames_realization),
-      escapeChat(p.frames_sfx),
+      escapeFanta(p.frames_shake),
+      escapeFanta(p.frames_realization),
+      escapeFanta(p.frames_sfx),
       Number(p.additive),
-      escapeChat(p.effect),
+      escapeFanta(p.effect),
     ];
     return `${fields.join("#")}#%`;
   },
@@ -356,12 +356,12 @@ export const MSServer: PacketCodec<MSPacketServer> = {
     const fields = [
       "MS",
       String(p.desk_modifier),
-      escapeChat(p.preanim),
-      escapeChat(p.character),
-      escapeChat(p.emote),
-      escapeChat(p.message),
-      escapeChat(p.side),
-      escapeChat(p.sfx_name),
+      escapeFanta(p.preanim),
+      escapeFanta(p.character),
+      escapeFanta(p.emote),
+      escapeFanta(p.message),
+      escapeFanta(p.side),
+      escapeFanta(p.sfx_name),
       p.emote_modifier,
       p.char_id,
       p.sfx_delay,
@@ -370,17 +370,17 @@ export const MSServer: PacketCodec<MSPacketServer> = {
       p.flip,
       Number(p.realization),
       p.text_color,
-      escapeChat(p.showname),
+      escapeFanta(p.showname),
       p.paired_charid,
-      escapeChat(encodeOffset(p.offset)),
+      escapeFanta(encodeOffset(p.offset)),
       Number(p.noninterrupting_preanim),
       Number(p.sfx_looping),
       Number(p.screenshake),
-      escapeChat(p.frames_shake),
-      escapeChat(p.frames_realization),
-      escapeChat(p.frames_sfx),
+      escapeFanta(p.frames_shake),
+      escapeFanta(p.frames_realization),
+      escapeFanta(p.frames_sfx),
       Number(p.additive),
-      escapeChat(p.effect),
+      escapeFanta(p.effect),
     ];
     return `${fields.join("#")}#%`;
   },
@@ -396,7 +396,7 @@ export const receiveMS = (packet: MSPacketClient) => {
   if (packet.message === client.viewport.getChatmsg().content) return;
 
   const char_id = packet.char_id;
-  const char_name = safeTags(packet.character);
+  const char_name = safeHtmlTags(packet.character);
 
   if (char_id >= 0 && char_id < client.char_list_length) {
     if (client.chars[char_id].name !== char_name) {

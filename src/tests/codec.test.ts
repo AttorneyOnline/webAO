@@ -301,7 +301,7 @@ describe("decode: strict type coercion", () => {
 });
 
 describe("encode -> decode round-trip: chat escapes (fanta only)", () => {
-  // Fanta strings get escapeChat / unescapeChat at the codec boundary so
+  // Fanta strings get escapeFanta / unescapeFanta at the codec boundary so
   // wire meta-characters (`#`, `&`, `%`, `$`) survive.
   it("strings with `#` round-trip through fanta", () => {
     const wire = encode(Mixed, { s: "a#b#c" }, false);

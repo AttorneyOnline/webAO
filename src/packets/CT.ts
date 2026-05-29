@@ -1,10 +1,10 @@
 import { client } from "../client";
 import {
-  decodeChat,
-  escapeChat,
-  safeTags,
-  unescapeChat,
-} from "../encoding";
+  unescapeUnicode,
+  escapeFanta,
+  safeHtmlTags,
+  unescapeFanta,
+} from "../escaping";
 import queryParser from "../utils/queryParser";
 import { flashPairActivity } from "../dom/pairNotification";
 import type { PacketCodec } from "../packets";
@@ -30,8 +30,8 @@ export const CT: PacketCodec<CTPacket> = {
   header: "CT",
   decode(args) {
     const packet: CTPacket = {
-      name: unescapeChat(args[1] ?? ""),
-      message: unescapeChat(args[2] ?? ""),
+      name: unescapeFanta(args[1] ?? ""),
+      message: unescapeFanta(args[2] ?? ""),
     };
     if (args[3] !== undefined) {
       packet.is_from_server = args[3] === "1";
@@ -39,8 +39,8 @@ export const CT: PacketCodec<CTPacket> = {
     return packet;
   },
   encode(packet) {
-    const name = escapeChat(packet.name);
-    const message = escapeChat(packet.message);
+    const name = escapeFanta(packet.name);
+    const message = escapeFanta(packet.message);
     if (packet.is_from_server !== undefined) {
       return `CT#${name}#${message}#${packet.is_from_server ? 1 : 0}#%`;
     }
@@ -56,8 +56,8 @@ const { mode } = queryParser();
 export const receiveCT = (packet: CTPacket) => {
   if (mode !== "replay") {
     const oocLog = document.getElementById("client_ooclog")!;
-    const username = safeTags(decodeChat(packet.name));
-    const rawMessage = safeTags(decodeChat(packet.message));
+    const username = safeHtmlTags(unescapeUnicode(packet.name));
+    const rawMessage = safeHtmlTags(unescapeUnicode(packet.message));
     let message = addLinks(rawMessage);
     message = message.replace(/\n/g, "<br>");
 

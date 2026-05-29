@@ -1,4 +1,4 @@
-import { safeTags } from "../encoding";
+import { safeHtmlTags } from "../escaping";
 
 /**
  * Handles the kicked packet
@@ -8,7 +8,7 @@ import { safeTags } from "../encoding";
 export const handleBans = (type: string, reason: string) => {
   document.getElementById("client_error_overlay")!.style.display = "flex";
   document.getElementById("client_errortext")!.innerHTML =
-    `${type}:<br>${safeTags(reason).replace(/\n/g, "<br />")}`;
+    `${type}:<br>${safeHtmlTags(reason).replace(/\n/g, "<br />")}`;
   (<HTMLElement>document.getElementById("client_reconnect")).style.display =
     "none";
   (<HTMLElement>document.getElementById("client_error_help")).style.display =

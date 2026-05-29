@@ -1,6 +1,6 @@
 import { client } from "../client";
 import { handleBans } from "../client/handleBans";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 
 export interface KKPacket {
@@ -10,10 +10,10 @@ export interface KKPacket {
 export const KK: PacketCodec<KKPacket> = {
   header: "KK",
   decode(args) {
-    return { reason: unescapeChat(args[1] ?? "") };
+    return { reason: unescapeFanta(args[1] ?? "") };
   },
   encode(packet) {
-    return `KK#${escapeChat(packet.reason)}#%`;
+    return `KK#${escapeFanta(packet.reason)}#%`;
   },
 };
 

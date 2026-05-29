@@ -1,5 +1,5 @@
 import { client } from "../client";
-import { escapeChat, unescapeChat } from "../encoding";
+import { escapeFanta, unescapeFanta } from "../escaping";
 import type { PacketCodec } from "../packets";
 import { version } from "../version";
 
@@ -10,10 +10,10 @@ export interface HIPacket {
 export const HI: PacketCodec<HIPacket> = {
   header: "HI",
   decode(args) {
-    return { hdid: unescapeChat(args[1] ?? "") };
+    return { hdid: unescapeFanta(args[1] ?? "") };
   },
   encode(packet) {
-    return `HI#${escapeChat(packet.hdid)}#%`;
+    return `HI#${escapeFanta(packet.hdid)}#%`;
   },
 };
 

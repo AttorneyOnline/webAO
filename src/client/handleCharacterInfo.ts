@@ -1,5 +1,5 @@
 import { client } from "../client";
-import { safeTags } from "../encoding";
+import { safeHtmlTags } from "../escaping";
 import iniParse from "../iniParse";
 import { Side } from "../packets/MS";
 import request from "../services/request";
@@ -29,17 +29,17 @@ export const setupCharacterBasic = (chargs: string[], charid: number) => {
     const mute_select = <HTMLSelectElement>(
       document.getElementById("mute_select")
     );
-    mute_select.add(new Option(safeTags(chargs[0]), String(charid)));
+    mute_select.add(new Option(safeHtmlTags(chargs[0]), String(charid)));
     const pair_select = <HTMLSelectElement>(
       document.getElementById("pair_select")
     );
-    pair_select.add(new Option(safeTags(chargs[0]), String(charid)));
+    pair_select.add(new Option(safeHtmlTags(chargs[0]), String(charid)));
 
     // Store defaults — these get replaced with actual ini values by ensureCharIni
     client.chars[charid] = {
-      name: safeTags(chargs[0]),
-      showname: safeTags(chargs[0]),
-      desc: safeTags(chargs[1]),
+      name: safeHtmlTags(chargs[0]),
+      showname: safeHtmlTags(chargs[0]),
+      desc: safeHtmlTags(chargs[1]),
       blips: "male",
       gender: "",
       side: Side.DEFENSE,
@@ -93,14 +93,14 @@ export const ensureCharIni = async (charid: number): Promise<any> => {
   cini.emotions = Object.assign(default_emotions, cini.emotions);
 
   // Replace defaults with actual ini values
-  char.showname = safeTags(cini.options.showname);
-  char.blips = safeTags(cini.options.blips).toLowerCase();
-  char.gender = safeTags(cini.options.gender).toLowerCase();
-  char.side = safeTags(cini.options.side).toLowerCase();
+  char.showname = safeHtmlTags(cini.options.showname);
+  char.blips = safeHtmlTags(cini.options.blips).toLowerCase();
+  char.gender = safeHtmlTags(cini.options.gender).toLowerCase();
+  char.side = safeHtmlTags(cini.options.side).toLowerCase();
   char.chat =
     cini.options.chat === ""
-      ? safeTags(cini.options.category).toLowerCase()
-      : safeTags(cini.options.chat).toLowerCase();
+      ? safeHtmlTags(cini.options.category).toLowerCase()
+      : safeHtmlTags(cini.options.chat).toLowerCase();
   char.icon = img ? img.src : "";
   char.inifile = cini;
 
@@ -131,7 +131,7 @@ export const handleCharacterInfo = async (chargs: string[], charid: number) => {
 
     // Reset inifile so ensureCharIni will re-fetch
     if (client.chars[charid]) {
-      client.chars[charid].name = safeTags(chargs[0]);
+      client.chars[charid].name = safeHtmlTags(chargs[0]);
       client.chars[charid].inifile = null;
     } else {
       setupCharacterBasic(chargs, charid);
