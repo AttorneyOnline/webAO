@@ -23,6 +23,7 @@ import {
   encodePacket,
   readHeader,
   encode,
+  serverReceive,
 } from "./packets";
 import { appendICNotice } from "./client/appendICNotice";
 import { loadResources } from "./client/loadResources";
@@ -252,35 +253,15 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Hook for sending messages to the client
-   * @param {string} message the message to send
+   * Transmit a wire frame to the server. In replay mode there is no
+   * real server, so the frame is fed to our own server-side dispatcher
+   * (`receiveDataAsServer`) and the local handlers synthesize what the
+   * server would have done.
    */
-  handleSelf(message: string) {
-    const message_event = new MessageEvent("websocket", { data: message });
-    setTimeout(() => this.onMessage(message_event), 1);
-  }
-
-  /**
-   * Echoes a wire message back into our own dispatcher. Used by handlers
-   * that synthesize follow-up packets (e.g. RD -> BN/DONE) and by replay
-   * mode to feed pre-recorded packets through.
-   */
-  sendToSelf(message: string) {
-    (<HTMLInputElement>document.getElementById("client_ooclog")).value +=
-      `${message}\r\n`;
-    this.handleSelf(message);
-  }
-
-  /**
-   * Writes a raw wire-format string to the server. Escape hatch for senders
-   * that build the wire bytes inline without going through a codec. In
-   * replay mode the websocket isn't live, so outgoing packets loop back
-   * through `sendToSelf` to drive the local dispatcher.
-   */
-  sendString(message: string) {
+  sendData(message: string) {
     console.debug("C: " + message);
     if (mode === "replay") {
-      this.sendToSelf(message);
+      this.receiveDataAsServer(message);
     } else {
       this.serv.send(message);
     }
@@ -302,9 +283,9 @@ class Client extends EventEmitter {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sendPacket(schema: any, packet: any) {
     if (typeof schema === "function") {
-      this.sendString(encode(schema, packet, json_mode));
+      this.sendData(encode(schema, packet, json_mode));
     } else {
-      this.sendString(encodePacket(schema, packet, json_mode));
+      this.sendData(encodePacket(schema, packet, json_mode));
     }
   }
 
@@ -368,11 +349,30 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Dispatch one WebSocket frame as one packet. Reads the header
-   * (`readHeader` handles both wire formats) and hands the raw frame to
-   * the registered receiver, which owns its own decode.
+   * Dispatch a wire frame as if we (the Client) just received it from
+   * the server. Called by `onMessage` for real network frames, and by
+   * handlers that synthesize a server -> client packet for local
+   * processing (e.g. RD -> BN + DONE).
    */
   receiveData(data: string) {
+    this.dispatchFrame(data, clientReceive, "Client");
+  }
+
+  /**
+   * Mirror of `receiveData` for the opposite direction: dispatch a
+   * wire frame as if we (acting as a Server) just received it from a
+   * client. Used by replay mode (the actual server is absent, so we
+   * synthesize its role) and by tests / server-emulation handlers.
+   */
+  receiveDataAsServer(data: string) {
+    this.dispatchFrame(data, serverReceive, "Server");
+  }
+
+  private dispatchFrame(
+    data: string,
+    map: Map<string, (body: string) => void>,
+    role: string,
+  ) {
     let header: string;
     try {
       header = readHeader(data);
@@ -381,22 +381,18 @@ class Client extends EventEmitter {
       return;
     }
     if (header === "") {
-      console.warn("WARNING: Empty header received from server, skipping...");
+      console.warn(`WARNING: Empty header received, skipping...`);
       return;
     }
-
-    const receiverFunction = clientReceive.get(header);
-
-    if (!receiverFunction) {
-      console.warn(`Unknown packet header for Client receiver:`, header);
+    const fn = map.get(header);
+    if (!fn) {
+      console.warn(`Unknown packet header for ${role} receiver:`, header);
       return;
     }
-
     try {
-      receiverFunction(data);
+      fn(data);
     } catch (err) {
       console.error(`Receiver for ${header} threw:`, err, { body: data });
-      return;
     }
   }
 
@@ -438,7 +434,7 @@ class Client extends EventEmitter {
     const clines = ooclog.value.split(/\r?\n/);
     if (clines[0]) {
       const currentLine = String(clines[0]);
-      this.handleSelf(currentLine);
+      this.receiveData(currentLine);
       ooclog.value = clines.slice(1).join("\r\n");
       if (currentLine.substr(0, 4) === "wait" && rawLog === false) {
         rtime = Number(currentLine.split("#")[1]);

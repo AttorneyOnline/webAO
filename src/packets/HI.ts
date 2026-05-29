@@ -21,8 +21,8 @@ export const HI: PacketCodec<HIPacket> = {
  * Handle the player
  */
 export const receiveHI = (_packet: HIPacket) => {
-  client.sendToSelf(`ID#1#webAO#${version}#%`);
-  client.sendToSelf(
+  client.receiveData(`ID#1#webAO#${version}#%`);
+  client.receiveData(
     "FL#fastloading#yellowtext#cccc_ic_support#flipping#looping_sfx#effects#%",
   );
 };

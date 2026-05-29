@@ -18,5 +18,5 @@ export const RM: PacketCodec<RMPacket> = {
  * we are asking ourselves what characters there are
  */
 export const receiveRM = (_packet: RMPacket) => {
-  client.sendToSelf(`SM#${vanilla_music_arr.join("#")}#%`);
+  client.receiveData(`SM#${vanilla_music_arr.join("#")}#%`);
 };

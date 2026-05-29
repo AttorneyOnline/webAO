@@ -30,7 +30,7 @@ export class MCPacketServer extends Packet {
 
 // Send music/area change request to server
 export function sendMC(packet: Partial<MCPacketServer>) {
-  client.sendString(encode(MCPacketServer, packet, json_mode));
+  client.sendData(encode(MCPacketServer, packet, json_mode));
 }
 
 // Receive music change request from server

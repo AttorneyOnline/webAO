@@ -22,11 +22,11 @@ export class CCPacketServer extends Packet {
 // Request to play as char_id. Caller is responsible for validating
 // that the char_id refers to a real slot.
 export function sendCC(packet: Partial<Wire<CCPacketServer>>) {
-  client.sendString(encode(CCPacketServer, packet, json_mode));
+  client.sendData(encode(CCPacketServer, packet, json_mode));
 }
 
 // Receive character choice from client; ack with PV.
 export function receiveCC(body: string) {
   const packet = decode(CCPacketServer, body);
-  client.sendToSelf(encode(PVPacket, { player_id: 1, char_id: packet.char_id }));
+  client.receiveData(encode(PVPacket, { player_id: 1, char_id: packet.char_id }));
 }

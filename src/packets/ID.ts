@@ -75,7 +75,7 @@ export const receiveID = (packet: IDPacketClient) => {
   const softwareParts = packet.software.split("&");
   const serverSoftware = softwareParts[0];
   if (serverSoftware === "webAO") {
-    client.sendToSelf("PN#0#1#%");
+    client.receiveData("PN#0#1#%");
   } else {
     client.sendPacket(IDServer, { software: "webAO", version });
   }

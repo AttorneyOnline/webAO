@@ -25,6 +25,6 @@ export function changeBackgroundOOC() {
       message: `/${changeBGCommand.replace("$1", filename)}`,
     });
   } else if (mode === "replay") {
-    client.sendToSelf(`BN#${filename}#%`);
+    client.receiveData(`BN#${filename}#%`);
   }
 }

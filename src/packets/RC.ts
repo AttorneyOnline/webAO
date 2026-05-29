@@ -18,5 +18,5 @@ export const RC: PacketCodec<RCPacket> = {
  * we are asking ourselves what characters there are
  */
 export const receiveRC = (_packet: RCPacket) => {
-  client.sendToSelf(`SC#${vanilla_character_arr.join("#")}#%`);
+  client.receiveData(`SC#${vanilla_character_arr.join("#")}#%`);
 };
