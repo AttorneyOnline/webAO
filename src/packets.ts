@@ -36,7 +36,7 @@ import { PE, sendPE } from "./packets/PE";
 import { PN, receivePN } from "./packets/PN";
 import { PR, receivePR } from "./packets/PR";
 import { PU, receivePU } from "./packets/PU";
-import { PV, receivePV } from "./packets/PV";
+import { receivePV } from "./packets/PV";
 import { RC, receiveRC } from "./packets/RC";
 import { RD, receiveRD } from "./packets/RD";
 import { RM, receiveRM } from "./packets/RM";
@@ -422,7 +422,6 @@ const clientPackets: Record<string, PacketBinding<any>> = {
   PN: { codec: PN, receive: receivePN },
   PR: { codec: PR, receive: receivePR },
   PU: { codec: PU, receive: receivePU },
-  PV: { codec: PV, receive: receivePV },
   RC: { codec: RC, receive: receiveRC },
   RD: { codec: RD, receive: receiveRD },
   RM: { codec: RM, receive: receiveRM },
@@ -486,6 +485,7 @@ export const clientReceive = new Map<string, ReceiveFn>([
   ["BB", receiveBB],
   ["DONE", receiveDONE],
   ["MC", receiveMC],
+  ["PV", receivePV],
 ]);
 
 export const clientSend = new Map<string, SendFn>([

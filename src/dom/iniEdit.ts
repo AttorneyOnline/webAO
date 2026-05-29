@@ -1,6 +1,6 @@
 import { client } from "../client";
+import { changeChar } from "../client/changeChar";
 import { handleCharacterInfo } from "../client/handleCharacterInfo";
-import { receivePV } from "../packets/PV";
 
 /**
  * Triggered by the ini button.
@@ -16,5 +16,5 @@ export async function iniedit() {
     iniselect.selectedIndex === 0 ? ininame.value : iniselect.value;
 
   await handleCharacterInfo(newname.split("&"), inicharID);
-  receivePV({ player_id: 0, char_id: inicharID });
+  await changeChar(inicharID);
 }

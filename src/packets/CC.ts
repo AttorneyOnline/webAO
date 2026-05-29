@@ -1,6 +1,7 @@
 import { Packet } from "../Packet";
 import { client, json_mode } from "../client";
 import { decode, encode, lit, req, Wire } from "../packets";
+import { PVPacket } from "./PV";
 
 /**
  * Choose character. Client requests to play as char_id; server acks
@@ -27,5 +28,5 @@ export function sendCC(packet: Partial<Wire<CCPacketServer>>) {
 // Receive character choice from client; ack with PV.
 export function receiveCC(body: string) {
   const packet = decode(CCPacketServer, body);
-  client.sendToSelf(`PV#1#CID#${packet.char_id}#%`);
+  client.sendToSelf(encode(PVPacket, { player_id: 1, char_id: packet.char_id }));
 }
