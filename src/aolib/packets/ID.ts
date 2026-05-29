@@ -1,7 +1,7 @@
 /**
  * ID — identity packet. Bidirectional with asymmetric shapes:
  *
- *   Server -> client (ID): `ID#<player_number>#<software>#<version>#%`.
+ *   Server -> client (ID): `ID#<player_id>#<software>#<version>#%`.
  *     Server identifies itself in response to HI and assigns the
  *     client its player slot id (NOT a population count — that's PN).
  *
@@ -18,7 +18,7 @@ import { str, num } from "../fields";
 
 /** Server -> client: the server identifies itself and assigns a slot. */
 export const ID = packet("ID", {
-  player_number: num(),
+  player_id: num(),
   software: str(),
   version: str(),
 });

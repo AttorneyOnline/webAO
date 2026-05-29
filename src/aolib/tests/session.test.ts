@@ -126,7 +126,7 @@ describe("client(): send (S2C)", () => {
   it("send.ID encodes a multi-field schema", () => {
     const { out, config } = makeBuf();
     client(config).send.ID({
-      player_number: 5,
+      player_id: 5,
       software: "LemmyAO",
       version: "1.0",
     });
