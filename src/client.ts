@@ -30,30 +30,30 @@ export { autoChar, autoArea };
 document.title = serverName;
 
 export let CHATBOX: string;
-export const setCHATBOX = (val: string) => {
+export function setCHATBOX(val: string) {
   CHATBOX = val;
-};
+}
 export let client: Client;
-export const setClient = (val: Client) => {
+export function setClient(val: Client) {
   client = val;
-};
+}
 
 export const UPDATE_INTERVAL = 60;
 
 // presettings
 export let selectedMenu = 1;
-export const setSelectedMenu = (val: number) => {
+export function setSelectedMenu(val: number) {
   selectedMenu = val;
-};
+}
 import { ShoutModifier } from "./aolib";
 export let selectedShout: ShoutModifier = ShoutModifier.NONE;
-export const setSelectedShout = (val: ShoutModifier) => {
+export function setSelectedShout(val: ShoutModifier) {
   selectedShout = val;
-};
+}
 export let extrafeatures: string[] = [];
-export const setExtraFeatures = (val: any) => {
+export function setExtraFeatures(val: any) {
   extrafeatures = val;
-};
+}
 
 
 let hdid: string;
@@ -97,7 +97,9 @@ fpPromise
     installVoiceUI();
   });
 
-export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+export function delay(ms: number) {
+  return new Promise((res) => setTimeout(res, ms));
+}
 
 export enum clientState {
   NotConnected,
@@ -110,9 +112,9 @@ export enum clientState {
 }
 
 export let lastICMessageTime = new Date(0);
-export const setLastICMessageTime = (val: Date) => {
+export function setLastICMessageTime(val: Date) {
   lastICMessageTime = val;
-};
+}
 
 class Client extends EventEmitter {
   /**
