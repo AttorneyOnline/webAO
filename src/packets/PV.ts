@@ -17,7 +17,7 @@ export class PVPacket extends Packet {
 }
 
 // Apply the server's character assignment.
-export async function receivePV(body: string) {
+export function receivePV(body: string) {
   const packet = decode(PVPacket, body);
-  await changeChar(packet.char_id);
+  changeChar(packet.char_id);
 }
