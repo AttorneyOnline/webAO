@@ -58,7 +58,7 @@ export function setupCharacterBasic(chargs: string[], charid: number) {
  * Fetches and parses char.ini for a character if not already loaded.
  * Replaces default values in client.chars[charid] with actual ini values.
  */
-export const ensureCharIni = async (charid: number): Promise<any> => {
+export async function ensureCharIni(charid: number): Promise<any> {
   const char = client.chars[charid];
   if (!char) return {};
   if (char.inifile) return char.inifile;
@@ -113,7 +113,7 @@ export const ensureCharIni = async (charid: number): Promise<any> => {
   }
 
   return cini;
-};
+}
 
 /**
  * Full character info load (used by iniEdit and receiveMS ini-edit path).

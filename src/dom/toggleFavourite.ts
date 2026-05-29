@@ -2,7 +2,7 @@ import { AO_HOST } from "../client/aoHost";
 
 const getFavKey = () => `favourites_${AO_HOST}`;
 
-export const getFavourites = (): Set<number> => {
+export function getFavourites(): Set<number> {
   try {
     const raw = localStorage.getItem(getFavKey());
     if (raw) return new Set(JSON.parse(raw) as number[]);
@@ -10,11 +10,11 @@ export const getFavourites = (): Set<number> => {
     // ignore parse errors
   }
   return new Set();
-};
+}
 
-const saveFavourites = (favs: Set<number>) => {
+function saveFavourites(favs: Set<number>) {
   localStorage.setItem(getFavKey(), JSON.stringify([...favs]));
-};
+}
 
 /**
  * Re-orders the character grid so that favourited characters appear first.

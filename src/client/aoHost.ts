@@ -2,7 +2,7 @@ import queryParser from "../utils/queryParser";
 
 const { asset } = queryParser();
 export let AO_HOST = asset;
-export const setAOhost = (val: string): string => {
+export function setAOhost(val: string): string {
   const currentProtocol = window.location.protocol;
   const assetProtocol = val.split(":")[0] + ":";
 
@@ -20,7 +20,7 @@ export const setAOhost = (val: string): string => {
   }
   console.log("Asset URL ist now " + AO_HOST);
   return AO_HOST;
-};
+}
 
 import { renderPlayerList } from "../dom/renderPlayerList";
 import type * as aolib from "../aolib";

@@ -40,8 +40,8 @@ export async function requestBuffer(url: string): Promise<ArrayBuffer> {
  * Make a GET request for a specific URI.
  * @throws {Error} if status code is not 2xx, or a network error occurs
  */
-export const request = async (url: string): Promise<string> =>
-  new Promise((resolve, reject) => {
+export async function request(url: string): Promise<string> {
+  return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.responseType = "text";
     xhr.addEventListener("error", () => {
@@ -68,4 +68,5 @@ export const request = async (url: string): Promise<string> =>
     xhr.open("GET", url, true);
     xhr.send();
   });
+}
 export default request;
