@@ -139,7 +139,8 @@ aolib/
 ├── index.ts                   ← public exports: bind, receive, on, send, types
 ├── transport.ts               ← bind() + receive() framing + dispatch
 ├── schema.ts                  ← packet() — builds a schema from fields
-├── fields.ts                  ← str, num, bool, opt, lit, blob, custom
+├── fields.ts                  ← str, num, bool, opt, lit, nested, array, custom
+├── json.ts                    ← library-side JSON walker (fromJson / toJson)
 ├── encode.ts                  ← fanta + JSON encode dispatch
 ├── decode.ts                  ← fanta + JSON decode + auto-detect
 ├── types.ts                   ← In<S> / Out<S> type derivation
@@ -198,11 +199,13 @@ export type CCPacket = Out<typeof CC>;
 ```
 
 ```ts
-// packets/EI.ts — `name&description&type&image` packed into one
-// positional slot in fanta, real nested object in JSON.
+// packets/EI.ts — `name&description&type&image` is a nested object
+// at the type level. In fanta it's packed into one positional slot
+// with `&`; in JSON it's a real nested object. The caller never sees
+// the wire-format difference.
 export const EI = packet("EI", {
   id: num(),
-  body: blob({
+  body: nested({
     name: str(),
     description: str(),
     type: str(),
@@ -215,6 +218,24 @@ encode(EI, { id: 1, body: { name: "Pistol", description: "...", type: "weapon", 
 
 encode(EI, { ... }, "json");
 // → '{"$header":"EI","id":1,"body":{"name":"Pistol","description":"...","type":"weapon","image":"pistol.png"}}'
+```
+
+```ts
+// packets/SM.ts — variable-length list. In fanta, an array consumes
+// all remaining positional slots (greedy); in JSON, it's a native array.
+export const SM = packet("SM", {
+  music_list: array(str()),
+});
+
+// fanta: SM#track1#track2#track3#%
+// JSON:  {"$header":"SM","music_list":["track1","track2","track3"]}
+
+// Arrays of nested objects work the same:
+export const VS_PEERS = packet("VS_PEERS", {
+  peers: array(nested({ uid: num(), name: str() })),
+});
+// fanta: VS_PEERS#1&Alice#2&Bob#%
+// JSON:  {"$header":"VS_PEERS","peers":[{"uid":1,"name":"Alice"},{"uid":2,"name":"Bob"}]}
 ```
 
 For genuinely one-off weirdness, fall back to `custom(...)` at the

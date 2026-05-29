@@ -21,15 +21,25 @@ export {
   bool,
   opt,
   lit,
-  blob,
+  nested,
+  array,
   custom,
   type Field,
   type FieldKind,
+  type ScalarField,
   type OptionalField,
   type LiteralField,
-  type BlobField,
-  type BlobValue,
+  type NestedField,
+  type NestedValue,
+  type ArrayField,
+  type CustomField,
 } from "./fields";
+
+// ---------------------------------------------------------------------
+// JSON walker (library-side).
+// ---------------------------------------------------------------------
+
+export { fromJson, toJson } from "./json";
 
 // ---------------------------------------------------------------------
 // Schema builder.
