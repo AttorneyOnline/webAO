@@ -26,6 +26,15 @@ export function onClientIdentify(_packet: aolib.HIPacket) {
   );
 }
 
+/**
+ * ID: the client's reply to our synthesised server-ID. Real servers
+ * follow this with PN; here we synthesise an empty one so the client
+ * advances to askchaa.
+ */
+export function onClientIdentified(_packet: aolib.IDRequestPacket) {
+  client.server.receive("PN#0#1#%");
+}
+
 /** askchaa: respond with the vanilla SI counts. */
 export function onAreaCharRequest(_packet: aolib.askchaaPacket) {
   client.server.receive(`SI#${vanilla_character_arr.length}#0#0#%`);

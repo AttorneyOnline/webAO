@@ -24,24 +24,16 @@ export function applyEncryptionMode() {
 }
 
 /**
- * ID: server identity packet. Some legacy servers (serverD) pack
- * `software` and `version` together separated by `&`; we tolerate that
- * quirk here rather than in the schema.
- *
- * webAO doesn't push a PN, so we synthesise an empty one locally to
- * keep the UI happy. Every other server (akashi, tsuserver, KFO, ...)
- * gates the rest of the handshake on receiving our own ID reply — if
- * we don't send one back, the server just sits there after its ID
- * and the join stalls.
+ * ID: server identity packet. We always reply with our own ID so the
+ * server can continue the handshake (akashi / tsuserver / KFO all
+ * gate the rest of the flow on receiving this). In replay mode the
+ * outbound ID loops back to `clientSession.on.ID` (see
+ * `onClientIdentified` in `./replay.ts`), which synthesises the
+ * server's next packet (PN) so the UI keeps moving.
  */
 export function applyServerIdentity(packet: aolib.IDPacket) {
   client.playerID = packet.player_id;
-  const serverSoftware = packet.software.split("&")[0];
-  if (serverSoftware === "webAO") {
-    client.server.receive("PN#0#1#%");
-  } else {
-    client.server.send.ID({ software: "webAO", version });
-  }
+  client.server.send.ID({ software: "webAO", version });
 }
 
 /** PN: server population. Triggers the character list request. */

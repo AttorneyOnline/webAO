@@ -119,6 +119,7 @@ import {
   onAreaCharRequest,
   onCharacterChoose,
   onCharacterListRequest,
+  onClientIdentified,
   onClientIdentify,
   onMusicListRequest,
   onReady,
@@ -182,6 +183,7 @@ export function registerProtocol(
   clientSession.on.CC(onCharacterChoose);
   clientSession.on.CH(() => {});              // client keepalive — no body
   clientSession.on.HI(onClientIdentify);
+  clientSession.on.ID(onClientIdentified);
   clientSession.on.RC(onCharacterListRequest);
   clientSession.on.RD(onReady);
   clientSession.on.RM(onMusicListRequest);
