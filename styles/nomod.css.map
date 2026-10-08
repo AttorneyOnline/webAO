@@ -1,0 +1,1 @@
+{"version":3,"file":"styles/nomod.css","sources":["webpack://webao/styles/nomod.css"],"sourcesContent":["table#client_playerlist td:nth-child(5),\ntd:nth-child(6) {\n  display: none;\n}\n"],"names":[],"mappings":"AAAA","sourceRoot":""}

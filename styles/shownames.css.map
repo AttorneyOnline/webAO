@@ -1,0 +1,1 @@
+{"version":3,"file":"styles/shownames.css","sources":["webpack://webao/styles/shownames.css"],"sourcesContent":[".iclog_nameplate {\n  display: none;\n}\n\n.iclog_showname {\n  display: inline;\n}\n"],"names":[],"mappings":"AAAA,8BAIA","sourceRoot":""}

@@ -1,4 +1,2 @@
-table#client_playerlist td:nth-child(5),
-td:nth-child(6) {
-  display: inherit;
-}
+table#client_playerlist td:nth-child(5),td:nth-child(6){display:inherit}
+/*# sourceMappingURL=mod.css.map*/
