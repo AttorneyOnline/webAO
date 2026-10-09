@@ -35,6 +35,7 @@ declare global {
     imgError: (image: any) => void;
     charError: (image: any) => void;
     changeCharacter: (_event: any) => void;
+    cancelCharacterSelect: () => void;
     switchChatOffset: () => void;
     switchAspectRatio: () => void;
     switchPanTilt: (addcheck: number) => void;

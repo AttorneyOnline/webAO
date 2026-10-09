@@ -190,10 +190,26 @@
 }
 
 #client_charselect {
+  position: relative;
   display: block;
   text-align: center;
   margin: 0 auto;
   background: #444;
+}
+
+#charselect_close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  line-height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #333;
+  color: #fff;
+  border: 1px solid #000;
 }
 
 #client_icwrapper {
